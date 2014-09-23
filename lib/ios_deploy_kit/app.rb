@@ -23,6 +23,13 @@ module IosDeployKit
     end
 
 
+    def initialize(apple_id = nil)
+      if apple_id
+        self.apple_id = apple_id
+        self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
+        Helper.log.debug "Created app with ID #{apple_id} and app_identifier #{self.app_identifier}"
+      end
+    end
 
     def itc
       @itc ||= IosDeployKit::ItunesConnect.new
