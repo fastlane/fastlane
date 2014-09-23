@@ -80,6 +80,20 @@ module IosDeployKit
 
 
 
+    # Constructive/Destructive Methods
+    def create_new_version!(app, version_number)
+      open_app_page(app)
+
+      if page.has_content?BUTTON_STRING_NEW_VERSION
+        click_on BUTTON_STRING_NEW_VERSION
+
+        Helper.log.info "Creating a new version (#{version_number})"
+        
+        all(".fullWidth.nobottom.ng-isolate-scope.ng-pristine").last.set(version_number.to_s)
+        click_on "Create"
+      else
+        Helper.log.info "Creating a new version"
+      end
 
       true
     end
