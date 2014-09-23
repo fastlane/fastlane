@@ -1,7 +1,13 @@
+require 'logger'
+
 module IosDeployKit
   module Helper
-    def self.debug_log(str)
-      puts str
+
+    def self.log
+      @@log ||= Logger.new(STDOUT)
+
+      @@log
     end
+    
   end
 end
