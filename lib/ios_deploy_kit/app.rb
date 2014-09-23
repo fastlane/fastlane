@@ -25,11 +25,7 @@ module IosDeployKit
 
 
     def itc
-      unless @itc
-        @itc = IosDeployKit::ItunesConnect.new
-        @itc.login
-      end
-      @itc
+      @itc ||= IosDeployKit::ItunesConnect.new
     end
 
     def open_in_itunes_connect

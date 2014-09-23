@@ -19,6 +19,8 @@ module IosDeployKit
       super
       
       Capybara.default_driver = :poltergeist
+
+      self.login
     end
 
     def login(user = nil, password = nil)
