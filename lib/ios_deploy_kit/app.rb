@@ -32,12 +32,18 @@ module IosDeployKit
       itc.open_app_page(self)
     end
 
-    def create_new_version(version_number)
-      itc.create_new_version(self, version_number)
+    def get_app_status
+      itc.get_app_status(self)
     end
 
     def to_s
       "#{apple_id} - #{app_identifier}"
+    end
+
+    # Destructive/Constructive methods
+
+    def create_new_version!(version_number)
+      itc.create_new_version!(self, version_number)
     end
   end
 end

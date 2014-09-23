@@ -14,6 +14,9 @@ module IosDeployKit
 
     ITUNESCONNECT_URL = "https://itunesconnect.apple.com"
     APP_DETAILS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/[[app_id]]"
+
+    BUTTON_STRING_NEW_VERSION = "New Version"
+    BUTTON_STRING_SUBMIT_FOR_REVIEW = "Submit for Review"
     
     def initialize
       super
@@ -24,7 +27,7 @@ module IosDeployKit
     end
 
     def login(user = nil, password = nil)
-      Helper.debug_log "Logging into iTunesConnect"
+      Helper.log.info "Logging into iTunesConnect"
 
       host = "itunesconnect.apple.com"
 
@@ -35,18 +38,19 @@ module IosDeployKit
       fill_in "accountname", with: user
       fill_in "accountpassword", with: password
 
-      wait_for_elements(".enabled").first.click
+      begin
+        wait_for_elements(".enabled").first.click
+        wait_for_elements('.ng-scope.managedWidth')
+      rescue
+        raise "Error logging in user #{user} with the given password. Make sure you set them correctly"
+      end
 
-      wait_for_elements('.ng-scope.managedWidth')
-
-      page.save_screenshot "loggedIn.png"
-
-      Helper.debug_log "Successfully logged into iTunesConnect"
+      Helper.log.info "Successfully logged into iTunesConnect"
       true
     end
 
     def open_app_page(app)
-      Helper.debug_log "Opening detail page for app #{app}"
+      Helper.log.info "Opening detail page for app #{app}"
 
       visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
 
@@ -55,13 +59,27 @@ module IosDeployKit
       true
     end
 
-    def create_new_version(app, version_number)
-      # TODO: Check if there was already a new version created
-      
-      click_on "New Version"
+    def get_app_status(app)
+      open_app_page(app)
 
-      all(".fullWidth.nobottom.ng-isolate-scope.ng-pristine").last.set(version_number.to_s)
-      click_on "Create"
+      if page.has_content?"Waiting For Review"
+        # That's either Upload Received or Waiting for Review
+        if page.has_content?"To submit a new build, you must remove this version from review"
+          return App::AppStatus::WAITING_FOR_REVIEW
+        else
+          return App::AppStatus::UPLOAD_RECEIVED
+        end
+      elsif page.has_content?BUTTON_STRING_NEW_VERSION
+        return App::AppStatus::READY_FOR_SALE
+      elsif page.has_content?BUTTON_STRING_SUBMIT_FOR_REVIEW
+        return App::AppStatus::PREPARE_FOR_SUBMISSION
+      else
+        raise "App status not yet implemented"
+      end
+    end
+
+
+
 
       true
     end
@@ -74,15 +92,15 @@ module IosDeployKit
       counter = 0
       results = all(name)
       while results.count == 0      
-        Helper.debug_log "Waiting for #{name}"
+        Helper.log.debug "Waiting for #{name}"
         sleep 0.2
 
         results = all(name)
 
         counter += 1
         if counter > 100
-          Helper.debug_log page.html
-          puts caller
+          Helper.log.debug page.html
+          Helper.log.debug caller
           raise "Couldn't find element '#{name}' after waiting for quite some time"
         end
       end
