@@ -3,7 +3,7 @@ describe IosDeployKit do
     it "returns nil when it could not be found" do
       IosDeployKit::ItunesSearchApi.fetch("invalid").should eq(nil)
       IosDeployKit::ItunesSearchApi.fetch("").should eq(nil)
-      IosDeployKit::ItunesSearchApi.fetch(123).should eq(nil)
+      IosDeployKit::ItunesSearchApi.fetch(0).should eq(nil)
     end
 
     it "returns the actual object if it could be found" do
