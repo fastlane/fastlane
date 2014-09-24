@@ -3,6 +3,7 @@ PATH
   specs:
     ios_deploy_kit (0.0.1)
       capybara
+      highline
       poltergeist
       security
 
@@ -18,6 +19,7 @@ GEM
     cliver (0.3.2)
     coderay (1.1.0)
     diff-lcs (1.2.5)
+    highline (1.6.21)
     method_source (0.8.2)
     mime-types (2.3)
     mini_portile (0.6.0)
