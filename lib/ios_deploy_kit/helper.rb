@@ -4,9 +4,17 @@ module IosDeployKit
   module Helper
 
     def self.log
-      @@log ||= Logger.new(STDOUT)
+      if is_test?
+        @@log ||= Logger.new(STDOUT).tap { |l| l.level = Logger::FATAL }
+      else
+        @@log ||= Logger.new(STDOUT)
+      end
 
       @@log
+    end
+
+    def self.is_test?
+      defined?SpecHelper
     end
 
     def self.xcode_path
