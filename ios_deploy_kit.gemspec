@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "capybara"
   spec.add_dependency "poltergeist"
   spec.add_dependency "security" # Mac OS Keychain manager
-  spec.add_dependency "open-uri"
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
