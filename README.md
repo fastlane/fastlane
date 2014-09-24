@@ -1,6 +1,8 @@
 DeployKit for iOS apps
 ============
 
+[ ![Codeship Status for KrauseFx/ios_deploy_kit](https://codeship.io/projects/c9f92850-25fe-0132-5601-76bec1757a7f/status)](https://codeship.io/projects/37295)
+
 Updating your iOS app should not be painful and time consuming. Automate the whole process to start with Continuous Deployment.
 
 ## Installation
