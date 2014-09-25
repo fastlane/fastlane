@@ -2,7 +2,8 @@ require 'nokogiri'
 
 module IosDeployKit
   class AppMetadataError < StandardError 
-
+  end
+  class AppMetadataParameterError < StandardError 
   end
 
   class AppMetadata
@@ -32,7 +33,28 @@ module IosDeployKit
 
     # Update the app description which is shown in the AppStore
     def update_description(hash)
-      update_localized_value('description', hash)
+      update_localized_value('description', hash) do |field, new_val|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+
+        field.content = new_val
+      end
+    end
+
+    # Update the app keywords
+    def update_keywords(hash)
+      update_localized_value('keywords', hash) do |field, keywords|
+        raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it") unless keywords.kind_of?Array
+
+        field.children.remove # remove old keywords
+
+        node_set = Nokogiri::XML::NodeSet.new(@data)
+        keywords.each do |word|
+          keyword = Nokogiri::XML::Node.new('Keyword', @data)
+          node_set << keyword
+        end
+
+        field.children = node_set
+      end
     end
 
 
@@ -53,15 +75,18 @@ module IosDeployKit
       end
 
       def update_localized_value(xpath_name, new_value)
-        raise "Please pass a hash of languages to this method" unless new_value.kind_of?Hash
+        raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
+        raise AppMetadataParameterError.new("Please pass a block, which updates the resulting node") unless block_given?
 
         fetch_value("//x:locale").each do |locale|
           key = locale['name']
           if new_value[key]
-            description_field = locale.search(xpath_name).first
-            if description_field.content != new_value[key]
-              description_field.content = new_value[key]
-              Helper.log.debug "Updated #{xpath_name} for locale #{locale}"
+            field = locale.search(xpath_name).first
+            if field.content != new_value[key]
+              yield(field, new_value[key])
+              Helper.log.info "Updated #{xpath_name} for locale #{key}"
+            else
+              Helper.log.info "Did not update #{xpath_name} for locale #{locale}, since it hasn't changed"
             end
           else
             Helper.log.error "Could not find '#{xpath_name}' for #{key}. It was provided before. Not updating this value"
