@@ -4,6 +4,7 @@ PATH
     ios_deploy_kit (0.0.1)
       capybara
       highline
+      nokogiri
       poltergeist
       security
 
