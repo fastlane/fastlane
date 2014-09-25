@@ -25,21 +25,22 @@ describe IosDeployKit do
 
 
     describe "Accessing App Metadata", felix: true do
+      let (:apple_id) { 794902327 }
       before do
-        @app = IosDeployKit::App.new(794902327, 'net.sunapps.1')
+        @app = IosDeployKit::App.new(apple_id, 'net.sunapps.1')
       end
 
       describe "#set_metadata_directory" do
 
         it "throws an exception when updating the location after accessing metadata" do
-          @app.metadata
+          @app.metadata = IosDeployKit::AppMetadata.new(@app, "./spec/fixtures/example1.itmsp/", false)
           expect {
             @app.set_metadata_directory("something")
           }.to raise_error("Can not change metadata directory after accessing metadata of an app")
         end
 
-        it "let's the user modify the download directory" do
-          @app.get_metadata_directory.should eq('./')
+        it "let's the user modify the download directory", broken: true do
+          @app.get_metadata_directory.should eq("./#{apple_id}.itmsp/")
 
           alternative = '/tmp/something'
           @app.set_metadata_directory(alternative)
