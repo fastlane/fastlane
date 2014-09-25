@@ -49,7 +49,8 @@ module IosDeployKit
 
         node_set = Nokogiri::XML::NodeSet.new(@data)
         keywords.each do |word|
-          keyword = Nokogiri::XML::Node.new('Keyword', @data)
+          keyword = Nokogiri::XML::Node.new('keyword', @data)
+          keyword.content = word
           node_set << keyword
         end
 
