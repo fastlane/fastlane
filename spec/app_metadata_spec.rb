@@ -3,7 +3,7 @@ describe IosDeployKit do
     let (:apple_id) { 794902327 }
     let (:app_identifier) { 'net.sunapps.1' }
 
-    describe "#update_description" do
+    describe "#update_description", felix: true do
       before do
         @app = IosDeployKit::App.new(apple_id, app_identifier)
       end

@@ -4,7 +4,7 @@ describe IosDeployKit do
       @app = IosDeployKit::App.new(284882215, 'com.facebook.Facebook')
     end
 
-    describe "#download" do
+    describe "#download", felix: true do
       it "throws an exception when invalid parameter is given" do
         expect {
           IosDeployKit::ItunesTransporter.new.download(123)
