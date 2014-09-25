@@ -58,6 +58,11 @@ module IosDeployKit
       end
     end
 
+    # Usage: '//x:keyword'
+    def fetch_value(xpath)
+      @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
+    end
+
 
     #####################################################
     # Uploading the updated metadata
@@ -69,11 +74,6 @@ module IosDeployKit
     end
 
     private
-
-      # Usage: '//x:keyword'
-      def fetch_value(xpath)
-        @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
-      end
 
       def update_localized_value(xpath_name, new_value)
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
