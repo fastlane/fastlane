@@ -14,11 +14,22 @@ module IosDeployKit
       @password = (password || PasswordManager.new.password)
     end
 
-    def download(app)
+    def download(app, dir = nil)
       raise "No valid IosDeployKit::App given" unless app.kind_of?IosDeployKit::App
 
-      command = build_download_command(@user, @password, app.apple_id)
-      Helper.log.debug command
+      dir ||= app.get_metadata_directory
+      command = build_download_command(@user, @password, app.apple_id, dir)
+
+      self.execute_transporter(command)
+    end
+
+    def upload(app, dir)
+      raise "No valid IosDeployKit::App given" unless app.kind_of?IosDeployKit::App
+
+      dir ||= app.get_metadata_directory
+      dir += "/#{app.apple_id}.itmsp"
+      
+      command = build_upload_command(@user, @password, app.apple_id, dir)
 
       self.execute_transporter(command)
     end
@@ -49,7 +60,11 @@ module IosDeployKit
         errors << ex.to_s
       end
 
-      raise errors.join("\n") if errors.count > 0
+      if errors.count > 0
+        Helper.log.debug(caller)
+        raise errors.join("\n") 
+      end
+
       true
     end
 
@@ -59,10 +74,24 @@ module IosDeployKit
           Helper.transporter_path,
           "-m lookupMetadata",
           "-u \"#{username}\"",
-          "-p '#{password.gsub('$', '\\$')}'",
+          "-p '#{escaped_password(password)}'",
           "-apple_id #{apple_id}",
           "-destination '#{destination}'"
         ].join(' ')
+      end
+
+      def build_upload_command(username, password, apple_id, source = "/tmp")
+        [
+          Helper.transporter_path,
+          "-m upload",
+          "-u \"#{username}\"",
+          "-p '#{escaped_password(password)}'",
+          "-f '#{source}'"
+        ].join(' ')
+      end
+
+      def escaped_password(password)
+        password.gsub('$', '\\$')
       end
 
   end
