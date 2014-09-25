@@ -31,11 +31,42 @@ module IosDeployKit
     # Updating metadata information
     #####################################################
 
+    # Update the app title
+    def update_title(hash)
+      update_localized_value('title', hash) do |field, new_val|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+        field.content = new_val
+      end
+    end
+
     # Update the app description which is shown in the AppStore
     def update_description(hash)
       update_localized_value('description', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+        field.content = new_val
+      end
+    end
 
+    # Set the changelog
+    def update_changelog(hash)
+      update_localized_value('version_whats_new', hash) do |field, new_val|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+        field.content = new_val
+      end
+    end
+
+    # Update the Marketing URL
+    def update_marketing_url(hash)
+      update_localized_value('software_url', hash) do |field, new_val|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+        field.content = new_val
+      end
+    end
+
+    # Update the support URL
+    def update_support_url(hash)
+      update_localized_value('support_url', hash) do |field, new_val|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
         field.content = new_val
       end
     end
