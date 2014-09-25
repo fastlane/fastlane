@@ -15,15 +15,20 @@ module IosDeployKit
       @transporter ||= ItunesTransporter.new
     end
 
-    def initialize(app, dir)
+    def initialize(app, dir, redownload_package = true)
       self.metadata_dir = dir
       @app = app
 
-      # we want to update the metadata, so first we have to download the existing one
-      transporter.download(app, dir)
+      if redownload_package
+        # we want to update the metadata, so first we have to download the existing one
+        transporter.download(app, dir)
 
-      # Parse the downloaded package
-      parse_package(dir)
+        # Parse the downloaded package
+        parse_package(dir)
+      else
+        # use_data contains the data to be used. This is the case for unit tests
+        parse_package(dir)
+      end
     end
 
 
@@ -127,8 +132,8 @@ module IosDeployKit
       end
 
       # Parses the metadata using nokogiri
-      def parse_package(path)        
-        @data ||= Nokogiri::XML(File.read("#{path}/#{@app.apple_id}.itmsp/metadata.xml"))
+      def parse_package(path)
+        @data ||= Nokogiri::XML(File.read("#{path}/metadata.xml"))
         verify_package
         clean_package
       end
