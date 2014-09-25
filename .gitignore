@@ -35,5 +35,5 @@ build/
 
 
 # Added by Felix
-*.itmsp
+/*.itmsp
 .idea

@@ -59,7 +59,7 @@ module IosDeployKit
     end
 
     def get_metadata_directory
-      metadata_dir || './'
+      metadata_dir || "./#{self.apple_id}.itmsp/"
     end
 
     def metadata
