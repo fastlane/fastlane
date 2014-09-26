@@ -102,5 +102,13 @@ describe IosDeployKit do
         result[2].content.should eq(tags[2])
       end
     end
+
+    describe "#clear_all_screenshots", now: true do
+      it "clears all the screenshots of the given language" do
+        @app.metadata.fetch_value("//x:software_screenshot").count.should eq(8)
+        @app.metadata.clear_all_screenshots("de-DE")
+        @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
+      end
+    end
   end
 end

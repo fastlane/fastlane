@@ -94,6 +94,13 @@ module IosDeployKit
       end
     end
 
+    # Removes all currently enabled screenshots for the given language
+    def clear_all_screenshots(language)
+      update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
+        field.children.remove # remove all the screenshots
+      end
+    end
+
     # Usage: '//x:keyword'
     def fetch_value(xpath)
       @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
@@ -120,7 +127,7 @@ module IosDeployKit
           if new_value[key]
             field = locale.search(xpath_name).first
             if field.content != new_value[key]
-              yield(field, new_value[key])
+              yield(field, new_value[key], key)
               Helper.log.info "Updated #{xpath_name} for locale #{key}"
             else
               Helper.log.info "Did not update #{xpath_name} for locale #{locale}, since it hasn't changed"
