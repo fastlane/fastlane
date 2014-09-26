@@ -94,12 +94,65 @@ module IosDeployKit
       end
     end
 
+    #####################################################
+    # Screenshot related
+    #####################################################
+
     # Removes all currently enabled screenshots for the given language
     def clear_all_screenshots(language)
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
       end
     end
+
+    # Appends another screenshot to the already existing ones
+    # This will raise an exception, when there are already 5 screenshots
+    def add_screenshot(language, app_screenshot)
+      
+      # Fetch the 'software_screenshots' node (array) for the specific locale
+      locales = self.fetch_value("//x:locale[@name='#{language}']")
+      raise AppMetadataError.new("Could not find locale entry for #{locale}") unless locales.count == 1
+
+      screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
+      
+      next_index = screenshots.children.count + 1
+
+      # Ready for storing the screenshot into the metadata.xml now
+      screenshots << app_screenshot.create_xml_node(@data, next_index)
+    end
+
+    # Using this method will clear all screenshots and set the new ones
+    # Pass the hash like this:
+    # {
+    #   'de-DE' => [
+    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_35),
+    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_40),
+    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_IPAD)
+    #   ]
+    # }
+    # This method uses clear_all_screenshots and add_screenshot under the hood
+    def set_all_screenshots(hash)
+      error_text = "Please pass a hash, containing an array of AppScreenshot objects"
+      raise AppMetadataParameterError.new(error_text) unless hash.kind_of?Hash
+
+      hash.each do |key, value|
+        if key.kind_of?String and value.kind_of?Array and value.count > 0 and value.first.kind_of?AppScreenshot
+          
+          self.clear_all_screenshots(key)
+
+          value.each do |screen|
+            add_screenshot(key, screen)
+          end
+        else
+          raise AppMetadataParameterError.new(error_text)
+        end
+      end
+    end
+
+
+    #####################################################
+    # Manually fetching elements from the metadata.xml
+    #####################################################
 
     # Usage: '//x:keyword'
     def fetch_value(xpath)
@@ -122,15 +175,17 @@ module IosDeployKit
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
         raise AppMetadataParameterError.new("Please pass a block, which updates the resulting node") unless block_given?
 
+        # Run through all the locales given in the metadata.xml
         fetch_value("//x:locale").each do |locale|
           key = locale['name']
           if new_value[key]
+            # now search for the given key inside this locale
             field = locale.search(xpath_name).first
             if field.content != new_value[key]
               yield(field, new_value[key], key)
               Helper.log.info "Updated #{xpath_name} for locale #{key}"
             else
-              Helper.log.info "Did not update #{xpath_name} for locale #{locale}, since it hasn't changed"
+              Helper.log.info "Did not update #{xpath_name} for locale #{locale}, since it has not changed"
             end
           else
             Helper.log.error "Could not find '#{xpath_name}' for #{key}. It was provided before. Not updating this value"

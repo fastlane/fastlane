@@ -110,5 +110,40 @@ describe IosDeployKit do
         @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
       end
     end
+
+    describe "#set_all_screenshots", now: true do
+      let (:error_message) { "Please pass a hash, containing an array of AppScreenshot objects" }
+      it "raises an error when not passing a hash" do
+        expect {
+          @app.metadata.set_all_screenshots([])
+        }.to raise_error(error_message)
+      end
+
+      it "raises an error when passing empty arrays" do
+        expect {
+          @app.metadata.set_all_screenshots({ 'de-DE' => [] })
+        }.to raise_error(error_message)
+      end
+
+      it "raises an error when not using AppScreenshot objects" do
+        expect {
+          @app.metadata.set_all_screenshots({ 'de-DE' => ["./screenshot.png"] })
+        }.to raise_error(error_message)
+      end
+
+      it "properly updates the metadat information when providing correct inputs" do
+        path = './spec/fixtures/screenshot1.png'
+
+        @app.metadata.fetch_value("//x:software_screenshot").count.should eq(8)
+        @app.metadata.set_all_screenshots({
+          'de-DE' => [
+            IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35)
+          ]
+        })
+        results = @app.metadata.fetch_value("//x:software_screenshot")
+        results.count.should eq(1)
+        results.first['position'].should eq('1')
+      end
+    end
   end
 end
