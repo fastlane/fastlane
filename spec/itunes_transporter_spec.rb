@@ -1,5 +1,5 @@
 describe IosDeployKit do
-  describe IosDeployKit::ItunesTransporter, new: true do
+  describe IosDeployKit::ItunesTransporter do
     before do
       @app = IosDeployKit::App.new(284882215, 'com.facebook.Facebook')
     end
