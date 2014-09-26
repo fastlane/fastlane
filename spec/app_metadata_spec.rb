@@ -24,6 +24,13 @@ describe IosDeployKit do
 
         @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
       end
+
+      it "supports the & symbol properly" do
+        new_title = "something & something else"
+        @app.metadata.update_title({ 'de-DE' => new_title })
+
+        @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
+      end
     end
 
     describe "#update_description" do
