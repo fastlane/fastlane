@@ -5,13 +5,14 @@ module IosDeployKit
     # This class represents a file, included in the metadata.xml
     # It takes care of calculating the file size and md5 value
 
-    attr_accessor :path
+    attr_accessor :path, :custom_node_name
 
 
-    def initialize(path)
+    def initialize(path, custom_node_name = nil)
       raise "File not found at path '#{path}'" unless File.exists?path
 
       self.path = path
+      self.custom_node_name = custom_node_name
     end
 
     # This method is called when storing this item into the metadata.xml file
@@ -26,7 +27,7 @@ module IosDeployKit
 
       # Take a look at the subclass AppScreenshot for screenshot specific code
 
-      screenshot = Nokogiri::XML::Node.new('software_screenshot', doc)
+      screenshot = Nokogiri::XML::Node.new(self.name_for_xml_node, doc)
 
       node_set = Nokogiri::XML::NodeSet.new(doc)
       
@@ -49,6 +50,10 @@ module IosDeployKit
 
       screenshot.children = node_set
       return screenshot
+    end
+
+    def name_for_xml_node
+      custom_node_name || 'data_file'
     end
   end
 end

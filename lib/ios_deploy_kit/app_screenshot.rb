@@ -32,5 +32,9 @@ module IosDeployKit
 
       return node
     end
+
+    def name_for_xml_node
+      'software_screenshot'
+    end
   end
 end
