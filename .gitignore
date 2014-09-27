@@ -37,3 +37,4 @@ build/
 # Added by Felix
 /*.itmsp
 .idea
+spec/fixtures/*.itmsp/*.png
