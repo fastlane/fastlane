@@ -175,21 +175,20 @@ module IosDeployKit
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
         raise AppMetadataParameterError.new("Please pass a block, which updates the resulting node") unless block_given?
 
-        # Run through all the locales given in the metadata.xml
-        fetch_value("//x:locale").each do |locale|
-          key = locale['name']
-          if new_value[key]
-            # now search for the given key inside this locale
-            field = locale.search(xpath_name).first
-            if field.content != new_value[key]
-              yield(field, new_value[key], key)
-              Helper.log.info "Updated #{xpath_name} for locale #{key}"
-            else
-              Helper.log.info "Did not update #{xpath_name} for locale #{locale}, since it has not changed"
-            end
-          else
-            Helper.log.error "Could not find '#{xpath_name}' for #{key}. It was provided before. Not updating this value"
+        # Run through all the locales given by the 'user'
+        new_value.each do |language, value|
+          locale = fetch_value("//x:locale[@name='#{language}']").first
+
+          field = locale.search(xpath_name).first
+
+          if not field
+            # This entry does not exist yet, so we have to create it
+            field = Nokogiri::XML::Node.new(xpath_name, @data)
+            locale << field
           end
+
+          yield(field, value, language)
+          Helper.log.info "Updated #{xpath_name} for locale #{language}"
         end
       end
 
