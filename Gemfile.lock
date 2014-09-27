@@ -2,12 +2,12 @@ PATH
   remote: .
   specs:
     ios_deploy_kit (0.0.1)
-      capybara
-      fastimage
-      highline
-      nokogiri
-      poltergeist
-      security
+      capybara (~> 2.4.3)
+      fastimage (~> 1.6.3)
+      highline (~> 1.6.21)
+      nokogiri (~> 1.6.3.1)
+      poltergeist (~> 1.5.1)
+      security (~> 0.1.3)
 
 GEM
   remote: https://rubygems.org/

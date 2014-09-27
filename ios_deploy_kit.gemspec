@@ -20,11 +20,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "capybara"
-  spec.add_dependency "poltergeist"
-  spec.add_dependency "security" # Mac OS Keychain manager
-  spec.add_dependency 'highline'
-  spec.add_dependency 'nokogiri'
+  spec.add_dependency 'capybara', '~> 2.4.3'
+  spec.add_dependency 'poltergeist', '~> 1.5.1'
+  spec.add_dependency 'security', '~> 0.1.3' # Mac OS Keychain manager
+  spec.add_dependency 'highline', '~> 1.6.21'
+  spec.add_dependency 'nokogiri', '~> 1.6.3.1'
   spec.add_dependency 'fastimage', '~> 1.6.3'
 
   spec.add_development_dependency "bundler", "~> 1.6"
