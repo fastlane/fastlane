@@ -167,6 +167,9 @@ module IosDeployKit
 
     # Actually upload the updated metadata to Apple
     def upload!
+      # First: Write the current XML state to disk
+      File.write(@metadata_path, @data.to_xml)
+
       transporter.upload(@app, @app.get_metadata_directory)
     end
 
