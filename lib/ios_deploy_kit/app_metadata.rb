@@ -117,18 +117,30 @@ module IosDeployKit
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
       
-      if not screenshots
+      if not screenshots or screenshots.children.count == 0
+        screenshots.remove if screenshots
+
         # First screenshot ever
         screenshots = Nokogiri::XML::Node.new('software_screenshots', @data)
         locales.first << screenshots
+
+        node_set = Nokogiri::XML::NodeSet.new(@data)
+        node_set << app_screenshot.create_xml_node(@data, 1)
+        screenshots.children = node_set
+      else
+        # There is already at least one screenshot
+        next_index = 1
+        screenshots.children.each do |screen|
+          if screen['display_target'] == app_screenshot.screen_size
+            next_index += 1
+          end
+        end
+
+        # Ready for storing the screenshot into the metadata.xml now
+        screenshots.children.after(app_screenshot.create_xml_node(@data, next_index))
+
+        app_screenshot.store_file_inside_package(@package_path)
       end
-
-      next_index = screenshots.children.count + 1
-
-      # Ready for storing the screenshot into the metadata.xml now
-      screenshots << app_screenshot.create_xml_node(@data, next_index)
-
-      app_screenshot.store_file_inside_package(@package_path)
     end
 
     # Using this method will clear all screenshots and set the new ones
