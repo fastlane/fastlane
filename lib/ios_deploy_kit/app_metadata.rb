@@ -104,6 +104,7 @@ module IosDeployKit
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
       end
+      true
     end
 
     # Appends another screenshot to the already existing ones
@@ -116,6 +117,12 @@ module IosDeployKit
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
       
+      if not screenshots
+        # First screenshot ever
+        screenshots = Nokogiri::XML::Node.new('software_screenshots', @data)
+        locales.first << screenshots
+      end
+
       next_index = screenshots.children.count + 1
 
       # Ready for storing the screenshot into the metadata.xml now

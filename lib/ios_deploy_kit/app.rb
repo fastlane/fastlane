@@ -32,7 +32,6 @@ module IosDeployKit
       if apple_id and not app_identifier
         # Fetch the app identifier based on the given Apple ID
         self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
-        Helper.log.debug "Created app with ID #{apple_id} and app_identifier #{self.app_identifier}"
       end
     end
 
