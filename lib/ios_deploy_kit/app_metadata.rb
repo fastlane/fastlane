@@ -113,7 +113,7 @@ module IosDeployKit
       
       # Fetch the 'software_screenshots' node (array) for the specific locale
       locales = self.fetch_value("//x:locale[@name='#{language}']")
-      raise AppMetadataError.new("Could not find locale entry for #{locale}") unless locales.count == 1
+      raise AppMetadataError.new("Could not find locale entry for #{language}") unless locales.count == 1
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
       
@@ -204,6 +204,8 @@ module IosDeployKit
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
+          raise "Locale #{language} not found" unless locale
+
           field = locale.search(xpath_name).first
 
           if not field
@@ -243,16 +245,13 @@ module IosDeployKit
       # Cleans up the package of stuff we do not want to modify/upload
       def clean_package
 
-
         # Remove the live version (if it exists)
         versions = fetch_value("//x:version")
         while versions.count > 1
           versions.last.remove
           versions = fetch_value("//x:version")
         end
-        Helper.log.info "Modifying version '#{versions.first.attr('string')}' of app #{@app.app_identifier}"
-
-
+        Helper.log.info "Modifying version '#{versions.first['string']}' of app #{@app.app_identifier}"
       end
   end
 end

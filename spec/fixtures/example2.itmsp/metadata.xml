@@ -15,6 +15,7 @@
             <versions>
                 <version string="0.9.10">
                     <locales>
+                        <locale name="en-US"></locale>
                         <locale name="de-DE">
                             <title>Example App Title</title>
                             <software_url>http://sunapps.net</software_url>
