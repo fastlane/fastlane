@@ -164,23 +164,24 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots('en-US')
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
 
+            path = './spec/fixtures/screenshot1.png'
             # The order is quite important. en-US first, since we check using the index afterwards
-            @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_47))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_47))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
 
             expect {
-              @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+              @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
             }.to raise_error("Only 5 screenshots are allowed per language per device type (iOS-iPad)")
             
-            
+
             results = @app.metadata.fetch_value("//x:software_screenshot")
             results.count.should eq(10)
 
