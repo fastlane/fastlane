@@ -8,6 +8,7 @@ module IosDeployKit
 
   class AppMetadata
     ITUNES_NAMESPACE = "http://apple.com/itunes/importer"
+    METADATA_FILE_NAME = "metadata.xml"
 
     attr_accessor :metadata_dir
 
@@ -194,7 +195,12 @@ module IosDeployKit
 
       # Parses the metadata using nokogiri
       def parse_package(path)
-        @data ||= Nokogiri::XML(File.read("#{path}/metadata.xml"))
+        unless path.include?".itmsp"
+          path += "/#{@app.apple_id}.itmsp/"
+        end
+        @metadata_path = "#{path}/#{METADATA_FILE_NAME}"
+
+        @data ||= Nokogiri::XML(File.read(@metadata_path))
         verify_package
         clean_package
       end

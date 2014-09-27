@@ -40,7 +40,7 @@ describe IosDeployKit do
         end
 
         it "let's the user modify the download directory", broken: true do
-          @app.get_metadata_directory.should eq("./#{apple_id}.itmsp/")
+          @app.get_metadata_directory.should eq("./")
 
           alternative = '/tmp/something'
           @app.set_metadata_directory(alternative)
