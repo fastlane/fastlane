@@ -127,6 +127,8 @@ module IosDeployKit
 
       # Ready for storing the screenshot into the metadata.xml now
       screenshots << app_screenshot.create_xml_node(@data, next_index)
+
+      app_screenshot.store_file_inside_package(@package_path)
     end
 
     # Using this method will clear all screenshots and set the new ones
@@ -175,7 +177,7 @@ module IosDeployKit
     # Actually upload the updated metadata to Apple
     def upload!
       # First: Write the current XML state to disk
-      File.write(@metadata_path, @data.to_xml)
+      File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
 
       transporter.upload(@app, @app.get_metadata_directory)
     end
@@ -208,9 +210,9 @@ module IosDeployKit
         unless path.include?".itmsp"
           path += "/#{@app.apple_id}.itmsp/"
         end
-        @metadata_path = "#{path}/#{METADATA_FILE_NAME}"
+        @package_path = path
 
-        @data ||= Nokogiri::XML(File.read(@metadata_path))
+        @data ||= Nokogiri::XML(File.read("#{path}/#{METADATA_FILE_NAME}"))
         verify_package
         clean_package
       end

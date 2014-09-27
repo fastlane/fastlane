@@ -38,7 +38,7 @@ module IosDeployKit
 
       # File Name
       file_name = Nokogiri::XML::Node.new('file_name', doc)
-      file_name.content = path
+      file_name.content = path.split("/").last
       node_set << file_name
 
       # md5 Checksum
@@ -50,6 +50,11 @@ module IosDeployKit
 
       screenshot.children = node_set
       return screenshot
+    end
+
+    def store_file_inside_package(path_to_package)
+      # We also have to copy the file itself, since it has to be **inside** the package
+      FileUtils.cp(self.path, path_to_package)
     end
 
     def name_for_xml_node
