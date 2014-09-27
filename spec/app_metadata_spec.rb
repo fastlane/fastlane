@@ -176,6 +176,10 @@ describe IosDeployKit do
             @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
             @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
 
+            expect {
+              @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            }.to raise_error("Only 5 screenshots are allowed per language per device type (iOS-iPad)")
+            
             
             results = @app.metadata.fetch_value("//x:software_screenshot")
             results.count.should eq(10)

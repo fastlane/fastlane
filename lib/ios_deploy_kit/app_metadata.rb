@@ -9,6 +9,7 @@ module IosDeployKit
   class AppMetadata
     ITUNES_NAMESPACE = "http://apple.com/itunes/importer"
     METADATA_FILE_NAME = "metadata.xml"
+    MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
 
     attr_accessor :metadata_dir
 
@@ -108,7 +109,7 @@ module IosDeployKit
     end
 
     # Appends another screenshot to the already existing ones
-    # This will raise an exception, when there are already 5 screenshots
+    # This will raise an exception, when there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS)
     def add_screenshot(language, app_screenshot)
       
       # Fetch the 'software_screenshots' node (array) for the specific locale
@@ -134,6 +135,10 @@ module IosDeployKit
           if screen['display_target'] == app_screenshot.screen_size
             next_index += 1
           end
+        end
+
+        if next_index > MAXIMUM_NUMBER_OF_SCREENSHOTS
+          raise AppMetadataParameterError.new("Only #{MAXIMUM_NUMBER_OF_SCREENSHOTS} screenshots are allowed per language per device type (#{app_screenshot.screen_size})")
         end
 
         # Ready for storing the screenshot into the metadata.xml now
