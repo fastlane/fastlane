@@ -1,3 +1,6 @@
+require 'fastimage'
+
+
 module IosDeployKit
   module ScreenSize
     IOS_35 = "iOS-3.5-in"
@@ -9,10 +12,13 @@ module IosDeployKit
 
   class AppScreenshot < MetadataItem
     attr_accessor :screen_size
+
     def initialize(path, screen_size)
       super(path)
 
       self.screen_size = screen_size
+
+      Helper.log.error "Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}" unless self.is_valid?
     end
 
     def create_xml_node(doc, order_index)
@@ -35,6 +41,32 @@ module IosDeployKit
 
     def name_for_xml_node
       'software_screenshot'
+    end
+
+    # Validates the given screenshots (size and format)
+    def is_valid?
+      return false unless self.path.split(".").last == "png"
+
+      size = FastImage.size(self.path)
+
+      # TODO: Support landscape screenshots
+      case self.screen_size
+        when ScreenSize::IOS_55
+          return (size[0] == 1080 and size[1] == 1920)
+        when ScreenSize::IOS_47
+          return (size[0] == 750 and size[1] == 1334)
+        when ScreenSize::IOS_40
+          return (size[0] == 640 and size[1] == 1136)
+        when ScreenSize::IOS_35
+          return (size[0] == 640 and size[1] == 960)
+        when ScreenSize::IOS_IPAD
+          return (size[0] == 1536 and size[1] == 2048)
+        else
+          Helper.log.error "Unsupported screen size #{self.screen_size}"
+          return false
+      end
+
+      return true
     end
   end
 end
