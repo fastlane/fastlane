@@ -31,7 +31,11 @@ module IosDeployKit
       
       command = build_upload_command(@user, @password, app.apple_id, dir)
 
-      self.execute_transporter(command)
+      result = self.execute_transporter(command)
+
+      Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.")
+
+      result
     end
 
     def execute_transporter(command)

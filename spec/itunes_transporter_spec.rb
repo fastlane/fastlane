@@ -18,8 +18,9 @@ describe IosDeployKit do
       end
 
       it "works with correct inputs" do
-        @app.apple_id = 794902327
-        IosDeployKit::ItunesTransporter.new.download(@app).should eq(true)
+        @app.apple_id = 878567776
+        @app.metadata
+        @app.upload_metadata!.should eq(true)
       end
     end
   end
