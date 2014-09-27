@@ -1,5 +1,5 @@
 describe IosDeployKit do
-  describe IosDeployKit::AppScreenshot, now: true do
+  describe IosDeployKit::AppScreenshot do
     let (:path) { "./spec/fixtures/screenshot1.png" }
 
     describe "#init" do
@@ -38,7 +38,7 @@ describe IosDeployKit do
         end
       end
 
-      describe "is_valid?" do
+      describe "#is_valid?" do
         it "is not valid when it's not a png" do
           @item.is_valid?.should eq(true)
 

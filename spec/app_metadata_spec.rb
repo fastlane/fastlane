@@ -18,7 +18,7 @@ describe IosDeployKit do
 
         it "properly cleaned up the live version, which cannot be updated" do
           @app.metadata.fetch_value("//x:version").count.should eq(1)
-          @app.metadata.fetch_value("//x:version").first.attr('string').should eq("0.9.10")
+          @app.metadata.fetch_value("//x:version").first['string'].should eq("0.9.10")
         end
 
         describe "#update_title" do
@@ -138,18 +138,58 @@ describe IosDeployKit do
             }.to raise_error(error_message)
           end
 
-          it "properly updates the metadata information when providing correct inputs" do
+          it "properly updates the metadata information when providing correct inputs", now: true do
             path = './spec/fixtures/screenshot1.png'
 
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
               'de-DE' => [
+                IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35),
+                IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35),
                 IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35)
               ]
             })
             results = @app.metadata.fetch_value("//x:software_screenshot")
-            results.count.should eq(1)
-            results.first['position'].should eq('1')
+            results.count.should eq(3)
+            results[0]['position'].should eq('1')
+            results[1]['position'].should eq('2')
+            results[2]['position'].should eq('3')
+          end
+        end
+
+        describe "#add_screenshot", now: true do
+          it "allows the user to add multiple screenshots" do
+            @app.apple_id = 878567776
+            @app.metadata.clear_all_screenshots('de-DE')
+            @app.metadata.clear_all_screenshots('en-US')
+            @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
+
+            # The order is quite important. en-US first, since we check using the index afterwards
+            @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new('/Users/felixkrause/Desktop/screen.png', IosDeployKit::ScreenSize::IOS_IPAD))
+
+            
+            results = @app.metadata.fetch_value("//x:software_screenshot")
+            results.count.should eq(10)
+
+            results[0]['position'].should eq('1')
+            results[1]['position'].should eq('1')
+            results[2]['position'].should eq('2')
+            results[3]['position'].should eq('1')
+            results[4]['position'].should eq('3')
+            results[5]['position'].should eq('1')
+            results[6]['position'].should eq('2')
+            results[7]['position'].should eq('3')
+            results[8]['position'].should eq('4')
+            results[9]['position'].should eq('5')
           end
         end
       end
