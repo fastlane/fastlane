@@ -26,7 +26,7 @@ describe IosDeployKit do
         it "properly creates a valid nokogiri xml node" do
           node = @item.create_xml_node(@doc)
           node.children.first.content.should eq(File.size(path).to_s)
-          node.children[1].content.should eq(path)
+          node.children[1].content.should eq(path.split("/").last)
           node.children.last['type'].should eq("md5")
         end
       end

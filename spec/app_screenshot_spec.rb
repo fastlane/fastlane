@@ -29,7 +29,7 @@ describe IosDeployKit do
           order_index = 1
           node = @item.create_xml_node(@doc, order_index)
           node.children.first.content.should eq(File.size(path).to_s)
-          node.children[1].content.should eq(path)
+          node.children[1].content.should eq("app_screenshot_spec.rb")
           node.children.last['type'].should eq("md5")
 
           node['position'].should eq(order_index.to_s)
