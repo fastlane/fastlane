@@ -1,5 +1,5 @@
 describe IosDeployKit do
-  describe IosDeployKit::AppScreenshot, now: true do
+  describe IosDeployKit::AppScreenshot do
     let (:path) { "./spec/app_screenshot_spec.rb" }
 
     describe "#init" do

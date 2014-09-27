@@ -1,5 +1,5 @@
 describe IosDeployKit do
-  describe IosDeployKit::MetadataItem, now: true do
+  describe IosDeployKit::MetadataItem do
     let (:path) { "./spec/metadata_item_spec.rb" }
 
     describe "#init" do
