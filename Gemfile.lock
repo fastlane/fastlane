@@ -61,6 +61,7 @@ GEM
     websocket-driver (0.3.4)
     xpath (2.0.0)
       nokogiri (~> 1.3)
+    yard (0.8.7.4)
 
 PLATFORMS
   ruby
@@ -71,3 +72,4 @@ DEPENDENCIES
   pry
   rake
   rspec
+  yard (~> 0.8.7.4)

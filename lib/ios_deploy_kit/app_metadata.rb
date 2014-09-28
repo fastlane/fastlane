@@ -148,21 +148,24 @@ module IosDeployKit
       end
     end
 
-    # Using this method will clear all screenshots and set the new ones
-    # Pass the hash like this:
-    # {
-    #   'de-DE' => [
-    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_35),
-    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_40),
-    #     AppScreenshot.new('path', IosDeployKit::ScreenSize::IOS_IPAD)
-    #   ]
-    # }
-    # This method uses clear_all_screenshots and add_screenshot under the hood
-    def set_all_screenshots(hash)
+    # This method will clear all screenshots and set the new ones you pass
+    # @param new_screenshots
+    #   +code+
+    #    {
+    #     'de-DE' => [
+    #       AppScreenshot.new('path/screenshot1.png', IosDeployKit::ScreenSize::IOS_35),
+    #       AppScreenshot.new('path/screenshot2.png', IosDeployKit::ScreenSize::IOS_40),
+    #       AppScreenshot.new('path/screenshot3.png', IosDeployKit::ScreenSize::IOS_IPAD)
+    #     ]
+    #    }
+    # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood
+    # @return [bool] true if everything was successful
+    # @raise [AppMetadataParameterError] error is raised when parameters are invalid
+    def set_all_screenshots(new_screenshots)
       error_text = "Please pass a hash, containing an array of AppScreenshot objects"
-      raise AppMetadataParameterError.new(error_text) unless hash.kind_of?Hash
+      raise AppMetadataParameterError.new(error_text) unless new_screenshots.kind_of?Hash
 
-      hash.each do |key, value|
+      new_screenshots.each do |key, value|
         if key.kind_of?String and value.kind_of?Array and value.count > 0 and value.first.kind_of?AppScreenshot
           
           self.clear_all_screenshots(key)
@@ -174,6 +177,7 @@ module IosDeployKit
           raise AppMetadataParameterError.new(error_text)
         end
       end
+      true
     end
 
 
