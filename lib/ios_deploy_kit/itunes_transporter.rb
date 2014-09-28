@@ -4,6 +4,14 @@ require 'ios_deploy_kit/password_manager'
 
 
 module IosDeployKit
+  # The TransporterInputError occurs when you passed wrong inputs to the {IosDeployKit::ItunesTransporter}
+  class TransporterInputError < StandardError 
+  end
+  # The TransporterTransferError occurs when some error happens
+  # while uploading or downloading something from/to iTC
+  class TransporterTransferError < StandardError
+  end
+
   class ItunesTransporter
     ERROR_REGEX = />\s*ERROR:\s+(.+)/  
     WARNING_REGEX = />\s*WARN:\s+(.+)/
@@ -15,7 +23,7 @@ module IosDeployKit
     end
 
     def download(app, dir = nil)
-      raise "No valid IosDeployKit::App given" unless app.kind_of?IosDeployKit::App
+      raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
       dir ||= app.get_metadata_directory
       command = build_download_command(@user, @password, app.apple_id, dir)
@@ -24,7 +32,7 @@ module IosDeployKit
     end
 
     def upload(app, dir)
-      raise "No valid IosDeployKit::App given" unless app.kind_of?IosDeployKit::App
+      raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
       dir ||= app.get_metadata_directory
       dir += "/#{app.apple_id}.itmsp"
@@ -38,41 +46,40 @@ module IosDeployKit
       result
     end
 
-    def execute_transporter(command)
-      # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
+    private
+      def execute_transporter(command)
+        # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
 
-      errors = []
-      warnings = []
+        errors = []
+        warnings = []
 
-      begin
-        PTY.spawn(command) do |stdin, stdout, pid|
-          stdin.each do |line|
-            if line =~ ERROR_REGEX
-              errors << $1
-            elsif line =~ WARNING_REGEX
-              warnings << $1
-            end
+        begin
+          PTY.spawn(command) do |stdin, stdout, pid|
+            stdin.each do |line|
+              if line =~ ERROR_REGEX
+                errors << $1
+              elsif line =~ WARNING_REGEX
+                warnings << $1
+              end
 
-            if line =~ OUTPUT_REGEX
-              # General logging for debug purposes
-              Helper.log.debug "[Transpoter Output]: #{$1}"
+              if line =~ OUTPUT_REGEX
+                # General logging for debug purposes
+                Helper.log.debug "[Transpoter Output]: #{$1}"
+              end
             end
           end
+        rescue Exception => ex
+          Helper.log.fatal(ex.to_s)
+          errors << ex.to_s
         end
-      rescue Exception => ex
-        Helper.log.fatal(ex.to_s)
-        errors << ex.to_s
+
+        if errors.count > 0
+          Helper.log.debug(caller)
+          raise TranspoterTransferError.new(errors.join("\n"))
+        end
+
+        true
       end
-
-      if errors.count > 0
-        Helper.log.debug(caller)
-        raise errors.join("\n") 
-      end
-
-      true
-    end
-
-    private
       def build_download_command(username, password, apple_id, destination = "/tmp")
         [
           Helper.transporter_path,
