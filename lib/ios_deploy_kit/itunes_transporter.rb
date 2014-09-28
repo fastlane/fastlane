@@ -19,11 +19,21 @@ module IosDeployKit
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX
     
+    # Returns a new instance of the iTunesTranspoter.
+    # If no username or password given, it will be taken from
+    # the #{IosDeployKit::PasswordManager}
     def initialize(user = nil, password = nil)
       @user = (user || PasswordManager.new.username)
       @password = (password || PasswordManager.new.password)
     end
 
+    # Downloads the latest version of the app metadata package from iTC.
+    # @param app [IosDeployKit::App] The app you want to download the data for
+    # @param dir [String] the path to the package file
+    # @return (Bool) True if everything worked fine
+    # @raise [IosDeployKit::TransporterTransferError] when something went wrong 
+    #   when transfering
+    # @raise [IosDeployKit::TransporterInputError] when passing wrong inputs
     def download(app, dir = nil)
       raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
@@ -33,6 +43,13 @@ module IosDeployKit
       self.execute_transporter(command)
     end
 
+    # Uploads the modified package back to iTunesConnect
+    # @param app [IosDeployKit::App] The app you want to download the data for
+    # @param dir [String] the path in which the package file is located
+    # @return (Bool) True if everything worked fine
+    # @raise [IosDeployKit::TransporterTransferError] when something went wrong 
+    #   when transfering
+    # @raise [IosDeployKit::TransporterInputError] when passing wrong inputs
     def upload(app, dir)
       raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
