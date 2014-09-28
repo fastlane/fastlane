@@ -45,7 +45,7 @@ module IosDeployKit
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
-    # @param pass (String) (optional) The password
+    # @param password (String) (optional) The password
     # @return (bool) true if everything worked fine
     # @raise [ItunesConnectGeneralError] General error while executing 
     #  this action
