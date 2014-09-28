@@ -9,7 +9,20 @@ require 'pry'
 
 
 module IosDeployKit
+  # Everything that can't be achived using the {IosDeployKit::ItunesTransporter}
+  # will be scripted using the iTunesConnect frontend.
+  # 
+  # Every method you call here, might take a time
   class ItunesConnect
+    # This error occurs only if there is something wrong with the given login data
+    class ItunesConnectLoginError < StandardError 
+    end
+
+    # This error can occur for many reaons. It is
+    # usually raised when a UI element could not be found
+    class ItunesConnectGeneralError < StandardError
+    end
+
     include Capybara::DSL
 
     ITUNESCONNECT_URL = "https://itunesconnect.apple.com"
@@ -26,7 +39,20 @@ module IosDeployKit
       self.login
     end
 
+    # Loggs in a user with the given login data on the iTC Frontend.
+    # You don't need to pass a username and password. It will
+    # Automatically be fetched using the {IosDeployKit::PasswordManager}.
+    # This method will also automatically be called when triggering other 
+    # actions like {#open_app_page}
+    # @param user (String) (optional) The username/email address
+    # @param pass (String) (optional) The password
+    # @return (bool) true if everything worked fine
+    # @raise [ItunesConnectGeneralError] General error while executing 
+    #  this action
+    # @raise [ItunesConnectLoginError] Login data is wrong
     def login(user = nil, password = nil)
+      return true if @logged_in
+
       Helper.log.info "Logging into iTunesConnect"
 
       host = "itunesconnect.apple.com"
@@ -42,14 +68,25 @@ module IosDeployKit
         wait_for_elements(".enabled").first.click
         wait_for_elements('.ng-scope.managedWidth')
       rescue
-        raise "Error logging in user #{user} with the given password. Make sure you set them correctly"
+        ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you set them correctly")
       end
 
       Helper.log.info "Successfully logged into iTunesConnect"
+      @logged_in = true
       true
     end
 
+    # Opens the app details page of the given app.
+    # @param app (IosDeployKit::App) the app that should be opened
+    # @return (bool) true if everything worked fine
+    # @raise [ItunesConnectGeneralError] General error while executing 
+    #  this action
+    # @raise [ItunesConnectLoginError] Login data is wrong
     def open_app_page(app)
+      verify_app(app)
+
+      self.login
+
       Helper.log.info "Opening detail page for app #{app}"
 
       visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
@@ -59,7 +96,18 @@ module IosDeployKit
       true
     end
 
+    # This method will fetch the current status ({IosDeployKit::App::AppStatus}) 
+    # of your app and return it. This method uses a headless browser
+    # under the hood, so it might take some time until you get the result
+    # @param app (IosDeployKit::App) the app you want this information from
+    # @raise [ItunesConnectGeneralError] General error while executing 
+    #  this action
+    # @raise [ItunesConnectLoginError] Login data is wrong
     def get_app_status(app)
+      verify_app(app)
+
+      self.login
+
       open_app_page(app)
 
       if page.has_content?"Waiting For Review"
@@ -81,7 +129,18 @@ module IosDeployKit
 
 
     # Constructive/Destructive Methods
+
+    # This method creates a new version of your app using the
+    # iTunesConnect frontend. This will happen directly after calling
+    # this method. 
+    # @param app (IosDeployKit::App) the app you want to modify
+    # @param version_number (String) the version number as string for 
+    # the new version that should be created
     def create_new_version!(app, version_number)
+      verify_app(app)
+
+      self.login
+
       open_app_page(app)
 
       if page.has_content?BUTTON_STRING_NEW_VERSION
@@ -100,25 +159,29 @@ module IosDeployKit
 
 
 
-    # Helper - move out
-
-    def wait_for_elements(name)
-      counter = 0
-      results = all(name)
-      while results.count == 0      
-        Helper.log.debug "Waiting for #{name}"
-        sleep 0.2
-
-        results = all(name)
-
-        counter += 1
-        if counter > 100
-          Helper.log.debug page.html
-          Helper.log.debug caller
-          raise "Couldn't find element '#{name}' after waiting for quite some time"
-        end
+    private
+      def verify_app(app)
+        raise ItunesConnectGeneralError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+        raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').length > 5
       end
-      return results
-    end
+
+      def wait_for_elements(name)
+        counter = 0
+        results = all(name)
+        while results.count == 0      
+          Helper.log.debug "Waiting for #{name}"
+          sleep 0.2
+
+          results = all(name)
+
+          counter += 1
+          if counter > 100
+            Helper.log.debug page.html
+            Helper.log.debug caller
+            raise ItunesConnectGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
+          end
+        end
+        return results
+      end
   end
 end
