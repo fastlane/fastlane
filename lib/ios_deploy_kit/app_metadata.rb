@@ -144,6 +144,8 @@ module IosDeployKit
 
         # Ready for storing the screenshot into the metadata.xml now
         screenshots.children.after(app_screenshot.create_xml_node(@data, next_index))
+
+        app_screenshot.store_file_inside_package(@package_path)
       end
     end
 

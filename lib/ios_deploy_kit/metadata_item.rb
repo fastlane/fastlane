@@ -58,17 +58,16 @@ module IosDeployKit
 
       screenshot.children = node_set
 
-      store_file_inside_package
-
       return screenshot
     end
 
-    private
-      # We also have to copy the file itself, since it has to be **inside** the package
-      def store_file_inside_package(path_to_package)
-        FileUtils.cp(self.path, path_to_package)
-      end
+    # We also have to copy the file itself, since it has to be *inside* the package
+    # You don't have to call this method manually.
+    def store_file_inside_package(path_to_package)
+      FileUtils.cp(self.path, path_to_package)
+    end
 
+    private
       def name_for_xml_node
         @custom_node_name || 'data_file'
       end
