@@ -157,7 +157,7 @@ describe IosDeployKit do
           end
         end
 
-        describe "#add_screenshot", now: true do
+        describe "#add_screenshot" do
           it "allows the user to add multiple screenshots" do
             @app.apple_id = 878567776
             @app.metadata.clear_all_screenshots('de-DE')
