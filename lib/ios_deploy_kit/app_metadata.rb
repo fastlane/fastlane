@@ -12,14 +12,15 @@ module IosDeployKit
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
     private_constant :ITUNES_NAMESPACE, :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
-    attr_accessor :metadata_dir
-
-    def transporter
-      @transporter ||= ItunesTransporter.new
-    end
-
+    # You don't have to manually create an AppMetadata object. It will
+    # be created when you access the app's metadata ({IosDeployKit::App#metadata})
+    # @param app [IosDeployKit::App] The app this metadata is from/for
+    # @param dir [String] The app this metadata is from/for
+    # @param redownload_package [bool] When true
+    #  the current package will be downloaded from iTC before you can 
+    #  modify any values. This should only be false for unit tests
     def initialize(app, dir, redownload_package = true)
-      self.metadata_dir = dir
+      @metadata_dir = dir
       @app = app
 
       if redownload_package
@@ -36,7 +37,7 @@ module IosDeployKit
 
 
     #####################################################
-    # Updating metadata information
+    # @!group Updating metadata information
     #####################################################
 
     # Update the app title
@@ -102,6 +103,7 @@ module IosDeployKit
     #####################################################
 
     # Removes all currently enabled screenshots for the given language
+    # @param language [String] The language of which you want to delete all screenshots
     def clear_all_screenshots(language)
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, current_language|
         field.children.remove # remove all the screenshots
@@ -109,8 +111,10 @@ module IosDeployKit
       true
     end
 
-    # Appends another screenshot to the already existing ones
-    # This will raise an exception, when there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS)
+    # Appends another screenshot to the already existing ones.
+    # @param [String] language The language this screenshot was taken in.
+    # @param app_screenshot [IosDeployKit::AppScreenshot] The screenshot you want to upload.
+    # @raise [AppMetadataParameterError] when there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS)
     def add_screenshot(language, app_screenshot)
       
       # Fetch the 'software_screenshots' node (array) for the specific locale
@@ -159,7 +163,7 @@ module IosDeployKit
     #       AppScreenshot.new('path/screenshot3.png', IosDeployKit::ScreenSize::IOS_IPAD)
     #     ]
     #    }
-    # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood
+    # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood.
     # @return [bool] true if everything was successful
     # @raise [AppMetadataParameterError] error is raised when parameters are invalid
     def set_all_screenshots(new_screenshots)
@@ -183,28 +187,41 @@ module IosDeployKit
 
 
     #####################################################
-    # Manually fetching elements from the metadata.xml
+    # @!group Manually fetching elements from the metadata.xml
     #####################################################
 
-    # Usage: '//x:keyword'
+    # Directly fetch XML nodes from the metadata.xml.
+    # @example Fetch all keywords
+    #  fetch_value("//x:keyword")
+    # @example Fetch a specific locale
+    #  fetch_value("//x:locale[@name='de-DE']")
+    # @example Fetch the node that contains all screenshots for a specific language
+    #  fetch_value("//x:locale[@name='de-DE']/x:software_screenshots")
+    # @return the requests XML nodes or node set
     def fetch_value(xpath)
       @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
     end
 
 
     #####################################################
-    # Uploading the updated metadata
+    # @!group Upload the changed App Metadata
     #####################################################
 
-    # Actually upload the updated metadata to Apple
+    # Actually upload the updated metadata to Apple.
+    # 
+    # This method will actually upload the modified package to Apple.
+    # @raise [TransporterTransferError] when the upload fails for some reason.
     def upload!
       # First: Write the current XML state to disk
       File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
 
-      transporter.upload(@app, @app.get_metadata_directory)
+      transporter.upload(@app, @metadata_dir)
     end
 
     private
+      def transporter
+        @transporter ||= ItunesTransporter.new
+      end
 
       def update_localized_value(xpath_name, new_value)
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
