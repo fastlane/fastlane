@@ -2,6 +2,8 @@ require 'fastimage'
 
 
 module IosDeployKit
+  # AppScreenshot represents one screenshots for one specific locale and 
+  # device type.
   class AppScreenshot < MetadataItem
     module ScreenSize
       # iPhone 4
