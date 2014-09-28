@@ -1,29 +1,32 @@
 module IosDeployKit
   class App
-    attr_accessor :apple_id, :app_identifier, :metadata, :metadata_dir
+    attr_accessor :apple_id, :app_identifier, :metadata
 
 
-
+    # Defines the different states of the app
+    # 
+    # As specified by Apple: https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/ChangingAppStatus.html
     module AppStatus
-      # As specified by Apple: https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/ChangingAppStatus.html
       PREPARE_FOR_SUBMISSION = "Prepare for Submission"
       WAITING_FOR_REVIEW = "Waiting For Review"
       IN_REVIEW = "In Review"
       UPLOAD_RECEIVED = "Upload Received"
-      # PENDING_CONTRACT = "Pending Contract"
-      # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       PENDING_DEVELOPER_RELEASE = "Pending Developer Release"
       PROCESSING_FOR_APP_STORE = "Processing for App Store"
-      # PENDING_APPLE_RELASE="Pending APple Release"
       READY_FOR_SALE = "Ready for Sale"
       REJECTED = "Rejected"
+
+
+      # Unused app states
+      # PENDING_APPLE_RELASE="Pending APple Release"
+      # PENDING_CONTRACT = "Pending Contract"
+      # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       # METADATA_REJECTED = "Metadata Rejected"
       # REMOVED_FROM_SALE = "Removed From Sale"
       # DEVELOPER_REJECTED = "Developer Rejected" # equals PREPARE_FOR_SUBMISSION
       # DEVELOPER_REMOVED_FROM_SALE = "Developer Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
     end
-
 
     # @param apple_id The Apple ID of the app you want to modify or update. This ID has usually 9 digits
     # @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
