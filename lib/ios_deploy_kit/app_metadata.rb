@@ -10,6 +10,7 @@ module IosDeployKit
     ITUNES_NAMESPACE = "http://apple.com/itunes/importer"
     METADATA_FILE_NAME = "metadata.xml"
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
+    private_constant :ITUNES_NAMESPACE, :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
     attr_accessor :metadata_dir
 
