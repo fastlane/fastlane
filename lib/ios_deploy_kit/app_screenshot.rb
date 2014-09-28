@@ -2,22 +2,22 @@ require 'fastimage'
 
 
 module IosDeployKit
-  module ScreenSize
-    # iPhone 4
-    IOS_35 = "iOS-3.5-in"
-    # iPhone 5
-    IOS_40 = "iOS-4-in"
-    # iPhone 6
-    IOS_47 = "iOS-4.7-in"
-    # iPhone 6 Plus
-    IOS_55 = "iOS-5.5-in"
-    # iPad
-    IOS_IPAD = "iOS-iPad"
-  end
-
   class AppScreenshot < MetadataItem
+    module ScreenSize
+      # iPhone 4
+      IOS_35 = "iOS-3.5-in"
+      # iPhone 5
+      IOS_40 = "iOS-4-in"
+      # iPhone 6
+      IOS_47 = "iOS-4.7-in"
+      # iPhone 6 Plus
+      IOS_55 = "iOS-5.5-in"
+      # iPad
+      IOS_IPAD = "iOS-iPad"
+    end
+
     # @return [IosDeployKit::ScreenSize] the screen size (device type) 
-    #  specied at {IosDeployKit::ScreenSize}
+    #  specified at {IosDeployKit::ScreenSize}
     attr_accessor :screen_size
 
     def initialize(path, screen_size)
@@ -76,4 +76,6 @@ module IosDeployKit
       return true
     end
   end
+
+  ScreenSize = AppScreenshot::ScreenSize
 end

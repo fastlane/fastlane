@@ -18,7 +18,7 @@ module IosDeployKit
 
 
       # Unused app states
-      # PENDING_APPLE_RELASE="Pending APple Release"
+      # PENDING_APPLE_RELASE="Pending Apple Release"
       # PENDING_CONTRACT = "Pending Contract"
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       # METADATA_REJECTED = "Metadata Rejected"
