@@ -103,7 +103,7 @@ module IosDeployKit
 
     # Removes all currently enabled screenshots for the given language
     def clear_all_screenshots(language)
-      update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
+      update_localized_value('software_screenshots', {language => {}}) do |field, useless, current_language|
         field.children.remove # remove all the screenshots
       end
       true

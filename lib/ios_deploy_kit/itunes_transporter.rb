@@ -56,7 +56,7 @@ module IosDeployKit
       dir ||= app.get_metadata_directory
       dir += "/#{app.apple_id}.itmsp"
       
-      command = build_upload_command(@user, @password, app.apple_id, dir)
+      command = build_upload_command(@user, @password, dir)
 
       result = self.execute_transporter(command)
 
@@ -99,6 +99,7 @@ module IosDeployKit
 
         true
       end
+
       def build_download_command(username, password, apple_id, destination = "/tmp")
         [
           Helper.transporter_path,
@@ -110,7 +111,7 @@ module IosDeployKit
         ].join(' ')
       end
 
-      def build_upload_command(username, password, apple_id, source = "/tmp")
+      def build_upload_command(username, password, source = "/tmp")
         [
           Helper.transporter_path,
           "-m upload",

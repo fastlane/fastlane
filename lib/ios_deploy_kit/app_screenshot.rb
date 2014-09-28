@@ -74,8 +74,6 @@ module IosDeployKit
           Helper.log.error "Unsupported screen size #{self.screen_size}"
           return false
       end
-
-      return true
     end
   end
 
