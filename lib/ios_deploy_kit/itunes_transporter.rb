@@ -16,6 +16,8 @@ module IosDeployKit
     ERROR_REGEX = />\s*ERROR:\s+(.+)/  
     WARNING_REGEX = />\s*WARN:\s+(.+)/
     OUTPUT_REGEX = />\s+(.+)/
+
+    private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX
     
     def initialize(user = nil, password = nil)
       @user = (user || PasswordManager.new.username)
