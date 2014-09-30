@@ -1,23 +1,28 @@
 require 'ios_deploy_kit/deliverfile/dsl'
 
 module IosDeployKit
-  class DeliverfileError < StandardError 
-  end
-  
-  class Deliverfile
+  module Deliverfile
+    class DeliverfileError < StandardError
+    end
 
-    include IosDeployKit::Deliverfile::DSL
+    class Deliverfile
 
-    attr_accessor :path
+      include IosDeployKit::Deliverfile::Deliverfile::DSL
 
-    def initialize(path = './')
-      full_path = path + "Deliverfile"
-      raise "not here" unless File.exists?(path) # TODO: Error handling
-      self.path = full_path
+      attr_accessor :path
 
-      content = File.read(full_path)
-      
-      eval(content)
+      # Loads the Deliverfile from the given path
+      # @param (String) path to the file itself. This must also include the
+      #  filename itself
+      def initialize(path = './Deliverfile')
+        raise "Deliverfile not found at path '#{path}'" unless File.exists?(path)
+
+        self.path = path
+
+        content = File.read(path)
+
+        eval(content) # this is okay in this case
+      end
     end
   end
 end
