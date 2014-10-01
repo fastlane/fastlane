@@ -38,6 +38,9 @@ module IosDeployKit
       if apple_id and not app_identifier
         # Fetch the app identifier based on the given Apple ID
         self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
+      elsif app_identifier and not apple_id
+        # Fetch the Apple ID based on the given app identifier
+        self.apple_id = IosDeployKit::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
       end
     end
 
