@@ -10,5 +10,31 @@ changelog({
   'en-US' => "Thanks for using this app"
 })
 
+title({
+  'de-DE' => "Die ultimative iPhone App",
+  'en-US' => "The ultimate iPhone app"
+})
+
+support_url({
+  'de-DE' => "http://support.sunapps.net"
+})
+
+marketing_url({
+  'de-DE' => "http://www.sunapps.net"
+})
+
+privacy_url do 
+  { 'de-DE' => "http://privacy.sunapps.net" }
+end
+
+description({
+  'de-DE' => "App Beschreibung",
+  'en-US' => "App description"
+})
+
+keywords({
+  'de-DE' => ["keyword1", "something", "else"],
+  'en-US' => %w|random values are here|
+})
 
 missing_method_call_should_not_cause_an_error

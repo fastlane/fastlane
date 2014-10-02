@@ -15,12 +15,14 @@ module IosDeployKit
     attr_accessor :deploy_information
 
     module ValKey
-      # TODO
       APP_VERSION = :version
-      # TODO
+      DESCRIPTION = :description
+      TITLE = :title
       CHANGELOG = :changelog
-      # TODO
       SUPPORT_URL = :support_url
+      PRIVACY_URL = :privacy_url
+      MARKETING_URL = :marketing_url
+      KEYWORDS = :keywords
     end
 
     
@@ -73,8 +75,18 @@ module IosDeployKit
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
 
+      # Most important
+      @app.metadata.update_title(@deploy_information[ValKey::TITLE]) if @deploy_information[ValKey::TITLE]
+      @app.metadata.update_description(@deploy_information[ValKey::DESCRIPTION]) if @deploy_information[ValKey::DESCRIPTION]
+
+      # URLs
       @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
       @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
+      @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
+
+      # App Keywords
+      @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
+
 
       unless Helper.is_test?
         @app.metadata.upload!

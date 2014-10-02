@@ -33,7 +33,7 @@ module IosDeployKit
 
             @deliver_data.set_new_value(method_sym, value)
           else
-            Helper.log.error("Could not find method #{method_sym}! Available methods: #{allowed.collect { |a| a.to_s }}")
+            Helper.log.error("Could not find method '#{method_sym}'. Available methods: #{allowed.collect { |a| a.to_s }}")
           end
         end
 
