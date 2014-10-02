@@ -139,7 +139,7 @@ describe IosDeployKit do
           end
 
           it "properly updates the metadata information when providing correct inputs" do
-            path = './spec/fixtures/screenshot1.png'
+            path = './spec/fixtures/screenshots/screenshot1.png'
 
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
