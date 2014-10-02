@@ -66,12 +66,12 @@ module IosDeployKit
     # Use this method to change the default download location for the metadata packages
     def set_metadata_directory(dir)
       raise "Can not change metadata directory after accessing metadata of an app" if @metadata
-      self.metadata_dir = dir
+      @metadata_dir = dir
     end
 
     # @return the path to the directy in which the itmsp files will be downloaded
     def get_metadata_directory
-      metadata_dir || "./"
+      @metadata_dir || "./"
     end
 
     # Access to update the metadata of this app

@@ -214,7 +214,7 @@ module IosDeployKit
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
-          raise "Locale #{language} not found" unless locale
+          raise "Locale '#{language}' not found. Please create the new locale on iTunesConnect first." unless locale
 
           field = locale.search(xpath_name).first
 

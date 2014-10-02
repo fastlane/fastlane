@@ -1,0 +1,14 @@
+
+version do 
+  '143.4.123'
+end
+
+app_identifier 'net.sunapps.54'
+
+changelog({
+  'de-DE' => "Danke für das Lesen dieses Tests",
+  'en-US' => "Thanks for using this app"
+})
+
+
+missing_method_call_should_not_cause_an_error

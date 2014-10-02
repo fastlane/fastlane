@@ -38,7 +38,7 @@ module IosDeployKit
     def set_new_value(key, value)
       # TODO: Unit test for that
       
-      unless Deliverer::ValKey.constants.collect { |a| Deliverer::ValKey.const_get(a) }.include?key
+      unless self.class.all_available_keys_to_set.include?key
         raise "Invalid key '#{key}', must be contained in Deliverer::ValKey."
       end
 
@@ -47,6 +47,10 @@ module IosDeployKit
       end
 
       @deploy_information[key] = value
+    end
+
+    def self.all_available_keys_to_set
+      Deliverer::ValKey.constants.collect { |a| Deliverer::ValKey.const_get(a) }
     end
 
     def set_app_identifier(str)
@@ -69,7 +73,13 @@ module IosDeployKit
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
 
-      @app.update_support_url(@support_url) if @support_url
+      @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
+      @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
+
+      unless Helper.is_test?
+        @app.metadata.upload!
+      end
+
     end
   end
 end
