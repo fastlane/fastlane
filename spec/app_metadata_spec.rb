@@ -164,7 +164,7 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots('en-US')
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
 
-            path = './spec/fixtures/screenshot1.png'
+            path = './spec/fixtures/screenshots/screenshot1.png'
             # The order is quite important. en-US first, since we check using the index afterwards
             @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
             @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))

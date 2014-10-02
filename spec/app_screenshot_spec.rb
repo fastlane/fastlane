@@ -31,7 +31,7 @@ describe IosDeployKit do
           node.children.first.content.should eq(File.size(path).to_s)
           node.children[1].content.should eq("screenshot1.png")
           node.children.last['type'].should eq("md5")
-          node.children.last.content.should eq("be2b3268bdd8fef0f9426629918adf9a")
+          node.children.last.content.should eq("e2c116d8f1ab7982a2b131ac681b6e86")
 
           node['position'].should eq(order_index.to_s)
           node['display_target'].should eq(IosDeployKit::ScreenSize::IOS_40)
