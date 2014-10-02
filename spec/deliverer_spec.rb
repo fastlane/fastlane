@@ -17,6 +17,11 @@ describe IosDeployKit, now: true do
           expect {
             IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
           }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
+
+
+          expect {
+            IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
+          }.to raise_exception(IosDeployKit::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
         end
 
         it "successfully loads the Deliverfile if it's valid" do
