@@ -16,6 +16,7 @@ module IosDeployKit
 
     module ValKey
       APP_VERSION = :version
+      IPA = :ipa
       DESCRIPTION = :description
       TITLE = :title
       CHANGELOG = :changelog
@@ -23,6 +24,7 @@ module IosDeployKit
       PRIVACY_URL = :privacy_url
       MARKETING_URL = :marketing_url
       KEYWORDS = :keywords
+      SCREENSHOTS_PATH = :screenshots_path
     end
 
     
@@ -87,6 +89,12 @@ module IosDeployKit
       # App Keywords
       @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
 
+      # Screenshots
+
+      @app.metadata.set_screenshots_from_path(@deploy_information[ValKey::SCREENSHOTS_PATH]) if @deploy_information[ValKey::SCREENSHOTS_PATH]
+
+      # IPA File
+      # @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS] # TODO
 
       unless Helper.is_test?
         @app.metadata.upload!

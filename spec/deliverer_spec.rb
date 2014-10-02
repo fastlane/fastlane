@@ -39,22 +39,28 @@ describe IosDeployKit do
           # meta.app.metadata.fetch_value("//x:version_whats_new").count.should eq(1) # one language only
         end
 
-        it "Sets all the available metadata", felix: true, now: true do
+        it "Sets all the available metadata", felix: true do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
 
-          meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION].should eq("143.4.123")
           meta.app.app_identifier.should eq("net.sunapps.54")
 
           meta.deploy_information[:changelog].should eq({
             "de-DE" => "Danke für das Lesen dieses Tests", 
             "en-US" => "Thanks for using this app"
           })
+
+          meta.deploy_information[:version].should eq("143.4.123")
           meta.deploy_information[:description].should eq({"de-DE"=>"App Beschreibung", "en-US"=>"App description"})
           meta.deploy_information[:privacy_url].values.first.should eq("http://privacy.sunapps.net")
           meta.deploy_information[:marketing_url].values.first.should eq("http://www.sunapps.net")
           meta.deploy_information[:support_url].values.first.should eq("http://support.sunapps.net")
           meta.deploy_information[:title].should eq({"de-DE"=>"Die ultimative iPhone App", "en-US"=>"The ultimate iPhone app"})
           meta.deploy_information[:keywords].should eq({"de-DE"=>["keyword1", "something", "else"], "en-US"=>["random", "values", "are", "here"]})
+        end
+
+        it "Uploads all the available screenshots", felix: true, now: true do
+          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
+          # TODO: test even more
         end
       end
     end

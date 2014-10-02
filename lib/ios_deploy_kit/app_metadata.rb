@@ -181,6 +181,22 @@ module IosDeployKit
       true
     end
 
+    # TODO: documentation
+    def set_screenshots_from_path(hash)
+      raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
+
+      hash.each do |language, current_path|
+        resulting_path = "#{current_path}/*"
+        raise "No screenshots found at the given path '#{resulting_path}'" unless Dir[resulting_path].count > 0
+        
+        Dir[resulting_path].each do |path|
+          add_screenshot(language, IosDeployKit::AppScreenshot.new(path))
+        end
+      end
+
+      true
+    end
+
 
     #####################################################
     # Manually fetching elements from the metadata.xml

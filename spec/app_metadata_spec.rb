@@ -157,6 +157,25 @@ describe IosDeployKit do
           end
         end
 
+        describe "#set_screenshots_from_path" do
+          it "automatically detects all screenshots in the given folder" do
+            @app.metadata.clear_all_screenshots("de-DE")
+            @app.metadata.clear_all_screenshots("en-US")
+
+            path = './spec/fixtures/screenshots/'
+            @app.metadata.set_screenshots_from_path(path).should eq(true)
+            results = @app.metadata.fetch_value("//x:software_screenshot")
+            
+            results.count.should eq(Dir["./spec/fixtures/screenshots/*"].length)
+            
+            example = results.first
+            example['display_target'].should eq("iOS-3.5-in")
+            example['position'].should eq("1")
+
+            results[1]['position'].should eq("1") # other screen size
+          end
+        end
+
         describe "#add_screenshot" do
           it "allows the user to add multiple screenshots" do
             @app.apple_id = 878567776
