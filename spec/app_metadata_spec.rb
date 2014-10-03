@@ -163,7 +163,7 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots("en-US")
 
             path = './spec/fixtures/screenshots/'
-            @app.metadata.set_screenshots_from_path(path).should eq(true)
+            @app.metadata.set_screenshots_from_path({'de-DE' => path}).should eq(true)
             results = @app.metadata.fetch_value("//x:software_screenshot")
             
             results.count.should eq(Dir["./spec/fixtures/screenshots/*"].length)
