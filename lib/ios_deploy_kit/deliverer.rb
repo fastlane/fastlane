@@ -15,6 +15,7 @@ module IosDeployKit
     attr_accessor :deploy_information
 
     module ValKey
+      APP_IDENTIFIER = :app_identifier
       APP_VERSION = :version
       IPA = :ipa
       DESCRIPTION = :description
@@ -57,22 +58,46 @@ module IosDeployKit
       Deliverer::ValKey.constants.collect { |a| Deliverer::ValKey.const_get(a) }
     end
 
-    def set_app_identifier(str)
-      # That's what we've been waiting for.
-      # We need the app identifier to fetch the Apple ID to actually do something
-      @app = IosDeployKit::App.new(nil, str)
-    end
-
 
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile
     def finished_executing_deliver_file
       app_version = @deploy_information[ValKey::APP_VERSION]
+      app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
+
       errors = IosDeployKit::Deliverfile::Deliverfile
-      raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE) unless @app
+
+      if @deploy_information[ValKey::IPA]
+
+        @ipa = IosDeployKit::IpaUploader.new(IosDeployKit::App.new(nil, nil), '/tmp/', @deploy_information[ValKey::IPA])
+
+        # We are able to fetch some metadata directly from the ipa file
+        # If they were also given in the Deliverfile, we will compare the values
+
+        if app_identifier
+          if app_identifier != @ipa.fetch_app_identifier
+            raise errors::DeliverfileDSLError.new("App Identifier of IPA does not mtach with the given one")
+          end
+        else
+          app_identifier = @ipa.fetch_app_identifier
+        end
+
+        if app_version
+          if app_version != @ipa.fetch_app_version
+            raise errors::DeliverfileDSLError.new("App Version of IPA does not mtach with the given one")
+          end
+        else
+          app_version = @ipa.fetch_app_version
+        end        
+      end
+
+      
+      raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE) unless app_identifier
       raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE) unless app_version
 
-      Helper.log.debug("Got all information needed to deploy a the update '#{app_version}' for app '#{@app.apple_id}'")
+      Helper.log.debug("Got all information needed to deploy a the update '#{app_version}' for app '#{app_identifier}'")
+
+      @app = IosDeployKit::App.new(nil, app_identifier)
 
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
@@ -100,9 +125,9 @@ module IosDeployKit
 
       # IPA File
       # The IPA file has to be handles seperatly
-      if @deploy_information[ValKey::IPA]
-        uploader = IosDeployKit::IpaUploader.new(@app, '/tmp/', @deploy_information[ValKey::IPA])
-        uploader.upload!
+      if @ipa
+        
+        @ipa.upload!
       end
 
     end

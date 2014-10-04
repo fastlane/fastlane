@@ -62,6 +62,23 @@ describe IosDeployKit do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
           # TODO: test even more
         end
+
+        it "raises an exception if app identifier of ipa does not match the given one" do
+          expect {
+            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
+          }.to raise_exception("App Identifier of IPA does not mtach with the given one")
+        end
+
+        it "raises an exception if app version of ipa does not match the given one" do
+          expect {
+            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
+          }.to raise_exception("App Version of IPA does not mtach with the given one")
+        end
+
+        it "works with a super simple Deliverfile" do
+          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimplest")
+          
+        end
       end
     end
   end

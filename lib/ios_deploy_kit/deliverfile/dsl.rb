@@ -49,14 +49,6 @@ module IosDeployKit
           Helper.log.debug("Set default language to #{@default_language}")
         end
 
-        # Custom actions
-        def app_identifier(value = nil)
-          value ||= yield if block_given?
-          raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
-          
-          @deliver_data.set_app_identifier(value)
-        end
-
         def ipa(value = nil)
           value ||= yield if block_given?
           raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
