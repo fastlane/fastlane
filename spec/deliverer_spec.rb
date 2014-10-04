@@ -76,7 +76,7 @@ describe IosDeployKit do
         end
 
         it "works with a super simple Deliverfile" do
-          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimplest")
+          # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimplest")
           
         end
       end

@@ -28,7 +28,9 @@ module IosDeployKit
               if @default_language
                 value = { @default_language => value }
               else
-                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
+                unless [:ipa, :app_identifier].include?method_sym
+                  raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
+                end
               end
             end
 
