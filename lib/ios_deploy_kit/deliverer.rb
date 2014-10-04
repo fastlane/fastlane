@@ -93,11 +93,16 @@ module IosDeployKit
 
       @app.metadata.set_screenshots_from_path(@deploy_information[ValKey::SCREENSHOTS_PATH]) if @deploy_information[ValKey::SCREENSHOTS_PATH]
 
-      # IPA File
-      # @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS] # TODO
-
-      unless Helper.is_test?
+      # unless Helper.is_test?
         @app.metadata.upload!
+      # end
+
+
+      # IPA File
+      # The IPA file has to be handles seperatly
+      if @deploy_information[ValKey::IPA]
+        uploader = IosDeployKit::IpaUploader.new(@app, '/tmp/', @deploy_information[ValKey::IPA])
+        uploader.upload!
       end
 
     end

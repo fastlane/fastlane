@@ -9,6 +9,7 @@ module IosDeployKit
 
         MISSING_APP_IDENTIFIER_MESSAGE = "You have to pass a valid app identifier using the Deliver file."
         MISSING_VERSION_NUMBER_MESSAGE = "You have to pass a valid version number using the Deliver file."
+        INVALID_IPA_FILE_GIVEN = "The given ipa file seems to be wrong. Make sure it's a valid ipa file."
 
         class DeliverfileDSLError < StandardError
         end
@@ -56,6 +57,13 @@ module IosDeployKit
           @deliver_data.set_app_identifier(value)
         end
 
+        def ipa(value = nil)
+          value ||= yield if block_given?
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+
+          @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
+        end
 
         # Set the apps new version number
         def version(value = nil)
