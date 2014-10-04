@@ -40,7 +40,11 @@ module IosDeployKit
         self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
       elsif app_identifier and not apple_id
         # Fetch the Apple ID based on the given app identifier
-        self.apple_id = IosDeployKit::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+        begin
+          self.apple_id = IosDeployKit::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+        rescue
+          raise "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+        end
       end
     end
 
