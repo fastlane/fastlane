@@ -10,7 +10,6 @@ module IosDeployKit
     ITUNES_NAMESPACE = "http://apple.com/itunes/importer"
     METADATA_FILE_NAME = "metadata.xml"
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
-    private_constant :ITUNES_NAMESPACE, :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
     attr_accessor :metadata_dir
 
@@ -18,19 +17,26 @@ module IosDeployKit
       @transporter ||= ItunesTransporter.new
     end
 
+    # TODO
+    # App is an object of the type App
+    # dir the directory the app should be downloaded to
     def initialize(app, dir, redownload_package = true)
+      raise AppMetadataParameterError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+
       self.metadata_dir = dir
       @app = app
 
-      if redownload_package
-        # we want to update the metadata, so first we have to download the existing one
-        transporter.download(app, dir)
+      if self.class == AppMetadata
+        if redownload_package
+          # we want to update the metadata, so first we have to download the existing one
+          transporter.download(app, dir)
 
-        # Parse the downloaded package
-        parse_package(dir)
-      else
-        # use_data contains the data to be used. This is the case for unit tests
-        parse_package(dir)
+          # Parse the downloaded package
+          parse_package(dir)
+        else
+          # use_data contains the data to be used. This is the case for unit tests
+          parse_package(dir)
+        end
       end
     end
 
