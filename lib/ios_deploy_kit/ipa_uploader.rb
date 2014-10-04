@@ -81,12 +81,20 @@ module IosDeployKit
         Zip::File.open(@ipa_file.path) do |zipfile|
           zipfile.each do |file|
             if file.name.include?'Info.plist' # TODO: how can we find the actual name of the plist file?
-              return Plist::parse_xml(zipfile.read(file))
+
+              # The XML file has to be properly unpacked first
+              tmp_path = "/tmp/deploytmp.plist"
+              File.write(tmp_path, zipfile.read(file))
+              system("plutil -convert xml1 #{tmp_path}")
+              result = Plist::parse_xml(tmp_path)
+              File.delete(tmp_path)
+
+              return result
             end
           end
         end
 
-        true
+        nil
       end
 
   end
