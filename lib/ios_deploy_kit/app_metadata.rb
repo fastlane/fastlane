@@ -192,7 +192,7 @@ module IosDeployKit
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
-        resulting_path = "#{current_path}/*"
+        resulting_path = "#{current_path}/*.png"
         raise "No screenshots found at the given path '#{resulting_path}'" unless Dir[resulting_path].count > 0
         
         Dir[resulting_path].each do |path|
