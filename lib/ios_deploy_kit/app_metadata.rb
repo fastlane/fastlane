@@ -194,6 +194,8 @@ module IosDeployKit
       hash.each do |language, current_path|
         resulting_path = "#{current_path}/*.png"
         raise "No screenshots found at the given path '#{resulting_path}'" unless Dir[resulting_path].count > 0
+
+        self.clear_all_screenshots(language)
         
         Dir[resulting_path].each do |path|
           add_screenshot(language, IosDeployKit::AppScreenshot.new(path))
