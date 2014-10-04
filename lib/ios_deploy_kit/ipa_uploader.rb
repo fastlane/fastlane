@@ -1,3 +1,6 @@
+require 'zip'
+require 'plist'
+
 module IosDeployKit
   class IpaUploaderError < StandardError 
   end
@@ -25,11 +28,15 @@ module IosDeployKit
 
 
     def fetch_app_identifier
-      return 'not yet done'
+      plist = fetch_info_plist_file
+      return plist['CFBundleIdentifier'] if plist
+      return nil
     end
 
     def fetch_app_version
-      return 'not yet done'
+      plist = fetch_info_plist_file
+      return plist['CFBundleShortVersionString'] if plist
+      return nil
     end
 
 
@@ -68,6 +75,18 @@ module IosDeployKit
         @data = builder.doc
         asset = @data.xpath('//x:asset', "x" => IosDeployKit::AppMetadata::ITUNES_NAMESPACE).first
         asset << @ipa_file.create_xml_node(@data)
+      end
+
+      def fetch_info_plist_file
+        Zip::File.open(@ipa_file.path) do |zipfile|
+          zipfile.each do |file|
+            if file.name.include?'Info.plist' # TODO: how can we find the actual name of the plist file?
+              return Plist::parse_xml(zipfile.read(file))
+            end
+          end
+        end
+
+        true
       end
 
   end

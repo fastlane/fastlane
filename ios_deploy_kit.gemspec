@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'highline', '~> 1.6.21'
   spec.add_dependency 'nokogiri', '~> 1.6.3.1'
   spec.add_dependency 'fastimage', '~> 1.6.3'
+  spec.add_dependency 'plist' # for reading the Info.plist of the ipa file
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"

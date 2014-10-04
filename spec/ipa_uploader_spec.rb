@@ -21,6 +21,24 @@ describe IosDeployKit do
       end
     end
 
+    describe "after init" do
+      before do
+        @uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
+      end
+
+      describe "#fetch_app_identifier" do
+        it "returns the valid identifier based on the Info.plist file" do
+          @uploader.fetch_app_identifier.should eq("at.felixkrause.iTanky")
+        end
+      end
+
+      describe "#fetch_app_version" do
+        it "returns the valid version based on the Info.plist file" do
+          @uploader.fetch_app_version.should eq("1.0")
+        end
+      end
+    end
+
     # describe "#start", current: true do
     #   it "properly loads and stores the ipa when it's valid" do
     #     # uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
