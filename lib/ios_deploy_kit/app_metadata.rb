@@ -336,6 +336,9 @@ module IosDeployKit
           versions = fetch_value("//x:version")
         end
         Helper.log.info "Modifying version '#{versions.first['string']}' of app #{@app.app_identifier}"
+
+        # Remove all GameCenter related code
+        fetch_value("//x:game_center").remove
       end
   end
 end
