@@ -12,15 +12,21 @@ module IosDeployKit
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
 
     INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES"
+
+    # @return (String) the path to the metadata directory (itmsp)
     attr_accessor :metadata_dir
 
+    # @return (IosDeployKit::ItunesTransporter) The iTunesTranspoter which is 
+    #  used to upload/download the app metadata.
     def transporter
       @transporter ||= ItunesTransporter.new
     end
 
-    # TODO
-    # App is an object of the type App
-    # dir the directory the app should be downloaded to
+    
+    # @param (IosDeployKit::App) app The app of which the metadata should be modified from.
+    # @param (String) dir the directory the app should be downloaded to.
+    # @param (Bool) redownload_package If true, the package will be downloaded on init
+    #  this should be true most of the times.
     def initialize(app, dir, redownload_package = true)
       raise AppMetadataParameterError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
@@ -46,7 +52,10 @@ module IosDeployKit
     # Updating metadata information
     #####################################################
 
-    # Update the app title
+    # Updates the app title
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
       update_localized_value('title', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
@@ -54,7 +63,10 @@ module IosDeployKit
       end
     end
 
-    # Update the app description which is shown in the AppStore
+    # Updates the app description which is shown in the AppStore
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_description(hash)
       update_localized_value('description', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
@@ -62,7 +74,10 @@ module IosDeployKit
       end
     end
 
-    # Set the changelog
+    # Updates the app changelog of the latest version
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
       update_localized_value('version_whats_new', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
@@ -70,7 +85,10 @@ module IosDeployKit
       end
     end
 
-    # Update the Marketing URL
+    # Updates the Marketing URL
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_marketing_url(hash)
       update_localized_value('software_url', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
@@ -78,7 +96,10 @@ module IosDeployKit
       end
     end
 
-    # Update the support URL
+    # Updates the Support URL
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_support_url(hash)
       update_localized_value('support_url', hash) do |field, new_val|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
@@ -86,7 +107,10 @@ module IosDeployKit
       end
     end
 
-    # Update the app keywords
+    # Updates the app keywords
+    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    #  as keys. The value should be an array of keywords (each keyword is a string)
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
       update_localized_value('keywords', hash) do |field, keywords|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it") unless keywords.kind_of?Array
@@ -108,9 +132,11 @@ module IosDeployKit
     # Screenshot related
     #####################################################
 
-    # Removes all currently enabled screenshots for the given language
+    # Removes all currently enabled screenshots for the given language.
+    # @param (String) language The language, which has to be in this list: {IosDeployKit::Languages}.
     def clear_all_screenshots(language)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
       end
@@ -118,7 +144,9 @@ module IosDeployKit
     end
 
     # Appends another screenshot to the already existing ones
-    # This will raise an exception, when there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS)
+    # @param (String) language The language, which has to be in this list: {IosDeployKit::Languages}.
+    # @param (IosDeployKit::AppScreenshot) app_screenshot The screenshot you want to add to the app metadata.
+    # @raise (AppMetadataParameterError) When there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS).
     def add_screenshot(language, app_screenshot)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
       
@@ -190,7 +218,12 @@ module IosDeployKit
       true
     end
 
-    # TODO: documentation
+    # Automatically add all screenshots contained in the given directory to the app.
+    # 
+    # This method will automatically detect which device type each screenshot is.
+    # 
+    # This will also clear all existing screenshots before setting the new ones.
+    # @param (Hash) hash A hash containing a different path for each locale ({IosDeployKit::Languages::ALL_LANGUAGES})
     def set_screenshots_from_path(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
@@ -215,7 +248,11 @@ module IosDeployKit
     # Manually fetching elements from the metadata.xml
     #####################################################
 
-    # Usage: '//x:keyword'
+    # Fetches a list of XML nodes from the app metadata
+    # @example
+    #  fetch_value('//x:keyword') # => array containing all keywords
+    #  fetch_value("//x:locale[@name='#{language}']").first
+    #  fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").count
     def fetch_value(xpath)
       @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
     end
@@ -225,7 +262,10 @@ module IosDeployKit
     # Uploading the updated metadata
     #####################################################
 
-    # Actually upload the updated metadata to Apple
+    # Actually uploads the updated metadata to Apple.
+    # This method might take a while.
+    # @raise (TransporterTransferError) When something goes wrong when uploading
+    #  the metadata/app
     def upload!
       # First: Write the current XML state to disk
       File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
