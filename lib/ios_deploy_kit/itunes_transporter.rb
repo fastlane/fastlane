@@ -40,7 +40,7 @@ module IosDeployKit
       dir ||= app.get_metadata_directory
       command = build_download_command(@user, @password, app.apple_id, dir)
 
-      self.execute_transporter(command)
+      execute_transporter(command)
     end
 
     # Uploads the modified package back to iTunesConnect
@@ -58,7 +58,7 @@ module IosDeployKit
       
       command = build_upload_command(@user, @password, dir)
 
-      result = self.execute_transporter(command)
+      result = execute_transporter(command)
 
       Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.")
 
@@ -94,7 +94,7 @@ module IosDeployKit
 
         if errors.count > 0
           Helper.log.debug(caller)
-          raise TranspoterTransferError.new(errors.join("\n"))
+          raise TransporterTransferError.new(errors.join("\n"))
         end
 
         true

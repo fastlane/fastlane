@@ -38,6 +38,12 @@ describe IosDeployKit do
 
             @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
           end
+
+          it "raises an error when passing an invalid language" do
+            expect {
+              @app.metadata.update_title({ 'de' => 'asdf' })
+            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
+          end
         end
 
         describe "#update_description" do
@@ -116,6 +122,12 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots("de-DE")
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
           end
+
+          it "throws an exception when language is invalid" do
+            expect {
+              @app.metadata.clear_all_screenshots("de")
+            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
+          end
         end
 
         describe "#set_all_screenshots" do
@@ -138,8 +150,8 @@ describe IosDeployKit do
             }.to raise_error(error_message)
           end
 
-          it "properly updates the metadata information when providing correct inputs", now: true do
-            path = './spec/fixtures/screenshot1.png'
+          it "properly updates the metadata information when providing correct inputs" do
+            path = './spec/fixtures/screenshots/screenshot1.png'
 
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
@@ -157,6 +169,25 @@ describe IosDeployKit do
           end
         end
 
+        describe "#set_screenshots_from_path" do
+          it "automatically detects all screenshots in the given folder" do
+            @app.metadata.clear_all_screenshots("de-DE")
+            @app.metadata.clear_all_screenshots("en-US")
+
+            path = './spec/fixtures/screenshots/'
+            @app.metadata.set_screenshots_from_path({'de-DE' => path}).should eq(true)
+            results = @app.metadata.fetch_value("//x:software_screenshot")
+            
+            results.count.should eq(Dir["./spec/fixtures/screenshots/*"].length)
+            
+            example = results.first
+            example['display_target'].should eq("iOS-3.5-in")
+            example['position'].should eq("1")
+
+            results[1]['position'].should eq("1") # other screen size
+          end
+        end
+
         describe "#add_screenshot" do
           it "allows the user to add multiple screenshots" do
             @app.apple_id = 878567776
@@ -164,7 +195,7 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots('en-US')
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
 
-            path = './spec/fixtures/screenshot1.png'
+            path = './spec/fixtures/screenshots/screenshot1.png'
             # The order is quite important. en-US first, since we check using the index afterwards
             @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
             @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))

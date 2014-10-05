@@ -38,3 +38,4 @@ build/
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
+/integration

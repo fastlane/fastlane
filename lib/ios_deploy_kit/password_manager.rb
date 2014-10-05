@@ -17,8 +17,8 @@ module IosDeployKit
     # This already check the Keychain if there is a username and password stored.
     # If that's not the case, it will ask for login data via stdin
     def initialize
-      self.username ||= ENV["IOS_DEPLOY_KIT_USER"] || self.load_from_keychain[0]
-      self.password ||= ENV["IOS_DEPLOY_KIT_PASSWORD"] || self.load_from_keychain[1]
+      self.username ||= ENV["IOS_DEPLOY_KIT_USER"] || load_from_keychain[0]
+      self.password ||= ENV["IOS_DEPLOY_KIT_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
         ask_for_login
@@ -41,7 +41,7 @@ module IosDeployKit
 
         # Now we store this information in the keychain
         # Example usage taken from https://github.com/nomad/cupertino/blob/master/lib/cupertino/provisioning_portal/commands/login.rb
-        if Security::InternetPassword.add(IosDeployKit::PasswordManager::HOST, self.username, self.password)
+        if Security::InternetPassword.add(HOST, self.username, self.password)
           return true
         else
           Helper.log.error "Could not store password in keychain"
@@ -50,7 +50,7 @@ module IosDeployKit
       end
     
       def load_from_keychain
-        pass = Security::InternetPassword.find(:server => IosDeployKit::PasswordManager::HOST)
+        pass = Security::InternetPassword.find(:server => HOST)
         
         return [pass.attributes['acct'], pass.password] if pass
         return [nil, nil]
