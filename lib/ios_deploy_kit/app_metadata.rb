@@ -13,24 +13,17 @@ module IosDeployKit
 
     INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES"
 
-    # @return (String) the path to the metadata directory (itmsp)
-    attr_accessor :metadata_dir
-
-    # @return (IosDeployKit::ItunesTransporter) The iTunesTranspoter which is 
-    #  used to upload/download the app metadata.
-    def transporter
-      @transporter ||= ItunesTransporter.new
-    end
-
-    
-    # @param (IosDeployKit::App) app The app of which the metadata should be modified from.
-    # @param (String) dir the directory the app should be downloaded to.
-    # @param (Bool) redownload_package If true, the package will be downloaded on init
-    #  this should be true most of the times.
+    # You don't have to manually create an AppMetadata object. It will
+    # be created when you access the app's metadata ({IosDeployKit::App#metadata})
+    # @param app [IosDeployKit::App] The app this metadata is from/for
+    # @param dir [String] The app this metadata is from/for
+    # @param redownload_package [bool] When true
+    #  the current package will be downloaded from iTC before you can 
+    #  modify any values. This should only be false for unit tests
     def initialize(app, dir, redownload_package = true)
       raise AppMetadataParameterError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
-      self.metadata_dir = dir
+      @metadata_dir = dir
       @app = app
 
       if self.class == AppMetadata
@@ -49,7 +42,7 @@ module IosDeployKit
 
 
     #####################################################
-    # Updating metadata information
+    # @!group Updating metadata information
     #####################################################
 
     # Updates the app title
@@ -129,7 +122,7 @@ module IosDeployKit
     end
 
     #####################################################
-    # Screenshot related
+    # @!group Screenshot related
     #####################################################
 
     # Removes all currently enabled screenshots for the given language.
@@ -196,7 +189,7 @@ module IosDeployKit
     #       AppScreenshot.new('path/screenshot3.png', IosDeployKit::ScreenSize::IOS_IPAD)
     #     ]
     #    }
-    # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood
+    # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood.
     # @return [bool] true if everything was successful
     # @raise [AppMetadataParameterError] error is raised when parameters are invalid
     def set_all_screenshots(new_screenshots)
@@ -245,21 +238,25 @@ module IosDeployKit
 
 
     #####################################################
-    # Manually fetching elements from the metadata.xml
+    # @!group Manually fetching elements from the metadata.xml
     #####################################################
 
     # Fetches a list of XML nodes from the app metadata
-    # @example
-    #  fetch_value('//x:keyword') # => array containing all keywords
-    #  fetch_value("//x:locale[@name='#{language}']").first
-    #  fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").count
+    # Directly fetch XML nodes from the metadata.xml.
+    # @example Fetch all keywords
+    #  fetch_value("//x:keyword")
+    # @example Fetch a specific locale
+    #  fetch_value("//x:locale[@name='de-DE']")
+    # @example Fetch the node that contains all screenshots for a specific language
+    #  fetch_value("//x:locale[@name='de-DE']/x:software_screenshots")
+    # @return the requests XML nodes or node set
     def fetch_value(xpath)
       @data.xpath(xpath, "x" => ITUNES_NAMESPACE)
     end
 
 
     #####################################################
-    # Uploading the updated metadata
+    # @!group Uploading the updated metadata
     #####################################################
 
     # Actually uploads the updated metadata to Apple.
@@ -270,10 +267,15 @@ module IosDeployKit
       # First: Write the current XML state to disk
       File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
 
-      transporter.upload(@app, @app.get_metadata_directory)
+      transporter.upload(@app, @metadata_dir)
     end
 
     private
+      # @return (IosDeployKit::ItunesTransporter) The iTunesTranspoter which is 
+      #  used to upload/download the app metadata.
+      def transporter
+        @transporter ||= ItunesTransporter.new
+      end
 
       def update_localized_value(xpath_name, new_value)
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash

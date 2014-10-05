@@ -91,7 +91,7 @@ module IosDeployKit
 
 
     #####################################################
-    # Destructive/Constructive methods
+    # @!group Destructive/Constructive methods
     #####################################################
 
     def create_new_version!(version_number)

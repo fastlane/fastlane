@@ -41,7 +41,7 @@ module IosDeployKit
 
 
     #####################################################
-    # Uploading the ipa file # TODO: pragma mark
+    # @!group Uploading the ipa file # TODO: pragma mark
     #####################################################
 
     # Actually upload the updated metadata to Apple
