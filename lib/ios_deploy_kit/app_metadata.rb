@@ -11,6 +11,7 @@ module IosDeployKit
     METADATA_FILE_NAME = "metadata.xml"
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
 
+    INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES"
     attr_accessor :metadata_dir
 
     def transporter
@@ -109,6 +110,7 @@ module IosDeployKit
 
     # Removes all currently enabled screenshots for the given language
     def clear_all_screenshots(language)
+      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
       end
@@ -118,6 +120,7 @@ module IosDeployKit
     # Appends another screenshot to the already existing ones
     # This will raise an exception, when there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS)
     def add_screenshot(language, app_screenshot)
+      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
       
       # Fetch the 'software_screenshots' node (array) for the specific locale
       locales = self.fetch_value("//x:locale[@name='#{language}']")
@@ -193,6 +196,8 @@ module IosDeployKit
 
       hash.each do |language, current_path|
         resulting_path = "#{current_path}/*.png"
+
+        raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
         raise "No screenshots found at the given path '#{resulting_path}'" unless Dir[resulting_path].count > 0
 
         self.clear_all_screenshots(language)
@@ -238,6 +243,7 @@ module IosDeployKit
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
+          raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
           raise "Locale '#{language}' not found. Please create the new locale on iTunesConnect first." unless locale
 
           field = locale.search(xpath_name).first

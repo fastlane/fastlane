@@ -38,6 +38,12 @@ describe IosDeployKit do
 
             @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
           end
+
+          it "raises an error when passing an invalid language" do
+            expect {
+              @app.metadata.update_title({ 'de' => 'asdf' })
+            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
+          end
         end
 
         describe "#update_description" do
@@ -115,6 +121,12 @@ describe IosDeployKit do
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
             @app.metadata.clear_all_screenshots("de-DE")
             @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
+          end
+
+          it "throws an exception when language is invalid" do
+            expect {
+              @app.metadata.clear_all_screenshots("de")
+            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
           end
         end
 

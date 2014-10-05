@@ -10,6 +10,7 @@ require 'ios_deploy_kit/itunes_transporter'
 require 'ios_deploy_kit/deliverfile/deliverfile'
 require 'ios_deploy_kit/deliverer'
 require 'ios_deploy_kit/ipa_uploader'
+require 'ios_deploy_kit/languages'
 
 
 module IosDeployKit
