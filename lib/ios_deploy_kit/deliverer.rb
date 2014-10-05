@@ -2,9 +2,9 @@ module IosDeployKit
   # This class takes care of handling the whole deployment process
   # This includes:
   # 
-  # -) Parsing the Deliverfile
-  # -) Storing all the information got from the file
-  # -) Triggering the upload process itself
+  # - Parsing the Deliverfile
+  # - Storing all the information got from the file
+  # - Triggering the upload process itself
   class Deliverer
     
     # General
