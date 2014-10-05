@@ -3,15 +3,20 @@ module IosDeployKit
   # This includes:
   # 
   # - Parsing the Deliverfile
-  # - Storing all the information got from the file
+  # - Temporary storing all the information got from the file, until the file finished executing
   # - Triggering the upload process itself
   class Deliverer
     
     # General
+
+    # @return (IosDeployKit::App) The App that is currently being edited.
     attr_accessor :app
+    # @return (IosDeployKit::Deliverfile::Deliverfile) A reference
+    #  to the Deliverfile which is currently being used.
     attr_accessor :deliver_file
 
-    # All the updated/new information we got from the Deliverfile
+    # @return (Hash) All the updated/new information we got from the Deliverfile. 
+    #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
 
     module ValKey
@@ -29,20 +34,32 @@ module IosDeployKit
     end
 
     
-    
-    def initialize(path = nil)
+    # Start a new deployment process based on the given Deliverfile
+    # @param (String) path The path to the Deliverfile.
+    # @param (Hash) hash You can pass a hash instead of a path to basically
+    #  give all the information required (see {Deliverer::ValKey} for available options)
+    def initialize(path = nil, hash = nil)
       @deploy_information = {}
 
-      @deliver_file = IosDeployKit::Deliverfile::Deliverfile.new(self, path)
-      # Do not put code here...
+      if hash
+        hash.each do |key, value|
+          # we still call this interface to verify the inputs correctly
+          set_new_value(key, value)
+        end
 
-      # TODO: Also allow passing a hash
-      # Make sure to use set_new_value to validate the inputs
+        finished_executing_deliver_file
+      else
+        @deliver_file = IosDeployKit::Deliverfile::Deliverfile.new(self, path)
+      end
+
+
+      # Do not put code here...
     end
 
+    # This method is internally called from the Deliverfile DSL
+    # to set a value for a given key. This method will also verify if 
+    # the key is valid.
     def set_new_value(key, value)
-      # TODO: Unit test for that
-      
       unless self.class.all_available_keys_to_set.include?key
         raise "Invalid key '#{key}', must be contained in Deliverer::ValKey."
       end
@@ -54,13 +71,20 @@ module IosDeployKit
       @deploy_information[key] = value
     end
 
+    # An array of all available options to be set a deployment_information.
+    # 
+    # Is used to verify user inputs
+    # @return (Hash) The array of symbols
     def self.all_available_keys_to_set
       Deliverer::ValKey.constants.collect { |a| Deliverer::ValKey.const_get(a) }
     end
 
 
     # This method will take care of the actual deployment process, after we 
-    # received all information from the Deliverfile
+    # received all information from the Deliverfile. 
+    # 
+    # This method will be called from the {IosDeployKit::Deliverfile} after
+    # it is finished executing the Ruby script.
     def finished_executing_deliver_file
       app_version = @deploy_information[ValKey::APP_VERSION]
       app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
@@ -76,7 +100,7 @@ module IosDeployKit
 
         if app_identifier
           if app_identifier != @ipa.fetch_app_identifier
-            raise errors::DeliverfileDSLError.new("App Identifier of IPA does not mtach with the given one")
+            raise errors::DeliverfileDSLError.new("App Identifier of IPA does not mtach with the given one (#{app_identifier} != #{@ipa.fetch_app_identifier})")
           end
         else
           app_identifier = @ipa.fetch_app_identifier
@@ -84,7 +108,7 @@ module IosDeployKit
 
         if app_version
           if app_version != @ipa.fetch_app_version
-            raise errors::DeliverfileDSLError.new("App Version of IPA does not mtach with the given one")
+            raise errors::DeliverfileDSLError.new("App Version of IPA does not mtach with the given one (#{app_version} != #{@ipa.fetch_app_version})")
           end
         else
           app_version = @ipa.fetch_app_version
@@ -126,7 +150,6 @@ module IosDeployKit
       # IPA File
       # The IPA file has to be handles seperatly
       if @ipa
-        
         @ipa.upload!
       end
 

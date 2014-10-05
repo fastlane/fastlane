@@ -66,19 +66,73 @@ describe IosDeployKit do
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not mtach with the given one")
+          }.to raise_exception("App Identifier of IPA does not mtach with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not mtach with the given one")
+          }.to raise_exception("App Version of IPA does not mtach with the given one (128378973 != 1.0)")
         end
 
         it "works with a super simple Deliverfile" do
           # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimplest")
           
         end
+      end
+    end
+
+    describe "#initialize with hash", felix: true do
+      it "raises an exception when some information is missing" do
+        expect {
+          @meta = IosDeployKit::Deliverer.new(nil, {})
+        }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
+      end
+
+      # it "works with valid data" do
+      #   version = '1.0'
+      #   identifier = 'at.felixkrause.iTanky'
+      #   ipa = "spec/fixtures/ipas/Example1.ipa"
+
+      #   @meta = IosDeployKit::Deliverer.new(nil, {
+      #     app_identifier: identifier,
+      #     version: version,
+      #     ipa: ipa
+      #   })
+
+      #   @meta.deploy_information[:version].should eq(version)
+      #   @meta.deploy_information[:app_identifier].should eq(identifier)
+      #   @meta.deploy_information[:ipa].should eq(ipa)
+      # end
+    end
+
+    describe "#set_new_value", felix: true do
+      before do
+        @hash = {
+          app_identifier: "net.sunapps.54",
+          version: "1.3",
+          description: { 'de-DE' => "Something" }
+        }
+        @meta = IosDeployKit::Deliverer.new(nil, @hash)
+      end
+
+      it "has the correct information set based on the given hash", currently: true do
+        @meta.deploy_information[:app_identifier].should eq(@hash[:app_identifier])
+        @meta.deploy_information[:version].should eq(@hash[:version])
+        @meta.deploy_information[:description].should eq(@hash[:description])
+      end
+
+      it "raises an exception when usig an invalid key" do
+        expect {
+          @meta.set_new_value("invalid_key", "value")
+        }.to raise_exception("Invalid key 'invalid_key', must be contained in Deliverer::ValKey.")
+      end
+
+      it "properly updates the key", currently: true do
+        ipa_value = "./something.ipa"
+
+        @meta.set_new_value(:ipa, ipa_value)
+        @meta.deploy_information[:ipa].should eq(ipa_value)
       end
     end
   end
