@@ -38,6 +38,13 @@ module IosDeployKit
       if apple_id and not app_identifier
         # Fetch the app identifier based on the given Apple ID
         self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
+      elsif app_identifier and not apple_id
+        # Fetch the Apple ID based on the given app identifier
+        begin
+          self.apple_id = IosDeployKit::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+        rescue
+          raise "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+        end
       end
     end
 
@@ -63,12 +70,12 @@ module IosDeployKit
     # Use this method to change the default download location for the metadata packages
     def set_metadata_directory(dir)
       raise "Can not change metadata directory after accessing metadata of an app" if @metadata
-      self.metadata_dir = dir
+      @metadata_dir = dir
     end
 
     # @return the path to the directy in which the itmsp files will be downloaded
     def get_metadata_directory
-      metadata_dir || "./"
+      @metadata_dir || "./"
     end
 
     # Access to update the metadata of this app
@@ -84,7 +91,7 @@ module IosDeployKit
 
 
     #####################################################
-    # Destructive/Constructive methods
+    # @!group Destructive/Constructive methods
     #####################################################
 
     def create_new_version!(version_number)

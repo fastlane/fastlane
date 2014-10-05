@@ -13,5 +13,12 @@ describe IosDeployKit do
 
       IosDeployKit::ItunesSearchApi.fetch_bundle_identifier("284882215").should eq('com.facebook.Facebook')
     end
+
+    it "returns the actual object if it could be found" do
+      response = IosDeployKit::ItunesSearchApi.fetch_by_identifier("com.facebook.Facebook")
+      response['kind'].should eq('software')
+      response['supportedDevices'].count.should be > 8
+      response['trackId'].should eq(284882215)
+    end
   end
 end

@@ -55,8 +55,6 @@ module IosDeployKit
 
       Helper.log.info "Logging into iTunesConnect"
 
-      host = "itunesconnect.apple.com"
-
       user ||= PasswordManager.new.username
       password ||= PasswordManager.new.password
 

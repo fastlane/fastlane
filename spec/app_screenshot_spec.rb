@@ -1,6 +1,6 @@
 describe IosDeployKit do
   describe IosDeployKit::AppScreenshot do
-    let (:path) { "./spec/fixtures/screenshot1.png" }
+    let (:path) { "./spec/fixtures/screenshots/screenshot1.png" }
 
     describe "#init" do
       it "raises an exception if image file was not found" do
@@ -31,7 +31,7 @@ describe IosDeployKit do
           node.children.first.content.should eq(File.size(path).to_s)
           node.children[1].content.should eq("screenshot1.png")
           node.children.last['type'].should eq("md5")
-          node.children.last.content.should eq("be2b3268bdd8fef0f9426629918adf9a")
+          node.children.last.content.should eq("e2c116d8f1ab7982a2b131ac681b6e86")
 
           node['position'].should eq(order_index.to_s)
           node['display_target'].should eq(IosDeployKit::ScreenSize::IOS_40)
@@ -51,6 +51,24 @@ describe IosDeployKit do
 
           @item.screen_size = IosDeployKit::ScreenSize::IOS_55
           @item.is_valid?.should eq(false) # wrong size
+        end
+      end
+
+      describe "#calculate_screen_size" do
+        it "it will return the size for a given png file" do
+          p = "./spec/fixtures/screenshots/"
+
+          files = [
+            ['iPhone4.png', 'iOS-3.5-in'],
+            ['iPhone6.png', 'iOS-4.7-in'],
+            ['iPhone6Plus1.png', 'iOS-5.5-in'],
+            ['iPhone6Plus2.png', 'iOS-5.5-in'],
+            ['screenshot1.png', 'iOS-4-in']
+          ]
+
+          files.each do |value|
+            IosDeployKit::AppScreenshot.calculate_screen_size(p + value[0]).should eq(value[1])
+          end
         end
       end
     end

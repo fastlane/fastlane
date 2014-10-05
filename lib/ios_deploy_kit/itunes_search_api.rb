@@ -18,15 +18,14 @@ module IosDeployKit
     #  }
     def self.fetch(id)
       # Example: https://itunes.apple.com/lookup?id=284882215
-
-      response = JSON.parse(open("https://itunes.apple.com/lookup?id=#{id.to_s}").read)
-      return nil if response['resultCount'] == 0
-
-      return response['results'].first
-    rescue
-      Helper.log.error "Could not find object '#{id}' using the iTunes API"
-      nil
+      fetch_url("https://itunes.apple.com/lookup?id=#{id.to_s}")
     end
+
+    def self.fetch_by_identifier(app_identifier)
+      # Example: http://itunes.apple.com/lookup?bundleId=net.sunapps.1
+      fetch_url("http://itunes.apple.com/lookup?bundleId=#{app_identifier}")
+    end
+      
 
     # This method only fetches the bundle identifier of a given app
     # @param id (int) The AppleID of the given app. This usually consists of 9 digits.
@@ -34,5 +33,16 @@ module IosDeployKit
     def self.fetch_bundle_identifier(id)
       self.fetch(id)['bundleId']
     end
+
+    private
+      def self.fetch_url(url)
+        response = JSON.parse(open(url).read)
+        return nil if response['resultCount'] == 0
+
+        return response['results'].first
+      rescue
+        Helper.log.error "Could not find object '#{url}' using the iTunes API"
+        nil
+      end
   end
 end

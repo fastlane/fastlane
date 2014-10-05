@@ -7,6 +7,10 @@ require 'ios_deploy_kit/app_screenshot'
 require 'ios_deploy_kit/itunes_connect'
 require 'ios_deploy_kit/itunes_search_api'
 require 'ios_deploy_kit/itunes_transporter'
+require 'ios_deploy_kit/deliverfile/deliverfile'
+require 'ios_deploy_kit/deliverer'
+require 'ios_deploy_kit/ipa_uploader'
+require 'ios_deploy_kit/languages'
 
 
 module IosDeployKit

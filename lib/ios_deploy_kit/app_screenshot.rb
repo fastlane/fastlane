@@ -22,11 +22,17 @@ module IosDeployKit
     #  specified at {IosDeployKit::ScreenSize}
     attr_accessor :screen_size
 
-    def initialize(path, screen_size)
+    # @param path (String) path to the screenshot file
+    # @param screen_size (IosDeployKit::AppScreenshot::ScreenSize) the screen size, which
+    #  will automatically be calculated when you don't set it.
+    def initialize(path, screen_size = nil)
       super(path)
+
+      screen_size ||= self.class.calculate_screen_size(path)
 
       self.screen_size = screen_size
 
+      # TODO: change to exception
       Helper.log.error "Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}" unless self.is_valid?
     end
 
@@ -58,24 +64,31 @@ module IosDeployKit
 
       size = FastImage.size(self.path)
 
-      # TODO: Support landscape screenshots
-      case self.screen_size
-        when ScreenSize::IOS_55
-          return (size[0] == 1080 and size[1] == 1920)
-        when ScreenSize::IOS_47
-          return (size[0] == 750 and size[1] == 1334)
-        when ScreenSize::IOS_40
-          return (size[0] == 640 and size[1] == 1136)
-        when ScreenSize::IOS_35
-          return (size[0] == 640 and size[1] == 960)
-        when ScreenSize::IOS_IPAD
-          return (size[0] == 1536 and size[1] == 2048)
-        else
-          Helper.log.error "Unsupported screen size #{self.screen_size}"
-          return false
-      end
+      return self.screen_size == self.class.calculate_screen_size(self.path)
+    end
 
-      return true
+    def self.calculate_screen_size(path)
+      size = FastImage.size(path)
+
+      # TODO: Support landscape screenshots
+
+      raise "Could not find or parse file at path '#{path}'" if (size == nil or size.count == 0)
+
+      if (size[0] == 1080 and size[1] == 1920) or (size[0] == 1242 and size[1] == 2208)
+        ScreenSize::IOS_55
+      elsif (size[0] == 750 and size[1] == 1334)
+        ScreenSize::IOS_47
+      elsif (size[0] == 640 and size[1] == 1136)
+        ScreenSize::IOS_40
+      elsif (size[0] == 640 and size[1] == 960)
+        ScreenSize::IOS_35
+      elsif (size[0] == 1536 and size[1] == 2048)
+        ScreenSize::IOS_IPAD
+      else
+        error = "Unsupported screen size #{size} for path '#{path}'"
+        Helper.log.error error
+        raise error
+      end
     end
   end
 
