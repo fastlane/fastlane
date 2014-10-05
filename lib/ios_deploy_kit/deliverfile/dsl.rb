@@ -17,20 +17,19 @@ module IosDeployKit
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = IosDeployKit::Deliverer.all_available_keys_to_set
+          not_translated = [:ipa, :app_identifier]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
             raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
 
-            if value.kind_of?String
+            if value.kind_of?String and not not_translated.include?method_sym
               # The user should pass a hash for multi-lang values
               # Maybe he at least set a default language
               if @default_language
                 value = { @default_language => value }
               else
-                unless [:ipa, :app_identifier].include?method_sym
-                  raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
-                end
+                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
               end
             end
 
