@@ -41,8 +41,14 @@ module IosDeployKit
 
         # This method can be used to set a default language, which is used
         # when passing a string to metadata changes, instead of a hash
-        # containing multiple languages
-        # TODO: Add example usage
+        # containing multiple languages.
+        # 
+        # This is approach only is recommend for deployments where you are only
+        # supporting one language.
+        # @example
+        #  default_language 'en-US'
+        # 
+        #  default_language 'de-DE'
         def default_language(value = nil)
           # TODO: raise error if this method is not on the top of the file
           @default_language = value
@@ -50,6 +56,9 @@ module IosDeployKit
           Helper.log.debug("Set default language to #{@default_language}")
         end
 
+        # Pass the path to the ipa file which should be uploaded
+        # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
+        #  IPA file.
         def ipa(value = nil)
           value ||= yield if block_given?
           raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
@@ -58,7 +67,10 @@ module IosDeployKit
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
         end
 
-        # Set the apps new version number
+        # Set the apps new version number.
+        # 
+        # If you do not set this, it will automatically being fetched from the 
+        # IPA file.
         def version(value = nil)
           value ||= yield if block_given?
           raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
