@@ -40,10 +40,10 @@ describe IosDeployKit do
           }.to raise_error("Can not change metadata directory after accessing metadata of an app")
         end
 
-        it "let's the user modify the download directory", broken: true do
+        it "let's the user modify the download directory" do
           expect(@app.get_metadata_directory).to eq("./")
 
-          alternative = '/tmp/something'
+          alternative = '/tmp/'
           @app.set_metadata_directory(alternative)
 
           expect(@app.get_metadata_directory).to eq(alternative)

@@ -1,6 +1,9 @@
 require 'ios_deploy_kit'
 require 'webmock/rspec'
-require 'webmocking'
+
+# Own mocking code
+require 'mocking/webmocking'
+require 'mocking/transporter_mocking'
 
 
 # This module is only used to check the environment is currently a testing env

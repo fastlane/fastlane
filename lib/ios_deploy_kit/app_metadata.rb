@@ -323,7 +323,7 @@ module IosDeployKit
         # TODO: This does not work for new apps
         raise AppMetadataError.new("You have to create a new version before modifying the app metadata") if versions.count == 1
 
-        raise AppMetadataError.new("metadata_token is missing") if fetch_value("//x:metadata_token").count != 1
+        raise AppMetadataError.new("metadata_token is missing. This package seems to be broken") if fetch_value("//x:metadata_token").count != 1
       end
 
       # Cleans up the package of stuff we do not want to modify/upload

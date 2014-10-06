@@ -12,6 +12,7 @@ describe IosDeployKit do
       end
 
       it "downloads the package" do
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_invalid_apple_id.txt")
         expect {
           expect(IosDeployKit::ItunesTransporter.new("email@email.com", "login").download(@app)).to eq(true)
         }.to raise_error(/.*This Apple ID has been locked for security reasons.*/)
@@ -19,7 +20,12 @@ describe IosDeployKit do
 
       it "works with correct inputs" do
         @app.apple_id = 878567776
-        @app.metadata
+
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+
+        @app.metadata # download the latest metadata
+
+
         expect(@app.upload_metadata!).to eq(true)
       end
     end
