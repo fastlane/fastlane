@@ -28,13 +28,13 @@ describe IosDeployKit do
 
       describe "#fetch_app_identifier" do
         it "returns the valid identifier based on the Info.plist file" do
-          @uploader.fetch_app_identifier.should eq("at.felixkrause.iTanky")
+          expect(@uploader.fetch_app_identifier).to eq("at.felixkrause.iTanky")
         end
       end
 
       describe "#fetch_app_version" do
         it "returns the valid version based on the Info.plist file" do
-          @uploader.fetch_app_version.should eq("1.0")
+          expect(@uploader.fetch_app_version).to eq("1.0")
         end
       end
     end

@@ -12,13 +12,13 @@ describe IosDeployKit do
 
     describe "#username" do
       it "uses the environment variable if given" do
-        IosDeployKit::PasswordManager.new.username.should eq(username)
+        expect(IosDeployKit::PasswordManager.new.username).to eq(username)
       end
     end
 
     describe "#password" do
       it "uses the environment variable if given" do
-        IosDeployKit::PasswordManager.new.password.should eq(password)
+        expect(IosDeployKit::PasswordManager.new.password).to eq(password)
       end
     end
   end

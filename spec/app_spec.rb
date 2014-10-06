@@ -7,19 +7,19 @@ describe IosDeployKit do
       it "automatically fetches the app identifier, if only Apple ID is given" do
         app = IosDeployKit::App.new(apple_id)
 
-        app.app_identifier.should eq(app_identifier)
-        app.apple_id.should eq(apple_id)
+        expect(app.app_identifier).to eq(app_identifier)
+        expect(app.apple_id).to eq(apple_id)
       end
 
       it "lets me create an app using an Apple ID and app identifier" do
         app = IosDeployKit::App.new(apple_id, app_identifier)
 
-        app.app_identifier.should eq(app_identifier)
-        app.apple_id.should eq(apple_id)
+        expect(app.app_identifier).to eq(app_identifier)
+        expect(app.apple_id).to eq(apple_id)
       end
 
       it "lets me create an app without any information given (yet)" do
-        IosDeployKit::App.new.app_identifier.should eq(nil)
+        expect(IosDeployKit::App.new.app_identifier).to eq(nil)
       end
     end
 
@@ -40,12 +40,12 @@ describe IosDeployKit do
         end
 
         it "let's the user modify the download directory", broken: true do
-          @app.get_metadata_directory.should eq("./")
+          expect(@app.get_metadata_directory).to eq("./")
 
           alternative = '/tmp/something'
           @app.set_metadata_directory(alternative)
 
-          @app.get_metadata_directory.should eq(alternative)
+          expect(@app.get_metadata_directory).to eq(alternative)
         end
 
       end
