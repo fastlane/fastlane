@@ -4,7 +4,7 @@ describe IosDeployKit do
     let (:app_identifier) { 'net.sunapps.1' }
 
     before do
-      @app = IosDeployKit::App.new(apple_id, app_identifier)
+      @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: app_identifier)
     end
 
     describe "#init" do

@@ -5,14 +5,15 @@ describe IosDeployKit do
 
     describe "#initialize" do
       it "automatically fetches the app identifier, if only Apple ID is given" do
-        app = IosDeployKit::App.new(apple_id)
+        app = IosDeployKit::App.new(apple_id: apple_id)
 
         expect(app.app_identifier).to eq(app_identifier)
         expect(app.apple_id).to eq(apple_id)
       end
 
       it "lets me create an app using an Apple ID and app identifier" do
-        app = IosDeployKit::App.new(apple_id, app_identifier)
+        app = IosDeployKit::App.new(apple_id: apple_id, 
+                              app_identifier: app_identifier)
 
         expect(app.app_identifier).to eq(app_identifier)
         expect(app.apple_id).to eq(apple_id)
@@ -27,7 +28,7 @@ describe IosDeployKit do
     describe "Accessing App Metadata", felix: true do
       let (:apple_id) { 794902327 }
       before do
-        @app = IosDeployKit::App.new(apple_id, 'net.sunapps.1')
+        @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
       end
 
       describe "#set_metadata_directory" do

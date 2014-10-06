@@ -1,7 +1,7 @@
 describe IosDeployKit do
   describe IosDeployKit::ItunesTransporter do
     before do
-      @app = IosDeployKit::App.new(284882215, 'com.facebook.Facebook')
+      @app = IosDeployKit::App.new(apple_id: 284882215, app_identifier: 'com.facebook.Facebook')
     end
 
     describe "#download", felix: true do

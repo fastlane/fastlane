@@ -58,7 +58,7 @@ describe IosDeployKit do
           expect(meta.deploy_information[:keywords]).to eq({"de-DE"=>["keyword1", "something", "else"], "en-US"=>["random", "values", "are", "here"]})
         end
 
-        it "Uploads all the available screenshots", felix: true, now: true do
+        it "Uploads all the available screenshots", felix: true do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
           # TODO: test even more
         end

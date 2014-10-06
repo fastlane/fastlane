@@ -9,7 +9,7 @@ describe IosDeployKit do
     ].each do |current_path|
       describe "Example metadata #{current_path.split('/').last}" do
         before do
-          @app = IosDeployKit::App.new(apple_id, app_identifier)
+          @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: app_identifier)
 
           @app.metadata = IosDeployKit::AppMetadata.new(@app, current_path, false)
 

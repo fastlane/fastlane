@@ -93,7 +93,7 @@ module IosDeployKit
 
       if @deploy_information[ValKey::IPA]
 
-        @ipa = IosDeployKit::IpaUploader.new(IosDeployKit::App.new(nil, nil), '/tmp/', @deploy_information[ValKey::IPA])
+        @ipa = IosDeployKit::IpaUploader.new(IosDeployKit::App.new, '/tmp/', @deploy_information[ValKey::IPA])
 
         # We are able to fetch some metadata directly from the ipa file
         # If they were also given in the Deliverfile, we will compare the values
@@ -121,7 +121,7 @@ module IosDeployKit
 
       Helper.log.debug("Got all information needed to deploy a the update '#{app_version}' for app '#{app_identifier}'")
 
-      @app = IosDeployKit::App.new(nil, app_identifier)
+      @app = IosDeployKit::App.new(app_identifier: app_identifier)
 
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
