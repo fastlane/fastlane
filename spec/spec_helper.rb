@@ -1,6 +1,9 @@
 require 'ios_deploy_kit'
+require 'webmock/rspec'
+require 'webmocking'
 
 
+# This module is only used to check the environment is currently a testing env
 module SpecHelper
   
 end
