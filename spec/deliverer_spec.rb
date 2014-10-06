@@ -26,39 +26,39 @@ describe IosDeployKit do
         it "successfully loads the Deliverfile if it's valid", felix: true do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
 
-          meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION].should eq("943.0")
+          expect(meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION]).to eq("943.0")
           # meta.app.app_identifier.should eq("com.facebook.Facebook") TODO
-          meta.app.app_identifier.should eq("net.sunapps.54")
-          meta.deploy_information[:version].should eq("943.0")
-          meta.deploy_information[:changelog].should eq({
+          expect(meta.app.app_identifier).to eq("net.sunapps.54")
+          expect(meta.deploy_information[:version]).to eq("943.0")
+          expect(meta.deploy_information[:changelog]).to eq({
             'en-US' => "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
           })
 
           # meta.app.metadata.fetch_value("//x:version").first['string'].should eq("943.0") TODO: works when properly mocking everything
-          meta.app.metadata.fetch_value("//x:version_whats_new").first.content.should eq("Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks.")
+          expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq("Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks.")
           # meta.app.metadata.fetch_value("//x:version_whats_new").count.should eq(1) # one language only
         end
 
         it "Sets all the available metadata", felix: true do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
 
-          meta.app.app_identifier.should eq("net.sunapps.54")
+          expect(meta.app.app_identifier).to eq("net.sunapps.54")
 
-          meta.deploy_information[:changelog].should eq({
+          expect(meta.deploy_information[:changelog]).to eq({
             "de-DE" => "Danke für das Lesen dieses Tests", 
             "en-US" => "Thanks for using this app"
           })
 
-          meta.deploy_information[:version].should eq("143.4.123")
-          meta.deploy_information[:description].should eq({"de-DE"=>"App Beschreibung", "en-US"=>"App description"})
-          meta.deploy_information[:privacy_url].values.first.should eq("http://privacy.sunapps.net")
-          meta.deploy_information[:marketing_url].values.first.should eq("http://www.sunapps.net")
-          meta.deploy_information[:support_url].values.first.should eq("http://support.sunapps.net")
-          meta.deploy_information[:title].should eq({"de-DE"=>"Die ultimative iPhone App", "en-US"=>"The ultimate iPhone app"})
-          meta.deploy_information[:keywords].should eq({"de-DE"=>["keyword1", "something", "else"], "en-US"=>["random", "values", "are", "here"]})
+          expect(meta.deploy_information[:version]).to eq("143.4.123")
+          expect(meta.deploy_information[:description]).to eq({"de-DE"=>"App Beschreibung", "en-US"=>"App description"})
+          expect(meta.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
+          expect(meta.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
+          expect(meta.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
+          expect(meta.deploy_information[:title]).to eq({"de-DE"=>"Die ultimative iPhone App", "en-US"=>"The ultimate iPhone app"})
+          expect(meta.deploy_information[:keywords]).to eq({"de-DE"=>["keyword1", "something", "else"], "en-US"=>["random", "values", "are", "here"]})
         end
 
-        it "Uploads all the available screenshots", felix: true, now: true do
+        it "Uploads all the available screenshots", felix: true do
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
           # TODO: test even more
         end
@@ -117,9 +117,9 @@ describe IosDeployKit do
       end
 
       it "has the correct information set based on the given hash", currently: true do
-        @meta.deploy_information[:app_identifier].should eq(@hash[:app_identifier])
-        @meta.deploy_information[:version].should eq(@hash[:version])
-        @meta.deploy_information[:description].should eq(@hash[:description])
+        expect(@meta.deploy_information[:app_identifier]).to eq(@hash[:app_identifier])
+        expect(@meta.deploy_information[:version]).to eq(@hash[:version])
+        expect(@meta.deploy_information[:description]).to eq(@hash[:description])
       end
 
       it "raises an exception when usig an invalid key" do
@@ -132,7 +132,7 @@ describe IosDeployKit do
         ipa_value = "./something.ipa"
 
         @meta.set_new_value(:ipa, ipa_value)
-        @meta.deploy_information[:ipa].should eq(ipa_value)
+        expect(@meta.deploy_information[:ipa]).to eq(ipa_value)
       end
     end
   end

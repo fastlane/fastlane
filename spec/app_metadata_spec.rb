@@ -9,7 +9,7 @@ describe IosDeployKit do
     ].each do |current_path|
       describe "Example metadata #{current_path.split('/').last}" do
         before do
-          @app = IosDeployKit::App.new(apple_id, app_identifier)
+          @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: app_identifier)
 
           @app.metadata = IosDeployKit::AppMetadata.new(@app, current_path, false)
 
@@ -17,8 +17,8 @@ describe IosDeployKit do
         end
 
         it "properly cleaned up the live version, which cannot be updated" do
-          @app.metadata.fetch_value("//x:version").count.should eq(1)
-          @app.metadata.fetch_value("//x:version").first['string'].should eq("0.9.10")
+          expect(@app.metadata.fetch_value("//x:version").count).to eq(1)
+          expect(@app.metadata.fetch_value("//x:version").first['string']).to eq("0.9.10")
         end
 
         describe "#update_title" do
@@ -26,17 +26,17 @@ describe IosDeployKit do
           it "updates the title" do
             new_title = "So new title"
 
-            @app.metadata.fetch_value("//x:title").first.content.should eq('Example App Title')
+            expect(@app.metadata.fetch_value("//x:title").first.content).to eq('Example App Title')
             @app.metadata.update_title({ 'de-DE' => new_title })
 
-            @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
+            expect(@app.metadata.fetch_value("//x:title").first.content).to eq(new_title)
           end
 
           it "supports the & symbol properly" do
             new_title = "something & something else"
             @app.metadata.update_title({ 'de-DE' => new_title })
 
-            @app.metadata.fetch_value("//x:title").first.content.should eq(new_title)
+            expect(@app.metadata.fetch_value("//x:title").first.content).to eq(new_title)
           end
 
           it "raises an error when passing an invalid language" do
@@ -61,7 +61,7 @@ describe IosDeployKit do
               'de-DE' => description
             })
             
-            @app.metadata.fetch_value("//x:description").first.content.should eq(description)
+            expect(@app.metadata.fetch_value("//x:description").first.content).to eq(description)
           end
         end
 
@@ -69,25 +69,25 @@ describe IosDeployKit do
           it "updates the changelog" do
             new_value = "What's new?"
             @app.metadata.update_changelog({ 'de-DE' => new_value })
-            @app.metadata.fetch_value("//x:version_whats_new").first.content.should eq(new_value)
+            expect(@app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(new_value)
           end
         end
 
         describe "#update_marketing_url" do
           it "updates the marketing URL" do
             new_value = "http://google.com"
-            @app.metadata.fetch_value("//x:software_url").first.content.should eq('http://sunapps.net')
+            expect(@app.metadata.fetch_value("//x:software_url").first.content).to eq('http://sunapps.net')
             @app.metadata.update_marketing_url({ 'de-DE' => new_value })
-            @app.metadata.fetch_value("//x:software_url").first.content.should eq(new_value)
+            expect(@app.metadata.fetch_value("//x:software_url").first.content).to eq(new_value)
           end
         end
 
         describe "#update_support_url" do
           it "updates the support URL" do
             new_value = "http://krause.pizza"
-            @app.metadata.fetch_value("//x:support_url").first.content.should eq('http://www.sunapps.net/')
+            expect(@app.metadata.fetch_value("//x:support_url").first.content).to eq('http://www.sunapps.net/')
             @app.metadata.update_support_url({ 'de-DE' => new_value })
-            @app.metadata.fetch_value("//x:support_url").first.content.should eq(new_value)
+            expect(@app.metadata.fetch_value("//x:support_url").first.content).to eq(new_value)
           end
         end
 
@@ -109,18 +109,18 @@ describe IosDeployKit do
             })
             
             result = @app.metadata.fetch_value("//x:keyword")
-            result.count.should eq(tags.count)
-            result[0].content.should eq(tags[0])
-            result[1].content.should eq(tags[1])
-            result[2].content.should eq(tags[2])
+            expect(result.count).to eq(tags.count)
+            expect(result[0].content).to eq(tags[0])
+            expect(result[1].content).to eq(tags[1])
+            expect(result[2].content).to eq(tags[2])
           end
         end
 
         describe "#clear_all_screenshots" do
           it "clears all the screenshots of the given language" do
-            @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
             @app.metadata.clear_all_screenshots("de-DE")
-            @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(0)
           end
 
           it "throws an exception when language is invalid" do
@@ -153,7 +153,7 @@ describe IosDeployKit do
           it "properly updates the metadata information when providing correct inputs" do
             path = './spec/fixtures/screenshots/screenshot1.png'
 
-            @app.metadata.fetch_value("//x:software_screenshot").count.should eq(@number_of_screenshots)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
               'de-DE' => [
                 IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35),
@@ -162,10 +162,10 @@ describe IosDeployKit do
               ]
             })
             results = @app.metadata.fetch_value("//x:software_screenshot")
-            results.count.should eq(3)
-            results[0]['position'].should eq('1')
-            results[1]['position'].should eq('2')
-            results[2]['position'].should eq('3')
+            expect(results.count).to eq(3)
+            expect(results[0]['position']).to eq('1')
+            expect(results[1]['position']).to eq('2')
+            expect(results[2]['position']).to eq('3')
           end
         end
 
@@ -175,16 +175,16 @@ describe IosDeployKit do
             @app.metadata.clear_all_screenshots("en-US")
 
             path = './spec/fixtures/screenshots/'
-            @app.metadata.set_screenshots_from_path({'de-DE' => path}).should eq(true)
+            expect(@app.metadata.set_screenshots_from_path({'de-DE' => path})).to eq(true)
             results = @app.metadata.fetch_value("//x:software_screenshot")
             
-            results.count.should eq(Dir["./spec/fixtures/screenshots/*"].length)
+            expect(results.count).to eq(Dir["./spec/fixtures/screenshots/*"].length)
             
             example = results.first
-            example['display_target'].should eq("iOS-3.5-in")
-            example['position'].should eq("1")
+            expect(example['display_target']).to eq("iOS-3.5-in")
+            expect(example['position']).to eq("1")
 
-            results[1]['position'].should eq("1") # other screen size
+            expect(results[1]['position']).to eq("1") # other screen size
           end
         end
 
@@ -193,7 +193,7 @@ describe IosDeployKit do
             @app.apple_id = 878567776
             @app.metadata.clear_all_screenshots('de-DE')
             @app.metadata.clear_all_screenshots('en-US')
-            @app.metadata.fetch_value("//x:software_screenshot").count.should eq(0)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(0)
 
             path = './spec/fixtures/screenshots/screenshot1.png'
             # The order is quite important. en-US first, since we check using the index afterwards
@@ -214,18 +214,18 @@ describe IosDeployKit do
             
 
             results = @app.metadata.fetch_value("//x:software_screenshot")
-            results.count.should eq(10)
+            expect(results.count).to eq(10)
 
-            results[0]['position'].should eq('1')
-            results[1]['position'].should eq('1')
-            results[2]['position'].should eq('2')
-            results[3]['position'].should eq('1')
-            results[4]['position'].should eq('3')
-            results[5]['position'].should eq('1')
-            results[6]['position'].should eq('2')
-            results[7]['position'].should eq('3')
-            results[8]['position'].should eq('4')
-            results[9]['position'].should eq('5')
+            expect(results[0]['position']).to eq('1')
+            expect(results[1]['position']).to eq('1')
+            expect(results[2]['position']).to eq('2')
+            expect(results[3]['position']).to eq('1')
+            expect(results[4]['position']).to eq('3')
+            expect(results[5]['position']).to eq('1')
+            expect(results[6]['position']).to eq('2')
+            expect(results[7]['position']).to eq('3')
+            expect(results[8]['position']).to eq('4')
+            expect(results[9]['position']).to eq('5')
           end
         end
       end

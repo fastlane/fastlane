@@ -177,9 +177,9 @@ module IosDeployKit
 
         # Ready for storing the screenshot into the metadata.xml now
         screenshots.children.after(app_screenshot.create_xml_node(@data, next_index))
-
-        app_screenshot.store_file_inside_package(@package_path)
       end
+
+      app_screenshot.store_file_inside_package(@package_path)
     end
 
     # This method will clear all screenshots and set the new ones you pass
@@ -336,6 +336,9 @@ module IosDeployKit
           versions = fetch_value("//x:version")
         end
         Helper.log.info "Modifying version '#{versions.first['string']}' of app #{@app.app_identifier}"
+
+        # Remove all GameCenter related code
+        fetch_value("//x:game_center").remove
       end
   end
 end

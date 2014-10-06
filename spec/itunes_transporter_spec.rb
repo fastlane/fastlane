@@ -1,7 +1,7 @@
 describe IosDeployKit do
   describe IosDeployKit::ItunesTransporter do
     before do
-      @app = IosDeployKit::App.new(284882215, 'com.facebook.Facebook')
+      @app = IosDeployKit::App.new(apple_id: 284882215, app_identifier: 'com.facebook.Facebook')
     end
 
     describe "#download", felix: true do
@@ -13,14 +13,14 @@ describe IosDeployKit do
 
       it "downloads the package" do
         expect {
-          IosDeployKit::ItunesTransporter.new("email@email.com", "login").download(@app).should eq(true)
+          expect(IosDeployKit::ItunesTransporter.new("email@email.com", "login").download(@app)).to eq(true)
         }.to raise_error(/.*This Apple ID has been locked for security reasons.*/)
       end
 
       it "works with correct inputs" do
         @app.apple_id = 878567776
         @app.metadata
-        @app.upload_metadata!.should eq(true)
+        expect(@app.upload_metadata!).to eq(true)
       end
     end
   end

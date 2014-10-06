@@ -12,7 +12,7 @@ describe IosDeployKit do
 
       it "properly saves the path" do
         res = IosDeployKit::MetadataItem.new(path)
-        res.path.should eq(path)
+        expect(res.path).to eq(path)
       end
     end
 
@@ -25,9 +25,9 @@ describe IosDeployKit do
       describe "#create_xml_node" do
         it "properly creates a valid nokogiri xml node" do
           node = @item.create_xml_node(@doc)
-          node.children.first.content.should eq(File.size(path).to_s)
-          node.children[1].content.should eq(path.split("/").last)
-          node.children.last['type'].should eq("md5")
+          expect(node.children.first.content).to eq(File.size(path).to_s)
+          expect(node.children[1].content).to eq(path.split("/").last)
+          expect(node.children.last['type']).to eq("md5")
         end
       end
     end

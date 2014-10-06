@@ -31,7 +31,7 @@ module IosDeployKit
     # @param apple_id The Apple ID of the app you want to modify or update. This ID has usually 9 digits
     # @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
     #   which means it takes longer. If you **can** pass the app_identifier (e.g. com.facebook.Facebook) do it
-    def initialize(apple_id = nil, app_identifier = nil)
+    def initialize(apple_id: nil, app_identifier: nil)
       self.apple_id = apple_id
       self.app_identifier = app_identifier
       
@@ -50,10 +50,6 @@ module IosDeployKit
 
     def itc
       @itc ||= IosDeployKit::ItunesConnect.new
-    end
-
-    def open_in_itunes_connect
-      itc.open_app_page(self)
     end
 
     # This method fetches the current app status from iTunesConnect.
