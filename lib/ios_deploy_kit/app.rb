@@ -52,10 +52,6 @@ module IosDeployKit
       @itc ||= IosDeployKit::ItunesConnect.new
     end
 
-    def open_in_itunes_connect
-      itc.open_app_page(self)
-    end
-
     # This method fetches the current app status from iTunesConnect.
     # This method may take some time to execute, since it uses frontend scripting under the hood.
     # @return the current App Status defined at {IosDeployKit::App::AppStatus}, like "Waiting For Review"
