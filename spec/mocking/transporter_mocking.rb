@@ -9,7 +9,7 @@ module IosDeployKit
 
     private
       def execute_transporter(command)
-        raise "You have to set a mock file for this test!" unless @@mocking_file
+        raise "You have to set a mock file for this test!" unless defined?@@mocking_file and @@mocking_file
 
         @errors = []
         @warnings = []
