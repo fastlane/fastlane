@@ -23,7 +23,7 @@ module IosDeployKit
 
     def self.fetch_by_identifier(app_identifier)
       # Example: http://itunes.apple.com/lookup?bundleId=net.sunapps.1
-      fetch_url("http://itunes.apple.com/lookup?bundleId=#{app_identifier}")
+      fetch_url("https://itunes.apple.com/lookup?bundleId=#{app_identifier}")
     end
       
 
