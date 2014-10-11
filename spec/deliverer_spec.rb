@@ -24,6 +24,8 @@ describe IosDeployKit do
         end
 
         it "successfully loads the Deliverfile if it's valid", felix: true do
+          IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
 
           expect(meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION]).to eq("943.0")
