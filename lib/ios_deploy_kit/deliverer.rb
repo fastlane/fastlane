@@ -150,6 +150,7 @@ module IosDeployKit
       # IPA File
       # The IPA file has to be handles seperatly
       if @ipa
+        @ipa.app = @app # we now have the resulting app
         @ipa.upload!
       end
 

@@ -8,6 +8,7 @@ module IosDeployKit
   # This class takes care of preparing and uploading the given ipa file
   # Metadata + IPA file can not be handled in one file
   class IpaUploader < AppMetadata
+    attr_accessor :app
 
     # TODO
     # @param dir The path to the IPA file which should be uploaded
@@ -18,8 +19,6 @@ module IosDeployKit
       super(app, dir, false)
 
       @ipa_file = IosDeployKit::MetadataItem.new(ipa_path)
-
-      build_document
     end
 
     def transporter
@@ -46,16 +45,18 @@ module IosDeployKit
 
     # Actually upload the updated metadata to Apple
     def upload!
-      # First: Write the current XML state to disk
+      build_document
+
+      # Write the current XML state to disk
       folder_name = "#{@app.apple_id}.itmsp"
-      path = "#{self.metadata_dir}/#{folder_name}/"
+      path = "#{@metadata_dir}/#{folder_name}/"
       FileUtils.mkdir_p path
 
       File.write("#{path}/#{METADATA_FILE_NAME}", @data.to_xml)
 
       @ipa_file.store_file_inside_package(path)
 
-      transporter.upload(@app, self.metadata_dir)
+      transporter.upload(@app, @metadata_dir)
     end
 
     
