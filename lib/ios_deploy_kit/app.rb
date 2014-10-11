@@ -106,6 +106,5 @@ module IosDeployKit
       self.metadata.upload!
     end
 
-
   end
 end

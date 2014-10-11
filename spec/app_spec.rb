@@ -25,7 +25,7 @@ describe IosDeployKit do
     end
 
 
-    describe "Accessing App Metadata", felix: true do
+    describe "Accessing App Metadata" do
       let (:apple_id) { 794902327 }
       before do
         @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
