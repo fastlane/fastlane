@@ -21,6 +21,7 @@ module IosDeployKit
 
     module ValKey
       APP_IDENTIFIER = :app_identifier
+      APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
       DESCRIPTION = :description
@@ -88,6 +89,7 @@ module IosDeployKit
     def finished_executing_deliver_file
       app_version = @deploy_information[ValKey::APP_VERSION]
       app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
+      apple_id = @deploy_information[ValKey::APPLE_ID]
 
       errors = IosDeployKit::Deliverfile::Deliverfile
 
@@ -121,7 +123,8 @@ module IosDeployKit
 
       Helper.log.debug("Got all information needed to deploy a the update '#{app_version}' for app '#{app_identifier}'")
 
-      @app = IosDeployKit::App.new(app_identifier: app_identifier)
+      @app = IosDeployKit::App.new(app_identifier: app_identifier,
+                                    apple_id: apple_id)
 
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
