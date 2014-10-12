@@ -21,7 +21,12 @@ module IosDeployKit
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
-            raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
+
+            unless value
+              Helper.log.error(caller)
+              Helper.log.fatal("No value or block passed to method '#{method_sym}'")
+              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) 
+            end
 
             if value.kind_of?String and not not_translated.include?method_sym
               # The user should pass a hash for multi-lang values
