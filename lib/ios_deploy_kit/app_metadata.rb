@@ -108,7 +108,7 @@ module IosDeployKit
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
       update_localized_value('keywords', hash) do |field, keywords|
-        raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it") unless keywords.kind_of?Array
+        raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
         field.children.remove # remove old keywords
 
@@ -287,7 +287,7 @@ module IosDeployKit
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
-          raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
           raise "Locale '#{language}' not found. Please create the new locale on iTunesConnect first." unless locale
 
           field = locale.search(xpath_name).first
@@ -319,9 +319,6 @@ module IosDeployKit
       # (a new version, or a new app)
       def verify_package
         versions = fetch_value("//x:version")
-
-        # TODO: This does not work for new apps
-        raise AppMetadataError.new("You have to create a new version before modifying the app metadata") if versions.count == 1
 
         raise AppMetadataError.new("metadata_token is missing. This package seems to be broken") if fetch_value("//x:metadata_token").count != 1
       end

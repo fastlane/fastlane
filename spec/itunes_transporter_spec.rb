@@ -19,7 +19,7 @@ describe IosDeployKit do
       end
     end
 
-    describe "#upload", now: true do
+    describe "#upload" do
       it "properly uploads the package file" do
         @app.apple_id = 878567776
 
