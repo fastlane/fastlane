@@ -46,12 +46,12 @@ module IosDeployKit
 
       # File Name
       file_name = Nokogiri::XML::Node.new('file_name', doc)
-      file_name.content = path.split("/").last
+      file_name.content = resulting_file_name
       node_set << file_name
 
       # md5 Checksum
       checksum = Nokogiri::XML::Node.new('checksum', doc)
-      checksum.content = Digest::MD5.hexdigest(File.read(path))
+      checksum.content = md5_value
       checksum['type'] = 'md5'
       node_set << checksum
 
@@ -64,12 +64,25 @@ module IosDeployKit
     # We also have to copy the file itself, since it has to be *inside* the package
     # You don't have to call this method manually.
     def store_file_inside_package(path_to_package)
-      FileUtils.cp(self.path, path_to_package)
+      # This will also rename the resulting file to not have any spaces or other
+      # illegal characters in the file name
+      
+      FileUtils.cp(self.path, "#{path_to_package}/#{resulting_file_name}")
     end
 
     private
       def name_for_xml_node
         @custom_node_name || 'data_file'
+      end
+
+      # The file name which is used inside the package
+      def resulting_file_name
+        extension = File.extname(self.path)
+        "#{md5_value}#{extension}"
+      end
+
+      def md5_value
+        Digest::MD5.hexdigest(File.read(self.path))
       end
   end
 end

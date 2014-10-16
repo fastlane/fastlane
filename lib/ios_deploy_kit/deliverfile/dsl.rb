@@ -17,11 +17,16 @@ module IosDeployKit
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = IosDeployKit::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier]
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
-            raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
+
+            unless value
+              Helper.log.error(caller)
+              Helper.log.fatal("No value or block passed to method '#{method_sym}'")
+              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) 
+            end
 
             if value.kind_of?String and not not_translated.include?method_sym
               # The user should pass a hash for multi-lang values
@@ -54,6 +59,7 @@ module IosDeployKit
           @default_language = value
           @default_language ||= yield if block_given?
           Helper.log.debug("Set default language to #{@default_language}")
+          @deliver_data.set_new_value(:default_language, @default_language)
         end
 
         # Pass the path to the ipa file which should be uploaded

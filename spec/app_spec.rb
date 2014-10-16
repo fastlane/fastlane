@@ -25,7 +25,7 @@ describe IosDeployKit do
     end
 
 
-    describe "Accessing App Metadata", felix: true do
+    describe "Accessing App Metadata" do
       let (:apple_id) { 794902327 }
       before do
         @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
@@ -40,10 +40,10 @@ describe IosDeployKit do
           }.to raise_error("Can not change metadata directory after accessing metadata of an app")
         end
 
-        it "let's the user modify the download directory", broken: true do
-          expect(@app.get_metadata_directory).to eq("./")
+        it "let's the user modify the download directory" do
+          expect(@app.get_metadata_directory).to eq("./spec/fixtures/packages/")
 
-          alternative = '/tmp/something'
+          alternative = '/tmp/'
           @app.set_metadata_directory(alternative)
 
           expect(@app.get_metadata_directory).to eq(alternative)

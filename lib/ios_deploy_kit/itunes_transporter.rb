@@ -67,37 +67,45 @@ module IosDeployKit
 
     private
       def execute_transporter(command)
-        # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
-
-        errors = []
-        warnings = []
+        @errors = []
+        @warnings = []
 
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
             stdin.each do |line|
-              if line =~ ERROR_REGEX
-                errors << $1
-              elsif line =~ WARNING_REGEX
-                warnings << $1
-              end
-
-              if line =~ OUTPUT_REGEX
-                # General logging for debug purposes
-                Helper.log.debug "[Transpoter Output]: #{$1}"
-              end
+              parse_line(line) # this is where the parsing happens
             end
           end
         rescue Exception => ex
           Helper.log.fatal(ex.to_s)
-          errors << ex.to_s
+          @errors << ex.to_s
         end
 
-        if errors.count > 0
+        if @errors.count > 0
           Helper.log.debug(caller)
-          raise TransporterTransferError.new(errors.join("\n"))
+          raise TransporterTransferError.new(@errors.join("\n"))
+        end
+
+        if @warnings.count > 0
+          Helper.log.warn(@warnings.join("\n"))
         end
 
         true
+      end
+
+      def parse_line(line)
+        # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
+
+        if line =~ ERROR_REGEX
+          @errors << $1
+        elsif line =~ WARNING_REGEX
+          @warnings << $1
+        end
+
+        if line =~ OUTPUT_REGEX
+          # General logging for debug purposes
+          Helper.log.debug "[Transpoter Output]: #{$1}"
+        end
       end
 
       def build_download_command(username, password, apple_id, destination = "/tmp")

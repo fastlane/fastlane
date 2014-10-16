@@ -23,56 +23,71 @@ describe IosDeployKit do
           }.to raise_exception(IosDeployKit::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
         end
 
-        it "successfully loads the Deliverfile if it's valid", felix: true do
-          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
+        describe "Valid Deliverfiles" do
+          before do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+          end
 
-          expect(meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION]).to eq("943.0")
-          # meta.app.app_identifier.should eq("com.facebook.Facebook") TODO
-          expect(meta.app.app_identifier).to eq("net.sunapps.54")
-          expect(meta.deploy_information[:version]).to eq("943.0")
-          expect(meta.deploy_information[:changelog]).to eq({
-            'en-US' => "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
-          })
+          it "successfully loads the Deliverfile if it's valid" do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-          # meta.app.metadata.fetch_value("//x:version").first['string'].should eq("943.0") TODO: works when properly mocking everything
-          expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq("Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks.")
-          # meta.app.metadata.fetch_value("//x:version_whats_new").count.should eq(1) # one language only
-        end
+            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
 
-        it "Sets all the available metadata", felix: true do
-          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
+            thanks_for_facebook = "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
 
-          expect(meta.app.app_identifier).to eq("net.sunapps.54")
+            expect(meta.app.app_identifier).to eq("net.sunapps.54")
+            expect(meta.deploy_information[:version]).to eq("943.0")
+            expect(meta.deploy_information[:changelog]).to eq({
+              'en-US' => thanks_for_facebook
+            })
 
-          expect(meta.deploy_information[:changelog]).to eq({
-            "de-DE" => "Danke für das Lesen dieses Tests", 
-            "en-US" => "Thanks for using this app"
-          })
+            # Stored in XML file
+            expect(meta.app.metadata.fetch_value("//x:version").first['string']).to eq("943.0")
+            expect(meta.app.metadata.fetch_value("//x:version_whats_new").count).to eq(1) # one language only
+            expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
+          end
 
-          expect(meta.deploy_information[:version]).to eq("143.4.123")
-          expect(meta.deploy_information[:description]).to eq({"de-DE"=>"App Beschreibung", "en-US"=>"App description"})
-          expect(meta.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
-          expect(meta.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
-          expect(meta.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
-          expect(meta.deploy_information[:title]).to eq({"de-DE"=>"Die ultimative iPhone App", "en-US"=>"The ultimate iPhone app"})
-          expect(meta.deploy_information[:keywords]).to eq({"de-DE"=>["keyword1", "something", "else"], "en-US"=>["random", "values", "are", "here"]})
+          it "Sets all the available metadata" do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
+
+            expect(meta.app.app_identifier).to eq("net.sunapps.54")
+
+            expect(meta.deploy_information[:changelog]).to eq({"en-US"=>"Thanks for using this app"})
+
+            expect(meta.deploy_information[:version]).to eq("943.0")
+            expect(meta.deploy_information[:description]).to eq({"en-US"=>"App description"})
+            expect(meta.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
+            expect(meta.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
+            expect(meta.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
+            expect(meta.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
+            expect(meta.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
+          end
+
+          it "raises an exception when the versions do not match" do
+            expect {
+              meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
+            }.to raise_exception("Version mismatch: on iTunesConnect the latest version is '943.0', you specified '0.9.0'")
+          end
         end
 
         it "Uploads all the available screenshots", felix: true do
-          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
-          # TODO: test even more
+          IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+          # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
+          # binding.pry
         end
 
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not mtach with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
+          }.to raise_exception("App Identifier of IPA does not match with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not mtach with the given one (128378973 != 1.0)")
+          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)")
         end
 
         it "works with a super simple Deliverfile" do

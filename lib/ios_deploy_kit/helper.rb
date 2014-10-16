@@ -22,6 +22,7 @@ module IosDeployKit
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
+      return "" if self.is_test? and not OS.mac?
       `xcode-select -p`.gsub("\n", '') + "/"
     end
 

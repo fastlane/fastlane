@@ -30,6 +30,11 @@ module IosDeployKit
 
       if self.class == AppMetadata
         if redownload_package
+          # Delete the one that may exists already
+          unless Helper.is_test?
+            `rm -fr #{dir}/*.itmsp`
+          end
+
           # we want to update the metadata, so first we have to download the existing one
           transporter.download(app, dir)
 
@@ -40,6 +45,13 @@ module IosDeployKit
           parse_package(dir)
         end
       end
+    end
+
+    # Verifies the if the version of iTunesConnect matches the one you pass as parameter
+    def verify_version(version_number)
+      xml_version = self.fetch_value("//x:version").first['string']
+      raise "Version mismatch: on iTunesConnect the latest version is '#{xml_version}', you specified '#{version_number}'" if xml_version != version_number
+      true
     end
 
 
@@ -108,7 +120,7 @@ module IosDeployKit
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
       update_localized_value('keywords', hash) do |field, keywords|
-        raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it") unless keywords.kind_of?Array
+        raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
         field.children.remove # remove old keywords
 
@@ -220,7 +232,7 @@ module IosDeployKit
     # 
     # This will also clear all existing screenshots before setting the new ones.
     # @param (Hash) hash A hash containing a different path for each locale ({IosDeployKit::Languages::ALL_LANGUAGES})
-    def set_screenshots_from_path(hash)
+    def set_screenshots_for_each_language(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
@@ -231,12 +243,31 @@ module IosDeployKit
 
         self.clear_all_screenshots(language)
         
-        Dir[resulting_path].each do |path|
+        Dir[resulting_path].sort.each do |path|
           add_screenshot(language, IosDeployKit::AppScreenshot.new(path))
         end
       end
 
       true
+    end
+
+    # This method will run through all the available locales, check if there is 
+    # a folder for this language (e.g. 'en-US') and use all screenshots in there
+    # @param (String) path A path to the folder, which contains a folder for each locale
+    def set_all_screenshots_from_path(path)
+      raise AppMetadataParameterError.new("Parameter needs to be a path (string)") unless path.kind_of?String
+
+      found = false
+      IosDeployKit::Languages::ALL_LANGUAGES.each do |language|
+        full_path = path + "/#{language}"
+        if File.directory?(full_path)
+          found = true
+          set_screenshots_for_each_language({
+            language => full_path
+          })
+        end
+      end
+      return found
     end
 
 
@@ -266,8 +297,10 @@ module IosDeployKit
     # @raise (TransporterTransferError) When something goes wrong when uploading
     #  the metadata/app
     def upload!
-      # First: Write the current XML state to disk
-      File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
+      unless Helper.is_test?
+        # First: Write the current XML state to disk
+        File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
+      end
 
       transporter.upload(@app, @metadata_dir)
     end
@@ -287,7 +320,7 @@ module IosDeployKit
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
-          raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
           raise "Locale '#{language}' not found. Please create the new locale on iTunesConnect first." unless locale
 
           field = locale.search(xpath_name).first
@@ -320,10 +353,7 @@ module IosDeployKit
       def verify_package
         versions = fetch_value("//x:version")
 
-        # TODO: This does not work for new apps
-        raise AppMetadataError.new("You have to create a new version before modifying the app metadata") if versions.count == 1
-
-        raise AppMetadataError.new("metadata_token is missing") if fetch_value("//x:metadata_token").count != 1
+        raise AppMetadataError.new("metadata_token is missing. This package seems to be broken") if fetch_value("//x:metadata_token").count != 1
       end
 
       # Cleans up the package of stuff we do not want to modify/upload
