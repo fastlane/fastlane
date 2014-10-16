@@ -61,20 +61,21 @@ describe IosDeployKit do
         end
 
         it "Uploads all the available screenshots", felix: true do
-          meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
-          # TODO: test even more
+          IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+          # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
+          # binding.pry
         end
 
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not mtach with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
+          }.to raise_exception("App Identifier of IPA does not match with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
           expect {
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not mtach with the given one (128378973 != 1.0)")
+          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)")
         end
 
         it "works with a super simple Deliverfile" do

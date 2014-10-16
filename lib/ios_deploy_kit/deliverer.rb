@@ -32,6 +32,7 @@ module IosDeployKit
       MARKETING_URL = :marketing_url
       KEYWORDS = :keywords
       SCREENSHOTS_PATH = :screenshots_path
+      DEFAULT_LANGUAGE = :default_language
     end
 
     
@@ -102,7 +103,7 @@ module IosDeployKit
 
         if app_identifier
           if app_identifier != @ipa.fetch_app_identifier
-            raise errors::DeliverfileDSLError.new("App Identifier of IPA does not mtach with the given one (#{app_identifier} != #{@ipa.fetch_app_identifier})")
+            raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one (#{app_identifier} != #{@ipa.fetch_app_identifier})")
           end
         else
           app_identifier = @ipa.fetch_app_identifier
@@ -110,7 +111,7 @@ module IosDeployKit
 
         if app_version
           if app_version != @ipa.fetch_app_version
-            raise errors::DeliverfileDSLError.new("App Version of IPA does not mtach with the given one (#{app_version} != #{@ipa.fetch_app_version})")
+            raise errors::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})")
           end
         else
           app_version = @ipa.fetch_app_version
@@ -142,12 +143,23 @@ module IosDeployKit
       @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
 
       # Screenshots
+      screens_path = @deploy_information[ValKey::SCREENSHOTS_PATH]
+      if screens_path
+        if not @app.metadata.set_all_screenshots_from_path(screens_path)
+          # This path does not contain folders for each language
+          if screens_path.kind_of?String
+            if @deploy_information[ValKey::DEFAULT_LANGUAGE]
+              screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path }
+            else
+              raise "You have to have folders for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
+            end
+          end
+          @app.metadata.set_screenshots_for_each_language(screens_path)
+        end
+      end
+      
 
-      @app.metadata.set_screenshots_for_each_language(@deploy_information[ValKey::SCREENSHOTS_PATH]) if @deploy_information[ValKey::SCREENSHOTS_PATH]
-
-      # unless Helper.is_test?
-        @app.metadata.upload!
-      # end
+      @app.metadata.upload!
 
 
       # IPA File

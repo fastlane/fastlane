@@ -17,7 +17,7 @@ module IosDeployKit
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = IosDeployKit::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier, :apple_id]
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
@@ -59,6 +59,7 @@ module IosDeployKit
           @default_language = value
           @default_language ||= yield if block_given?
           Helper.log.debug("Set default language to #{@default_language}")
+          @deliver_data.set_new_value(:default_language, @default_language)
         end
 
         # Pass the path to the ipa file which should be uploaded

@@ -1,9 +1,5 @@
-ipa './spec/fixtures/ipas/example1.ipa'
-
 version '1.0'
 
 app_identifier 'net.sunapps.54'
 
-screenshots_path({
-  'de-DE' => "./spec/fixtures/screenshots"
-})
+screenshots_path("./spec/fixtures/screenshots")
