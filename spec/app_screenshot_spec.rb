@@ -29,7 +29,7 @@ describe IosDeployKit do
           order_index = 1
           node = @item.create_xml_node(@doc, order_index)
           expect(node.children.first.content).to eq(File.size(path).to_s)
-          expect(node.children[1].content).to eq("screenshot1.png")
+          expect(node.children[1].content).to eq("e2c116d8f1ab7982a2b131ac681b6e86.png")
           expect(node.children.last['type']).to eq("md5")
           expect(node.children.last.content).to eq("e2c116d8f1ab7982a2b131ac681b6e86")
 

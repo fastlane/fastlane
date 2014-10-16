@@ -42,7 +42,7 @@ describe IosDeployKit do
           it "raises an error when passing an invalid language" do
             expect {
               @app.metadata.update_title({ 'de' => 'asdf' })
-            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
+            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES (de)")
           end
         end
 
@@ -96,7 +96,7 @@ describe IosDeployKit do
           it "throws an exception when a string is given instead of an array" do
             expect {
               @app.metadata.update_keywords({ "de-DE" => "keyword1, keyword2" })
-            }.to raise_error("Parameter needs to be a hash (each language) with an array of keywords in it")
+            }.to raise_error("Parameter needs to be a hash (each language) with an array of keywords in it (given: {\"de-DE\"=>\"keyword1, keyword2\"})")
           end
 
           it "updates the keywords when a hash of arrays is given" do

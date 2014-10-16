@@ -1,6 +1,6 @@
 describe IosDeployKit do
   describe IosDeployKit::MetadataItem do
-    let (:path) { "./spec/metadata_item_spec.rb" }
+    let (:path) { "./spec/fixtures/screenshots/iPhone4.png" }
 
     describe "#init" do
       it "raises an exception if file was not found" do
@@ -26,7 +26,7 @@ describe IosDeployKit do
         it "properly creates a valid nokogiri xml node" do
           node = @item.create_xml_node(@doc)
           expect(node.children.first.content).to eq(File.size(path).to_s)
-          expect(node.children[1].content).to eq(path.split("/").last)
+          expect(node.children[1].content).to eq("21cc9b3dfd716023aad118bce2442b77.png")
           expect(node.children.last['type']).to eq("md5")
         end
       end
