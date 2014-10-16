@@ -70,25 +70,39 @@ module IosDeployKit
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
-      # TODO: Support landscape screenshots
-
       raise "Could not find or parse file at path '#{path}'" if (size == nil or size.count == 0)
 
-      if (size[0] == 1080 and size[1] == 1920) or (size[0] == 1242 and size[1] == 2208)
-        ScreenSize::IOS_55
-      elsif (size[0] == 750 and size[1] == 1334)
-        ScreenSize::IOS_47
-      elsif (size[0] == 640 and size[1] == 1136)
-        ScreenSize::IOS_40
-      elsif (size[0] == 640 and size[1] == 960)
-        ScreenSize::IOS_35
-      elsif (size[0] == 1536 and size[1] == 2048)
-        ScreenSize::IOS_IPAD
-      else
-        error = "Unsupported screen size #{size} for path '#{path}'"
-        Helper.log.error error
-        raise error
+      devices = {
+        ScreenSize::IOS_55 => [
+          [1080, 1920],
+          [1242, 2208]
+        ],
+        ScreenSize::IOS_47 => [
+          [750, 1334]
+        ],
+        ScreenSize::IOS_40 => [
+          [640, 1136]
+        ],
+        ScreenSize::IOS_35 => [
+          [640, 960]
+        ],
+        ScreenSize::IOS_IPAD => [
+          [1536, 2048]
+        ]
+      }
+
+      devices.each do |device_type, array|
+        array.each do |resolution|
+          if (size[0] == resolution[0] and size[1] == resolution[1]) or # portrait
+              (size[1] == resolution[0] and size[0] == resolution[1]) # landscape
+            return device_type
+          end
+        end
       end
+
+      error = "Unsupported screen size #{size} for path '#{path}'"
+      Helper.log.error error
+      raise error
     end
   end
 
