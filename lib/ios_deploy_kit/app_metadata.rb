@@ -31,7 +31,9 @@ module IosDeployKit
       if self.class == AppMetadata
         if redownload_package
           # Delete the one that may exists already
-          `rm -fr #{dir}/*.itmsp`
+          unless Helper.is_test?
+            `rm -fr #{dir}/*.itmsp`
+          end
 
           # we want to update the metadata, so first we have to download the existing one
           transporter.download(app, dir)
@@ -295,8 +297,10 @@ module IosDeployKit
     # @raise (TransporterTransferError) When something goes wrong when uploading
     #  the metadata/app
     def upload!
-      # First: Write the current XML state to disk
-      File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
+      unless Helper.is_test?
+        # First: Write the current XML state to disk
+        File.write("#{@package_path}/#{METADATA_FILE_NAME}", @data.to_xml)
+      end
 
       transporter.upload(@app, @metadata_dir)
     end
