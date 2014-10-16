@@ -30,6 +30,9 @@ module IosDeployKit
 
       if self.class == AppMetadata
         if redownload_package
+          # Delete the one that may exists already
+          `rm -fr #{dir}/*.itmsp`
+
           # we want to update the metadata, so first we have to download the existing one
           transporter.download(app, dir)
 
