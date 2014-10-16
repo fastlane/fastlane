@@ -234,7 +234,7 @@ module IosDeployKit
 
         self.clear_all_screenshots(language)
         
-        Dir[resulting_path].each do |path|
+        Dir[resulting_path].sort.each do |path|
           add_screenshot(language, IosDeployKit::AppScreenshot.new(path))
         end
       end
