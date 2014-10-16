@@ -81,12 +81,23 @@ module IosDeployKit
           [750, 1334]
         ],
         ScreenSize::IOS_40 => [
-          [640, 1136]
+          [640, 1136],
+          [640, 1096],
+          [1136, 600] # landscape status bar is smaller
         ],
         ScreenSize::IOS_35 => [
-          [640, 960]
+          [640, 960],
+          [640, 920],
+          [960, 600] # landscape status bar is smaller
         ],
         ScreenSize::IOS_IPAD => [
+          [1024, 748],
+          [1024, 768],
+          [2048, 1496],
+          [2048, 1536],
+          [768, 1004],
+          [768, 1024],
+          [1536, 2008],
           [1536, 2048]
         ]
       }
