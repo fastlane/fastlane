@@ -41,7 +41,7 @@ describe IosDeployKit do
         end
 
         it "let's the user modify the download directory" do
-          expect(@app.get_metadata_directory).to eq("./")
+          expect(@app.get_metadata_directory).to eq("./spec/fixtures/packages/")
 
           alternative = '/tmp/'
           @app.set_metadata_directory(alternative)

@@ -23,22 +23,24 @@ describe IosDeployKit do
           }.to raise_exception(IosDeployKit::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
         end
 
-        it "successfully loads the Deliverfile if it's valid", felix: true do
+        it "successfully loads the Deliverfile if it's valid" do
           IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+          IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
           meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
 
-          expect(meta.deploy_information[IosDeployKit::Deliverer::ValKey::APP_VERSION]).to eq("943.0")
-          # meta.app.app_identifier.should eq("com.facebook.Facebook") TODO
+          thanks_for_facebook = "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
+
           expect(meta.app.app_identifier).to eq("net.sunapps.54")
           expect(meta.deploy_information[:version]).to eq("943.0")
           expect(meta.deploy_information[:changelog]).to eq({
-            'en-US' => "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
+            'en-US' => thanks_for_facebook
           })
 
-          # meta.app.metadata.fetch_value("//x:version").first['string'].should eq("943.0") TODO: works when properly mocking everything
-          expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq("Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks.")
-          # meta.app.metadata.fetch_value("//x:version_whats_new").count.should eq(1) # one language only
+          # Stored in XML file
+          expect(meta.app.metadata.fetch_value("//x:version").first['string']).to eq("943.0")
+          expect(meta.app.metadata.fetch_value("//x:version_whats_new").count).to eq(1) # one language only
+          expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
         end
 
         it "Sets all the available metadata", felix: true do
