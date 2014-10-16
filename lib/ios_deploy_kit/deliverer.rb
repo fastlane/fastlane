@@ -143,7 +143,7 @@ module IosDeployKit
 
       # Screenshots
 
-      @app.metadata.set_screenshots_from_path(@deploy_information[ValKey::SCREENSHOTS_PATH]) if @deploy_information[ValKey::SCREENSHOTS_PATH]
+      @app.metadata.set_screenshots_for_each_language(@deploy_information[ValKey::SCREENSHOTS_PATH]) if @deploy_information[ValKey::SCREENSHOTS_PATH]
 
       # unless Helper.is_test?
         @app.metadata.upload!

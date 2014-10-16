@@ -169,22 +169,53 @@ describe IosDeployKit do
           end
         end
 
-        describe "#set_screenshots_from_path" do
+        describe "#set_screenshots_for_each_language" do
           it "automatically detects all screenshots in the given folder" do
             @app.metadata.clear_all_screenshots("de-DE")
             @app.metadata.clear_all_screenshots("en-US")
 
-            path = './spec/fixtures/screenshots/'
-            expect(@app.metadata.set_screenshots_from_path({'de-DE' => path})).to eq(true)
+            path = './spec/fixtures/screenshots/de-DE'
+            expect(@app.metadata.set_screenshots_for_each_language({'de-DE' => path})).to eq(true)
             results = @app.metadata.fetch_value("//x:software_screenshot")
             
-            expect(results.count).to eq(Dir["./spec/fixtures/screenshots/*"].length)
+            expect(results.count).to eq(Dir["./spec/fixtures/screenshots/de-DE/*"].length)
             
             example = results.first
             expect(example['display_target']).to eq("iOS-3.5-in")
             expect(example['position']).to eq("1")
 
             expect(results[1]['position']).to eq("1") # other screen size
+          end
+        end
+
+        describe "#set_all_screenshots_from_path" do
+          it "return false if no folders could be found" do
+            expect(@app.metadata.set_all_screenshots_from_path('./notfound')).to equal(false)
+          end
+
+          it "automatically detects all screenshots in the given folder" do
+            @app.metadata.clear_all_screenshots("de-DE")
+            @app.metadata.clear_all_screenshots("en-US")
+
+            path = './spec/fixtures/screenshots/'
+            expect(@app.metadata.set_all_screenshots_from_path(path)).to equal(true)
+
+            results = @app.metadata.fetch_value("//x:software_screenshot")
+
+            expect(results.count).to eq(Dir["./spec/fixtures/screenshots/de-DE/*"].length + 
+                                      Dir["./spec/fixtures/screenshots/en-US/*"].length)
+            
+            example = results.first
+            expect(example['display_target']).to eq("iOS-4-in")
+            expect(example['position']).to eq("1")
+
+            expect(results[1]['position']).to eq("1") # other screen size
+          end
+
+          it "throws an exception when there are too many screenshots" do
+            expect {
+              @app.metadata.set_all_screenshots_from_path('./spec/fixtures/screenshots/tooMany/')
+            }.to raise_error("Only 5 screenshots are allowed per language per device type (iOS-3.5-in)")
           end
         end
 

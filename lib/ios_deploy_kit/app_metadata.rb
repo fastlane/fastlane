@@ -223,7 +223,7 @@ module IosDeployKit
     # 
     # This will also clear all existing screenshots before setting the new ones.
     # @param (Hash) hash A hash containing a different path for each locale ({IosDeployKit::Languages::ALL_LANGUAGES})
-    def set_screenshots_from_path(hash)
+    def set_screenshots_for_each_language(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
@@ -240,6 +240,25 @@ module IosDeployKit
       end
 
       true
+    end
+
+    # This method will run through all the available locales, check if there is 
+    # a folder for this language (e.g. 'en-US') and use all screenshots in there
+    # @param (String) path A path to the folder, which contains a folder for each locale
+    def set_all_screenshots_from_path(path)
+      raise AppMetadataParameterError.new("Parameter needs to be a path (string)") unless path.kind_of?String
+
+      found = false
+      IosDeployKit::Languages::ALL_LANGUAGES.each do |language|
+        full_path = path + "/#{language}"
+        if File.directory?(full_path)
+          found = true
+          set_screenshots_for_each_language({
+            language => full_path
+          })
+        end
+      end
+      return found
     end
 
 

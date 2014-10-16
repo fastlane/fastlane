@@ -56,7 +56,7 @@ describe IosDeployKit do
 
       describe "#calculate_screen_size" do
         it "it will return the size for a given png file" do
-          p = "./spec/fixtures/screenshots/"
+          p = "./spec/fixtures/screenshots/de-DE/"
 
           files = [
             ['iPhone4.png', 'iOS-3.5-in'],
