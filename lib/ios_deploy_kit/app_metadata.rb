@@ -45,6 +45,13 @@ module IosDeployKit
       end
     end
 
+    # Verifies the if the version of iTunesConnect matches the one you pass as parameter
+    def verify_version(version_number)
+      xml_version = self.fetch_value("//x:version").first['string']
+      raise "Version mismatch: on iTunesConnect the latest version is '#{xml_version}', you specified '#{version_number}'" if xml_version != version_number
+      true
+    end
+
 
     #####################################################
     # @!group Updating metadata information

@@ -127,6 +127,8 @@ module IosDeployKit
       @app = IosDeployKit::App.new(app_identifier: app_identifier,
                                     apple_id: apple_id)
 
+      @app.metadata.verify_version(app_version)
+
       # Now: set all the updated metadata. We can only do that
       # once the whole file is finished
 
