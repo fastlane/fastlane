@@ -32,7 +32,7 @@ module IosDeployKit
     # @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
     #   which means it takes longer. If you **can** pass the app_identifier (e.g. com.facebook.Facebook) do it
     def initialize(apple_id: nil, app_identifier: nil)
-      self.apple_id = apple_id
+      self.apple_id = (apple_id || '').gsub('id', '')
       self.app_identifier = app_identifier
       
       if apple_id and not app_identifier
