@@ -104,28 +104,32 @@ describe IosDeployKit do
       end
     end
 
-    describe "#initialize with hash", felix: true do
+    describe "#initialize with hash" do
       it "raises an exception when some information is missing" do
         expect {
           @meta = IosDeployKit::Deliverer.new(nil, {})
         }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
       end
 
-      # it "works with valid data" do
-      #   version = '1.0'
-      #   identifier = 'at.felixkrause.iTanky'
-      #   ipa = "spec/fixtures/ipas/Example1.ipa"
+      it "works with valid data" do
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # metadata
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # ipa file
 
-      #   @meta = IosDeployKit::Deliverer.new(nil, {
-      #     app_identifier: identifier,
-      #     version: version,
-      #     ipa: ipa
-      #   })
+        version = '1.0'
+        identifier = 'at.felixkrause.iTanky'
+        ipa = "spec/fixtures/ipas/Example1.ipa"
 
-      #   @meta.deploy_information[:version].should eq(version)
-      #   @meta.deploy_information[:app_identifier].should eq(identifier)
-      #   @meta.deploy_information[:ipa].should eq(ipa)
-      # end
+        @meta = IosDeployKit::Deliverer.new(nil, {
+          app_identifier: identifier,
+          version: version,
+          ipa: ipa
+        })
+
+        @meta.deploy_information[:version].should eq(version)
+        @meta.deploy_information[:app_identifier].should eq(identifier)
+        @meta.deploy_information[:ipa].should eq(ipa)
+      end
     end
 
     describe "#set_new_value", felix: true do
