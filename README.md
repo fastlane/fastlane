@@ -39,7 +39,6 @@ You can use the following environment variables:
 Take a look at *Using the exposed Ruby classes. You
 
 #Usage
-_______
 
 ## Using a *Deliver* file (recommended)
 Why should you have to remember complicated commands and parameters?
