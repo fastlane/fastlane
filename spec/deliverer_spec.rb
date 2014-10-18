@@ -67,15 +67,22 @@ describe IosDeployKit do
 
           it "raises an exception when the versions do not match" do
             expect {
-              meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
+              IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
             }.to raise_exception("Version mismatch: on iTunesConnect the latest version is '943.0', you specified '0.9.0'")
           end
-        end
 
-        it "Uploads all the available screenshots", felix: true do
-          IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
-          # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
-          # binding.pry
+          it "Uploads all the available screenshots" do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
+            screenshots = deliv.app.metadata.fetch_value("//x:software_screenshot")
+            expect(screenshots.count).to eq(9)
+
+            screenshots_path = "spec/fixtures/packages/#{deliv.app.apple_id}.itmsp/*.png"
+            expect(Dir.glob(screenshots_path).count).to equal(screenshots.count)
+            Dir.glob(screenshots_path) do |file|
+              File.delete(file)
+            end
+          end
         end
 
         it "raises an exception if app identifier of ipa does not match the given one" do
