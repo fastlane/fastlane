@@ -96,11 +96,6 @@ describe IosDeployKit do
             meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
           }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)")
         end
-
-        it "works with a super simple Deliverfile" do
-          # meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimplest")
-          
-        end
       end
     end
 
@@ -129,36 +124,6 @@ describe IosDeployKit do
         @meta.deploy_information[:version].should eq(version)
         @meta.deploy_information[:app_identifier].should eq(identifier)
         @meta.deploy_information[:ipa].should eq(ipa)
-      end
-    end
-
-    describe "#set_new_value", felix: true do
-      before do
-        @hash = {
-          app_identifier: "net.sunapps.54",
-          version: "1.3",
-          description: { 'de-DE' => "Something" }
-        }
-        @meta = IosDeployKit::Deliverer.new(nil, @hash)
-      end
-
-      it "has the correct information set based on the given hash", currently: true do
-        expect(@meta.deploy_information[:app_identifier]).to eq(@hash[:app_identifier])
-        expect(@meta.deploy_information[:version]).to eq(@hash[:version])
-        expect(@meta.deploy_information[:description]).to eq(@hash[:description])
-      end
-
-      it "raises an exception when usig an invalid key" do
-        expect {
-          @meta.set_new_value("invalid_key", "value")
-        }.to raise_exception("Invalid key 'invalid_key', must be contained in Deliverer::ValKey.")
-      end
-
-      it "properly updates the key", currently: true do
-        ipa_value = "./something.ipa"
-
-        @meta.set_new_value(:ipa, ipa_value)
-        expect(@meta.deploy_information[:ipa]).to eq(ipa_value)
       end
     end
   end
