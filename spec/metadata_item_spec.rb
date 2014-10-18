@@ -26,7 +26,7 @@ describe IosDeployKit do
         it "properly creates a valid nokogiri xml node" do
           node = @item.create_xml_node(@doc)
           expect(node.children.first.content).to eq(File.size(path).to_s)
-          expect(node.children[1].content).to eq("21cc9b3dfd716023aad118bce2442b77.png")
+          expect(node.children[1].content).to eq("c85dd7b9040bdf34e844d26a144707ab.png")
           expect(node.children.last['type']).to eq("md5")
         end
       end

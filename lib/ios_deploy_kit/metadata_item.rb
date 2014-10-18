@@ -82,7 +82,7 @@ module IosDeployKit
       end
 
       def md5_value
-        Digest::MD5.hexdigest(File.read(self.path))
+        Digest::MD5.hexdigest([File.read(self.path), self.path].join("-"))
       end
   end
 end
