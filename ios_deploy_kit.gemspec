@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
 
-  spec.add_development_dependency "bundler", "~> 1.6"
+  spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency "pry"
