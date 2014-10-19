@@ -22,7 +22,7 @@ module IosDeployKit
 
     include Capybara::DSL
 
-    ITUNESCONNECT_URL = "https://itunesconnect.apple.com"
+    ITUNESCONNECT_URL = "https://itunesconnect.apple.com/"
     APP_DETAILS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/[[app_id]]"
 
     BUTTON_STRING_NEW_VERSION = "New Version"
@@ -31,7 +31,18 @@ module IosDeployKit
     def initialize
       super
       
+      Capybara.run_server = false
       Capybara.default_driver = :poltergeist
+      Capybara.javascript_driver = :poltergeist
+      Capybara.current_driver = :poltergeist
+      Capybara.app_host = ITUNESCONNECT_URL
+
+      # Since Apple has some SSL errors, we have to configure the client properly:
+      # https://github.com/ariya/phantomjs/issues/11239
+      Capybara.register_driver :poltergeist do |a|
+        conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
+        Capybara::Poltergeist::Driver.new(a, phantomjs_options: conf)
+      end
 
       self.login
     end
