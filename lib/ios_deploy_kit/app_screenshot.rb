@@ -32,7 +32,6 @@ module IosDeployKit
 
       self.screen_size = screen_size
 
-      # TODO: change to exception
       Helper.log.error "Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}" unless self.is_valid?
     end
 
