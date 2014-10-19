@@ -92,6 +92,11 @@ module IosDeployKit
     # @!group Destructive/Constructive methods
     #####################################################
 
+    # This method creates a new version of your app using the
+    # iTunesConnect frontend. This will happen directly after calling
+    # this method. 
+    # @param version_number (String) the version number as string for 
+    # the new version that should be created
     def create_new_version!(version_number)
       itc.create_new_version!(self, version_number)
     end
