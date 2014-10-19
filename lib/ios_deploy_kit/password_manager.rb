@@ -21,15 +21,36 @@ module IosDeployKit
       self.password ||= ENV["IOS_DEPLOY_KIT_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
+        puts "No username or password given. You can use environment variables"
+        puts "IOS_DEPLOY_KIT_USER, IOS_DEPLOY_KIT_PASSWORD"
+
         ask_for_login
+      end
+    end
+
+    # This method is called, when the iTunes backend returns that the login data is wrong
+    # This will ask the user, if he wants to re-enter the password
+    def password_seems_wrong
+      puts "It seems like the username or password for the account '#{self.username}' is wrong."
+      reenter = agree("Do you want to re-enter your username and password? (y/n)", true)
+      if reenter
+        @username = nil
+        @password = nil
+        remove_from_keychain
+
+        puts "You will have to re-run the recent command to use the new username/password."
+        ask_for_login
+        return true
+      else
+        return false
       end
     end
 
     private
       def ask_for_login
-        puts "No username or password given. You can use environment variables"
-        puts "IOS_DEPLOY_KIT_USER, IOS_DEPLOY_KIT_PASSWORD"
-        puts "The login information will be stored in your keychain"
+        puts "-------------------------------------------------------------------"
+        puts "The login information you enter now will be stored in your keychain"
+        puts "-------------------------------------------------------------------"
 
         while (self.username || '').length == 0
           self.username = ask("Username: ")
@@ -47,6 +68,10 @@ module IosDeployKit
           Helper.log.error "Could not store password in keychain"
           return false
         end
+      end
+
+      def remove_from_keychain
+        Security::InternetPassword.delete(:server => HOST)
       end
     
       def load_from_keychain

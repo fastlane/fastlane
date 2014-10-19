@@ -100,6 +100,14 @@ module IosDeployKit
 
         if line =~ ERROR_REGEX
           @errors << $1
+
+          # Check if it's a login error
+          if $1.include?"Your Apple ID or password was entered incorrectly" or
+             $1.include?"This Apple ID has been locked for security reasons"
+
+            IosDeployKit::PasswordManager.new.password_seems_wrong
+          end
+
         elsif line =~ WARNING_REGEX
           @warnings << $1
         end
