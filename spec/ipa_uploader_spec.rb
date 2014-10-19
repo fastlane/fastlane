@@ -43,15 +43,15 @@ describe IosDeployKit do
       it "properly loads and stores the ipa when it's valid" do
         IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-        uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./integration/example1/example1.ipa")
+        uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
 
         expect(uploader.app.apple_id).to eq(apple_id)
         
         expect(uploader.upload!).to eq(true)
         
-        expect(uploader.fetch_value("//x:size").first.content.to_i).to eq(14873289)
-        expect(uploader.fetch_value("//x:checksum").first.content).to eq("e1ff5cc61fae98484d30e0771596ead4")
-        expect(uploader.fetch_value("//x:file_name").first.content).to eq("0154140b19748b04ebcf57989f43a99e.ipa")
+        expect(uploader.fetch_value("//x:size").first.content.to_i).to eq(2056240)
+        expect(uploader.fetch_value("//x:checksum").first.content).to eq("094c6abbfd3a22e7e0ebc85c5f650882")
+        expect(uploader.fetch_value("//x:file_name").first.content).to eq("304c8f3176463c89c28fe3a8ea6c726b.ipa")
 
         content = File.read("/tmp/#{apple_id}.itmsp/metadata.xml").to_s
         expect(content).to eq(File.read("./spec/fixtures/metadata/ipa_result2.xml").to_s)

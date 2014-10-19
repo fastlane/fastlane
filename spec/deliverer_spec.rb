@@ -121,9 +121,9 @@ describe IosDeployKit do
           ipa: ipa
         })
 
-        @meta.deploy_information[:version].should eq(version)
-        @meta.deploy_information[:app_identifier].should eq(identifier)
-        @meta.deploy_information[:ipa].should eq(ipa)
+        expect(@meta.deploy_information[:version]).to eq(version)
+        expect(@meta.deploy_information[:app_identifier]).to eq(identifier)
+        expect(@meta.deploy_information[:ipa]).to eq(ipa)
       end
     end
   end
