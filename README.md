@@ -39,7 +39,6 @@ You can use the following environment variables:
 Take a look at *Using the exposed Ruby classes. You
 
 #Usage
-_______
 
 ## Using a *Deliver* file (recommended)
 Why should you have to remember complicated commands and parameters?
@@ -49,35 +48,47 @@ Store your configuration in a text file to easily deploy from any computer.
 Name the file *Deliverfile* and store it in your project folder.
 
 Here are a few example files:
-### Upload all screenshots to iTunesConnect
-    app_identifier "net.sunapps.1"
-    screenshots_path "./screenshots"
+#### Upload all screenshots to iTunesConnect
+```ruby
+app_identifier "net.sunapps.1"
+screenshots_path "./screenshots"
+```
 The screenshots must be grouped by language code (see Available language codes)
 
-### Upload a new ipa file with a changelog to iTunesConnect
-    ipa "./latest.ipa"
-    changelog({
-        'en-US' => "This update adds cool new features",
-        'de-DE' => "Dieses Update ist super"
-    })
-### Set a default language if you are lucky enough to only maintain one language
-    default_language 'en-US'
-    title 'Only English Title'
+#### Upload a new ipa file with a changelog to iTunesConnect
+```ruby
+ipa "./latest.ipa"
+changelog({
+    'en-US' => "This update adds cool new features",
+    'de-DE' => "Dieses Update ist super"
+})
+```
+#### Set a default language if you are lucky enough to only maintain one language
+```ruby
+default_language 'en-US'
+title 'Only English Title'
+```
 
-### Update the app's keywords
-    default_language 'de-DE'
-    keywords ["keyword1", "something", "else"]
+#### Update the app's keywords
+```ruby
+default_language 'de-DE'
+keywords ["keyword1", "something", "else"]
+```
 
-### Read content from somewhere external (file, web service, ...)
-    description({
-        'en-US' => File.read("changelog-en.txt")
-        'de-DE' => open("http://example.com/latest-changelog.txt").read
-    })
-### Build and sign the app using Shenzhen (https://github.com/nomad/shenzhen)
-    ipa do
-        system("ipa build") # first build it using Shenzhen
-        "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
-    end
+#### Read content from somewhere external (file, web service, ...)
+```ruby
+description({
+    'en-US' => File.read("changelog-en.txt")
+    'de-DE' => open("http://example.com/latest-changelog.txt").read
+})
+```
+#### Build and sign the app using Shenzhen (https://github.com/nomad/shenzhen)
+```ruby
+ipa do
+    system("ipa build") # first build it using Shenzhen
+    "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
+end
+```
     
 As you can see, the *Deliverfile* is a normal Ruby file, which is executed when
 running a deployment. Therefore it's possible to fully customise the behaviour
@@ -97,22 +108,24 @@ The documentation will be updated, once this is implemented
 
 ## Using the exposed Ruby classes
 Some examples
+```ruby
+app = IosDeployKit::App.new(apple_id)
 
-    app = IosDeployKit::App.new(apple_id)
-    
-    app.get_app_status # => Waiting for Review
-    app.create_new_version!('1.4')
-    app.metadata.update_title({ 'en-US' => "iPhone App Title" })
-    app.metadata.set_all_screenshots_from_path("./screenshots")
-    app.upload_metadata!
-    
-    IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
-    
+app.get_app_status # => Waiting for Review
+app.create_new_version!('1.4')
+app.metadata.update_title({ 'en-US' => "iPhone App Title" })
+app.metadata.set_all_screenshots_from_path("./screenshots")
+app.upload_metadata!
+
+IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
+```    
     
 
 # Tips
 ## Available language codes
-    ["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
+```ruby
+["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
+```
     
 
 
