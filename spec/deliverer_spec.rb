@@ -83,6 +83,15 @@ describe IosDeployKit do
               File.delete(file)
             end
           end
+
+          it "Does not require an app version, when an ipa is given" do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileNoVersion")
+            expect(deliv.app.apple_id).to eq(464686641)
+            expect(deliv.app.app_identifier).to eq('at.felixkrause.iTanky')
+            expect(deliv.deploy_information.values.count).to eq(2)
+          end
         end
 
         it "raises an exception if app identifier of ipa does not match the given one" do
