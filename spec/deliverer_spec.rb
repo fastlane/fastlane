@@ -88,9 +88,66 @@ describe IosDeployKit do
             IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
             IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
             deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileNoVersion")
+
             expect(deliv.app.apple_id).to eq(464686641)
             expect(deliv.app.app_identifier).to eq('at.felixkrause.iTanky')
             expect(deliv.deploy_information.values.count).to eq(2)
+          end
+
+          describe "Test Deliver Callback blocks" do
+            before do
+              path = "/tmp/"
+              @tests_path = "#{path}/deliver_unit_tests.txt"
+              @success_path = "#{path}/deliver_success.txt"
+              @error_path = "#{path}/deliver_error.txt"
+              paths = [@tests_path, @success_path, @error_path]
+
+              # Delete files from previous runs
+              paths.each do |current|
+                File.delete(current) if File.exists?current
+              end
+            end
+
+            it "Successful" do
+              expect(File.exists?@tests_path).to eq(false)
+              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect(File.exists?@tests_path).to eq(true)
+              expect(File.exists?@success_path).to eq(true)
+              expect(File.exists?@error_path).to eq(false)
+            end
+
+            it "Error on ipa upload" do
+              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt") # the ipa file
+              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect(File.exists?@tests_path).to eq(true)
+              expect(File.exists?@success_path).to eq(false)
+              expect(File.exists?@error_path).to eq(true)
+            end
+
+            it "Error on app metadata upload" do
+              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt")
+              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect(File.exists?@tests_path).to eq(true)
+              expect(File.exists?@success_path).to eq(false)
+              expect(File.exists?@error_path).to eq(true)
+            end
+
+            it "Error on unit tests" do
+              expect(File.exists?@tests_path).to eq(false)
+              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              expect(File.exists?@tests_path).to eq(true)
+              expect(File.exists?@success_path).to eq(false)
+              expect(File.exists?@error_path).to eq(true)
+            end
+
+            it "Error on unit tests with no error block raises an exception" do
+              expect{
+                deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksNoErrorBlock")
+              }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.")
+            end
           end
         end
 

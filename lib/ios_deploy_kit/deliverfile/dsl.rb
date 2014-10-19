@@ -40,7 +40,17 @@ module IosDeployKit
 
             @deliver_data.set_new_value(method_sym, value)
           else
-            Helper.log.error("Could not find method '#{method_sym}'. Available methods: #{allowed.collect { |a| a.to_s }}")
+            # Check if it's a block (e.g. run tests)
+            if IosDeployKit::Deliverer.all_available_blocks_to_set.include?method_sym
+              if block
+                @deliver_data.set_new_block(method_sym, block)
+              else
+                Helper.log.error("Value for #{method_sym} must be a Ruby block. Use '#{method_sym} do ... end'")
+              end
+            else
+              # Couldn't find this particular method
+              Helper.log.error("Could not find method '#{method_sym}'. Available methods: #{allowed.collect { |a| a.to_s }}")
+            end
           end
         end
 

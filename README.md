@@ -1,4 +1,4 @@
-DeployKit for iOS apps
+Deliver - Continuous Deployment for iOS
 ============
 
 [ ![Codeship Status for KrauseFx/ios_deploy_kit](https://codeship.io/projects/c9f92850-25fe-0132-5601-76bec1757a7f/status)](https://codeship.io/projects/37295)
@@ -67,6 +67,26 @@ changelog({
     'de-DE' => "Dieses Update ist super"
 })
 ```
+
+#### Implement blocks to run unit tests
+```ruby
+unit_tests do
+    system("xctool test")
+end
+
+success do
+    notifier = Slack::Notifier.new("SlackTeam", "SlackToken")
+    notifier.ping "Successfully deployed new version"
+end
+
+error do |exception|
+    # custom exception handling here
+    raise "Something went wrong: #{exception}"    
+end
+```
+For this example I used https://github.com/stevenosloan/slack-notifier
+
+
 #### Set a default language if you are lucky enough to only maintain one language
 ```ruby
 default_language 'en-US'
@@ -91,10 +111,13 @@ description({
     'de-DE' => open("http://example.com/latest-changelog.txt").read
 })
 ```
+
 #### Build and sign the app using Shenzhen (https://github.com/nomad/shenzhen)
 ```ruby
 ipa do
-  # Add any code you want, like incrementing the build number or changing the app identifier
+    # Add any code you want, like incrementing the build 
+    # number or changing the app identifier
+  
     system("ipa build") # build your project using Shenzhen
     "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
 end

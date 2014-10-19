@@ -37,6 +37,7 @@ module IosDeployKit
     def download(app, dir = nil)
       raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 
+      Helper.log.info("Going to upload updated app metadata to iTunesConnect")
       dir ||= app.get_metadata_directory
       command = build_download_command(@user, @password, app.apple_id, dir)
 
@@ -57,7 +58,6 @@ module IosDeployKit
       dir += "/#{app.apple_id}.itmsp"
       
       command = build_upload_command(@user, @password, dir)
-
       result = execute_transporter(command)
 
       Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.")
