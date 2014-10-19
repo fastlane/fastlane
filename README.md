@@ -19,6 +19,10 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 
     $ sudo gem install ios_deploy_kit
 
+Make sure, you have the latest version of the Xcode command line tools installed:
+
+  xcode-select --install
+
 ## Credentials
 
 ### Use the Keychain
@@ -66,12 +70,17 @@ changelog({
 #### Set a default language if you are lucky enough to only maintain one language
 ```ruby
 default_language 'en-US'
+version '1.2'
+
 title 'Only English Title'
 ```
+If you do not pass an ipa file, you have to specify the app version you want to edit.
 
 #### Update the app's keywords
 ```ruby
 default_language 'de-DE'
+version '1.2'
+
 keywords ["keyword1", "something", "else"]
 ```
 
@@ -85,7 +94,8 @@ description({
 #### Build and sign the app using Shenzhen (https://github.com/nomad/shenzhen)
 ```ruby
 ipa do
-    system("ipa build") # first build it using Shenzhen
+  # Add any code you want, like incrementing the build number or changing the app identifier
+    system("ipa build") # build your project using Shenzhen
     "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 ```
@@ -119,7 +129,14 @@ app.upload_metadata!
 
 IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
 ```    
-    
+
+# Can I trust *Deliver*? How does this thing even work? Is magic involved? 🎩
+*Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the *Deliverfile*. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+
+*Deliver* uses the following techniques under the hood:
+
+- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. iTMSTransporter is a command line tool provided by Apple.
+- With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using Capybara (https://github.com/jnicklas/capybara) and Poltergeist (https://github.com/teampoltergeist/poltergeist)
 
 # Tips
 ## Available language codes
