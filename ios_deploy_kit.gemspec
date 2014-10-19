@@ -8,10 +8,14 @@ Gem::Specification.new do |spec|
   spec.version       = IosDeployKit::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Deliver - Continuous Deployment for iOS - automatically publish new app updates and app screenshots to the AppStore}
+  spec.description   = %q{Using Deliver you can easily integrate a real continuous delivery 
+    solution for iOS applications. You can update the app metadata, upload screenshots 
+    in all languages for different screensizes to iTunesConnect and even publish a new 
+    ipa file to iTunesConnect. You define you prefered deployment information once in a so called
+    Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
   spec.homepage      = ""
-  spec.license       = "MIT"
+  # spec.license       = ""
 
   spec.required_ruby_version = '>= 1.9.3'
 
