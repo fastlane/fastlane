@@ -22,6 +22,7 @@ module IosDeployKit
     # @param redownload_package [bool] When true
     #  the current package will be downloaded from iTC before you can 
     #  modify any values. This should only be false for unit tests
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct app object
     def initialize(app, dir, redownload_package = true)
       raise AppMetadataParameterError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
 

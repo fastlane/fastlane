@@ -39,12 +39,22 @@ describe IosDeployKit do
       end
     end
 
-    # describe "#start", current: true do
-    #   it "properly loads and stores the ipa when it's valid" do
-    #     # uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
-    #     uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./integration/example1/example1.ipa")
-    #     uploader.upload!
-    #   end
-    # end 
+    describe "#start" do
+      it "properly loads and stores the ipa when it's valid" do
+        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+        uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./integration/example1/example1.ipa")
+
+        expect(uploader.app.apple_id).to eq(apple_id)
+        
+        expect(uploader.upload!).to eq(true)
+        
+        expect(uploader.fetch_value("//x:size").first.content.to_i).to eq(14873289)
+        expect(uploader.fetch_value("//x:checksum").first.content).to eq("0154140b19748b04ebcf57989f43a99e")
+
+        content = File.read("/tmp/#{apple_id}.itmsp/metadata.xml").to_s
+        expect(content).to eq(File.read("./spec/fixtures/metadata/ipa_result2.xml").to_s)
+      end
+    end 
   end
 end
