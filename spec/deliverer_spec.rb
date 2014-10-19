@@ -1,3 +1,4 @@
+require 'pry'
 describe IosDeployKit do
   describe IosDeployKit::Deliverer do
 
@@ -92,6 +93,15 @@ describe IosDeployKit do
             expect(deliv.app.apple_id).to eq(464686641)
             expect(deliv.app.app_identifier).to eq('at.felixkrause.iTanky')
             expect(deliv.deploy_information.values.count).to eq(2)
+          end
+
+          it "Let's the user specify which languages should be supported" do
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+
+            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileLocales")
+            expect(deliv.app.metadata.fetch_value("//x:locale").count).to eq(5)
+            expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(5)
           end
 
           describe "Test Deliver Callback blocks" do

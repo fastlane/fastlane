@@ -122,7 +122,14 @@ ipa do
     "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 ```
-    
+
+#### Defining which languages your app supports
+```ruby
+supported_languages ['de-DE', 'en-US', 'en-CA', 'it-IT']
+```
+This will take care of creating the locales, if they don't already exist.
+
+##### What is the *Deliverfile*
 As you can see, the *Deliverfile* is a normal Ruby file, which is executed when
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 

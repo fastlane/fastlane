@@ -36,6 +36,7 @@ module IosDeployKit
       KEYWORDS = :keywords
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
+      SUPPORTED_LANGUAGES = :supported_languages
     end
 
     module AllBlocks
@@ -62,7 +63,6 @@ module IosDeployKit
       else
         @deliver_file = IosDeployKit::Deliverfile::Deliverfile.new(self, path)
       end
-
 
       # Do not put code here...
     end
@@ -160,6 +160,16 @@ module IosDeployKit
           result = @active_blocks[:unit_tests].call
           if result != true and (result || 0).to_i != 1
             raise DeliverUnitTestsError.new("Unit tests failed. Got result: '#{result}'. Need 'true' or 1 to succeed.")
+          end
+        end
+
+        ##########################################
+        # Everything is ready for deployment
+        ##########################################
+
+        if @deploy_information[ValKey::SUPPORTED_LANGUAGES]
+          @deploy_information[ValKey::SUPPORTED_LANGUAGES].each do |language|
+            @app.metadata.add_new_locale(language)
           end
         end
 

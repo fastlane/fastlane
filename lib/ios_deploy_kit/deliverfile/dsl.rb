@@ -17,7 +17,7 @@ module IosDeployKit
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = IosDeployKit::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path]
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
