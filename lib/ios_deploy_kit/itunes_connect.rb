@@ -60,8 +60,6 @@ module IosDeployKit
     # @raise [ItunesConnectLoginError] Login data is wrong
     def login(user = nil, password = nil)
       begin
-        return true if @logged_in
-
         Helper.log.info "Logging into iTunesConnect"
 
         user ||= PasswordManager.new.username
@@ -81,7 +79,7 @@ module IosDeployKit
         end
 
         Helper.log.info "Successfully logged into iTunesConnect"
-        @logged_in = true
+
         true
       rescue Exception => ex
         error_occured(ex)
@@ -97,8 +95,6 @@ module IosDeployKit
     def open_app_page(app)
       begin
         verify_app(app)
-
-        self.login
 
         Helper.log.info "Opening detail page for app #{app}"
 
@@ -122,8 +118,6 @@ module IosDeployKit
     def get_app_status(app)
       begin
         verify_app(app)
-
-        self.login
 
         open_app_page(app)
 
@@ -159,8 +153,6 @@ module IosDeployKit
     def create_new_version!(app, version_number)
       begin
         verify_app(app)
-
-        self.login
 
         open_app_page(app)
 
