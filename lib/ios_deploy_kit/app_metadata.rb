@@ -55,6 +55,39 @@ module IosDeployKit
       true
     end
 
+    # Adds a new locale (language) to the given app
+    # @param language (IosDeployKit::Languages::ALL_LANGUAGES) the language you want to
+    #  this app
+    def add_new_locale(language)
+      unless IosDeployKit::Languages::ALL_LANGUAGES.include?language
+        raise "Language '#{language}' is invalid. It must be in #{IosDeployKit::Languages::ALL_LANGUAGES}."
+      end
+
+      if fetch_value("//x:locale[@name='#{language}']").count > 0
+        Helper.log.info("Locale '#{language}' already exists. Can not create it again.")
+        return true
+      end
+      
+
+      locales = fetch_value("//x:locales").first
+      
+      new_locale = @data.create_element('locale')
+      new_locale['name'] = language
+      locales << new_locale
+
+      # Title is the only thing which is required by iTC
+      default_title = fetch_value("//x:title").collect { |a| a.content }.first
+
+      title = @data.create_element('title')
+      title.content = default_title
+      new_locale << title
+
+      Helper.log.info("Successfully created the new locale '#{language}'. The default title '#{default_title}' was set, since it's required by iTunesConnect.")
+      Helper.log.info("You can update the title using 'app.metadata.update_title'")
+      
+      true
+    end
+
 
     #####################################################
     # @!group Updating metadata information
@@ -161,7 +194,7 @@ module IosDeployKit
       
       # Fetch the 'software_screenshots' node (array) for the specific locale
       locales = self.fetch_value("//x:locale[@name='#{language}']")
-      raise AppMetadataError.new("Could not find locale entry for #{language}") unless locales.count == 1
+      raise AppMetadataError.new("Locale '#{language}' not found. Please call app.metadata.add_new_locale('#{locale}) first.") unless locales.count == 1
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
       
@@ -322,7 +355,7 @@ module IosDeployKit
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
           raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
-          raise "Locale '#{language}' not found. Please create the new locale on iTunesConnect first." unless locale
+          raise "Locale '#{language}' not found. Please call app.metadata.add_new_locale('#{locale}) first." unless locale
 
           field = locale.search(xpath_name).first
 

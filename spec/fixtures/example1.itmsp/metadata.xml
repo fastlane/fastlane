@@ -16,6 +16,7 @@
                 <version string="0.9.10">
                     <locales>
                         <locale name="en-US">
+                            <title>Default English Title</title>
                         </locale>
                         <locale name="de-DE">
                             <title>Example App Title</title>

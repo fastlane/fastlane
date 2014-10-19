@@ -26,23 +26,44 @@ describe IosDeployKit do
           it "updates the title" do
             new_title = "So new title"
 
-            expect(@app.metadata.fetch_value("//x:title").first.content).to eq('Example App Title')
+            expect(@app.metadata.fetch_value("//x:title").last.content).to eq('Example App Title')
             @app.metadata.update_title({ 'de-DE' => new_title })
 
-            expect(@app.metadata.fetch_value("//x:title").first.content).to eq(new_title)
+            expect(@app.metadata.fetch_value("//x:title").last.content).to eq(new_title)
           end
 
           it "supports the & symbol properly" do
             new_title = "something & something else"
             @app.metadata.update_title({ 'de-DE' => new_title })
 
-            expect(@app.metadata.fetch_value("//x:title").first.content).to eq(new_title)
+            expect(@app.metadata.fetch_value("//x:title").last.content).to eq(new_title)
           end
 
           it "raises an error when passing an invalid language" do
             expect {
               @app.metadata.update_title({ 'de' => 'asdf' })
             }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES (de)")
+          end
+        end
+
+        describe "#add_new_locale" do
+          it "throws an exception when an invalid language was passed" do
+            expect {
+              @app.metadata.add_new_locale('asdf')
+            }.to raise_error(/is invalid. It must be in/)
+          end
+
+          it "adds a new language if it's valid" do
+            expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
+            expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
+
+            expect(@app.metadata.fetch_value("//x:locale").count).to eq(3)
+            expect(@app.metadata.fetch_value("//x:title").count).to eq(3)
+
+            @app.metadata.fetch_value("//x:title").each do |current|
+              # it properly set the default title to be valid
+              expect(current.content.length).to be > 5
+            end
           end
         end
 
