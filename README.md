@@ -21,7 +21,7 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
-  xcode-select --install
+    xcode-select --install
 
 ## Credentials
 
