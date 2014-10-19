@@ -4,9 +4,6 @@ require 'capybara'
 require 'capybara/poltergeist'
 require 'security'
 
-# TODO: Dev only
-require 'pry'
-
 
 module IosDeployKit
   # Everything that can't be achived using the {IosDeployKit::ItunesTransporter}
@@ -51,27 +48,33 @@ module IosDeployKit
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
     def login(user = nil, password = nil)
-      return true if @logged_in
-
-      Helper.log.info "Logging into iTunesConnect"
-
-      user ||= PasswordManager.new.username
-      password ||= PasswordManager.new.password
-
-      visit ITUNESCONNECT_URL
-      fill_in "accountname", with: user
-      fill_in "accountpassword", with: password
-
       begin
-        wait_for_elements(".enabled").first.click
-        wait_for_elements('.ng-scope.managedWidth')
-      rescue
-        ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you set them correctly")
-      end
+        return true if @logged_in
 
-      Helper.log.info "Successfully logged into iTunesConnect"
-      @logged_in = true
-      true
+        Helper.log.info "Logging into iTunesConnect"
+
+        user ||= PasswordManager.new.username
+        password ||= PasswordManager.new.password
+
+        result = visit ITUNESCONNECT_URL
+        raise "Could not open iTunesConnect" unless result['status'] == 'success'
+
+        fill_in "accountname", with: user
+        fill_in "accountpassword", with: password
+
+        begin
+          wait_for_elements(".enabled").first.click
+          wait_for_elements('.ng-scope.managedWidth')
+        rescue
+          ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you set them correctly")
+        end
+
+        Helper.log.info "Successfully logged into iTunesConnect"
+        @logged_in = true
+        true
+      rescue Exception => ex
+        error_occured(ex)
+      end
     end
 
     # Opens the app details page of the given app.
@@ -160,7 +163,14 @@ module IosDeployKit
     private
       def verify_app(app)
         raise ItunesConnectGeneralError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
-        raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').length > 5
+        raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').to_s.length > 5
+      end
+
+      def error_occured(ex)
+        path = "Error#{Time.now.to_i}.png"
+        save_screenshot(path, :full => true)
+        system("open '#{path}'")
+        raise ex # re-raise the error after saving the snapshot
       end
 
       def wait_for_elements(name)
