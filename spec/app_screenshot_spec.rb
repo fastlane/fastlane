@@ -31,7 +31,7 @@ describe IosDeployKit do
           expect(node.children.first.content).to eq(File.size(path).to_s)
           expect(node.children[1].content).to eq("30fbc3071dc36b824bcd5960bcfef775.png")
           expect(node.children.last['type']).to eq("md5")
-          expect(node.children.last.content).to eq("30fbc3071dc36b824bcd5960bcfef775")
+          expect(node.children.last.content).to eq("e2c116d8f1ab7982a2b131ac681b6e86")
 
           expect(node['position']).to eq(order_index.to_s)
           expect(node['display_target']).to eq(IosDeployKit::ScreenSize::IOS_40)

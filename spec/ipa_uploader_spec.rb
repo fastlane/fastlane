@@ -50,7 +50,8 @@ describe IosDeployKit do
         expect(uploader.upload!).to eq(true)
         
         expect(uploader.fetch_value("//x:size").first.content.to_i).to eq(14873289)
-        expect(uploader.fetch_value("//x:checksum").first.content).to eq("0154140b19748b04ebcf57989f43a99e")
+        expect(uploader.fetch_value("//x:checksum").first.content).to eq("e1ff5cc61fae98484d30e0771596ead4")
+        expect(uploader.fetch_value("//x:file_name").first.content).to eq("0154140b19748b04ebcf57989f43a99e.ipa")
 
         content = File.read("/tmp/#{apple_id}.itmsp/metadata.xml").to_s
         expect(content).to eq(File.read("./spec/fixtures/metadata/ipa_result2.xml").to_s)

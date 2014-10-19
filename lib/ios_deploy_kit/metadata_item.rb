@@ -78,10 +78,16 @@ module IosDeployKit
       # The file name which is used inside the package
       def resulting_file_name
         extension = File.extname(self.path)
-        "#{md5_value}#{extension}"
+        "#{file_name_for_element}#{extension}"
       end
 
       def md5_value
+        Digest::MD5.hexdigest(File.read(self.path))
+      end
+
+      # This method will also take some other things into account to generate a truly unique
+      # file name. This will enable using the same screenshots multiple times
+      def file_name_for_element
         Digest::MD5.hexdigest([File.read(self.path), self.path].join("-"))
       end
   end
