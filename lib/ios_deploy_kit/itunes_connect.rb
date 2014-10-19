@@ -95,17 +95,21 @@ module IosDeployKit
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
     def open_app_page(app)
-      verify_app(app)
+      begin
+        verify_app(app)
 
-      self.login
+        self.login
 
-      Helper.log.info "Opening detail page for app #{app}"
+        Helper.log.info "Opening detail page for app #{app}"
 
-      visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
+        visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
 
-      wait_for_elements('.page-subnav')
+        wait_for_elements('.page-subnav')
 
-      true
+        true
+      rescue Exception => ex
+        error_occured(ex)
+      end
     end
 
     # This method will fetch the current status ({IosDeployKit::App::AppStatus}) 
@@ -116,25 +120,29 @@ module IosDeployKit
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
     def get_app_status(app)
-      verify_app(app)
+      begin
+        verify_app(app)
 
-      self.login
+        self.login
 
-      open_app_page(app)
+        open_app_page(app)
 
-      if page.has_content?"Waiting For Review"
-        # That's either Upload Received or Waiting for Review
-        if page.has_content?"To submit a new build, you must remove this version from review"
-          return App::AppStatus::WAITING_FOR_REVIEW
+        if page.has_content?"Waiting For Review"
+          # That's either Upload Received or Waiting for Review
+          if page.has_content?"To submit a new build, you must remove this version from review"
+            return App::AppStatus::WAITING_FOR_REVIEW
+          else
+            return App::AppStatus::UPLOAD_RECEIVED
+          end
+        elsif page.has_content?BUTTON_STRING_NEW_VERSION
+          return App::AppStatus::READY_FOR_SALE
+        elsif page.has_content?BUTTON_STRING_SUBMIT_FOR_REVIEW
+          return App::AppStatus::PREPARE_FOR_SUBMISSION
         else
-          return App::AppStatus::UPLOAD_RECEIVED
+          raise "App status not yet implemented"
         end
-      elsif page.has_content?BUTTON_STRING_NEW_VERSION
-        return App::AppStatus::READY_FOR_SALE
-      elsif page.has_content?BUTTON_STRING_SUBMIT_FOR_REVIEW
-        return App::AppStatus::PREPARE_FOR_SUBMISSION
-      else
-        raise "App status not yet implemented"
+      rescue Exception => ex
+        error_occured(ex)
       end
     end
 
@@ -149,24 +157,28 @@ module IosDeployKit
     # @param version_number (String) the version number as string for 
     # the new version that should be created
     def create_new_version!(app, version_number)
-      verify_app(app)
+      begin
+        verify_app(app)
 
-      self.login
+        self.login
 
-      open_app_page(app)
+        open_app_page(app)
 
-      if page.has_content?BUTTON_STRING_NEW_VERSION
-        click_on BUTTON_STRING_NEW_VERSION
+        if page.has_content?BUTTON_STRING_NEW_VERSION
+          click_on BUTTON_STRING_NEW_VERSION
 
-        Helper.log.info "Creating a new version (#{version_number})"
-        
-        all(".fullWidth.nobottom.ng-isolate-scope.ng-pristine").last.set(version_number.to_s)
-        click_on "Create"
-      else
-        Helper.log.info "Creating a new version"
+          Helper.log.info "Creating a new version (#{version_number})"
+          
+          all(".fullWidth.nobottom.ng-isolate-scope.ng-pristine").last.set(version_number.to_s)
+          click_on "Create"
+        else
+          Helper.log.info "Version #{version_number} was already created"
+        end
+
+        true
+      rescue Exception => ex
+        error_occured(ex)
       end
-
-      true
     end
 
 
