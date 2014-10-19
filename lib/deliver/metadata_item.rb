@@ -1,6 +1,6 @@
 require 'nokogiri'
 
-module IosDeployKit
+module Deliver
   # This class represents a file, included in the metadata.xml
   # 
   # It takes care of calculating the file size and md5 value.
@@ -29,7 +29,7 @@ module IosDeployKit
     #     <file_name>myapp.54.56.ipa</file_name>
     #     <checksum type="md5">9d6b7b0e20bde9a3c831db89563e949f</checksum>
     #   </data_file>
-    # Take a look at the subclass {IosDeployKit::AppScreenshot#create_xml_node} for a
+    # Take a look at the subclass {Deliver::AppScreenshot#create_xml_node} for a
     # screenshot specific implementation
     # @param doc [Nokogiri::XML::Document] The document this node
     #  should be added to

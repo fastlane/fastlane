@@ -1,6 +1,6 @@
 # Inspired by https://github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/podfile/dsl.rb
 
-module IosDeployKit
+module Deliver
   module Deliverfile
     class Deliverfile
       module DSL
@@ -16,7 +16,7 @@ module IosDeployKit
         
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
-          allowed = IosDeployKit::Deliverer.all_available_keys_to_set
+          allowed = Deliver::Deliverer.all_available_keys_to_set
           not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages]
 
           if allowed.include?(method_sym)
@@ -41,7 +41,7 @@ module IosDeployKit
             @deliver_data.set_new_value(method_sym, value)
           else
             # Check if it's a block (e.g. run tests)
-            if IosDeployKit::Deliverer.all_available_blocks_to_set.include?method_sym
+            if Deliver::Deliverer.all_available_blocks_to_set.include?method_sym
               if block
                 @deliver_data.set_new_block(method_sym, block)
               else

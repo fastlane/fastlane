@@ -26,7 +26,7 @@
 [2014-10-19 13:42:12 BST] <main> ERROR: Your Apple ID or password was entered incorrectly. (-20101)
 [2014-10-19 13:42:12 BST] <main> DBG-X: The error code is: -20101
 [2014-10-19 13:42:12 BST] <main>  INFO: Failed to retrieve current preferred transport order; reverting to default values
-[2014-10-19 13:42:12 BST] <main>  INFO: Examining the package at: /Users/felixkrause/Apps/ios_deploy_kit/./spec/fixtures/packages/464686641.itmsp
+[2014-10-19 13:42:12 BST] <main>  INFO: Examining the package at: /Users/deliver/Apps/deliver/./spec/fixtures/packages/464686641.itmsp
 [2014-10-19 13:42:12 BST] <main>  INFO: Ensuring that package has well formed metadata file...
 [2014-10-19 13:42:12 BST] <main> DEBUG: Getting case-sensitive metadata xml filename...
 [2014-10-19 13:42:12 BST] <main>  INFO: Gathering the list of valid files from the package ...
@@ -169,6 +169,6 @@ In other words, past data may not be reflected by this interval.-->
 Package Summary:
  
 1 package(s) were not uploaded because they had problems:
-  /Users/felixkrause/Apps/ios_deploy_kit/./spec/fixtures/packages/464686641.itmsp - Error Messages:
+  /Users/felixkrause/Apps/deliver/./spec/fixtures/packages/464686641.itmsp - Error Messages:
     Your Apple ID or password was entered incorrectly. (-20101)
 [2014-10-19 13:42:12 BST] <main> DBG-X: Returning 1

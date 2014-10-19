@@ -1,7 +1,7 @@
 require 'fastimage'
 
 
-module IosDeployKit
+module Deliver
   # AppScreenshot represents one screenshots for one specific locale and 
   # device type.
   class AppScreenshot < MetadataItem
@@ -18,12 +18,12 @@ module IosDeployKit
       IOS_IPAD = "iOS-iPad"
     end
 
-    # @return [IosDeployKit::ScreenSize] the screen size (device type) 
-    #  specified at {IosDeployKit::ScreenSize}
+    # @return [Deliver::ScreenSize] the screen size (device type)
+    #  specified at {Deliver::ScreenSize}
     attr_accessor :screen_size
 
     # @param path (String) path to the screenshot file
-    # @param screen_size (IosDeployKit::AppScreenshot::ScreenSize) the screen size, which
+    # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
     #  will automatically be calculated when you don't set it.
     def initialize(path, screen_size = nil)
       super(path)

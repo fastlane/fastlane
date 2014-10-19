@@ -1,6 +1,6 @@
 require 'logger'
 
-module IosDeployKit
+module Deliver
   module Helper
 
     # Logging happens using this method

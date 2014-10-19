@@ -1,4 +1,4 @@
-module IosDeployKit
+module Deliver
   # This class takes care of handling the whole deployment process
   # This includes:
   # 
@@ -12,9 +12,9 @@ module IosDeployKit
     
     # General
 
-    # @return (IosDeployKit::App) The App that is currently being edited.
+    # @return (Deliver::App) The App that is currently being edited.
     attr_accessor :app
-    # @return (IosDeployKit::Deliverfile::Deliverfile) A reference
+    # @return (Deliver::Deliverfile::Deliverfile) A reference
     #  to the Deliverfile which is currently being used.
     attr_accessor :deliver_file
 
@@ -61,7 +61,7 @@ module IosDeployKit
 
         finished_executing_deliver_file
       else
-        @deliver_file = IosDeployKit::Deliverfile::Deliverfile.new(self, path)
+        @deliver_file = Deliver::Deliverfile::Deliverfile.new(self, path)
       end
 
       # Do not put code here...
@@ -108,7 +108,7 @@ module IosDeployKit
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile. 
     # 
-    # This method will be called from the {IosDeployKit::Deliverfile} after
+    # This method will be called from the {Deliver::Deliverfile} after
     # it is finished executing the Ruby script.
     def finished_executing_deliver_file
       begin
@@ -118,12 +118,12 @@ module IosDeployKit
         app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
         apple_id = @deploy_information[ValKey::APPLE_ID]
 
-        errors = IosDeployKit::Deliverfile::Deliverfile
+        errors = Deliver::Deliverfile::Deliverfile
 
         # Verify or complete the IPA information (app identifier and app version)
         if @deploy_information[ValKey::IPA]
 
-          @ipa = IosDeployKit::IpaUploader.new(IosDeployKit::App.new, '/tmp/', @deploy_information[ValKey::IPA])
+          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', @deploy_information[ValKey::IPA])
 
           # We are able to fetch some metadata directly from the ipa file
           # If they were also given in the Deliverfile, we will compare the values
@@ -151,7 +151,7 @@ module IosDeployKit
 
         Helper.log.info("Got all information needed to deploy a the update '#{app_version}' for app '#{app_identifier}'")
 
-        @app = IosDeployKit::App.new(app_identifier: app_identifier,
+        @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
 
         @app.metadata.verify_version(app_version)

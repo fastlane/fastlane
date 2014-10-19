@@ -1,4 +1,4 @@
-module IosDeployKit
+module Deliver
   class App
     attr_accessor :apple_id, :app_identifier, :metadata
 
@@ -37,11 +37,11 @@ module IosDeployKit
       
       if apple_id and not app_identifier
         # Fetch the app identifier based on the given Apple ID
-        self.app_identifier = IosDeployKit::ItunesSearchApi.fetch_bundle_identifier(apple_id)
+        self.app_identifier = Deliver::ItunesSearchApi.fetch_bundle_identifier(apple_id)
       elsif app_identifier and not apple_id
         # Fetch the Apple ID based on the given app identifier
         begin
-          self.apple_id = IosDeployKit::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+          self.apple_id = Deliver::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
         rescue
           raise "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
         end
@@ -49,12 +49,12 @@ module IosDeployKit
     end
 
     def itc
-      @itc ||= IosDeployKit::ItunesConnect.new
+      @itc ||= Deliver::ItunesConnect.new
     end
 
     # This method fetches the current app status from iTunesConnect.
     # This method may take some time to execute, since it uses frontend scripting under the hood.
-    # @return the current App Status defined at {IosDeployKit::App::AppStatus}, like "Waiting For Review"
+    # @return the current App Status defined at {Deliver::App::AppStatus}, like "Waiting For Review"
     def get_app_status
       itc.get_app_status(self)
     end
@@ -82,9 +82,9 @@ module IosDeployKit
     # the latest version from iTC.
     # 
     # Don't forget to call {#upload_metadata!} once you are finished
-    # @return [IosDeployKit::AppMetadata] the latest metadata of this app
+    # @return [Deliver::AppMetadata] the latest metadata of this app
     def metadata
-      @metadata ||= IosDeployKit::AppMetadata.new(self, get_metadata_directory)
+      @metadata ||= Deliver::AppMetadata.new(self, get_metadata_directory)
     end
 
 
@@ -105,8 +105,8 @@ module IosDeployKit
     # It will take care of uploading all changes to Apple.
     # This method might take a few minutes to run
     # @return [bool] true on success
-    # @raise [IosDeployKit::TransporterTransferError]
-    # @raise [IosDeployKit::TransporterInputError]
+    # @raise [Deliver::TransporterTransferError]
+    # @raise [Deliver::TransporterInputError]
     def upload_metadata!
       raise "You first have to modify the metadata using app.metadata.setDescription" unless @metadata
       

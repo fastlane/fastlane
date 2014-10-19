@@ -1,7 +1,7 @@
 require 'zip'
 require 'plist'
 
-module IosDeployKit
+module Deliver
   class IpaUploaderError < StandardError 
   end
 
@@ -12,7 +12,7 @@ module IosDeployKit
 
     # Create a new uploader for one ipa file. This will only upload the ipa and no
     # other app metadata.
-    # @param app (IosDeployKit::App) The app for which the ipa should be uploaded for
+    # @param app (Deliver::App) The app for which the ipa should be uploaded for
     # @param dir (String) The path to where we can store (copy) the ipa file. Usually /tmp/
     # @param ipa_path (String) The path to the IPA file which should be uploaded
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
@@ -22,7 +22,7 @@ module IosDeployKit
 
       super(app, dir, false)
 
-      @ipa_file = IosDeployKit::MetadataItem.new(ipa_path)
+      @ipa_file = Deliver::MetadataItem.new(ipa_path)
     end
 
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
@@ -76,7 +76,7 @@ module IosDeployKit
         end
 
         @data = builder.doc
-        asset = @data.xpath('//x:asset', "x" => IosDeployKit::AppMetadata::ITUNES_NAMESPACE).first
+        asset = @data.xpath('//x:asset', "x" => Deliver::AppMetadata::ITUNES_NAMESPACE).first
         asset << @ipa_file.create_xml_node(@data)
       end
 

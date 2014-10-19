@@ -1,5 +1,5 @@
-describe IosDeployKit do
-  describe IosDeployKit::AppMetadata do
+describe Deliver do
+  describe Deliver::AppMetadata do
     let (:apple_id) { 794902327 }
     let (:app_identifier) { 'net.sunapps.1' }
 
@@ -9,9 +9,9 @@ describe IosDeployKit do
     ].each do |current_path|
       describe "Example metadata #{current_path.split('/').last}" do
         before do
-          @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: app_identifier)
+          @app = Deliver::App.new(apple_id: apple_id, app_identifier: app_identifier)
 
-          @app.metadata = IosDeployKit::AppMetadata.new(@app, current_path, false)
+          @app.metadata = Deliver::AppMetadata.new(@app, current_path, false)
 
           @number_of_screenshots = (current_path.include?("example1") ? 8 : 0)
         end
@@ -42,7 +42,7 @@ describe IosDeployKit do
           it "raises an error when passing an invalid language" do
             expect {
               @app.metadata.update_title({ 'de' => 'asdf' })
-            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES (de)")
+            }.to raise_error("The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES (de)")
           end
         end
 
@@ -147,7 +147,7 @@ describe IosDeployKit do
           it "throws an exception when language is invalid" do
             expect {
               @app.metadata.clear_all_screenshots("de")
-            }.to raise_error("The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES")
+            }.to raise_error("The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES")
           end
         end
 
@@ -177,9 +177,9 @@ describe IosDeployKit do
             expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
               'de-DE' => [
-                IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35),
-                IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35),
-                IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_35)
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35),
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35),
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35)
               ]
             })
             results = @app.metadata.fetch_value("//x:software_screenshot")
@@ -249,19 +249,19 @@ describe IosDeployKit do
 
             path = './spec/fixtures/screenshots/screenshot1.png'
             # The order is quite important. en-US first, since we check using the index afterwards
-            @app.metadata.add_screenshot('en-US', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_47))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_55))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
-            @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('en-US', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_47))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
 
             expect {
-              @app.metadata.add_screenshot('de-DE', IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_IPAD))
+              @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
             }.to raise_error("Only 5 screenshots are allowed per language per device type (iOS-iPad)")
             
 

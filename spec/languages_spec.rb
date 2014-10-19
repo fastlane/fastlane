@@ -1,7 +1,7 @@
-describe IosDeployKit do
-  describe IosDeployKit::Languages do
+describe Deliver do
+  describe Deliver::Languages do
     it "all languages are available" do
-      expect(IosDeployKit::Languages::ALL_LANGUAGES.count).to be >= 28
+      expect(Deliver::Languages::ALL_LANGUAGES.count).to be >= 28
     end
   end
 end

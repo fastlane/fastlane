@@ -1,17 +1,17 @@
-require 'ios_deploy_kit/deliverfile/dsl'
+require 'deliver/deliverfile/dsl'
 
-module IosDeployKit
+module Deliver
   module Deliverfile
     # Deliverfile represents a Deliverfile created by a user of this library
     class Deliverfile
 
-      include IosDeployKit::Deliverfile::Deliverfile::DSL
+      include Deliver::Deliverfile::Deliverfile::DSL
 
       # The path to the used Deliverfile.
       attr_accessor :path
 
       # Loads the Deliverfile from the given path
-      # @param deliver_data (IosDeployKit::Deliverer) The deliverer which handles the
+      # @param deliver_data (Deliver::Deliverer) The deliverer which handles the
       #  results of running this deliverfile
       # @param (String) path (optional) to the file itself. This must also include the
       #  filename itself.

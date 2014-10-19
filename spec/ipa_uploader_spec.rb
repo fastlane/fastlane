@@ -1,29 +1,29 @@
-describe IosDeployKit do
-  describe IosDeployKit::IpaUploader do
+describe Deliver do
+  describe Deliver::IpaUploader do
     let (:apple_id) { 794902327 }
     let (:app_identifier) { 'net.sunapps.1' }
 
     before do
-      @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: app_identifier)
+      @app = Deliver::App.new(apple_id: apple_id, app_identifier: app_identifier)
     end
 
     describe "#init" do
       it "raises an exception, when ipa file could not be found" do
         expect {
-          IosDeployKit::IpaUploader.new(@app, "/tmp", "./nonExistent.ipa")
+          Deliver::IpaUploader.new(@app, "/tmp", "./nonExistent.ipa")
         }.to raise_error("IPA on path './nonExistent.ipa' not found")
       end
 
       it "raises an exception, when ipa file is not an ipa file" do
         expect {
-          IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/screenshots/iPhone4.png")
+          Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/screenshots/iPhone4.png")
         }.to raise_error("IPA on path './spec/fixtures/screenshots/iPhone4.png' is not a valid IPA file")
       end
     end
 
     describe "after init" do
       before do
-        @uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
+        @uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
       end
 
       describe "#fetch_app_identifier" do
@@ -41,9 +41,9 @@ describe IosDeployKit do
 
     describe "#start" do
       it "properly loads and stores the ipa when it's valid" do
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-        uploader = IosDeployKit::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
+        uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
 
         expect(uploader.app.apple_id).to eq(apple_id)
         

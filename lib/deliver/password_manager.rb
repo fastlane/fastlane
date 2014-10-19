@@ -1,7 +1,7 @@
 require 'security'
 require 'highline/import' # to hide the entered password
 
-module IosDeployKit
+module Deliver
   # Handles reading out the password from the keychain or asking for login data
   class PasswordManager
     # @return [String] The username / email address of the currently logged in user
@@ -17,12 +17,12 @@ module IosDeployKit
     # This already check the Keychain if there is a username and password stored.
     # If that's not the case, it will ask for login data via stdin
     def initialize
-      self.username ||= ENV["IOS_DEPLOY_KIT_USER"] || load_from_keychain[0]
-      self.password ||= ENV["IOS_DEPLOY_KIT_PASSWORD"] || load_from_keychain[1]
+      self.username ||= ENV["DELIVER_USER"] || load_from_keychain[0]
+      self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
         puts "No username or password given. You can use environment variables"
-        puts "IOS_DEPLOY_KIT_USER, IOS_DEPLOY_KIT_PASSWORD"
+        puts "DELIVER_USER, DELIVER_PASSWORD"
 
         ask_for_login
       end

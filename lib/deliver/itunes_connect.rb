@@ -1,12 +1,12 @@
-require 'ios_deploy_kit/password_manager'
+require 'deliver/password_manager'
 
 require 'capybara'
 require 'capybara/poltergeist'
 require 'security'
 
 
-module IosDeployKit
-  # Everything that can't be achived using the {IosDeployKit::ItunesTransporter}
+module Deliver
+  # Everything that can't be achived using the {Deliver::ItunesTransporter}
   # will be scripted using the iTunesConnect frontend.
   # 
   # Every method you call here, might take a time
@@ -49,7 +49,7 @@ module IosDeployKit
 
     # Loggs in a user with the given login data on the iTC Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {IosDeployKit::PasswordManager}.
+    # Automatically be fetched using the {Deliver::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -87,7 +87,7 @@ module IosDeployKit
     end
 
     # Opens the app details page of the given app.
-    # @param app (IosDeployKit::App) the app that should be opened
+    # @param app (Deliver::App) the app that should be opened
     # @return (bool) true if everything worked fine
     # @raise [ItunesConnectGeneralError] General error while executing 
     #  this action
@@ -108,10 +108,10 @@ module IosDeployKit
       end
     end
 
-    # This method will fetch the current status ({IosDeployKit::App::AppStatus}) 
+    # This method will fetch the current status ({Deliver::App::AppStatus})
     # of your app and return it. This method uses a headless browser
     # under the hood, so it might take some time until you get the result
-    # @param app (IosDeployKit::App) the app you want this information from
+    # @param app (Deliver::App) the app you want this information from
     # @raise [ItunesConnectGeneralError] General error while executing 
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
@@ -147,7 +147,7 @@ module IosDeployKit
     # This method creates a new version of your app using the
     # iTunesConnect frontend. This will happen directly after calling
     # this method. 
-    # @param app (IosDeployKit::App) the app you want to modify
+    # @param app (Deliver::App) the app you want to modify
     # @param version_number (String) the version number as string for 
     # the new version that should be created
     def create_new_version!(app, version_number)
@@ -177,7 +177,7 @@ module IosDeployKit
 
     private
       def verify_app(app)
-        raise ItunesConnectGeneralError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+        raise ItunesConnectGeneralError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
         raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').to_s.length > 5
       end
 

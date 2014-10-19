@@ -1,7 +1,7 @@
 Deliver - Continuous Deployment for iOS
 ============
 
-[ ![Codeship Status for KrauseFx/ios_deploy_kit](https://codeship.io/projects/c9f92850-25fe-0132-5601-76bec1757a7f/status)](https://codeship.io/projects/37295)
+[ ![Codeship Status for KrauseFx/deliver](https://codeship.io/projects/685c3d40-39e2-0132-238b-56fe17215915/status?branch=master)](https://codeship.io/projects/42273)
 
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
@@ -17,7 +17,7 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 
 # Installation
 
-    $ sudo gem install ios_deploy_kit
+    $ sudo gem install deliver
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -36,8 +36,8 @@ credentials from the Keychain, just open the *Keychain Access*, select
 ### Use environment variables
 You can use the following environment variables:
 
-    IOS_DEPLOY_KIT_USER
-    IOS_DEPLOY_KIT_PASSWORD
+    DELIVER_USER
+    DELIVER_PASSWORD
     
 ### Implement something custom to fit your needs
 Take a look at *Using the exposed Ruby classes. You
@@ -149,7 +149,7 @@ The documentation will be updated, once this is implemented
 ## Using the exposed Ruby classes
 Some examples
 ```ruby
-app = IosDeployKit::App.new(apple_id)
+app = Deliver::App.new(apple_id)
 
 app.get_app_status # => Waiting for Review
 app.create_new_version!('1.4')
@@ -157,7 +157,7 @@ app.metadata.update_title({ 'en-US' => "iPhone App Title" })
 app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
 
-IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
+Deliver::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
 ```    
 
 # Can I trust *Deliver*? How does this thing even work? Is magic involved? 🎩
@@ -179,7 +179,7 @@ IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches 
 
 # Contributing
 
-1. Fork it ( https://github.com/KrauseFx/ios_deploy_kit/fork )
+1. Fork it ( https://github.com/KrauseFx/deliver/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

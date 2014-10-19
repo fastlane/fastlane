@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ios_deploy_kit (0.0.1)
+    deliver (0.0.1)
       capybara (~> 2.4.3)
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
@@ -78,7 +78,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
-  ios_deploy_kit!
+  deliver!
   pry
   rake
   rspec (~> 3.1.0)

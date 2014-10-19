@@ -1,6 +1,6 @@
 require 'nokogiri'
 
-module IosDeployKit
+module Deliver
   class AppMetadataError < StandardError 
   end
   class AppMetadataParameterError < StandardError 
@@ -13,18 +13,18 @@ module IosDeployKit
 
     private_constant :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
-    INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in IosDeployKit::Languages::ALL_LANGUAGES"
+    INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES"
 
     # You don't have to manually create an AppMetadata object. It will
-    # be created when you access the app's metadata ({IosDeployKit::App#metadata})
-    # @param app [IosDeployKit::App] The app this metadata is from/for
+    # be created when you access the app's metadata ({Deliver::App#metadata})
+    # @param app [Deliver::App] The app this metadata is from/for
     # @param dir [String] The app this metadata is from/for
     # @param redownload_package [bool] When true
     #  the current package will be downloaded from iTC before you can 
     #  modify any values. This should only be false for unit tests
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct app object
     def initialize(app, dir, redownload_package = true)
-      raise AppMetadataParameterError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+      raise AppMetadataParameterError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
 
       @metadata_dir = dir
       @app = app
@@ -56,11 +56,11 @@ module IosDeployKit
     end
 
     # Adds a new locale (language) to the given app
-    # @param language (IosDeployKit::Languages::ALL_LANGUAGES) the language you want to
+    # @param language (Deliver::Languages::ALL_LANGUAGES) the language you want to
     #  this app
     def add_new_locale(language)
-      unless IosDeployKit::Languages::ALL_LANGUAGES.include?language
-        raise "Language '#{language}' is invalid. It must be in #{IosDeployKit::Languages::ALL_LANGUAGES}."
+      unless Deliver::Languages::ALL_LANGUAGES.include?language
+        raise "Language '#{language}' is invalid. It must be in #{Deliver::Languages::ALL_LANGUAGES}."
       end
 
       if fetch_value("//x:locale[@name='#{language}']").count > 0
@@ -94,7 +94,7 @@ module IosDeployKit
     #####################################################
 
     # Updates the app title
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
@@ -105,7 +105,7 @@ module IosDeployKit
     end
 
     # Updates the app description which is shown in the AppStore
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_description(hash)
@@ -116,7 +116,7 @@ module IosDeployKit
     end
 
     # Updates the app changelog of the latest version
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
@@ -127,7 +127,7 @@ module IosDeployKit
     end
 
     # Updates the Marketing URL
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_marketing_url(hash)
@@ -138,7 +138,7 @@ module IosDeployKit
     end
 
     # Updates the Support URL
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_support_url(hash)
@@ -149,7 +149,7 @@ module IosDeployKit
     end
 
     # Updates the app keywords
-    # @param (Hash) hash The hash should contain the correct language codes ({IosDeployKit::Languages}) 
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
     #  as keys. The value should be an array of keywords (each keyword is a string)
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
@@ -174,7 +174,7 @@ module IosDeployKit
     #####################################################
 
     # Removes all currently enabled screenshots for the given language.
-    # @param (String) language The language, which has to be in this list: {IosDeployKit::Languages}.
+    # @param (String) language The language, which has to be in this list: {Deliver::Languages}.
     def clear_all_screenshots(language)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
 
@@ -185,8 +185,8 @@ module IosDeployKit
     end
 
     # Appends another screenshot to the already existing ones
-    # @param (String) language The language, which has to be in this list: {IosDeployKit::Languages}.
-    # @param (IosDeployKit::AppScreenshot) app_screenshot The screenshot you want to add to the app metadata.
+    # @param (String) language The language, which has to be in this list: {Deliver::Languages}.
+    # @param (Deliver::AppScreenshot) app_screenshot The screenshot you want to add to the app metadata.
     # @raise (AppMetadataParameterError) When there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS).
 
     def add_screenshot(language, app_screenshot)
@@ -233,9 +233,9 @@ module IosDeployKit
     #   +code+
     #    {
     #     'de-DE' => [
-    #       AppScreenshot.new('path/screenshot1.png', IosDeployKit::ScreenSize::IOS_35),
-    #       AppScreenshot.new('path/screenshot2.png', IosDeployKit::ScreenSize::IOS_40),
-    #       AppScreenshot.new('path/screenshot3.png', IosDeployKit::ScreenSize::IOS_IPAD)
+    #       AppScreenshot.new('path/screenshot1.png', Deliver::ScreenSize::IOS_35),
+    #       AppScreenshot.new('path/screenshot2.png', Deliver::ScreenSize::IOS_40),
+    #       AppScreenshot.new('path/screenshot3.png', Deliver::ScreenSize::IOS_IPAD)
     #     ]
     #    }
     # This method uses {#clear_all_screenshots} and {#add_screenshot} under the hood.
@@ -265,7 +265,7 @@ module IosDeployKit
     # This method will automatically detect which device type each screenshot is.
     # 
     # This will also clear all existing screenshots before setting the new ones.
-    # @param (Hash) hash A hash containing a different path for each locale ({IosDeployKit::Languages::ALL_LANGUAGES})
+    # @param (Hash) hash A hash containing a different path for each locale ({Deliver::Languages::ALL_LANGUAGES})
     def set_screenshots_for_each_language(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
@@ -278,7 +278,7 @@ module IosDeployKit
         self.clear_all_screenshots(language)
         
         Dir[resulting_path].sort.each do |path|
-          add_screenshot(language, IosDeployKit::AppScreenshot.new(path))
+          add_screenshot(language, Deliver::AppScreenshot.new(path))
         end
       end
 
@@ -292,7 +292,7 @@ module IosDeployKit
       raise AppMetadataParameterError.new("Parameter needs to be a path (string)") unless path.kind_of?String
 
       found = false
-      IosDeployKit::Languages::ALL_LANGUAGES.each do |language|
+      Deliver::Languages::ALL_LANGUAGES.each do |language|
         full_path = path + "/#{language}"
         if File.directory?(full_path)
           found = true
@@ -340,7 +340,7 @@ module IosDeployKit
     end
 
     private
-      # @return (IosDeployKit::ItunesTransporter) The iTunesTranspoter which is 
+    # @return (Deliver::ItunesTransporter) The iTunesTranspoter which is
       #  used to upload/download the app metadata.
       def transporter
         @transporter ||= ItunesTransporter.new

@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'ios_deploy_kit/version'
+require 'deliver/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "ios_deploy_kit"
-  spec.version       = IosDeployKit::VERSION
+  spec.name          = "deliver"
+  spec.version       = Deliver::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
   spec.summary       = %q{Deliver - Continuous Deployment for iOS - automatically publish new app updates and app screenshots to the AppStore}

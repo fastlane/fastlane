@@ -1,10 +1,10 @@
 require 'pty'
 
-require 'ios_deploy_kit/password_manager'
+require 'deliver/password_manager'
 
 
-module IosDeployKit
-  # The TransporterInputError occurs when you passed wrong inputs to the {IosDeployKit::ItunesTransporter}
+module Deliver
+  # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
   class TransporterInputError < StandardError 
   end
   # The TransporterTransferError occurs when some error happens
@@ -21,21 +21,21 @@ module IosDeployKit
     
     # Returns a new instance of the iTunesTranspoter.
     # If no username or password given, it will be taken from
-    # the #{IosDeployKit::PasswordManager}
+    # the #{Deliver::PasswordManager}
     def initialize(user = nil, password = nil)
       @user = (user || PasswordManager.new.username)
       @password = (password || PasswordManager.new.password)
     end
 
     # Downloads the latest version of the app metadata package from iTC.
-    # @param app [IosDeployKit::App] The app you want to download the data for
+    # @param app [Deliver::App] The app you want to download the data for
     # @param dir [String] the path to the package file
     # @return (Bool) True if everything worked fine
-    # @raise [IosDeployKit::TransporterTransferError] when something went wrong 
+    # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transfering
-    # @raise [IosDeployKit::TransporterInputError] when passing wrong inputs
+    # @raise [Deliver::TransporterInputError] when passing wrong inputs
     def download(app, dir = nil)
-      raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+      raise TransporterInputError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
 
       Helper.log.info("Going to download app metadata from iTunesConnect")
       dir ||= app.get_metadata_directory
@@ -45,14 +45,14 @@ module IosDeployKit
     end
 
     # Uploads the modified package back to iTunesConnect
-    # @param app [IosDeployKit::App] The app you want to download the data for
+    # @param app [Deliver::App] The app you want to download the data for
     # @param dir [String] the path in which the package file is located
     # @return (Bool) True if everything worked fine
-    # @raise [IosDeployKit::TransporterTransferError] when something went wrong 
+    # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transfering
-    # @raise [IosDeployKit::TransporterInputError] when passing wrong inputs
+    # @raise [Deliver::TransporterInputError] when passing wrong inputs
     def upload(app, dir)
-      raise TransporterInputError.new("No valid IosDeployKit::App given") unless app.kind_of?IosDeployKit::App
+      raise TransporterInputError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
 
       dir ||= app.get_metadata_directory
       dir += "/#{app.apple_id}.itmsp"
@@ -105,7 +105,7 @@ module IosDeployKit
           if $1.include?"Your Apple ID or password was entered incorrectly" or
              $1.include?"This Apple ID has been locked for security reasons"
 
-            IosDeployKit::PasswordManager.new.password_seems_wrong
+            Deliver::PasswordManager.new.password_seems_wrong
           end
 
         elsif line =~ WARNING_REGEX

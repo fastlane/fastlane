@@ -1,38 +1,38 @@
 require 'pry'
-describe IosDeployKit do
-  describe IosDeployKit::Deliverer do
+describe Deliver do
+  describe Deliver::Deliverer do
 
     describe "#initialize" do
       describe "Different Deliverfiles" do
         it "raises an error when file was not found" do
           expect {
-            IosDeployKit::Deliverer.new(nil)
+            Deliver::Deliverer.new(nil)
           }.to raise_exception "Deliverfile not found at path './Deliverfile'"
         end
 
         it "raises an error if some key information is missing" do
           expect {
-            IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
           }.to raise_exception("You have to pass a valid version number using the Deliver file.")
 
           expect {
-            IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
           }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
 
           expect {
-            IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
-          }.to raise_exception(IosDeployKit::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
+          }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
         end
 
         describe "Valid Deliverfiles" do
           before do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
           end
 
           it "successfully loads the Deliverfile if it's valid" do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileSimple")
 
             thanks_for_facebook = "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
 
@@ -49,9 +49,9 @@ describe IosDeployKit do
           end
 
           it "Sets all the available metadata" do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
 
             expect(meta.app.app_identifier).to eq("net.sunapps.54")
 
@@ -68,13 +68,13 @@ describe IosDeployKit do
 
           it "raises an exception when the versions do not match" do
             expect {
-              IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
+              Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
             }.to raise_exception("Version mismatch: on iTunesConnect the latest version is '943.0', you specified '0.9.0'")
           end
 
           it "Uploads all the available screenshots" do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
             screenshots = deliv.app.metadata.fetch_value("//x:software_screenshot")
             expect(screenshots.count).to eq(9)
 
@@ -86,9 +86,9 @@ describe IosDeployKit do
           end
 
           it "Does not require an app version, when an ipa is given" do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
-            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileNoVersion")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileNoVersion")
 
             expect(deliv.app.apple_id).to eq(464686641)
             expect(deliv.app.app_identifier).to eq('at.felixkrause.iTanky')
@@ -96,10 +96,10 @@ describe IosDeployKit do
           end
 
           it "Let's the user specify which languages should be supported" do
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-            IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
 
-            deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileLocales")
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileLocales")
             expect(deliv.app.metadata.fetch_value("//x:locale").count).to eq(5)
             expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(5)
           end
@@ -120,26 +120,26 @@ describe IosDeployKit do
 
             it "Successful" do
               expect(File.exists?@tests_path).to eq(false)
-              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
-              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(true)
               expect(File.exists?@error_path).to eq(false)
             end
 
             it "Error on ipa upload" do
-              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt") # the ipa file
-              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt") # the ipa file
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
             end
 
             it "Error on app metadata upload" do
-              IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt")
-              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt")
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -147,7 +147,7 @@ describe IosDeployKit do
 
             it "Error on unit tests" do
               expect(File.exists?@tests_path).to eq(false)
-              deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -155,7 +155,7 @@ describe IosDeployKit do
 
             it "Error on unit tests with no error block raises an exception" do
               expect{
-                deliv = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksNoErrorBlock")
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksNoErrorBlock")
               }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.")
             end
           end
@@ -163,13 +163,13 @@ describe IosDeployKit do
 
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
-            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
           }.to raise_exception("App Identifier of IPA does not match with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
           expect {
-            meta = IosDeployKit::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
           }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)")
         end
       end
@@ -178,20 +178,20 @@ describe IosDeployKit do
     describe "#initialize with hash" do
       it "raises an exception when some information is missing" do
         expect {
-          @meta = IosDeployKit::Deliverer.new(nil, {})
+          @meta = Deliver::Deliverer.new(nil, {})
         }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
       end
 
       it "works with valid data" do
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # metadata
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # ipa file
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # metadata
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # ipa file
 
         version = '1.0'
         identifier = 'at.felixkrause.iTanky'
         ipa = "spec/fixtures/ipas/Example1.ipa"
 
-        @meta = IosDeployKit::Deliverer.new(nil, {
+        @meta = Deliver::Deliverer.new(nil, {
           app_identifier: identifier,
           version: version,
           ipa: ipa

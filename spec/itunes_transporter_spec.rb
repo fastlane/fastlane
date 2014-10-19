@@ -1,20 +1,20 @@
-describe IosDeployKit do
-  describe IosDeployKit::ItunesTransporter do
+describe Deliver do
+  describe Deliver::ItunesTransporter do
     before do
-      @app = IosDeployKit::App.new(apple_id: 284882215, app_identifier: 'com.facebook.Facebook')
+      @app = Deliver::App.new(apple_id: 284882215, app_identifier: 'com.facebook.Facebook')
     end
 
     describe "#download" do
       it "throws an exception when invalid parameter is given" do
         expect {
-          IosDeployKit::ItunesTransporter.new.download(123)
-        }.to raise_error "No valid IosDeployKit::App given"
+          Deliver::ItunesTransporter.new.download(123)
+        }.to raise_error "No valid Deliver::App given"
       end
 
       it "invalid login information" do
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_invalid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_invalid_apple_id.txt")
         expect {
-          expect(IosDeployKit::ItunesTransporter.new("email@email.com", "login").download(@app)).to eq(true)
+          expect(Deliver::ItunesTransporter.new("email@email.com", "login").download(@app)).to eq(true)
         }.to raise_error(/.*This Apple ID has been locked for security reasons.*/)
       end
     end
@@ -23,7 +23,7 @@ describe IosDeployKit do
       it "properly uploads the package file" do
         @app.apple_id = 878567776
 
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
 
         FileUtils.cp_r "./spec/fixtures/example2.itmsp/", '/tmp'
 
@@ -33,12 +33,12 @@ describe IosDeployKit do
 
         @app.metadata # download & parse the latest metadata
 
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
         expect(@app.upload_metadata!).to eq(true)
 
 
-        IosDeployKit::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-        @ipa = IosDeployKit::IpaUploader.new(@app, '/tmp/', "./spec/fixtures/ipas/Example1.ipa")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+        @ipa = Deliver::IpaUploader.new(@app, '/tmp/', "./spec/fixtures/ipas/Example1.ipa")
         expect(@ipa.upload!).to eq(true)
 
         # Verify the example2/metadata.xml is correct

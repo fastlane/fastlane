@@ -1,6 +1,6 @@
 require 'open-uri'
 
-module IosDeployKit
+module Deliver
   # A wrapper around the Apple iTunes Search API to access app information like
   # the app identifier of an app.
   class ItunesSearchApi
