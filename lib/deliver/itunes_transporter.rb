@@ -37,11 +37,17 @@ module Deliver
     def download(app, dir = nil)
       raise TransporterInputError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
 
-      Helper.log.info("Going to download app metadata from iTunesConnect")
+      Helper.log.info "Going to download app metadata from iTunesConnect"
       dir ||= app.get_metadata_directory
       command = build_download_command(@user, @password, app.apple_id, dir)
 
-      execute_transporter(command)
+      result = execute_transporter(command)
+
+      if result
+        Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
+      end
+
+      result
     end
 
     # Uploads the modified package back to iTunesConnect
@@ -57,12 +63,14 @@ module Deliver
       dir ||= app.get_metadata_directory
       dir += "/#{app.apple_id}.itmsp"
 
-      Helper.log.info("Going to upload updated app metadata to iTunesConnect")
+      Helper.log.info "Going to upload updated app metadata to iTunesConnect"
       
       command = build_upload_command(@user, @password, dir)
       result = execute_transporter(command)
 
-      Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.")
+      if result
+        Helper.log.info "Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.".green
+      end
 
       result
     end

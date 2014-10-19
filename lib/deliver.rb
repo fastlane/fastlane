@@ -11,7 +11,7 @@ require 'deliver/deliverfile/deliverfile'
 require 'deliver/deliverer'
 require 'deliver/ipa_uploader'
 require 'deliver/languages'
-
+require 'colored'
 
 module Deliver
   # Your code goes here...

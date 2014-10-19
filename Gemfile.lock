@@ -3,6 +3,7 @@ PATH
   specs:
     deliver (0.0.1)
       capybara (~> 2.4.3)
+      colored
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       nokogiri (~> 1.6.3.1)
@@ -23,6 +24,7 @@ GEM
       xpath (~> 2.0)
     cliver (0.3.2)
     coderay (1.1.0)
+    colored (1.2)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
