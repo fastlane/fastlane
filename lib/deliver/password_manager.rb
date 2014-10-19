@@ -31,6 +31,8 @@ module Deliver
     # This method is called, when the iTunes backend returns that the login data is wrong
     # This will ask the user, if he wants to re-enter the password
     def password_seems_wrong
+      return false if Helper.is_test?
+      
       puts "It seems like the username or password for the account '#{self.username}' is wrong."
       reenter = agree("Do you want to re-enter your username and password? (y/n)", true)
       if reenter
