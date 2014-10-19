@@ -137,6 +137,7 @@ IosDeployKit::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches 
 
 - The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. iTMSTransporter is a command line tool provided by Apple.
 - With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using Capybara (https://github.com/jnicklas/capybara) and Poltergeist (https://github.com/teampoltergeist/poltergeist)
+- The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
 ## Available language codes
