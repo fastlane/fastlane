@@ -1,0 +1,3 @@
+supported_languages ['de-DE', 'en-US', 'en-CA', 'it-IT', 'sv-SE']
+
+ipa "./spec/fixtures/ipas/Example1.ipa"

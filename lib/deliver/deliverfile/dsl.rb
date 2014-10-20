@@ -1,6 +1,6 @@
 # Inspired by https://github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/podfile/dsl.rb
 
-module IosDeployKit
+module Deliver
   module Deliverfile
     class Deliverfile
       module DSL
@@ -16,8 +16,8 @@ module IosDeployKit
         
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
-          allowed = IosDeployKit::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path]
+          allowed = Deliver::Deliverer.all_available_keys_to_set
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
@@ -40,7 +40,17 @@ module IosDeployKit
 
             @deliver_data.set_new_value(method_sym, value)
           else
-            Helper.log.error("Could not find method '#{method_sym}'. Available methods: #{allowed.collect { |a| a.to_s }}")
+            # Check if it's a block (e.g. run tests)
+            if Deliver::Deliverer.all_available_blocks_to_set.include?method_sym
+              if block
+                @deliver_data.set_new_block(method_sym, block)
+              else
+                Helper.log.error("Value for #{method_sym} must be a Ruby block. Use '#{method_sym} do ... end'")
+              end
+            else
+              # Couldn't find this particular method
+              Helper.log.error("Could not find method '#{method_sym}'. Available methods: #{allowed.collect { |a| a.to_s }}")
+            end
           end
         end
 

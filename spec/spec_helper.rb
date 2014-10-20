@@ -1,4 +1,4 @@
-require 'ios_deploy_kit'
+require 'deliver'
 require 'webmock/rspec'
 
 # Own mocking code

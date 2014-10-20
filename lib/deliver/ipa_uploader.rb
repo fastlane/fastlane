@@ -1,7 +1,7 @@
 require 'zip'
 require 'plist'
 
-module IosDeployKit
+module Deliver
   class IpaUploaderError < StandardError 
   end
 
@@ -10,28 +10,29 @@ module IosDeployKit
   class IpaUploader < AppMetadata
     attr_accessor :app
 
-    # TODO
-    # @param dir The path to the IPA file which should be uploaded
+    # Create a new uploader for one ipa file. This will only upload the ipa and no
+    # other app metadata.
+    # @param app (Deliver::App) The app for which the ipa should be uploaded for
+    # @param dir (String) The path to where we can store (copy) the ipa file. Usually /tmp/
+    # @param ipa_path (String) The path to the IPA file which should be uploaded
+    # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
     def initialize(app, dir, ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
 
       super(app, dir, false)
 
-      @ipa_file = IosDeployKit::MetadataItem.new(ipa_path)
+      @ipa_file = Deliver::MetadataItem.new(ipa_path)
     end
 
-    def transporter
-      @transporter ||= ItunesTransporter.new
-    end
-
-
+    # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def fetch_app_identifier
       plist = fetch_info_plist_file
       return plist['CFBundleIdentifier'] if plist
       return nil
     end
 
+    # Fetches the app version from the given ipa file.
     def fetch_app_version
       plist = fetch_info_plist_file
       return plist['CFBundleShortVersionString'] if plist
@@ -43,8 +44,9 @@ module IosDeployKit
     # @!group Uploading the ipa file # TODO: pragma mark
     #####################################################
 
-    # Actually upload the updated metadata to Apple
+    # Actually upload the ipa file to Apple
     def upload!
+      Helper.log.info "Uploading ipa file to iTunesConnect"
       build_document
 
       # Write the current XML state to disk
@@ -74,7 +76,7 @@ module IosDeployKit
         end
 
         @data = builder.doc
-        asset = @data.xpath('//x:asset', "x" => IosDeployKit::AppMetadata::ITUNES_NAMESPACE).first
+        asset = @data.xpath('//x:asset', "x" => Deliver::AppMetadata::ITUNES_NAMESPACE).first
         asset << @ipa_file.create_xml_node(@data)
       end
 

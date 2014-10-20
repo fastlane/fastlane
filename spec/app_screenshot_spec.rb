@@ -1,26 +1,25 @@
-describe IosDeployKit do
-  describe IosDeployKit::AppScreenshot do
+describe Deliver do
+  describe Deliver::AppScreenshot do
     let (:path) { "./spec/fixtures/screenshots/screenshot1.png" }
 
     describe "#init" do
       it "raises an exception if image file was not found" do
         path = "./notHere.png"
         expect {
-          IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_40)
+          Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
         }.to raise_error("File not found at path '#{path}'")
       end
 
       it "properly saves the path and screen size" do
-        path = "./spec/app_screenshot_spec.rb"
-        res = IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_40)
+        res = Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
         expect(res.path).to eq(path)
-        expect(res.screen_size).to eq(IosDeployKit::ScreenSize::IOS_40)
+        expect(res.screen_size).to eq(Deliver::ScreenSize::IOS_40)
       end
     end
 
     describe "after init" do
       before do
-        @item = IosDeployKit::AppScreenshot.new(path, IosDeployKit::ScreenSize::IOS_40)
+        @item = Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
         @doc = Nokogiri::XML(File.read("./spec/fixtures/example1.itmsp/metadata.xml"))
       end
 
@@ -29,12 +28,12 @@ describe IosDeployKit do
           order_index = 1
           node = @item.create_xml_node(@doc, order_index)
           expect(node.children.first.content).to eq(File.size(path).to_s)
-          expect(node.children[1].content).to eq("e2c116d8f1ab7982a2b131ac681b6e86.png")
+          expect(node.children[1].content).to eq("30fbc3071dc36b824bcd5960bcfef775.png")
           expect(node.children.last['type']).to eq("md5")
           expect(node.children.last.content).to eq("e2c116d8f1ab7982a2b131ac681b6e86")
 
           expect(node['position']).to eq(order_index.to_s)
-          expect(node['display_target']).to eq(IosDeployKit::ScreenSize::IOS_40)
+          expect(node['display_target']).to eq(Deliver::ScreenSize::IOS_40)
         end
       end
 
@@ -49,7 +48,7 @@ describe IosDeployKit do
         it "it is not valid, when the size does not match the given type" do
           expect(@item.is_valid?).to eq(true)
 
-          @item.screen_size = IosDeployKit::ScreenSize::IOS_55
+          @item.screen_size = Deliver::ScreenSize::IOS_55
           expect(@item.is_valid?).to eq(false) # wrong size
         end
       end
@@ -67,7 +66,7 @@ describe IosDeployKit do
           ]
 
           files.each do |value|
-            expect(IosDeployKit::AppScreenshot.calculate_screen_size(p + value[0])).to eq(value[1])
+            expect(Deliver::AppScreenshot.calculate_screen_size(p + value[0])).to eq(value[1])
           end
         end
       end

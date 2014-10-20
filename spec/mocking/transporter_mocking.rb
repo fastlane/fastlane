@@ -1,4 +1,4 @@
-module IosDeployKit
+module Deliver
 
   class ItunesTransporter
     

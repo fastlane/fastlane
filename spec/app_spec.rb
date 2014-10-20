@@ -1,18 +1,18 @@
-describe IosDeployKit do
-  describe IosDeployKit::App do
+describe Deliver do
+  describe Deliver::App do
     let (:apple_id) { 284882215 }
     let (:app_identifier) { 'com.facebook.Facebook' }
 
     describe "#initialize" do
       it "automatically fetches the app identifier, if only Apple ID is given" do
-        app = IosDeployKit::App.new(apple_id: apple_id)
+        app = Deliver::App.new(apple_id: apple_id)
 
         expect(app.app_identifier).to eq(app_identifier)
         expect(app.apple_id).to eq(apple_id)
       end
 
       it "lets me create an app using an Apple ID and app identifier" do
-        app = IosDeployKit::App.new(apple_id: apple_id, 
+        app = Deliver::App.new(apple_id: apple_id,
                               app_identifier: app_identifier)
 
         expect(app.app_identifier).to eq(app_identifier)
@@ -20,7 +20,7 @@ describe IosDeployKit do
       end
 
       it "lets me create an app without any information given (yet)" do
-        expect(IosDeployKit::App.new.app_identifier).to eq(nil)
+        expect(Deliver::App.new.app_identifier).to eq(nil)
       end
     end
 
@@ -28,13 +28,13 @@ describe IosDeployKit do
     describe "Accessing App Metadata" do
       let (:apple_id) { 794902327 }
       before do
-        @app = IosDeployKit::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
+        @app = Deliver::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
       end
 
       describe "#set_metadata_directory" do
 
         it "throws an exception when updating the location after accessing metadata" do
-          @app.metadata = IosDeployKit::AppMetadata.new(@app, "./spec/fixtures/example1.itmsp/", false)
+          @app.metadata = Deliver::AppMetadata.new(@app, "./spec/fixtures/example1.itmsp/", false)
           expect {
             @app.set_metadata_directory("something")
           }.to raise_error("Can not change metadata directory after accessing metadata of an app")
