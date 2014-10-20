@@ -11,7 +11,6 @@ describe Deliver do
       end
 
       it "properly saves the path and screen size" do
-        path = "./spec/app_screenshot_spec.rb"
         res = Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
         expect(res.path).to eq(path)
         expect(res.screen_size).to eq(Deliver::ScreenSize::IOS_40)

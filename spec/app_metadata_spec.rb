@@ -177,9 +177,9 @@ describe Deliver do
             expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
             @app.metadata.set_all_screenshots({
               'de-DE' => [
-                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35),
-                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35),
-                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_35)
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40),
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40),
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
               ]
             })
             results = @app.metadata.fetch_value("//x:software_screenshot")
