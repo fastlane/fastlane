@@ -63,8 +63,8 @@ The screenshots must be grouped by language code (see Available language codes)
 ```ruby
 ipa "./latest.ipa"
 changelog({
-    'en-US' => "This update adds cool new features",
-    'de-DE' => "Dieses Update ist super"
+    "en-US" => "This update adds cool new features",
+    "de-DE" => "Dieses Update ist super"
 })
 ```
 
@@ -89,17 +89,17 @@ For this example I used https://github.com/stevenosloan/slack-notifier
 
 #### Set a default language if you are lucky enough to only maintain one language
 ```ruby
-default_language 'en-US'
-version '1.2'
+default_language "en-US"
+version "1.2"
 
-title 'Only English Title'
+title "Only English Title"
 ```
 If you do not pass an ipa file, you have to specify the app version you want to edit.
 
 #### Update the app's keywords
 ```ruby
-default_language 'de-DE'
-version '1.2'
+default_language "de-DE"
+version "1.2"
 
 keywords ["keyword1", "something", "else"]
 ```
@@ -107,8 +107,8 @@ keywords ["keyword1", "something", "else"]
 #### Read content from somewhere external (file, web service, ...)
 ```ruby
 description({
-    'en-US' => File.read("changelog-en.txt")
-    'de-DE' => open("http://example.com/latest-changelog.txt").read
+    "en-US" => File.read("changelog-en.txt")
+    "de-DE" => open("http://example.com/latest-changelog.txt").read
 })
 ```
 
@@ -125,7 +125,7 @@ end
 
 #### Defining which languages your app supports
 ```ruby
-supported_languages ['de-DE', 'en-US', 'en-CA', 'it-IT']
+supported_languages ["de-DE", "en-US", "en-CA", "it-IT"]
 ```
 This will take care of creating the locales, if they don't already exist.
 
@@ -152,12 +152,12 @@ Some examples
 app = Deliver::App.new(apple_id)
 
 app.get_app_status # => Waiting for Review
-app.create_new_version!('1.4')
-app.metadata.update_title({ 'en-US' => "iPhone App Title" })
+app.create_new_version!("1.4")
+app.metadata.update_title({ "en-US" => "iPhone App Title" })
 app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
 
-Deliver::ItunesSearchApi.fetch_by_identifier('net.sunapps.9') # => Fetches public metadata
+Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches public metadata
 ```    
 
 # Can I trust *Deliver*? How does this thing even work? Is magic involved? 🎩
