@@ -58,13 +58,20 @@ module Deliver
 
       @ipa_file.store_file_inside_package(path)
 
-      result = transporter.upload(@app, @metadata_dir)
-      if result
+      is_okay = true
+      begin
+        transporter.upload(@app, @metadata_dir)
+      rescue Exception => ex
+        is_okay = ex.to_s.include?"ready exists a binary upload with build" # this just means, the ipa is already online
+      end
+
+      if is_okay
         unless Helper.is_test?
           return publish_on_itunes_connect
         end
       end
-      return result
+
+      return is_okay
     end
 
     
