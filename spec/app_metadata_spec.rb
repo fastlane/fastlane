@@ -75,7 +75,6 @@ describe Deliver do
 
           it "adds a new language if it's valid" do
             expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
-            expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
 
             expect(@app.metadata.fetch_value("//x:locale").count).to eq(3)
             expect(@app.metadata.fetch_value("//x:title").count).to eq(3)
