@@ -11,6 +11,7 @@ require 'deliver/deliverfile/deliverfile'
 require 'deliver/deliverer'
 require 'deliver/ipa_uploader'
 require 'deliver/languages'
+require 'deliver/pdf_generator'
 require 'colored'
 
 module Deliver
