@@ -68,6 +68,11 @@ describe Deliver do
             }.to raise_error(/is invalid. It must be in/)
           end
 
+          it "throws return false when languag already exists" do
+            expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
+            expect(@app.metadata.add_new_locale('es-ES')).to eq(false)
+          end
+
           it "adds a new language if it's valid" do
             expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
             expect(@app.metadata.add_new_locale('es-ES')).to eq(true)

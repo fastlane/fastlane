@@ -82,14 +82,16 @@ module Deliver
     # Adds a new locale (language) to the given app
     # @param language (Deliver::Languages::ALL_LANGUAGES) the language you want to
     #  this app
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
+    # @return (Bool) Is true, if the language was created. False, when the language alreade existed
     def add_new_locale(language)
       unless Deliver::Languages::ALL_LANGUAGES.include?language
         raise "Language '#{language}' is invalid. It must be in #{Deliver::Languages::ALL_LANGUAGES}."
       end
 
-      if fetch_value("//x:locale[@name='#{language}']").count > 0
+      if information[language] != nil
         Helper.log.info("Locale '#{language}' already exists. Can not create it again.")
-        return true
+        return false
       end
       
 
