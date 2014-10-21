@@ -213,7 +213,7 @@ module Deliver
 
         begin
           first('a', :text => BUTTON_ADD_NEW_BUILD).click
-          sleep 3
+          wait_for_elements(".buildModalList")
         rescue
           if page.has_content?"Upload Date"
             # That's fine, the ipa was already selected
@@ -222,8 +222,6 @@ module Deliver
             raise "Could not find Build Button. It looks like the ipa file was not properly uploaded."
           end
         end
-        
-        version_number = '0.9.11'
 
         if page.all('td', :text => version_number).count > 1
           error_text = "There were multiple submitted builds found. Don't know which one to choose.\n" + 
@@ -269,6 +267,8 @@ module Deliver
         errors = (all(".pagemessage.error") || []).count > 0
         raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
 
+
+        wait_for_elements(".savingWrapper.ng-scope.ng-pristine.ng-valid.ng-valid-required")
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
@@ -278,35 +278,38 @@ module Deliver
             advertising_identifier: false
           }
 
-          Capybara.ignore_hidden_elements = false
-
           basic = "//*[@itc-radio='submitForReviewAnswers"
 
           #####################
           # Export Compliance #
           #####################
-          all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance]}']").first.click
-          if perms[:export_compliance]
-            raise "Sorry, that's not supported yet" # TODO
+          if page.has_content?"Export"
+            all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance]}']").first.click
+            if perms[:export_compliance]
+              raise "Sorry, that's not supported yet" # TODO
+            end
           end
 
           ##################
           # Content Rights #
           ##################
-          all(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content]}']").first.click
-          if perms[:third_party_content]
-            raise "Sorry, that's not supported yet" # TODO
+          if page.has_content?"Content Rights"
+            all(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content]}']").first.click
+            if perms[:third_party_content]
+              raise "Sorry, that's not supported yet" # TODO
+            end
           end
 
           ##########################
           # Advertising Identifier #
           ##########################
-          all(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']").first.click
-          if perms[:advertising_identifier]
-            raise "Sorry, that's not supported yet" # TODO
+          if page.has_content?"Advertising Identifier"
+            all(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']").first.click
+            if perms[:advertising_identifier]
+              raise "Sorry, that's not supported yet" # TODO
+            end
           end
           
-          Capybara.ignore_hidden_elements = true
 
           Helper.log.info("Filled out the export compliance and other information on iTC")
 
