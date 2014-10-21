@@ -154,6 +154,7 @@ module Deliver
         @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
 
+        @app.create_new_version!(app_version)
         @app.metadata.verify_version(app_version)
 
         if @active_blocks[:unit_tests]
