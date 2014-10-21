@@ -154,7 +154,7 @@ module Deliver
         @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
 
-        @app.create_new_version!(app_version)
+        @app.create_new_version!(app_version) unless Helper.is_test?
         @app.metadata.verify_version(app_version)
 
         if @active_blocks[:unit_tests]
@@ -207,17 +207,22 @@ module Deliver
         
 
         result = @app.metadata.upload!
+        raise "Error uploading app metadata" unless result == true
 
         # IPA File
         # The IPA file has to be handles seperatly
         if @ipa
           @ipa.app = @app # we now have the resulting app
-          @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
+          result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
         else
           Helper.log.warn "No IPA file given. Only the metadata were uploaded. If you want to deploy a full update, provide an ipa file."
         end
 
-        @active_blocks[:success].call if @active_blocks[:success]
+        if result == true
+          @active_blocks[:success].call if @active_blocks[:success]
+        else
+          raise "Error uploading the ipa file"
+        end
 
       rescue Exception => ex
         if @active_blocks[:error]
