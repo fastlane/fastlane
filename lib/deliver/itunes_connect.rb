@@ -27,6 +27,8 @@ module Deliver
 
     BUTTON_STRING_NEW_VERSION = "New Version"
     BUTTON_STRING_SUBMIT_FOR_REVIEW = "Submit for Review"
+
+    BUTTON_ADD_NEW_BUILD = 'Click + to add a build before you submit your app.'
     
     def initialize
       super
@@ -153,7 +155,6 @@ module Deliver
     def create_new_version!(app, version_number)
       begin
         verify_app(app)
-
         open_app_page(app)
 
         if page.has_content?BUTTON_STRING_NEW_VERSION
@@ -173,6 +174,57 @@ module Deliver
       end
     end
 
+    # This will choose the latest uploaded build on iTunesConnect as the production one
+    # After this method, you still have to call submit_for_review to actually submit the
+    # whole update
+    # @param app (Deliver::App) the app you want to choose the build for
+    def put_build_into_production!(app)
+      begin
+        verify_app(app)
+        open_app_page(app)
+
+        Helper.log("Choosing the latest build on iTunesConnect.")
+
+        while not page.has_content?"Add Build"
+          click_on BUTTON_ADD_NEW_BUILD
+          sleep 1
+        end
+
+        
+        # TODO: Sorted correctly?
+        result = page.first('td', :text => '0.9.11').first(:xpath,"./..").first(:css, ".small").click
+        click_on "Done" # Save the modal dialog
+        click_on "Save" # on the top right to save everything else
+
+        error = page.has_content?BUTTON_ADD_NEW_BUILD
+        raise "Could not put build itself onto production. Try opening '#{current_url}'" if error
+
+        return true
+      rescue
+        error_occured(ex)
+      end
+    end
+
+    # Submits the update itself to Apple, this includes the app metadata and the ipa file
+    # This can easily cause exceptions, which will be shown on iTC.
+    # @param app (Deliver::App) the app you want to submit
+    def submit_for_review!(app)
+      begin
+        verify_app(app)
+        open_app_page(app)
+
+        Helper.log("Submitting app for Review")
+
+        click_on BUTTON_STRING_SUBMIT_FOR_REVIEW
+
+        errors = (all(".pagemessage.error") || []).count > 0
+        raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
+
+        return true
+      rescue
+        error_occured(ex)
+      end
+    end
 
 
     private

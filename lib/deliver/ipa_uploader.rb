@@ -58,12 +58,29 @@ module Deliver
 
       @ipa_file.store_file_inside_package(path)
 
-      transporter.upload(@app, @metadata_dir)
+      result = transporter.upload(@app, @metadata_dir)
+      if result
+        unless Helper.is_test?
+          return publish_on_itunes_connect
+        end
+      end
+      return result
     end
 
     
 
     private
+      # This method will trigger the iTunesConnect class to choose the latest build
+      def publish_on_itunes_connect
+        if self.app.itc.put_build_into_production
+          if self.app.itc.submit_for_review
+            Helper.log.info "Successfully deployed and published a new update. Please enjoy a good Club Mate."
+            return true
+          end
+        end
+      end
+
+
       def build_document
         builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
           xml.package(xmlns: "http://apple.com/itunes/importer", version: "software4.7") {

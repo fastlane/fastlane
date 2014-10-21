@@ -212,6 +212,8 @@ module Deliver
         if @ipa
           @ipa.app = @app # we now have the resulting app
           @ipa.upload!
+        else
+          Helper.log.warn "No IPA file given. Only the metadata were uploaded. If you want to deploy a full update, provide an ipa file."
         end
 
         @active_blocks[:success].call if @active_blocks[:success]
