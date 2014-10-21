@@ -79,9 +79,9 @@ module Deliver
     private
       # This method will trigger the iTunesConnect class to choose the latest build
       def publish_on_itunes_connect
-        if self.app.itc.put_build_into_production
-          if self.app.itc.submit_for_review
-            Helper.log.info "Successfully deployed and published a new update. Please enjoy a good Club Mate."
+        if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
+          if self.app.itc.submit_for_review!(self.app)
+            Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
             return true
           end
         end
