@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'deliver'
+
+HighLine.track_eof = false # Fix for built-in Ruby
+
+Deliver::Deliverer.new("./Deliverfile")

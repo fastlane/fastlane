@@ -41,7 +41,6 @@ module Deliver
         remove_from_keychain
 
         puts "You will have to re-run the recent command to use the new username/password."
-        ask_for_login
         return true
       else
         return false

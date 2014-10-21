@@ -58,12 +58,36 @@ module Deliver
 
       @ipa_file.store_file_inside_package(path)
 
-      transporter.upload(@app, @metadata_dir)
+      is_okay = true
+      begin
+        transporter.upload(@app, @metadata_dir)
+      rescue Exception => ex
+        is_okay = ex.to_s.include?"ready exists a binary upload with build" # this just means, the ipa is already online
+      end
+
+      if is_okay
+        unless Helper.is_test?
+          return publish_on_itunes_connect
+        end
+      end
+
+      return is_okay
     end
 
     
 
     private
+      # This method will trigger the iTunesConnect class to choose the latest build
+      def publish_on_itunes_connect
+        if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
+          if self.app.itc.submit_for_review!(self.app)
+            Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
+            return true
+          end
+        end
+      end
+
+
       def build_document
         builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
           xml.package(xmlns: "http://apple.com/itunes/importer", version: "software4.7") {
