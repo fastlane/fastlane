@@ -129,8 +129,10 @@ module Deliver
     def update_title(hash)
       update_localized_value('title', hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language]['title'] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language]['title'] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -142,8 +144,10 @@ module Deliver
       key = :description
       update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language][key] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -155,8 +159,10 @@ module Deliver
       key = :version_whats_new
       update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language][key] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -168,8 +174,10 @@ module Deliver
       key = :software_url
       update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language][key] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -181,8 +189,10 @@ module Deliver
       key = :support_url
       update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language][key] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -194,8 +204,10 @@ module Deliver
       key = :privacy_url
       update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
-        information[language][key] = { value: new_val, modified: true }
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 

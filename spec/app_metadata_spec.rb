@@ -134,6 +134,19 @@ describe Deliver do
             @app.metadata.update_support_url({ 'de-DE' => new_value })
             expect(@app.metadata.fetch_value("//x:support_url").first.content).to eq(new_value)
           end
+
+          it "doesn't set the modified to true if it's the same value" do
+            old = @app.metadata.information['de-DE'][:support_url][:value]
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(false)
+
+            @app.metadata.update_support_url({'de-DE' => old})
+
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(false)
+
+            @app.metadata.update_support_url({'de-DE' => 'something new'})
+
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(true)
+          end
         end
 
         describe "#update_privacy_url" do
