@@ -184,6 +184,7 @@ module Deliver
         @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
         @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
         @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
+        @app.metadata.update_privacy_url(@deploy_information[ValKey::PRIVACY_URL]) if @deploy_information[ValKey::PRIVACY_URL]
 
         # App Keywords
         @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]

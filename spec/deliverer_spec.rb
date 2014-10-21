@@ -38,7 +38,7 @@ describe Deliver do
 
             expect(meta.app.app_identifier).to eq("net.sunapps.54")
             expect(meta.deploy_information[:version]).to eq("943.0")
-            expect(meta.deploy_information[:changelog]).to eq({
+            expect(meta.deploy_information[:version_whats_new]).to eq({
               'en-US' => thanks_for_facebook
             })
 
@@ -55,12 +55,12 @@ describe Deliver do
 
             expect(meta.app.app_identifier).to eq("net.sunapps.54")
 
-            expect(meta.deploy_information[:changelog]).to eq({"en-US"=>"Thanks for using this app"})
+            expect(meta.deploy_information[:version_whats_new]).to eq({"en-US"=>"Thanks for using this app"})
 
             expect(meta.deploy_information[:version]).to eq("943.0")
             expect(meta.deploy_information[:description]).to eq({"en-US"=>"App description"})
             expect(meta.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
-            expect(meta.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
+            expect(meta.deploy_information[:software_url].values.first).to eq("http://www.sunapps.net")
             expect(meta.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
             expect(meta.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
             expect(meta.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
