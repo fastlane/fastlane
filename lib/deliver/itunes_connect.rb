@@ -210,6 +210,7 @@ module Deliver
             "You can always open the browser page yourself: '#{current_url}'\n" +
             "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
           sleep 10
+          visit current_url
         end
 
         ################# Apple is finished processing the ipa file #################
