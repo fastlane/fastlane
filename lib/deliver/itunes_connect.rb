@@ -173,7 +173,13 @@ module Deliver
             Helper.log.debug("Waiting for 'Prepare for Submission'")
           end
         else
-          Helper.log.info "Version #{version_number} was already created"
+          Helper.log.warn "Can not create version #{version_number} on iTunesConnect. Maybe it was already created."
+          Helper.log.info "Check out '#{current_url}' what's the latest version."
+
+          created_version = first(".status.waiting").text.split(" ").first
+          if created_version != version_number
+            raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+          end
         end
 
         true
