@@ -211,13 +211,16 @@ module Deliver
           # Everything is prepared for the upload
           # We may have to ask the user if that's okay
           pdf_path = PdfGenerator.new.render(self)
-          system("open '#{pdf_path}'")
-          puts "----------------------------------------------------------------------------"
-          puts "Verifying the upload via the PDF file can be disabled by either adding"
-          puts "'skip_pdf true' to your Deliverfile or using the flag -f when using the CLI."
-          puts "----------------------------------------------------------------------------"
-          okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
-          raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
+          unless Helper.is_test?
+            puts "----------------------------------------------------------------------------"
+            puts "Verifying the upload via the PDF file can be disabled by either adding"
+            puts "'skip_pdf true' to your Deliverfile or using the flag -f when using the CLI."
+            puts "----------------------------------------------------------------------------"
+
+            system("open '#{pdf_path}'")
+            okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
+            raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
+          end
         else
           Helper.log.debug "PDF verify was skipped"
         end

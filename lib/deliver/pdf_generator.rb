@@ -37,13 +37,17 @@ module Deliver
           prev_cursor = cursor.to_f
           # Description on right side
           bounding_box([col1, cursor], width: 340.0) do
-            text content[:description][:value], size: 6, color: (content[:description][:modified] ? modified_color : standard_color)
+            if content[:description] and content[:description][:value]
+              text content[:description][:value], size: 6, color: (content[:description][:modified] ? modified_color : standard_color)
+            end
             move_down 10
             stroke_horizontal_rule
             move_down 10
             text "Changelog:", size: 8
             move_down 5
-            text content[:version_whats_new][:value], size: 6, color: (content[:version_whats_new][:modified] ? modified_color : standard_color)
+            if content[:version_whats_new] and content[:version_whats_new][:value]
+              text content[:version_whats_new][:value], size: 6, color: (content[:version_whats_new][:modified] ? modified_color : standard_color)
+            end
           end
           title_bottom = cursor.to_f
 
@@ -55,7 +59,7 @@ module Deliver
           all_keys.each_with_index do |key, index|
             value = content[key][:value] rescue nil
             
-            color = content[key][:modified] ? modified_color : standard_color
+            color = (content[key][:modified] ? modified_color : standard_color rescue standard_color)
 
             bounding_box([0, cursor], width: col1) do
               key = key.to_s.gsub('_', ' ').capitalize
@@ -69,22 +73,24 @@ module Deliver
           top = [cursor, title_bottom].min - padding
           index = 0
           previous_image_height = 0
-          content[:screenshots].sort{ |a, b| a.screen_size <=> b.screen_size }.each do |screenshot|
-            
-            if last_size and last_size != screenshot.screen_size
-              # Next row (other simulator size)
-              top -= (previous_image_height + padding)
-              index = 0
+          if content[:screenshots]
+            content[:screenshots].sort{ |a, b| a.screen_size <=> b.screen_size }.each do |screenshot|
+              
+              if last_size and last_size != screenshot.screen_size
+                # Next row (other simulator size)
+                top -= (previous_image_height + padding)
+                index = 0
+              end
+
+              image screenshot.path, width: image_width, 
+                                        at: [(index * (image_width + padding)), top]
+
+              original_size = FastImage.size(screenshot.path)
+              previous_image_height = (image_width.to_f / original_size[0].to_f) * original_size[1].to_f
+
+              last_size = screenshot.screen_size
+              index += 1
             end
-
-            image screenshot.path, width: image_width, 
-                                      at: [(index * (image_width + padding)), top]
-
-            original_size = FastImage.size(screenshot.path)
-            previous_image_height = (image_width.to_f / original_size[0].to_f) * original_size[1].to_f
-
-            last_size = screenshot.screen_size
-            index += 1
           end
 
           start_new_page
