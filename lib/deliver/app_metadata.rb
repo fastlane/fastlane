@@ -11,6 +11,26 @@ module Deliver
     METADATA_FILE_NAME = "metadata.xml"
     MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
 
+    # @return Data contains all information for this app, including the unmodified one
+    attr_accessor :information
+    # data = {
+    #   'en-US' => {
+    #     title: {
+    #       value: "Something",
+    #       modified: false
+    #     },
+    #     version_whats_new: {
+    #       value: "Some text",
+    #       modified: true
+    #     }
+    #     screenshots: {
+    #       '45' => [
+    #         Screenshot1
+    #       ]
+    #     }
+    #   }
+    # }
+
     private_constant :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
     INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES"
@@ -48,6 +68,10 @@ module Deliver
       end
     end
 
+    def information
+      @information ||= {}
+    end
+
     # Verifies the if the version of iTunesConnect matches the one you pass as parameter
     def verify_version(version_number)
       xml_version = self.fetch_value("//x:version").first['string']
@@ -58,14 +82,16 @@ module Deliver
     # Adds a new locale (language) to the given app
     # @param language (Deliver::Languages::ALL_LANGUAGES) the language you want to
     #  this app
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
+    # @return (Bool) Is true, if the language was created. False, when the language alreade existed
     def add_new_locale(language)
       unless Deliver::Languages::ALL_LANGUAGES.include?language
         raise "Language '#{language}' is invalid. It must be in #{Deliver::Languages::ALL_LANGUAGES}."
       end
 
-      if fetch_value("//x:locale[@name='#{language}']").count > 0
+      if information[language] != nil
         Helper.log.info("Locale '#{language}' already exists. Can not create it again.")
-        return true
+        return false
       end
       
 
@@ -85,6 +111,9 @@ module Deliver
       Helper.log.info("Successfully created the new locale '#{language}'. The default title '#{default_title}' was set, since it's required by iTunesConnect.")
       Helper.log.info("You can update the title using 'app.metadata.update_title'")
       
+      information[language] ||= {}
+      information[language][:title] = { value: default_title, modified: true}
+
       true
     end
 
@@ -98,9 +127,12 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
-      update_localized_value('title', hash) do |field, new_val|
+      update_localized_value('title', hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
+        if field.content != new_val
+          field.content = new_val
+          information[language]['title'] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -109,9 +141,13 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_description(hash)
-      update_localized_value('description', hash) do |field, new_val|
+      key = :description
+      update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -120,9 +156,13 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
-      update_localized_value('version_whats_new', hash) do |field, new_val|
+      key = :version_whats_new
+      update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -131,9 +171,13 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_marketing_url(hash)
-      update_localized_value('software_url', hash) do |field, new_val|
+      key = :software_url
+      update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -142,9 +186,28 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_support_url(hash)
-      update_localized_value('support_url', hash) do |field, new_val|
+      key = :support_url
+      update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        field.content = new_val
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
+      end
+    end
+
+    # Updates the Privacy URL
+    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    #  as keys.
+    # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
+    def update_privacy_url(hash)
+      key = :privacy_url
+      update_localized_value(key, hash) do |field, new_val, language|
+        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
+        if field.content != new_val
+          field.content = new_val
+          information[language][key] = { value: new_val, modified: true }
+        end
       end
     end
 
@@ -153,7 +216,7 @@ module Deliver
     #  as keys. The value should be an array of keywords (each keyword is a string)
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
-      update_localized_value('keywords', hash) do |field, keywords|
+      update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
         field.children.remove # remove old keywords
@@ -166,6 +229,8 @@ module Deliver
         end
 
         field.children = node_set
+
+        information[language][:keywords] = { value: keywords, modified: true }
       end
     end
 
@@ -181,6 +246,7 @@ module Deliver
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
       end
+      information[language][:screenshots] = []
       true
     end
 
@@ -224,6 +290,8 @@ module Deliver
         # Ready for storing the screenshot into the metadata.xml now
         screenshots.children.after(app_screenshot.create_xml_node(@data, next_index))
       end
+
+      information[language][:screenshots] << app_screenshot
 
       app_screenshot.store_file_inside_package(@package_path)
     end
@@ -350,6 +418,8 @@ module Deliver
         raise AppMetadataParameterError.new("Please pass a hash of languages to this method") unless new_value.kind_of?Hash
         raise AppMetadataParameterError.new("Please pass a block, which updates the resulting node") unless block_given?
 
+        xpath_name = xpath_name.to_s
+
         # Run through all the locales given by the 'user'
         new_value.each do |language, value|
           locale = fetch_value("//x:locale[@name='#{language}']").first
@@ -380,6 +450,7 @@ module Deliver
         @data ||= Nokogiri::XML(File.read("#{path}/#{METADATA_FILE_NAME}"))
         verify_package
         clean_package
+        fill_in_data
       end
 
       # Checks if there is a non live version available
@@ -403,6 +474,31 @@ module Deliver
 
         # Remove all GameCenter related code
         fetch_value("//x:game_center").remove
+      end
+
+      # This will fill in all information we got into self.information
+      def fill_in_data
+        locales = fetch_value("//x:locale")
+        locales.each do |locale|
+          language = locale['name']
+          information[language] ||= {}
+
+          all_keys = [:title, :description, :version_whats_new, :software_url, :support_url, :privacy_url]
+
+          all_keys.each do |key|
+            information[language][key] = {
+              value: (locale.search(key.to_s).first.content rescue ''),
+              modified: false
+            }
+          end
+          
+          information[language][:keywords] = { value: [], modified: false}
+          locale.search('keyword').each do |current|
+            information[language][:keywords][:value] << current.content
+          end
+
+          information[language][:screenshots] = []
+        end
       end
   end
 end

@@ -37,6 +37,7 @@ module Deliver
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
       SUPPORTED_LANGUAGES = :supported_languages
+      SKIP_PDF = :skip_pdf
     end
 
     module AllBlocks
@@ -185,6 +186,7 @@ module Deliver
         @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
         @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
         @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
+        @app.metadata.update_privacy_url(@deploy_information[ValKey::PRIVACY_URL]) if @deploy_information[ValKey::PRIVACY_URL]
 
         # App Keywords
         @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
@@ -205,6 +207,21 @@ module Deliver
           end
         end
         
+        unless @deploy_information[ValKey::SKIP_PDF]
+          # Everything is prepared for the upload
+          # We may have to ask the user if that's okay
+          pdf_path = PdfGenerator.new.render(self)
+          system("open '#{pdf_path}'")
+          puts "----------------------------------------------------------------------------"
+          puts "Verifying the upload via the PDF file can be disabled by either adding"
+          puts "'skip_pdf true' to your Deliverfile or using the flag -f when using the CLI."
+          puts "----------------------------------------------------------------------------"
+          okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
+          raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
+        else
+          Helper.log.debug "PDF verify was skipped"
+        end
+
 
         result = @app.metadata.upload!
         raise "Error uploading app metadata" unless result == true
