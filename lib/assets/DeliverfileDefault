@@ -1,10 +1,4 @@
-# This is the example Deliverfile
 # For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
-# 
-# You can remove those parts you don't need
-# 
-# A list of available language codes can be found here: https://github.com/krausefx/deliver#available-language-codes
-# 
 # Everything next to a # is a comment and will be ignored
 
 
@@ -13,28 +7,18 @@
 # App Metadata
 ########################################
 
-
-
 # The app identifier is required
-app_identifier "[Your App Identifier, e.g. at.felixkrause.app_name]"
+app_identifier "[[APP_IDENTIFIER]]"
 
 
 # This folder has to include one folder for each language
 # More information about automatic screenshot upload: 
-screenshots_path "./screenshots"
+screenshots_path "./deliver/screenshots/"
 
 
 # version '1.2' # you can pass this if you want to verify the version number with the ipa file
-# 
-# tite({
-#   "en-US" => "Your App Name"
-# })
-# 
-# changelog({
-#   "en-US" => "- iPhone 6 (Plus) Support\n" + 
-#              "- Some other cool new features"
-# })
 
+config_json_folder './deliver'
 
 
 ########################################

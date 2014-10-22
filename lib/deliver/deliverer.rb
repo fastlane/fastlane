@@ -37,6 +37,7 @@ module Deliver
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
       SUPPORTED_LANGUAGES = :supported_languages
+      CONFIG_JSON_FOLDER = :config_json_folder # path to a folder containing json files for all supported languages, including screenshots
       SKIP_PDF = :skip_pdf
     end
 
@@ -105,6 +106,34 @@ module Deliver
       Deliverer::AllBlocks.constants.collect { |a| Deliverer::AllBlocks.const_get(a) }
     end
 
+    # This will check which file exist in this folder and load their content
+    def load_config_json_folder
+      matching = {
+        'title' => ValKey::TITLE,
+        'description' => ValKey::DESCRIPTION,
+        'version_whats_new' => ValKey::CHANGELOG,
+        'keywords' => ValKey::KEYWORDS,
+        'privacy_url' => ValKey::PRIVACY_URL,
+        'software_url' => ValKey::MARKETING_URL,
+        'support_url' => ValKey::SUPPORT_URL
+      }
+
+      Dir.glob("#{@deploy_information[:config_json_folder]}/*").each do |path|
+        if File.exists?(path) and not File.directory?(path)
+          language = path.split("/").last.split(".").first # TODO: this should be improved
+          data = JSON.parse(File.read(path))
+
+          matching.each do |key, value|
+
+            if data[key]
+              @deploy_information[value] ||= {}
+              @deploy_information[value][language] = data[key]
+            end
+
+          end
+        end
+      end
+    end
 
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile. 
@@ -175,6 +204,13 @@ module Deliver
           end
         end
 
+        # Config JS Folder, which is used when starting with the Quick Start
+        # This has to be before the other things
+        if @deploy_information[:config_json_folder]
+          load_config_json_folder
+        end
+
+
         # Now: set all the updated metadata. We can only do that
         # once the whole file is finished
 
@@ -200,7 +236,7 @@ module Deliver
               if @deploy_information[ValKey::DEFAULT_LANGUAGE]
                 screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path }
               else
-                raise "You have to have folders for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
+                Helper.log.error"You have to have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
               end
             end
             @app.metadata.set_screenshots_for_each_language(screens_path)

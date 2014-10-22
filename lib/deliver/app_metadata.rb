@@ -219,18 +219,20 @@ module Deliver
       update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
-        field.children.remove # remove old keywords
+        if keywords.sort != information[language][:keywords][:value].sort
+          field.children.remove # remove old keywords
 
-        node_set = Nokogiri::XML::NodeSet.new(@data)
-        keywords.each do |word|
-          keyword = Nokogiri::XML::Node.new('keyword', @data)
-          keyword.content = word
-          node_set << keyword
+          node_set = Nokogiri::XML::NodeSet.new(@data)
+          keywords.each do |word|
+            keyword = Nokogiri::XML::Node.new('keyword', @data)
+            keyword.content = word
+            node_set << keyword
+          end
+
+          field.children = node_set
+
+          information[language][:keywords] = { value: keywords, modified: true }
         end
-
-        field.children = node_set
-
-        information[language][:keywords] = { value: keywords, modified: true }
       end
     end
 
@@ -341,7 +343,7 @@ module Deliver
         resulting_path = "#{current_path}/*.png"
 
         raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
-        raise "No screenshots found at the given path '#{resulting_path}'" unless Dir[resulting_path].count > 0
+        Helper.log.error("No screenshots found at the given path '#{resulting_path}'") unless Dir[resulting_path].count > 0
 
         self.clear_all_screenshots(language)
         

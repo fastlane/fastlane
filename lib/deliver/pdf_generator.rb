@@ -18,7 +18,7 @@ module Deliver
           # info = deliverer.deploy_information
           title = content[:title][:value] rescue '' # TODO: that shouldn't happen
 
-          Helper.log.info("Exporting locale '#{language}' for app with title '#{title}'")
+          Helper.log.info("[PDF] Exporting locale '#{language}' for app with title '#{title}'")
 
           font_size 20
           text "#{language}: #{title}"
