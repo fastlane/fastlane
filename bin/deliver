@@ -1,7 +1,54 @@
 #!/usr/bin/env ruby
 
+$:.push File.expand_path("../../lib", __FILE__)
+
 require 'deliver'
+require 'commander/import'
 
 HighLine.track_eof = false # Fix for built-in Ruby
 
-Deliver::Deliverer.new("./Deliverfile")
+
+# Commander
+program :version, Deliver::VERSION
+program :description, 'CLI for \'Deliver\' - Automate uploading of app metadata, screenshots and app updates to Apple'
+program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
+program :help, 'Website', 'http://felixkrause.at'
+program :help, 'GitHub', 'https://github.com/krausefx/deliver'
+program :help_formatter, :compact
+
+global_option('--verbose') { $verbose = true }
+
+default_command :run
+
+
+command :run do |c|
+  c.syntax = 'deliver'
+  c.description = 'Run a deploy process using the Deliverfile in the current folder'
+  c.option '--force', 'Runs a deployment without verifying any information. This can be used in build servers.'
+  c.action do |args, options|
+    if File.exists?(deliver_path)
+      # Everything looks alright, use the given Deliverfile
+      meta = Deliver::Deliverer.new(deliver_path)
+      puts meta
+    else
+      Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
+      if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
+        Deliver::DeliverfileCreator.create(deliver_path)
+      end
+    end
+  end
+end
+
+command :init do |c|
+  c.syntax = 'deliver init'
+  c.description = "Creates a new Deliverfile in the current directory"
+
+  c.action do |args, options|
+    Deliver::DeliverfileCreator.create(deliver_path)
+  end
+end
+
+
+def deliver_path
+  "./#{Deliver::Deliverfile::Deliverfile::FILE_NAME}"
+end
