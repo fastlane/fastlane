@@ -57,7 +57,7 @@ Here are a few example files:
 app_identifier "net.sunapps.1"
 screenshots_path "./screenshots"
 ```
-The screenshots must be grouped by language code (see Available language codes)
+The screenshots folder must include one subfolder per language (see Available language codes)
 
 #### Upload a new ipa file with a changelog to iTunesConnect
 ```ruby
