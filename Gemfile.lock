@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.0.1)
+    deliver (0.1.0)
       capybara (~> 2.4.3)
       colored
       fastimage (~> 1.6.3)
