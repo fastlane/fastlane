@@ -63,7 +63,27 @@ module Deliver
 
             bounding_box([0, cursor], width: col1) do
               key = key.to_s.gsub('_', ' ').capitalize
-              text "#{key}: #{value}", color: color, width: 200, size: 12
+
+              width = 200
+              size = 10
+
+              if value.kind_of?Array
+                # Keywords only
+                text "#{key}:", color: color, width: width, size: size
+                move_down 2
+
+                keywords_padding_left = 5
+                bounding_box([keywords_padding_left, cursor], width: (col1 - keywords_padding_left)) do
+                  value.each do |item|
+                    text "- #{item}", color: color, width: width, size: (size - 2)
+                  end
+                end
+              else
+                # Everything else
+                next if value == nil or value.length == 0
+                
+                text "#{key}: #{value}", color: color, width: width, size: size
+              end
             end
           end
 
