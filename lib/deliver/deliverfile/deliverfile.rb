@@ -5,6 +5,8 @@ module Deliver
     # Deliverfile represents a Deliverfile created by a user of this library
     class Deliverfile
 
+      FILE_NAME = "Deliverfile"
+
       include Deliver::Deliverfile::Deliverfile::DSL
 
       # The path to the used Deliverfile.
@@ -16,8 +18,8 @@ module Deliver
       # @param (String) path (optional) to the file itself. This must also include the
       #  filename itself.
       def initialize(deliver_data, path = nil)
-        path ||= './Deliverfile'
-        raise "Deliverfile not found at path '#{path}'" unless File.exists?(path.to_s)
+        path ||= "./#{FILE_NAME}"
+        raise "#{FILE_NAME} not found at path '#{path}'" unless File.exists?(path.to_s)
 
         self.path = path
         @deliver_data = deliver_data
