@@ -29,13 +29,14 @@ module Deliver
 
     # This method is used, when the user does not want to automatically create the Deliverfile
     def self.create_example_deliver_file(path)
-      example = File.read("./lib/assets/DeliverfileExample")
+      example = File.read("#{gem_path}/lib/assets/DeliverfileExample")
       example.gsub!("[[APP_NAME]]", Dir.pwd.split("/").last)
       File.write(path, example)
 
       puts "Successfully created new Deliverfile at '#{path}'".green
     end
 
+    # This will download all the app metadata and store its data into JSON files
     def self.create_based_on_identifier(deliver_path, identifier)
       app = Deliver::App.new(app_identifier: identifier)
       app.set_metadata_directory("/tmp") # we don't want to pollute the current folder
@@ -63,7 +64,7 @@ module Deliver
       end
 
       # Generate the final Deliverfile here
-      deliver = File.read("./lib/assets/DeliverfileDefault")
+      deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
       deliver.gsub!("[[APP_IDENTIFIER]]", identifier)
       deliver.gsub!("[[APP_NAME]]", Dir.pwd.split("/").last)
 
@@ -71,5 +72,10 @@ module Deliver
       File.write(deliver_path, deliver)
       puts "Successfully created new Deliverfile at '#{deliver_path}'".green
     end
+
+    private
+      def self.gem_path
+        Gem::Specification.find_by_name("deliver").gem_dir
+      end
   end
 end
