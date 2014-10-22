@@ -23,24 +23,26 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-## Credentials
+# Quick Start
 
-### Use the Keychain
-The first time you use *Deliver* you have to enter your iTunesConnect 
-credentials. They will be stored in the Keychain. 
+Use the Quick Start guide to instantly get started. 
 
-If you decide to remove your
-credentials from the Keychain, just open the *Keychain Access*, select 
-*All Items* and search for 'itunesconnect.apple.com'.
+The guide will create all the necessary files for you, using the existing app metadata from iTunesConnect.
 
-### Use environment variables
-You can use the following environment variables:
+- ```cd [your_project_folder]```
+- ```deliver init```
+- Approve by entering ```y```
+- Enter your iTunesConnect credentials
+- Enter your app identifier
+- Enjoy a good drink, while the computer does all the work for you
 
-    DELIVER_USER
-    DELIVER_PASSWORD
-    
-### Implement something custom to fit your needs
-Take a look at *Using the exposed Ruby classes. You
+From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
+
+### Customize the ```Deliverfile```
+Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings
+
+- ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
+- ```unit_tests```: Uncomment the code to run tests using *xctool*.
 
 #Usage
 
@@ -49,7 +51,7 @@ Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
 
-Name the file *Deliverfile* and store it in your project folder.
+Run ```deliver init``` to create a new ```Deliverfile```. You can either let the wizard generate a file based on the metadata from iTunesConnect or create one from a template.
 
 Here are a few example files:
 #### Upload all screenshots to iTunesConnect
@@ -57,7 +59,7 @@ Here are a few example files:
 app_identifier "net.sunapps.1"
 screenshots_path "./screenshots"
 ```
-The screenshots must be grouped by language code (see Available language codes)
+The screenshots folder must include one subfolder per language (see Available language codes)
 
 #### Upload a new ipa file with a changelog to iTunesConnect
 ```ruby
@@ -129,8 +131,8 @@ supported_languages ["de-DE", "en-US", "en-CA", "it-IT"]
 ```
 This will take care of creating the locales, if they don't already exist.
 
-##### What is the *Deliverfile*
-As you can see, the *Deliverfile* is a normal Ruby file, which is executed when
+##### What is the ```Deliverfile```
+As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed when
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 
 
@@ -156,11 +158,36 @@ app.create_new_version!("1.4")
 app.metadata.update_title({ "en-US" => "iPhone App Title" })
 app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
+app.submit_for_review!
 
 Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches public metadata
-```    
+```
+This project is well documented, check it out here: http://www.rubydoc.info/github/KrauseFx/deliver/frames
 
-# Can I trust *Deliver*? How does this thing even work? Is magic involved? 🎩
+
+## Credentials
+
+### Use the Keychain
+The first time you use *Deliver* you have to enter your iTunesConnect 
+credentials. They will be stored in the Keychain. 
+
+If you decide to remove your
+credentials from the Keychain, just open the *Keychain Access*, select 
+*All Items* and search for 'itunesconnect.apple.com'.
+
+### Use environment variables
+You can use the following environment variables:
+
+    DELIVER_USER
+    DELIVER_PASSWORD
+    
+### Implement something custom to fit your needs
+Take a look at *Using the exposed Ruby classes. You
+
+
+# Can I trust *Deliver*? 
+###How does this thing even work? Is magic involved? 🎩###
+
 *Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the *Deliverfile*. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
 *Deliver* uses the following techniques under the hood:
@@ -179,7 +206,7 @@ Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches publi
 
 # Contributing
 
-1. Fork it ( https://github.com/KrauseFx/deliver/fork )
+1. Fork it (https://github.com/KrauseFx/deliver/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

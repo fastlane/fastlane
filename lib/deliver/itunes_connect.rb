@@ -161,6 +161,13 @@ module Deliver
         open_app_page(app)
 
         if page.has_content?BUTTON_STRING_NEW_VERSION
+
+          current_version = first(".status.ready").text.split(" ").first
+          if current_version == version_number
+            # This means, this version is already live on the App Store
+            raise "Version #{version_number} is already created, submitted and released on iTC. Please verify you're using a new version number."
+          end
+
           click_on BUTTON_STRING_NEW_VERSION
 
           Helper.log.info "Creating a new version (#{version_number})"

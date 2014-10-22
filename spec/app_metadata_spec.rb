@@ -21,6 +21,21 @@ describe Deliver do
           expect(@app.metadata.fetch_value("//x:version").first['string']).to eq("0.9.10")
         end
 
+        if current_path.include?'example1'
+          it "properly loaded all the app metadata into the information hash" do
+            info = @app.metadata.information['de-DE']
+            expect(info[:title][:value]).to eq("Example App Title")
+            expect(info[:title][:modified]).to eq(false)
+            expect(info[:description][:value].include?"3D GPS Birdiebuch").to eq(true)
+            expect(info[:keywords][:value]).to eq(%w|personal sunapps sun sunapps felix krause|)
+            expect(info[:version_whats_new][:value]).to eq("- Changelog Line 1\n- Changelog Line 2")
+            expect(info[:software_url][:value]).to eq("http://sunapps.net")
+            expect(info[:support_url][:value]).to eq("http://www.sunapps.net/")
+
+            expect(@app.metadata.information.count).to eq(2)
+          end
+        end
+
         describe "#update_title" do
 
           it "updates the title" do
@@ -53,8 +68,12 @@ describe Deliver do
             }.to raise_error(/is invalid. It must be in/)
           end
 
-          it "adds a new language if it's valid" do
+          it "throws return false when languag already exists" do
             expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
+            expect(@app.metadata.add_new_locale('es-ES')).to eq(false)
+          end
+
+          it "adds a new language if it's valid" do
             expect(@app.metadata.add_new_locale('es-ES')).to eq(true)
 
             expect(@app.metadata.fetch_value("//x:locale").count).to eq(3)
@@ -78,11 +97,16 @@ describe Deliver do
           it "updates the description when a hash is given" do
             description = "Something Deutsch"
 
+            expect(@app.metadata.information['de-DE'][:description][:modified]).to eq(false)
+
             @app.metadata.update_description({
               'de-DE' => description
             })
             
             expect(@app.metadata.fetch_value("//x:description").first.content).to eq(description)
+
+            expect(@app.metadata.information['de-DE'][:description][:value]).to eq(description)
+            expect(@app.metadata.information['de-DE'][:description][:modified]).to eq(true)
           end
         end
 
@@ -109,6 +133,32 @@ describe Deliver do
             expect(@app.metadata.fetch_value("//x:support_url").first.content).to eq('http://www.sunapps.net/')
             @app.metadata.update_support_url({ 'de-DE' => new_value })
             expect(@app.metadata.fetch_value("//x:support_url").first.content).to eq(new_value)
+          end
+
+          it "doesn't set the modified to true if it's the same value" do
+            old = @app.metadata.information['de-DE'][:support_url][:value]
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(false)
+
+            @app.metadata.update_support_url({'de-DE' => old})
+
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(false)
+
+            @app.metadata.update_support_url({'de-DE' => 'something new'})
+
+            expect(@app.metadata.information['de-DE'][:support_url][:modified]).to eq(true)
+          end
+        end
+
+        describe "#update_privacy_url" do
+          it "updates the privacy URL" do
+            new_value = "http://krause.pizza"
+            expect(@app.metadata.fetch_value("//x:privacy_url").first).to eq(nil)
+
+            @app.metadata.update_privacy_url({ 'de-DE' => new_value })
+
+            expect(@app.metadata.fetch_value("//x:privacy_url").first.content).to eq(new_value)
+            expect(@app.metadata.information['de-DE'][:privacy_url][:value]).to eq(new_value)
+            expect(@app.metadata.information['de-DE'][:privacy_url][:modified]).to eq(true)
           end
         end
 
