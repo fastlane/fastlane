@@ -1,0 +1,62 @@
+# This is the example Deliverfile
+# For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
+# 
+# You can remove those parts you don't need
+# 
+# A list of available language codes can be found here: https://github.com/krausefx/deliver#available-language-codes
+# 
+# Everything next to a # is a comment and will be ignored
+
+
+
+########################################
+# App Metadata
+########################################
+
+
+
+# The app identifier is required
+app_identifer "[Your App Identifier, e.g. at.felixkrause.app_name]"
+
+
+# This folder has to include one folder for each language
+# More information about automatic screenshot upload: 
+screenshots_path "./screenshots"
+
+
+# version '1.2' # you can pass this if you want to verify the version number with the ipa file
+# 
+# tite({
+#   "en-US" => "Your App Name"
+# })
+# 
+# changelog({
+#   "en-US" => "- iPhone 6 (Plus) Support\n" + 
+#              "- Some other cool new features"
+# })
+
+
+
+########################################
+# Building and Testing
+########################################
+
+# Dynamic generation of the ipa file
+# I'm using Shenzhen by Mattt, but you can use any build tool you want
+ipa do
+    # Add any code you want, like incrementing the build 
+    # number or changing the app identifier
+
+    system("ipa build") # build your project using Shenzhen
+    "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
+end
+
+# ipa "./latest.ipa" # this can be used, if you prefer manually building the ipa file
+
+# unit_tests do
+#   system("xctool test")
+# end
+
+success do
+  system("say 'Successfully deployed a new version.'")
+end
