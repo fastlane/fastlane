@@ -63,7 +63,7 @@ module Deliver
       dir ||= app.get_metadata_directory
       dir += "/#{app.apple_id}.itmsp"
 
-      Helper.log.info "Going to upload updated app metadata to iTunesConnect"
+      Helper.log.info "Going to upload updated app to iTunesConnect"
       
       command = build_upload_command(@user, @password, dir)
       result = execute_transporter(command)

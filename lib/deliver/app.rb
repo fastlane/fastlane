@@ -87,6 +87,10 @@ module Deliver
       @metadata ||= Deliver::AppMetadata.new(self, get_metadata_directory)
     end
 
+    # Was the app metadata already downloaded?
+    def metadata_downloaded?
+      @metadata != nil
+    end
 
     #####################################################
     # @!group Destructive/Constructive methods

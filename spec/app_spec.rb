@@ -31,6 +31,16 @@ describe Deliver do
         @app = Deliver::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
       end
 
+      describe "#metadata_downloaded?" do
+        it "return false if not done yet" do
+          Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+
+          expect(@app.metadata_downloaded?).to eq(false)
+          @app.metadata
+          expect(@app.metadata_downloaded?).to eq(true)
+        end
+      end
+
       describe "#set_metadata_directory" do
 
         it "throws an exception when updating the location after accessing metadata" do

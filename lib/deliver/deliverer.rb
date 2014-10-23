@@ -190,7 +190,7 @@ module Deliver
         Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
 
         @app = Deliver::App.new(app_identifier: app_identifier,
-                                           apple_id: apple_id)
+                                      apple_id: apple_id)
 
         if @ipa and not is_beta_build
           # This is a real release, which should also upload the ipa file onto production
@@ -272,9 +272,14 @@ module Deliver
           end
         end
 
-
-        result = @app.metadata.upload!
-        raise "Error uploading app metadata" unless result == true
+        if @app.metadata_downloaded?
+          Helper.log.info "Finished setting app metadata."
+          result = @app.metadata.upload!
+          raise "Error uploading app metadata" unless result == true
+        else
+          # This is the usual case for beta_ipa builds for apps which are probably not yet in the store
+          Helper.log.info "Metadata was not touched. Nothing has changed."
+        end
 
         # IPA File
         # The IPA file has to be handles seperatly
