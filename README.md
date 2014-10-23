@@ -25,16 +25,16 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Quick Start
 
-Use the Quick Start guide to instantly get started. 
 
 The guide will create all the necessary files for you, using the existing app metadata from iTunesConnect.
 
 - ```cd [your_project_folder]```
 - ```deliver init```
-- Approve by entering ```y```
-- Enter your iTunesConnect credentials
-- Enter your app identifier
-- Enjoy a good drink, while the computer does all the work for you
+- When your app is already in the AppStore: ```y```
+ - Enter your iTunesConnect credentials
+ - Enter your app identifier
+ - Enjoy a good drink, while the computer does all the work for you
+- When it's a new app: ```n```
 
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
@@ -45,7 +45,7 @@ Open the ```Deliverfile``` using a text editor and customize it even further. Ta
 - ```beta_ipa```: If you only want to distribute a beta build to your testers.
 - ```unit_tests```: Uncomment the code to run tests using *xctool*.
 
-#Usage
+# Usage
 
 ## Using a ```Deliverfile``` (recommended)
 Why should you have to remember complicated commands and parameters?
