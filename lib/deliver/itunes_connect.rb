@@ -34,6 +34,8 @@ module Deliver
     
     def initialize
       super
+
+      DependencyChecker.check_for_brew
       
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist

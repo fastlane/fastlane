@@ -24,7 +24,7 @@ module Deliver
         elsif severity == "ERROR"
           string = string.red
         elsif severity == "FATAL"
-          string = string.red.bold.underline
+          string = string.red.bold
         end
 
 
