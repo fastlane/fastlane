@@ -27,6 +27,7 @@ module Deliver
       APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
+      BETA_IPA = :beta_ipa
       DESCRIPTION = :description
       TITLE = :title
       CHANGELOG = :changelog
@@ -150,10 +151,13 @@ module Deliver
 
         errors = Deliver::Deliverfile::Deliverfile
 
-        # Verify or complete the IPA information (app identifier and app version)
-        if @deploy_information[ValKey::IPA]
+        used_ipa_file = @deploy_information[ValKey::IPA] || @deploy_information[ValKey::BETA_IPA]
+        is_beta_build = @deploy_information[ValKey::BETA_IPA] != nil
 
-          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', @deploy_information[ValKey::IPA])
+        # Verify or complete the IPA information (app identifier and app version)
+        if used_ipa_file
+
+          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build)
 
           # We are able to fetch some metadata directly from the ipa file
           # If they were also given in the Deliverfile, we will compare the values
@@ -184,8 +188,11 @@ module Deliver
         @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
 
-        @app.create_new_version!(app_version) unless Helper.is_test?
-        @app.metadata.verify_version(app_version)
+        if @ipa and not is_beta_build
+          # This is a real release, which should also upload the ipa file onto production
+          @app.create_new_version!(app_version) unless Helper.is_test?
+          @app.metadata.verify_version(app_version)
+        end
 
         if @active_blocks[:unit_tests]
           result = @active_blocks[:unit_tests].call
@@ -243,7 +250,9 @@ module Deliver
           end
         end
         
-        unless @deploy_information[ValKey::SKIP_PDF]
+        if @deploy_information[ValKey::SKIP_PDF] or is_beta_build
+          Helper.log.debug "PDF verify was skipped"
+        else
           # Everything is prepared for the upload
           # We may have to ask the user if that's okay
           pdf_path = PdfGenerator.new.render(self)
@@ -257,8 +266,6 @@ module Deliver
             okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
             raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
           end
-        else
-          Helper.log.debug "PDF verify was skipped"
         end
 
 

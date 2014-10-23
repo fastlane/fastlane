@@ -195,6 +195,46 @@ module Deliver
       end
     end
 
+    def wait_for_preprocessing
+      started = Time.now
+      while page.has_content?PROCESSING_TEXT
+        # iTunesConnect is super slow... so we have to wait...
+        Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
+          "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
+          "You can always open the browser page yourself: '#{current_url}'\n" +
+          "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
+        sleep 10
+        visit current_url
+      end
+    end
+
+    # This will put the latest uploaded build as a new beta build
+    def put_build_into_beta_testing!(app, version_number)
+      begin
+        verify_app(app)
+        open_app_page(app)
+
+        Helper.log.info("Choosing the latest build on iTunesConnect for beta distribution")
+
+        click_on "Prerelease"
+
+        wait_for_preprocessing
+
+        if all(".switcher.ng-binding").count == 0
+          raise "Could not find beta build on '#{current_url}'. Make sure it is available there"
+        end
+
+        first(".switcher.ng-binding").click
+        click_on "Start"
+
+        # TODO: Check if everything has worked properly
+
+        return true
+      rescue Exception => ex
+        error_occured(ex)
+      end
+    end
+
     # This will choose the latest uploaded build on iTunesConnect as the production one
     # After this method, you still have to call submit_for_review to actually submit the
     # whole update
@@ -205,20 +245,11 @@ module Deliver
         verify_app(app)
         open_app_page(app)
 
-        Helper.log.info("Choosing the latest build on iTunesConnect.")
+        Helper.log.info("Choosing the latest build on iTunesConnect for release")
 
         click_on "Prerelease"
 
-        started = Time.now
-        while page.has_content?PROCESSING_TEXT
-          # iTunesConnect is super slow... so we have to wait...
-          Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
-            "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
-            "You can always open the browser page yourself: '#{current_url}'\n" +
-            "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-          sleep 10
-          visit current_url
-        end
+        wait_for_preprocessing
 
         ################# Apple is finished processing the ipa file #################
 

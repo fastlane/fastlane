@@ -10,20 +10,20 @@ describe Deliver do
     describe "#init" do
       it "raises an exception, when ipa file could not be found" do
         expect {
-          Deliver::IpaUploader.new(@app, "/tmp", "./nonExistent.ipa")
+          Deliver::IpaUploader.new(@app, "/tmp", "./nonExistent.ipa", true)
         }.to raise_error("IPA on path './nonExistent.ipa' not found")
       end
 
       it "raises an exception, when ipa file is not an ipa file" do
         expect {
-          Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/screenshots/iPhone4.png")
+          Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/screenshots/iPhone4.png", true)
         }.to raise_error("IPA on path './spec/fixtures/screenshots/iPhone4.png' is not a valid IPA file")
       end
     end
 
     describe "after init" do
       before do
-        @uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
+        @uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa", false)
       end
 
       describe "#fetch_app_identifier" do
@@ -43,7 +43,7 @@ describe Deliver do
       it "properly loads and stores the ipa when it's valid" do
         Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
-        uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa")
+        uploader = Deliver::IpaUploader.new(@app, "/tmp", "./spec/fixtures/ipas/Example1.ipa", false)
 
         expect(uploader.app.apple_id).to eq(apple_id)
         
