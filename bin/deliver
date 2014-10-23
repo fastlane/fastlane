@@ -24,12 +24,11 @@ default_command :run
 command :run do |c|
   c.syntax = 'deliver'
   c.description = 'Run a deploy process using the Deliverfile in the current folder'
-  c.option '--force', 'Runs a deployment without verifying any information. This can be used in build servers.'
+  c.option '--force', 'Runs a deployment without verifying any information. This can be used for build servers.'
   c.action do |args, options|
     if File.exists?(deliver_path)
       # Everything looks alright, use the given Deliverfile
-      meta = Deliver::Deliverer.new(deliver_path)
-      puts meta
+      Deliver::Deliverer.new(deliver_path, force: options.force)
     else
       Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
       if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)

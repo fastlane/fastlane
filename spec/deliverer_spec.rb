@@ -178,7 +178,7 @@ describe Deliver do
     describe "#initialize with hash" do
       it "raises an exception when some information is missing" do
         expect {
-          @meta = Deliver::Deliverer.new(nil, {})
+          @meta = Deliver::Deliverer.new(nil, hash: {})
         }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
       end
 
@@ -191,7 +191,7 @@ describe Deliver do
         identifier = 'at.felixkrause.iTanky'
         ipa = "spec/fixtures/ipas/Example1.ipa"
 
-        @meta = Deliver::Deliverer.new(nil, {
+        @meta = Deliver::Deliverer.new(nil, hash: {
           app_identifier: identifier,
           version: version,
           ipa: ipa

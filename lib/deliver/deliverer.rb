@@ -53,8 +53,11 @@ module Deliver
     # @param (String) path The path to the Deliverfile.
     # @param (Hash) hash You can pass a hash instead of a path to basically
     #  give all the information required (see {Deliverer::ValKey} for available options)
-    def initialize(path = nil, hash = nil)
+    # @param (Bool) force Runs a deployment without verifying any information. This can be 
+    # used for build servers. If this is set to false a PDF summary will be generated and opened
+    def initialize(path = nil, hash: nil, force: false)
       @deploy_information = {}
+      @deploy_information[ValKey::SKIP_PDF] = true if force
 
       if hash
         hash.each do |key, value|
