@@ -63,6 +63,9 @@ module Deliver
         FileUtils.mkdir_p "#{path}screenshots/#{locale}/"
       end
 
+      # Add a README to the screenshots folder
+      File.write("#{path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))
+
       # Generate the final Deliverfile here
       deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
       deliver.gsub!("[[APP_IDENTIFIER]]", identifier)
