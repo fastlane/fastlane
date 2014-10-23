@@ -226,8 +226,15 @@ module Deliver
           raise "Could not find beta build on '#{current_url}'. Make sure it is available there"
         end
 
+        if first(".switcher.ng-binding")['class'].include?"checked"
+          Helper.log.warn("Beta Build seems to be already active. Take a look at '#{current_url}'")
+          return true
+        end
+
         first(".switcher.ng-binding").click
-        click_on "Start"
+        if page.has_content?"Are you sure you want to start testing"
+          click_on "Start"
+        end
 
         # TODO: Check if everything has worked properly
 
