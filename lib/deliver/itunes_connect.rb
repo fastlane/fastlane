@@ -197,7 +197,9 @@ module Deliver
 
     def wait_for_preprocessing
       started = Time.now
-      while page.has_content?PROCESSING_TEXT
+
+      # Wait, while iTunesConnect is processing the uploaded file
+      while page.has_content?"Uploaded"
         # iTunesConnect is super slow... so we have to wait...
         Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
           "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
@@ -259,6 +261,7 @@ module Deliver
         begin
           first('a', :text => BUTTON_ADD_NEW_BUILD).click
           wait_for_elements(".buildModalList")
+          sleep 1
         rescue
           if page.has_content?"Upload Date"
             # That's fine, the ipa was already selected
