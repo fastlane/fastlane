@@ -39,9 +39,10 @@ The guide will create all the necessary files for you, using the existing app me
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
 ### Customize the ```Deliverfile```
-Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings
+Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings:
 
 - ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
+- ```beta_ipa```: If you only want to distribute a beta build to your testers.
 - ```unit_tests```: Uncomment the code to run tests using *xctool*.
 
 #Usage
@@ -61,7 +62,13 @@ screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see Available language codes)
 
-#### Upload a new ipa file with a changelog to iTunesConnect
+#### Distribute an ipa file to your TestFlight beta testers
+```ruby
+beta_ipa "./latest.ipa"
+```
+
+#### Upload a new ipa file to the AppStore with a changelog to iTunesConnect
+This will submit a new update to Apple
 ```ruby
 ipa "./latest.ipa"
 changelog({
@@ -69,6 +76,7 @@ changelog({
     "de-DE" => "Dieses Update ist super"
 })
 ```
+
 
 #### Implement blocks to run unit tests
 ```ruby

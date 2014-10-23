@@ -183,7 +183,7 @@ module Deliver
         raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE) unless app_identifier
         raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE) unless app_version
 
-        Helper.log.info("Got all information needed to deploy a the update '#{app_version}' for app '#{app_identifier}'")
+        Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
 
         @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
