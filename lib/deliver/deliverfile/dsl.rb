@@ -17,7 +17,7 @@ module Deliver
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages]
+          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages, :config_json_folder]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
@@ -81,6 +81,17 @@ module Deliver
           raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
+        end
+
+        # Pass the path to the ipa file (beta version) which should be uploaded
+        # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
+        #  IPA file.
+        def beta_ipa(value = nil)
+          value ||= yield if block_given?
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+
+          @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
 
         # Set the apps new version number.

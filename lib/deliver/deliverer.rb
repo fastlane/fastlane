@@ -27,6 +27,7 @@ module Deliver
       APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
+      BETA_IPA = :beta_ipa
       DESCRIPTION = :description
       TITLE = :title
       CHANGELOG = :changelog
@@ -37,6 +38,8 @@ module Deliver
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
       SUPPORTED_LANGUAGES = :supported_languages
+      CONFIG_JSON_FOLDER = :config_json_folder # path to a folder containing json files for all supported languages, including screenshots
+      SKIP_PDF = :skip_pdf
     end
 
     module AllBlocks
@@ -104,6 +107,34 @@ module Deliver
       Deliverer::AllBlocks.constants.collect { |a| Deliverer::AllBlocks.const_get(a) }
     end
 
+    # This will check which file exist in this folder and load their content
+    def load_config_json_folder
+      matching = {
+        'title' => ValKey::TITLE,
+        'description' => ValKey::DESCRIPTION,
+        'version_whats_new' => ValKey::CHANGELOG,
+        'keywords' => ValKey::KEYWORDS,
+        'privacy_url' => ValKey::PRIVACY_URL,
+        'software_url' => ValKey::MARKETING_URL,
+        'support_url' => ValKey::SUPPORT_URL
+      }
+
+      Dir.glob("#{@deploy_information[:config_json_folder]}/*").each do |path|
+        if File.exists?(path) and not File.directory?(path)
+          language = path.split("/").last.split(".").first # TODO: this should be improved
+          data = JSON.parse(File.read(path))
+
+          matching.each do |key, value|
+
+            if data[key]
+              @deploy_information[value] ||= {}
+              @deploy_information[value][language] = data[key]
+            end
+
+          end
+        end
+      end
+    end
 
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile. 
@@ -120,10 +151,13 @@ module Deliver
 
         errors = Deliver::Deliverfile::Deliverfile
 
-        # Verify or complete the IPA information (app identifier and app version)
-        if @deploy_information[ValKey::IPA]
+        used_ipa_file = @deploy_information[ValKey::IPA] || @deploy_information[ValKey::BETA_IPA]
+        is_beta_build = @deploy_information[ValKey::BETA_IPA] != nil
 
-          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', @deploy_information[ValKey::IPA])
+        # Verify or complete the IPA information (app identifier and app version)
+        if used_ipa_file
+
+          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build)
 
           # We are able to fetch some metadata directly from the ipa file
           # If they were also given in the Deliverfile, we will compare the values
@@ -154,8 +188,11 @@ module Deliver
         @app = Deliver::App.new(app_identifier: app_identifier,
                                            apple_id: apple_id)
 
-        @app.create_new_version!(app_version) unless Helper.is_test?
-        @app.metadata.verify_version(app_version)
+        if @ipa and not is_beta_build
+          # This is a real release, which should also upload the ipa file onto production
+          @app.create_new_version!(app_version) unless Helper.is_test?
+          @app.metadata.verify_version(app_version)
+        end
 
         if @active_blocks[:unit_tests]
           result = @active_blocks[:unit_tests].call
@@ -174,6 +211,13 @@ module Deliver
           end
         end
 
+        # Config JS Folder, which is used when starting with the Quick Start
+        # This has to be before the other things
+        if @deploy_information[:config_json_folder]
+          load_config_json_folder
+        end
+
+
         # Now: set all the updated metadata. We can only do that
         # once the whole file is finished
 
@@ -185,6 +229,7 @@ module Deliver
         @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
         @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
         @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
+        @app.metadata.update_privacy_url(@deploy_information[ValKey::PRIVACY_URL]) if @deploy_information[ValKey::PRIVACY_URL]
 
         # App Keywords
         @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
@@ -198,13 +243,31 @@ module Deliver
               if @deploy_information[ValKey::DEFAULT_LANGUAGE]
                 screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path }
               else
-                raise "You have to have folders for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
+                Helper.log.error"You have to have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
               end
             end
             @app.metadata.set_screenshots_for_each_language(screens_path)
           end
         end
         
+        if @deploy_information[ValKey::SKIP_PDF] or is_beta_build
+          Helper.log.debug "PDF verify was skipped"
+        else
+          # Everything is prepared for the upload
+          # We may have to ask the user if that's okay
+          pdf_path = PdfGenerator.new.render(self)
+          unless Helper.is_test?
+            puts "----------------------------------------------------------------------------"
+            puts "Verifying the upload via the PDF file can be disabled by either adding"
+            puts "'skip_pdf true' to your Deliverfile or using the flag -f when using the CLI."
+            puts "----------------------------------------------------------------------------"
+
+            system("open '#{pdf_path}'")
+            okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
+            raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
+          end
+        end
+
 
         result = @app.metadata.upload!
         raise "Error uploading app metadata" unless result == true

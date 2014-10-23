@@ -66,12 +66,6 @@ describe Deliver do
             expect(meta.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
           end
 
-          it "raises an exception when the versions do not match" do
-            expect {
-              Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileVersionMismatchPackage")
-            }.to raise_exception("Version mismatch: on iTunesConnect the latest version is '943.0', you specified '0.9.0'")
-          end
-
           it "Uploads all the available screenshots" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")

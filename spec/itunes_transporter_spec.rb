@@ -38,7 +38,7 @@ describe Deliver do
 
 
         Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-        @ipa = Deliver::IpaUploader.new(@app, '/tmp/', "./spec/fixtures/ipas/Example1.ipa")
+        @ipa = Deliver::IpaUploader.new(@app, '/tmp/', "./spec/fixtures/ipas/Example1.ipa", false)
         expect(@ipa.upload!).to eq(true)
 
         # Verify the example2/metadata.xml is correct

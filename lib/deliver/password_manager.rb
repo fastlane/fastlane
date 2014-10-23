@@ -49,9 +49,10 @@ module Deliver
 
     private
       def ask_for_login
-        puts "-------------------------------------------------------------------"
-        puts "The login information you enter now will be stored in your keychain"
-        puts "-------------------------------------------------------------------"
+        puts "--------------------------------------------------------------------------".green
+        puts "The login information you enter now will be stored in your keychain       ".green
+        puts "More information about that on GitHub: https://github.com/krausefx/deliver".green
+        puts "--------------------------------------------------------------------------".green
 
         while (self.username || '').length == 0
           self.username = ask("Username: ")
