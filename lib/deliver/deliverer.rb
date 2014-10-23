@@ -182,6 +182,7 @@ module Deliver
         
         raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE) unless app_identifier
         raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE) unless app_version
+        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build" if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
 
         Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
 

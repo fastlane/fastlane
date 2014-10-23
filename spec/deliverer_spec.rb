@@ -24,6 +24,12 @@ describe Deliver do
           }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
         end
 
+        it "throws an exception when both ipa and beta_ipa are given" do
+          expect {
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDuplicateIpa")
+          }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build")
+        end
+
         describe "Valid Deliverfiles" do
           before do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
