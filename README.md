@@ -46,7 +46,7 @@ Open the ```Deliverfile``` using a text editor and customize it even further. Ta
 
 #Usage
 
-## Using a *Deliver* file (recommended)
+## Using a ```Deliverfile``` (recommended)
 Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
@@ -188,7 +188,7 @@ Take a look at *Using the exposed Ruby classes. You
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-*Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the *Deliverfile*. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+*Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
 *Deliver* uses the following techniques under the hood:
 
