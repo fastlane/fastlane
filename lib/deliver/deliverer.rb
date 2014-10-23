@@ -166,15 +166,15 @@ module Deliver
           # If they were also given in the Deliverfile, we will compare the values
 
           if app_identifier
-            if app_identifier != @ipa.fetch_app_identifier
-              raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one (#{app_identifier} != #{@ipa.fetch_app_identifier})")
+            if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
+              raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')")
             end
           else
             app_identifier = @ipa.fetch_app_identifier
           end
 
           if app_version
-            if app_version != @ipa.fetch_app_version
+            if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
               raise errors::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})")
             end
           else

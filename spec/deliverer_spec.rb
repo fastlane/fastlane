@@ -164,7 +164,7 @@ describe Deliver do
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
             meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not match with the given one (net.sunapps.321 != at.felixkrause.iTanky)")
+          }.to raise_exception("App Identifier of IPA does not match with the given one ('net.sunapps.321' != 'at.felixkrause.iTanky')")
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
