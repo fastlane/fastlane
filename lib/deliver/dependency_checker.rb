@@ -11,6 +11,15 @@ module Deliver
         Helper.log.fatal '#############################################################'
         raise "Run 'brew install phantomjs' and start deliver again"
       end
+
+      unless `xcode-select -v`.include?"xcode-select version "
+        Helper.log.fatal '#############################################################'
+        Helper.log.fatal "# You have to install the Xcode commdand line tools to use deliver"
+        Helper.log.fatal "# Install the latest version of Xcode from the AppStore"
+        Helper.log.fatal "# Run xcode-select --install to install the developer tools"
+        Helper.log.fatal '#############################################################'
+        raise "Run 'xcode-select --install' and start deliver again"
+      end
     end
   end
 end
