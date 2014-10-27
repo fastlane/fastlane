@@ -48,7 +48,6 @@ The guide will create all the necessary files for you, using the existing app me
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
 ### Customize the ```Deliverfile```
-- ```beta_ipa```: If you only want to distribute a beta build to your testers.
 Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings:
 
 - ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
@@ -71,12 +70,7 @@ screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see Available language codes)
 
-#### Distribute an ipa file to your TestFlight beta testers
-```ruby
-beta_ipa "./latest.ipa"
-```
-
-#### Upload a new ipa file to the AppStore with a changelog to iTunesConnect
+#### Upload a new ipa file with a changelog to the AppStore
 This will submit a new update to Apple
 ```ruby
 ipa "./latest.ipa"
@@ -219,6 +213,14 @@ Take a look at *Using the exposed Ruby classes. You
 ["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
 ```
     
+# In progress
+These are features, which are implemented, but not yet fully tested and production ready. You can try it on your own risk.
+
+#### Distribute an ipa file to your TestFlight beta testers
+```ruby
+beta_ipa "./latest.ipa"
+```
+This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
 
 
 # Contributing
