@@ -6,11 +6,14 @@ Deliver - Continuous Deployment for iOS
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
 
+```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using the command line.
+
+
 Follow the developer on Twitter: https://twitter.com/KrauseFx
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
-- Upload a new ipa file to iTunesConnect without Xcode
+- Upload a new ipa file to iTunesConnect without Xcode from any computer
 - Update app metadata
 - Easily implement a real Continuous Deployment process
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
@@ -45,10 +48,10 @@ The guide will create all the necessary files for you, using the existing app me
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
 ### Customize the ```Deliverfile```
+- ```beta_ipa```: If you only want to distribute a beta build to your testers.
 Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings:
 
 - ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
-- ```beta_ipa```: If you only want to distribute a beta build to your testers.
 - ```unit_tests```: Uncomment the code to run tests using *xctool*.
 
 # Usage
