@@ -28,7 +28,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 Install phantomjs (this is needed to control the iTunesConnect frontend)
 
-    brew install phantomjs
+    brew update && brew install phantomjs
 
 If you don't have homebrew installed already, do it here: http://brew.sh/
 

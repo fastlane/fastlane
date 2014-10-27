@@ -7,9 +7,9 @@ module Deliver
         Helper.log.fatal "# You have to install phantomjs to use deliver"
         Helper.log.fatal "# phantomjs is used to control the iTunesConnect frontend"
         Helper.log.fatal "# Install Homebrew using http://brew.sh/" if `which brew`.length == 0
-        Helper.log.fatal "# Run 'brew install phantomjs' and start deliver again"
+        Helper.log.fatal "# Run 'brew update && brew install phantomjs' and start deliver again"
         Helper.log.fatal '#############################################################'
-        raise "Run 'brew install phantomjs' and start deliver again"
+        raise "Run 'brew update && brew install phantomjs' and start deliver again"
       end
 
       unless `xcode-select -v`.include?"xcode-select version "
