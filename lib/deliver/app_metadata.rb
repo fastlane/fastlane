@@ -127,11 +127,12 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
-      update_localized_value('title', hash) do |field, new_val, language|
+      key = :title
+      update_localized_value(key, hash) do |field, new_val, language|
         raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
         if field.content != new_val
           field.content = new_val
-          information[language]['title'] = { value: new_val, modified: true }
+          information[language][key] = { value: new_val, modified: true }
         end
       end
     end
