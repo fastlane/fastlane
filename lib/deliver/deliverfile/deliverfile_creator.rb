@@ -1,4 +1,5 @@
 module Deliver
+  # Helps new user quickly adopt Deliver
   class DeliverfileCreator
 
     # This method will ask the user what he wants to do
@@ -45,6 +46,7 @@ module Deliver
       path = './deliver/'
       FileUtils.mkdir_p path
 
+      json = {}
       # Access the app metadata and use them to create a finished Deliverfile
       app_name = app.metadata.information.each do |locale, current|
         current.each do |key, value|
@@ -55,13 +57,15 @@ module Deliver
           end
         end
 
-        meta_path = "#{path}#{locale}.json"
-        File.write(meta_path, current.to_json)
-        puts "Successfully created new JSON file with metadata at '#{meta_path}'".green
+        json[locale] = current
 
         # Create an empty folder for the screenshots too
         FileUtils.mkdir_p "#{path}screenshots/#{locale}/"
       end
+
+      meta_path = "#{path}metadata.json"
+      File.write(meta_path, json.to_json)
+      puts "Successfully created new metadata JSON file at '#{meta_path}'".green
 
       # Add a README to the screenshots folder
       File.write("#{path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))

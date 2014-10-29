@@ -122,18 +122,20 @@ module Deliver
         'support_url' => ValKey::SUPPORT_URL
       }
 
-      Dir.glob("#{@deploy_information[:config_json_folder]}/*").each do |path|
-        if File.exists?(path) and not File.directory?(path)
-          language = path.split("/").last.split(".").first # TODO: this should be improved
-          data = JSON.parse(File.read(path))
+      file_path = @deploy_information[:config_json_folder]
+      unless file_path.split("/").last.include?"metadata.json"
+        file_path += "/metadata.json"
+      end
 
-          matching.each do |key, value|
+      raise "Could not find metadatafile at path '#{file_path}'" unless File.exists?file_path
 
-            if data[key]
-              @deploy_information[value] ||= {}
-              @deploy_information[value][language] = data[key]
-            end
+      content = JSON.parse(File.read(file_path))
+      content.each do |language, current|
 
+        matching.each do |key, value|
+          if current[key]
+            @deploy_information[value] ||= {}
+            @deploy_information[value][language] = current[key]
           end
         end
       end

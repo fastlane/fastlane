@@ -106,6 +106,21 @@ describe Deliver do
             expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(5)
           end
 
+          describe "#load_config_json_folder" do
+            it "Correctly parses all the values for all the languages" do
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMetadataJson")
+
+              expect(deliv.deploy_information[:title].values.count).to eq(2) # languages
+              expect(deliv.deploy_information[:title]['de-DE']).to eq("Mein App Titel")
+              expect(deliv.deploy_information[:title]['en-US']).to eq("My App Title")
+              expect(deliv.deploy_information[:description]['de-DE']).to eq("German Description")
+              expect(deliv.deploy_information[:description]['en-US']).to eq("English Description here")
+              expect(deliv.deploy_information[:keywords]['de-DE'].last).to eq("Tag1")
+              expect(deliv.deploy_information[:keywords]['en-US'].last).to eq("Keyword1")
+            end
+          end
+
           describe "Test Deliver Callback blocks" do
             before do
               path = "/tmp/"
@@ -181,7 +196,7 @@ describe Deliver do
       it "raises an exception when some information is missing" do
         expect {
           @meta = Deliver::Deliverer.new(nil, hash: {})
-        }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
+        }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')")
       end
 
       it "works with valid data" do
