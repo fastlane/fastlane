@@ -345,12 +345,15 @@ module Deliver
         resulting_path = "#{current_path}/*.png"
 
         raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
-        Helper.log.error("No screenshots found at the given path '#{resulting_path}'") unless Dir[resulting_path].count > 0
 
-        self.clear_all_screenshots(language)
-        
-        Dir[resulting_path].sort.each do |path|
-          add_screenshot(language, Deliver::AppScreenshot.new(path))
+        if Dir[resulting_path].count == 0
+          Helper.log.error("No screenshots found at the given path '#{resulting_path}'") 
+        else
+          self.clear_all_screenshots(language)
+          
+          Dir[resulting_path].sort.each do |path|
+            add_screenshot(language, Deliver::AppScreenshot.new(path))
+          end
         end
       end
 
