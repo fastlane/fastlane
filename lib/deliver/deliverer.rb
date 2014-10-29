@@ -37,7 +37,6 @@ module Deliver
       KEYWORDS = :keywords
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
-      SUPPORTED_LANGUAGES = :supported_languages
       CONFIG_JSON_FOLDER = :config_json_folder # path to a folder containing json files for all supported languages, including screenshots
       SKIP_PDF = :skip_pdf
     end
@@ -211,13 +210,8 @@ module Deliver
         # Everything is ready for deployment
         ##########################################
 
-        if @deploy_information[ValKey::SUPPORTED_LANGUAGES]
-          @deploy_information[ValKey::SUPPORTED_LANGUAGES].each do |language|
-            @app.metadata.add_new_locale(language)
-          end
-        end
 
-        # Config JS Folder, which is used when starting with the Quick Start
+        # Config JSON Folder, which is used when starting with the Quick Start
         # This has to be before the other things
         if @deploy_information[:config_json_folder]
           load_config_json_folder

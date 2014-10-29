@@ -261,9 +261,10 @@ module Deliver
     def add_screenshot(language, app_screenshot)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
       
+      create_locale_if_not_exists(language)
+
       # Fetch the 'software_screenshots' node (array) for the specific locale
       locales = self.fetch_value("//x:locale[@name='#{language}']")
-      raise AppMetadataError.new("Locale '#{language}' not found. Please call app.metadata.add_new_locale('#{locale}) first.") unless locales.count == 1
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
       
@@ -425,10 +426,12 @@ module Deliver
 
         # Run through all the locales given by the 'user'
         new_value.each do |language, value|
+          create_locale_if_not_exists(language)
+
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
           raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
-          raise "Locale '#{language}' not found. Please call app.metadata.add_new_locale('#{locale}) first." unless locale
+          
 
           field = locale.search(xpath_name).first
 
@@ -441,6 +444,10 @@ module Deliver
           yield(field, value, language)
           Helper.log.info "Updated #{xpath_name} for locale #{language}"
         end
+      end
+
+      def create_locale_if_not_exists(locale)
+        add_new_locale(locale) unless information[locale]
       end
 
       # Parses the metadata using nokogiri

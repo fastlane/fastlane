@@ -55,9 +55,12 @@ describe Deliver do
           end
 
           it "raises an error when passing an invalid language" do
-            expect {
+            begin
               @app.metadata.update_title({ 'de' => 'asdf' })
-            }.to raise_error("The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES (de)")
+              raise "No exception was raised"
+            rescue Exception => ex
+              expect(ex.to_s).to include("Language 'de' is invalid. It must be in [")
+            end
           end
         end
 

@@ -99,11 +99,18 @@ describe Deliver do
 
           it "Let's the user specify which languages should be supported" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
 
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileLocales")
-            expect(deliv.app.metadata.fetch_value("//x:locale").count).to eq(5)
-            expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(5)
+            expect(deliv.app.metadata.fetch_value("//x:locale").count).to eq(3)
+            expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(3)
+
+            expect(deliv.app.metadata.information['de-DE'][:title][:value]).to eq("Deutscher Titel")
+            expect(deliv.app.metadata.information['en-US'][:title][:value]).to eq("The ultimate iPhone app")
+            expect(deliv.app.metadata.information['en-GB'][:title][:value]).to eq("The ultimate iPhone app") # default language
+
+            expect(deliv.app.metadata.information['de-DE'][:version_whats_new][:value]).to eq("Deutscher Changelog")
+            expect(deliv.app.metadata.information['en-US'][:version_whats_new][:value]).to eq("Thanks for using this app")
+            expect(deliv.app.metadata.information['en-GB'][:version_whats_new][:value]).to eq("So british")
           end
 
           describe "#load_config_json_folder" do
