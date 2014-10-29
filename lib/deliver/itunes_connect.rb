@@ -77,6 +77,11 @@ module Deliver
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
 
+        if page.has_content?"My Apps"
+          # Already logged in
+          return true
+        end
+
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
 
