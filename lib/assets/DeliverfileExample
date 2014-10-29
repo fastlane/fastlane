@@ -31,8 +31,7 @@ screenshots_path "./screenshots"
 # })
 # 
 # changelog({
-#   "en-US" => "- iPhone 6 (Plus) Support\n" + 
-#              "- Some other cool new features"
+#   "en-US" => "iPhone 6 (Plus) Support" 
 # })
 
 
