@@ -235,8 +235,9 @@ module Deliver
           "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
           "You can always open the browser page yourself: '#{current_url}'\n" +
           "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-        sleep 10
+        sleep 30
         visit current_url
+        sleep 5
       end
     end
 
@@ -309,9 +310,7 @@ module Deliver
         end
 
         if page.all('td', :text => version_number).count > 1
-          error_text = "There were multiple submitted builds found. Don't know which one to choose.\n" + 
-            "Open '#{current_url}' in your browser, remove all builds and run this script again"
-          raise error_text
+          Helper.log.fatal "There were multiple submitted builds found. Don't know which one to choose. Just choosing the top one for now"
         end
 
         result = page.first('td', :text => version_number).first(:xpath,"./..").first(:css, ".small").click
@@ -352,8 +351,7 @@ module Deliver
         errors = (all(".pagemessage.error") || []).count > 0
         raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
 
-
-        wait_for_elements(".savingWrapper.ng-scope.ng-pristine.ng-valid.ng-valid-required")
+        wait_for_elements(".savingWrapper.ng-scope.ng-pristine")
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
