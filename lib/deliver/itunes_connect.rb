@@ -155,6 +155,25 @@ module Deliver
       end
     end
 
+    # This method will fetch the version number of the currently live version
+    # of your app and return it. This method uses a headless browser
+    # under the hood, so it might take some time until you get the result
+    # @param app (Deliver::App) the app you want this information from
+    # @raise [ItunesConnectGeneralError] General error while executing 
+    #  this action
+    # @raise [ItunesConnectLoginError] Login data is wrong
+    def get_live_version(app)
+      begin
+        verify_app(app)
+
+        open_app_page(app)
+
+        return first(".status.ready").text.split(" ").first
+      rescue Exception => ex
+        error_occured(ex)
+      end
+    end
+
 
 
     # Constructive/Destructive Methods
@@ -167,12 +186,13 @@ module Deliver
     # the new version that should be created
     def create_new_version!(app, version_number)
       begin
+        current_version = get_live_version(app)
+
         verify_app(app)
         open_app_page(app)
 
         if page.has_content?BUTTON_STRING_NEW_VERSION
 
-          current_version = first(".status.ready").text.split(" ").first
           if current_version == version_number
             # This means, this version is already live on the App Store
             raise "Version #{version_number} is already created, submitted and released on iTC. Please verify you're using a new version number."
@@ -415,7 +435,7 @@ module Deliver
         counter = 0
         results = all(name)
         while results.count == 0      
-          Helper.log.debug "Waiting for #{name}"
+          # Helper.log.debug "Waiting for #{name}"
           sleep 0.2
 
           results = all(name)

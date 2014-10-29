@@ -60,6 +60,13 @@ module Deliver
       itc.get_app_status(self)
     end
 
+    # This method fetches the app version of the latest published version
+    # This method may take some time to execute, since it uses frontend scripting under the hood.
+    # @return the currently active app version, which in production
+    def get_live_version
+      itc.get_live_version(self)
+    end
+
     def to_s
       "#{apple_id} - #{app_identifier}"
     end
