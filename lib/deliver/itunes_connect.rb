@@ -47,7 +47,10 @@ module Deliver
       # https://github.com/ariya/phantomjs/issues/11239
       Capybara.register_driver :poltergeist do |a|
         conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
-        Capybara::Poltergeist::Driver.new(a, phantomjs_options: conf)
+        Capybara::Poltergeist::Driver.new(a, {
+          phantomjs_options: conf,
+          phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
+        })
       end
 
       self.login
