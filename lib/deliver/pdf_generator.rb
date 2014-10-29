@@ -14,8 +14,8 @@ module Deliver
       resulting_path = "#{export_path}/#{Time.now.to_i}.pdf"
       Prawn::Document.generate(resulting_path) do
 
+        counter = 0
         deliverer.app.metadata.information.each do |language, content|
-          # info = deliverer.deploy_information
           title = content[:title][:value] rescue '' # TODO: that shouldn't happen
 
           Helper.log.info("[PDF] Exporting locale '#{language}' for app with title '#{title}'")
@@ -113,7 +113,10 @@ module Deliver
             end
           end
 
-          start_new_page
+          counter += 1
+          if counter < deliverer.app.metadata.information.count
+            start_new_page
+          end
         end
       end
 
