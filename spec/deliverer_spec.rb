@@ -13,11 +13,11 @@ describe Deliver do
         it "raises an error if some key information is missing" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
-          }.to raise_exception("You have to pass a valid version number using the Deliver file.")
+          }.to raise_exception("You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')")
 
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
-          }.to raise_exception("You have to pass a valid app identifier using the Deliver file.")
+          }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')")
 
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
@@ -29,6 +29,8 @@ describe Deliver do
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDuplicateIpa")
           }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build")
         end
+
+
 
         describe "Valid Deliverfiles" do
           before do
