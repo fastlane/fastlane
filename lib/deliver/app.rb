@@ -43,7 +43,8 @@ module Deliver
         begin
           self.apple_id = Deliver::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
         rescue
-          raise "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+          Helper.log.fatal "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+          raise "Please pass a valid Apple ID using 'apple_id'"
         end
       end
     end

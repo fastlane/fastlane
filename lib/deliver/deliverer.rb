@@ -247,10 +247,11 @@ module Deliver
               if @deploy_information[ValKey::DEFAULT_LANGUAGE]
                 screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path }
               else
-                Helper.log.error"You have to have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE) or provide a default language or provide a hash with one path for each language"
+                Helper.log.error "You must have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE)."
+                screens_path = nil
               end
             end
-            @app.metadata.set_screenshots_for_each_language(screens_path)
+            @app.metadata.set_screenshots_for_each_language(screens_path) if screens_path
           end
         end
         

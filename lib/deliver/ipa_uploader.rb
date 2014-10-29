@@ -18,6 +18,7 @@ module Deliver
     # @param is_beta_build (Bool) If it's a beta build, it will be released to the testers, otherwise into production
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
     def initialize(app, dir, ipa_path, is_beta_build)
+      ipa_path.strip! # remove unused white spaces
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
 
