@@ -199,6 +199,8 @@ module Deliver
           @app.metadata.verify_version(app_version)
         end
 
+        result = true
+
         if @active_blocks[:unit_tests]
           result = @active_blocks[:unit_tests].call
           if result != true and (result || 0).to_i != 1
