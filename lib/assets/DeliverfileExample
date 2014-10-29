@@ -26,7 +26,7 @@ screenshots_path "./screenshots"
 
 # version '1.2' # you can pass this if you want to verify the version number with the ipa file
 # 
-# tite({
+# title({
 #   "en-US" => "Your App Name"
 # })
 # 
