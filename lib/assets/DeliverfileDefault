@@ -31,7 +31,7 @@ ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
 
-    system("ipa build") # build your project using Shenzhen
+    # system("ipa build") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 
