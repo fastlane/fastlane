@@ -102,7 +102,7 @@ module Deliver
       locales << new_locale
 
       # Title is the only thing which is required by iTC
-      default_title = fetch_value("//x:title").collect { |a| a.content }.first
+      default_title = information.values.first[:title][:value]
 
       title = @data.create_element('title')
       title.content = default_title
