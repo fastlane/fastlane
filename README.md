@@ -61,6 +61,8 @@ Store your configuration in a text file to easily deploy from any computer.
 
 Run ```deliver init``` to create a new ```Deliverfile```. You can either let the wizard generate a file based on the metadata from iTunesConnect or create one from a template.
 
+Once you created your configuration, just run ```deliver```.
+
 Here are a few example files:
 #### Upload all screenshots to iTunesConnect
 ```ruby
