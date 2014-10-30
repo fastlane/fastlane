@@ -37,7 +37,7 @@ module Deliver
       KEYWORDS = :keywords
       SCREENSHOTS_PATH = :screenshots_path
       DEFAULT_LANGUAGE = :default_language
-      CONFIG_JSON_FOLDER = :config_json_folder # path to a folder containing json files for all supported languages, including screenshots
+      CONFIG_JSON_FOLDER = :config_json_folder # Path to a folder containing a configuration file and including screenshots
       SKIP_PDF = :skip_pdf
     end
 

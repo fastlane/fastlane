@@ -137,10 +137,12 @@ ipa do
 end
 ```
 
-##### What is the ```Deliverfile```
+##### What is the ```Deliverfile```?
 As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed when
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 
+
+All available commands with a short description can be found in the wiki: https://github.com/KrauseFx/deliver/wiki/All-available-commands-of-the-Deliverfile
 
 **Some examples:**
 
