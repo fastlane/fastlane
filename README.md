@@ -187,7 +187,8 @@ You can use the following environment variables:
     DELIVER_PASSWORD
     
 ### Implement something custom to fit your needs
-Take a look at the Ruby source files to have full control.
+Take a look at *Using the exposed Ruby classes. You
+
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
@@ -219,6 +220,9 @@ Some open source tools I found helpful:
 - **rScreenshooter** (https://github.com/KrauseFx/rScreenshooter): Similar to ui-screen-shooter, but based on Ruby. 
 
 *Deliver* automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
+
+## Editing the ```Deliverfile```
+Change syntax highlighting to *Ruby*.
 
 ## In progress
 These are features, which are implemented, but not yet fully tested and production ready. You can try it on your own risk.
