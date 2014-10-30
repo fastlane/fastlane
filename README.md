@@ -235,6 +235,10 @@ beta_ipa "./latest.ipa"
 ```
 This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
 
+# Need help?
+- If there is a technical problem with *Deliver*, submit an issue
+- I'm available for contract work - drop me an email: deliver@felixkrause.at
+
 # License
 GNU v3.0. See LICENSE file.
 
