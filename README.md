@@ -204,8 +204,11 @@ Take a look at *Using the exposed Ruby classes. You
 ```ruby
 ["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
 ```
-    
-# In progress
+
+## Use a clean status bar
+You can use SimulatorStatusMagic(https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+
+## In progress
 These are features, which are implemented, but not yet fully tested and production ready. You can try it on your own risk.
 
 #### Distribute an ipa file to your TestFlight beta testers
