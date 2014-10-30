@@ -286,7 +286,7 @@ module Deliver
           @ipa.app = @app # we now have the resulting app
           result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
         else
-          Helper.log.warn "No IPA file given. Only the metadata were uploaded. If you want to deploy a full update, provide an ipa file."
+          Helper.log.warn "No IPA file given. Only the metadata was uploaded. If you want to deploy a full update, provide an ipa file."
         end
 
         if result == true
