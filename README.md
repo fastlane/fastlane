@@ -216,6 +216,8 @@ beta_ipa "./latest.ipa"
 ```
 This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
 
+# License
+GNU v3.0. See LICENSE file.
 
 # Contributing
 
