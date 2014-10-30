@@ -4,7 +4,7 @@ module Deliver
 
     # This method will ask the user what he wants to do
     def self.create(path)
-      raise "Deliverfile already exists at path '#{deliver_path}'" if File.exists?(deliver_path)
+      raise "Deliverfile already exists at path '#{deliver_path}'. Run 'deliver' to use Deliver." if File.exists?(deliver_path)
 
       if agree("Do you want Deliver to automatically create the Deliverfile for you based " + 
               "on your current app? (y/n)", true)
