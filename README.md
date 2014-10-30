@@ -55,7 +55,6 @@ Open the ```Deliverfile``` using a text editor and customize it even further. Ta
 
 # Usage
 
-## Using a ```Deliverfile``` (recommended)
 Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
@@ -150,12 +149,11 @@ on a deployment.
 - Upload the latest screenshots on your server
 - Many more things, be creative and let me know :)
     
-## Using the CLI (not yet finished)
-The documentation will be updated, once this is implemented
-
-## Using the exposed Ruby classes
+## You can also use the exposed Ruby classes to have full control:
 Some examples
 ```ruby
+require 'deliver'
+
 app = Deliver::App.new(apple_id)
 
 app.get_app_status # => Waiting for Review
