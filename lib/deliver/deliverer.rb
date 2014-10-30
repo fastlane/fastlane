@@ -262,7 +262,7 @@ module Deliver
           unless Helper.is_test?
             puts "----------------------------------------------------------------------------"
             puts "Verifying the upload via the PDF file can be disabled by either adding"
-            puts "'skip_pdf true' to your Deliverfile or using the flag -f when using the CLI."
+            puts "'skip_pdf true' to your Deliverfile or using the flag --force."
             puts "----------------------------------------------------------------------------"
 
             system("open '#{pdf_path}'")
