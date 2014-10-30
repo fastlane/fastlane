@@ -187,8 +187,7 @@ You can use the following environment variables:
     DELIVER_PASSWORD
     
 ### Implement something custom to fit your needs
-Take a look at *Using the exposed Ruby classes. You
-
+Take a look at the Ruby source files to have full control.
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
