@@ -83,19 +83,29 @@ module Deliver
       # This method will trigger the iTunesConnect class to choose the latest build
       def publish_on_itunes_connect
         if not @is_beta_build
-          # Publish onto Production
-          Helper.log.info "Putting the latest build onto production."
-          if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
-            if self.app.itc.submit_for_review!(self.app)
-              Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
-              return true
-            end
-          end
+          return publish_production_build
         else
-          # Distribute to beta testers
-          Helper.log.info "Distributing the latest build to Beta Testers."
-          if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
-            Helper.log.info "Successfully distributed a new beta build of your app.".green
+          return publish_beta_build
+        end
+        return false
+      end
+
+      def publish_beta_build
+        # Distribute to beta testers
+        Helper.log.info "Distributing the latest build to Beta Testers."
+        if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
+          Helper.log.info "Successfully distributed a new beta build of your app.".green
+          return true
+        end
+        return false
+      end
+
+      def publish_production_build
+        # Publish onto Production
+        Helper.log.info "Putting the latest build onto production."
+        if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
+          if self.app.itc.submit_for_review!(self.app)
+            Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
             return true
           end
         end
