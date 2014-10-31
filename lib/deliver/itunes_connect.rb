@@ -3,6 +3,7 @@ require 'deliver/password_manager'
 require 'capybara'
 require 'capybara/poltergeist'
 require 'security'
+require 'fastimage'
 
 
 module Deliver
@@ -176,7 +177,9 @@ module Deliver
 
 
 
-    # Constructive/Destructive Methods
+    #####################################################
+    # @!group Constructive/Destructive Methods
+    #####################################################
 
     # This method creates a new version of your app using the
     # iTunesConnect frontend. This will happen directly after calling
@@ -225,21 +228,30 @@ module Deliver
       end
     end
 
-    def wait_for_preprocessing
-      started = Time.now
+    # def update_app_icon!(app, path)
+    #   raise "App icon not found at path '#{path}'" unless File.exists?(path)
+    #   size = FastImage.size(path)
+    #   raise "App icon must have the resolution of 1024x1024px" unless (size[0] == 1024 and size[1] == 1024)
 
-      # Wait, while iTunesConnect is processing the uploaded file
-      while page.has_content?"Uploaded"
-        # iTunesConnect is super slow... so we have to wait...
-        Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
-          "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
-          "You can always open the browser page yourself: '#{current_url}'\n" +
-          "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-        sleep 30
-        visit current_url
-        sleep 5
-      end
-    end
+    #   begin
+    #     verify_app(app)
+    #     open_app_page(app)
+
+    #     Capybara.ignore_hidden_elements = false
+
+    #     icon_area = first(:xpath, "//div[@url='tempPageContent.appIconDisplayUrl']")
+    #     delete_button = icon_area.first(".deleteButton")
+    #     input = icon_area.first(:xpath, ".//input[@type='file']")
+
+
+    #     Capybara.ignore_hidden_elements = true
+    #     first(:button, "Save").click
+
+    #   rescue Exception => ex
+    #     error_occured(ex)
+    #   end
+    # end
+
 
     # This will put the latest uploaded build as a new beta build
     def put_build_into_beta_testing!(app, version_number)
@@ -419,14 +431,35 @@ module Deliver
     private
       def verify_app(app)
         raise ItunesConnectGeneralError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
-        raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').to_s.length > 5
+        raise ItunesConnectGeneralError.new("App is missing information (apple_id not given)") unless (app.apple_id || '').to_s.length > 5
       end
 
       def error_occured(ex)
+        snap
+        raise ex # re-raise the error after saving the snapshot
+      end
+
+      def snap
         path = "Error#{Time.now.to_i}.png"
         save_screenshot(path, :full => true)
         system("open '#{path}'")
-        raise ex # re-raise the error after saving the snapshot
+      end
+
+      # Since Apple takes for ages, after the upload is properly processed, we have to wait here
+      def wait_for_preprocessing
+        started = Time.now
+
+        # Wait, while iTunesConnect is processing the uploaded file
+        while page.has_content?"Uploaded"
+          # iTunesConnect is super slow... so we have to wait...
+          Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
+            "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
+            "You can always open the browser page yourself: '#{current_url}'\n" +
+            "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
+          sleep 30
+          visit current_url
+          sleep 5
+        end
       end
 
       def wait_for_elements(name)

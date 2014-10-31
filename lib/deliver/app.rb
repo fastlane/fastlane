@@ -49,6 +49,15 @@ module Deliver
       end
     end
 
+    def to_s
+      "#{apple_id} - #{app_identifier}"
+    end
+
+    #####################################################
+    # @!group Interacting with iTunesConnect
+    #####################################################
+
+    # The iTC handler which is used to interact with the iTunesConnect backend
     def itc
       @itc ||= Deliver::ItunesConnect.new
     end
@@ -67,9 +76,10 @@ module Deliver
       itc.get_live_version(self)
     end
 
-    def to_s
-      "#{apple_id} - #{app_identifier}"
-    end
+
+    #####################################################
+    # @!group Updating the App Metadata
+    #####################################################
 
     # Use this method to change the default download location for the metadata packages
     def set_metadata_directory(dir)
@@ -100,6 +110,14 @@ module Deliver
       @metadata != nil
     end
 
+
+    # # Uploads a new app icon to iTunesConnect. This uses a headless browser
+    # # which makes this command quite slow.
+    # # @param (path) a path to the new app icon. The image must have the resolution of 1024x1024
+    # def update_app_icon!(path)
+    #   itc.update_app_icon!(self, path)
+    # end
+
     #####################################################
     # @!group Destructive/Constructive methods
     #####################################################
@@ -124,6 +142,5 @@ module Deliver
       
       self.metadata.upload!
     end
-
   end
 end
