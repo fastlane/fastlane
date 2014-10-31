@@ -27,5 +27,19 @@ describe Deliver do
         expect(@meta.deploy_information[:ipa]).to eq(ipa)
       end
     end
+
+    describe "#set_new_value" do
+      it "raises an exception when invalid key is used" do
+        expect {
+          Deliver::Deliverer.new(nil, hash: { app_identifier: 'net.sunapps.54', invalid_key: '1' })
+        }.to raise_error("Invalid key 'invalid_key', must be contained in Deliverer::ValKey.".red)
+      end
+
+      it "works when the same value is set twice" do
+        del = Deliver::Deliverer.new(nil, hash: { app_identifier: 'net.sunapps.54', version: '1.0' })
+        del.set_new_value(:version, '2.0')
+        expect(del.deploy_information[:version]).to eq("2.0")
+      end
+    end
   end
 end
