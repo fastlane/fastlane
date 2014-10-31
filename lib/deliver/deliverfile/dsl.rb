@@ -45,7 +45,7 @@ module Deliver
               if block
                 @deliver_data.set_new_block(method_sym, block)
               else
-                Helper.log.error("Value for #{method_sym} must be a Ruby block. Use '#{method_sym} do ... end'")
+                raise DeliverfileDSLError.new("Value for #{method_sym} must be a Ruby block. Use '#{method_sym}' do ... end.".red)
               end
             else
               # Couldn't find this particular method

@@ -36,6 +36,12 @@ describe Deliver do
             }.to raise_exception("You have to pass either a value or a block to the given method.".red)
         end
 
+        it "throws an exception when no block is given for tests" do
+          expect {
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingBlockForTests")
+            }.to raise_exception("Value for unit_tests must be a Ruby block. Use 'unit_tests' do ... end.".red)
+        end
+
 
 
         describe "Valid Deliverfiles" do
