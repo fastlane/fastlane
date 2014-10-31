@@ -1,13 +1,13 @@
+# Code climate
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 require 'deliver'
 require 'webmock/rspec'
 
 # Own mocking code
 require 'mocking/webmocking'
 require 'mocking/transporter_mocking'
-
-# Code climate
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
 
 
 # This module is only used to check the environment is currently a testing env

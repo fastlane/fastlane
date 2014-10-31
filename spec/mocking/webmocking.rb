@@ -1,4 +1,4 @@
-WebMock.disable_net_connect!(allow_localhost: false)
+WebMock.disable_net_connect!(:allow => 'codeclimate.com')
 
 # iTunes Lookup API
 RSpec.configure do |config|
