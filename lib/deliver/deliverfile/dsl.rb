@@ -86,8 +86,7 @@ module Deliver
         #  IPA file.
         def ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
+          validate_ipa(value)
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
         end
@@ -97,8 +96,7 @@ module Deliver
         #  IPA file.
         def beta_ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
+          validate_ipa(value)
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
@@ -115,6 +113,11 @@ module Deliver
           @deliver_data.set_new_value(Deliverer::ValKey::APP_VERSION, value)
         end
         
+        private
+          def validate_ipa(value)
+            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
+            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
+          end
       end
     end
   end
