@@ -5,6 +5,10 @@ require 'webmock/rspec'
 require 'mocking/webmocking'
 require 'mocking/transporter_mocking'
 
+# Code climate
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
