@@ -1,6 +1,11 @@
 module Deliver
   class DependencyChecker
-    def self.check_for_brew
+    def self.check_dependencies
+      self.check_phantom_js
+      self.check_xcode_select
+    end
+    
+    def self.check_phantom_js
       if `which phantomjs`.length == 0
         # Missing brew dependency
         Helper.log.fatal '#############################################################'
@@ -11,7 +16,9 @@ module Deliver
         Helper.log.fatal '#############################################################'
         raise "Run 'brew update && brew install phantomjs' and start deliver again"
       end
+    end
 
+    def self.check_xcode_select
       unless `xcode-select -v`.include?"xcode-select version "
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to install the Xcode commdand line tools to use deliver"

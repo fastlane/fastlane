@@ -26,7 +26,7 @@ command :run do |c|
   c.description = 'Run a deploy process using the Deliverfile in the current folder'
   c.option '--force', 'Runs a deployment without verifying any information. This can be used for build servers.'
   c.action do |args, options|
-    Deliver::DependencyChecker.check_for_brew
+    Deliver::DependencyChecker.check_dependencies
 
     if File.exists?(deliver_path)
       # Everything looks alright, use the given Deliverfile
@@ -45,7 +45,7 @@ command :init do |c|
   c.description = "Creates a new Deliverfile in the current directory"
 
   c.action do |args, options|
-    Deliver::DependencyChecker.check_for_brew
+    Deliver::DependencyChecker.check_dependencies
 
     Deliver::DeliverfileCreator.create(deliver_path)
   end
