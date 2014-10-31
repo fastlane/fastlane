@@ -5,18 +5,20 @@ require 'pry'
 module Deliver
   class PdfGenerator
 
-    # TODO: Docs
+    # Renders all data available in the Deliverer to quickly see if everything was correctly generated.
+    # @param deliverer [Deliver::Deliverer] The deliver process on which based the PDF file should be generated
+    # @param export_path (String) The path to a folder where the resulting PDF file should be stored. 
     def render(deliverer, export_path = nil)
       export_path ||= '/tmp'
       
-      pdf = Prawn::Document.new(:margin => [0,0,0,0])
+      pdf = Prawn::Document.new(:margin => [0, 0, 0, 0])
       
       resulting_path = "#{export_path}/#{Time.now.to_i}.pdf"
       Prawn::Document.generate(resulting_path) do
 
         counter = 0
         deliverer.app.metadata.information.each do |language, content|
-          title = content[:title][:value] rescue '' # TODO: that shouldn't happen
+          title = content[:title][:value] rescue ''
 
           Helper.log.info("[PDF] Exporting locale '#{language}' for app with title '#{title}'")
 

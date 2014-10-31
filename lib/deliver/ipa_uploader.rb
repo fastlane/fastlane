@@ -44,7 +44,7 @@ module Deliver
 
 
     #####################################################
-    # @!group Uploading the ipa file # TODO: pragma mark
+    # @!group Uploading the ipa file
     #####################################################
 
     # Actually upload the ipa file to Apple
