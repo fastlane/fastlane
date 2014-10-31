@@ -54,6 +54,18 @@ describe Deliver do
       end
 
       describe "#calculate_screen_size" do
+        it "will raise an error if the file can not be found" do
+          expect {
+            Deliver::AppScreenshot.calculate_screen_size('./notHere.png')
+          }.to raise_error("Could not find or parse file at path './notHere.png'")
+        end
+
+        it "will raise an error if the size is invalid" do
+          expect {
+            Deliver::AppScreenshot.calculate_screen_size('./spec/fixtures/screenshots/invalidImage.png')
+          }.to raise_error("Unsupported screen size [20, 36] for path './spec/fixtures/screenshots/invalidImage.png'")
+        end
+
         it "it will return the size for a given png file" do
           p = "./spec/fixtures/screenshots/de-DE/"
 

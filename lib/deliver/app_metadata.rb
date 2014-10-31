@@ -489,7 +489,7 @@ module Deliver
         fetch_value("//x:game_center").remove
       end
 
-      # This will fill in all information we got into self.information
+      # This will fill in all information we got (from the downloaded metadata.xml file) into self.information
       def fill_in_data
         locales = fetch_value("//x:locale")
         locales.each do |locale|
