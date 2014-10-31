@@ -118,6 +118,10 @@ module Deliver
         wait_for_elements('.page-subnav')
         sleep 3
 
+        if current_url.include?"wa/defaultError" # app could not be found
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID.".red
+        end
+
         true
       rescue Exception => ex
         error_occured(ex)
