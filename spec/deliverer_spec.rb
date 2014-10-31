@@ -30,6 +30,12 @@ describe Deliver do
           }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red)
         end
 
+        it "throws an exception when block does not return anything" do
+          expect {
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingValue")
+            }.to raise_exception("You have to pass either a value or a block to the given method.".red)
+        end
+
 
 
         describe "Valid Deliverfiles" do
