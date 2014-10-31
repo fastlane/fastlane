@@ -30,6 +30,12 @@ describe Deliver do
       end
     end
 
+    describe "#to_s" do
+      it "returns a well formatted string" do
+        app = Deliver::App.new(apple_id: apple_id)
+        expect(app.to_s).to eq("#{apple_id} - #{app_identifier}")
+      end
+    end
 
     describe "Accessing App Metadata" do
       let (:apple_id) { 794902327 }
