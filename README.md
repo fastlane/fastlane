@@ -130,7 +130,8 @@ description({
 })
 ```
 
-#### Build and sign the app using Shenzhen (https://github.com/nomad/shenzhen)
+#### Build and sign the app
+I'm using Shenzhen ((https://github.com/nomad/shenzhen), but you can use any build tool or custom scripts.
 ```ruby
 ipa do
     # Add any code you want, like incrementing the build 
