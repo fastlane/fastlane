@@ -77,7 +77,7 @@ module Deliver
     # the key is valid.
     def set_new_value(key, value)
       unless self.class.all_available_keys_to_set.include?key
-        raise "Invalid key '#{key}', must be contained in Deliverer::ValKey."
+        raise "Invalid key '#{key}', must be contained in Deliverer::ValKey.".red
       end
 
       if @deploy_information[key]      
@@ -126,7 +126,7 @@ module Deliver
         file_path += "/metadata.json"
       end
 
-      raise "Could not find metadatafile at path '#{file_path}'" unless File.exists?file_path
+      raise "Could not find metadatafile at path '#{file_path}'".red unless File.exists?file_path
 
       content = JSON.parse(File.read(file_path))
       content.each do |language, current|
@@ -140,6 +140,11 @@ module Deliver
       end
     end
 
+    #####################################################
+    # @!group Using the collected data to trigger the deployment process
+    #####################################################
+
+
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile. 
     # 
@@ -149,6 +154,89 @@ module Deliver
       begin
         @active_blocks ||= {}
 
+        app_version, app_identifier, apple_id, is_beta_build = fetch_and_verify_app_metadata_from_ipa
+        
+        Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
+
+        @app = Deliver::App.new(app_identifier: app_identifier,
+                                      apple_id: apple_id)
+
+        if @ipa and not is_beta_build
+          # This is a real release, which should also upload the ipa file onto production
+          @app.create_new_version!(app_version) unless Helper.is_test?
+          @app.metadata.verify_version(app_version)
+        end
+
+        result = true
+
+        if @active_blocks[:unit_tests]
+          result = @active_blocks[:unit_tests].call
+          if result != true and (result || 0).to_i != 1
+            raise DeliverUnitTestsError.new("Unit tests failed. Got result: '#{result}'. Need 'true' or 1 to succeed.".red)
+          end
+        end
+
+        ##########################################
+        # Everything is ready for deployment
+        ##########################################
+
+
+        # Config JSON Folder, which is used when starting with the Quick Start
+        # This has to be before the other things
+        if @deploy_information[:config_json_folder]
+          load_config_json_folder
+        end
+
+        # Now: set all the updated metadata. We can only do that once the whole file is finished
+        update_app_metadata
+
+
+        # Check if metadatafile has changed
+        if @app.metadata_downloaded?
+          # Something has changed, upload the new files to iTunesConnect
+
+          # Generate the PDF file (if not skipped)
+          verify_pdf(is_beta_build)
+
+          Helper.log.info "Finished setting app metadata."
+          result = @app.metadata.upload!
+          raise "Error uploading app metadata".red unless result == true
+        else
+          # This is the usual case for beta_ipa builds for apps which are probably not yet in the store
+          Helper.log.info "Metadata was not touched. Nothing has changed."
+        end
+
+        # IPA File
+        # The IPA file has to be uploaded seperatly
+        if @ipa
+          @ipa.app = @app # we now have the resulting app
+          result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
+        else
+          Helper.log.warn "No IPA file given. Only the metadata was uploaded. If you want to deploy a full update, provide an ipa file."
+        end
+
+        # Call the succes Ruby block (if given)
+        if result == true
+          @active_blocks[:success].call if @active_blocks[:success]
+        else
+          raise "Error uploading the ipa file".red
+        end
+
+      rescue Exception => ex
+        if @active_blocks[:error]
+          # Custom error handling, we just call this one
+          @active_blocks[:error].call(ex)
+        else
+          # Re-Raise the exception
+          raise ex
+        end
+      end
+    end
+
+    private
+      # This will verify the given app version, app identifier and apple ID with the given ipa file (if both are there)
+      # @return (app_version, app_identifier, apple_id, is_beta_build)
+      def fetch_and_verify_app_metadata_from_ipa
         app_version = @deploy_information[ValKey::APP_VERSION]
         app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
         apple_id = @deploy_information[ValKey::APPLE_ID]
@@ -168,7 +256,7 @@ module Deliver
 
           if app_identifier
             if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
-              raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')")
+              raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
             end
           else
             app_identifier = @ipa.fetch_app_identifier
@@ -176,7 +264,7 @@ module Deliver
 
           if app_version
             if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
-              raise errors::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})")
+              raise errors::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
             end
           else
             app_version = @ipa.fetch_app_version
@@ -184,45 +272,14 @@ module Deliver
         end
 
         
-        raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE) unless app_identifier
-        raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE) unless app_version
-        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build" if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
+        raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE.red) unless app_identifier
+        raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE.red) unless app_version
+        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
 
-        Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
+        return app_version, app_identifier, apple_id, is_beta_build
+      end
 
-        @app = Deliver::App.new(app_identifier: app_identifier,
-                                      apple_id: apple_id)
-
-        if @ipa and not is_beta_build
-          # This is a real release, which should also upload the ipa file onto production
-          @app.create_new_version!(app_version) unless Helper.is_test?
-          @app.metadata.verify_version(app_version)
-        end
-
-        result = true
-
-        if @active_blocks[:unit_tests]
-          result = @active_blocks[:unit_tests].call
-          if result != true and (result || 0).to_i != 1
-            raise DeliverUnitTestsError.new("Unit tests failed. Got result: '#{result}'. Need 'true' or 1 to succeed.")
-          end
-        end
-
-        ##########################################
-        # Everything is ready for deployment
-        ##########################################
-
-
-        # Config JSON Folder, which is used when starting with the Quick Start
-        # This has to be before the other things
-        if @deploy_information[:config_json_folder]
-          load_config_json_folder
-        end
-
-
-        # Now: set all the updated metadata. We can only do that
-        # once the whole file is finished
-
+      def update_app_metadata
         # Most important
         @app.metadata.update_title(@deploy_information[ValKey::TITLE]) if @deploy_information[ValKey::TITLE]
         @app.metadata.update_description(@deploy_information[ValKey::DESCRIPTION]) if @deploy_information[ValKey::DESCRIPTION]
@@ -252,7 +309,9 @@ module Deliver
             @app.metadata.set_screenshots_for_each_language(screens_path) if screens_path
           end
         end
-        
+      end
+
+      def verify_pdf(is_beta_build)
         if @deploy_information[ValKey::SKIP_PDF] or is_beta_build
           Helper.log.debug "PDF verify was skipped"
         else
@@ -267,43 +326,9 @@ module Deliver
 
             system("open '#{pdf_path}'")
             okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
-            raise "Did not upload the metadata, because the PDF file was rejected by the user" unless okay
+            raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow unless okay
           end
         end
-
-        if @app.metadata_downloaded?
-          Helper.log.info "Finished setting app metadata."
-          result = @app.metadata.upload!
-          raise "Error uploading app metadata" unless result == true
-        else
-          # This is the usual case for beta_ipa builds for apps which are probably not yet in the store
-          Helper.log.info "Metadata was not touched. Nothing has changed."
-        end
-
-        # IPA File
-        # The IPA file has to be handles seperatly
-        if @ipa
-          @ipa.app = @app # we now have the resulting app
-          result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
-        else
-          Helper.log.warn "No IPA file given. Only the metadata was uploaded. If you want to deploy a full update, provide an ipa file."
-        end
-
-        if result == true
-          @active_blocks[:success].call if @active_blocks[:success]
-        else
-          raise "Error uploading the ipa file"
-        end
-
-      rescue Exception => ex
-        if @active_blocks[:error]
-          # Custom error handling, we just call this one
-          @active_blocks[:error].call(ex)
-        else
-          # Re-Raise the exception
-          raise ex
-        end
       end
-    end
   end
 end

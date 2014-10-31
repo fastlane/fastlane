@@ -25,7 +25,7 @@ module Deliver
             unless value
               Helper.log.error(caller)
               Helper.log.fatal("No value or block passed to method '#{method_sym}'")
-              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) 
+              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) 
             end
 
             if value.kind_of?String and not not_translated.include?method_sym
@@ -34,7 +34,7 @@ module Deliver
               if @default_language
                 value = { @default_language => value }
               else
-                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
+                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE.red)
               end
             end
 
@@ -71,7 +71,7 @@ module Deliver
           already_set = @deliver_data.deploy_information
           minimum = (already_set[:skip_pdf] ? 1 : 0)
           if already_set.count > minimum
-            raise "'default_language' must be on the top of the Deliverfile."
+            raise "'default_language' must be on the top of the Deliverfile.".red
           end
 
 
@@ -86,8 +86,8 @@ module Deliver
         #  IPA file.
         def ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
         end
@@ -97,8 +97,8 @@ module Deliver
         #  IPA file.
         def beta_ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
@@ -109,8 +109,8 @@ module Deliver
         # IPA file.
         def version(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
-          raise DeliverfileDSLError.new("The app version should be a string") unless value.kind_of?(String)
+          raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) unless value
+          raise DeliverfileDSLError.new("The app version should be a string".red) unless value.kind_of?(String)
           
           @deliver_data.set_new_value(Deliverer::ValKey::APP_VERSION, value)
         end

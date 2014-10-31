@@ -7,27 +7,27 @@ describe Deliver do
         it "raises an error when file was not found" do
           expect {
             Deliver::Deliverer.new(nil)
-          }.to raise_exception "Deliverfile not found at path './Deliverfile'"
+          }.to raise_exception "Deliverfile not found at path './Deliverfile'".red
         end
 
         it "raises an error if some key information is missing" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
-          }.to raise_exception("You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')")
+          }.to raise_exception("You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')".red)
 
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
-          }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')")
+          }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')".red)
 
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
-          }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE)
+          }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE.red)
         end
 
         it "throws an exception when both ipa and beta_ipa are given" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDuplicateIpa")
-          }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build")
+          }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red)
         end
 
 
@@ -180,7 +180,7 @@ describe Deliver do
             it "Error on unit tests with no error block raises an exception" do
               expect{
                 deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksNoErrorBlock")
-              }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.")
+              }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.".red)
             end
           end
         end
@@ -188,13 +188,13 @@ describe Deliver do
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {
             meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not match with the given one ('net.sunapps.321' != 'at.felixkrause.iTanky')")
+          }.to raise_exception("App Identifier of IPA does not match with the given one ('net.sunapps.321' != 'at.felixkrause.iTanky')".red)
         end
 
         it "raises an exception if app version of ipa does not match the given one" do
           expect {
             meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)")
+          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)".red)
         end
       end
     end
@@ -203,7 +203,7 @@ describe Deliver do
       it "raises an exception when some information is missing" do
         expect {
           @meta = Deliver::Deliverer.new(nil, hash: {})
-        }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')")
+        }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')".red)
       end
 
       it "works with valid data" do
