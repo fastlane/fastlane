@@ -60,12 +60,21 @@ module Deliver
         # 
         # This is approach only is recommend for deployments where you are only
         # supporting one language.
+        # 
+        # The language itself must be included in {Deliver::Languages::ALL_LANGUAGES}.
         # @example
         #  default_language 'en-US'
-        # 
+        # @example
         #  default_language 'de-DE'
         def default_language(value = nil)
-          # TODO: raise error if this method is not on the top of the file
+          # Verify, default_language is on the top of the file
+          already_set = @deliver_data.deploy_information
+          minimum = (already_set[:skip_pdf] ? 1 : 0)
+          if already_set.count > minimum
+            raise "'default_language' must be on the top of the Deliverfile."
+          end
+
+
           @default_language = value
           @default_language ||= yield if block_given?
           Helper.log.debug("Set default language to #{@default_language}")
