@@ -1,11 +1,13 @@
 Deliver - Continuous Deployment for iOS
 ============
 
-[ ![Codeship Status for KrauseFx/deliver](https://codeship.io/projects/685c3d40-39e2-0132-238b-56fe17215915/status?branch=master)](https://codeship.io/projects/42273)
-
 <p align="center">
     <img src="assets/deliver.png">
 </p>
+
+=====
+
+[ ![Codeship Status for KrauseFx/deliver](https://codeship.io/projects/685c3d40-39e2-0132-238b-56fe17215915/status?branch=master)](https://codeship.io/projects/42273)
 
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
