@@ -22,6 +22,12 @@ describe Deliver do
       it "lets me create an app without any information given (yet)" do
         expect(Deliver::App.new.app_identifier).to eq(nil)
       end
+
+      it "raises an exception if given app identifier is invalid" do
+        expect {
+          Deliver::App.new(app_identifier: 'net.sunapps.invalid')
+        }.to raise_error("Please pass a valid Apple ID using 'apple_id'".red)
+      end
     end
 
 
