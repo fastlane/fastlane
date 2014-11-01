@@ -36,7 +36,10 @@ describe Deliver do
       end
 
       it "works when the same value is set twice" do
-        del = Deliver::Deliverer.new(nil, hash: { app_identifier: 'net.sunapps.54', version: '1.0' })
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+        del = Deliver::Deliverer.new(nil, hash: { app_identifier: 'net.sunapps.54', version: '1.0', apple_id: 878567776 })
         del.set_new_value(:version, '2.0')
         expect(del.deploy_information[:version]).to eq("2.0")
       end
