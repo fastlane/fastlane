@@ -17,7 +17,7 @@ module Deliver
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder]
+          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, :submit_further_information]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call

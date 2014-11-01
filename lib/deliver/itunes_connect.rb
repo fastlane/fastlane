@@ -345,7 +345,8 @@ module Deliver
     # Submits the update itself to Apple, this includes the app metadata and the ipa file
     # This can easily cause exceptions, which will be shown on iTC.
     # @param app (Deliver::App) the app you want to submit
-    def submit_for_review!(app)
+    # @param perms (Hash) information about content rights, ...
+    def submit_for_review!(app, perms = nil)
       begin
         verify_app(app)
         open_app_page(app)
@@ -371,9 +372,16 @@ module Deliver
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
-          perms = {
-            export_compliance: false,
-            third_party_content: false,
+          perms ||= {
+            export_compliance: {
+              encryption_updated: false,
+              cryptography_enabled: false,
+              is_exempt: false
+            },
+            third_party_content: {
+              contains_third_party_content: false,
+              has_rights: false
+            },
             advertising_identifier: false
           }
 
@@ -383,9 +391,15 @@ module Deliver
           # Export Compliance #
           #####################
           if page.has_content?"Export"
-            all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance]}']").first.click
-            if perms[:export_compliance]
-              raise "Sorry, that's not supported yet" # TODO
+            if not perms[:export_compliance][:encryption_updated] and perms[:export_compliance][:cryptography_enabled]
+              raise "encryption_updated must be enabled if cryptography_enabled is enabled!"
+            end
+
+            begin
+              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click')
+              first(:xpath, "#{basic}.exportCompliance.usesEncryption.value' and @radio-value='#{perms[:export_compliance][:cryptography_enabled]}']//input").trigger('click')
+              first(:xpath, "#{basic}.exportCompliance.isExempt.value' and @radio-value='#{perms[:export_compliance][:is_exempt]}']//input").trigger('click')
+            rescue
             end
           end
 
@@ -393,9 +407,14 @@ module Deliver
           # Content Rights #
           ##################
           if page.has_content?"Content Rights"
-            all(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content]}']").first.click
-            if perms[:third_party_content]
-              raise "Sorry, that's not supported yet" # TODO
+            if not perms[:third_party_content][:contains_third_party_content] and perms[:third_party_content][:has_rights]
+              raise "contains_third_party_content must be enabled if has_rights is enabled"
+            end
+
+            begin
+              first(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content][:contains_third_party_content]}']//input").trigger('click')
+              first(:xpath, "#{basic}.contentRights.hasRights.value' and @radio-value='#{perms[:third_party_content][:has_rights]}']//input").trigger('click')
+            rescue
             end
           end
 
@@ -403,9 +422,10 @@ module Deliver
           # Advertising Identifier #
           ##########################
           if page.has_content?"Advertising Identifier"
-            all(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']").first.click
+            first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
+
             if perms[:advertising_identifier]
-              raise "Sorry, that's not supported yet" # TODO
+              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app"            
             end
           end
           

@@ -39,6 +39,7 @@ module Deliver
       DEFAULT_LANGUAGE = :default_language
       CONFIG_JSON_FOLDER = :config_json_folder # Path to a folder containing a configuration file and including screenshots
       SKIP_PDF = :skip_pdf
+      SUBMIT_FURTHER_INFORMATION = :submit_further_information # export compliance, content rights and advertising identifier
     end
 
     module AllBlocks
