@@ -9,6 +9,7 @@ Deliver - Continuous Deployment for iOS
 [![Gem Version](https://badge.fury.io/rb/deliver.svg)](http://badge.fury.io/rb/deliver)
 [![Code Climate](https://codeclimate.com/repos/545413bae30ba063f0000fa9/badges/b7338ad492af4ceba91f/gpa.svg)](https://codeclimate.com/repos/545413bae30ba063f0000fa9/feed)
 [![Test Coverage](https://codeclimate.com/repos/545413bae30ba063f0000fa9/badges/b7338ad492af4ceba91f/coverage.svg)](https://codeclimate.com/repos/545413bae30ba063f0000fa9/feed)
+[![Inline docs](http://inch-ci.org/github/krausefx/deliver.svg?branch=master)](http://inch-ci.org/github/krausefx/deliver)
 
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
