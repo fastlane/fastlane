@@ -193,20 +193,12 @@ module Deliver
         set_screenshots
 
 
-        # Check if metadatafile has changed
-        if @app.metadata_downloaded?
-          # Something has changed, upload the new files to iTunesConnect
+        # Generate the PDF file (if not skipped)
+        verify_pdf(is_beta_build)
 
-          # Generate the PDF file (if not skipped)
-          verify_pdf(is_beta_build)
-
-          Helper.log.info "Finished setting app metadata."
-          result = @app.metadata.upload!
-          raise "Error uploading app metadata".red unless result == true
-        else
-          # This is the usual case for beta_ipa builds for apps which are probably not yet in the store
-          Helper.log.info "Metadata was not touched. Nothing has changed."
-        end
+        Helper.log.info "Finished setting app metadata."
+        result = @app.metadata.upload!
+        raise "Error uploading app metadata".red unless result == true
 
         # IPA File
         # The IPA file has to be uploaded seperatly
