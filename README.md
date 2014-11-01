@@ -27,6 +27,12 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
 
 # Installation
+## During the beta phase
+    cd [deliver folder]
+    rake install
+    cd [your iOS project]
+
+## Once it goes live
 
     sudo gem install deliver
 
