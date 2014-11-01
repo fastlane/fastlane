@@ -46,43 +46,55 @@ module Deliver
       path = './deliver/'
       FileUtils.mkdir_p path
 
-      json = {}
-      # Access the app metadata and use them to create a finished Deliverfile
-      app_name = app.metadata.information.each do |locale, current|
-        current.each do |key, value|
-          if value and value.kind_of?Hash # that does not apply for screenshots, which is an array
-            current[key] = value[:value] 
-          else
-            current.delete(key)
-          end
-        end
-
-        json[locale] = current
-
-        # Create an empty folder for the screenshots too
-        FileUtils.mkdir_p "#{path}screenshots/#{locale}/"
-      end
-
-      meta_path = "#{path}metadata.json"
-      File.write(meta_path, json.to_json)
-      puts "Successfully created new metadata JSON file at '#{meta_path}'".green
-
-      # Add a README to the screenshots folder
-      File.write("#{path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))
-
-      # Generate the final Deliverfile here
-      deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
-      deliver.gsub!("[[APP_IDENTIFIER]]", identifier)
-      deliver.gsub!("[[APP_NAME]]", Dir.pwd.split("/").last)
-
-
-      File.write(deliver_path, deliver)
+      deliver_path = write_generated_json_to_file(app, path)
+      
       puts "Successfully created new Deliverfile at '#{deliver_path}'".green
     end
 
     private
       def self.gem_path
         Gem::Specification.find_by_name("deliver").gem_dir
+      end
+
+      def self.write_generated_json_to_file(app, path)
+        json = create_json_based_on_xml(app, path)
+        
+        meta_path = "#{path}metadata.json"
+        File.write(meta_path, json.to_json)
+        puts "Successfully created new metadata JSON file at '#{meta_path}'".green
+
+        # Add a README to the screenshots folder
+        File.write("#{path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))
+
+        # Generate the final Deliverfile here
+        deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
+        deliver.gsub!("[[APP_IDENTIFIER]]", app.app_identifier)
+        deliver.gsub!("[[APP_NAME]]", Dir.pwd.split("/").last)
+
+        File.write(deliver_path, deliver)
+        return deliver_path
+      end
+
+      # Access the app metadata and use them to create a finished Deliverfile
+      def self.create_json_based_on_xml(app, path)
+        json = {}
+        # Access the app metadata and use them to create a finished Deliverfile
+        app_name = app.metadata.information.each do |locale, current|
+          current.each do |key, value|
+            if value and value.kind_of?Hash # that does not apply for screenshots, which is an array
+              current[key] = value[:value] 
+            else
+              current.delete(key)
+            end
+          end
+
+          json[locale] = current
+
+          # Create an empty folder for the screenshots too
+          FileUtils.mkdir_p "#{path}screenshots/#{locale}/"
+        end
+
+        return json
       end
   end
 end
