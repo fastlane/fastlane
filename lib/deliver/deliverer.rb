@@ -296,7 +296,6 @@ module Deliver
       end
 
       def set_screenshots
-        # Screenshots
         screens_path = @deploy_information[ValKey::SCREENSHOTS_PATH]
         if screens_path
           if not @app.metadata.set_all_screenshots_from_path(screens_path)
