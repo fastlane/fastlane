@@ -172,7 +172,7 @@ app.create_new_version!("1.4")
 app.metadata.update_title({ "en-US" => "iPhone App Title" })
 app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
-app.submit_for_review!
+app.itc.submit_for_review!(app)
 
 Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches public metadata
 ```

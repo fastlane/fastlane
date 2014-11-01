@@ -132,16 +132,22 @@ module Deliver
       def fetch_info_plist_file
         Zip::File.open(@ipa_file.path) do |zipfile|
           zipfile.each do |file|
-            if file.name.include?'Info.plist' # TODO: how can we find the actual name of the plist file?
+            if file.name.include?'.plist'
+              # We can not be completely sure, that's the correct plist file, so we have to try
+              begin
+                # The XML file has to be properly unpacked first
+                tmp_path = "/tmp/deploytmp.plist"
+                File.write(tmp_path, zipfile.read(file))
+                system("plutil -convert xml1 #{tmp_path}")
+                result = Plist::parse_xml(tmp_path)
+                File.delete(tmp_path)
 
-              # The XML file has to be properly unpacked first
-              tmp_path = "/tmp/deploytmp.plist"
-              File.write(tmp_path, zipfile.read(file))
-              system("plutil -convert xml1 #{tmp_path}")
-              result = Plist::parse_xml(tmp_path)
-              File.delete(tmp_path)
-
-              return result
+                if result['CFBundleIdentifier'] or result['CFBundleVersion']
+                  return result
+                end
+              rescue
+                # We don't really care, look for another XML file
+              end
             end
           end
         end
