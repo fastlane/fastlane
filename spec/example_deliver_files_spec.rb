@@ -101,6 +101,13 @@ describe Deliver do
             end
           end
 
+          it "Falls back to the default language if only one screenshot path is given" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshotsFallbackDefaultLanguage")
+            expect(deliv.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp"})
+          end
+
           it "Does not require an app version, when an ipa is given" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file

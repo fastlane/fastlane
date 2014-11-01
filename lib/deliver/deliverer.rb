@@ -304,6 +304,7 @@ module Deliver
             if screens_path.kind_of?String
               if @deploy_information[ValKey::DEFAULT_LANGUAGE]
                 screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path } # use the default language
+                @deploy_information[ValKey::SCREENSHOTS_PATH] = screens_path
               else
                 Helper.log.error "You must have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE)."
                 screens_path = nil
