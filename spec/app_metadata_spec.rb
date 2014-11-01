@@ -238,7 +238,7 @@ describe Deliver do
           it "properly updates the metadata information when providing correct inputs" do
             path = './spec/fixtures/screenshots/screenshot1.png'
 
-            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(0)
             @app.metadata.set_all_screenshots({
               'de-DE' => [
                 Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40),
