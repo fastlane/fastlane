@@ -1,7 +1,7 @@
 require 'deliver/password_manager'
 
 describe Deliver do
-  describe Deliver::PasswordManager, now: true do
+  describe Deliver::PasswordManager do
     describe "Test environment" do
       let (:username) { "test@example123.com" }
       let (:password) { "somethingFancy123$" }

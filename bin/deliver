@@ -34,7 +34,7 @@ command :run do |c|
     else
       Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
       if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
-        Deliver::DeliverfileCreator.create(deliver_path)
+        Deliver::DeliverfileCreator.create(enclosing_directory)
       end
     end
   end
@@ -47,11 +47,16 @@ command :init do |c|
   c.action do |args, options|
     Deliver::DependencyChecker.check_dependencies
 
-    Deliver::DeliverfileCreator.create(deliver_path)
+    Deliver::DeliverfileCreator.create(enclosing_directory)
   end
 end
 
 
 def deliver_path
-  "./#{Deliver::Deliverfile::Deliverfile::FILE_NAME}"
+  [enclosing_directory, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
+end
+
+# The directoy in which the Deliverfile and metadata should be created
+def enclosing_directory
+  "."
 end
