@@ -189,6 +189,7 @@ module Deliver
 
         # Now: set all the updated metadata. We can only do that once the whole file is finished
         update_app_metadata
+        set_screenshots
 
 
         # Check if metadatafile has changed
@@ -292,7 +293,9 @@ module Deliver
 
         # App Keywords
         @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
+      end
 
+      def set_screenshots
         # Screenshots
         screens_path = @deploy_information[ValKey::SCREENSHOTS_PATH]
         if screens_path
@@ -300,7 +303,7 @@ module Deliver
             # This path does not contain folders for each language
             if screens_path.kind_of?String
               if @deploy_information[ValKey::DEFAULT_LANGUAGE]
-                screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path }
+                screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path } # use the default language
               else
                 Helper.log.error "You must have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE)."
                 screens_path = nil
