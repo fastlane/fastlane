@@ -283,7 +283,6 @@ module Deliver
           click_on "Start"
         end
 
-        # TODO: Check if everything has worked properly
 
         return true
       rescue Exception => ex
