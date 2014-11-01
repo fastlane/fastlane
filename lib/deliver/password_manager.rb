@@ -21,7 +21,7 @@ module Deliver
       self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
-        puts "No username or password given. You can use environment variables"
+        puts "No username or password given. You can set environment variables:"
         puts "DELIVER_USER, DELIVER_PASSWORD"
 
         ask_for_login
