@@ -127,14 +127,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
-      key = :title
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:title, hash)
     end
 
     # Updates the app description which is shown in the AppStore
@@ -142,14 +135,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_description(hash)
-      key = :description
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:description, hash)
     end
 
     # Updates the app changelog of the latest version
@@ -157,14 +143,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
-      key = :version_whats_new
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:version_whats_new, hash)
     end
 
     # Updates the Marketing URL
@@ -172,14 +151,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_marketing_url(hash)
-      key = :software_url
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:software_url, hash)
     end
 
     # Updates the Support URL
@@ -187,14 +159,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_support_url(hash)
-      key = :support_url
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:support_url, hash)
     end
 
     # Updates the Privacy URL
@@ -202,14 +167,7 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_privacy_url(hash)
-      key = :privacy_url
-      update_localized_value(key, hash) do |field, new_val, language|
-        raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless new_val.kind_of?String
-        if field.content != new_val
-          field.content = new_val
-          information[language][key] = { value: new_val, modified: true }
-        end
-      end
+      update_metadata_key(:privacy_url, hash)
     end
 
     # Updates the app keywords
@@ -415,7 +373,17 @@ module Deliver
     end
 
     private
-    # @return (Deliver::ItunesTransporter) The iTunesTranspoter which is
+      def update_metadata_key(key, hash)
+        update_localized_value(key, hash) do |field, new_val, language|
+          raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings.") unless new_val.kind_of?String
+          if field.content != new_val
+            field.content = new_val
+            information[language][key] = { value: new_val, modified: true }
+          end
+        end
+      end
+
+      # @return (Deliver::ItunesTransporter) The iTunesTranspoter which is
       #  used to upload/download the app metadata.
       def transporter
         @transporter ||= ItunesTransporter.new
