@@ -155,14 +155,14 @@ module Deliver
       begin
         @active_blocks ||= {}
 
-        app_version, app_identifier, apple_id, is_beta_build = fetch_and_verify_app_metadata_from_ipa
+        app_version, app_identifier = verify_app_metadata_from_ipa
         
         Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
 
         @app = Deliver::App.new(app_identifier: app_identifier,
-                                      apple_id: apple_id)
+                                      apple_id: @deploy_information[ValKey::APPLE_ID])
 
-        if @ipa and not is_beta_build
+        if @ipa and not is_beta_build?
           # This is a real release, which should also upload the ipa file onto production
           @app.create_new_version!(app_version) unless Helper.is_test?
           @app.metadata.verify_version(app_version)
@@ -194,7 +194,7 @@ module Deliver
 
 
         # Generate the PDF file (if not skipped)
-        verify_pdf(is_beta_build)
+        verify_pdf
 
         Helper.log.info "Finished setting app metadata."
         result = @app.metadata.upload!
@@ -229,48 +229,57 @@ module Deliver
 
     private
       # This will verify the given app version, app identifier and apple ID with the given ipa file (if both are there)
-      # @return (app_version, app_identifier, apple_id, is_beta_build)
-      def fetch_and_verify_app_metadata_from_ipa
+      # @return (app_version, app_identifier)
+      def verify_app_metadata_from_ipa
+        app_version, app_identifier = fetch_app_metadata_from_ipa
+        
+        raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliver::Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless app_identifier
+        raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliver::Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless app_version
+        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
+
+        return app_version, app_identifier
+      end
+
+      # This will read in the app version and app identifier from the given ipa file
+      # @return (app_version, app_identifier)
+      def fetch_app_metadata_from_ipa
         app_version = @deploy_information[ValKey::APP_VERSION]
         app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
-        apple_id = @deploy_information[ValKey::APPLE_ID]
-
-        errors = Deliver::Deliverfile::Deliverfile
-
+        
         used_ipa_file = @deploy_information[ValKey::IPA] || @deploy_information[ValKey::BETA_IPA]
-        is_beta_build = @deploy_information[ValKey::BETA_IPA] != nil
 
-        # Verify or complete the IPA information (app identifier and app version)
         if used_ipa_file
-
-          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build)
+          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build?)
 
           # We are able to fetch some metadata directly from the ipa file
           # If they were also given in the Deliverfile, we will compare the values
-
-          if app_identifier
-            if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
-              raise errors::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
-            end
-          else
-            app_identifier = @ipa.fetch_app_identifier
-          end
-
-          if app_version
-            if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
-              raise errors::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
-            end
-          else
-            app_version = @ipa.fetch_app_version
-          end        
+          app_identifier = verify_app_identifier(app_identifier)
+          app_version = verify_app_version(app_version)
         end
 
-        
-        raise errors::DeliverfileDSLError.new(errors::MISSING_APP_IDENTIFIER_MESSAGE.red) unless app_identifier
-        raise errors::DeliverfileDSLError.new(errors::MISSING_VERSION_NUMBER_MESSAGE.red) unless app_version
-        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
+        return app_version, app_identifier
+      end
 
-        return app_version, app_identifier, apple_id, is_beta_build
+      def verify_app_identifier(app_identifier)
+        if app_identifier
+          if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
+            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
+          end
+        else
+          app_identifier = @ipa.fetch_app_identifier
+        end
+        return app_identifier
+      end
+
+      def verify_app_version(app_version)
+        if app_version
+          if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
+            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
+          end
+        else
+          app_version = @ipa.fetch_app_version
+        end
+        return app_version
       end
 
       def update_app_metadata
@@ -278,14 +287,22 @@ module Deliver
         @app.metadata.update_title(@deploy_information[ValKey::TITLE]) if @deploy_information[ValKey::TITLE]
         @app.metadata.update_description(@deploy_information[ValKey::DESCRIPTION]) if @deploy_information[ValKey::DESCRIPTION]
 
-        # URLs
+        update_app_urls
+      end
+
+      def update_app_urls
         @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
         @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
         @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
         @app.metadata.update_privacy_url(@deploy_information[ValKey::PRIVACY_URL]) if @deploy_information[ValKey::PRIVACY_URL]
+      end
 
-        # App Keywords
+      def update_app_keywords
         @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
+      end
+
+      def is_beta_build?
+        @deploy_information[ValKey::BETA_IPA] != nil
       end
 
       def set_screenshots
@@ -307,8 +324,8 @@ module Deliver
         end
       end
 
-      def verify_pdf(is_beta_build)
-        if @deploy_information[ValKey::SKIP_PDF] or is_beta_build
+      def verify_pdf
+        if @deploy_information[ValKey::SKIP_PDF] or is_beta_build?
           Helper.log.debug "PDF verify was skipped"
         else
           # Everything is prepared for the upload
