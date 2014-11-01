@@ -192,8 +192,19 @@ describe Deliver do
 
         describe "#clear_all_screenshots" do
           it "clears all the screenshots of the given language" do
-            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(@number_of_screenshots)
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(0)
+
+            path = './spec/fixtures/screenshots/screenshot1.png'
+            @app.metadata.set_all_screenshots({
+              'de-DE' => [
+                Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_40)
+              ]
+            })
+
+            expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(1)
+
             @app.metadata.clear_all_screenshots("de-DE")
+
             expect(@app.metadata.fetch_value("//x:software_screenshot").count).to eq(0)
           end
 
