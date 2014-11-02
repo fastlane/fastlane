@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Using Deliver you can easily integrate a real continuous delivery 
     solution for iOS applications. You can update the app metadata, upload screenshots 
     in all languages for different screensizes to iTunesConnect and even publish a new 
-    ipa file to iTunesConnect. You define you prefered deployment information once in a so called
+    ipa file to iTunesConnect. You define your prefered deployment information once in a so called
     Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
   spec.homepage      = ""
   # spec.license       = ""
