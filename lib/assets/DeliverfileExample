@@ -26,13 +26,12 @@ screenshots_path "./screenshots"
 
 # version '1.2' # you can pass this if you want to verify the version number with the ipa file
 # 
-# tite({
+# title({
 #   "en-US" => "Your App Name"
 # })
 # 
 # changelog({
-#   "en-US" => "- iPhone 6 (Plus) Support\n" + 
-#              "- Some other cool new features"
+#   "en-US" => "iPhone 6 (Plus) Support" 
 # })
 
 
@@ -47,7 +46,7 @@ ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
 
-    system("ipa build") # build your project using Shenzhen
+    # system("ipa build") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 

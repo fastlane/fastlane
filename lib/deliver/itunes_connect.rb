@@ -3,6 +3,7 @@ require 'deliver/password_manager'
 require 'capybara'
 require 'capybara/poltergeist'
 require 'security'
+require 'fastimage'
 
 
 module Deliver
@@ -34,6 +35,8 @@ module Deliver
     
     def initialize
       super
+
+      DependencyChecker.check_dependencies
       
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist
@@ -45,7 +48,10 @@ module Deliver
       # https://github.com/ariya/phantomjs/issues/11239
       Capybara.register_driver :poltergeist do |a|
         conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
-        Capybara::Poltergeist::Driver.new(a, phantomjs_options: conf)
+        Capybara::Poltergeist::Driver.new(a, {
+          phantomjs_options: conf,
+          phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
+        })
       end
 
       self.login
@@ -71,6 +77,11 @@ module Deliver
 
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
+
+        if page.has_content?"My Apps"
+          # Already logged in
+          return true
+        end
 
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
@@ -106,6 +117,10 @@ module Deliver
 
         wait_for_elements('.page-subnav')
         sleep 3
+
+        if current_url.include?"wa/defaultError" # app could not be found
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID.".red
+        end
 
         true
       rescue Exception => ex
@@ -145,9 +160,30 @@ module Deliver
       end
     end
 
+    # This method will fetch the version number of the currently live version
+    # of your app and return it. This method uses a headless browser
+    # under the hood, so it might take some time until you get the result
+    # @param app (Deliver::App) the app you want this information from
+    # @raise [ItunesConnectGeneralError] General error while executing 
+    #  this action
+    # @raise [ItunesConnectLoginError] Login data is wrong
+    def get_live_version(app)
+      begin
+        verify_app(app)
+
+        open_app_page(app)
+
+        return first(".status.ready").text.split(" ").first
+      rescue Exception => ex
+        error_occured(ex)
+      end
+    end
 
 
-    # Constructive/Destructive Methods
+
+    #####################################################
+    # @!group Constructive/Destructive Methods
+    #####################################################
 
     # This method creates a new version of your app using the
     # iTunesConnect frontend. This will happen directly after calling
@@ -157,12 +193,13 @@ module Deliver
     # the new version that should be created
     def create_new_version!(app, version_number)
       begin
+        current_version = get_live_version(app)
+
         verify_app(app)
         open_app_page(app)
 
         if page.has_content?BUTTON_STRING_NEW_VERSION
 
-          current_version = first(".status.ready").text.split(" ").first
           if current_version == version_number
             # This means, this version is already live on the App Store
             raise "Version #{version_number} is already created, submitted and released on iTC. Please verify you're using a new version number."
@@ -195,18 +232,30 @@ module Deliver
       end
     end
 
-    def wait_for_preprocessing
-      started = Time.now
-      while page.has_content?PROCESSING_TEXT
-        # iTunesConnect is super slow... so we have to wait...
-        Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
-          "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
-          "You can always open the browser page yourself: '#{current_url}'\n" +
-          "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-        sleep 10
-        visit current_url
-      end
-    end
+    # def update_app_icon!(app, path)
+    #   raise "App icon not found at path '#{path}'" unless File.exists?(path)
+    #   size = FastImage.size(path)
+    #   raise "App icon must have the resolution of 1024x1024px" unless (size[0] == 1024 and size[1] == 1024)
+
+    #   begin
+    #     verify_app(app)
+    #     open_app_page(app)
+
+    #     Capybara.ignore_hidden_elements = false
+
+    #     icon_area = first(:xpath, "//div[@url='tempPageContent.appIconDisplayUrl']")
+    #     delete_button = icon_area.first(".deleteButton")
+    #     input = icon_area.first(:xpath, ".//input[@type='file']")
+
+
+    #     Capybara.ignore_hidden_elements = true
+    #     first(:button, "Save").click
+
+    #   rescue Exception => ex
+    #     error_occured(ex)
+    #   end
+    # end
+
 
     # This will put the latest uploaded build as a new beta build
     def put_build_into_beta_testing!(app, version_number)
@@ -224,10 +273,16 @@ module Deliver
           raise "Could not find beta build on '#{current_url}'. Make sure it is available there"
         end
 
-        first(".switcher.ng-binding").click
-        click_on "Start"
+        if first(".switcher.ng-binding")['class'].include?"checked"
+          Helper.log.warn("Beta Build seems to be already active. Take a look at '#{current_url}'")
+          return true
+        end
 
-        # TODO: Check if everything has worked properly
+        first(".switcher.ng-binding").click
+        if page.has_content?"Are you sure you want to start testing"
+          click_on "Start"
+        end
+
 
         return true
       rescue Exception => ex
@@ -259,6 +314,7 @@ module Deliver
         begin
           first('a', :text => BUTTON_ADD_NEW_BUILD).click
           wait_for_elements(".buildModalList")
+          sleep 1
         rescue
           if page.has_content?"Upload Date"
             # That's fine, the ipa was already selected
@@ -269,9 +325,7 @@ module Deliver
         end
 
         if page.all('td', :text => version_number).count > 1
-          error_text = "There were multiple submitted builds found. Don't know which one to choose.\n" + 
-            "Open '#{current_url}' in your browser, remove all builds and run this script again"
-          raise error_text
+          Helper.log.fatal "There were multiple submitted builds found. Don't know which one to choose. Just choosing the top one for now"
         end
 
         result = page.first('td', :text => version_number).first(:xpath,"./..").first(:css, ".small").click
@@ -290,7 +344,8 @@ module Deliver
     # Submits the update itself to Apple, this includes the app metadata and the ipa file
     # This can easily cause exceptions, which will be shown on iTC.
     # @param app (Deliver::App) the app you want to submit
-    def submit_for_review!(app)
+    # @param perms (Hash) information about content rights, ...
+    def submit_for_review!(app, perms = nil)
       begin
         verify_app(app)
         open_app_page(app)
@@ -312,14 +367,20 @@ module Deliver
         errors = (all(".pagemessage.error") || []).count > 0
         raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
 
-
-        wait_for_elements(".savingWrapper.ng-scope.ng-pristine.ng-valid.ng-valid-required")
+        wait_for_elements(".savingWrapper.ng-scope.ng-pristine")
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
-          perms = {
-            export_compliance: false,
-            third_party_content: false,
+          perms ||= {
+            export_compliance: {
+              encryption_updated: false,
+              cryptography_enabled: false,
+              is_exempt: false
+            },
+            third_party_content: {
+              contains_third_party_content: false,
+              has_rights: false
+            },
             advertising_identifier: false
           }
 
@@ -329,9 +390,15 @@ module Deliver
           # Export Compliance #
           #####################
           if page.has_content?"Export"
-            all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance]}']").first.click
-            if perms[:export_compliance]
-              raise "Sorry, that's not supported yet" # TODO
+            if not perms[:export_compliance][:encryption_updated] and perms[:export_compliance][:cryptography_enabled]
+              raise "encryption_updated must be enabled if cryptography_enabled is enabled!"
+            end
+
+            begin
+              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click')
+              first(:xpath, "#{basic}.exportCompliance.usesEncryption.value' and @radio-value='#{perms[:export_compliance][:cryptography_enabled]}']//input").trigger('click')
+              first(:xpath, "#{basic}.exportCompliance.isExempt.value' and @radio-value='#{perms[:export_compliance][:is_exempt]}']//input").trigger('click')
+            rescue
             end
           end
 
@@ -339,9 +406,14 @@ module Deliver
           # Content Rights #
           ##################
           if page.has_content?"Content Rights"
-            all(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content]}']").first.click
-            if perms[:third_party_content]
-              raise "Sorry, that's not supported yet" # TODO
+            if not perms[:third_party_content][:contains_third_party_content] and perms[:third_party_content][:has_rights]
+              raise "contains_third_party_content must be enabled if has_rights is enabled"
+            end
+
+            begin
+              first(:xpath, "#{basic}.contentRights.containsThirdPartyContent.value' and @radio-value='#{perms[:third_party_content][:contains_third_party_content]}']//input").trigger('click')
+              first(:xpath, "#{basic}.contentRights.hasRights.value' and @radio-value='#{perms[:third_party_content][:has_rights]}']//input").trigger('click')
+            rescue
             end
           end
 
@@ -349,9 +421,10 @@ module Deliver
           # Advertising Identifier #
           ##########################
           if page.has_content?"Advertising Identifier"
-            all(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']").first.click
+            first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
+
             if perms[:advertising_identifier]
-              raise "Sorry, that's not supported yet" # TODO
+              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app"            
             end
           end
           
@@ -381,21 +454,42 @@ module Deliver
     private
       def verify_app(app)
         raise ItunesConnectGeneralError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
-        raise ItunesConnectGeneralError.new("App is missing information") unless (app.apple_id || '').to_s.length > 5
+        raise ItunesConnectGeneralError.new("App is missing information (apple_id not given)") unless (app.apple_id || '').to_s.length > 5
       end
 
       def error_occured(ex)
+        snap
+        raise ex # re-raise the error after saving the snapshot
+      end
+
+      def snap
         path = "Error#{Time.now.to_i}.png"
         save_screenshot(path, :full => true)
         system("open '#{path}'")
-        raise ex # re-raise the error after saving the snapshot
+      end
+
+      # Since Apple takes for ages, after the upload is properly processed, we have to wait here
+      def wait_for_preprocessing
+        started = Time.now
+
+        # Wait, while iTunesConnect is processing the uploaded file
+        while page.has_content?"Uploaded"
+          # iTunesConnect is super slow... so we have to wait...
+          Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
+            "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
+            "You can always open the browser page yourself: '#{current_url}'\n" +
+            "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
+          sleep 30
+          visit current_url
+          sleep 5
+        end
       end
 
       def wait_for_elements(name)
         counter = 0
         results = all(name)
         while results.count == 0      
-          Helper.log.debug "Waiting for #{name}"
+          # Helper.log.debug "Waiting for #{name}"
           sleep 0.2
 
           results = all(name)

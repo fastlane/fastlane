@@ -5,7 +5,7 @@ $:.push File.expand_path("../../lib", __FILE__)
 require 'deliver'
 require 'commander/import'
 
-HighLine.track_eof = false # Fix for built-in Ruby
+HighLine.track_eof = false
 
 
 # Commander
@@ -20,35 +20,13 @@ global_option('--verbose') { $verbose = true }
 
 default_command :run
 
-
-command :run do |c|
-  c.syntax = 'deliver'
-  c.description = 'Run a deploy process using the Deliverfile in the current folder'
-  c.option '--force', 'Runs a deployment without verifying any information. This can be used in build servers.'
-  c.action do |args, options|
-    if File.exists?(deliver_path)
-      # Everything looks alright, use the given Deliverfile
-      meta = Deliver::Deliverer.new(deliver_path)
-      puts meta
-    else
-      Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
-      if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
-        Deliver::DeliverfileCreator.create(deliver_path)
-      end
-    end
-  end
-end
-
-command :init do |c|
-  c.syntax = 'deliver init'
-  c.description = "Creates a new Deliverfile in the current directory"
-
-  c.action do |args, options|
-    Deliver::DeliverfileCreator.create(deliver_path)
-  end
-end
-
+require 'deliver/commands'
 
 def deliver_path
-  "./#{Deliver::Deliverfile::Deliverfile::FILE_NAME}"
+  [enclosed_directory, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
+end
+
+# The directoy in which the Deliverfile and metadata should be created
+def enclosed_directory
+  "."
 end

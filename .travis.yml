@@ -3,6 +3,6 @@ before_install: gem update --system
 rvm:
   - 2.0.0
   - 2.1.0
-  - jruby-18mode
-  - jruby-19mode
-  - rbx-2
+addons:
+    code_climate:
+        repo_token: f7d5286e2b59ff6ad34882cb8646da3a110913e428464a87a4aee98646aaa337

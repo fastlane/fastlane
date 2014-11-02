@@ -7,8 +7,8 @@ module Deliver
         MISSING_VALUE_ERROR_MESSAGE = "You have to pass either a value or a block to the given method."
         SPECIFY_LANGUAGE_FOR_VALUE = "You have to specify the language of the given value. Either set a default language using 'default_language \"en\"' on the top of the file or pass a hash containing the language codes"
 
-        MISSING_APP_IDENTIFIER_MESSAGE = "You have to pass a valid app identifier using the Deliver file."
-        MISSING_VERSION_NUMBER_MESSAGE = "You have to pass a valid version number using the Deliver file."
+        MISSING_APP_IDENTIFIER_MESSAGE = "You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')"
+        MISSING_VERSION_NUMBER_MESSAGE = "You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')"
         INVALID_IPA_FILE_GIVEN = "The given ipa file seems to be wrong. Make sure it's a valid ipa file."
 
         class DeliverfileDSLError < StandardError
@@ -17,7 +17,7 @@ module Deliver
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :supported_languages, :config_json_folder]
+          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, :submit_further_information]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
@@ -25,7 +25,7 @@ module Deliver
             unless value
               Helper.log.error(caller)
               Helper.log.fatal("No value or block passed to method '#{method_sym}'")
-              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) 
+              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) 
             end
 
             if value.kind_of?String and not not_translated.include?method_sym
@@ -34,7 +34,7 @@ module Deliver
               if @default_language
                 value = { @default_language => value }
               else
-                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE)
+                raise DeliverfileDSLError.new(SPECIFY_LANGUAGE_FOR_VALUE.red)
               end
             end
 
@@ -45,7 +45,7 @@ module Deliver
               if block
                 @deliver_data.set_new_block(method_sym, block)
               else
-                Helper.log.error("Value for #{method_sym} must be a Ruby block. Use '#{method_sym} do ... end'")
+                raise DeliverfileDSLError.new("Value for #{method_sym} must be a Ruby block. Use '#{method_sym}' do ... end.".red)
               end
             else
               # Couldn't find this particular method
@@ -60,12 +60,21 @@ module Deliver
         # 
         # This is approach only is recommend for deployments where you are only
         # supporting one language.
+        # 
+        # The language itself must be included in {Deliver::Languages::ALL_LANGUAGES}.
         # @example
         #  default_language 'en-US'
-        # 
+        # @example
         #  default_language 'de-DE'
         def default_language(value = nil)
-          # TODO: raise error if this method is not on the top of the file
+          # Verify, default_language is on the top of the file
+          already_set = @deliver_data.deliver_process.deploy_information
+          minimum = (already_set[:skip_pdf] ? 2 : 1) # skip_pdf + blocks
+          if already_set.count > minimum
+            raise "'default_language' must be on the top of the Deliverfile.".red
+          end
+
+
           @default_language = value
           @default_language ||= yield if block_given?
           Helper.log.debug("Set default language to #{@default_language}")
@@ -77,8 +86,7 @@ module Deliver
         #  IPA file.
         def ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+          validate_ipa(value)
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
         end
@@ -88,8 +96,7 @@ module Deliver
         #  IPA file.
         def beta_ipa(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value
-          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN) unless value.include?".ipa"
+          validate_ipa(value)
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
@@ -100,12 +107,17 @@ module Deliver
         # IPA file.
         def version(value = nil)
           value ||= yield if block_given?
-          raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE) unless value
-          raise DeliverfileDSLError.new("The app version should be a string") unless value.kind_of?(String)
+          raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) unless value
+          raise DeliverfileDSLError.new("The app version should be a string".red) unless value.kind_of?(String)
           
           @deliver_data.set_new_value(Deliverer::ValKey::APP_VERSION, value)
         end
         
+        private
+          def validate_ipa(value)
+            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
+            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
+          end
       end
     end
   end

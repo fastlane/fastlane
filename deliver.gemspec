@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Using Deliver you can easily integrate a real continuous delivery 
     solution for iOS applications. You can update the app metadata, upload screenshots 
     in all languages for different screensizes to iTunesConnect and even publish a new 
-    ipa file to iTunesConnect. You define you prefered deployment information once in a so called
+    ipa file to iTunesConnect. You define your prefered deployment information once in a so called
     Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
   spec.homepage      = ""
   # spec.license       = ""
@@ -39,10 +39,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'poltergeist', '~> 1.5.1' # headless Javascript browser for controlling iTC
 
   # Development only
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.1.0"
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency "yard", "~> 0.8.7.4"
-  spec.add_development_dependency "webmock", "~> 1.19.0"
+  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'yard', '~> 0.8.7.4'
+  spec.add_development_dependency 'webmock', '~> 1.19.0'
+  spec.add_development_dependency 'codeclimate-test-reporter'
+
+
+  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end

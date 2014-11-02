@@ -18,6 +18,7 @@ module Deliver
     # @param is_beta_build (Bool) If it's a beta build, it will be released to the testers, otherwise into production
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
     def initialize(app, dir, ipa_path, is_beta_build)
+      ipa_path.strip! # remove unused white spaces
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
 
@@ -43,11 +44,12 @@ module Deliver
 
 
     #####################################################
-    # @!group Uploading the ipa file # TODO: pragma mark
+    # @!group Uploading the ipa file
     #####################################################
 
     # Actually upload the ipa file to Apple
-    def upload!
+    # @param submit_information (Hash) A hash containing submit information (export, content rights)
+    def upload!(submit_information = nil)
       Helper.log.info "Uploading ipa file to iTunesConnect"
       build_document
 
@@ -69,7 +71,7 @@ module Deliver
 
       if is_okay
         unless Helper.is_test?
-          return publish_on_itunes_connect
+          return publish_on_itunes_connect(submit_information)
         end
       end
 
@@ -80,21 +82,31 @@ module Deliver
 
     private
       # This method will trigger the iTunesConnect class to choose the latest build
-      def publish_on_itunes_connect
+      def publish_on_itunes_connect(submit_information = nil)
         if not @is_beta_build
-          # Publish onto Production
-          Helper.log.info "Putting the latest build onto production."
-          if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
-            if self.app.itc.submit_for_review!(self.app)
-              Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
-              return true
-            end
-          end
+          return publish_production_build(submit_information)
         else
-          # Distribute to beta testers
-          Helper.log.info "Distributing the latest build to Beta Testers."
-          if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
-            Helper.log.info "Successfully distributed a new beta build of your app.".green
+          return publish_beta_build
+        end
+        return false
+      end
+
+      def publish_beta_build
+        # Distribute to beta testers
+        Helper.log.info "Distributing the latest build to Beta Testers."
+        if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
+          Helper.log.info "Successfully distributed a new beta build of your app.".green
+          return true
+        end
+        return false
+      end
+
+      def publish_production_build(submit_information)
+        # Publish onto Production
+        Helper.log.info "Putting the latest build onto production."
+        if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
+          if self.app.itc.submit_for_review!(self.app, submit_information)
+            Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
             return true
           end
         end
@@ -121,16 +133,22 @@ module Deliver
       def fetch_info_plist_file
         Zip::File.open(@ipa_file.path) do |zipfile|
           zipfile.each do |file|
-            if file.name.include?'Info.plist' # TODO: how can we find the actual name of the plist file?
+            if file.name.include?'.plist'
+              # We can not be completely sure, that's the correct plist file, so we have to try
+              begin
+                # The XML file has to be properly unpacked first
+                tmp_path = "/tmp/deploytmp.plist"
+                File.write(tmp_path, zipfile.read(file))
+                system("plutil -convert xml1 #{tmp_path}")
+                result = Plist::parse_xml(tmp_path)
+                File.delete(tmp_path)
 
-              # The XML file has to be properly unpacked first
-              tmp_path = "/tmp/deploytmp.plist"
-              File.write(tmp_path, zipfile.read(file))
-              system("plutil -convert xml1 #{tmp_path}")
-              result = Plist::parse_xml(tmp_path)
-              File.delete(tmp_path)
-
-              return result
+                if result['CFBundleIdentifier'] or result['CFBundleVersion']
+                  return result
+                end
+              rescue
+                # We don't really care, look for another XML file
+              end
             end
           end
         end

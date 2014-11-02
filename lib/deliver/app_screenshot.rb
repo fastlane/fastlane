@@ -111,7 +111,6 @@ module Deliver
       end
 
       error = "Unsupported screen size #{size} for path '#{path}'"
-      Helper.log.error error
       raise error
     end
   end

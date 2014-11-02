@@ -1,3 +1,7 @@
+# Code climate
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 require 'deliver'
 require 'webmock/rspec'
 

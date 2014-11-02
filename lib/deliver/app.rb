@@ -43,11 +43,21 @@ module Deliver
         begin
           self.apple_id = Deliver::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
         rescue
-          raise "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+          Helper.log.fatal "Could not find Apple ID based on the app identifier '#{app_identifier}'. Maybe the app is not in the AppStore yet?"
+          raise "Please pass a valid Apple ID using 'apple_id'".red
         end
       end
     end
 
+    def to_s
+      "#{apple_id} - #{app_identifier}"
+    end
+
+    #####################################################
+    # @!group Interacting with iTunesConnect
+    #####################################################
+
+    # The iTC handler which is used to interact with the iTunesConnect backend
     def itc
       @itc ||= Deliver::ItunesConnect.new
     end
@@ -59,9 +69,17 @@ module Deliver
       itc.get_app_status(self)
     end
 
-    def to_s
-      "#{apple_id} - #{app_identifier}"
+    # This method fetches the app version of the latest published version
+    # This method may take some time to execute, since it uses frontend scripting under the hood.
+    # @return the currently active app version, which in production
+    def get_live_version
+      itc.get_live_version(self)
     end
+
+
+    #####################################################
+    # @!group Updating the App Metadata
+    #####################################################
 
     # Use this method to change the default download location for the metadata packages
     def set_metadata_directory(dir)
@@ -87,6 +105,18 @@ module Deliver
       @metadata ||= Deliver::AppMetadata.new(self, get_metadata_directory)
     end
 
+    # Was the app metadata already downloaded?
+    def metadata_downloaded?
+      @metadata != nil
+    end
+
+
+    # # Uploads a new app icon to iTunesConnect. This uses a headless browser
+    # # which makes this command quite slow.
+    # # @param (path) a path to the new app icon. The image must have the resolution of 1024x1024
+    # def update_app_icon!(path)
+    #   itc.update_app_icon!(self, path)
+    # end
 
     #####################################################
     # @!group Destructive/Constructive methods
@@ -112,6 +142,5 @@ module Deliver
       
       self.metadata.upload!
     end
-
   end
 end

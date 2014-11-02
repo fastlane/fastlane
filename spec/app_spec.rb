@@ -22,13 +22,35 @@ describe Deliver do
       it "lets me create an app without any information given (yet)" do
         expect(Deliver::App.new.app_identifier).to eq(nil)
       end
+
+      it "raises an exception if given app identifier is invalid" do
+        expect {
+          Deliver::App.new(app_identifier: 'net.sunapps.invalid')
+        }.to raise_error("Please pass a valid Apple ID using 'apple_id'".red)
+      end
     end
 
+    describe "#to_s" do
+      it "returns a well formatted string" do
+        app = Deliver::App.new(apple_id: apple_id)
+        expect(app.to_s).to eq("#{apple_id} - #{app_identifier}")
+      end
+    end
 
     describe "Accessing App Metadata" do
       let (:apple_id) { 794902327 }
       before do
         @app = Deliver::App.new(apple_id: apple_id, app_identifier: 'net.sunapps.1')
+      end
+
+      describe "#metadata_downloaded?" do
+        it "return false if not done yet" do
+          Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+
+          expect(@app.metadata_downloaded?).to eq(false)
+          @app.metadata
+          expect(@app.metadata_downloaded?).to eq(true)
+        end
       end
 
       describe "#set_metadata_directory" do
