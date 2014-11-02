@@ -288,6 +288,7 @@ module Deliver
         @app.metadata.update_description(@deploy_information[ValKey::DESCRIPTION]) if @deploy_information[ValKey::DESCRIPTION]
 
         update_app_urls
+        update_app_keywords
       end
 
       def update_app_urls
