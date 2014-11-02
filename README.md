@@ -255,7 +255,7 @@ This will upload the ipa file to iTunesConnect and mark the uploaded build as Be
 - I'm available for contract work - drop me an email: deliver@felixkrause.at
 
 # License
-GNU v3.0. See LICENSE file.
+This projected is licensed under the terms of the MIT license. See the LICENSE file.
 
 # Contributing
 
