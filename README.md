@@ -6,7 +6,7 @@ Deliver - Continuous Deployment for iOS
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/develop/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/krausefx/deliver/master.svg?style=flat)](https://magnum.travis-ci.com/KrauseFx/deliver)
 [![Code Climate](https://img.shields.io/codeclimate/github/krausefx/deliver.svg?style=flat)](https://codeclimate.com/github/krausefx/deliver)
