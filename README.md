@@ -25,6 +25,7 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 - Update app metadata
 - Easily implement a real Continuous Deployment process
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
+- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots on taken for all screen sizes)
 
 # Installation
 ## During the beta phase
