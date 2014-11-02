@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
     ipa file to iTunesConnect. You define your prefered deployment information once in a so called
     Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
   spec.homepage      = ""
-  # spec.license       = ""
+  spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 1.9.3'
 
