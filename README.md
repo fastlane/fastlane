@@ -44,7 +44,7 @@ Install phantomjs (this is needed to control the iTunesConnect frontend)
 
     brew update && brew install phantomjs
 
-If you don't have homebrew installed already, do it here: http://brew.sh/
+If you don't have homebrew installed already, [install it here](http://brew.sh/).
 
 # Quick Start
 
@@ -112,7 +112,7 @@ error do |exception|
     raise "Something went wrong: #{exception}"    
 end
 ```
-For this example I used https://github.com/stevenosloan/slack-notifier
+For this example I used [slack-notifier](https://github.com/stevenosloan/slack-notifier).
 
 
 #### Set a default language if you are lucky enough to only maintain one language
@@ -141,7 +141,7 @@ description({
 ```
 
 #### Build and sign the app
-I'm using Shenzhen ((https://github.com/nomad/shenzhen), but you can use any build tool or custom scripts.
+I'm using [Shenzhen](https://github.com/nomad/shenzhen), but you can use any build tool or custom scripts.
 ```ruby
 ipa do
     # Add any code you want, like incrementing the build 
@@ -157,7 +157,7 @@ As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed w
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 
 
-All available commands with a short description can be found in the wiki: https://github.com/KrauseFx/deliver/wiki/All-available-commands-of-the-Deliverfile
+All available commands with a short description can be found in the [wiki](https://github.com/KrauseFx/deliver/wiki/All-available-commands-of-the-Deliverfile).
 
 **Some examples:**
 
@@ -184,7 +184,7 @@ app.itc.submit_for_review!(app)
 
 Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches public metadata
 ```
-This project is well documented, check it out here: http://www.rubydoc.info/github/KrauseFx/deliver/frames
+This project is well documented, check it out on [Rubydoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
 
 
 ## Credentials
@@ -215,7 +215,7 @@ Take a look at *Using the exposed Ruby classes. You
 *Deliver* uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. iTMSTransporter is a command line tool provided by Apple.
-- With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using Capybara (https://github.com/jnicklas/capybara) and Poltergeist (https://github.com/teampoltergeist/poltergeist)
+- With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
 - The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
@@ -225,16 +225,16 @@ Take a look at *Using the exposed Ruby classes. You
 ```
 
 ## Use a clean status bar
-You can use SimulatorStatusMagic(https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
 ## Automatically create screenshots
 There is no optimal solution out there (yet).
 
 Some open source tools I found helpful:
 
-- **Subliminal** (https://github.com/inkling/Subliminal): Write your app interaction (e.g. taps) in Objective C. Is based on UIAutomation and is well documented. Currently there are some issues with the latest release of Xcode, which are partly solved in the Xcode6 branch. Checkout my public [gist](https://gist.github.com/KrauseFx/fda87474855dfe0051e6) for running Subliminal on different devices and generating a HTML site viewing all screenshots.
-- **ui-screen-shooter** (https://github.com/jonathanpenn/ui-screen-shooter): Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
-- **rScreenshooter** (https://github.com/KrauseFx/rScreenshooter): Similar to ui-screen-shooter, but based on Ruby. 
+- **[Subliminal](https://github.com/inkling/Subliminal)**: Write your app interaction (e.g. taps) in Objective C. Is based on UIAutomation and is well documented. Currently there are some issues with the latest release of Xcode, which are partly solved in the Xcode6 branch. Checkout my public [gist](https://gist.github.com/KrauseFx/fda87474855dfe0051e6) for running Subliminal on different devices and generating a HTML site viewing all screenshots.
+- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
+- **[rScreenshooter](https://github.com/KrauseFx/rScreenshooter)**: Similar to ui-screen-shooter, but based on Ruby. 
 
 *Deliver* automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
 
