@@ -1,6 +1,6 @@
 describe Deliver do
   describe Deliver::ItunesConnect do
-    describe "#update_app_icon", now: true do
+    describe "#update_app_icon" do
       # it "raises an error when image resolution is wrong" do
       #   app = Deliver::App.new(apple_id: 912330783, app_identifier: 'net.sunapps.54')
       #   expect {

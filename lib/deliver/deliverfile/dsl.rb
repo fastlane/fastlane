@@ -68,8 +68,8 @@ module Deliver
         #  default_language 'de-DE'
         def default_language(value = nil)
           # Verify, default_language is on the top of the file
-          already_set = @deliver_data.deploy_information
-          minimum = (already_set[:skip_pdf] ? 1 : 0)
+          already_set = @deliver_data.deliver_process.deploy_information
+          minimum = (already_set[:skip_pdf] ? 2 : 1) # skip_pdf + blocks
           if already_set.count > minimum
             raise "'default_language' must be on the top of the Deliverfile.".red
           end

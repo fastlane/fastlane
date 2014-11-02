@@ -58,16 +58,16 @@ describe Deliver do
 
             thanks_for_facebook = "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks."
 
-            expect(meta.app.app_identifier).to eq("net.sunapps.54")
-            expect(meta.deploy_information[:version]).to eq("943.0")
-            expect(meta.deploy_information[:changelog]).to eq({
+            expect(meta.deliver_process.app.app_identifier).to eq("net.sunapps.54")
+            expect(meta.deliver_process.deploy_information[:version]).to eq("943.0")
+            expect(meta.deliver_process.deploy_information[:changelog]).to eq({
               'en-US' => thanks_for_facebook
             })
 
             # Stored in XML file
-            expect(meta.app.metadata.fetch_value("//x:version").first['string']).to eq("943.0")
-            expect(meta.app.metadata.fetch_value("//x:version_whats_new").count).to eq(1) # one language only
-            expect(meta.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:version").first['string']).to eq("943.0")
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").count).to eq(1) # one language only
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
           end
 
           it "Sets all the available metadata" do
@@ -75,26 +75,25 @@ describe Deliver do
 
             meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMixed")
 
-            expect(meta.app.app_identifier).to eq("net.sunapps.54")
+            expect(meta.deliver_process.app.app_identifier).to eq("net.sunapps.54")
 
-            expect(meta.deploy_information[:changelog]).to eq({"en-US"=>"Thanks for using this app"})
-
-            expect(meta.deploy_information[:version]).to eq("943.0")
-            expect(meta.deploy_information[:description]).to eq({"en-US"=>"App description"})
-            expect(meta.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
-            expect(meta.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
-            expect(meta.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
-            expect(meta.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
-            expect(meta.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
+            expect(meta.deliver_process.deploy_information[:changelog]).to eq({"en-US"=>"Thanks for using this app"})
+            expect(meta.deliver_process.deploy_information[:version]).to eq("943.0")
+            expect(meta.deliver_process.deploy_information[:description]).to eq({"en-US"=>"App description"})
+            expect(meta.deliver_process.deploy_information[:privacy_url].values.first).to eq("http://privacy.sunapps.net")
+            expect(meta.deliver_process.deploy_information[:marketing_url].values.first).to eq("http://www.sunapps.net")
+            expect(meta.deliver_process.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
+            expect(meta.deliver_process.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
+            expect(meta.deliver_process.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
           end
 
           it "Uploads all the available screenshots" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")
-            screenshots = deliv.app.metadata.fetch_value("//x:software_screenshot")
+            screenshots = deliv.deliver_process.app.metadata.fetch_value("//x:software_screenshot")
             expect(screenshots.count).to eq(9)
 
-            screenshots_path = "spec/fixtures/packages/#{deliv.app.apple_id}.itmsp/*.png"
+            screenshots_path = "spec/fixtures/packages/#{deliv.deliver_process.app.apple_id}.itmsp/*.png"
             expect(Dir.glob(screenshots_path).count).to equal(screenshots.count)
             Dir.glob(screenshots_path) do |file|
               File.delete(file)
@@ -105,7 +104,7 @@ describe Deliver do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshotsFallbackDefaultLanguage")
-            expect(deliv.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp"})
+            expect(deliv.deliver_process.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp"})
           end
 
           it "Does not require an app version, when an ipa is given" do
@@ -113,25 +112,27 @@ describe Deliver do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileNoVersion")
 
-            expect(deliv.app.apple_id).to eq(464686641)
-            expect(deliv.app.app_identifier).to eq('at.felixkrause.iTanky')
-            expect(deliv.deploy_information.values.count).to eq(2)
+            expect(deliv.deliver_process.app.apple_id).to eq(464686641)
+            expect(deliv.deliver_process.app.app_identifier).to eq('at.felixkrause.iTanky')
+            expect(deliv.deliver_process.deploy_information.values.count).to eq(3)
           end
 
           it "Let's the user specify which languages should be supported" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileLocales")
-            expect(deliv.app.metadata.fetch_value("//x:locale").count).to eq(3)
-            expect(deliv.app.metadata.fetch_value("//x:title").count).to eq(3)
 
-            expect(deliv.app.metadata.information['de-DE'][:title][:value]).to eq("Deutscher Titel")
-            expect(deliv.app.metadata.information['en-US'][:title][:value]).to eq("The ultimate iPhone app")
-            expect(deliv.app.metadata.information['en-GB'][:title][:value]).to eq("The ultimate iPhone app") # default language
+            metadata = deliv.deliver_process.app.metadata
+            expect(metadata.fetch_value("//x:locale").count).to eq(3)
+            expect(metadata.fetch_value("//x:title").count).to eq(3)
 
-            expect(deliv.app.metadata.information['de-DE'][:version_whats_new][:value]).to eq("Deutscher Changelog")
-            expect(deliv.app.metadata.information['en-US'][:version_whats_new][:value]).to eq("Thanks for using this app")
-            expect(deliv.app.metadata.information['en-GB'][:version_whats_new][:value]).to eq("So british")
+            expect(metadata.information['de-DE'][:title][:value]).to eq("Deutscher Titel")
+            expect(metadata.information['en-US'][:title][:value]).to eq("The ultimate iPhone app")
+            expect(metadata.information['en-GB'][:title][:value]).to eq("The ultimate iPhone app") # default language
+
+            expect(metadata.information['de-DE'][:version_whats_new][:value]).to eq("Deutscher Changelog")
+            expect(metadata.information['en-US'][:version_whats_new][:value]).to eq("Thanks for using this app")
+            expect(metadata.information['en-GB'][:version_whats_new][:value]).to eq("So british")
           end
 
           describe "#load_config_json_folder" do
@@ -139,13 +140,13 @@ describe Deliver do
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
               deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMetadataJson")
 
-              expect(deliv.deploy_information[:title].values.count).to eq(2) # languages
-              expect(deliv.deploy_information[:title]['de-DE']).to eq("Mein App Titel")
-              expect(deliv.deploy_information[:title]['en-US']).to eq("My App Title")
-              expect(deliv.deploy_information[:description]['de-DE']).to eq("German Description")
-              expect(deliv.deploy_information[:description]['en-US']).to eq("English Description here")
-              expect(deliv.deploy_information[:keywords]['de-DE'].last).to eq("Tag1")
-              expect(deliv.deploy_information[:keywords]['en-US'].last).to eq("Keyword1")
+              expect(deliv.deliver_process.deploy_information[:title].values.count).to eq(2) # languages
+              expect(deliv.deliver_process.deploy_information[:title]['de-DE']).to eq("Mein App Titel")
+              expect(deliv.deliver_process.deploy_information[:title]['en-US']).to eq("My App Title")
+              expect(deliv.deliver_process.deploy_information[:description]['de-DE']).to eq("German Description")
+              expect(deliv.deliver_process.deploy_information[:description]['en-US']).to eq("English Description here")
+              expect(deliv.deliver_process.deploy_information[:keywords]['de-DE'].last).to eq("Tag1")
+              expect(deliv.deliver_process.deploy_information[:keywords]['en-US'].last).to eq("Keyword1")
             end
           end
 
@@ -191,6 +192,8 @@ describe Deliver do
             end
 
             it "Error on unit tests" do
+              Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
+
               expect(File.exists?@tests_path).to eq(false)
               deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
               expect(File.exists?@tests_path).to eq(true)
@@ -199,7 +202,8 @@ describe Deliver do
             end
 
             it "Error on unit tests with no error block raises an exception" do
-              expect{
+              Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
+              expect {
                 deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksNoErrorBlock")
               }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.".red)
             end

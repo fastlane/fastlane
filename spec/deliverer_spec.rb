@@ -22,9 +22,9 @@ describe Deliver do
           ipa: ipa
         })
 
-        expect(@meta.deploy_information[:version]).to eq(version)
-        expect(@meta.deploy_information[:app_identifier]).to eq(identifier)
-        expect(@meta.deploy_information[:ipa]).to eq(ipa)
+        expect(@meta.deliver_process.deploy_information[:version]).to eq(version)
+        expect(@meta.deliver_process.deploy_information[:app_identifier]).to eq(identifier)
+        expect(@meta.deliver_process.deploy_information[:ipa]).to eq(ipa)
       end
     end
 
@@ -41,7 +41,7 @@ describe Deliver do
 
         del = Deliver::Deliverer.new(nil, hash: { app_identifier: 'net.sunapps.54', version: '1.0', apple_id: 878567776 })
         del.set_new_value(:version, '2.0')
-        expect(del.deploy_information[:version]).to eq("2.0")
+        expect(del.deliver_process.deploy_information[:version]).to eq("2.0")
       end
     end
   end

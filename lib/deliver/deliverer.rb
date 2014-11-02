@@ -1,26 +1,17 @@
 module Deliver
-  # This class takes care of handling the whole deployment process
-  # This includes:
+  # This class will collect the deploy data from different places
+  # This will trigger:
   # 
   # - Parsing the Deliverfile
   # - Temporary storing all the information got from the file, until the file finished executing
-  # - Triggering the upload process itself
+  # - Triggering the upload process itself using the DeliverProcess class
   class Deliverer
-    # DeliverUnitTestsError is triggered, when the unit tests of the given block failed.
-    class DeliverUnitTestsError < StandardError
-    end
-    
-    # General
-
-    # @return (Deliver::App) The App that is currently being edited.
-    attr_accessor :app
     # @return (Deliver::Deliverfile::Deliverfile) A reference
     #  to the Deliverfile which is currently being used.
     attr_accessor :deliver_file
 
-    # @return (Hash) All the updated/new information we got from the Deliverfile. 
-    #  is used to store the deploy information until the Deliverfile finished running.
-    attr_accessor :deploy_information
+    # @return (Deliver::DeliverProcess) The class which handels the deployment process itself
+    attr_accessor :deliver_process
 
     module ValKey
       APP_IDENTIFIER = :app_identifier
@@ -56,8 +47,8 @@ module Deliver
     # @param (Bool) force Runs a deployment without verifying any information. This can be 
     # used for build servers. If this is set to false a PDF summary will be generated and opened
     def initialize(path = nil, hash: nil, force: false)
-      @deploy_information = {}
-      @deploy_information[ValKey::SKIP_PDF] = true if force
+      @deliver_process = DeliverProcess.new
+      @deliver_process.deploy_information[ValKey::SKIP_PDF] = true if force
 
       if hash
         hash.each do |key, value|
@@ -81,17 +72,16 @@ module Deliver
         raise "Invalid key '#{key}', must be contained in Deliverer::ValKey.".red
       end
 
-      if @deploy_information[key]      
+      if @deliver_process.deploy_information[key]      
         Helper.log.warn("You already set a value for key '#{key}'. Overwriting value '#{value}' with new value.")
       end
 
-      @deploy_information[key] = value
+      @deliver_process.deploy_information[key] = value
     end
 
     # Sets a new block for a specific key
     def set_new_block(key, block)
-      @active_blocks ||= {}
-      @active_blocks[key] = block
+      @deliver_process.deploy_information[:blocks][key] = block
     end
 
     # An array of all available options to be set a deployment_information.
@@ -110,239 +100,13 @@ module Deliver
       Deliverer::AllBlocks.constants.collect { |a| Deliverer::AllBlocks.const_get(a) }
     end
 
-    # This will check which file exist in this folder and load their content
-    def load_config_json_folder
-      matching = {
-        'title' => ValKey::TITLE,
-        'description' => ValKey::DESCRIPTION,
-        'version_whats_new' => ValKey::CHANGELOG,
-        'keywords' => ValKey::KEYWORDS,
-        'privacy_url' => ValKey::PRIVACY_URL,
-        'software_url' => ValKey::MARKETING_URL,
-        'support_url' => ValKey::SUPPORT_URL
-      }
-
-      file_path = @deploy_information[:config_json_folder]
-      unless file_path.split("/").last.include?"metadata.json"
-        file_path += "/metadata.json"
-      end
-
-      raise "Could not find metadatafile at path '#{file_path}'".red unless File.exists?file_path
-
-      content = JSON.parse(File.read(file_path))
-      content.each do |language, current|
-
-        matching.each do |key, value|
-          if current[key]
-            @deploy_information[value] ||= {}
-            @deploy_information[value][language] = current[key]
-          end
-        end
-      end
-    end
-
-    #####################################################
-    # @!group Using the collected data to trigger the deployment process
-    #####################################################
-
-
     # This method will take care of the actual deployment process, after we 
     # received all information from the Deliverfile. 
     # 
     # This method will be called from the {Deliver::Deliverfile} after
     # it is finished executing the Ruby script.
     def finished_executing_deliver_file
-      begin
-        @active_blocks ||= {}
-
-        app_version, app_identifier = verify_app_metadata_from_ipa
-        
-        Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
-
-        @app = Deliver::App.new(app_identifier: app_identifier,
-                                      apple_id: @deploy_information[ValKey::APPLE_ID])
-
-        if @ipa and not is_beta_build?
-          # This is a real release, which should also upload the ipa file onto production
-          @app.create_new_version!(app_version) unless Helper.is_test?
-          @app.metadata.verify_version(app_version)
-        end
-
-        result = true
-
-        if @active_blocks[:unit_tests]
-          result = @active_blocks[:unit_tests].call
-          if result != true and (result || 0).to_i != 1
-            raise DeliverUnitTestsError.new("Unit tests failed. Got result: '#{result}'. Need 'true' or 1 to succeed.".red)
-          end
-        end
-
-        ##########################################
-        # Everything is ready for deployment
-        ##########################################
-
-
-        # Config JSON Folder, which is used when starting with the Quick Start
-        # This has to be before the other things
-        if @deploy_information[:config_json_folder]
-          load_config_json_folder
-        end
-
-        # Now: set all the updated metadata. We can only do that once the whole file is finished
-        update_app_metadata
-        set_screenshots
-
-
-        # Generate the PDF file (if not skipped)
-        verify_pdf
-
-        Helper.log.info "Finished setting app metadata."
-        result = @app.metadata.upload!
-        raise "Error uploading app metadata".red unless result == true
-
-        # IPA File
-        # The IPA file has to be uploaded seperatly
-        if @ipa
-          @ipa.app = @app # we now have the resulting app
-          result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
-        else
-          Helper.log.warn "No IPA file given. Only the metadata was uploaded. If you want to deploy a full update, provide an ipa file."
-        end
-
-        # Call the succes Ruby block (if given)
-        if result == true
-          @active_blocks[:success].call if @active_blocks[:success]
-        else
-          raise "Error uploading the ipa file".red
-        end
-
-      rescue Exception => ex
-        if @active_blocks[:error]
-          # Custom error handling, we just call this one
-          @active_blocks[:error].call(ex)
-        else
-          # Re-Raise the exception
-          raise ex
-        end
-      end
+      deliver_process.run
     end
-
-    private
-      # This will verify the given app version, app identifier and apple ID with the given ipa file (if both are there)
-      # @return (app_version, app_identifier)
-      def verify_app_metadata_from_ipa
-        app_version, app_identifier = fetch_app_metadata_from_ipa
-        
-        raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliver::Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless app_identifier
-        raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliver::Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless app_version
-        raise "You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red if (@deploy_information[ValKey::IPA] and @deploy_information[ValKey::BETA_IPA])
-
-        return app_version, app_identifier
-      end
-
-      # This will read in the app version and app identifier from the given ipa file
-      # @return (app_version, app_identifier)
-      def fetch_app_metadata_from_ipa
-        app_version = @deploy_information[ValKey::APP_VERSION]
-        app_identifier = @deploy_information[ValKey::APP_IDENTIFIER]
-        
-        used_ipa_file = @deploy_information[ValKey::IPA] || @deploy_information[ValKey::BETA_IPA]
-
-        if used_ipa_file
-          @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build?)
-
-          # We are able to fetch some metadata directly from the ipa file
-          # If they were also given in the Deliverfile, we will compare the values
-          app_identifier = verify_app_identifier(app_identifier)
-          app_version = verify_app_version(app_version)
-        end
-
-        return app_version, app_identifier
-      end
-
-      def verify_app_identifier(app_identifier)
-        if app_identifier
-          if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
-            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
-          end
-        else
-          app_identifier = @ipa.fetch_app_identifier
-        end
-        return app_identifier
-      end
-
-      def verify_app_version(app_version)
-        if app_version
-          if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
-            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
-          end
-        else
-          app_version = @ipa.fetch_app_version
-        end
-        return app_version
-      end
-
-      def update_app_metadata
-        # Most important
-        @app.metadata.update_title(@deploy_information[ValKey::TITLE]) if @deploy_information[ValKey::TITLE]
-        @app.metadata.update_description(@deploy_information[ValKey::DESCRIPTION]) if @deploy_information[ValKey::DESCRIPTION]
-
-        update_app_urls
-        update_app_keywords
-      end
-
-      def update_app_urls
-        @app.metadata.update_support_url(@deploy_information[ValKey::SUPPORT_URL]) if @deploy_information[ValKey::SUPPORT_URL]
-        @app.metadata.update_changelog(@deploy_information[ValKey::CHANGELOG]) if @deploy_information[ValKey::CHANGELOG]
-        @app.metadata.update_marketing_url(@deploy_information[ValKey::MARKETING_URL]) if @deploy_information[ValKey::MARKETING_URL]
-        @app.metadata.update_privacy_url(@deploy_information[ValKey::PRIVACY_URL]) if @deploy_information[ValKey::PRIVACY_URL]
-      end
-
-      def update_app_keywords
-        @app.metadata.update_keywords(@deploy_information[ValKey::KEYWORDS]) if @deploy_information[ValKey::KEYWORDS]
-      end
-
-      def is_beta_build?
-        @deploy_information[ValKey::BETA_IPA] != nil
-      end
-
-      def set_screenshots
-        screens_path = @deploy_information[ValKey::SCREENSHOTS_PATH]
-        if screens_path
-          if not @app.metadata.set_all_screenshots_from_path(screens_path)
-            # This path does not contain folders for each language
-            if screens_path.kind_of?String
-              if @deploy_information[ValKey::DEFAULT_LANGUAGE]
-                screens_path = { @deploy_information[ValKey::DEFAULT_LANGUAGE] => screens_path } # use the default language
-                @deploy_information[ValKey::SCREENSHOTS_PATH] = screens_path
-              else
-                Helper.log.error "You must have folders for the screenshots (#{screens_path}) for each language (e.g. en-US, de-DE)."
-                screens_path = nil
-              end
-            end
-            @app.metadata.set_screenshots_for_each_language(screens_path) if screens_path
-          end
-        end
-      end
-
-      def verify_pdf
-        if @deploy_information[ValKey::SKIP_PDF] or is_beta_build?
-          Helper.log.debug "PDF verify was skipped"
-        else
-          # Everything is prepared for the upload
-          # We may have to ask the user if that's okay
-          pdf_path = PdfGenerator.new.render(self)
-          unless Helper.is_test?
-            puts "----------------------------------------------------------------------------"
-            puts "Verifying the upload via the PDF file can be disabled by either adding"
-            puts "'skip_pdf true' to your Deliverfile or using the flag --force."
-            puts "----------------------------------------------------------------------------"
-
-            system("open '#{pdf_path}'")
-            okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
-            raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow unless okay
-          end
-        end
-      end
   end
 end

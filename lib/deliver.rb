@@ -14,6 +14,9 @@ require 'deliver/ipa_uploader'
 require 'deliver/languages'
 require 'deliver/pdf_generator'
 require 'deliver/dependency_checker'
+require 'deliver/deliver_process'
+
+# Third Party code
 require 'colored'
 
 module Deliver

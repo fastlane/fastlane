@@ -8,6 +8,10 @@ module Deliver
       @@mocking_file << file_name
     end
 
+    def self.clear_mock_files
+      @@mocking_file = []
+    end
+
     private
       def execute_transporter(command)
         current = @@mocking_file.shift if defined?@@mocking_file and @@mocking_file
