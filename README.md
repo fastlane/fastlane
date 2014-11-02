@@ -58,6 +58,7 @@ The guide will create all the necessary files for you, using the existing app me
  - Enter your iTunesConnect credentials
  - Enter your app identifier
  - Enjoy a good drink, while the computer does all the work for you
+ - Copy your screenshots into the ```deliver/screenshots/[language]``` folders
 - When it's a new app: ```n```
 
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
