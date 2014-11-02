@@ -456,7 +456,7 @@ module Deliver
         # Remove all GameCenter related code
         fetch_value("//x:game_center").remove
 
-        fetch_value("//x:software_screenshots").children.remove
+        fetch_value("//x:software_screenshots").remove
       end
 
       # This will fill in all information we got (from the downloaded metadata.xml file) into self.information
