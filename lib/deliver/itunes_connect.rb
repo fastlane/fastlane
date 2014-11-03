@@ -119,7 +119,7 @@ module Deliver
         sleep 3
 
         if current_url.include?"wa/defaultError" # app could not be found
-          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID.".red
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.new.username}).".red
         end
 
         true
