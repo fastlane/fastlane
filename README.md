@@ -14,7 +14,7 @@ Deliver - Continuous Deployment for iOS
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
 
-```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using the command line.
+```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using one command.
 
 
 Follow the developer on Twitter: https://twitter.com/KrauseFx
