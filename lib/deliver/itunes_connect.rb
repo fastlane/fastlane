@@ -479,9 +479,9 @@ module Deliver
             "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
             "You can always open the browser page yourself: '#{current_url}'\n" +
             "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-          sleep 30
+          sleep 60
           visit current_url
-          sleep 5
+          sleep 10
         end
       end
 
