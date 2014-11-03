@@ -114,7 +114,7 @@ module Deliver
               index += 1
             end
           else
-            move_down 20
+            move_cursor_to top
             text "No screenshots passed. Is this correct? They will get removed from iTunesConnect."
           end
 
