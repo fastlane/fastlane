@@ -212,9 +212,9 @@ Take a look at *Using the exposed Ruby classes. You
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-*Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+```Deliver``` is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
-*Deliver* uses the following techniques under the hood:
+```Deliver``` uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. iTMSTransporter is a command line tool provided by Apple.
 - With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
@@ -238,7 +238,7 @@ Some open source tools I found helpful:
 - **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
 - **[rScreenshooter](https://github.com/KrauseFx/rScreenshooter)**: Similar to ui-screen-shooter, but based on Ruby. 
 
-*Deliver* automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
+```Deliver``` automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
@@ -253,7 +253,7 @@ beta_ipa "./latest.ipa"
 This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
 
 # Need help?
-- If there is a technical problem with *Deliver*, submit an issue
+- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: deliver@felixkrause.at
 
 # License
