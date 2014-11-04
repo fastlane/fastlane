@@ -6,7 +6,7 @@ module Deliver
     # Logging happens using this method
     def self.log
       if is_test?
-        @@log ||= Logger.new(STDOUT).tap { |l| l.level = Logger::FATAL }
+        @@log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @@log ||= Logger.new(STDOUT)
       end
