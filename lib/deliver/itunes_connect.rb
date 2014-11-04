@@ -220,9 +220,14 @@ module Deliver
           Helper.log.warn "Can not create version #{version_number} on iTunesConnect. Maybe it was already created."
           Helper.log.info "Check out '#{current_url}' what's the latest version."
 
-          created_version = first(".status.waiting").text.split(" ").first
-          if created_version != version_number
-            raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+          begin
+            created_version = first(".status.waiting").text.split(" ").first
+            if created_version != version_number
+              raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+            end
+          rescue Exception => ex
+            # Can not fetch the version number of the new version (this happens, when it's e.g. 'Developer Rejected')
+            raise "Some other version was created instead of the one you defined ('#{version_number}')."
           end
         end
 
