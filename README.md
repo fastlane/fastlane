@@ -93,6 +93,8 @@ Here are a few example files:
 #### Upload screenshots to iTunesConnect
 ```ruby
 app_identifier "net.sunapps.1"
+version "1.1"
+
 screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes))
