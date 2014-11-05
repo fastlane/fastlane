@@ -227,7 +227,9 @@ module Deliver
             end
           rescue Exception => ex
             # Can not fetch the version number of the new version (this happens, when it's e.g. 'Developer Rejected')
-            raise "Some other version was created instead of the one you defined ('#{version_number}')."
+            unless page.has_content?version_number
+              raise "Some other version was created instead of the one you defined ('#{version_number}')."
+            end
           end
         end
 
