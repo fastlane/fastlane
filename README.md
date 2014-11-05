@@ -38,7 +38,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Update app metadata
 - Easily implement a real Continuous Deployment process
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
-- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots on taken for all screen sizes)
+- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots taken for all screen sizes)
 
 # Installation
 
@@ -212,7 +212,8 @@ credentials from the Keychain, just open the *Keychain Access*, select
 *All Items* and search for 'itunesconnect.apple.com'.
 
 ## Use environment variables
-You can use the following environment variables to use a specific account instead of the one stored in the keychain:
+You can use the following environment variables to use a specific account instead of the one stored in the keychain.
+This is especially important if you have more than one iTunesConnect account in your keychain:
 
     DELIVER_USER
     DELIVER_PASSWORD
