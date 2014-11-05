@@ -186,9 +186,9 @@ Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches publ
 This project is well documented, check it out on [Rubydoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
 
 
-## Credentials
+# Credentials
 
-### Use the Keychain
+## Use the Keychain
 The first time you use *Deliver* you have to enter your iTunesConnect 
 credentials. They will be stored in the Keychain. 
 
@@ -196,15 +196,14 @@ If you decide to remove your
 credentials from the Keychain, just open the *Keychain Access*, select 
 *All Items* and search for 'itunesconnect.apple.com'.
 
-### Use environment variables
+## Use environment variables
 You can use the following environment variables to use a specific account instead of the one stored in the keychain:
 
     DELIVER_USER
     DELIVER_PASSWORD
     
-### Implement something custom to fit your needs
-Take a look at *Using the exposed Ruby classes. You
-
+## Implement your custom solution
+Take a look at [Using the exposed Ruby classes](use-the-exposed-ruby-classes).
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
