@@ -5,11 +5,15 @@
 Deliver - Continuous Deployment for iOS
 ============
 
-[![Build Status](https://magnum.travis-ci.com/KrauseFx/deliver.svg?token=G7AGvpR68L1gSxxr9AL2&branch=master)](https://magnum.travis-ci.com/KrauseFx/deliver)
-[![Gem Version](https://badge.fury.io/rb/deliver.svg)](http://badge.fury.io/rb/deliver)
-[![Code Climate](https://codeclimate.com/repos/545413bae30ba063f0000fa9/badges/b7338ad492af4ceba91f/gpa.svg)](https://codeclimate.com/repos/545413bae30ba063f0000fa9/feed)
-[![Test Coverage](https://codeclimate.com/repos/545413bae30ba063f0000fa9/badges/b7338ad492af4ceba91f/coverage.svg)](https://codeclimate.com/repos/545413bae30ba063f0000fa9/feed)
-[![Inline docs](http://inch-ci.org/github/krausefx/deliver.svg?branch=master)](http://inch-ci.org/github/krausefx/deliver)
+[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/develop/LICENSE)
+[![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
+[![Build Status](https://img.shields.io/travis/krausefx/deliver/master.svg?style=flat)](https://magnum.travis-ci.com/KrauseFx/deliver)
+[![Code Climate](https://img.shields.io/codeclimate/github/krausefx/deliver.svg?style=flat)](https://codeclimate.com/github/krausefx/deliver)
+[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/krausefx/deliver.svg?style=flat)](https://codeclimate.com/repos/545413bae30ba063f0000fa9/feed)
+[![Inline Docs](http://inch-ci.org/github/krausefx/deliver.svg?branch=master&style=flat)](http://inch-ci.org/github/krausefx/deliver)
+
+
 
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
