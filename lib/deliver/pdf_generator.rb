@@ -1,7 +1,5 @@
 require 'prawn'
 
-require 'pry'
-
 module Deliver
   class PdfGenerator
 
