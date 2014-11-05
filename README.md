@@ -16,8 +16,22 @@ whole process to start with Continuous Deployment.
 
 ```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using one command.
 
+Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-Follow the developer on Twitter: https://twitter.com/KrauseFx
+
+-------
+[Features](#features) &bull;
+[Installation](#installation) &bull;
+[Quick Start](#quick-start) &bull;
+[Usage](#usage) &bull;
+[Credentials](#credentials) &bull;
+[Can I trust Deliver?](#can-i-trust-deliver) &bull;
+[Tips](#tips) &bull;
+[Need help?](#need-help) &bull;
+[License](#license)
+
+-------
+
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
@@ -214,8 +228,8 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 
 ```Deliver``` uses the following techniques under the hood:
 
-- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. It is also used to upoad the ipa file. iTMSTransporter is a command line tool provided by Apple.
-- With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
+- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
+- With the iTMSTransporter you cannot create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
 - The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
