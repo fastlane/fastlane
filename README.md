@@ -27,8 +27,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 [Credentials](#credentials) &bull;
 [Can I trust Deliver?](#can-i-trust-deliver) &bull;
 [Tips](#tips) &bull;
-[Need help?](#need-help) &bull;
-[License](#license)
+[Need help?](#need-help)
 
 -------
 
