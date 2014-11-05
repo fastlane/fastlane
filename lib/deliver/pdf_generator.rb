@@ -95,7 +95,7 @@ module Deliver
           top = [cursor, title_bottom].min - padding
           index = 0
           previous_image_height = 0
-          if content[:screenshots]
+          if (content[:screenshots] || []).count > 0
             content[:screenshots].sort{ |a, b| a.screen_size <=> b.screen_size }.each do |screenshot|
               
               if last_size and last_size != screenshot.screen_size
@@ -113,6 +113,9 @@ module Deliver
               last_size = screenshot.screen_size
               index += 1
             end
+          else
+            move_cursor_to top
+            text "No screenshots passed. Is this correct? They will get removed from iTunesConnect."
           end
 
           counter += 1

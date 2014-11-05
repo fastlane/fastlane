@@ -119,7 +119,7 @@ module Deliver
         sleep 3
 
         if current_url.include?"wa/defaultError" # app could not be found
-          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID.".red
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.new.username}).".red
         end
 
         true
@@ -220,9 +220,16 @@ module Deliver
           Helper.log.warn "Can not create version #{version_number} on iTunesConnect. Maybe it was already created."
           Helper.log.info "Check out '#{current_url}' what's the latest version."
 
-          created_version = first(".status.waiting").text.split(" ").first
-          if created_version != version_number
-            raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+          begin
+            created_version = first(".status.waiting").text.split(" ").first
+            if created_version != version_number
+              raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+            end
+          rescue Exception => ex
+            # Can not fetch the version number of the new version (this happens, when it's e.g. 'Developer Rejected')
+            unless page.has_content?version_number
+              raise "Some other version was created instead of the one you defined ('#{version_number}')."
+            end
           end
         end
 
@@ -479,9 +486,9 @@ module Deliver
             "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
             "You can always open the browser page yourself: '#{current_url}'\n" +
             "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
-          sleep 30
+          sleep 60
           visit current_url
-          sleep 5
+          sleep 10
         end
       end
 

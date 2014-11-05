@@ -42,6 +42,7 @@ screenshots_path "./screenshots"
 
 # Dynamic generation of the ipa file
 # I'm using Shenzhen by Mattt, but you can use any build tool you want
+# Remove the whole block if you do not want to upload an ipa file
 ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier

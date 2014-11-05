@@ -18,10 +18,23 @@ Deliver - Continuous Deployment for iOS
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
 
-```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using the command line.
+```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using one command.
+
+Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
-Follow the developer on Twitter: https://twitter.com/KrauseFx
+-------
+[Features](#features) &bull;
+[Installation](#installation) &bull;
+[Quick Start](#quick-start) &bull;
+[Usage](#usage) &bull;
+[Credentials](#credentials) &bull;
+[Can I trust Deliver?](#can-i-trust-deliver) &bull;
+[Tips](#tips) &bull;
+[Need help?](#need-help)
+
+-------
+
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
@@ -32,12 +45,8 @@ Follow the developer on Twitter: https://twitter.com/KrauseFx
 - Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots on taken for all screen sizes)
 
 # Installation
-## During the beta phase
-    cd [deliver folder]
-    rake install
-    cd [your iOS project]
 
-## Once it goes live
+Install the gem
 
     sudo gem install deliver
 
@@ -64,13 +73,15 @@ The guide will create all the necessary files for you, using the existing app me
  - Enjoy a good drink, while the computer does all the work for you
 - When it's a new app: ```n```
 
+Copy your screenshots into the ```deliver/screenshots/[language]``` folders (see [Available language codes](#available-language-codes))
+
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
 ### Customize the ```Deliverfile```
 Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings:
 
 - ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
-- ```unit_tests```: Uncomment the code to run tests using *xctool*.
+- ```unit_tests```: Uncomment the code to run tests. (e.g. using [xctool](https://github.com/facebook/xctool))
 
 # Usage
 
@@ -83,12 +94,14 @@ Run ```deliver init``` to create a new ```Deliverfile```. You can either let the
 Once you created your configuration, just run ```deliver```.
 
 Here are a few example files:
-#### Upload all screenshots to iTunesConnect
+#### Upload screenshots to iTunesConnect
 ```ruby
 app_identifier "net.sunapps.1"
+version "1.1"
+
 screenshots_path "./screenshots"
 ```
-The screenshots folder must include one subfolder per language (see Available language codes)
+The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes))
 
 #### Upload a new ipa file with a changelog to the AppStore
 This will submit a new update to Apple
@@ -173,12 +186,12 @@ All available commands with a short description can be found in the [wiki](https
 - Upload the latest screenshots on your server
 - Many more things, be creative and let me know :)
     
-## You can also use the exposed Ruby classes to have full control:
-Some examples
+#### Use the exposed Ruby classes
+Some examples:
 ```ruby
 require 'deliver'
 
-app = Deliver::App.new(apple_id)
+app = Deliver::App.new(app_identifier: 'at.felixkrause.app')
 
 app.get_app_status # => Waiting for Review
 app.create_new_version!("1.4")
@@ -187,14 +200,14 @@ app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
 app.itc.submit_for_review!(app)
 
-Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.9") # => Fetches public metadata
+Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches public metadata
 ```
 This project is well documented, check it out on [Rubydoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
 
 
-## Credentials
+# Credentials
 
-### Use the Keychain
+## Use the Keychain
 The first time you use *Deliver* you have to enter your iTunesConnect 
 credentials. They will be stored in the Keychain. 
 
@@ -202,25 +215,26 @@ If you decide to remove your
 credentials from the Keychain, just open the *Keychain Access*, select 
 *All Items* and search for 'itunesconnect.apple.com'.
 
-### Use environment variables
-You can use the following environment variables:
+## Use environment variables
+You can use the following environment variables to use a specific account instead of the one stored in the keychain:
 
     DELIVER_USER
     DELIVER_PASSWORD
     
-### Implement something custom to fit your needs
-Take a look at *Using the exposed Ruby classes. You
-
+## Implement your custom solution
+Take a look at [Using the exposed Ruby classes](use-the-exposed-ruby-classes).
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-*Deliver* is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+```Deliver``` is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
-*Deliver* uses the following techniques under the hood:
+Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
-- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. iTMSTransporter is a command line tool provided by Apple.
-- With the iTMSTransporter you can not create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
+```Deliver``` uses the following techniques under the hood:
+
+- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
+- With the iTMSTransporter you cannot create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
 - The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
@@ -241,7 +255,7 @@ Some open source tools I found helpful:
 - **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
 - **[rScreenshooter](https://github.com/KrauseFx/rScreenshooter)**: Similar to ui-screen-shooter, but based on Ruby. 
 
-*Deliver* automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
+```Deliver``` automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
@@ -256,7 +270,7 @@ beta_ipa "./latest.ipa"
 This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
 
 # Need help?
-- If there is a technical problem with *Deliver*, submit an issue
+- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: deliver@felixkrause.at
 
 # License
@@ -264,8 +278,9 @@ This projected is licensed under the terms of the MIT license. See the LICENSE f
 
 # Contributing
 
-1. Fork it (https://github.com/KrauseFx/deliver/fork)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+1. Create an issue to discuss about your idea
+2. Fork it (https://github.com/KrauseFx/deliver/fork)
+3. Create your feature branch (`git checkout -b my-new-feature`)
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new Pull Request

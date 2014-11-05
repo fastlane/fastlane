@@ -76,7 +76,7 @@ module Deliver
         json = create_json_based_on_xml(app, metadata_path)
         
         meta_path = "#{metadata_path}metadata.json"
-        File.write(meta_path, json.to_json)
+        File.write(meta_path, JSON.pretty_generate(json))
         puts "Successfully created new metadata JSON file at '#{meta_path}'".green
 
         # Add a README to the screenshots folder
