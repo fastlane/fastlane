@@ -202,6 +202,9 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 
 # Credentials
+The used username (Apple ID) will be stored in the ```Deliverfile``` by default. When you run ```deliver``` for the first time on another computer, you will only be asked for the password.
+
+Therefore it is easy to switch between projects, without needing to logout and login again.
 
 ## Use the Keychain
 The first time you use *Deliver* you have to enter your iTunes Connect 
@@ -209,7 +212,7 @@ credentials. They will be stored in the Keychain.
 
 If you decide to remove your
 credentials from the Keychain, just open the *Keychain Access*, select 
-*All Items* and search for 'itunesconnect.apple.com'.
+*All Items* and search for 'deliver'.
 
 ## Use environment variables
 You can use the following environment variables to use a specific account instead of the one stored in the keychain.
