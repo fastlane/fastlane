@@ -14,7 +14,7 @@ Deliver - Continuous Deployment for iOS
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
 
-```Deliver``` **can upload ipa files, app screenshots and more to the iTunesConnect backend**, which means, you can deploy new iPhone app updates just by using one command.
+```Deliver``` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates just by using one command.
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -34,7 +34,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
-- Upload a new ipa file to iTunesConnect without Xcode from any computer
+- Upload a new ipa file to iTunes Connect without Xcode from any computer
 - Update app metadata
 - Easily implement a real Continuous Deployment process
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
@@ -50,7 +50,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-Install phantomjs (this is needed to control the iTunesConnect frontend)
+Install phantomjs (this is needed to control the iTunes Connect frontend)
 
     brew update && brew install phantomjs
 
@@ -59,12 +59,12 @@ If you don't have homebrew installed already, [install it here](http://brew.sh/)
 # Quick Start
 
 
-The guide will create all the necessary files for you, using the existing app metadata from iTunesConnect.
+The guide will create all the necessary files for you, using the existing app metadata from iTunes Connect.
 
 - ```cd [your_project_folder]```
 - ```deliver init```
-- When your app is already in the AppStore: ```y```
- - Enter your iTunesConnect credentials
+- When your app is already in the App Store: ```y```
+ - Enter your iTunes Connect credentials
  - Enter your app identifier
  - Enjoy a good drink, while the computer does all the work for you
 - When it's a new app: ```n```
@@ -85,12 +85,12 @@ Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
 
-Run ```deliver init``` to create a new ```Deliverfile```. You can either let the wizard generate a file based on the metadata from iTunesConnect or create one from a template.
+Run ```deliver init``` to create a new ```Deliverfile```. You can either let the wizard generate a file based on the metadata from iTunes Connect or create one from a template.
 
 Once you created your configuration, just run ```deliver```.
 
 Here are a few example files:
-#### Upload screenshots to iTunesConnect
+#### Upload screenshots to iTunes Connect
 ```ruby
 app_identifier "net.sunapps.1"
 version "1.1"
@@ -99,7 +99,7 @@ screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes))
 
-#### Upload a new ipa file with a changelog to the AppStore
+#### Upload a new ipa file with a changelog to the App Store
 This will submit a new update to Apple
 ```ruby
 ipa "./latest.ipa"
@@ -204,7 +204,7 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 # Credentials
 
 ## Use the Keychain
-The first time you use *Deliver* you have to enter your iTunesConnect 
+The first time you use *Deliver* you have to enter your iTunes Connect 
 credentials. They will be stored in the Keychain. 
 
 If you decide to remove your
@@ -213,7 +213,7 @@ credentials from the Keychain, just open the *Keychain Access*, select
 
 ## Use environment variables
 You can use the following environment variables to use a specific account instead of the one stored in the keychain.
-This is especially important if you have more than one iTunesConnect account in your keychain:
+This is especially important if you have more than one iTunes Connect account in your keychain:
 
     DELIVER_USER
     DELIVER_PASSWORD
@@ -230,8 +230,8 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 
 ```Deliver``` uses the following techniques under the hood:
 
-- The iTMSTransporter tool is used to fetch the latest app metadata from iTunesConnect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
-- With the iTMSTransporter you cannot create new version on iTunesConnect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
+- The iTMSTransporter tool is used to fetch the latest app metadata from iTunes Connect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
+- With the iTMSTransporter you cannot create new version on iTunes Connect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
 - The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
@@ -264,7 +264,7 @@ These are features, which are implemented, but not yet fully tested and producti
 ```ruby
 beta_ipa "./latest.ipa"
 ```
-This will upload the ipa file to iTunesConnect and mark the uploaded build as Beta build.
+This will upload the ipa file to iTunes Connect and mark the uploaded build as Beta build.
 
 # Need help?
 - If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
