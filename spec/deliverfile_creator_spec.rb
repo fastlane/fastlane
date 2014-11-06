@@ -32,7 +32,6 @@ describe Deliver do
       FileUtils.rm_rf("/tmp/#{apple_id}.itmsp") rescue nil
 
 
-      
 
       Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
 
@@ -60,6 +59,7 @@ describe Deliver do
       correct = File.read("./lib/assets/DeliverfileDefault")
       correct.gsub!("[[APP_IDENTIFIER]]", 'net.sunapps.54')
       correct.gsub!("[[APP_NAME]]", project_name)
+      correct.gsub!("[[EMAIL]]", ENV["DELIVER_USER"])
       expect(File.read("/tmp/Deliverfile")).to eq(correct)
 
       expect(File.directory?([deliver_path, "screenshots"].join("/"))).to eq(true)

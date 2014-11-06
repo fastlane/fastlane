@@ -1,7 +1,7 @@
 # For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
 # Everything next to a # is a comment and will be ignored
 
-
+email '[[EMAIL]]'
 
 ########################################
 # App Metadata

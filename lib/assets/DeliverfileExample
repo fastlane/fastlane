@@ -7,7 +7,7 @@
 # 
 # Everything next to a # is a comment and will be ignored
 
-
+email "yourappleid@company.com"
 
 ########################################
 # App Metadata

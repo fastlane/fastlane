@@ -101,6 +101,12 @@ module Deliver
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
 
+        # This will set the email address of the Apple ID to be used
+        def email(value)
+          value ||= yield if block_given?
+          PasswordManager.shared_manager(value)
+        end
+
         # Set the apps new version number.
         # 
         # If you do not set this, it will automatically being fetched from the 

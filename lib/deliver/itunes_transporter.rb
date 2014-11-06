@@ -23,8 +23,8 @@ module Deliver
     # If no username or password given, it will be taken from
     # the #{Deliver::PasswordManager}
     def initialize(user = nil, password = nil)
-      @user = (user || PasswordManager.new.username)
-      @password = (password || PasswordManager.new.password)
+      @user = (user || PasswordManager.shared_manager.username)
+      @password = (password || PasswordManager.shared_manager.password)
     end
 
     # Downloads the latest version of the app metadata package from iTC.
@@ -112,7 +112,7 @@ module Deliver
           if $1.include?"Your Apple ID or password was entered incorrectly" or
              $1.include?"This Apple ID has been locked for security reasons"
 
-            Deliver::PasswordManager.new.password_seems_wrong
+            Deliver::PasswordManager.shared_manager.password_seems_wrong
           end
 
         elsif line =~ WARNING_REGEX

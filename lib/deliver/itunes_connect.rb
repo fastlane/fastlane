@@ -72,8 +72,8 @@ module Deliver
       begin
         Helper.log.info "Logging into iTunesConnect"
 
-        user ||= PasswordManager.new.username
-        password ||= PasswordManager.new.password
+        user ||= PasswordManager.shared_manager.username
+        password ||= PasswordManager.shared_manager.password
 
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
@@ -119,7 +119,7 @@ module Deliver
         sleep 3
 
         if current_url.include?"wa/defaultError" # app could not be found
-          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.new.username}).".red
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.shared_manager.username}).".red
         end
 
         true

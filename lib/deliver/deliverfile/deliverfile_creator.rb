@@ -18,7 +18,7 @@ module Deliver
           "\nThis is necessary to fetch the latest metadata from your app and use it to create a Deliverfile for you." + 
           "\nIf you have previously entered your credentials already, you will not be asked again."
 
-        if Deliver::PasswordManager.new.username and Deliver::PasswordManager.new.password
+        if Deliver::PasswordManager.shared_manager.username and Deliver::PasswordManager.shared_manager.password
           identifier = ''
           while identifier.length < 3
             identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
@@ -86,6 +86,7 @@ module Deliver
         deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
         deliver.gsub!("[[APP_IDENTIFIER]]", app.app_identifier)
         deliver.gsub!("[[APP_NAME]]", project_name)
+        deliver.gsub!("[[EMAIL]]", PasswordManager.shared_manager.username)
 
         return deliver
       end
