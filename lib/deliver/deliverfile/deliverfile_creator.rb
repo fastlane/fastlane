@@ -86,6 +86,7 @@ module Deliver
         deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
         deliver.gsub!("[[APP_IDENTIFIER]]", app.app_identifier)
         deliver.gsub!("[[APP_NAME]]", project_name)
+        deliver.gsub!("[[APPLE_ID]]", app.apple_id.to_s)
         deliver.gsub!("[[EMAIL]]", PasswordManager.shared_manager.username)
 
         return deliver

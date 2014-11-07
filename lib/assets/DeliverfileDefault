@@ -9,6 +9,7 @@ email '[[EMAIL]]'
 
 # The app identifier is required
 app_identifier "[[APP_IDENTIFIER]]"
+apple_id "[[APPLE_ID]]"
 
 
 # This folder has to include one folder for each language

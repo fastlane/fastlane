@@ -60,6 +60,7 @@ describe Deliver do
       correct.gsub!("[[APP_IDENTIFIER]]", 'net.sunapps.54')
       correct.gsub!("[[APP_NAME]]", project_name)
       correct.gsub!("[[EMAIL]]", ENV["DELIVER_USER"])
+      correct.gsub!("[[APPLE_ID]]", apple_id.to_s)
       expect(File.read("/tmp/Deliverfile")).to eq(correct)
 
       expect(File.directory?([deliver_path, "screenshots"].join("/"))).to eq(true)
