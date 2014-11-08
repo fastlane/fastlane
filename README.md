@@ -251,9 +251,9 @@ There is no optimal solution out there (yet).
 
 Some open source tools I found helpful:
 
-- **[Subliminal](https://github.com/inkling/Subliminal)**: Write your app interaction (e.g. taps) in Objective C. Is based on UIAutomation and is well documented. Currently there are some issues with the latest release of Xcode, which are partly solved in the Xcode6 branch. Checkout my public [gist](https://gist.github.com/KrauseFx/fda87474855dfe0051e6) for running Subliminal on different devices and generating a HTML site viewing all screenshots.
 - **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
 - **[rScreenshooter](https://github.com/KrauseFx/rScreenshooter)**: Similar to ui-screen-shooter, but based on Ruby. 
+- **[Subliminal](https://github.com/inkling/Subliminal)**: Write your app interaction (e.g. taps) in Objective C. It is based on UIAutomation and is well documented. Currently there are some issues with the latest release of Xcode, which are partly solved in the Xcode6 branch. Checkout my public [gist](https://gist.github.com/KrauseFx/fda87474855dfe0051e6) for running Subliminal on different devices and generating a HTML site viewing all screenshots.
 
 ```Deliver``` automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
 
