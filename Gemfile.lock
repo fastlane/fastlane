@@ -7,6 +7,7 @@ PATH
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
+      json
       nokogiri (~> 1.6.3.1)
       plist (~> 3.1.0)
       poltergeist (~> 1.5.1)
@@ -38,6 +39,7 @@ GEM
     fastimage (1.6.3)
       addressable (~> 2.3, >= 2.3.5)
     highline (1.6.21)
+    json (1.8.1)
     method_source (0.8.2)
     mime-types (2.4.2)
     mini_portile (0.6.0)
