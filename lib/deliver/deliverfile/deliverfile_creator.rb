@@ -64,7 +64,7 @@ module Deliver
 
     private
       def self.gem_path
-        if Gem::Specification::find_all_by_name('deliver').any?
+        if not Helper.is_test? and Gem::Specification::find_all_by_name('deliver').any?
           return Gem::Specification.find_by_name('deliver').gem_dir
         else
           return './'
