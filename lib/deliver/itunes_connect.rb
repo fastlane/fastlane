@@ -51,6 +51,7 @@ module Deliver
         Capybara::Poltergeist::Driver.new(a, {
           phantomjs_options: conf,
           phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
+          js_errors: false
         })
       end
 
