@@ -64,7 +64,11 @@ module Deliver
 
     private
       def self.gem_path
-        Gem::Specification.find_by_name("deliver").gem_dir
+        if Gem::Specification::find_all_by_name('deliver').any?
+          return Gem::Specification.find_by_name('deliver').gem_dir
+        else
+          return './'
+        end
       end
 
       # This method takes care of creating a new 'deliver' folder, containg the app metadata 
