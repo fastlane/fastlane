@@ -34,6 +34,7 @@ module Snapshot
         Helper.log.info "BUILD SUCCEEDED".green
         return true
       else
+        Helper.log.info(all_lines.join(' '))
         raise "Looks like the build was not successfull."
       end
     end
