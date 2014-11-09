@@ -10,7 +10,7 @@ module Snapshot
     def build_app
       command = generate_build_command
 
-      puts "Building project... this might take some time...".green
+      Helper.log.info "Building project... this might take some time...".green
       Helper.log.debug command.yellow
 
       all_lines = []

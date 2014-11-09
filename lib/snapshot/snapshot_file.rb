@@ -22,7 +22,7 @@ module Snapshot
         when :devices
           raise "Devices has to be an array" unless value.kind_of?Array
           value.each do |current|
-            unless available_devices.include?current
+            unless SnapshotFile.available_devices.include?current
               raise "Device '#{current}' not found. Available device types: #{available_devices}"
             end
           end
@@ -39,7 +39,7 @@ module Snapshot
         end
     end
 
-    def available_devices
+    def self.available_devices
       if not @result
         @result = []
         `instruments -s`.split("\n").each do |current|
