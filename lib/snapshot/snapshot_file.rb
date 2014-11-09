@@ -29,6 +29,11 @@ module Snapshot
           @config.devices = value
         when :languages
           raise "Languages has to be an array" unless value.kind_of?Array
+          value.each do |current|
+            unless Languages::ALL_LANGUAGES.include?current
+              raise "Language '#{current}' not found. Available languages: #{Languages::ALL_LANGUAGES}"
+            end
+          end
           @config.languages = value
         when :ios_version
           raise "ios_version has to be an String" unless value.kind_of?String
