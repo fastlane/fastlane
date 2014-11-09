@@ -3,6 +3,7 @@ module Snapshot
     def self.check_dependencies
       self.check_xcode_select
       self.check_simulators
+      self.check_xctool
     end
 
     def self.check_xcode_select
@@ -24,6 +25,20 @@ module Snapshot
         Helper.log.fatal "# Xcode => Window => Devices"
         Helper.log.fatal '#############################################################'
         raise "Create the new simulators and run this script again"
+      end
+    end
+
+    def self.xctool_installed?
+      return `which xctool`.length > 1
+    end
+
+    def self.check_xctool
+      if not self.xctool_installed?
+        Helper.log.error '#############################################################'
+        Helper.log.error "# xctool is recommended to build the apps"
+        Helper.log.error "# Install it using 'brew install xctool'"
+        Helper.log.error "# Falling back to xcode build instead "
+        Helper.log.error '#############################################################'
       end
     end
   end
