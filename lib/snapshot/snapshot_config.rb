@@ -65,6 +65,7 @@ module Snapshot
         schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
         Helper.log.debug "Found available schemes: #{schemes}"
 
+
         if self.manual_scheme
           if not schemes.include?manual_scheme
             raise "Could not find requested scheme '#{self.manual_scheme}' in Xcode's schemes #{schemes}"
@@ -85,7 +86,7 @@ module Snapshot
           end
         end
       rescue Exception => ex
-        Helper.log.fatal "Could not fetch available schemes: #{ex}".red
+        raise "Could not fetch available schemes: #{ex}".red
       end
     end
   end
