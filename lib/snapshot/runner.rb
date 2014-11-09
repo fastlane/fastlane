@@ -2,7 +2,6 @@ require 'pty'
 
 module Snapshot
   class Runner
-    BUILD_DIR = '/tmp/snapshot'
     TRACE_DIR = '/tmp/snapshot_traces'
 
     def initialize
@@ -10,24 +9,12 @@ module Snapshot
     end
 
     def work
-      devices = [
-        "iPhone 6 (8.1 Simulator)",
-        "iPhone 6 Plus (8.1 Simulator)",
-        "iPhone 5 (8.1 Simulator)",
-        "iPhone 4S (8.1 Simulator)"
-      ]
-      languages = [ 'de-DE', 'en-US' ]
-      @ios_version = '8.1'
       @screenshots_path = './screenshots'
 
-      find_project
+      Builder.new.build_app
 
-      # Apparantly we have to do this twice: https://github.com/jonathanpenn/ui-screen-shooter/blob/master/ui-screen-shooter.sh#L111
-      # build_app
-      # build_app
-
-      devices.each do |device|
-        languages.each do |language|
+      SnapshotConfig.shared_instance.devices.each do |device|
+        SnapshotConfig.shared_instance.languages.each do |language|
 
           run_tests(device, language)
           copy_screenshots(language)
@@ -41,30 +28,6 @@ module Snapshot
       FileUtils.mkdir_p(TRACE_DIR)
     end
 
-    def find_project
-      # TODO
-      @project_path = Dir.glob("./integration/Moto\ Deals/*.xcworkspace").first
-      @project_name = @project_path.split('/').last.split('.').first
-    end
-
-    def build_app
-      command = generate_build_command
-      Helper.log.warn command.green
-
-      PTY.spawn(command) do |stdin, stdout, pid|
-        stdin.each do |line|
-          Helper.log.debug line
-          parse_build_line(line)
-        end
-      end
-    end
-
-    def parse_build_line(line)
-      if line.include?"** BUILD FAILED **"
-        raise line
-      end
-      # ** BUILD SUCCEEDED **
-    end
 
     def run_tests(device, language)
       Helper.log.warn "Running tests on #{device} in language #{language}"
@@ -78,10 +41,11 @@ module Snapshot
 
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          Helper.log.debug line
-          result = parse_test_line(line)
-          if result == :retry
-            retry_run = true
+          if line.length > 1
+            result = parse_test_line(line)
+            if result == :retry
+              retry_run = true
+            end
           end
         end
       end
@@ -93,6 +57,8 @@ module Snapshot
     end
 
     def parse_test_line(line)
+      Helper.log.debug line
+
       if line =~ /.*Target failed to run.*/
         Helper.log.error "Instruments tool failed again. Re-trying..."
         return :retry
@@ -107,24 +73,6 @@ module Snapshot
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
       end
-    end
-
-    def generate_build_command
-      scheme = @project_name # TODO
-
-      [
-        "xcodebuild",
-        "-sdk iphonesimulator#{@ios_version}",
-        "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
-        "-workspace '#{@project_path}'",
-        "-scheme '#{scheme}'",
-        "-configuration Debug",
-        "DSTROOT='#{BUILD_DIR}'",
-        "OBJROOT='#{BUILD_DIR}'",
-        "SYMROOT='#{BUILD_DIR}'",
-        "ONLY_ACTIVE_ARCH=NO",
-        "clean build"
-      ].join(' ')
     end
 
     def generate_test_command(device, language, app_path)
