@@ -31,7 +31,7 @@ command :run do |c|
   c.action do |args, options|
     Snapshot::DependencyChecker.check_dependencies
 
-    path = "./Snapshotfile"
+    path = "./Snapfile"
 
     if File.exists?(path)
       Snapshot::Runner.new.work

@@ -24,7 +24,7 @@ module Snapshot
     end
 
     # @param path (String) the path to the config file to use (including the file name)
-    def initialize(path = './Snapshotfile')
+    def initialize(path = './Snapfile')
       set_defaults
 
       self.snapshot_file = SnapshotFile.new(path, self)
