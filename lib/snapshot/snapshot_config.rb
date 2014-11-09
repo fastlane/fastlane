@@ -45,7 +45,8 @@ module Snapshot
 
       self.ios_version = '8.1'
 
-      self.project_path = Dir.glob("./integration/Moto\ Deals/*.xcworkspace").first # TODO
+      self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
+      self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
     end
   end
 end
