@@ -29,14 +29,6 @@ command :run do |c|
   c.syntax = 'snapshot'
   c.description = 'Run the script, to take all the screenshots.'
   c.action do |args, options|
-    Snapshot::DependencyChecker.check_dependencies
-
-    path = "./Snapfile"
-
-    if File.exists?(path)
-      Snapshot::Runner.new.work
-    else
-      raise "Could not find config file at '#{path}"
-    end
+    Snapshot::Runner.new.work
   end
 end

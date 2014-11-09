@@ -32,10 +32,10 @@ module Snapshot
 
     def set_defaults
       self.devices = [
-        "iPhone 6 (8.1 Simulator)",
-        "iPhone 6 Plus (8.1 Simulator)",
-        "iPhone 5 (8.1 Simulator)",
-        "iPhone 4S (8.1 Simulator)"
+        "iPhone 6",
+        "iPhone 6 Plus",
+        "iPhone 5",
+        "iPhone 4S"
       ]
 
       self.languages = [

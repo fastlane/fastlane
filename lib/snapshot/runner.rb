@@ -5,7 +5,7 @@ module Snapshot
     TRACE_DIR = '/tmp/snapshot_traces'
 
     def initialize
-
+      Snapshot::DependencyChecker.check_dependencies
     end
 
     def work

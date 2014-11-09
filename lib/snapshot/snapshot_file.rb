@@ -20,28 +20,40 @@ module Snapshot
 
       case method_sym
         when :devices
-          raise "Devices has to be an array" unless value.kind_of?Array
-          value.each do |current|
-            unless SnapshotFile.available_devices.include?current
-              raise "Device '#{current}' not found. Available device types: #{available_devices}"
-            end
-          end
-          @config.devices = value
+          self.verify_devices(value)
         when :languages
-          raise "Languages has to be an array" unless value.kind_of?Array
-          value.each do |current|
-            unless Languages::ALL_LANGUAGES.include?current
-              raise "Language '#{current}' not found. Available languages: #{Languages::ALL_LANGUAGES}"
-            end
-          end
-          @config.languages = value
+          self.verify_languages(value)
         when :ios_version
           raise "ios_version has to be an String" unless value.kind_of?String
           @config.ios_version = value
         when :project_path
           raise "project_path has to be an String" unless value.kind_of?String
           @config.project_path = value
+        else
+          Helper.log.error "Unknown method #{method_sym}"
         end
+    end
+
+    def verify_devices(value)
+      raise "Devices has to be an array" unless value.kind_of?Array
+      value.each do |current|
+        current += " (#{@config.ios_version} Simulator)" unless current.include?"Simulator"
+
+        unless SnapshotFile.available_devices.include?current
+          raise "Device '#{current}' not found. Available device types: #{SnapshotFile.available_devices}"
+        end
+      end
+      @config.devices = value
+    end
+
+    def verify_languages(value)
+      raise "Languages has to be an array" unless value.kind_of?Array
+      value.each do |current|
+        unless Languages::ALL_LANGUAGES.include?current
+          raise "Language '#{current}' not found. Available languages: #{Languages::ALL_LANGUAGES}"
+        end
+      end
+      @config.languages = value
     end
 
     def self.available_devices
