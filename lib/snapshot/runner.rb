@@ -35,13 +35,14 @@ module Snapshot
 
       clean_old_traces
 
+      ENV['SNAPSHOT_LANGUAGE'] = language
       command = generate_test_command(device, language, app_path)
       
       retry_run = false
 
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          if line.length > 1
+          if line.length > 2
             result = parse_test_line(line)
             if result == :retry
               retry_run = true

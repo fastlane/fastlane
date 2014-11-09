@@ -23,8 +23,8 @@ function captureLocalizedScreenshot(name) {
   var orientation = "portrait";
   if (rect.size.height < rect.size.width) orientation = "landscape";
 
-  var language = target.frontMostApp().
-    preferencesValueForKey("AppleLanguages")[0];
+  var result = target.host().performTaskWithPathArgumentsTimeout("/usr/bin/printenv" , ["SNAPSHOT_LANGUAGE"], 5);
+  var language = result.stdout.substring(0, result.stdout.length - 1);
 
   var parts = [language, model, orientation, name];
   target.captureScreenWithName(parts.join("___"));

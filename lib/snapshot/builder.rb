@@ -15,7 +15,7 @@ module Snapshot
 
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          parse_build_line(line) if line.length > 1
+          parse_build_line(line) if line.length > 2
           all_lines << line
         end
       end
