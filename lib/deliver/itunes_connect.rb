@@ -93,7 +93,7 @@ module Deliver
           wait_for_elements(".enabled").first.click
           wait_for_elements('.ng-scope.managedWidth')
         rescue
-          ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you set them correctly")
+          raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
         Helper.log.info "Successfully logged into iTunesConnect"
