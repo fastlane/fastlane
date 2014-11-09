@@ -32,23 +32,27 @@ module Snapshot
     def initialize(path = './Snapfile')
       set_defaults
 
-      self.snapshot_file = SnapshotFile.new(path, self)
+      if path and File.exists?path
+        self.snapshot_file = SnapshotFile.new(path, self)
+      else
+        Helper.log.error "Could not find './Snapfile'. It is recommended to create a file into the current directory. Using the defaults now."
+      end
     end
 
     def set_defaults
+      self.ios_version = '8.1'
+
       self.devices = [
-        "iPhone 6",
-        "iPhone 6 Plus",
-        "iPhone 5",
-        "iPhone 4S"
+        "iPhone 6 (#{self.ios_version} Simulator)",
+        "iPhone 6 Plus (#{self.ios_version} Simulator)",
+        "iPhone 5 (#{self.ios_version} Simulator)",
+        "iPhone 4S (#{self.ios_version} Simulator)"
       ]
 
       self.languages = [
         'de-DE',
         'en-US'
       ]
-
-      self.ios_version = '8.1'
 
       self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
