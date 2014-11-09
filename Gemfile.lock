@@ -1,0 +1,14 @@
+PATH
+  remote: .
+  specs:
+    snapshot (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  snapshot!
