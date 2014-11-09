@@ -9,19 +9,26 @@ module Snapshot
 
     def build_app
       command = generate_build_command
-      Helper.log.warn command.green
+
+      puts "Building project... this might take some time...".green
+      Helper.log.debug command.yellow
 
       all_lines = []
 
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          parse_build_line(line) if line.length > 2
           all_lines << line
+          begin
+            parse_build_line(line) if line.length > 2
+          rescue Exception => ex
+            Helper.log.fatal all_lines.join("\n")
+            raise ex
+          end
         end
       end
 
       if all_lines.join('\n').include?'** BUILD SUCCEEDED **'
-        Helper.log.info "Build succeeded".green
+        Helper.log.info "BUILD SUCCEEDED".green
         return true
       else
         raise "Looks like the build was not successfull."
@@ -30,7 +37,6 @@ module Snapshot
 
     private
       def parse_build_line(line)
-        Helper.log.debug line
         if line.include?"** BUILD FAILED **"
           raise line
         end
