@@ -11,6 +11,8 @@ module Snapshot
     def work
       @screenshots_path = './screenshots'
 
+      SnapshotConfig.shared_instance.js_file # to verify the file can be found
+
       Builder.new.build_app
 
       SnapshotConfig.shared_instance.devices.each do |device|
@@ -89,7 +91,7 @@ module Snapshot
     end
 
     def generate_test_command(device, language, app_path)
-      script_path = './test.js'
+      script_path = SnapshotConfig.shared_instance.js_file
 
       [
         "instruments",

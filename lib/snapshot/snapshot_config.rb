@@ -19,6 +19,9 @@ module Snapshot
     # @return (String) The name of a scheme, manually set by the user using the config file
     attr_accessor :manual_scheme
 
+    # @return (String) The path to the JavaScript file to use
+    attr_accessor :manual_js_file
+
 
     # A shared singleton
     def self.shared_instance
@@ -58,6 +61,16 @@ module Snapshot
       (self.project_path.split('/').last.split('.').first rescue nil)
     end
 
+    # The JavaScript UIAutomation file
+    def js_file
+      files = Dir.glob("./*.js")
+      if files.count == 1
+        return files.first
+      else
+        raise "Could not determine which UIAutomation file to use. Please pass a path to your Javascript file using 'js_path'.".red
+      end
+    end
+
     # The scheme to use (either it's set, or there is only one, or user has to enter it)
     def scheme
       begin
@@ -86,6 +99,7 @@ module Snapshot
               self.manual_scheme = (schemes[val - 1] rescue nil)
             end
           end
+          return self.manual_scheme
         end
       rescue Exception => ex
         raise "Could not fetch available schemes: #{ex}".red
