@@ -63,7 +63,7 @@ module Snapshot
 
     # The JavaScript UIAutomation file
     def js_file
-      files = Dir.glob("./*.js")
+      files = Dir.glob("./*.js").delete_if { |path| path.include?"SnapshotHelper.js" }
       if files.count == 1
         return files.first
       else
