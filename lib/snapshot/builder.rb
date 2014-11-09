@@ -1,3 +1,5 @@
+require 'snapshot/dependency_checker'
+
 module Snapshot
   class Builder
     BUILD_DIR = '/tmp/snapshot'
@@ -45,8 +47,9 @@ module Snapshot
       def generate_build_command
         scheme = SnapshotConfig.shared_instance.project_path.split('/').last.split('.').first # TODO
 
+        build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
         [
-          "xctool",
+          build_command,
           "-sdk iphonesimulator#{SnapshotConfig.shared_instance.ios_version}",
           "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
           "-workspace '#{SnapshotConfig.shared_instance.project_path}'",
