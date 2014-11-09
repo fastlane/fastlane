@@ -27,5 +27,5 @@ function captureLocalizedScreenshot(name) {
   var language = result.stdout.substring(0, result.stdout.length - 1);
 
   var parts = [language, model, orientation, name];
-  target.captureScreenWithName(parts.join("___"));
+  target.captureScreenWithName(parts.join("-"));
 }
