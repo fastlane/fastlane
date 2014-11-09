@@ -48,5 +48,12 @@ module Snapshot
       self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
     end
+
+    # Getters
+
+    # Returns the file name of the project
+    def project_name
+      (self.project_path.split('/').last.split('.').first rescue nil)
+    end
   end
 end

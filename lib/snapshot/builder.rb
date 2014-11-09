@@ -10,9 +10,10 @@ module Snapshot
     end
 
     def build_app
+      raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
       command = generate_build_command
 
-      Helper.log.info "Building project... this might take some time...".green
+      Helper.log.info "Building project '#{SnapshotConfig.shared_instance.project_name}'... this might take some time...".green
       Helper.log.debug command.yellow
 
       all_lines = []

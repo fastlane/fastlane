@@ -24,33 +24,38 @@ module Snapshot
         when :languages
           self.verify_languages(value)
         when :ios_version
-          raise "ios_version has to be an String" unless value.kind_of?String
+          raise "ios_version has to be an String".red unless value.kind_of?String
           @config.ios_version = value
         when :project_path
-          raise "project_path has to be an String" unless value.kind_of?String
-          @config.project_path = value
+          raise "project_path has to be an String".red unless value.kind_of?String
+
+          if File.exists?value and (value.end_with?".xcworkspace" or value.end_with?".xcodeproj")
+            @config.project_path = value
+          else
+            raise "The given project_path '#{value}' could not be found. Make sure to include the extension as well.".red
+          end
         else
           Helper.log.error "Unknown method #{method_sym}"
         end
     end
 
     def verify_devices(value)
-      raise "Devices has to be an array" unless value.kind_of?Array
+      raise "Devices has to be an array".red unless value.kind_of?Array
       value.each do |current|
         current += " (#{@config.ios_version} Simulator)" unless current.include?"Simulator"
 
         unless SnapshotFile.available_devices.include?current
-          raise "Device '#{current}' not found. Available device types: #{SnapshotFile.available_devices}"
+          raise "Device '#{current}' not found. Available device types: #{SnapshotFile.available_devices}".red
         end
       end
       @config.devices = value
     end
 
     def verify_languages(value)
-      raise "Languages has to be an array" unless value.kind_of?Array
+      raise "Languages has to be an array".red unless value.kind_of?Array
       value.each do |current|
         unless Languages::ALL_LANGUAGES.include?current
-          raise "Language '#{current}' not found. Available languages: #{Languages::ALL_LANGUAGES}"
+          raise "Language '#{current}' not found. Available languages: #{Languages::ALL_LANGUAGES}".red
         end
       end
       @config.languages = value
