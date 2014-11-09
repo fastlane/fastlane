@@ -176,7 +176,12 @@ module Deliver
 
         open_app_page(app)
 
-        return first(".status.ready").text.split(" ").first
+        begin
+          return first(".status.ready").text.split(" ").first
+        rescue
+          Helper.log.debug "Could not fetch version number of the live version for app #{app}."
+          return nil
+        end
       rescue Exception => ex
         error_occured(ex)
       end
