@@ -14,7 +14,7 @@ Taking perfect iOS screenshots is difficult. You usually want them to look the s
 
 This easily results in over **300 screenshots** you have to create. 
 
-Uploading them is really easy, using [```deliver```](https://github.com/KrauseFx/deliver)
+Uploading them is really easy, using [```deliver```](https://github.com/KrauseFx/deliver).
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -92,11 +92,10 @@ languages([
 ])
 ```
 
-### iOS Version
-I'll try to keep the script up to date. If you need to change the iOS version, you can do it like this:
-
+### Scheme
+To not be asked which scheme to use, just set it like this:
 ```ruby
-ios_version "9.0"
+scheme "Name"
 ```
 
 ### Project Path
@@ -105,11 +104,13 @@ By default, ```snapshot``` will look for your project in the current directory. 
 project_path "./my_project/Project.xcworkspace"
 ```
 
-### Scheme
-To not be asked which scheme to use, just set it like this:
+### iOS Version
+I'll try to keep the script up to date. If you need to change the iOS version, you can do it like this:
+
 ```ruby
-scheme "Name"
+ios_version "9.0"
 ```
+
 
 # Tips
 ## Available language codes
