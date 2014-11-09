@@ -1,8 +1,8 @@
 module Snapshot
   class SnapshotConfig
     
-    # @return (String) The path to the used Deliverfile.
-    attr_accessor :path
+    # @return (SnapshotFile)
+    attr_accessor :snapshot_file
 
     # @return (Array) List of simulators to use
     attr_accessor :devices
@@ -25,10 +25,12 @@ module Snapshot
 
     # @param path (String) the path to the config file to use (including the file name)
     def initialize(path = './Snapshotfile')
-      raise "Config file not found at path '#{path}'".red unless File.exists?(path.to_s)
+      set_defaults
 
-      self.path = path
+      self.snapshot_file = SnapshotFile.new(path, self)
+    end
 
+    def set_defaults
       self.devices = [
         "iPhone 6 (8.1 Simulator)",
         "iPhone 6 Plus (8.1 Simulator)",

@@ -4,6 +4,7 @@ require 'snapshot/helper'
 require 'snapshot/snapshot_config'
 require 'snapshot/runner'
 require 'snapshot/builder'
+require 'snapshot/snapshot_file'
 
 require 'pry' # TODO: Remove
 
