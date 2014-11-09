@@ -16,8 +16,12 @@ module Snapshot
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language|
 
-          run_tests(device, language)
-          copy_screenshots(language)
+          begin
+            run_tests(device, language)
+            copy_screenshots(language)
+          rescue Exception => ex
+            Helper.log.error(ex)
+          end
 
         end
       end
@@ -30,7 +34,7 @@ module Snapshot
 
 
     def run_tests(device, language)
-      Helper.log.warn "Running tests on #{device} in language #{language}"
+      Helper.log.info "Running tests on #{device} in language #{language}".green
       app_path = Dir.glob("/tmp/snapshot/build/*.app").first
 
       clean_old_traces
@@ -40,29 +44,37 @@ module Snapshot
       
       retry_run = false
 
+      lines = []
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          if line.length > 2
-            result = parse_test_line(line)
-            if result == :retry
+          lines << line
+          result = parse_test_line(line)
+
+          case result
+            when :retry
               retry_run = true
+            when :screenshot
+              Helper.log.info "Successfully took screenshot 📱"
             end
-          end
         end
       end
 
       if retry_run
-        sleep 2 # We need enough sleep
+        Helper.log.error "Instruments tool failed again. Re-trying..."
+        sleep 2 # We need enough sleep... that's an instruments bug
         run_tests(device, language)
       end
     end
 
     def parse_test_line(line)
-      Helper.log.debug line
-
       if line =~ /.*Target failed to run.*/
-        Helper.log.error "Instruments tool failed again. Re-trying..."
         return :retry
+      elsif line.include?"Screenshot captured"
+        return :screenshot
+      elsif line =~ /.*Error: (.*)/
+        raise "UIAutomation Error: #{$1}"
+      elsif line =~ /Instruments Usage Error :(.*)/
+        raise "Instruments Usage Error: #{$1}"
       elsif line.include?"__NSPlaceholderDictionary initWithObjects:forKeys:count:]: attempt to insert nil object"
         raise "Looks like something is wrong with the used app. Make sure the build was successful."
       end
