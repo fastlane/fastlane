@@ -79,6 +79,8 @@ module Deliver
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
 
+        (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
+
         if page.has_content?"My Apps"
           # Already logged in
           return true
