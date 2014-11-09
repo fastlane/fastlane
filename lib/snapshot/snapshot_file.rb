@@ -26,6 +26,9 @@ module Snapshot
         when :ios_version
           raise "ios_version has to be an String".red unless value.kind_of?String
           @config.ios_version = value
+        when :manual_scheme
+          raise "manual_scheme has to be an String".red unless value.kind_of?String
+          @config.manual_scheme = value
         when :project_path
           raise "project_path has to be an String".red unless value.kind_of?String
 

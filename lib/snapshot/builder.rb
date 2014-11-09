@@ -47,7 +47,7 @@ module Snapshot
       end
 
       def generate_build_command
-        scheme = SnapshotConfig.shared_instance.project_path.split('/').last.split('.').first # TODO
+        scheme = SnapshotConfig.shared_instance.scheme
 
         build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
         [

@@ -16,6 +16,8 @@ module Snapshot
     # @return (String) The path to the project/workspace
     attr_accessor :project_path
 
+    # @return (String) The name of a scheme, manually set by the user using the config file
+    attr_accessor :manual_scheme
 
 
     # A shared singleton
@@ -54,6 +56,37 @@ module Snapshot
     # Returns the file name of the project
     def project_name
       (self.project_path.split('/').last.split('.').first rescue nil)
+    end
+
+    # The scheme to use (either it's set, or there is only one, or user has to enter it)
+    def scheme
+      begin
+        command = "cd '#{project_path.split('/')[0..-2].join('/')}'; xcodebuild -list"
+        schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
+        Helper.log.debug "Found available schemes: #{schemes}"
+
+        if self.manual_scheme
+          if not schemes.include?manual_scheme
+            raise "Could not find requested scheme '#{self.manual_scheme}' in Xcode's schemes #{schemes}"
+          else
+            return self.manual_scheme
+          end
+        else
+          # We have to ask the user first
+          puts "Found the following schemes in your project:"
+          while not schemes.include?self.manual_scheme
+            schemes.each_with_index do |current, index|
+              puts "#{index + 1}) #{current}"
+            end
+            val = gets.strip.to_i
+            if val > 0
+              self.manual_scheme = (schemes[val - 1] rescue nil)
+            end
+          end
+        end
+      rescue Exception => ex
+        Helper.log.fatal "Could not fetch available schemes: #{ex}".red
+      end
     end
   end
 end
