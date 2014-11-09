@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
     in all languages for different screensizes to iTunesConnect and even publish a new 
     ipa file to iTunesConnect. You define your prefered deployment information once in a so called
     Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
-  spec.homepage      = ""
+  spec.homepage      = "http://felixkrause.at"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 1.9.3'
