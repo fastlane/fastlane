@@ -63,7 +63,7 @@ From now on, you can run ```snapshot``` to create new screenshots of your app.
 
 Why should you have to remember complicated commands and parameters?
 
-Store your configuration in a text file to easily deploy from any computer.
+Store your configuration in a text file to easily take screenshots from any computer.
 
 ## Snapfile
 
@@ -90,6 +90,13 @@ languages([
   "de-DE",
   "es-ES"
 ])
+```
+
+### Javascript file
+Usually ```snapshot``` automatically finds your JavaScript file. If that's not the case, you can pass the path 
+to your test file.
+```ruby
+js_file './path/file.js'
 ```
 
 ### Scheme
