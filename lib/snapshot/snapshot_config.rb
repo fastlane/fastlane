@@ -75,7 +75,7 @@ module Snapshot
         else
           # We have to ask the user first
           puts "Found the following schemes in your project:".green
-          puts "You can use scheme \"Name\" in your Snapfile".green
+          puts "You can use 'scheme \"Name\"' in your Snapfile".green
           puts "--------------------------------------------".green
           while not schemes.include?self.manual_scheme
             schemes.each_with_index do |current, index|

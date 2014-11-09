@@ -105,6 +105,12 @@ By default, ```snapshot``` will look for your project in the current directory. 
 project_path "./my_project/Project.xcworkspace"
 ```
 
+### Scheme
+To not be asked which scheme to use, just set it like this:
+```ruby
+scheme "Name"
+```
+
 # Tips
 ## Available language codes
 ```ruby
@@ -114,10 +120,12 @@ project_path "./my_project/Project.xcworkspace"
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
+## Editing the ```Deliverfile```
+Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: deliver@felixkrause.at
+- If there is a technical problem with ```Snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
+- I'm available for contract work - drop me an email: snapshot@felixkrause.at
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
