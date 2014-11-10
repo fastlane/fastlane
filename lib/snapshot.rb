@@ -7,8 +7,6 @@ require 'snapshot/builder'
 require 'snapshot/snapshot_file'
 require 'snapshot/languages'
 
-require 'pry' # TODO: Remove
-
 # Third Party code
 require 'colored'
 
