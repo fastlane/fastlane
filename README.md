@@ -22,6 +22,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 -------
 [Features](#features) &bull;
 [Installation](#installation) &bull;
+[UI Automation](#ui-automation) &bull;
 [Quick Start](#quick-start) &bull;
 [Usage](#usage) &bull;
 [Tips](#tips) &bull;
@@ -35,6 +36,16 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Very easy to integrate with ```deliver```
+- ```Snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
+
+## Why?
+This gem automatically switches the language and device type and runs the automation script to take all screenshots.
+
+**Why use ```snapshot``` instead of....**
+
+- **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
+- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This ist the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```Snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
+- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately it has a lot of open issues with the latest release of Xcode.
 
 # Installation
 
@@ -45,6 +56,28 @@ Install the gem
 Make sure, you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
+    
+# UI Automation
+
+## Get started
+This project uses Apple's ```UI Automation``` under the hood. I will not go into detail on how to write scripts. 
+
+Here a few links to get started:
+
+- [Apple's official documentation](https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UsingtheAutomationInstrument/UsingtheAutomationInstrument.html)
+- [UI Automation: An Introduction (cocoamanifest.net)](http://cocoamanifest.net/articles/2011/05/uiautomation-an-introduction.html)
+- [Functional Testing UI Automation (mattmccomb.com)](http://www.mattmccomb.com/blog/2013/06/02/ios-functional-testing-with-uiautomation/)
+
+## Record your first script
+Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
+
+This will get you started. Save the generated file with the extension ```js``` into your project root. 
+
+Add ```#import "SnapshotHelper.js"``` on the top of your file.
+
+Now you can use ```captureLocalizedScreenshot('0-name')``` to take a snapshot.
+
+You can take a look at the example project to play around with it.
 
 # Quick Start
 
