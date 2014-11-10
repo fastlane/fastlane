@@ -49,7 +49,7 @@ module Snapshot
         "iPhone 6 (#{self.ios_version} Simulator)",
         "iPhone 6 Plus (#{self.ios_version} Simulator)",
         "iPhone 5 (#{self.ios_version} Simulator)",
-        "iPhone 4S (#{self.ios_version} Simulator)"
+        "iPhone 4s (#{self.ios_version} Simulator)"
       ]
 
       self.languages = [
