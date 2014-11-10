@@ -51,14 +51,16 @@ module Snapshot
 
     def verify_devices(value)
       raise "Devices has to be an array".red unless value.kind_of?Array
+      @config.devices = []
       value.each do |current|
         current += " (#{@config.ios_version} Simulator)" unless current.include?"Simulator"
 
         unless SnapshotFile.available_devices.include?current
           raise "Device '#{current}' not found. Available device types: #{SnapshotFile.available_devices}".red
+        else
+          @config.devices << current
         end
       end
-      @config.devices = value
     end
 
     def verify_languages(value)
