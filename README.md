@@ -134,7 +134,7 @@ ios_version "9.0"
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
-## Editing the ```Deliverfile```
+## Editing the ```Snapfile```
 Change syntax highlighting to *Ruby*.
 
 # Need help?
