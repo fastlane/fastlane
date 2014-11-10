@@ -20,11 +20,13 @@ You have to manually create 20 (languages) x 4 (devices) x 5 (screenshots) = **4
 
 It's hard to get everything right!
 
+- New screenshots with every (design) update
 - No loading indicators
 - Same content / screens
-- New screenshots with every (design) update
 - [Clean Status Bar](#use-a-clean-status-bar)
 - Uploading screenshots ([```deliver```](https://github.com/KrauseFx/deliver) is your friend)
+
+This gem solves all those problems. It will run completely in the background - you can do something else, while your computer takes the screenshots for you.
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
