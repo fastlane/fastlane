@@ -87,6 +87,7 @@ module Snapshot
         schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
         Helper.log.debug "Found available schemes: #{schemes}"
 
+        self.manual_scheme = schemes.first if schemes.count == 1
 
         if self.manual_scheme
           if not schemes.include?manual_scheme
