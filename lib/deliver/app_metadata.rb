@@ -456,6 +456,9 @@ module Deliver
         # Remove all GameCenter related code
         fetch_value("//x:game_center").remove
 
+        # Remove all InApp purchases
+        fetch_value("//x:in_app_purchases").remove
+
         fetch_value("//x:software_screenshots").remove
       end
 
