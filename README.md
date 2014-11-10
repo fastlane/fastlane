@@ -92,7 +92,7 @@ languages([
 ])
 ```
 
-### Javascript file
+### JavaScript file
 Usually ```snapshot``` automatically finds your JavaScript file. If that's not the case, you can pass the path 
 to your test file.
 ```ruby

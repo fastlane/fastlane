@@ -1,0 +1,24 @@
+# Uncommend the lines below you want to change by removing the # in the beginning
+
+# A list of devices you want to take the screenshots from
+devices([
+  "iPhone 6",
+  "iPhone 6 Plus",
+  "iPhone 5",
+  "iPhone 4S"
+])
+
+# Where should the resulting screenshots be stored?
+screenshots_path "~/Desktop/NewScreenshots"
+
+# JavaScript UIAutomation file
+# js_file './tests.js'
+
+# The name of the project's scheme
+# scheme 'SchemeName'
+
+# Where is your project (or workspace)? Provide the full path here
+# project_path './YourProject.xcworkspace'
+
+# By default, the latest version should be used automatically. If you want to change it, do it here
+# ios_version '8.1'
