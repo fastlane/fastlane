@@ -1,4 +1,16 @@
+function wait_for_loading_indicator_to_be_finished()
+{
+  re = UIATarget.localTarget().frontMostApp().statusBar().elements()[2].rect()
+  while (re['size']['width'] == 10 && re['size']['height'] == 20) {
+    UIALogger.logMessage("Loading indicator is visible... waiting")
+    UIATarget.localTarget().delay(1)
+    re = UIATarget.localTarget().frontMostApp().statusBar().elements()[2].rect()
+  }
+}
+
 function captureLocalizedScreenshot(name) {
+  wait_for_loading_indicator_to_be_finished();
+
   var target = UIATarget.localTarget();
   var model = target.model();
   var rect = target.rect();
