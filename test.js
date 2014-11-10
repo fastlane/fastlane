@@ -1,4 +1,4 @@
-#import "ScreenshotHelper.js"
+#import "SnapshotHelper.js"
 
 var target = UIATarget.localTarget();
 var app = target.frontMostApp();
