@@ -49,12 +49,16 @@ module Snapshot
       def generate_build_command
         scheme = SnapshotConfig.shared_instance.scheme
 
+        proj_path = SnapshotConfig.shared_instance.project_path
+        proj_key = 'project'
+        proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
+
         build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
         [
           build_command,
           "-sdk iphonesimulator#{SnapshotConfig.shared_instance.ios_version}",
           "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
-          "-workspace '#{SnapshotConfig.shared_instance.project_path}'",
+          "-#{proj_key} '#{proj_path}'",
           "-scheme '#{scheme}'",
           "-configuration Debug",
           "DSTROOT='#{BUILD_DIR}'",
