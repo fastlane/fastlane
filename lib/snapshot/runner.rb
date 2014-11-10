@@ -9,8 +9,6 @@ module Snapshot
     end
 
     def work
-      @screenshots_path = './screenshots'
-
       SnapshotConfig.shared_instance.js_file # to verify the file can be found
 
       Builder.new.build_app
@@ -83,8 +81,11 @@ module Snapshot
     end
 
     def copy_screenshots(language)
-      resulting_path = [@screenshots_path, language].join('/')
+      resulting_path = [SnapshotConfig.shared_instance.screenshots_path, language].join('/')
+      resulting_path.gsub!("~", ENV['HOME']) # some strange bug requires this
+
       FileUtils.mkdir_p resulting_path
+
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
       end

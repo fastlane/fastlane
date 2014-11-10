@@ -33,6 +33,9 @@ module Snapshot
           raise "js_file has to be an String".red unless value.kind_of?String
           raise "js_file at path '#{value}' not found".red unless File.exists?value
           @config.manual_js_file = value
+        when :screenshots_path
+          raise "screenshots_path has to be an String".red unless value.kind_of?String
+          @config.screenshots_path = value
         when :project_path
           raise "project_path has to be an String".red unless value.kind_of?String
 

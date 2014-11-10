@@ -22,6 +22,9 @@ module Snapshot
     # @return (String) The path to the JavaScript file to use
     attr_accessor :manual_js_file
 
+    # @return (String) The path, in which the screenshots should be stored
+    attr_accessor :screenshots_path
+
 
     # A shared singleton
     def self.shared_instance
@@ -53,6 +56,8 @@ module Snapshot
         'de-DE',
         'en-US'
       ]
+
+      self.screenshots_path = './screenshots'
 
       self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
