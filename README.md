@@ -65,8 +65,8 @@ This gem automatically switches the language and device type and runs the automa
 I've been using many other solutions out there. Unfortunately none of them were perfect. The biggest issue was random timeouts of ```Instruments``` when starting the script. This problem is solved with ```snapshot```
 
 - **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
-- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This ist the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```Snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
-- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately it has a lot of open issues with the latest release of Xcode.
+- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This is the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```Snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
+- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately it has a lot of open issues with the latest release of Xcode. Also, it requires modifications of your Xcode project and schemes, which might break some other things.
 
 # Installation
 
