@@ -9,11 +9,22 @@ Snapshot - Create hundreds of iOS app screenshots
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/snapshot/blob/develop/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
-Taking perfect iOS screenshots is difficult. You usually want them to look the same in **all languages** on **all devices**. 
+You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
+*What's missing? *
 
-This easily results in over **300 screenshots** you have to create. 
+**New Screenshots**
 
-Uploading them is really easy, using [```deliver```](https://github.com/KrauseFx/deliver).
+You want them to look **perfect** and **gorgeous**. They should show the same screens on all devices in all languages.
+
+You have to manually create 20 (languages) x 4 (devices) x 5 (screenshots) = **400 screenshots**.
+
+It's hard to get everything right!
+
+- No loading indicators
+- Same content / screens
+- New screenshots with every (design) update
+- [Clean Status Bar](#use-a-clean-status-bar)
+- Uploading screenshots ([```deliver```](https://github.com/KrauseFx/deliver) is your friend)
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -40,7 +51,16 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 ## Why?
 This gem automatically switches the language and device type and runs the automation script to take all screenshots.
 
-**Why use ```snapshot``` instead of....**
+### Why should I automate this process?
+- It takes **hours** to take screenshots
+- It is an integration test: You can test for UI elements and other things inside your scripts
+- Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
+- You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script.
+- You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
+
+###Why use ```snapshot``` instead of....
+
+I've been using many other solutions out there. Unfortunately none of them were perfect. The biggest issue was random timeouts of ```Instruments``` when starting the script. This problem is solved with ```snapshot```
 
 - **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
 - **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This ist the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```Snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
