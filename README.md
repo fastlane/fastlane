@@ -105,6 +105,12 @@ To not be asked which scheme to use, just set it like this:
 scheme "Name"
 ```
 
+### Screenshots output path
+All generated screenshots will be stored in the given path.
+```ruby
+screenshots_path './screenshots'
+```
+
 ### Project Path
 By default, ```snapshot``` will look for your project in the current directory. If it is located somewhere else, pass your custom path:
 ```ruby
