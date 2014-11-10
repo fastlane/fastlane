@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://felixkrause.at"
   spec.license       = "MIT"
 
-  spec.required_ruby_version = '>= 1.9.3'
+  spec.required_ruby_version = '>= 2.0.0'
 
   spec.files = Dir["lib/**/*"] + %w{ bin/deliver README.md LICENSE }
 

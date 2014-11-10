@@ -28,14 +28,10 @@ module Deliver
       # INVALID_BINARY = "Invalid Binary"
     end
 
-    # @param options
-    #   @param apple_id The Apple ID of the app you want to modify or update. This ID has usually 9 digits
-    #   @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
-    #     which means it takes longer. If you **can** pass the app_identifier (e.g. com.facebook.Facebook) do it
-    def initialize(options = {})
-      apple_id = options.fetch(:apple_id, nil)
-      app_identifier = options.fetch(:app_identifier, nil)
-      
+    # @param apple_id The Apple ID of the app you want to modify or update. This ID has usually 9 digits
+    # @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
+    #   which means it takes longer. If you **can** pass the app_identifier (e.g. com.facebook.Facebook) do it
+    def initialize(apple_id: nil, app_identifier: nil)
       self.apple_id = (apple_id || '').to_s.gsub('id', '').to_i
       self.app_identifier = app_identifier
       
