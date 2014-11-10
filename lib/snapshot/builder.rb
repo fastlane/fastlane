@@ -6,7 +6,7 @@ module Snapshot
 
 
     def initialize
-
+      FileUtils.rm_rf(BUILD_DIR)
     end
 
     def build_app
