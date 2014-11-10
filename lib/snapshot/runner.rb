@@ -25,6 +25,9 @@ module Snapshot
 
         end
       end
+
+      Helper.log.info "Successfully finished generating screenshots.".green
+      Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
     end
 
     def clean_old_traces
