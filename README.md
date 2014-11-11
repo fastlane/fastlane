@@ -89,21 +89,19 @@ Here a few links to get started:
 - [UI Automation: An Introduction (cocoamanifest.net)](http://cocoamanifest.net/articles/2011/05/uiautomation-an-introduction.html)
 - [Functional Testing UI Automation (mattmccomb.com)](http://www.mattmccomb.com/blog/2013/06/02/ios-functional-testing-with-uiautomation/)
 
+# Quick Start
+
 ## Record your first script
-Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
 
-This will get you started. Save the generated file with the extension ```js``` into your project root. 
-
-Add ```#import "SnapshotHelper.js"``` on the top of your file.
-
-Now you can use ```captureLocalizedScreenshot('0-name')``` to take a snapshot.
+- Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
+- This will get you started. Save the generated file with the extension ```js``` into your project root. 
+- Copy the ```SnapshotHelper.js``` file from the example folder to your project.
+- Add ```#import "SnapshotHelper.js"``` on the top of your newly created JS file.
+- Now you can use ```captureLocalizedScreenshot('0-name')``` to take a snapshot.
 
 You can take a look at the example project to play around with it.
 
-# Quick Start
-
-
-The guide will create all the necessary files for you, using the existing app metadata from iTunes Connect.
+## Start ```snapshot```
 
 - ```cd [your_project_folder]```
 - ```snapshot```
