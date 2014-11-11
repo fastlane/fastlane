@@ -178,7 +178,7 @@ module Deliver
       update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
-        if keywords.sort != information[language][:keywords][:value].sort
+        if not information[language][:keywords] or keywords.sort != information[language][:keywords][:value].sort
           field.children.remove # remove old keywords
 
           node_set = Nokogiri::XML::NodeSet.new(@data)

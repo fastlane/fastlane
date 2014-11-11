@@ -87,6 +87,20 @@ describe Deliver do
             expect(meta.deliver_process.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
           end
 
+          it "Uses the given default language" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDefaultLanguage")
+            metadata = deliv.deliver_process.app.metadata
+
+            expect(deliv.deliver_process.deploy_information[:keywords]['pt-BR']).to eq(["banese", "banco", "sergipe", "finanças"])
+            expect(metadata.information['pt-BR'][:keywords][:value]).to eq(["banese", "banco", "sergipe", "finanças"])
+            expect(metadata.information['pt-BR'][:description][:value]).to eq("only description")
+            expect(metadata.information['pt-BR'][:support_url][:value]).to eq("something")
+            expect(metadata.information['pt-BR'][:version_whats_new][:value]).to eq("what's new?")
+            expect(deliv.deliver_process.deploy_information[:changelog]['pt-BR']).to eq("what's new?")
+          end
+
           it "Uploads all the available screenshots" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshots")

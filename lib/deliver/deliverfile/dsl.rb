@@ -28,7 +28,7 @@ module Deliver
               raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) 
             end
 
-            if value.kind_of?String and not not_translated.include?method_sym
+            if not value.kind_of?Hash and not not_translated.include?method_sym
               # The user should pass a hash for multi-lang values
               # Maybe he at least set a default language
               if @default_language
