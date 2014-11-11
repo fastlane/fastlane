@@ -72,11 +72,12 @@ module Snapshot
 
     # The JavaScript UIAutomation file
     def js_file
+      return manual_js_file if manual_js_file
       files = Dir.glob("./*.js").delete_if { |path| path.include?"SnapshotHelper.js" }
       if files.count == 1
         return files.first
       else
-        raise "Could not determine which UIAutomation file to use. Please pass a path to your Javascript file using 'js_path'.".red
+        raise "Could not determine which UIAutomation file to use. Please pass a path to your Javascript file using 'js_file'.".red
       end
     end
 
