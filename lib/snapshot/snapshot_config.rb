@@ -25,6 +25,9 @@ module Snapshot
     # @return (String) The path, in which the screenshots should be stored
     attr_accessor :screenshots_path
 
+    # @return (String) The path, in which the HTML file should be exported to
+    attr_accessor :html_path
+
 
     # A shared singleton
     def self.shared_instance
@@ -61,6 +64,8 @@ module Snapshot
 
       self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
+
+      self.html_path = './screenshots.html'
     end
 
     # Getters
@@ -73,6 +78,7 @@ module Snapshot
     # The JavaScript UIAutomation file
     def js_file
       return manual_js_file if manual_js_file
+
       files = Dir.glob("./*.js").delete_if { |path| path.include?"SnapshotHelper.js" }
       if files.count == 1
         return files.first

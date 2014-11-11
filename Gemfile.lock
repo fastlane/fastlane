@@ -4,13 +4,14 @@ PATH
     snapshot (0.1.0)
       colored
       commander (~> 4.2.0)
+      fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
-      plist (~> 3.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.3.6)
     codeclimate-test-reporter (0.4.1)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
@@ -19,11 +20,12 @@ GEM
       highline (~> 1.6.11)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    fastimage (1.6.3)
+      addressable (~> 2.3, >= 2.3.5)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
     multi_json (1.10.1)
-    plist (3.1.0)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)

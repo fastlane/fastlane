@@ -6,6 +6,7 @@ require 'snapshot/runner'
 require 'snapshot/builder'
 require 'snapshot/snapshot_file'
 require 'snapshot/languages'
+require 'snapshot/reports_generator'
 
 # Third Party code
 require 'colored'

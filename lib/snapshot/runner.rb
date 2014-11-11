@@ -29,6 +29,7 @@ module Snapshot
 
       Helper.log.info "Successfully finished generating #{counter} screenshots.".green
       Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
+      ReportsGenerator.new.generate
     end
 
     def clean_old_traces
@@ -86,7 +87,6 @@ module Snapshot
 
     def copy_screenshots(language)
       resulting_path = [SnapshotConfig.shared_instance.screenshots_path, language].join('/')
-      resulting_path.gsub!("~", ENV['HOME']) # some strange bug requires this
 
       FileUtils.mkdir_p resulting_path
 

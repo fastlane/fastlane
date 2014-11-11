@@ -32,15 +32,19 @@ module Snapshot
         when :js_file
           raise "js_file has to be an String".red unless value.kind_of?String
           raise "js_file at path '#{value}' not found".red unless File.exists?value
-          @config.manual_js_file = value
+          @config.manual_js_file = value.gsub("~", ENV['HOME'])
         when :screenshots_path
           raise "screenshots_path has to be an String".red unless value.kind_of?String
-          @config.screenshots_path = value
+          @config.screenshots_path = value.gsub("~", ENV['HOME'])
+        when :html_path
+          raise "html_path has to be an String".red unless value.kind_of?String
+          @config.html_path = value.gsub("~", ENV['HOME'])
+          @config.html_path = @config.html_path + "/screenshots.html" unless @config.html_path.include?".html"
         when :project_path
           raise "project_path has to be an String".red unless value.kind_of?String
 
           if File.exists?value and (value.end_with?".xcworkspace" or value.end_with?".xcodeproj")
-            @config.project_path = value
+            @config.project_path = value.gsub("~", ENV['HOME'])
           else
             raise "The given project_path '#{value}' could not be found. Make sure to include the extension as well.".red
           end
