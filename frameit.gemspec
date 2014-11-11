@@ -5,7 +5,7 @@ require 'frameit/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "frameit"
-  spec.version       = Snapshot::VERSION
+  spec.version       = Frameit::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
   spec.summary       = %q{FrameIt - Want a device frame around your screenshots? Do it in an instant!}
@@ -15,8 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  # spec.files = Dir["lib/**/*"] + %w{ bin/frameit README.md LICENSE }
-  spec.files = 'lib/snapshot/version'
+  spec.files = Dir["lib/**/*"] + %w{ bin/frameit README.md LICENSE }
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -28,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'mini_magick', '~> 3.8.1' # To open, edit and export PSD files
+  spec.add_dependency 'deliver', '~> 0.2' # To determine the device type based on a screenshot file
 
   # Development only
   spec.add_development_dependency 'bundler'
