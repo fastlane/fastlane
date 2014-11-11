@@ -39,6 +39,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Easily implement a real Continuous Deployment process
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
 - Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots taken for all screen sizes)
+- Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
 
 # Installation
 
@@ -247,15 +248,10 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
 ## Automatically create screenshots
-There is no optimal solution out there (yet).
 
-Some open source tools I found helpful:
+You can easily create screenshots completely automatically in the background using [```snapshot```](https://github.com/KrauseFx/snapshot), the little brother of ```deliver```.
 
-- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: Makes use of the normal UIAutomation code based on Javascript. The script basically helps you switching the device type and simulator language. It is based on AppleScript.
-- **[rScreenshooter](https://github.com/KrauseFx/rScreenshooter)**: Similar to ui-screen-shooter, but based on Ruby. 
-- **[Subliminal](https://github.com/inkling/Subliminal)**: Write your app interaction (e.g. taps) in Objective C. It is based on UIAutomation and is well documented. Currently there are some issues with the latest release of Xcode, which are partly solved in the Xcode6 branch. Checkout my public [gist](https://gist.github.com/KrauseFx/fda87474855dfe0051e6) for running Subliminal on different devices and generating a HTML site viewing all screenshots.
-
-```Deliver``` automatically detects the device type of each screenshot based on its resolution. All you have to do is to group the screenshots by their language. Make sure you use the correct language codes.
+```Deliver``` automatically detects the device type of each screenshot based on its resolution.
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
