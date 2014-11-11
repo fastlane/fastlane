@@ -13,12 +13,13 @@ module Snapshot
 
       Builder.new.build_app
 
+      counter = 0
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language|
 
           begin
             run_tests(device, language)
-            copy_screenshots(language)
+            counter += copy_screenshots(language)
           rescue Exception => ex
             Helper.log.error(ex)
           end
@@ -26,7 +27,7 @@ module Snapshot
         end
       end
 
-      Helper.log.info "Successfully finished generating screenshots.".green
+      Helper.log.info "Successfully finished generating #{counter} screenshots.".green
       Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
     end
 
@@ -92,6 +93,7 @@ module Snapshot
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
       end
+      return Dir.glob("#{TRACE_DIR}/**/*.png").count
     end
 
     def generate_test_command(device, language, app_path)
