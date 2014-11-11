@@ -9,7 +9,7 @@ FrameIt
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/frameit/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
 
-
+Want a device frame around your screenshot? Do it in an instant!
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
