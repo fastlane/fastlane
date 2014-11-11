@@ -1,0 +1,68 @@
+PATH
+  remote: .
+  specs:
+    frameit (0.0.1)
+      colored
+      commander (~> 4.2.0)
+      fastimage (~> 1.6.3)
+      highline (~> 1.6.21)
+      json
+      mini_magick (~> 3.8.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.3.6)
+    codeclimate-test-reporter (0.4.1)
+      simplecov (>= 0.7.1, < 1.0.0)
+    coderay (1.1.0)
+    colored (1.2)
+    commander (4.2.0)
+      highline (~> 1.6.11)
+    diff-lcs (1.2.5)
+    docile (1.1.5)
+    fastimage (1.6.3)
+      addressable (~> 2.3, >= 2.3.5)
+    highline (1.6.21)
+    json (1.8.1)
+    method_source (0.8.2)
+    mini_magick (3.8.1)
+      subexec (~> 0.2.1)
+    multi_json (1.10.1)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    rake (10.3.2)
+    rspec (3.1.0)
+      rspec-core (~> 3.1.0)
+      rspec-expectations (~> 3.1.0)
+      rspec-mocks (~> 3.1.0)
+    rspec-core (3.1.5)
+      rspec-support (~> 3.1.0)
+    rspec-expectations (3.1.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.1.0)
+    rspec-mocks (3.1.2)
+      rspec-support (~> 3.1.0)
+    rspec-support (3.1.1)
+    simplecov (0.9.1)
+      docile (~> 1.1.0)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.8.0)
+    simplecov-html (0.8.0)
+    slop (3.6.0)
+    subexec (0.2.3)
+    yard (0.8.7.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler
+  codeclimate-test-reporter
+  frameit!
+  pry
+  rake
+  rspec (~> 3.1.0)
+  yard (~> 0.8.7.4)
