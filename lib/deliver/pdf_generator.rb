@@ -108,19 +108,22 @@ module Deliver
                 top -= (previous_image_height + padding)
                 move_cursor_to top
                 
-                if top < previous_image_height
-                  start_new_page
-                  top = cursor
-                end
-                
                 index = 0
+              end
+
+              # Compute the image height to know how far to move down
+              original_size = FastImage.size(screenshot.path)
+              previous_image_height = (image_width.to_f / original_size[0].to_f) * original_size[1].to_f
+
+              # If there isn't enough room for this image then start a new page
+              if top < previous_image_height
+                start_new_page
+                top = cursor
               end
 
               image screenshot.path, width: image_width, 
                                         at: [(index * (image_width + padding)), top]
 
-              original_size = FastImage.size(screenshot.path)
-              previous_image_height = (image_width.to_f / original_size[0].to_f) * original_size[1].to_f
 
               last_size = screenshot.screen_size
               index += 1
