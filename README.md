@@ -180,6 +180,12 @@ ipa do
 end
 ```
 
+#### Hide the iTunes Transporter log
+By default, the transporter log is shown, to be fully transparent. If you prefer to hide it, you can use the following option in your ```Deliverfile``` to disable it for both the upload and the download of metadata:
+```ruby
+hide_transporter_log
+```
+
 ##### What is the ```Deliverfile```?
 As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed when
 running a deployment. Therefore it's possible to fully customise the behaviour
