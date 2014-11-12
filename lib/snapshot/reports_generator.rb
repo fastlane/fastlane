@@ -37,7 +37,11 @@ module Snapshot
 
     private
       def lib_path
-        "./lib/"
+        if not Helper.is_test? and Gem::Specification::find_all_by_name('snapshot').any?
+          return [Gem::Specification.find_by_name('snapshot').gem_dir, 'lib'].join('/')
+        else
+          return './lib'
+        end
       end
 
       def available_devices
