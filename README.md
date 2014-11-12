@@ -39,19 +39,35 @@ Install the gem
 
     sudo gem install frameit
 
-Make sure, you have the latest version of the Xcode command line tools installed:
+Because of legal reasons, I can not pre-package the device frames with ```FrameIt```.
 
-    xcode-select --install
+The process of adding is really easy, just run ```frameit``` and the guide will help you set it up.
+You only have to do this once per computer.
+
+- Run ```frameit```
+- Press ```Enter```. The [Apple page](https://developer.apple.com/app-store/marketing/guidelines/#images) to download the images should open in your browser.
+- Download the devices you want to use
+- Press ```Enter```
+- Unzip and move the content of the zip files to ```~/.frameit/device_frames```
+- Press ```Enter```
   
 # Usage
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
+
+Just navigate to your folder of screenshots and try the following:
+
+- ```frameit```
+- ```frameit silver```
 
 # Tips
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
+## Uninstall
+- ```sudo gem uninstall frameit```
+- ```rm -rf ~/.frameit```
 
 # Need help?
 - If there is a technical problem with ```FrameIt```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
