@@ -56,12 +56,17 @@ module Frameit
         @color
       ]
 
-      templates = Dir["#{ENV['HOME']}/#{FrameConverter::FRAME_PATH}/**/#{parts.join('_')}*.png"]
+      templates_path = [ENV['HOME'], FrameConverter::FRAME_PATH].join('/')
+      templates = Dir["#{templates_path}/**/#{parts.join('_')}*.png"]
+
       if templates.count == 0
         if screen_size(path) == Deliver::AppScreenshot::ScreenSize::IOS_35
           Helper.log.warn "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{path}'".yellow
         else
-          Helper.log.error "Could not find a valid template for screenshot '#{path}'"
+          Helper.log.error "Could not find a valid template for screenshot '#{path}'".red
+          Helper.log.error "You can download new templates from '#{FrameConverter::DOWNLOAD_URL}'"
+          Helper.log.error "and store them in '#{templates_path}'"
+          Helper.log.error "Missing file: '#{parts.join('_')}.psd'".red
         end
         return nil
       else
