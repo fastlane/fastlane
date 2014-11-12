@@ -14,11 +14,12 @@ module Snapshot
       Builder.new.build_app
 
       counter = 0
+      errors = []
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language|
 
           begin
-            run_tests(device, language)
+            errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
           rescue Exception => ex
             Helper.log.error(ex)
@@ -27,9 +28,18 @@ module Snapshot
         end
       end
 
-      Helper.log.info "Successfully finished generating #{counter} screenshots.".green
-      Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
       ReportsGenerator.new.generate
+
+      if errors.count > 0
+        Helper.log.error "-----------------------------------------------------------"
+        Helper.log.error errors.join(' - ').red
+        Helper.log.error "-----------------------------------------------------------"
+        raise "Finished generating #{counter} screenshots with #{errors.count} errors.".red
+      else
+        Helper.log.info "Successfully finished generating #{counter} screenshots.".green
+      end
+      
+      Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
     end
 
     def clean_old_traces
@@ -50,6 +60,7 @@ module Snapshot
       retry_run = false
 
       lines = []
+      errors = []
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
           lines << line
@@ -63,8 +74,9 @@ module Snapshot
                 Helper.log.info "Successfully took screenshot 📱"
               end
             rescue Exception => ex
-              Helper.log.error lines.join('\n')
+              Helper.log.error lines.join('')
               Helper.log.error ex.to_s.red
+              errors << ex.to_s
             end
         end
       end
@@ -72,8 +84,10 @@ module Snapshot
       if retry_run
         Helper.log.error "Instruments tool failed again. Re-trying..."
         sleep 2 # We need enough sleep... that's an instruments bug
-        run_tests(device, language)
+        errors = run_tests(device, language)
       end
+
+      return errors
     end
 
     def parse_test_line(line)
