@@ -1,3 +1,5 @@
+require 'fastimage'
+
 module Frameit
   class Editor
     module Color
@@ -27,6 +29,7 @@ module Frameit
             image = MiniMagick::Image.open(screenshot)
 
             offset_information = image_offset(screenshot)
+            raise "Could not find offset_information for '#{screenshot}'" unless (offset_information and offset_information[:width])
             width = offset_information[:width]
             image.resize width
 
@@ -87,7 +90,9 @@ module Frameit
       end
 
       def orientation_name(path)
-        return Orientation::PORTRAIT # TODO: Check that
+        size = FastImage.size(path)
+        return Orientation::PORTRAIT if size[0] < size[1]
+        return Orientation::LANDSCAPE
       end
 
       def image_offset(path)
@@ -109,6 +114,29 @@ module Frameit
                 return {
                   offset: "+54+197",
                   width: 543
+                }
+              when size::IOS_IPAD
+                return {
+                  offset: '+0+0', # TODO
+                  width: ''
+                }
+            end
+          when Orientation::LANDSCAPE
+            case screen_size(path)
+              when size::IOS_55
+                return { 
+                  offset: "+146+41",
+                  width: 960
+                }
+              when size::IOS_47
+                return {
+                  offset: "+153+41",
+                  width: 946
+                }
+              when size::IOS_40
+                return {
+                  offset: "+201+48",
+                  width: 970
                 }
               when size::IOS_IPAD
                 return {
