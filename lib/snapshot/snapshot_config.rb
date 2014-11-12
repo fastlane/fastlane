@@ -41,7 +41,7 @@ module Snapshot
       if path and File.exists?path
         self.snapshot_file = SnapshotFile.new(path, self)
       else
-        Helper.log.error "Could not find './Snapfile'. It is recommended to create a file into the current directory. Using the defaults now."
+        Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now."
       end
     end
 
