@@ -54,7 +54,7 @@ module Frameit
       templates = Dir["#{FrameConverter::TEMPLATES_PATH}/**/#{parts.join('_')}*.png"]
       if templates.count == 0
         if screen_size(path) == Deliver::AppScreenshot::ScreenSize::IOS_35
-          Helper.log.warn "Unfortunately 3.5\" device frames work discontinued. Skipping screen '#{path}'".yellow
+          Helper.log.warn "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{path}'".yellow
         else
           Helper.log.error "Could not find a valid template for screenshot '#{path}'"
         end
