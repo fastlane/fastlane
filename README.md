@@ -33,10 +33,17 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Features
 
-Put a gorgeous device frame around your iOS screenshots. Support for:
+Put a gorgeous device frame around your iOS screenshots just by running one simple command. Support for:
 - iPhone 6 Plus, iPhone 6, iPhone 5s and iPad Air
 - Portrait and Landscape
 - Black and Silver devices
+
+Here is a nice gif, that shows ```frameit``` in action:
+
+![assets/FrameitGit.gif](assets/FrameitGit.gif)
+
+Here is how the result can look like
+![assets/Overview.png](assets/Overview.png)
 
 # Installation
 
