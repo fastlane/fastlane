@@ -53,13 +53,18 @@ module Snapshot
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
           lines << line
-          result = parse_test_line(line)
+          begin
+            result = parse_test_line(line)
 
-          case result
-            when :retry
-              retry_run = true
-            when :screenshot
-              Helper.log.info "Successfully took screenshot 📱"
+            case result
+              when :retry
+                retry_run = true
+              when :screenshot
+                Helper.log.info "Successfully took screenshot 📱"
+              end
+            rescue Exception => ex
+              Helper.log.error lines.join('\n')
+              Helper.log.error ex.to_s.red
             end
         end
       end
