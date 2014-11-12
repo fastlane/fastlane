@@ -47,6 +47,10 @@ Here is how the result can look like
 
 # Installation
 
+Make sure, you have the commandline tools installed
+
+    xcode-select --install
+
 Install the gem
 
     sudo gem install frameit
