@@ -10,6 +10,14 @@ Deliver - Continuous Deployment for iOS
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
+-------
+Deliver &bull;
+[Snapshot](https://github.com/KrauseFx/snapshot) &bull;
+[FrameIt](https://github.com/KrauseFx/frameit) (to be released soon)
+
+-------
+
+
 
 Updating your iOS app should not be painful and time consuming. Automate the 
 whole process to start with Continuous Deployment.
