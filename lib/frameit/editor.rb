@@ -122,8 +122,8 @@ module Frameit
                 }
               when size::IOS_IPAD
                 return {
-                  offset: '+0+0', # TODO
-                  width: ''
+                  offset: '+57+112',
+                  width: 765
                 }
             end
           when Orientation::LANDSCAPE
@@ -145,8 +145,8 @@ module Frameit
                 }
               when size::IOS_IPAD
                 return {
-                  offset: '+0+0', # TODO
-                  width: ''
+                  offset: '+113+57',
+                  width: 1024
                 }
             end
         end
