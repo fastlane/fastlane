@@ -9,7 +9,7 @@
     <img src="assets/frameit.png">
 </p>
 
-FrameIt
+FrameIt - Add gorgeous device frames around your screenshots
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -22,16 +22,12 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
-[Features](#features) &bull;
 [Installation](#installation) &bull;
 [Usage](#usage) &bull;
 [Tips](#tips) &bull;
 [Need help?](#need-help)
 
 -------
-
-
-# Features
 
 # Installation
 
