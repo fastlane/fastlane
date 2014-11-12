@@ -107,6 +107,11 @@ module Deliver
           PasswordManager.shared_manager(value)
         end
 
+        # This will hide the output of the iTunes Connect transporter while uploading/downloading
+        def hide_transporter_log
+          ItunesTransporter.hide_transporter_output
+        end
+
         # Set the apps new version number.
         # 
         # If you do not set this, it will automatically being fetched from the 

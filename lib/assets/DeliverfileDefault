@@ -2,6 +2,8 @@
 # Everything next to a # is a comment and will be ignored
 
 email '[[EMAIL]]'
+# hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
+
 
 ########################################
 # App Metadata

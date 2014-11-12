@@ -18,6 +18,11 @@ module Deliver
     OUTPUT_REGEX = />\s+(.+)/
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX
+
+    # This will be called from the Deliverfile, and disables the logging of the transpoter output
+    def self.hide_transporter_output
+      @@hide_transporter_output = true
+    end
     
     # Returns a new instance of the iTunesTranspoter.
     # If no username or password given, it will be taken from
@@ -80,6 +85,13 @@ module Deliver
         @errors = []
         @warnings = []
 
+        if defined?@@hide_transporter_output
+          # Show a one time message instead
+          Helper.log.info "Waiting for iTunes Connect transpoter to be finished.".green
+          Helper.log.info "If you want upload/download logs to be enabled, remove 'hide_transporter_log' from your Deliverfile."
+          Helper.log.info "In progress...".green
+        end
+
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
             stdin.each do |line|
@@ -119,7 +131,7 @@ module Deliver
           @warnings << $1
         end
 
-        if line =~ OUTPUT_REGEX
+        if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
           # General logging for debug purposes
           Helper.log.debug "[Transpoter Output]: #{$1}"
         end
