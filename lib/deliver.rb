@@ -22,4 +22,7 @@ require 'colored'
 
 module Deliver
   # Your code goes here...
+  
+  FONTDIR = File.expand_path(File.join(File.dirname(__FILE__), '..', 'fonts'))
+  
 end
