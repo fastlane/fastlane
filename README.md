@@ -11,10 +11,11 @@ Deliver - Continuous Deployment for iOS
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
 -------
-**Deliver** &bull;
-[Snapshot](https://github.com/KrauseFx/snapshot) &bull;
-[FrameIt](https://github.com/KrauseFx/frameit) (to be released soon)
-
+<p align="center">
+<b>Deliver</b> &bull; 
+<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull;
+<a href="https://github.com/KrauseFx/frameit">FrameIt</a> (to be released soon)
+</p>
 -------
 
 
