@@ -1,4 +1,3 @@
-require 'pry'
 module Frameit
   class Editor
     module Color
