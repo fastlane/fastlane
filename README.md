@@ -108,6 +108,8 @@ screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes)).
 
+The screenshots are ordered alphabetically. The best way to sort them is to prepend a number before the actual screenshot name.
+
 To let the computer create the screenshots for you, checkout [this section of the README](#automatically-create-screenshots).
 
 #### Upload a new ipa file with a changelog to the App Store
