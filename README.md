@@ -1,3 +1,10 @@
+-------
+<p align="center">
+<b>Deliver</b> &bull; 
+<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull;
+</p>
+-------
+
 <p align="center">
     <img src="assets/deliver.png">
 </p>
@@ -9,15 +16,6 @@ Deliver - Continuous Deployment for iOS
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
-
--------
-<p align="center">
-<b>Deliver</b> &bull; 
-<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull;
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> (to be released soon)
-</p>
--------
-
 
 
 Updating your iOS app should not be painful and time consuming. Automate the 
