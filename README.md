@@ -58,6 +58,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Very easy to integrate with ```deliver```
 - ```Snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
+After ```Snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
+![assets/htmlPage.png](assets/htmlPage.png)
+
 ## Why?
 This gem automatically switches the language and device type and runs the automation script to take all screenshots.
 
