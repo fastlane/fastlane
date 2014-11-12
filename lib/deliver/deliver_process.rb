@@ -1,9 +1,15 @@
+require 'snapshot'
+
 module Deliver
   # This class takes care of verifying all inputs and triggering the upload process
   class DeliverProcess
 
     # DeliverUnitTestsError is triggered, when the unit tests of the given block failed.
     class DeliverUnitTestsError < StandardError
+    end
+
+    # DeliverUnitTestsError is triggered, when the unit tests of the given block failed.
+    class DeliverUIAutomationError < StandardError
     end
 
     # @return (Deliver::App) The App that is currently being edited.
@@ -142,7 +148,22 @@ module Deliver
 
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
-      if screens_path
+      
+      # Check if there is a Snapfile
+      if File.exists?('./Snapfile')
+
+        Helper.log.info("Found a Snapfile, using it to create new screenshots.".green)
+        begin
+          Snapshot::Runner.new.work
+          @app.metadata.set_all_screenshots_from_path(screens_path) if screens_path
+          @app.metadata.set_all_screenshots_from_path('./screenshots')
+        rescue Exception => ex
+          # There were some UI Automation errors
+          raise DeliverUIAutomationError.new(ex)
+        end
+
+      elsif screens_path
+        # Not using Snapfile. Not a good user.
         if not @app.metadata.set_all_screenshots_from_path(screens_path)
           # This path does not contain folders for each language
           if screens_path.kind_of?String

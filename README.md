@@ -108,7 +108,9 @@ version "1.1"
 
 screenshots_path "./screenshots"
 ```
-The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes))
+The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes)).
+
+To let the computer create the screenshots for you, checkout [this section of the README](#automatically-create-screenshots).
 
 #### Upload a new ipa file with a changelog to the App Store
 This will submit a new update to Apple
@@ -261,7 +263,15 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 
 You can easily create screenshots completely automatically in the background using [```snapshot```](https://github.com/KrauseFx/snapshot), the little brother of ```deliver```.
 
-```Deliver``` automatically detects the device type of each screenshot based on its resolution.
+**Getting started:**
+
+- Run ```snapshot init``` in your project folder
+- You can edit the new ```snapshot.js``` file with your UI Automation code
+- Run ```snapshot``` to test if the screenshots work as expected
+
+From now on, when you start ```deliver```, it will first create the new screenshots for you, which then will be uploaded to iTunes Connect.
+
+More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
