@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://github.com/KrauseFx/snapshot">Deliver</a> &bull; 
+<a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
 <b>Snapshot</b> &bull; 
 <a href="https://github.com/KrauseFx/frameit">FrameIt</a>
 </p>
