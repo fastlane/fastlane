@@ -8,15 +8,17 @@ module Deliver
     # @param export_path (String) The path to a folder where the resulting PDF file should be stored. 
     def render(deliverer, export_path = nil)
       export_path ||= '/tmp'
+      fontdir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'fonts'))
       
       resulting_path = "#{export_path}/#{Time.now.to_i}.pdf"
       Prawn::Document.generate(resulting_path) do
 
+  
         # Adding Mona to handle Japanese. The Prawn docs say not to use the included Kai font so we're
         # using this 3rd-party font instead.
         
         font_families["Mona"] = {
-          :normal => { :file => "#{Deliver::FONTDIR}/mona.ttf", :font => "Mona" }
+          :normal => { :file => "#{fontdir}/mona.ttf", :font => "Mona" }
         }
         
         pdf_fallback_fonts = [ "Mona" ]
