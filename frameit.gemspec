@@ -36,7 +36,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'codeclimate-test-reporter'
-
-
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end
