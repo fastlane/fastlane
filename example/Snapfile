@@ -18,7 +18,7 @@ languages([
 screenshots_path "~/Desktop/NewScreenshots"
 
 # JavaScript UIAutomation file
-# js_file './tests.js'
+# js_file './snapshot.js'
 
 # The name of the project's scheme
 # scheme 'SchemeName'
