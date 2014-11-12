@@ -57,6 +57,8 @@ Install phantomjs (this is needed to control the iTunes Connect frontend)
 
 If you don't have homebrew installed already, [install it here](http://brew.sh/).
 
+To create new screenshots automatically, check out my other open source project [Snapshot](https://github.com/KrauseFx/snapshot).
+
 # Quick Start
 
 
