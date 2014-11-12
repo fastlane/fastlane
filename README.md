@@ -91,13 +91,10 @@ Here a few links to get started:
 
 # Quick Start
 
-## Record your first script
-
+- Run ```snapshot init``` in your project folder
 - Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
-- This will get you started. Save the generated file with the extension ```js``` into your project root. 
-- Copy the ```SnapshotHelper.js``` file from the example folder to your project.
-- Add ```#import "SnapshotHelper.js"``` on the top of your newly created JS file.
-- Now you can use ```captureLocalizedScreenshot('0-name')``` to take a snapshot.
+- This will get you started. Copy the generated code into ```./snapshot.js```. Make sure, you leave the import statement on the top.
+- To take a screenshot, use ```captureLocalizedScreenshot('0-name')```
 
 You can take a look at the example project to play around with it.
 
