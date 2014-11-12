@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    frameit (0.0.1)
+    frameit (0.1.0)
       colored
       commander (~> 4.2.0)
       deliver (~> 0.3)
