@@ -1,4 +1,3 @@
--------
 <p align="center">
 <b>Deliver</b> &bull; 
 <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull;
