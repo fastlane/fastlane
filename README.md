@@ -1,4 +1,11 @@
 <p align="center">
+<a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
+<b>Snapshot</b> &bull; 
+<a href="https://github.com/KrauseFx/frameit">FrameIt</a>
+</p>
+-------
+
+<p align="center">
     <img src="assets/snapshot.png">
 </p>
 
@@ -8,14 +15,6 @@ Snapshot - Create hundreds of iOS app screenshots
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/snapshot/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
-
--------
-<p align="center">
-<a href="https://github.com/KrauseFx/deliver">Deliver</b> &bull; 
-<b>Snapshot</b> &bull;
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> (to be released soon)
-</p>
--------
 
 
 You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
