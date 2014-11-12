@@ -10,10 +10,11 @@ Snapshot - Create hundreds of iOS app screenshots
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
 -------
-[Deliver](https://github.com/KrauseFx/deliver) &bull;
-**Snapshot** &bull;
-[FrameIt](https://github.com/KrauseFx/frameit) (to be released soon)
-
+<p align="center">
+<a href="https://github.com/KrauseFx/deliver">Deliver</b> &bull; 
+<b>Snapshot</b> &bull;
+<a href="https://github.com/KrauseFx/frameit">FrameIt</a> (to be released soon)
+</p>
 -------
 
 
