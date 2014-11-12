@@ -96,6 +96,9 @@ Here a few links to get started:
 - This will get you started. Copy the generated code into ```./snapshot.js```. Make sure, you leave the import statement on the top.
 - To take a screenshot, use ```captureLocalizedScreenshot('0-name')```
 
+Here is a nice gif, that shows ```snapshot``` in action:
+![assets/snapshot.gif](assets/snapshot.gif)
+
 You can take a look at the example project to play around with it.
 
 ## Start ```snapshot```
