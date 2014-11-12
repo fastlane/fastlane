@@ -34,7 +34,7 @@ module Frameit
 
     # The currently used version of this gem
     def self.current_version
-      FrameIt::VERSION
+      Frameit::VERSION
     end
 
     private
