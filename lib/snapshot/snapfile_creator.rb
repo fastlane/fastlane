@@ -2,14 +2,15 @@ module Snapshot
   class SnapfileCreator
     # This method will take care of creating a Snapfile
     def self.create(path)
-      path = [path, 'Snapfile'].join("/")
+      snapfile_path = [path, 'Snapfile'].join("/")
 
-      raise "Snapfile already exists at path '#{path}'. Run 'snapshot' to use Snapshot.".red if File.exists?(path)
+      raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use Snapshot.".red if File.exists?(snapfile_path)
 
-      template = File.read("#{gem_path}/lib/assets/SnapfileTemplate")
-      File.write(path, template)
+      File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))
+      File.write([path, 'snapshot.js'].join('/'), File.read("#{gem_path}/lib/assets/snapshot.js"))
+      File.write([path, 'SnapshotHelper.js'].join('/'), File.read("#{gem_path}/lib/assets/SnapshotHelper.js"))
 
-      puts "Successfully created new Snapfile at '#{path}'".green
+      puts "Successfully created new Snapfile at '#{snapfile_path}'".green
     end
 
      private
