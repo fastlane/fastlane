@@ -9,6 +9,14 @@ Snapshot - Create hundreds of iOS app screenshots
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/snapshot/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
+-------
+[Deliver](https://github.com/KrauseFx/deliver) &bull;
+**Snapshot** &bull;
+[FrameIt](https://github.com/KrauseFx/frameit) (to be released soon)
+
+-------
+
+
 You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
 *What's missing? *
 
