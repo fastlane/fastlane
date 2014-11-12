@@ -1,4 +1,11 @@
 <p align="center">
+  <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
+  <b>FrameIt</b>
+</p>
+-------
+
+<p align="center">
     <img src="assets/frameit.png">
 </p>
 
