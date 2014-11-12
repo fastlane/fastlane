@@ -22,12 +22,21 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
+[Features](#features) &bull;
 [Installation](#installation) &bull;
 [Usage](#usage) &bull;
 [Tips](#tips) &bull;
 [Need help?](#need-help)
 
 -------
+
+
+# Features
+
+Put a gorgeous device frame around your iOS screenshots. Support for:
+- iPhone 6 Plus, iPhone 6, iPhone 5s and iPad Air
+- Portrait and Landscape
+- Black and Silver devices
 
 # Installation
 
