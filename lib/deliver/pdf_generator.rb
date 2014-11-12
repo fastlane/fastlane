@@ -102,7 +102,6 @@ module Deliver
                   top = cursor
                 end
                 
-                puts "#{screenshot.path}  #{top}" 
                 index = 0
               end
 
