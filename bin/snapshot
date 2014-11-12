@@ -6,6 +6,7 @@ require 'snapshot'
 require 'commander/import'
 require 'snapshot/update_checker'
 require 'snapshot/dependency_checker'
+require 'snapshot/snapfile_creator'
 
 HighLine.track_eof = false
 
@@ -27,8 +28,17 @@ default_command :run
 
 command :run do |c|
   c.syntax = 'snapshot'
-  c.description = 'Run the script, to take all the screenshots.'
+  c.description = 'Run the script, to take all the screenshots'
   c.action do |args, options|
     Snapshot::Runner.new.work
+  end
+end
+
+command :init do |c|
+  c.syntax = 'snapshot init'
+  c.description = "Creates a new Snapfile in the current directory"
+
+  c.action do |args, options|
+    Snapshot::SnapfileCreator.create('.')
   end
 end
