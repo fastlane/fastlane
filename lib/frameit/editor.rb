@@ -16,7 +16,9 @@ module Frameit
       FrameConverter.new.run
     end
 
-    def run(path)
+    def run(path, color = Color::BLACK)
+      @color = color
+
       Dir["#{path}/**/*.png"].each do |screenshot|
         next if screenshot.include?"_framed.png"
         begin
@@ -36,6 +38,7 @@ module Frameit
 
             output_path = screenshot.gsub('.png', '_framed.png')
             result.write output_path
+            Helper.log.info "Successfully framed screenshots at path '#{output_path}'".green
           end
         rescue Exception => ex
           Helper.log.error ex
@@ -48,7 +51,7 @@ module Frameit
       parts = [
         device_name(screen_size(path)),
         orientation_name(path),
-        Color::BLACK
+        @color
       ]
 
       templates = Dir["#{FrameConverter::TEMPLATES_PATH}/**/#{parts.join('_')}*.png"]
@@ -60,7 +63,7 @@ module Frameit
         end
         return nil
       else
-        Helper.log.debug "Found template '#{templates.first}' for screenshot '#{path}'"
+        # Helper.log.debug "Found template '#{templates.first}' for screenshot '#{path}'"
         return templates.first.gsub(" ", "\ ")
       end
     end
