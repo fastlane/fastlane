@@ -18,7 +18,7 @@ Snapshot - Create hundreds of iOS app screenshots
 
 
 You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
-*What's missing? *
+What's missing?
 
 **New Screenshots**
 
