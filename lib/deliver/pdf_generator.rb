@@ -90,7 +90,7 @@ module Deliver
           move_cursor_to top
           
           if (content[:screenshots] || []).count > 0
-            content[:screenshots].sort{ |a, b| a.screen_size <=> b.screen_size }.each do |screenshot|
+            content[:screenshots].sort_by { |a| [:screen_size, :path] }.each do |screenshot|
               
               if last_size and last_size != screenshot.screen_size
                 # Next row (other simulator size)
