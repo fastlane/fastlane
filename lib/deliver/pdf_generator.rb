@@ -9,8 +9,6 @@ module Deliver
     def render(deliverer, export_path = nil)
       export_path ||= '/tmp'
       
-      pdf = Prawn::Document.new(:margin => [0, 0, 0, 0])
-      
       resulting_path = "#{export_path}/#{Time.now.to_i}.pdf"
       Prawn::Document.generate(resulting_path) do
 
@@ -27,12 +25,9 @@ module Deliver
 
           move_down 30
 
-
-
           col1 = 200
           modified_color = '0000AA'
           standard_color = '000000'
-
 
           prev_cursor = cursor.to_f
           # Description on right side
@@ -52,7 +47,6 @@ module Deliver
           title_bottom = cursor.to_f
 
           move_cursor_to prev_cursor
-
 
           all_keys = [:support_url, :privacy_url, :software_url, :keywords]
 
@@ -87,18 +81,27 @@ module Deliver
             end
           end
 
-          image_width = 60
+          image_width = bounds.width / 6 # wide enough for 5 portrait screenshots to fit
           padding = 10
           last_size = nil
           top = [cursor, title_bottom].min - padding
           index = 0
           previous_image_height = 0
+          move_cursor_to top
+          
           if (content[:screenshots] || []).count > 0
             content[:screenshots].sort{ |a, b| a.screen_size <=> b.screen_size }.each do |screenshot|
               
               if last_size and last_size != screenshot.screen_size
                 # Next row (other simulator size)
                 top -= (previous_image_height + padding)
+                move_cursor_to top
+                
+                if top < previous_image_height
+                  start_new_page
+                  top = cursor
+                end
+                
                 index = 0
               end
 
