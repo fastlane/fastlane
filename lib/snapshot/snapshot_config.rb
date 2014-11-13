@@ -62,7 +62,7 @@ module Snapshot
 
       self.screenshots_path = './screenshots'
 
-      self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil)
+      self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil) # prefer workspaces ofc
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
 
       self.html_path = './screenshots.html'
