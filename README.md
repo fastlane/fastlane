@@ -206,6 +206,11 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 ## Editing the ```Snapfile```
 Change syntax highlighting to *Ruby*.
 
+## Instruments is not responding
+Unfortunately, from time to time, ```Instruments``` decide, to not respond to anything. Which means, neither the ```Instruments``` application, nor the ```instruments``` command line work. Killing the process doesn't help.
+
+The only way to fix this, is a restart of the Mac. 
+
 # Need help?
 - If there is a technical problem with ```Snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: snapshot@felixkrause.at
