@@ -1,5 +1,5 @@
 require 'pty'
-
+require 'shellwords'
 require 'deliver/password_manager'
 
 
@@ -48,8 +48,10 @@ module Deliver
 
       result = execute_transporter(command)
 
-      if result
+      if result and File.directory?"/tmp/#{app.apple_id}.itmsp"
         Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
+      else
+        Helper.log.fatal "Could not download metadata from iTunes Connect. Do you have special characters in your password (Like ' or \")?"
       end
 
       result
@@ -159,7 +161,7 @@ module Deliver
       end
 
       def escaped_password(password)
-        password.gsub('$', '\\$')
+        Shellwords.escape(password)
       end
 
   end
