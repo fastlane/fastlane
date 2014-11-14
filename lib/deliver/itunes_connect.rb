@@ -90,7 +90,7 @@ module Deliver
         fill_in "accountpassword", with: password
 
         begin
-          wait_for_elements(".enabled").first.click
+          wait_for_elements(".enabled").first.click # Login Button
           wait_for_elements('.ng-scope.managedWidth')
         rescue
           raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")

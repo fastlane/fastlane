@@ -53,7 +53,7 @@ module Deliver
         if redownload_package
           # Delete the one that may exists already
           unless Helper.is_test?
-            `rm -fr #{dir}/*.itmsp`
+            `rm -rf #{dir}/*.itmsp`
           end
 
           # we want to update the metadata, so first we have to download the existing one
