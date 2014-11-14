@@ -150,12 +150,12 @@ module Deliver
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
       
       # Check if there is a Snapfile
-      if File.exists?('./Snapfile')
+      if File.exists?('./Snapfile') and not screens_path
 
         Helper.log.info("Found a Snapfile, using it to create new screenshots.".green)
         begin
           Snapshot::Runner.new.work
-          @app.metadata.set_all_screenshots_from_path(screens_path) if screens_path
+          Helper.log.info("Looking for screenshots in './screenshots'.".yellow)
           @app.metadata.set_all_screenshots_from_path('./screenshots')
         rescue Exception => ex
           # There were some UI Automation errors
@@ -163,6 +163,9 @@ module Deliver
         end
 
       elsif screens_path
+        if File.exists?('./Snapfile')
+          Helper.log.info("Found a Snapfile. Ignoring it. If you want 'deliver' to automatically take new screenshots for you, remove 'screenshots_path' from your 'Deliverfile'.".yellow)
+        end
         # Not using Snapfile. Not a good user.
         if not @app.metadata.set_all_screenshots_from_path(screens_path)
           # This path does not contain folders for each language
