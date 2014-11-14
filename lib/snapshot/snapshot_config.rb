@@ -28,6 +28,9 @@ module Snapshot
     # @return (String) The path, in which the HTML file should be exported to
     attr_accessor :html_path
 
+    # @return (String) The build command, wich should build the app to '/tmp/snapshot'
+    attr_accessor :build_command
+
 
     # A shared singleton
     def self.shared_instance

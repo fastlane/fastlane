@@ -10,8 +10,13 @@ module Snapshot
     end
 
     def build_app
-      raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
-      command = generate_build_command
+      command = SnapshotConfig.shared_instance.build_command
+
+      if not command
+        # That's the default case, user did not provide a custom build_command
+        raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
+        command = generate_build_command
+      end
 
       Helper.log.info "Building project '#{SnapshotConfig.shared_instance.project_name}' - this might take some time...".green
       Helper.log.debug command.yellow
@@ -60,11 +65,9 @@ module Snapshot
           "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
           "-#{proj_key} '#{proj_path}'",
           "-scheme '#{scheme}'",
-          "-configuration Debug",
           "DSTROOT='#{BUILD_DIR}'",
           "OBJROOT='#{BUILD_DIR}'",
           "SYMROOT='#{BUILD_DIR}'",
-          "ONLY_ACTIVE_ARCH=NO",
           "clean build"
         ].join(' ')
       end

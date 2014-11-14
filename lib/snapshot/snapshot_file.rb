@@ -40,6 +40,9 @@ module Snapshot
           raise "html_path has to be an String".red unless value.kind_of?String
           @config.html_path = value.gsub("~", ENV['HOME'])
           @config.html_path = @config.html_path + "/screenshots.html" unless @config.html_path.include?".html"
+        when :build_command
+          raise "build_command has to be an String".red unless value.kind_of?String
+          @config.build_command = value
         when :project_path
           raise "project_path has to be an String".red unless value.kind_of?String
 

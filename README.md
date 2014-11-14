@@ -193,6 +193,11 @@ I'll try to keep the script up to date. If you need to change the iOS version, y
 ios_version "9.0"
 ```
 
+### Custom Build Command
+If for some reason, the default build command does not work for your project, you can pass your own build script. The script will be executed **once** before the tests are being run.
+
+**Make sure** you are setting the output path to ```/tmp/snapshot```.
+
 
 # Tips
 ## Available language codes
