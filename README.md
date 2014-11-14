@@ -198,6 +198,9 @@ If for some reason, the default build command does not work for your project, yo
 
 **Make sure** you are setting the output path to ```/tmp/snapshot```.
 
+```ruby
+build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROOT='/tmp/snapshot' ... "
+```
 
 # Tips
 ## Available language codes
