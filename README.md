@@ -113,6 +113,8 @@ The screenshots are ordered alphabetically. The best way to sort them is to prep
 
 To let the computer create the screenshots for you, checkout [this section of the README](#automatically-create-screenshots).
 
+If you want to have the screenshots inside a device frame, with a background and a fancy label on top, you can use [Sketch to App Store](http://sketchtoappstore.com/).
+
 #### Upload a new ipa file with a changelog to the App Store
 This will submit a new update to Apple
 ```ruby
