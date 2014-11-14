@@ -90,9 +90,16 @@ module Deliver
         fill_in "accountpassword", with: password
 
         begin
-          wait_for_elements(".enabled").first.click # Login Button
-          wait_for_elements('.ng-scope.managedWidth')
-        rescue
+          (wait_for_elements(".enabled").first.click rescue nil) # Login Button
+          wait_for_elements('.homepageWrapper.ng-scope')
+          
+          if page.has_content?"My Apps"
+            # Everything looks good
+          else
+            raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.")
+          end
+        rescue Exception => ex
+          Helper.log.debug(ex)
           raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
