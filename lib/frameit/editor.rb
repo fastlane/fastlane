@@ -40,7 +40,7 @@ module Frameit
 
             output_path = screenshot.gsub('.png', '_framed.png')
             result.write output_path
-            Helper.log.info "Successfully framed screenshots at path '#{output_path}'".green
+            Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
           end
         rescue Exception => ex
           Helper.log.error ex
