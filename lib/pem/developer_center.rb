@@ -1,3 +1,4 @@
+require 'pry'
 require 'deliver/password_manager'
 
 require 'capybara'
@@ -17,6 +18,7 @@ module PEM
     include Capybara::DSL
 
     DEVELOPER_CENTER_URL = "https://developer.apple.com/devcenter/ios/index.action"
+    APP_IDS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
 
     def initialize
       super
@@ -36,7 +38,8 @@ module PEM
         Capybara::Poltergeist::Driver.new(a, {
           phantomjs_options: conf,
           phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
-          js_errors: false
+          js_errors: false,
+          debu: true
         })
       end
 
@@ -51,9 +54,9 @@ module PEM
     # @param user (String) (optional) The username/email address
     # @param password (String) (optional) The password
     # @return (bool) true if everything worked fine
-    # @raise [ItunesConnectGeneralError] General error while executing 
+    # @raise [DeveloperCenterGeneralError] General error while executing 
     #  this action
-    # @raise [ItunesConnectLoginError] Login data is wrong
+    # @raise [DeveloperCenterLoginError] Login data is wrong
     def login(user = nil, password = nil)
       begin
         Helper.log.info "Logging into Developer Center"
@@ -80,10 +83,12 @@ module PEM
           all(".button.large.blue.signin-button").first.click
           wait_for_elements('#aprerelease')
         rescue
-          raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+          raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
         Helper.log.info "Successfully logged into Developer Center"
+
+        binding.pry
 
         true
       rescue Exception => ex
@@ -91,7 +96,74 @@ module PEM
       end
     end
 
+    def open_app_page(app_identifier)
+      begin
+        visit APP_IDS_URL
+
+        apps = all(:xpath, "//td[@title='#{app_identifier}']")
+        if apps.count == 1
+          apps.first.click
+          return true
+        else
+          raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
+        end
+      rescue Exception => ex
+        error_occured(ex)
+      end
+    end
+
+    def verify_push_for_app(app_identifier)
+      begin
+        open_app_page(app_identifier)
+
+        click_on "Edit"
+
+        push_value = first(:css, '#pushEnabled').value
+        if push_value == "on"
+          Helper.log.info "Push for app '#{app_identifier}' is enabled."
+        else
+          Helper.log.warn "Push for app '#{app_identifier}' is disabled. This has to change."
+          first(:css, '#pushEnabled').click
+
+          # original_url = current_url
+          # all(:css, '.button.small.blue.right.submit').last.click # Submit
+          # visit original_url
+
+          create_push_for_app(app_identifier)
+        end
+
+      rescue Exception => ex
+        error_occured(ex)
+      end
+    end
+
+    def create_push_for_app(app_identifier)
+      all(:css, '.button.small.navLink.distribution.enabled').last.click # Create Certificate button
+      click_next # "Continue"
+      
+      wait_for_elements(".button.small.center") # just to finish loading
+
+      # Upload CSR file
+      first(:xpath, "//input[@type='file']").set '/Users/felixkrause/Sites/sun-tools/deployment/sun-ios/Other/Push/CertificateSigningRequest.certSigningRequest'
+      click_next # "Generate"
+
+      while all(:css, '.loadingMessage').count > 0
+        Helper.log.debug "Waiting for iTC to generate the profile"
+      end
+
+      open_app_page(app_identifier)
+      click_on "Edit"
+
+      url = all(:css, '.download-button').last['href']
+      visit ['https://developer.apple.com', url].join("/")
+    end
+
+
     private
+      def click_next
+        wait_for_elements('.button.small.blue.right.submit').last.click
+      end
+
       def error_occured(ex)
         snap
         raise ex # re-raise the error after saving the snapshot
