@@ -38,6 +38,8 @@ module Snapshot
       else
         Helper.log.info "Successfully finished generating #{counter} screenshots.".green
       end
+
+      ScreenshotFlatten.new.run(SnapshotConfig.shared_instance.screenshots_path)
       
       Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
     end

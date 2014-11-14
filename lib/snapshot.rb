@@ -7,6 +7,7 @@ require 'snapshot/builder'
 require 'snapshot/snapshot_file'
 require 'snapshot/languages'
 require 'snapshot/reports_generator'
+require 'snapshot/screenshot_flatten'
 
 # Third Party code
 require 'colored'
