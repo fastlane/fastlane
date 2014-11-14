@@ -11,11 +11,12 @@ module PEM
       app_identifier = 'net.sunapps.151'
       keychain = "PEM.keychain"
 
+      cert_file = dev.fetch_cer_file(app_identifier)
+      rsa_file = [TMP_FOLDER, 'myrsa'].join('/')
+
       previous_keychain = command("security default-keychain")
 
-      cert_file = dev.fetch_cer_file(app_identifier)
-      cert_file = "/tmp/PEM/aps_production_net.sunapps.54.cer"
-      rsa_file = [TMP_FOLDER, 'myrsa'].join('/')
+
 
       command("security create-keychain -p '' #{keychain}") # create a new keychain for this type
 

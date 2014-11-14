@@ -23,6 +23,8 @@ module PEM
     def initialize
       super
 
+      FileUtils.mkdir_p TMP_FOLDER
+
       DependencyChecker.check_dependencies
       
       Capybara.run_server = false
@@ -37,7 +39,7 @@ module PEM
         conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
         Capybara::Poltergeist::Driver.new(a, {
           phantomjs_options: conf,
-          phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
+          phantomjs_logger: File.open("#{TMP_FOLDER}/poltergeist_log.txt", "a"),
           js_errors: false,
           debu: true
         })
@@ -81,14 +83,14 @@ module PEM
 
         begin
           all(".button.large.blue.signin-button").first.click
+
           wait_for_elements('#aprerelease')
-        rescue
+        rescue Exception => ex
+          Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
         Helper.log.info "Successfully logged into Developer Center"
-
-        binding.pry
 
         true
       rescue Exception => ex
@@ -96,27 +98,19 @@ module PEM
       end
     end
 
-    def open_app_page(app_identifier)
-      begin
-        visit APP_IDS_URL
-
-        apps = all(:xpath, "//td[@title='#{app_identifier}']")
-        if apps.count == 1
-          apps.first.click
-          return true
-        else
-          raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
-        end
-      rescue Exception => ex
-        error_occured(ex)
-      end
+    def app_status(app_identifier)
+      # TODO
     end
 
-    def verify_push_for_app(app_identifier)
+    # This method will enable push for the given app
+    # and download the cer file in any case, no matter if it existed before or not
+    # @return the path to the push file
+    def fetch_cer_file(app_identifier)
       begin
         open_app_page(app_identifier)
 
         click_on "Edit"
+        wait_for_elements(".item-details") # just to finish loading
 
         push_value = first(:css, '#pushEnabled').value
         if push_value == "on"
@@ -124,39 +118,82 @@ module PEM
         else
           Helper.log.warn "Push for app '#{app_identifier}' is disabled. This has to change."
           first(:css, '#pushEnabled').click
+        end
 
-          # original_url = current_url
-          # all(:css, '.button.small.blue.right.submit').last.click # Submit
-          # visit original_url
+        sleep 1
 
+        production_block = all(:css, '.certificate').last # already a cert
+        fallback = all(:css, '.createCertificate')
+        production_block = fallback.last if (not production_block and fallback.count == 2) # no certs at all
+        
+        if production_block.all('.download-button').count == 0
+          # No production certificate yet
+          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no production certificate yet."
           create_push_for_app(app_identifier)
         end
+
+        # It is enabled, now just download it
+        # Taken from http://stackoverflow.com/a/17111206/445598
+        sleep 2
+
+        binding.pry
+        url = wait_for_elements('.download-button').last['href']
+        page.execute_script("window.downloadCSVXHR = function(){ var url = window.location.protocol + '//' + window.location.host + '#{url}'; return getFile(url); }")
+        page.execute_script("window.getFile = function(url) { var xhr = new XMLHttpRequest(); xhr.open('GET', url, false);  xhr.send(null); return xhr.responseText; }")
+        data = page.evaluate_script("downloadCSVXHR()")
+
+        path = "#{TMP_FOLDER}/aps_production_#{app_identifier}.cer"
+        File.write(path, data)
+        return path
 
       rescue Exception => ex
         error_occured(ex)
       end
     end
 
-    def create_push_for_app(app_identifier)
-      all(:css, '.button.small.navLink.distribution.enabled').last.click # Create Certificate button
-      click_next # "Continue"
-      
-      wait_for_elements(".button.small.center") # just to finish loading
 
-      # Upload CSR file
-      first(:xpath, "//input[@type='file']").set '/Users/felixkrause/Sites/sun-tools/deployment/sun-ios/Other/Push/CertificateSigningRequest.certSigningRequest'
-      click_next # "Generate"
+    private
+      def open_app_page(app_identifier)
+        begin
+          visit APP_IDS_URL
 
-      while all(:css, '.loadingMessage').count > 0
-        Helper.log.debug "Waiting for iTC to generate the profile"
+          apps = all(:xpath, "//td[@title='#{app_identifier}']")
+          if apps.count == 1
+            apps.first.click
+            sleep 1
+
+            return true
+          else
+            raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
+          end
+        rescue Exception => ex
+          error_occured(ex)
+        end
       end
 
-      open_app_page(app_identifier)
-      click_on "Edit"
+      def create_push_for_app(app_identifier)
+        wait_for_elements('.button.small.navLink.distribution.enabled').last.click # Create Certificate button
 
-      url = all(:css, '.download-button').last['href']
-      visit ['https://developer.apple.com', url].join("/")
-    end
+        sleep 2
+
+        click_next # "Continue"
+
+        sleep 1
+        wait_for_elements(".button.small.center.back") # just to wait
+
+        # Upload CSR file
+        first(:xpath, "//input[@type='file']").set Config.shared.signing_request
+
+        click_next # "Generate"
+
+        while all(:css, '.loadingMessage').count > 0
+          Helper.log.debug "Waiting for iTC to generate the profile"
+          sleep 2
+        end
+
+        open_app_page(app_identifier)
+        click_on "Edit"
+      end
 
 
     private
@@ -188,7 +225,7 @@ module PEM
           if counter > 100
             Helper.log.debug page.html
             Helper.log.debug caller
-            raise ItunesConnectGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
+            raise DeveloperCenterGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
           end
         end
         return results

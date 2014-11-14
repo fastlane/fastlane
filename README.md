@@ -19,6 +19,10 @@ Pem
 [![Build Status](https://img.shields.io/travis/KrauseFx/pem/master.svg?style=flat)](https://travis-ci.org/KrauseFx/pem)
 
 
+# Usage
+```pem status```
+```pem renew```
+```pem renew --a at.felixkrause.app```
 
 # Need help?
 - If there is a technical problem with ```PEM```, submit an issue. Run ```pem --trace``` to get the stacktrace.
