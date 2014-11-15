@@ -1,7 +1,7 @@
 <p align="center">
 <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
 <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a>
+<a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
 <b>PEM</b>
 </p>
 -------
@@ -36,7 +36,7 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 # Features
 Well, it's actually just one: Generate the ```pem```-file for your server.
 Check out this gif: 
-![assets/PEMRecording.png](assets/PEMRecording.png)
+![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
     sudo gem install pem
@@ -56,7 +56,7 @@ This does the following:
 - Download the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-You can pass parameters to the command, like this:
+You can pass parameters like this:
 
 ```pem -a at.felixkrause.app -u username```
 
