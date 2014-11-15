@@ -62,7 +62,7 @@ module PEM
     # @raise [DeveloperCenterLoginError] Login data is wrong
     def login(user = nil, password = nil)
       begin
-        Helper.log.info "Logging into Developer Center"
+        Helper.log.info "Login into iOS Developer Center"
 
         user ||= Deliver::PasswordManager.shared_manager.username
         password ||= Deliver::PasswordManager.shared_manager.password
@@ -91,7 +91,7 @@ module PEM
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
-        Helper.log.info "Successfully logged into Developer Center"
+        Helper.log.info "Login successful"
 
         true
       rescue Exception => ex
@@ -115,7 +115,7 @@ module PEM
 
         push_value = first(:css, '#pushEnabled').value
         if push_value == "on"
-          Helper.log.info "Push for app '#{app_identifier}' is enabled."
+          Helper.log.info "Push for app '#{app_identifier}' is enabled"
         else
           Helper.log.warn "Push for app '#{app_identifier}' is disabled. This has to change."
           first(:css, '#pushEnabled').click
@@ -201,7 +201,7 @@ module PEM
         path = "#{TMP_FOLDER}/aps_production_#{app_identifier}.cer"
         File.write(path, data)
 
-        Helper.log.debug "Successfully downloaded latest .cer file."
+        Helper.log.info "Successfully downloaded latest .cer file."
         return path
 
       rescue Exception => ex
