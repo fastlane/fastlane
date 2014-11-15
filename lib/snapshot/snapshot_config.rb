@@ -46,6 +46,8 @@ module Snapshot
       else
         Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now."
       end
+
+      load_env
     end
 
     def set_defaults
@@ -69,6 +71,12 @@ module Snapshot
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
 
       self.html_path = './screenshots.html'
+    end
+
+    def load_env
+      # Load environment variables
+      self.manual_scheme = ENV["SNAPSHOT_SCHEME"] if ENV["SNAPSHOT_SCHEME"]
+      self.screenshots_path = ENV["SNAPSHOT_SCREENSHOTS_PATH"] if ENV["SNAPSHOT_SCREENSHOTS_PATH"]
     end
 
     # Getters

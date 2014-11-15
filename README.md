@@ -167,12 +167,14 @@ To not be asked which scheme to use, just set it like this:
 ```ruby
 scheme "Name"
 ```
+You can also use the environment variable ```SNAPSHOT_SCHEME```.
 
 ### Screenshots output path
 All generated screenshots will be stored in the given path.
 ```ruby
 screenshots_path './screenshots'
 ```
+You can also use the environment variable ```SNAPSHOT_SCREENSHOTS_PATH```.
 
 ### Project Path
 By default, ```snapshot``` will look for your project in the current directory. If it is located somewhere else, pass your custom path:
