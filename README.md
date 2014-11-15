@@ -28,9 +28,15 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 [Installation](#installation) &bull;
 [Usage](#usage) &bull;
 [How does it work?](#how-does-it-work) &bull;
+[Tips](#tips) &bull;
 [Need help?](#need-help)
 
 -------
+
+# Features
+Well, it's actually just one: Generate the ```pem```-file for your server.
+Check out this gif: 
+![assets/PEMRecording.png](assets/PEMRecording.png)
 
 # Installation
     sudo gem install pem
@@ -70,6 +76,13 @@ There are 2 actions involved:
 
 ## How is my password stored?
 ```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver) for more information.
+
+# Tips
+## Use the ```Provisioning Quicklook plugin```
+Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
+
+It will show you the ```pem```-files like this: 
+![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 
 # Need help?
