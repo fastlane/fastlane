@@ -8,7 +8,7 @@ module PEM
 
       dev = PEM::DeveloperCenter.new
 
-      app_identifier = 'net.sunapps.151'
+      app_identifier = 'net.sunapps.4'
       keychain = "PEM.keychain"
 
       cert_file = dev.fetch_cer_file(app_identifier)

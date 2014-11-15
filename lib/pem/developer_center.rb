@@ -21,6 +21,9 @@ module PEM
     DEVELOPER_CENTER_URL = "https://developer.apple.com/devcenter/ios/index.action"
     APP_IDS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
 
+    # Strings
+    PRODUCTION_SSL_CERTIFICATE_TITLE = "Production SSL Certificate"
+
     def initialize
       super
 
@@ -122,16 +125,64 @@ module PEM
 
         sleep 1
 
-        production_block = all(:css, '.certificate').last # already a cert
-        fallback = all(:css, '.createCertificate')
-        production_block = fallback.last if (not production_block and fallback.count == 2) # no certs at all
-        
-        if production_block.all('.download-button').count == 0
-          # No production certificate yet
-          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no production certificate yet."
-          create_push_for_app(app_identifier)
+        # Example code
+        # <div class="appCertificates">
+        #   <h3>Apple Push Notification service SSL Certificates</h3>
+        #   <p>To configure push notifications for this iOS App ID, a Client SSL Certificate that allows your notification server to connect to the Apple Push Notification Service is required. Each iOS App ID requires its own Client SSL Certificate. Manage and generate your certificates below.</p>
+        #   <div class="title" data-hires-status="replaced">Development SSL Certificate</div>
+        #   <div class="createCertificate">
+        #     <p>Create  certificate to use for this App ID.</p>
+        #       <a class="button small navLink development enabled" href="/account/ios/certificate/certificateRequest.action?appIdId=...&amp;types=..."><span>Create Certificate...</span></a>
+        #   </div>              
+        #   <div class="title" data-hires-status="replaced">Production SSL Certificate</div>
+        #   <div class="certificate">
+        #     <dl>
+        #       <dt>Name:</dt>
+        #       <dd>Apple Production iOS Push Services: net.sunapps.151</dd>
+        #       <dt>Type:</dt>
+        #       <dd>APNs Production iOS</dd>
+        #       <dt>Expires:</dt>
+        #       <dd>Nov 14, 2015</dd>
+        #     </dl>
+        #     <a class="button small revoke-button" href="https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action?content-type=application/x-www-form-urlencoded&amp;accept=application/json&amp;requestId=....;userLocale=en_US&amp;teamId=...&amp;certificateId=...&amp;type=...."><span>Revoke</span></a>
+        #     <a class="button small download-button" href="/account/ios/certificate/certificateContentDownload.action?displayId=....&amp;type=..."><span>Download</span></a>                  
+        #   </div>
+        #   <div class="createCertificate">
+        #     <p>Create an additional certificate to use for this App ID.</p>
+        #       <a class="button small navLink distribution enabled" href="/account/ios/certificate/certificateRequest.action?appIdId=...&amp;types=..."><span>Create Certificate...</span></a>              
+        #   </div>
+        # </div>
+
+        def find_download_button
+          wait_for_elements(".formContent")
+
+          certificates_block = first('.appCertificates')
+          download_button = nil
+
+          production_section = false
+          certificates_block.all(:xpath, "./div").each do |div|
+            if production_section
+              # We're now in the second part, we only care about production certificates
+              if (download_button = div.first(".download-button"))
+                return download_button
+              end
+            end
+
+            production_section = true if div.text == PRODUCTION_SSL_CERTIFICATE_TITLE
+          end
+          nil
         end
 
+
+        download_button = find_download_button
+
+        if not download_button
+          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no production certificate yet."
+          create_push_for_app(app_identifier)
+
+          download_button = find_download_button
+          raise "Could not find download button for Production SSL Certificate. Check out: '#{current_url}'" unless download_button
+        end
 
 
         Helper.log.info "Going to download the latest profile"
@@ -141,11 +192,13 @@ module PEM
         sleep 2
 
         host = Capybara.current_session.current_host
-        url = wait_for_elements('.download-button').last['href']
+        url = download_button['href']
         url = [host, url].join('')
         
         myacinfo = page.driver.cookies['myacinfo'].value # some magic Apple, which is required for the profile download
         data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
+
+        raise "Something went wrong when downloading the certificate" unless data
 
         path = "#{TMP_FOLDER}/aps_production_#{app_identifier}.cer"
         File.write(path, data)
