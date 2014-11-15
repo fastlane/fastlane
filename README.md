@@ -282,6 +282,13 @@ From now on, when you start ```deliver```, it will first create the new screensh
 
 More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
+## Jenkins integration
+Depending on how you set up your Jenkins instance, there might be problems with the ```phantomjs``` dependency.
+
+I've been using [Jenkins App](https://github.com/stisti/jenkins-app) for a long time, where ```Deliver``` works just fine. 
+
+You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
+
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
 
