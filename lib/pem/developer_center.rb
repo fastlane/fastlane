@@ -1,5 +1,6 @@
 require 'pry'
 require 'deliver/password_manager'
+require 'open-uri'
 
 require 'capybara'
 require 'capybara/poltergeist'
@@ -40,8 +41,7 @@ module PEM
         Capybara::Poltergeist::Driver.new(a, {
           phantomjs_options: conf,
           phantomjs_logger: File.open("#{TMP_FOLDER}/poltergeist_log.txt", "a"),
-          js_errors: false,
-          debu: true
+          js_errors: false
         })
       end
 
@@ -132,15 +132,20 @@ module PEM
           create_push_for_app(app_identifier)
         end
 
+
+
+        Helper.log.info "Going to download the latest profile"
+
         # It is enabled, now just download it
         # Taken from http://stackoverflow.com/a/17111206/445598
         sleep 2
 
-        binding.pry
+        host = Capybara.current_session.current_host
         url = wait_for_elements('.download-button').last['href']
-        page.execute_script("window.downloadCSVXHR = function(){ var url = window.location.protocol + '//' + window.location.host + '#{url}'; return getFile(url); }")
-        page.execute_script("window.getFile = function(url) { var xhr = new XMLHttpRequest(); xhr.open('GET', url, false);  xhr.send(null); return xhr.responseText; }")
-        data = page.evaluate_script("downloadCSVXHR()")
+        url = [host, url].join('')
+        
+        myacinfo = page.driver.cookies['myacinfo'].value # some magic Apple, which is required for the profile download
+        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
 
         path = "#{TMP_FOLDER}/aps_production_#{app_identifier}.cer"
         File.write(path, data)
