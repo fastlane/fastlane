@@ -19,10 +19,50 @@ Pem
 [![Build Status](https://img.shields.io/travis/KrauseFx/pem/master.svg?style=flat)](https://travis-ci.org/KrauseFx/pem)
 
 
+Tired of manually creating and maintaining your push notification profiles? Tired of generating a ```pem``` file for your server? 
+
+```PEM``` does all that for, just by running ```pem```!
+
+-------
+[Features](#features) &bull;
+[Installation](#installation) &bull;
+[Usage](#usage) &bull;
+[How does it work?](#how-does-it-work) &bull;
+[Need help?](#need-help)
+
+-------
+
+# Installation
+    sudo gem install pem
+
+Make sure, you have the latest version of the Xcode command line tools installed:
+
+    xcode-select --install
+
 # Usage
-```pem status```
-```pem renew```
-```pem renew --a at.felixkrause.app```
+
+```pem ```
+
+This command does the following:
+
+- Verifies the production push certificate looks alright
+- Download the certificate
+- Generates a new ```.pem``` file in the current working directory, which you can upload to your server
+
+You can pass parameters to the command, like this:
+
+```pem renew -a at.felixkrause.app -u username```
+
+## Environment Variables
+In case you prefer environment variables:
+
+- ```PEM_USERNAME```
+- ```PEM_APP_IDENTIFIER```
+
+# How does it work?
+
+TODO
+
 
 # Need help?
 - If there is a technical problem with ```PEM```, submit an issue. Run ```pem --trace``` to get the stacktrace.
