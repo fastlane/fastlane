@@ -5,6 +5,7 @@ module PEM
       # Keychain (security) documentation: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/security.1.html
       # Old project, which might be helpful: https://github.com/jprichardson/keychain_manager
 
+      Helper.log.info "Refreshing push notification profiles for app '#{app_identifier}'"
 
       dev = PEM::DeveloperCenter.new
 
@@ -44,7 +45,7 @@ module PEM
       def command(com)
         puts com.yellow
         result = `#{com}`
-        puts result
+        puts result if (result || '').length > 0
         result
       end
   end
