@@ -16,7 +16,6 @@ Pem
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/pem/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
-[![Build Status](https://img.shields.io/travis/KrauseFx/pem/master.svg?style=flat)](https://travis-ci.org/KrauseFx/pem)
 
 
 Tired of manually creating and maintaining your push notification profiles? Tired of generating a ```pem``` file for your server? 
