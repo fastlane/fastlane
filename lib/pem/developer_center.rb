@@ -25,8 +25,6 @@ module PEM
     PRODUCTION_SSL_CERTIFICATE_TITLE = "Production SSL Certificate"
 
     def initialize
-      super
-
       FileUtils.mkdir_p TMP_FOLDER
 
       DependencyChecker.check_dependencies

@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'pem'
+require 'commander/import'
+require 'pem/update_checker'
+require 'deliver/password_manager'
+
+HighLine.track_eof = false
+
+
+# Commander
+program :version, PEM::VERSION
+program :description, 'CLI for \'PEM\' - Automate maintaining of push notification profiles.'
+program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
+program :help, 'Website', 'http://felixkrause.at'
+program :help, 'GitHub', 'https://github.com/krausefx/PEM'
+program :help_formatter, :compact
+
+global_option('--verbose') { $verbose = true }
+
+default_command :run
+
+
+command :renew do |c|
+  c.syntax = 'pem renew'
+  c.description = 'Renews the certificate (in case it expired) and returns the path to the generated pem file'
+
+  c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
+  c.option '-u', '--username STRING', String, 'Your Apple ID username'
+
+  c.action do |args, options|
+    app = app_identifier(options)
+    username(options)
+
+    PEM::UpdateChecker.verify_latest_version
+
+    path = PEM::CertManager.new.run(app)
+
+    if path
+      output = "./production_#{app}.pem"
+      FileUtils.mv(path, output)
+      puts output
+    end
+  end
+end
+
+default_command :status
+
+def username(options)
+  user = nil
+  user = options.username if options.username
+  user = ENV["PEM_USERNAME"] if ENV["PEM_USERNAME"]
+  
+  Deliver::PasswordManager.shared_manager(user) if user
+end
+
+def app_identifier(options)
+  return options.identifier if options.identifier
+  return ENV["PEM_APP_IDENTIFIER"] if ENV["PEM_APP_IDENTIFIER"]
+  return ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+end
