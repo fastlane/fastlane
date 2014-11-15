@@ -14,14 +14,16 @@ function captureLocalizedScreenshot(name) {
   var target = UIATarget.localTarget();
   var model = target.model();
   var rect = target.rect();
+  
+  var theSize = (rect.size.width > rect.size.height) ? rect.size.width.toFixed() : rect.size.height.toFixed();
 
   if (model.match(/iPhone/)) 
   {
-    if (rect.size.height > 667) {
+    if (theSize > 667) {
       model = "iPhone6Plus";
-    } else if (rect.size.height == 667) {
+    } else if (theSize == 667) {
       model = "iPhone6";
-    } else if (rect.size.height == 568){
+    } else if (theSize == 568){
       model = "iPhone5";
     } else {
     model = "iPhone4";
