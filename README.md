@@ -78,6 +78,9 @@ Just navigate to your folder of screenshots and try the following:
 
 # Tips
 
+## Generate screenshots
+Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
+
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
