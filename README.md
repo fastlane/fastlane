@@ -41,9 +41,10 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-```pem ```
+    pem
+Yes, that's the whole command!
 
-This command does the following:
+This does the following:
 
 - Verifies the production push certificate looks alright
 - Download the certificate
@@ -51,17 +52,24 @@ This command does the following:
 
 You can pass parameters to the command, like this:
 
-```pem renew -a at.felixkrause.app -u username```
+```pem -a at.felixkrause.app -u username```
 
 ## Environment Variables
 In case you prefer environment variables:
 
 - ```PEM_USERNAME```
 - ```PEM_APP_IDENTIFIER```
+- ```PEM_CERT_SIGNING_REQUEST``` which is used, in case a new profile needs to be created
 
 # How does it work?
+There are 2 actions involved:
 
-TODO
+- Accessing the ```iOS Dev Center``` to download the latest ```aps_production.cer```. See: [developer_center.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/developer_center.rb)
+- Generating all the necessary profiles and files to prepare the finished ```.pem``` file. See: [cert_manager.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/cert_manager.rb)
+
+
+## How is my password stored?
+```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver) for more information.
 
 
 # Need help?
