@@ -36,6 +36,7 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 # Features
 Well, it's actually just one: Generate the ```pem```-file for your server.
 Check out this gif: 
+
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
