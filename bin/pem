@@ -46,7 +46,7 @@ command :renew do |c|
   end
 end
 
-default_command :status
+default_command :renew
 
 def username(options)
   user = nil
