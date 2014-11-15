@@ -33,8 +33,10 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 -------
 
 # Features
-Well, it's actually just one: Generate the ```pem```-file for your server.
-Check out this gif: 
+Well, it's actually just one: Generate the ```pem``` file for your server.
+
+
+Check out this gif:
 
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
@@ -58,7 +60,7 @@ This does the following:
 
 You can pass parameters like this:
 
-```pem -a at.felixkrause.app -u username```
+    pem -a at.felixkrause.app -u username
 
 ## Environment Variables
 In case you prefer environment variables:
@@ -76,13 +78,13 @@ There are 2 actions involved:
 
 
 ## How is my password stored?
-```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver) for more information.
+```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
 ## Use the ```Provisioning Quicklook plugin```
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the ```pem```-files like this: 
+It will show you the ```pem``` files like this: 
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 
