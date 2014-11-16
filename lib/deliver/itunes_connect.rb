@@ -390,6 +390,9 @@ module Deliver
         raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
 
         wait_for_elements(".savingWrapper.ng-scope.ng-pristine")
+        wait_for_elements(".radiostyle")
+        sleep 3
+        
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
@@ -429,7 +432,7 @@ module Deliver
           ##################
           if page.has_content?"Content Rights"
             if not perms[:third_party_content][:contains_third_party_content] and perms[:third_party_content][:has_rights]
-              raise "contains_third_party_content must be enabled if has_rights is enabled"
+              raise "contains_third_party_content must be enabled if has_rights is enabled".red
             end
 
             begin
@@ -446,12 +449,12 @@ module Deliver
             first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
 
             if perms[:advertising_identifier]
-              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app"            
+              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app".red
             end
           end
           
 
-          Helper.log.info("Filled out the export compliance and other information on iTC")
+          Helper.log.info("Filled out the export compliance and other information on iTC".green)
 
           click_on "Submit"
           sleep 5
@@ -461,10 +464,10 @@ module Deliver
             Helper.log.info("Successfully submitted App for Review".green)
             return true
           else
-            raise "So close, it looks like there went something wrong with the actual deployment. Checkout '#{current_url}'"
+            raise "So close, it looks like there went something wrong with the actual deployment. Checkout '#{current_url}'".red
           end
         else
-          raise "Something is missing here."
+          raise "Something is missing here.".red
         end
         return false
       rescue Exception => ex
