@@ -28,6 +28,7 @@ default_command :black
 
 command :black do |c|
   c.syntax = 'frameit black'
+  c.description = "Adds a black frame around all screenshots."
 
   c.action do |args, options|
     Frameit::DependencyChecker.check_dependencies
@@ -37,6 +38,7 @@ end
 
 command :silver do |c|
   c.syntax = 'frameit silver'
+  c.description = "Adds a silver frame around all screenshots."
   
   c.action do |args, options|
     Frameit::DependencyChecker.check_dependencies
