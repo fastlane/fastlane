@@ -40,6 +40,7 @@ module Deliver
     #   when transfering
     # @raise [Deliver::TransporterInputError] when passing wrong inputs
     def download(app, dir = nil)
+      dir ||= "/tmp"
       raise TransporterInputError.new("No valid Deliver::App given") unless app.kind_of?Deliver::App
 
       Helper.log.info "Going to download app metadata from iTunesConnect"
@@ -48,7 +49,8 @@ module Deliver
 
       result = execute_transporter(command)
 
-      if result and File.directory?"/tmp/#{app.apple_id}.itmsp"
+      itmsp_path = [dir, "#{app.apple_id}.itmsp"].join('/')
+      if result and File.directory?itmsp_path
         Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
       else
         Helper.log.fatal "Could not download metadata from iTunes Connect. Do you have special characters in your password (Like ' or \")?"
