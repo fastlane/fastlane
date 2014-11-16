@@ -3,6 +3,7 @@ module Snapshot
   class ScreenshotFlatten
     # @param (String) The path in which the screenshots are located in
     def run(path)
+      Helper.log.info "Going to remove the alpha channel from generated png files"
       if image_magick_installed?
         flatten(path)
       else
@@ -13,9 +14,11 @@ module Snapshot
     end
 
     def flatten(path)
-      Dir.glob([path, '**/*.png'].join('/')).each do |file|
+      Dir.glob([path, '/**/*.png'].join('/')).each do |file|
+        Helper.log.info "Removing alpha channel from '#{file}'"
         `convert -flatten '#{file}' -alpha off -alpha remove '#{file}'`
       end
+      Helper.log.info "Finished removing the alpha channel."
     end
 
     def image_magick_installed?
