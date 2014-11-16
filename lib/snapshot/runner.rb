@@ -21,10 +21,12 @@ module Snapshot
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
-          rescue Exception => ex
+
+          rescue SystemExit, Interrupt => ex
+            raise ex # system interrupted exception (Strg + C)
+          rescue StandardError => ex
             Helper.log.error(ex)
           end
-
         end
       end
 
