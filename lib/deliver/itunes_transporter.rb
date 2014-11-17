@@ -92,8 +92,8 @@ module Deliver
         if defined?@@hide_transporter_output
           # Show a one time message instead
           Helper.log.info "Waiting for iTunes Connect transpoter to be finished.".green
-          Helper.log.info "If you want upload/download logs to be enabled, remove 'hide_transporter_log' from your Deliverfile."
-          Helper.log.info "In progress...".green
+          Helper.log.info "If you want upload/download logs to be enabled, remove 'hide_transporter_output' from your Deliverfile."
+          Helper.log.info "iTunes Transporter progress...".green
         end
 
         begin

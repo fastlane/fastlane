@@ -185,7 +185,7 @@ end
 #### Hide the iTunes Transporter log
 By default, the transporter log is shown, to be fully transparent. If you prefer to hide it, you can use the following option in your ```Deliverfile``` to disable it for both the upload and the download of metadata:
 ```ruby
-hide_transporter_log
+hide_transporter_output
 ```
 
 ##### What is the ```Deliverfile```?

@@ -108,7 +108,7 @@ module Deliver
         end
 
         # This will hide the output of the iTunes Connect transporter while uploading/downloading
-        def hide_transporter_log
+        def hide_transporter_output
           ItunesTransporter.hide_transporter_output
         end
 
