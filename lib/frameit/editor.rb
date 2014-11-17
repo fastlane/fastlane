@@ -20,7 +20,7 @@ module Frameit
     def run(path, color = Color::BLACK)
       @color = color
 
-      Dir["#{path}/**/*.png"].each do |screenshot|
+      Dir.glob("#{path}/**/*.{png,PNG}").each do |screenshot|
         next if screenshot.include?"_framed.png"
         begin
           template_path = get_template(screenshot)
@@ -38,7 +38,7 @@ module Frameit
               c.geometry offset_information[:offset]
             end
 
-            output_path = screenshot.gsub('.png', '_framed.png')
+            output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
             result.write output_path
             Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
           end
