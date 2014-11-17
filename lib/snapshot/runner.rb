@@ -16,18 +16,23 @@ module Snapshot
       counter = 0
       errors = []
       SnapshotConfig.shared_instance.devices.each do |device|
+        
+        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device)  # Callback
+
         SnapshotConfig.shared_instance.languages.each do |language|
+          SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
 
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
-
           rescue SystemExit, Interrupt => ex
             raise ex # system interrupted exception (Strg + C)
           rescue StandardError => ex
             Helper.log.error(ex)
           end
+          SnapshotConfig.shared_instance.blocks[:teardown_language].call(language, device) # Callback
         end
+        SnapshotConfig.shared_instance.blocks[:teardown_device].call(device) # Callback
       end
 
       ReportsGenerator.new.generate

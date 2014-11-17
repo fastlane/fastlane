@@ -16,7 +16,11 @@ module Snapshot
     end
 
     def method_missing(method_sym, *arguments, &block)
-      value = arguments.first || (block.call if block_given?)
+      if ["setup", "teardown"].any?{|a| method_sym.to_s.include?a }
+        value = nil # this is a block
+      else
+        value = arguments.first || (block.call if block_given?) # this is either a block or a value
+      end
 
       case method_sym
         when :devices
@@ -51,6 +55,11 @@ module Snapshot
           else
             raise "The given project_path '#{value}' could not be found. Make sure to include the extension as well.".red
           end
+
+        # Blocks
+        when :setup_for_device_change, :teardown_device, :setup_for_language_change, :teardown_language
+          raise "#{method_sym} needs to have a block provided." unless block_given?
+          @config.blocks[method_sym] = block
         else
           Helper.log.error "Unknown method #{method_sym}"
         end

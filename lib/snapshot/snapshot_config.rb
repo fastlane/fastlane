@@ -31,6 +31,9 @@ module Snapshot
     # @return (String) The build command, wich should build the app to '/tmp/snapshot'
     attr_accessor :build_command
 
+    # @return (Hash) All the blocks, which are called on specific actions
+    attr_accessor :blocks
+
 
     # A shared singleton
     def self.shared_instance
@@ -71,6 +74,14 @@ module Snapshot
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
 
       self.html_path = './screenshots.html'
+
+      empty = Proc.new {}
+      self.blocks = {
+        setup_for_device_change: empty, 
+        teardown_device: empty,
+        setup_for_language_change: empty,
+        teardown_language: empty
+      }
     end
 
     def load_env

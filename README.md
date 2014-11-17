@@ -204,6 +204,27 @@ If for some reason, the default build command does not work for your project, yo
 build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROOT='/tmp/snapshot' ... "
 ```
 
+### Custom callbacks to prepare your app
+```ruby
+setup_for_device_change do |device| 
+  puts "Preparing device: #{device}"
+end
+
+setup_for_language_change do |lang, device|
+  puts "Running #{lang} on #{device}"
+  system("./popuplateDatabase.sh")
+end
+
+teardown_language do |lang, device|
+  puts "Finished with #{lang} on #{device}"
+end
+
+teardown_device do |device|
+  puts "Cleaning device #{device}"
+  system("./cleanup.sh")
+end
+```
+
 # Tips
 ## Available language codes
 ```ruby
