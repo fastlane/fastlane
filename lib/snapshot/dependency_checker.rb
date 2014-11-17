@@ -4,6 +4,7 @@ module Snapshot
       self.check_xcode_select
       self.check_simulators
       self.check_xctool
+      self.check_for_automation_subfolder
     end
 
     def self.check_xcode_select
@@ -39,6 +40,12 @@ module Snapshot
         Helper.log.error "# Install it using 'brew install xctool'"
         Helper.log.error "# Falling back to xcode build instead "
         Helper.log.error '#############################################################'
+      end
+    end
+
+    def self.check_for_automation_subfolder
+      if File.directory?"./Automation" or File.exists?"./Automation"
+        raise "Seems like you have an 'Automation' folder in the current directory. You need to delete/rename it!".red
       end
     end
   end
