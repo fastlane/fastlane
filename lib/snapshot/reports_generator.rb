@@ -1,5 +1,5 @@
 require 'erb'
-require "fastimage"
+require 'fastimage'
 
 module Snapshot
   class ReportsGenerator
@@ -52,6 +52,7 @@ module Snapshot
           'iPhone6' => "iPhone 6",
           'iPhone5' => "iPhone 5",
           'iPhone4' => "iPhone 4",
+          'iOS-iPad' => "iPad"
         }
       end
   end
