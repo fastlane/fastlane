@@ -205,6 +205,13 @@ build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROO
 ```
 
 ### Custom callbacks to prepare your app
+Run your own script when ```snapshot``` switches the simulator type or the language. 
+This can be used to 
+- Logout the user
+- Reset all user defaults
+- Pre-fill the database
+
+To run a shell script, just use ```system('./script.sh')```.
 ```ruby
 setup_for_device_change do |device| 
   puts "Preparing device: #{device}"
