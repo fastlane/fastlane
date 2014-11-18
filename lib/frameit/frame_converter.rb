@@ -25,7 +25,7 @@ module Frameit
         system("open '#{DOWNLOAD_URL}'")
         puts "----------------------------------------------------".green
         puts "Download the zip files for the following devices".green
-        puts "iPhone 6, iPhone 6 Plus, iPhone 5s and iPad Air".green
+        puts "iPhone 6, iPhone 6 Plus, iPhone 5s and iPad mini 3".green
         puts "You only need to download the devices you want to use".green
         puts "Press Enter when you downloaded the zip files".green
         puts "----------------------------------------------------".green
@@ -37,8 +37,7 @@ module Frameit
           puts "Extract the downloaded files into the folder".green
           puts "'#{@templates_path}', which should be open in your Finder".green
           puts "You can just copy the whole content into it.".green
-          puts "The structure doesn't matter.".green
-          puts "Press Enter when you downloaded the zip files".green
+          puts "Press Enter when you extracted the files into the given folder".green
           puts "----------------------------------------------------".green
           STDIN.gets
 
