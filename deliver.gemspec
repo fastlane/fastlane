@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'prawn' # generating PDF file for the applied changes
 
-  spec.add_dependency 'snapshot', '~> 0.2.1' # creating new screenshots of your app
+  spec.add_dependency 'snapshot' # creating new screenshots of your app
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
