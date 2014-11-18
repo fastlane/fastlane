@@ -35,8 +35,8 @@ module Frameit
           system("mkdir -p '#{@templates_path}' && open '#{@templates_path}'")
           puts "----------------------------------------------------".green
           puts "Extract the downloaded files into the folder".green
-          puts "'#{@templates_path}', which should be open in your Finder'".green
-          puts "You can just copy the whole content into it.'".green
+          puts "'#{@templates_path}', which should be open in your Finder".green
+          puts "You can just copy the whole content into it.".green
           puts "The structure doesn't matter.".green
           puts "Press Enter when you downloaded the zip files".green
           puts "----------------------------------------------------".green
