@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    snapshot (0.3.0)
+    snapshot (0.3.1)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
