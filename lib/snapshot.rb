@@ -8,6 +8,7 @@ require 'snapshot/snapshot_file'
 require 'snapshot/languages'
 require 'snapshot/reports_generator'
 require 'snapshot/screenshot_flatten'
+require 'snapshot/simulators'
 
 # Third Party code
 require 'colored'

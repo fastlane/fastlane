@@ -71,8 +71,8 @@ module Snapshot
       value.each do |current|
         current += " (#{@config.ios_version} Simulator)" unless current.include?"Simulator"
 
-        unless SnapshotFile.available_devices.include?current
-          raise "Device '#{current}' not found. Available device types: #{SnapshotFile.available_devices}".red
+        unless Simulators.available_devices.include?current
+          raise "Device '#{current}' not found. Available device types: #{Simulators.available_devices}".red
         else
           @config.devices << current
         end
@@ -87,17 +87,6 @@ module Snapshot
         end
       end
       @config.languages = value
-    end
-
-    def self.available_devices
-      if not @result
-        @result = []
-        `instruments -s`.split("\n").each do |current|
-          # Example: "iPhone 5 (8.1 Simulator) [C49ECC4A-5A3D-44B6-B9BF-4E25BC326400]"
-          @result << current.split(' [').first if current.include?"Simulator"
-        end
-      end
-      return @result
     end
   end
 end
