@@ -14,36 +14,34 @@ module Frameit
     end
 
     def setup_frames
-      unless frames_exist?
+      puts "----------------------------------------------------".green
+      puts "Looks like you have no device templates installed".green
+      puts "The images can not be pre-installed due to licensing".green
+      puts "Press Enter to get started".green
+      puts "----------------------------------------------------".green
+      STDIN.gets
+      
+      system("open '#{DOWNLOAD_URL}'")
+      puts "----------------------------------------------------".green
+      puts "Download the zip files for the following devices".green
+      puts "iPhone 6, iPhone 6 Plus, iPhone 5s and iPad mini 3".green
+      puts "You only need to download the devices you want to use".green
+      puts "Press Enter when you downloaded the zip files".green
+      puts "----------------------------------------------------".green
+      STDIN.gets
+
+      while not frames_exist?
+        system("mkdir -p '#{@templates_path}' && open '#{@templates_path}'")
         puts "----------------------------------------------------".green
-        puts "Looks like you have no device templates installed".green
-        puts "The images can not be pre-installed due to licensing".green
-        puts "Press Enter to get started".green
-        puts "----------------------------------------------------".green
-        STDIN.gets
-        
-        system("open '#{DOWNLOAD_URL}'")
-        puts "----------------------------------------------------".green
-        puts "Download the zip files for the following devices".green
-        puts "iPhone 6, iPhone 6 Plus, iPhone 5s and iPad mini 3".green
-        puts "You only need to download the devices you want to use".green
-        puts "Press Enter when you downloaded the zip files".green
+        puts "Extract the downloaded files into the folder".green
+        puts "'#{@templates_path}', which should be open in your Finder".green
+        puts "You can just copy the whole content into it.".green
+        puts "Press Enter when you extracted the files into the given folder".green
         puts "----------------------------------------------------".green
         STDIN.gets
 
-        while not frames_exist?
-          system("mkdir -p '#{@templates_path}' && open '#{@templates_path}'")
-          puts "----------------------------------------------------".green
-          puts "Extract the downloaded files into the folder".green
-          puts "'#{@templates_path}', which should be open in your Finder".green
-          puts "You can just copy the whole content into it.".green
-          puts "Press Enter when you extracted the files into the given folder".green
-          puts "----------------------------------------------------".green
-          STDIN.gets
-
-          if not frames_exist?
-            puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{@templates_path}'".red
-          end
+        if not frames_exist?
+          puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{@templates_path}'".red
         end
       end
 

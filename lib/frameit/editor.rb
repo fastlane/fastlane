@@ -14,7 +14,8 @@ module Frameit
 
 
     def initialize
-      FrameConverter.new.run
+      converter = FrameConverter.new
+      converter.run unless converter.frames_exist?
     end
 
     def run(path, color = Color::BLACK)

@@ -46,6 +46,16 @@ command :silver do |c|
   end
 end
 
+command :setup do |c|
+  c.syntax = 'frameit setup'
+  c.description = "Helps you adding new frames."
+  
+  c.action do |args, options|
+    Frameit::DependencyChecker.check_dependencies
+    Frameit::FrameConverter.new.run
+  end
+end
+
 alias_command :white, :silver
 
 def shared_run(c)
