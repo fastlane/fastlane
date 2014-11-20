@@ -437,8 +437,6 @@ module Deliver
       # Checks if there is a non live version available
       # (a new version, or a new app)
       def verify_package
-        versions = fetch_value("//x:version")
-
         raise AppMetadataError.new("metadata_token is missing. This package seems to be broken") if fetch_value("//x:metadata_token").count != 1
       end
 
