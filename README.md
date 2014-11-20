@@ -23,7 +23,8 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 ```PEM``` does all that for, just by running ```pem```.
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)<br />
-Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates.
+Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates
+Alexander Schuch ([@schuchalexander](https://twitter.com/schuchalexander)) who automated the generation of the signing request 
 
 
 -------
@@ -59,7 +60,8 @@ Yes, that's the whole command!
 This does the following:
 
 - Verifies the production push certificate looks alright
-- Download the certificate
+- Renews the push certificate in case it's necessary
+- Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
 You can pass parameters like this:
@@ -71,7 +73,7 @@ In case you prefer environment variables:
 
 - ```PEM_USERNAME```
 - ```PEM_APP_IDENTIFIER```
-- ```PEM_CERT_SIGNING_REQUEST``` which is used, in case a new profile needs to be created
+- ```PEM_CERT_SIGNING_REQUEST``` in case you want to pass your own signing request file
 
 # How does it work?
 There are 2 actions involved:
@@ -79,6 +81,7 @@ There are 2 actions involved:
 - Accessing the ```iOS Dev Center``` to download the latest ```aps_production.cer```. See: [developer_center.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/developer_center.rb).
 - Generating all the necessary profiles and files to prepare the finished ```.pem``` file. See: [cert_manager.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/cert_manager.rb).
 ```PEM``` will create a temporary keychain called ```PEM.keychain``` and use that to generate the necessary profiles. That means ```PEM``` will not pollute your default keychain.
+- The ```.certSigningRequest``` file will be generated in [signing_request.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/signing_request.rb)
 
 
 ## How is my password stored?
