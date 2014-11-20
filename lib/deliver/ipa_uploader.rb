@@ -5,6 +5,10 @@ module Deliver
   class IpaUploaderError < StandardError 
   end
 
+  IpaUploaderPublishToProduction = 1
+  IpaUploaderPublishBetaBuild = 2
+  IpaUploaderJustUpload = 3
+
   # This class takes care of preparing and uploading the given ipa file
   # Metadata + IPA file can not be handled in one file
   class IpaUploader < AppMetadata
@@ -15,9 +19,10 @@ module Deliver
     # @param app (Deliver::App) The app for which the ipa should be uploaded for
     # @param dir (String) The path to where we can store (copy) the ipa file. Usually /tmp/
     # @param ipa_path (String) The path to the IPA file which should be uploaded
-    # @param is_beta_build (Bool) If it's a beta build, it will be released to the testers, otherwise into production
+    # @param publish_strategy (Int) If it's a beta build, it will be released to the testers. 
+    # If it's a production build it will be released into production. Otherwise no action.
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
-    def initialize(app, dir, ipa_path, is_beta_build)
+    def initialize(app, dir, ipa_path, publish_strategy)
       ipa_path.strip! # remove unused white spaces
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
@@ -25,7 +30,7 @@ module Deliver
       super(app, dir, false)
 
       @ipa_file = Deliver::MetadataItem.new(ipa_path)
-      @is_beta_build = is_beta_build
+      @publish_strategy = publish_strategy
     end
 
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
@@ -85,11 +90,11 @@ module Deliver
     private
       # This method will trigger the iTunesConnect class to choose the latest build
       def publish_on_itunes_connect(submit_information = nil)
-        if not @is_beta_build
+        if @publish_strategy == IpaUploaderPublishToProduction
           return publish_production_build(submit_information)
-        else
+        elsif @publish_strategy == IpaUploaderPublishBetaBuild
           return publish_beta_build
-        end
+        end 
         return false
       end
 
