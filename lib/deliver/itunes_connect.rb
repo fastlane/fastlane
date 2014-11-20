@@ -55,6 +55,8 @@ module Deliver
         })
       end
 
+      page.driver.headers = { "Accept-Language" => "en" }
+
       self.login
     end
 
