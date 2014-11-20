@@ -72,10 +72,17 @@ You only have to do this once per computer.
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
 
-Just navigate to your folder of screenshots and try the following:
+Just navigate to your folder of screenshots and use the following command:
 
-- ```frameit```
-- ```frameit silver```
+    frameit
+
+To use the silver version of the frames:
+
+    frameit silver
+    
+To run the setup proces again to add new frames use:
+
+    frameit setup
 
 # Tips
 
