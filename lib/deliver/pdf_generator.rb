@@ -8,7 +8,7 @@ module Deliver
     # @param export_path (String) The path to a folder where the resulting PDF file should be stored. 
     def render(deliverer, export_path = nil)
       export_path ||= '/tmp'
-      fontdir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'fonts'))
+      fontdir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'assets', 'fonts'))
       
       resulting_path = "#{export_path}/#{Time.now.to_i}.pdf"
       Prawn::Document.generate(resulting_path) do
