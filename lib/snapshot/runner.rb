@@ -45,8 +45,6 @@ module Snapshot
       else
         Helper.log.info "Successfully finished generating #{counter} screenshots.".green
       end
-
-      ScreenshotFlatten.new.run(SnapshotConfig.shared_instance.screenshots_path)
       
       Helper.log.info "Check it out here: #{SnapshotConfig.shared_instance.screenshots_path}".green
     end
@@ -117,6 +115,8 @@ module Snapshot
       resulting_path = [SnapshotConfig.shared_instance.screenshots_path, language].join('/')
 
       FileUtils.mkdir_p resulting_path
+
+      ScreenshotFlatten.new.run(TRACE_DIR)
 
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
