@@ -1,4 +1,3 @@
-require 'pry'
 require 'deliver/password_manager'
 require 'open-uri'
 
