@@ -1,5 +1,6 @@
 require 'deliver/password_manager'
 require 'open-uri'
+require 'openssl'
 
 require 'capybara'
 require 'capybara/poltergeist'
@@ -239,7 +240,7 @@ module PEM
         wait_for_elements(".button.small.center.back") # just to wait
 
         # Upload CSR file
-        first(:xpath, "//input[@type='file']").set signing_request
+        first(:xpath, "//input[@type='file']").set PEM::SigningRequest.get_path
 
         click_next # "Generate"
 
@@ -250,26 +251,6 @@ module PEM
 
         open_app_page(app_identifier)
         click_on "Edit"
-      end
-
-      def signing_request
-        return ENV["PEM_CERT_SIGNING_REQUEST"] if (ENV["PEM_CERT_SIGNING_REQUEST"] and File.exists?(ENV["PEM_CERT_SIGNING_REQUEST"]))
-
-        files = Dir["./*.certSigningRequest"]
-        if files.count == 1
-          Helper.log.debug "Found a .certSigningRequest at the current folder. Using that."
-          return files.first
-        end
-
-        path = nil
-        while not path or not File.exists?path
-          puts "There was no profile found. To create a new one, we need a .certSigningRequest file".yellow
-          puts "To not be asked for a .certSigningRequest, PEM will automatically look for one in the current folder".yellow
-          path = ask("Path to your .certSigningRequest file (including extension): ")
-          puts "Could not find certSigningRequest file at path '#{path}'".red unless File.exists?path
-        end
-
-        return path
       end
 
 
