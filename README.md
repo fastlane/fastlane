@@ -22,8 +22,8 @@ Tired of manually creating and maintaining your push notification profiles? Tire
 
 ```PEM``` does all that for, just by running ```pem```.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)<br />
-Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates
+Felix Krause ([@KrauseFx](https://twitter.com/KrauseFx)) the developer of ```PEM```<br />
+Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates<br />
 Alexander Schuch ([@schuchalexander](https://twitter.com/schuchalexander)) who automated the generation of the signing request 
 
 
