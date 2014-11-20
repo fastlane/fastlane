@@ -23,6 +23,7 @@ module PEM
 
     # Strings
     PRODUCTION_SSL_CERTIFICATE_TITLE = "Production SSL Certificate"
+    DEVELOPMENT_SSL_CERTIFICATE_TITLE = "Development SSL Certificate"
 
     def initialize
       FileUtils.mkdir_p TMP_FOLDER
@@ -106,7 +107,7 @@ module PEM
     # This method will enable push for the given app
     # and download the cer file in any case, no matter if it existed before or not
     # @return the path to the push file
-    def fetch_cer_file(app_identifier)
+    def fetch_cer_file(app_identifier, production)
       begin
         open_app_page(app_identifier)
 
@@ -151,35 +152,37 @@ module PEM
         #   </div>
         # </div>
 
-        def find_download_button
+        def find_download_button(section_title)
           wait_for_elements(".formContent")
 
           certificates_block = first('.appCertificates')
           download_button = nil
 
-          production_section = false
+          found_section = false
           certificates_block.all(:xpath, "./div").each do |div|
-            if production_section
+            if found_section
               # We're now in the second part, we only care about production certificates
               if (download_button = div.first(".download-button"))
                 return download_button
               end
             end
 
-            production_section = true if div.text == PRODUCTION_SSL_CERTIFICATE_TITLE
+            found_section = true if div.text == section_title
           end
           nil
         end
 
+        section_title = (production ? PRODUCTION_SSL_CERTIFICATE_TITLE : DEVELOPMENT_SSL_CERTIFICATE_TITLE)
+        certificate_type = (production ? 'production' : 'development')
 
-        download_button = find_download_button
+        download_button = find_download_button(section_title)
 
         if not download_button
-          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no production certificate yet."
-          create_push_for_app(app_identifier)
+          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no #{certificate_type} certificate yet."
+          create_push_for_app(app_identifier, production)
 
-          download_button = find_download_button
-          raise "Could not find download button for Production SSL Certificate. Check out: '#{current_url}'" unless download_button
+          download_button = find_download_button(section_title)
+          raise "Could not find download button for #{section_title}. Check out: '#{current_url}'" unless download_button
         end
 
 
@@ -198,7 +201,7 @@ module PEM
 
         raise "Something went wrong when downloading the certificate" unless data
 
-        path = "#{TMP_FOLDER}/aps_production_#{app_identifier}.cer"
+        path = "#{TMP_FOLDER}/aps_#{certificate_type}_#{app_identifier}.cer"
         File.write(path, data)
 
         Helper.log.info "Successfully downloaded latest .cer file."
@@ -229,8 +232,9 @@ module PEM
         end
       end
 
-      def create_push_for_app(app_identifier)
-        wait_for_elements('.button.small.navLink.distribution.enabled').last.click # Create Certificate button
+      def create_push_for_app(app_identifier, production)
+        element_name = (production ? '.button.small.navLink.distribution.enabled' : '.button.small.navLink.development.enabled')
+        wait_for_elements(element_name).last.click # Create Certificate button
 
         sleep 2
 

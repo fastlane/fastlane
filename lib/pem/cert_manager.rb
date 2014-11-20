@@ -1,7 +1,7 @@
 module PEM
   class CertManager
     # Download the cert, do all kinds of Keychain related things
-    def run(app_identifier)
+    def run(app_identifier, production)
       # Keychain (security) documentation: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/security.1.html
       # Old project, which might be helpful: https://github.com/jprichardson/keychain_manager
 
@@ -11,7 +11,7 @@ module PEM
 
       keychain = "PEM.keychain"
 
-      cert_file = dev.fetch_cer_file(app_identifier)
+      cert_file = dev.fetch_cer_file(app_identifier, production)
       rsa_file = [TMP_FOLDER, 'myrsa'].join('/')
 
       previous_keychain = command("security default-keychain")
@@ -30,7 +30,8 @@ module PEM
 
       command("security export -k '#{keychain}' -t all -f pkcs12 -P '' -o #{p12_file}") # export code signing identity
 
-      pem_file = [TMP_FOLDER, "production_#{app_identifier}.pem"].join('')
+      certificate_type = (production ? 'production' : 'development')
+      pem_file = [TMP_FOLDER, "#{certificate_type}_#{app_identifier}.pem"].join('')
       command("openssl pkcs12 -passin pass: -nodes -in #{p12_file} -out #{pem_file}")
 
       command("security delete-keychain #{keychain}")
