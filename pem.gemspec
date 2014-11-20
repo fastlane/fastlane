@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = PEM::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
-  spec.summary       = %q{PEM}
-  spec.description   = %q{To be announced soon}
+  spec.summary       = %q{Tired of creating and maintaining your push certification profiles? PEM does all that for you.}
+  spec.description   = %q{Tired of creating and maintaining your push certification profiles? PEM helps you creating and maintaining your iOS push notification certificates.}
   spec.homepage      = "http://felixkrause.at"
   spec.license       = "MIT"
 
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
-  spec.add_dependency 'deliver', '~> 0.3' # password manager
+  spec.add_dependency 'deliver' # password manager
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
@@ -41,7 +41,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'codeclimate-test-reporter'
-
-
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end
