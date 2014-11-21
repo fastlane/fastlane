@@ -116,7 +116,9 @@ module Snapshot
 
       FileUtils.mkdir_p resulting_path
 
-      ScreenshotFlatten.new.run(TRACE_DIR)
+      unless SnapshotConfig.shared_instance.skip_alpha_removal
+        ScreenshotFlatten.new.run(TRACE_DIR)
+      end
 
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')

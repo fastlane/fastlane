@@ -234,6 +234,9 @@ teardown_device do |device|
 end
 ```
 
+### Skip alpha removal from screenshots
+In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
+
 # Tips
 ## Available language codes
 ```ruby
