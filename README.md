@@ -80,7 +80,7 @@ To use the silver version of the frames:
 
     frameit silver
     
-To run the setup proces again to add new frames use:
+To run the setup process again to add new frames use:
 
     frameit setup
 
