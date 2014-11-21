@@ -43,6 +43,8 @@ module Frameit
             result.write output_path
             Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
           end
+        rescue SystemExit, Interrupt => ex
+          raise ex # system interrupted exception (Strg + C)
         rescue Exception => ex
           Helper.log.error ex
         end
