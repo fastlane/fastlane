@@ -169,6 +169,7 @@ module PEM
               end
             end
 
+            found_section = false if div["class"] == 'title' # next section, might be from dev to production
             found_section = true if div.text == section_title
           end
           nil
