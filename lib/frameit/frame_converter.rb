@@ -4,13 +4,7 @@ module Frameit
     FRAME_PATH = '.frameit/devices_frames'
     
     def run
-      @templates_path = "#{ENV['HOME']}/#{FRAME_PATH}"
-
       self.setup_frames
-    end
-
-    def templates_path
-      @templates_path
     end
 
     def setup_frames
@@ -31,17 +25,17 @@ module Frameit
       STDIN.gets
 
       while not frames_exist?
-        system("mkdir -p '#{@templates_path}' && open '#{@templates_path}'")
+        system("mkdir -p '#{templates_path}' && open '#{templates_path}'")
         puts "----------------------------------------------------".green
         puts "Extract the downloaded files into the folder".green
-        puts "'#{@templates_path}', which should be open in your Finder".green
+        puts "'#{templates_path}', which should be open in your Finder".green
         puts "You can just copy the whole content into it.".green
         puts "Press Enter when you extracted the files into the given folder".green
         puts "----------------------------------------------------".green
         STDIN.gets
 
         if not frames_exist?
-          puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{@templates_path}'".red
+          puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{templates_path}'".red
         end
       end
 
@@ -49,12 +43,16 @@ module Frameit
     end
 
     def frames_exist?
-      Dir["#{@templates_path}/**/*.psd"].count > 0
+      Dir["#{templates_path}/**/*.psd"].count > 0
+    end
+
+    def templates_path
+      "#{ENV['HOME']}/#{FRAME_PATH}"
     end
 
     # Converts all the PSD files to trimmed PNG files
     def convert_frames
-      Dir["#{@templates_path}/**/*.psd"].each do |psd|
+      Dir["#{templates_path}/**/*.psd"].each do |psd|
         resulting_path = psd.gsub('.psd', '.png')
         unless File.exists?resulting_path
           Helper.log.debug "Converting PSD file '#{psd}'".yellow
