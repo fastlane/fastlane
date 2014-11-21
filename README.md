@@ -70,7 +70,7 @@ You can pass parameters like this:
 
 If you want to generate a development certificate instead:
 
-    pem -a at.felixkrause.app --development
+    pem --development
 
 ## Environment Variables
 In case you prefer environment variables:
