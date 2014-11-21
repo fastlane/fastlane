@@ -44,7 +44,7 @@ module Frameit
             Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
           end
         rescue SystemExit, Interrupt => ex
-          raise ex # system interrupted exception (Strg + C)
+          raise ex # system interrupted exception (ctrl + C)
         rescue Exception => ex
           Helper.log.error ex
         end
