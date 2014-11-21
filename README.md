@@ -68,6 +68,10 @@ You can pass parameters like this:
 
     pem -a at.felixkrause.app -u username
 
+If you want to generate a development certificate instead:
+
+    pem -a at.felixkrause.app --development
+
 ## Environment Variables
 In case you prefer environment variables:
 
