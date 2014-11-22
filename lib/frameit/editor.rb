@@ -93,7 +93,7 @@ module Frameit
           when size::IOS_40
             return 'iPhone_5s'
           when size::IOS_IPAD
-            return 'iPad_Air'
+            return 'iPad_mini'
         end
       end
 
@@ -125,8 +125,8 @@ module Frameit
                 }
               when size::IOS_IPAD
                 return {
-                  offset: '+57+112',
-                  width: 765
+                  offset: '+50+134',
+                  width: 792
                 }
             end
           when Orientation::LANDSCAPE
@@ -148,8 +148,8 @@ module Frameit
                 }
               when size::IOS_IPAD
                 return {
-                  offset: '+113+57',
-                  width: 1024
+                  offset: '+133+50',
+                  width: 1058
                 }
             end
         end
