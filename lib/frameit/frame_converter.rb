@@ -24,7 +24,7 @@ module Frameit
       puts "----------------------------------------------------".green
       STDIN.gets
 
-      while not frames_exist?
+      loop do
         system("mkdir -p '#{templates_path}' && open '#{templates_path}'")
         puts "----------------------------------------------------".green
         puts "Extract the downloaded files into the folder".green
@@ -36,6 +36,8 @@ module Frameit
 
         if not frames_exist?
           puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{templates_path}'".red
+        else
+          break # everything is finished
         end
       end
 
