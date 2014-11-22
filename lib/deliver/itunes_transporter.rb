@@ -5,7 +5,7 @@ require 'deliver/password_manager'
 
 module Deliver
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
-  class TransporterInputError < StandardError 
+  class TransporterInputError < StandardError
   end
   # The TransporterTransferError occurs when some error happens
   # while uploading or downloading something from/to iTC
@@ -13,18 +13,18 @@ module Deliver
   end
 
   class ItunesTransporter
-    ERROR_REGEX = />\s*ERROR:\s+(.+)/  
+    ERROR_REGEX = />\s*ERROR:\s+(.+)/
     WARNING_REGEX = />\s*WARN:\s+(.+)/
     OUTPUT_REGEX = />\s+(.+)/
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX
 
-    # This will be called from the Deliverfile, and disables the logging of the transpoter output
+    # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
       @@hide_transporter_output = true
     end
-    
-    # Returns a new instance of the iTunesTranspoter.
+
+    # Returns a new instance of the iTunesTransporter.
     # If no username or password given, it will be taken from
     # the #{Deliver::PasswordManager}
     def initialize(user = nil, password = nil)
@@ -73,7 +73,7 @@ module Deliver
       dir += "/#{app.apple_id}.itmsp"
 
       Helper.log.info "Going to upload updated app to iTunesConnect"
-      
+
       command = build_upload_command(@user, @password, dir)
       result = execute_transporter(command)
 
@@ -91,7 +91,7 @@ module Deliver
 
         if defined?@@hide_transporter_output
           # Show a one time message instead
-          Helper.log.info "Waiting for iTunes Connect transpoter to be finished.".green
+          Helper.log.info "Waiting for iTunes Connect transporter to be finished.".green
           Helper.log.info "If you want upload/download logs to be enabled, remove 'hide_transporter_output' from your Deliverfile."
           Helper.log.info "iTunes Transporter progress...".green
         end
@@ -137,7 +137,7 @@ module Deliver
 
         if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
           # General logging for debug purposes
-          Helper.log.debug "[Transpoter Output]: #{$1}"
+          Helper.log.debug "[Transporter Output]: #{$1}"
         end
       end
 
