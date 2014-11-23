@@ -63,6 +63,7 @@ module Snapshot
 
       ENV['SNAPSHOT_LANGUAGE'] = language
       command = generate_test_command(device, language, app_path)
+      Helper.log.debug command.yellow
       
       retry_run = false
 
