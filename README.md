@@ -92,7 +92,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
     
 # UI Automation
 
-## Get started
+## Getting started
 This project uses Apple's ```UI Automation``` under the hood. I will not go into detail on how to write scripts. 
 
 Here a few links to get started:
