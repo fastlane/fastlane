@@ -39,18 +39,23 @@ module Snapshot
 
 
     # A shared singleton
-    def self.shared_instance
-      @@instance ||= SnapshotConfig.new
+    def self.shared_instance(path = nil)
+      @@instance ||= SnapshotConfig.new(path)
     end
 
     # @param path (String) the path to the config file to use (including the file name)
-    def initialize(path = './Snapfile')
+    def initialize(path = nil)
+      path ||= './Snapfile'
       set_defaults
 
       if path and File.exists?path
         self.snapshot_file = SnapshotFile.new(path, self)
       else
-        Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now."
+        if path != './Snapfile'
+          raise "Could not find Snapfile at path '#{path}'. Make sure you pass the full path, including 'Snapfile'".red
+        else
+          Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now.".red
+        end
       end
 
       load_env

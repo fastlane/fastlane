@@ -7,6 +7,7 @@ require 'commander/import'
 require 'snapshot/update_checker'
 require 'snapshot/dependency_checker'
 require 'snapshot/snapfile_creator'
+require 'snapshot/snapshot_config'
 
 HighLine.track_eof = false
 
@@ -29,7 +30,10 @@ default_command :run
 command :run do |c|
   c.syntax = 'snapshot'
   c.description = 'Run the script, to take all the screenshots'
+  c.option '--snapfile STRING', String, 'Custom path for your Snapfile'
+
   c.action do |args, options|
+    Snapshot::SnapshotConfig.shared_instance(options.snapfile) if options.snapfile # to set the custom Snapfile path if given
     Snapshot::Runner.new.work
   end
 end
