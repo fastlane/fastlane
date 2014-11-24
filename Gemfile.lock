@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    snapshot (0.3.1)
+    snapshot (0.3.2)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
@@ -16,11 +16,11 @@ GEM
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
-    commander (4.2.0)
+    commander (4.2.1)
       highline (~> 1.6.11)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastimage (1.6.3)
+    fastimage (1.6.4)
       addressable (~> 2.3, >= 2.3.5)
     highline (1.6.21)
     json (1.8.1)
