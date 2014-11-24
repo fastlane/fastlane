@@ -256,7 +256,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 Change syntax highlighting to *Ruby*.
 
 ## Instruments is not responding
-Unfortunately, from time to time, ```Instruments``` decide, to not respond to anything. Which means, neither the ```Instruments``` application, nor the ```instruments``` command line work. Killing the process doesn't help.
+Unfortunately ```Instruments``` sometimes decides, to not respond to anything. Which means, neither the ```Instruments``` application, nor the ```instruments``` command line work. Killing the process doesn't help.
 
 The only way to fix this, is a restart of the Mac. 
 
