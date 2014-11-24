@@ -238,6 +238,12 @@ end
 In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
 
 # Tips
+## Specify a custom ```Snapfile```
+
+    snapshot --snapfile ./SpecialSnapfile
+
+Be aware: The file will be executed from the current directory, not the location of the ```Snapfile```. That means: ```./screenshots``` will export the screenshots to the current directory of your terminal session.
+
 ## Available language codes
 ```ruby
 ["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
