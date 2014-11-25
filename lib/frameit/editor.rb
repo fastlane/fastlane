@@ -15,7 +15,13 @@ module Frameit
 
     def initialize
       converter = FrameConverter.new
-      converter.run unless converter.frames_exist?
+      unless converter.frames_exist?
+        # First run
+        converter.run
+      else
+        # Just make sure, the PSD files are converted to PNG
+        converter.convert_frames
+      end
     end
 
     def run(path, color = Color::BLACK)
