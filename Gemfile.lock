@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    frameit (0.1.4)
+    frameit (0.1.5)
       colored
       commander (~> 4.2.0)
       deliver (~> 0.3)
@@ -93,7 +93,7 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    snapshot (0.3.1)
+    snapshot (0.3.2)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
