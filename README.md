@@ -261,6 +261,14 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 - The iTunes search API to find missing information about a certain app, like the *apple_id* when you only pass the *bundle_identifier*. 
 
 # Tips
+
+## Other helpful tools
+Check out other tools in this collection to speed up your deployment process:
+- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
+- [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
+- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
+
+
 ## Available language codes
 ```ruby
 ["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "zh_CN", "cmn-Hant"]
