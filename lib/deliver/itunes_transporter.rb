@@ -121,8 +121,10 @@ module Deliver
       def parse_line(line)
         # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
 
+        output_done = false
         if line =~ ERROR_REGEX
           @errors << $1
+          Helper.log.error "[Transporter Error Output]: #{$1}".red
 
           # Check if it's a login error
           if $1.include?"Your Apple ID or password was entered incorrectly" or
@@ -131,13 +133,18 @@ module Deliver
             Deliver::PasswordManager.shared_manager.password_seems_wrong
           end
 
+          output_done = true
         elsif line =~ WARNING_REGEX
           @warnings << $1
+          Helper.log.warn "[Transporter Warning Output]: #{$1}".yellow
+          output_done = true
         end
 
         if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
           # General logging for debug purposes
-          Helper.log.debug "[Transporter Output]: #{$1}"
+          unless output_done
+            Helper.log.debug "[Transporter Output]: #{$1}"
+          end
         end
       end
 
