@@ -238,6 +238,14 @@ end
 In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
 
 # Tips
+
+## Other helpful tools
+Check out other tools in this collection to speed up your deployment process:
+- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command.
+- [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
+- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
+
+
 ## Specify a custom ```Snapfile```
 
     snapshot --snapfile ./SpecialSnapfile
