@@ -86,6 +86,13 @@ To run the setup process again to add new frames use:
 
 # Tips
 
+## Other helpful tools
+Check out other tools in this collection to speed up your deployment process:
+- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
+- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
+- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
+
+
 ## Generate screenshots
 Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
 
