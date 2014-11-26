@@ -1,8 +1,9 @@
 <p align="center">
-<a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
-<b>PEM</b>
+    <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
+    <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
+    <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
+    <b>PEM</b> &bull; 
+    <a href="https://github.com/KrauseFx/sigh">Sigh</a>
 </p>
 -------
 
@@ -97,6 +98,7 @@ Check out other tools in this collection to speed up your deployment process:
 - [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
 - [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
+- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
