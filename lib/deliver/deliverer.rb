@@ -18,7 +18,7 @@ module Deliver
       APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
-      BETA_IPA = :beta_ipa
+      UPLOAD_TYPE = :upload_type
       DESCRIPTION = :description
       TITLE = :title
       CHANGELOG = :changelog

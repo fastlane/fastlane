@@ -72,7 +72,7 @@ module Deliver
       used_ipa_file = @deploy_information[:ipa] || @deploy_information[:beta_ipa]
 
       if used_ipa_file
-        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build?)
+        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_type)
 
         # We are able to fetch some metadata directly from the ipa file
         # If they were also given in the Deliverfile, we will compare the values
@@ -95,7 +95,7 @@ module Deliver
     end
 
     def verify_app_on_itunesconnect
-      if @ipa and not is_beta_build?
+      if @ipa and is_release_build?
         # This is a real release, which should also upload the ipa file onto production
         @app.create_new_version!(@app_version) unless Helper.is_test?
         @app.metadata.verify_version(@app_version)
@@ -258,8 +258,16 @@ module Deliver
         return app_version
       end
 
+      def upload_type
+        @deploy_information[Deliverer::ValKey::UPLOAD_TYPE]
+      end
+
+      def is_release_build?
+        upload_type == Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
+      end
+
       def is_beta_build?
-        @deploy_information[Deliverer::ValKey::BETA_IPA] != nil
+        upload_type == Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
       end
   end
 end
