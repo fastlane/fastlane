@@ -76,11 +76,16 @@ module Sigh
         result = visit PROFILES_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
 
-        wait_for_elements(".button.blue").first.click
+        if page.has_content?"Member Center"
+          # Already logged in
+          return true
+        end
+
+        (wait_for_elements(".button.blue").first.click rescue nil) # maybe already logged in
 
         (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
 
-        if page.has_content?"My Apps"
+        if page.has_content?"Member Center"
           # Already logged in
           return true
         end
