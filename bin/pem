@@ -20,8 +20,6 @@ program :help_formatter, :compact
 
 global_option('--verbose') { $verbose = true }
 
-default_command :run
-
 
 command :renew do |c|
   c.syntax = 'pem renew'
