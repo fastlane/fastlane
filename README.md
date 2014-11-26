@@ -101,7 +101,7 @@ Check out other tools in this collection to speed up your deployment process:
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the ```pem``` files like this: 
+It will show you the ```mobileprovision``` files like this: 
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 
