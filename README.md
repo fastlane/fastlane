@@ -51,7 +51,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 ### Why not let Xcode do the work?
 
 - ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
-- Xcode sometimes invalidates all existing profiles
+- Xcode sometimes invalidates all existing profiles ([Proof](assets/SignErrors.png))
 - You have control over what happens
 - You still get to have the signing files, which you can then use for your build scripts or store in git
 
