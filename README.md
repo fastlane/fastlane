@@ -16,7 +16,7 @@ Sign - Create and maintain provisioning profiles
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sign/blob/master/LICENSE)
-[![Gem](https://img.shields.io/gem/v/sign.svg?style=flat)](http://rubygems.org/sign/pem)
+[![Gem](https://img.shields.io/gem/v/sign.svg?style=flat)](http://rubygems.org/gems/sign)
 
 
 Tired of manually creating and maintaining your provisioning profiles?
@@ -86,7 +86,7 @@ In case you prefer environment variables:
 
 
 ## How is my password stored?
-```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
+```Sign``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
 ## Other helpful tools
