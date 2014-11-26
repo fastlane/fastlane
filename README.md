@@ -80,7 +80,7 @@ If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
     sigh --adhoc
     
-If you want to generate an **Development** profile:
+If you want to generate a **Development** profile:
 
     sigh --development
 
@@ -129,7 +129,7 @@ This project is licensed under the terms of the MIT license. See the LICENSE fil
 
 # Contributing
 
-1. Create an issue to discuss about your idea
+1. Create an issue to start a discussion about your idea
 2. Fork it (https://github.com/KrauseFx/sigh/fork)
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Commit your changes (`git commit -am 'Add some feature'`)
