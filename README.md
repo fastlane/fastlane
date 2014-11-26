@@ -12,15 +12,16 @@
     <img src="assets/sigh.png">
 </p>
 
-Sigh - Create and maintain provisioning profiles
+Sigh
 ============
+#### Because you would rather spend your time building stuff than fighting provisioning
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sigh/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
 
 
-Tired of manually creating and maintaining your provisioning profiles?
+Tired of manually creating, renewing and downloading your provisioning profiles?
 
 ```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
 
@@ -42,11 +43,12 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 - **Download** the latest provisioning profile for your app
 - **Renew** a provisioning profile, when it has expired
+- **Repair** a provisioning profile, when it is broken
 - **Create** a new provisioning profile, if it doesn't exist already
 - Support for both **App Store**, **Ad Hoc** and **Development** profiles
 
 
-Check out this gif:
+See ```sigh``` in action:
 
 ![assets/sighRecording.gif](assets/sighRecording.gif)
 
