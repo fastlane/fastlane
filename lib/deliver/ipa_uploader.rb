@@ -5,9 +5,9 @@ module Deliver
   class IpaUploaderError < StandardError 
   end
 
-  IpaUploaderPublishToProduction = 1
-  IpaUploaderPublishBetaBuild = 2
-  IpaUploaderJustUpload = 3
+  IPA_UPLOAD_STRATEGY_APP_STORE = 1
+  IPA_UPLOAD_STRATEGY_BETA_BUILD = 2
+  IPA_UPLOAD_STRATEGY_JUST_UPLOAD = 3
 
   # This class takes care of preparing and uploading the given ipa file
   # Metadata + IPA file can not be handled in one file
@@ -90,9 +90,9 @@ module Deliver
     private
       # This method will trigger the iTunesConnect class to choose the latest build
       def publish_on_itunes_connect(submit_information = nil)
-        if @publish_strategy == IpaUploaderPublishToProduction
+        if @publish_strategy == IPA_UPLOAD_STRATEGY_APP_STORE
           return publish_production_build(submit_information)
-        elsif @publish_strategy == IpaUploaderPublishBetaBuild
+        elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
         end 
         return false
