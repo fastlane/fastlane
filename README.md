@@ -109,7 +109,7 @@ In case you prefer environment variables:
 ## How is my password stored?
 ```sigh``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
-# Tipsbo
+# Tips
 ## Other helpful tools
 Check out other tools in this collection to speed up your deployment process:
 
