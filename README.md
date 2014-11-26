@@ -5,6 +5,7 @@
 <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
 <b>Sigh</b>
 </p>
+
 -------
 
 <p align="center">
@@ -61,11 +62,17 @@ Make sure, you have the latest version of the Xcode command line tools installed
     sigh
 Yes, that's the whole command!
 
-You can pass parameters like this:
+```sigh``` will create, repair and download profiles for the App Store by default. 
+
+You can pass your bundle identifier and username like this:
 
     sigh -a at.felixkrause.app -u username
 
-If you want to generate an Ad Ho profile instead:
+If you want to generate an **Ad Hoc** profile instead of an App Store profile:
+
+    sigh --adhoc
+    
+If you want to generate an **Development** profile:
 
     sigh --development
 
