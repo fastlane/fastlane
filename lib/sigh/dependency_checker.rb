@@ -2,7 +2,7 @@ module Sigh
   class DependencyChecker
     def self.check_dependencies
       self.check_phantom_js
-      self.check_xcode_select
+      self.check_xcode_select unless Helper.is_test?
     end
     
     def self.check_phantom_js
