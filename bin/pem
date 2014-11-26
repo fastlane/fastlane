@@ -41,7 +41,7 @@ command :renew do |c|
       file_name = File.basename(path)
       output = "./#{file_name}"
       FileUtils.mv(path, output)
-      puts output
+      puts output.green
     end
   end
 end
