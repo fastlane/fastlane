@@ -151,7 +151,7 @@ module Sign
             if current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif ['Expired', 'Invalid'].include?current_cert['status']
-              renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
+              renew_profile(current_cert['provisioningProfileId'], type) # This one needs to be renewed
               return maintain_app_certificate(app_identifier, type) # recursive
             end
 
@@ -160,7 +160,7 @@ module Sign
         end
 
         Helper.log.info "Could not find existing profile. Trying to create a new one.".yellow
-        if type == APPSTORE
+        if type != APPSTORE
           # Certificate does not exist yet, we need to create a new one
           create_profile(app_identifier, type)
           # After creating the profile, we need to download it
@@ -175,14 +175,18 @@ module Sign
 
     def create_profile(app_identifier, type)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificate = code_signing_certificate
+      certificate = code_signing_certificate type
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
 
       # 1) Select the profile type (AppStore, Adhoc)
       wait_for_elements('#type-production')
-      first(:xpath, "//input[@type='radio' and @value='store']").click
+      if type == DEVELOPMENT 
+        first(:xpath, "//input[@type='radio' and @value='limited']").click
+      else 
+        first(:xpath, "//input[@type='radio' and @value='store']").click
+      end
       click_next
 
       # 2) Select the App ID
@@ -213,8 +217,8 @@ module Sign
       wait_for_elements('.row-details')
     end
 
-    def renew_profile(profile_id)
-      certificate = code_signing_certificate
+    def renew_profile(profile_id, type)
+      certificate = code_signing_certificate type
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
@@ -278,20 +282,29 @@ module Sign
         # "certificateTypeDisplayId"=>"...",
         # "serialNum"=>"....",
         # "typeString"=>"iOS Distribution"},
-      def code_signing_certificate
-        visit "https://developer.apple.com/account/ios/certificate/certificateList.action?type=distribution"
+      def code_signing_certificate(type)
+        certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type="
+        certs_url << "distribution" if type != DEVELOPMENT
+        certs_url << "development" if type == DEVELOPMENT
+        visit certs_url
+
         certificateDataURL = page.html.match(/var certificateDataURL = "(.*)"/)[1]
         certificateRequestTypes = page.html.match(/var certificateRequestTypes = "(.*)"/)[1]
         certificateStatuses = page.html.match(/var certificateStatuses = "(.*)"/)[1]
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
+
+        my_name = find("#content").find(".topbar").find(".section-title").value
+        puts "MY NAME: #{my_name}"
         
         certs = post_ajax(url)['certRequests']
         certs.each do |current_cert|
-          if current_cert['typeString'] == 'iOS Distribution'
+          if type != DEVELOPMENT && current_cert['typeString'] == 'iOS Distribution' 
             # The other profiles are push profiles
             # We only care about the distribution profile
+            return current_cert # mostly we only care about the 'certificateId'
+          elsif type == DEVELOPMENT &&  current_cert['typeString'] == 'iOS Development' 
             return current_cert # mostly we only care about the 'certificateId'
           end
         end
