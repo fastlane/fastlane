@@ -46,6 +46,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - **Repair** a provisioning profile, when it is broken
 - **Create** a new provisioning profile, if it doesn't exist already
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
+- Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
 ### Why not let Xcode do the work?
 
