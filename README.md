@@ -41,8 +41,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 - **Download** the latest provisioning profile for your app
 - **Renew** a provisioning profile, when it has expired
-- **Create** a new App Store provisioning profile, if it doesn't exist yet
-- Support for both **App Store** and **Ad Hoc** profiles
+- **Create** a new provisioning profile, if it doesn't exist already
+- Support for both **App Store**, **Ad Hoc** and **Development** profiles
 
 
 Check out this gif:
