@@ -3,7 +3,7 @@
 <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
 <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
 <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-<b>sigh</b>
+<b>Sigh</b>
 </p>
 -------
 
@@ -11,7 +11,7 @@
     <img src="assets/sigh.png">
 </p>
 
-sigh - Create and maintain provisioning profiles
+Sigh - Create and maintain provisioning profiles
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
