@@ -1,6 +1,7 @@
-require 'sigh'
-describe "Something" do 
-  it 'works' do
+require 'spec_helper'
+
+describe "Create certificates" do 
+  it 'AppStore, Development and Ad Hoc' do
     system("rm -rf /tmp/sigh/")
     ENV["DELIVER_USER"] = "felix@sunapps.net"
     
