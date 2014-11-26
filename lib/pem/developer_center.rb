@@ -102,10 +102,6 @@ module PEM
       end
     end
 
-    def app_status(app_identifier)
-      # TODO
-    end
-
     # This method will enable push for the given app
     # and download the cer file in any case, no matter if it existed before or not
     # @return the path to the push file
