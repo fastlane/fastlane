@@ -98,7 +98,7 @@ Check out other tools in this collection to speed up your deployment process:
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
 - [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
 
-## Use the ```Provisioning Quicklook plugin```
+## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the ```pem``` files like this: 
