@@ -47,6 +47,12 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - **Create** a new provisioning profile, if it doesn't exist already
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
 
+### Why not let Xcode do the work?
+
+- ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
+- Xcode sometimes invalidates all existing profiles
+- You have control over what happens
+- You still get to have the signing files, which you can then use for your build scripts or store in git
 
 See ```sigh``` in action:
 
