@@ -27,6 +27,7 @@ command :renew do |c|
 
   c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
   c.option '-u', '--username STRING', String, 'Your Apple ID username'
+  c.option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
   c.option '--adhoc', 'By default, sign will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
   c.option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
   # c.option '--development', 'Renew the development certificate instead of the production one'
@@ -39,8 +40,8 @@ command :renew do |c|
 
     type = Sign::DeveloperCenter::APPSTORE
     type = Sign::DeveloperCenter::ADHOC if options.adhoc 
-    # type = Sign::DeveloperCenter::DEVELOPMENT
-    path = Sign::DeveloperCenter.new.run(app, type)
+    
+    path = Sign::DeveloperCenter.new.run(app, type, options.cert_name)
 
     if path
       file_name = File.basename(path)

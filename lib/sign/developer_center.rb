@@ -106,10 +106,13 @@ module Sign
       end
     end
 
-    def run(app_identifier, type)
+    def run(app_identifier, type, cert_name)
       cert = maintain_app_certificate(app_identifier, type)
 
-      output_path = "#{TMP_FOLDER}#{type}_#{app_identifier}.mobileprovision"
+      cert_name ||= "#{type}_#{app_identifier}.mobileprovision" # default name
+      cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
+
+      output_path = TMP_FOLDER + cert_name
       File.write(output_path, cert)
 
       return output_path
