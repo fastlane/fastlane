@@ -1,3 +1,4 @@
+require 'pry'
 require 'deliver/password_manager'
 require 'open-uri'
 require 'openssl'
@@ -106,7 +107,7 @@ module Sign
       end
     end
 
-    def run(app_identifier, type, cert_name)
+    def run(app_identifier, type, cert_name = nil)
       cert = maintain_app_certificate(app_identifier, type)
 
       cert_name ||= "#{type}_#{app_identifier}.mobileprovision" # default name
@@ -132,7 +133,7 @@ module Sign
 
         certs = post_ajax(@list_certs_url)
 
-        Helper.log.info "Checking if profile is already available. (#{certs['provisioningProfiles'].count} profiles found)"
+        Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
         certs['provisioningProfiles'].each do |current_cert|
           next if type == DEVELOPMENT and current_cert['type'] != "iOS Development"
           next if type != DEVELOPMENT and current_cert['type'] != 'iOS Distribution'
@@ -141,10 +142,10 @@ module Sign
 
           if details['provisioningProfile']['appId']['identifier'] == app_identifier
             if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
-              next # that's an Ad Hoc profile. I didn't find a better way to detect if it's one
+              next # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
             end
-            if type == ADHOC and details['provisioningProfile']['deviceCount'] == 0
-              next # that's an App Store profile.
+            if type != APPSTORE and details['provisioningProfile']['deviceCount'] == 0
+              next # that's an App Store profile ... skipping it
             end
 
             # We found the correct certificate
@@ -159,15 +160,12 @@ module Sign
           end
         end
 
-        Helper.log.info "Could not find existing profile. Trying to create a new one.".yellow
-        if type != APPSTORE
-          # Certificate does not exist yet, we need to create a new one
-          create_profile(app_identifier, type)
-          # After creating the profile, we need to download it
-          return maintain_app_certificate(app_identifier, type) # recursive
-        elsif type == ADHOC
-          raise "No Ad Hoc profile found. Currently 'sign' can not create an Ad Hoc profile for you. Only App Store profiles can be generated for you!".red
-        end
+        Helper.log.info "Could not find existing profile. Trying to create a new one."
+        # Certificate does not exist yet, we need to create a new one
+        create_profile(app_identifier, type)
+        # After creating the profile, we need to download it
+        return maintain_app_certificate(app_identifier, type) # recursive
+
       rescue Exception => ex
         error_occured(ex)
       end
@@ -182,7 +180,10 @@ module Sign
 
       # 1) Select the profile type (AppStore, Adhoc)
       wait_for_elements('#type-production')
-      value = ((type == DEVELOPMENT) ? 'limited' : 'store')
+      value = 'store'
+      value = 'limited' if type == DEVELOPMENT
+      value = 'adhoc' if type == ADHOC
+
       first(:xpath, "//input[@type='radio' and @value='#{value}']").click
       click_next
 
@@ -197,8 +198,10 @@ module Sign
       sleep 3
       Helper.log.info "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
 
-      # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]">
-      certs = all(:xpath, "//input[@type='radio' and @value='[#{certificate["certificateId"]}]']")
+      # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]"> (production)
+      id = certificate["certificateId"]
+      certs = all(:xpath, "//input[@type='radio' and @value='[#{id}]']") if type != DEVELOPMENT # production uses radio and has a [] around the value
+      certs = all(:xpath, "//input[@type='checkbox' and @value='#{id}']") if type == DEVELOPMENT # development uses a checkbox and has no [] around the value
       if certs.count != 1
         Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs.count}"
         raise "Could not find certificate in the list of available certificates."
@@ -206,7 +209,16 @@ module Sign
       certs.first.click
       click_next
 
-      # 4) Choose a profile name
+      if type != APPSTORE
+        # 4) Devices selection
+        wait_for_elements('.selectAll.column')
+        sleep 3
+
+        first(:xpath, "//div[@class='selectAll column']/input").click # select all the devices
+        click_next
+      end
+
+      # 5) Choose a profile name
       wait_for_elements('.distributionType')
       profile_name = [app_identifier, type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
@@ -291,7 +303,7 @@ module Sign
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
-        
+
         certs = post_ajax(url)['certRequests']
         certs.each do |current_cert|
           if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
@@ -302,6 +314,8 @@ module Sign
             return current_cert # mostly we only care about the 'certificateId'
           end
         end
+
+        raise "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
       end
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file
