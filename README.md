@@ -39,8 +39,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Features
 
-- **Download** the latest provisining profile for your app
-- **Renew** a provisining profile, when it has expired
+- **Download** the latest provisioning profile for your app
+- **Renew** a provisioning profile, when it has expired
 - **Create** a new App Store provisioning profile, if it doesn't exist yet
 - Support for both **App Store** and **Ad Hoc** profiles
 
