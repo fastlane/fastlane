@@ -98,7 +98,7 @@ Check out other tools in this collection to speed up your deployment process:
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
 
 
-## Use the ```Provisioning Quicklook plugin```
+## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the ```pem``` files like this: 
