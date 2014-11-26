@@ -1,3 +1,4 @@
+require 'pry'
 require 'deliver/password_manager'
 require 'open-uri'
 require 'openssl'
@@ -142,7 +143,7 @@ module Sign
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif current_cert['status'] == 'Expired'
               renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
-              return maintain_app_certificate(app_identifier) # recursive
+              return maintain_app_certificate(app_identifier, type) # recursive
             end
 
             break
@@ -151,7 +152,9 @@ module Sign
 
         if type == APPSTORE
           # Certificate does not exist yet, we need to create a new one
-          create_profile(app_identifier)
+          create_profile(app_identifier, type)
+          # After creating the profile, we need to download it
+          return maintain_app_certificate(app_identifier, type) # recursive
         elsif type == ADHOC
           raise "No Ad Hoc profile found. Currently 'sign' can not create an Ad Hoc profile for you. Only App Store profiles can be generated for you!".red
         end
@@ -160,11 +163,44 @@ module Sign
       end
     end
 
-    def create_profile(app_identifier)
+    def create_profile(app_identifier, type)
+      Helper.log.debug "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
+      certificate = code_signing_certificate
+
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
 
-      # TODO: open
+      # 1) Select the profile type (AppStore, Adhoc)
+      wait_for_elements('#type-production')
+      first(:xpath, "//input[@type='radio' and @value='store']").click
+      click_next
+
+      # 2) Select the App ID
+      while not page.has_content?"Select App ID" do sleep 1 end
+      # example: <option value="RGAWZGXSY4">ABP (5A997XSHK2.net.sunapps.34)</option>
+      first(:xpath, "//option[contains(text(), '.#{app_identifier})')]").select_option
+      click_next
+
+      # 3) Select the certificate
+      while not page.has_content?"Select certificates" do sleep 1 end
+      sleep 3
+      Helper.log.debug "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
+
+      # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]">
+      certs = all(:xpath, "//input[@type='radio' and @value='[#{certificate["certificateId"]}]']")
+      if certs.count != 1
+        Helper.log.debug "Looking for certificate: #{certificate}. Found: #{certs.count}"
+        raise "Could not find certificate in the list of available certificates."
+      end
+      certs.first.click
+      click_next
+
+      # 4) Choose a profile name
+      wait_for_elements('.distributionType')
+      profile_name = [app_identifier, type].join(' ')
+      fill_in "provisioningProfileName", with: profile_name
+      click_next
+      wait_for_elements('.row-details')
     end
 
     def renew_profile(profile_id)
@@ -179,8 +215,7 @@ module Sign
 
       certs = all(:xpath, "//input[@type='radio' and @value='#{certificate["certificateId"]}']")
       if certs.count == 1
-        cert = certs.first
-        cert.click
+        certs.first.click
         click_next
 
         wait_for_elements('.row-details')
