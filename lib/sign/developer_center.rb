@@ -175,18 +175,15 @@ module Sign
 
     def create_profile(app_identifier, type)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificate = code_signing_certificate type
+      certificate = code_signing_certificate(type)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
 
       # 1) Select the profile type (AppStore, Adhoc)
       wait_for_elements('#type-production')
-      if type == DEVELOPMENT 
-        first(:xpath, "//input[@type='radio' and @value='limited']").click
-      else 
-        first(:xpath, "//input[@type='radio' and @value='store']").click
-      end
+      value = ((type == DEVELOPMENT) ? 'limited' : 'store')
+      first(:xpath, "//input[@type='radio' and @value='#{value}']").click
       click_next
 
       # 2) Select the App ID
@@ -294,17 +291,14 @@ module Sign
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
-
-        my_name = find("#content").find(".topbar").find(".section-title").value
-        puts "MY NAME: #{my_name}"
         
         certs = post_ajax(url)['certRequests']
         certs.each do |current_cert|
-          if type != DEVELOPMENT && current_cert['typeString'] == 'iOS Distribution' 
+          if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
             # The other profiles are push profiles
             # We only care about the distribution profile
             return current_cert # mostly we only care about the 'certificateId'
-          elsif type == DEVELOPMENT &&  current_cert['typeString'] == 'iOS Development' 
+          elsif type == DEVELOPMENT and current_cert['typeString'] == 'iOS Development' 
             return current_cert # mostly we only care about the 'certificateId'
           end
         end
