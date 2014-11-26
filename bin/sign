@@ -1,0 +1,69 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'sign'
+require 'commander/import'
+require 'sign/update_checker'
+require 'deliver/password_manager'
+
+HighLine.track_eof = false
+
+
+# Commander
+program :version, Sign::VERSION
+program :description, 'CLI for \'sign\' - Automatic maintaining of iOS certificates'
+program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
+program :help, 'Website', 'http://felixkrause.at'
+program :help, 'GitHub', 'https://github.com/krausefx/sign'
+program :help_formatter, :compact
+
+global_option('--verbose') { $verbose = true }
+
+
+command :renew do |c|
+  c.syntax = 'sign renew'
+  c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
+
+  c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
+  c.option '-u', '--username STRING', String, 'Your Apple ID username'
+  c.option '--adhoc', 'By default, sign will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
+  c.option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
+  # c.option '--development', 'Renew the development certificate instead of the production one'
+
+  c.action do |args, options|
+    app = app_identifier(options)
+    username(options)
+
+    Sign::UpdateChecker.verify_latest_version
+
+    type = Sign::DeveloperCenter::APPSTORE
+    type = Sign::DeveloperCenter::ADHOC if options.adhoc 
+    # type = Sign::DeveloperCenter::DEVELOPMENT
+    path = Sign::DeveloperCenter.new.run(app, type)
+
+    if path
+      file_name = File.basename(path)
+      output = "./#{file_name}"
+      FileUtils.mv(path, output)
+      system("open '#{output}'") unless options.skip_install
+      puts output.green
+    end
+  end
+end
+
+default_command :renew
+
+def username(options)
+  user = nil
+  user = options.username if options.username
+  user = ENV["SIGN_USERNAME"] if ENV["SIGN_USERNAME"]
+  
+  Deliver::PasswordManager.shared_manager(user) if user
+end
+
+def app_identifier(options)
+  return options.identifier if options.identifier
+  return ENV["SIGN_APP_IDENTIFIER"] if ENV["SIGN_APP_IDENTIFIER"]
+  return ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+end
