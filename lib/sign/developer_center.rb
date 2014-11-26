@@ -16,6 +16,11 @@ module Sign
     class DeveloperCenterGeneralError < StandardError
     end
 
+    # Types of certificates
+    APPSTORE = "AppStore"
+    ADHOC = "AdHoc"
+    DEVELOPMENT = "Development"
+
     include Capybara::DSL
 
     DEVELOPER_CENTER_URL = "https://developer.apple.com/devcenter/ios/index.action"
@@ -100,20 +105,17 @@ module Sign
       end
     end
 
-    def work(app_identifier)
-      cert = download_certificate(app_identifier)
+    def run(app_identifier, type)
+      cert = maintain_app_certificate(app_identifier, type)
 
-      type = "AppStore"
-      output_path = "./#{type}_#{app_identifier}.mobileprovision"
+      output_path = "#{TMP_FOLDER}#{type}_#{app_identifier}.mobileprovision"
       File.write(output_path, cert)
 
-      puts output_path.green
       return output_path
     end
 
-    def download_certificate(app_identifier)
+    def maintain_app_certificate(app_identifier, type)
       begin
-        mode ||= 'distribution'
         visit PROFILES_URL
 
         @list_certs_url = page.html.match(/var profileDataURL = "(.*)"/)[1]
@@ -122,29 +124,47 @@ module Sign
 
         certs = post_ajax(@list_certs_url)
 
-
         certs['provisioningProfiles'].each do |current_cert|
           next if current_cert['type'] != 'iOS Distribution'
           
           details = profile_details(current_cert['provisioningProfileId'])
-          if details['provisioningProfile']['appId']['identifier'] == app_identifier
-            # We found the certificate we needed
 
+          if details['provisioningProfile']['appId']['identifier'] == app_identifier
+            if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
+              next # that's an Ad Hoc profile. I didn't find a better way to detect if it's one
+            end
+            if type == ADHOC and details['provisioningProfile']['deviceCount'] == 0
+              next # that's an App Store profile.
+            end
+
+            # We found the correct certificate
             if current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif current_cert['status'] == 'Expired'
               renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
-              return download_certificate(app_identifier) # recursiv
+              return maintain_app_certificate(app_identifier) # recursive
             end
 
             break
           end
         end
 
-        raise "Something went wrong... :("
+        if type == APPSTORE
+          # Certificate does not exist yet, we need to create a new one
+          create_profile(app_identifier)
+        elsif type == ADHOC
+          raise "No Ad Hoc profile found. Currently 'sign' can not create an Ad Hoc profile for you. Only App Store profiles can be generated for you!".red
+        end
       rescue Exception => ex
         error_occured(ex)
       end
+    end
+
+    def create_profile(app_identifier)
+      create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
+      visit create_url
+
+      # TODO: open
     end
 
     def renew_profile(profile_id)
