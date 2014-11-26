@@ -134,8 +134,8 @@ module Sign
 
         Helper.log.info "Checking if profile is already available. (#{certs['provisioningProfiles'].count} profiles found)"
         certs['provisioningProfiles'].each do |current_cert|
-          next if type == DEVELOPMENT && current_cert['type'] != "iOS Development"
-          next if type != DEVELOPMENT && current_cert['type'] != 'iOS Distribution'
+          next if type == DEVELOPMENT and current_cert['type'] != "iOS Development"
+          next if type != DEVELOPMENT and current_cert['type'] != 'iOS Distribution'
           
           details = profile_details(current_cert['provisioningProfileId'])
 
