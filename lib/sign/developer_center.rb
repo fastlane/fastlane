@@ -123,10 +123,11 @@ module Sign
 
         @list_certs_url = page.html.match(/var profileDataURL = "(.*)"/)[1]
         # list_certs_url will look like this: "https://developer.apple.com/services-account/..../account/ios/profile/listProvisioningProfiles.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=id&userLocale=en_US&teamId=xy&includeInactiveProfiles=true&onlyCountLists=true"
-        Helper.log.debug "Fetching URL: '#{@list_certs_url}'"
+        Helper.log.info "Fetching all available provisioning profiles..."
 
         certs = post_ajax(@list_certs_url)
 
+        Helper.log.info "Checking if profile is already available. (#{certs['provisioningProfiles'].count} profiles found)"
         certs['provisioningProfiles'].each do |current_cert|
           next if current_cert['type'] != 'iOS Distribution'
           
@@ -152,6 +153,7 @@ module Sign
           end
         end
 
+        Helper.log.info "Could not find existing profile. Trying to create a new one.".yellow
         if type == APPSTORE
           # Certificate does not exist yet, we need to create a new one
           create_profile(app_identifier, type)
@@ -166,7 +168,7 @@ module Sign
     end
 
     def create_profile(app_identifier, type)
-      Helper.log.debug "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
+      Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
       certificate = code_signing_certificate
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
@@ -186,12 +188,12 @@ module Sign
       # 3) Select the certificate
       while not page.has_content?"Select certificates" do sleep 1 end
       sleep 3
-      Helper.log.debug "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
+      Helper.log.info "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
 
       # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]">
       certs = all(:xpath, "//input[@type='radio' and @value='[#{certificate["certificateId"]}]']")
       if certs.count != 1
-        Helper.log.debug "Looking for certificate: #{certificate}. Found: #{certs.count}"
+        Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs.count}"
         raise "Could not find certificate in the list of available certificates."
       end
       certs.first.click
@@ -209,10 +211,10 @@ module Sign
       certificate = code_signing_certificate
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
-      Helper.log.debug "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
+      Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
       visit details_url
 
-      Helper.log.debug "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
+      Helper.log.info "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
       wait_for_elements('.selectCertificates')
 
       certs = all(:xpath, "//input[@type='radio' and @value='#{certificate["certificateId"]}']")
@@ -223,7 +225,7 @@ module Sign
         wait_for_elements('.row-details')
         click_on "Done"
       else
-        Helper.log.debug "Looking for certificate: #{certificate}. Found: #{certs}"
+        Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs}"
         raise "Could not find certificate in the list of available certificates."
       end
     end
@@ -240,7 +242,7 @@ module Sign
         # We need to build the URL to get the App ID for a specific certificate
         current_profile_url = @list_certs_url.gsub('listProvisioningProfiles', 'getProvisioningProfile')
         current_profile_url += "&provisioningProfileId=#{profile_id}"
-        Helper.log.debug "Fetching URL: '#{current_profile_url}'"
+        # Helper.log.debug "Fetching URL: '#{current_profile_url}'"
 
         result = post_ajax(current_profile_url)
         # Example response, see bottom of file
@@ -291,7 +293,7 @@ module Sign
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file
       def download_file(url)
-        Helper.log.debug "Download '#{url}'"
+        Helper.log.info "Downloading profile..."
         host = Capybara.current_session.current_host
         url = [host, url].join('')
 
@@ -299,6 +301,7 @@ module Sign
         data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
 
         raise "Something went wrong when downloading the file from the Dev Center" unless data
+        Helper.log.info "Successfully downloaded provisioning profile"
         return data
       end
 
