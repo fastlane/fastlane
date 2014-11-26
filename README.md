@@ -3,25 +3,25 @@
 <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
 <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
 <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-<b>Sign</b>
+<b>sigh</b>
 </p>
 -------
 
 <p align="center">
-    <img src="assets/sign.png">
+    <img src="assets/sigh.png">
 </p>
 
-Sign - Create and maintain provisioning profiles
+sigh - Create and maintain provisioning profiles
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sign/blob/master/LICENSE)
-[![Gem](https://img.shields.io/gem/v/sign.svg?style=flat)](http://rubygems.org/gems/sign)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sigh/blob/master/LICENSE)
+[![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
 
 
 Tired of manually creating and maintaining your provisioning profiles?
 
-```Sign``` handles all that for you. Just run ```sign``` and it will do the rest.
+```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -47,10 +47,10 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 Check out this gif:
 
-![assets/signRecording.gif](assets/signRecording.gif)
+![assets/sighRecording.gif](assets/sighRecording.gif)
 
 # Installation
-    sudo gem install sign
+    sudo gem install sigh
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -58,35 +58,35 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    sign
+    sigh
 Yes, that's the whole command!
 
 You can pass parameters like this:
 
-    sign -a at.felixkrause.app -u username
+    sigh -a at.felixkrause.app -u username
 
 If you want to generate an Ad Ho profile instead:
 
-    sign --development
+    sigh --development
 
-By default, ```sign``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
+By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
-    sign --skip_install
+    sigh --skip_install
 
 
 ## Environment Variables
 In case you prefer environment variables:
 
-- ```SIGN_USERNAME```
-- ```SIGN_APP_IDENTIFIER```
+- ```SIGH_USERNAME```
+- ```SIGH_APP_IDENTIFIER```
 
 # How does it work?
 
-```Sign``` will access the ```iOS Dev Center``` to download, renew or generate the ```.mobileprovision``` file. Check out the full source code: [developer_center.rb](https://github.com/KrauseFx/sign/blob/master/lib/sign/developer_center.rb).
+```sigh``` will access the ```iOS Dev Center``` to download, renew or generate the ```.mobileprovision``` file. Check out the full source code: [developer_center.rb](https://github.com/KrauseFx/sigh/blob/master/lib/sigh/developer_center.rb).
 
 
 ## How is my password stored?
-```Sign``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
+```sigh``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
 ## Other helpful tools
@@ -106,8 +106,8 @@ It will show you the ```mobileprovision``` files like this:
 
 
 # Need help?
-- If there is a technical problem with ```sign```, submit an issue. Run ```sign --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: sign@felixkrause.at
+- If there is a technical problem with ```sigh```, submit an issue. Run ```sigh --trace``` to get the stacktrace.
+- I'm available for contract work - drop me an email: sigh@felixkrause.at
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
@@ -115,7 +115,7 @@ This project is licensed under the terms of the MIT license. See the LICENSE fil
 # Contributing
 
 1. Create an issue to discuss about your idea
-2. Fork it (https://github.com/KrauseFx/sign/fork)
+2. Fork it (https://github.com/KrauseFx/sigh/fork)
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)

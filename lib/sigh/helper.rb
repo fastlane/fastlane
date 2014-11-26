@@ -1,6 +1,6 @@
 require 'logger'
 
-module Sign
+module Sigh
   module Helper
 
     # Logging happens using this method

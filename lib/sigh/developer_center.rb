@@ -1,4 +1,3 @@
-require 'pry'
 require 'deliver/password_manager'
 require 'open-uri'
 require 'openssl'
@@ -6,7 +5,7 @@ require 'openssl'
 require 'capybara'
 require 'capybara/poltergeist'
 
-module Sign
+module Sigh
   class DeveloperCenter
     # This error occurs only if there is something wrong with the given login data
     class DeveloperCenterLoginError < StandardError 

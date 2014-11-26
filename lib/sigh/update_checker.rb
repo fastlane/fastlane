@@ -1,6 +1,6 @@
 require 'open-uri'
 
-module Sign
+module Sigh
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
     # This method will check if the latest version is installed and show a warning if that's not the case
@@ -8,10 +8,10 @@ module Sign
       if self.update_available?
         v = fetch_latest
         puts '#######################################################################'.green
-        puts "# sign #{v} is available.".green
+        puts "# sigh #{v} is available.".green
         puts "# It is recommended to use the latest version.".green
-        puts "# Update using '(sudo) gem update sign'.".green
-        puts "# To see what's new, open https://github.com/KrauseFx/sign/releases.".green
+        puts "# Update using '(sudo) gem update sigh'.".green
+        puts "# To see what's new, open https://github.com/KrauseFx/sigh/releases.".green
         puts '#######################################################################'.green
         return true
       end
@@ -26,19 +26,19 @@ module Sign
           return true
         end
       rescue Exception => ex
-        Helper.log.error("Could not check if 'sign' is up to date.")
+        Helper.log.error("Could not check if 'sigh' is up to date.")
       end
       return false
     end
 
     # The currently used version of this gem
     def self.current_version
-      Sign::VERSION
+      Sigh::VERSION
     end
 
     private
       def self.fetch_latest
-        JSON.parse(open("http://rubygems.org/api/v1/gems/sign.json").read)["version"]
+        JSON.parse(open("http://rubygems.org/api/v1/gems/sigh.json").read)["version"]
       end
   end
 end

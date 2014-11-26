@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'sign/version'
+require 'sigh/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "sign"
-  spec.version       = Sign::VERSION
+  spec.name          = "sigh"
+  spec.version       = Sigh::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
   spec.summary       = %q{Create, Renew and Download your provisioning profiles - using one command}
@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ bin/sign README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w{ bin/sigh README.md LICENSE }
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
