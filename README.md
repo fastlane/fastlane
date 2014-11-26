@@ -10,7 +10,7 @@
     <img src="assets/snapshot.png">
 </p>
 
-Snapshot - Create hundreds of iOS app screenshots
+Snapshot - Create iOS app screenshots
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
