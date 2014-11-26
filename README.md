@@ -1,8 +1,9 @@
 <p align="center">
-<a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
-<b>PEM</b>
+    <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
+    <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
+    <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
+    <b>PEM</b> &bull; 
+    <a href="https://github.com/KrauseFx/sigh">Sigh</a>
 </p>
 -------
 
@@ -10,7 +11,7 @@
     <img src="assets/pem.png">
 </p>
 
-Pem
+Pem - Maintain your push certificates
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -51,6 +52,12 @@ Check out this gif:
 Make sure, you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
+
+Install phantomjs (this is needed to control the Apple Developer Portal)
+
+    brew update && brew install phantomjs
+
+If you don't already have homebrew installed, [install it here](http://brew.sh/).
 
 # Usage
 
@@ -97,8 +104,9 @@ Check out other tools in this collection to speed up your deployment process:
 - [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
 - [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
+- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
-## Use the ```Provisioning Quicklook plugin```
+## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the ```pem``` files like this: 
