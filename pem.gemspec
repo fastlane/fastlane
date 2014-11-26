@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Sign::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
-  spec.summary       = %q{To be announced}
-  spec.description   = %q{To be announced}
+  spec.summary       = %q{Create, Renew and Download your provisioning profiles - using one command}
+  spec.description   = %q{Create, Renew and Download your provisioning profiles - using one command}
   spec.homepage      = "http://felixkrause.at"
   spec.license       = "MIT"
 
