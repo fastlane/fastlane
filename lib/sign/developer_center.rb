@@ -25,6 +25,7 @@ module Sign
 
     DEVELOPER_CENTER_URL = "https://developer.apple.com/devcenter/ios/index.action"
     PROFILES_URL = "https://developer.apple.com/account/ios/profile/profileList.action?type=production"
+    PROFILES_URL_DEV = "https://developer.apple.com/account/ios/profile/profileList.action?type=limited"
 
 
     def initialize
@@ -119,7 +120,11 @@ module Sign
 
     def maintain_app_certificate(app_identifier, type)
       begin
-        visit PROFILES_URL
+        if type == DEVELOPMENT 
+          visit PROFILES_URL_DEV
+        else
+          visit PROFILES_URL
+        end
 
         @list_certs_url = page.html.match(/var profileDataURL = "(.*)"/)[1]
         # list_certs_url will look like this: "https://developer.apple.com/services-account/..../account/ios/profile/listProvisioningProfiles.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=id&userLocale=en_US&teamId=xy&includeInactiveProfiles=true&onlyCountLists=true"
@@ -129,7 +134,8 @@ module Sign
 
         Helper.log.info "Checking if profile is already available. (#{certs['provisioningProfiles'].count} profiles found)"
         certs['provisioningProfiles'].each do |current_cert|
-          next if current_cert['type'] != 'iOS Distribution'
+          next if type == DEVELOPMENT && current_cert['type'] != "iOS Development"
+          next if type != DEVELOPMENT && current_cert['type'] != 'iOS Distribution'
           
           details = profile_details(current_cert['provisioningProfileId'])
 
