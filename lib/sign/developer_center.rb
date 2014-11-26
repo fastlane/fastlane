@@ -144,7 +144,7 @@ module Sign
             # We found the correct certificate
             if current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
-            elsif current_cert['status'] == 'Expired'
+            elsif ['Expired', 'Invalid'].include?current_cert['status']
               renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
               return maintain_app_certificate(app_identifier, type) # recursive
             end
