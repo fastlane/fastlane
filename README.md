@@ -2,7 +2,8 @@
   <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
   <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
   <b>FrameIt</b> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a>
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
+  <a href="https://github.com/KrauseFx/sigh">Sigh</a>
 </p>
 -------
 
@@ -91,7 +92,7 @@ Check out other tools in this collection to speed up your deployment process:
 - [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-
+- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
 ## Generate screenshots
 Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
