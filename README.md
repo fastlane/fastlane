@@ -47,6 +47,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - **Create** a new provisioning profile, if it doesn't exist already
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
+- Support for **multiple Teams**
 
 ### Why not let Xcode do the work?
 

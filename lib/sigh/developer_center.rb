@@ -93,15 +93,39 @@ module Sigh
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
 
-        begin
-          all(".button.large.blue.signin-button").first.click
+        all(".button.large.blue.signin-button").first.click
 
+        begin
+          if page.has_content?"Select Team" # If the user is not on multiple teams
+            Helper.log.info "Your ID belongs to the following teams:"
+            teams = find("div.input").all('.team-value') # Grab all the teams data
+            teams.each_with_index do | val, index |
+              teamText = val.find(".label-primary").text
+              descriptionText = val.find(".label-secondary").text
+              descriptionText = " (#{descriptionText})" unless descriptionText.empty? # Include the team description if any
+              Helper.log.info "\t#{index+1}. #{teamText}#{descriptionText}" # Print the team index and team name
+            end
+            teamIndex = ask("Please select the team number you would like to access:")
+            teamID = teams[teamIndex.to_i-1].find(".radio").value
+            first(:xpath, "//input[@type='radio' and @value='#{teamID}']").click # Select the desired team
+            all(".button.large.blue.submit").first.click
+
+            result = visit PROFILES_URL
+            raise "Could not open Developer Center" unless result['status'] == 'success'
+          end
+        rescue Exception => ex
+          Helper.log.debug ex
+          raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
+        end
+
+        begin
           wait_for_elements('.ios.profiles.gridList')
           visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
         rescue Exception => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
+
 
         Helper.log.info "Login successful"
         
