@@ -102,6 +102,7 @@ In case you prefer environment variables:
 
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
+- ```SIGH_TEAM_ID``` (The exact name of your preferred team for this account)
 
 # How does it work?
 

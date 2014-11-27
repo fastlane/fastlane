@@ -97,17 +97,24 @@ module Sigh
 
         begin
           if page.has_content?"Select Team" # If the user is not on multiple teams
-            Helper.log.info "Your ID belongs to the following teams:"
-            teams = find("div.input").all('.team-value') # Grab all the teams data
-            teams.each_with_index do | val, index |
-              teamText = val.find(".label-primary").text
-              descriptionText = val.find(".label-secondary").text
-              descriptionText = " (#{descriptionText})" unless descriptionText.empty? # Include the team description if any
-              Helper.log.info "\t#{index+1}. #{teamText}#{descriptionText}" # Print the team index and team name
+            team_id = ENV["SIGH_TEAM_ID"]
+            unless team_id
+              Helper.log.info "You can store you preferred team using the environment variable `SIGH_TEAM_ID`".green
+              Helper.log.info "Your ID belongs to the following teams:".green
+              
+              teams = find("div.input").all('.team-value') # Grab all the teams data
+              teams.each_with_index do |val, index|
+                team_text = val.find(".label-primary").text
+                description_text = val.find(".label-secondary").text
+                description_text = " (#{description_text})" unless description_text.empty? # Include the team description if any
+                Helper.log.info "\t#{index + 1}. #{team_text}#{description_text}".green # Print the team index and team name
+              end
+
+              team_index = ask("Please select the team number you would like to access: ".green)
+              team_id = teams[team_index.to_i - 1].find(".radio").value
             end
-            teamIndex = ask("Please select the team number you would like to access:")
-            teamID = teams[teamIndex.to_i-1].find(".radio").value
-            first(:xpath, "//input[@type='radio' and @value='#{teamID}']").click # Select the desired team
+
+            first(:xpath, "//input[@type='radio' and @value='#{team_id}']").click # Select the desired team
             all(".button.large.blue.submit").first.click
 
             result = visit PROFILES_URL
