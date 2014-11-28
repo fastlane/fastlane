@@ -68,8 +68,8 @@ Yes, that's the whole command!
 
 This does the following:
 
-- Verifies the production push certificate looks alright
-- Renews the push certificate in case it's necessary
+- Create a new signing request
+- Create a new push certification
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
