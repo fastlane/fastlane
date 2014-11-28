@@ -33,10 +33,10 @@ command :renew do |c|
   c.option '--development', 'Renew the development certificate instead of the production one'
 
   c.action do |args, options|
+    Sigh::UpdateChecker.verify_latest_version
+    
     app = app_identifier(options)
     username(options)
-
-    Sigh::UpdateChecker.verify_latest_version
 
     type = Sigh::DeveloperCenter::APPSTORE
     type = Sigh::DeveloperCenter::ADHOC if options.adhoc 
