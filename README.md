@@ -30,12 +30,14 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
-[Features](#features) &bull;
-[Installation](#installation) &bull;
-[Usage](#usage) &bull;
-[How does it work?](#how-does-it-work) &bull;
-[Tips](#tips) &bull;
-[Need help?](#need-help)
+<p align="center">
+    <a href="#features">Features</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#how-does-it-work">How does it work?</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
+    <a href="#need-help">Need help?</a>
+</p>
 
 -------
 
