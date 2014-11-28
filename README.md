@@ -29,14 +29,16 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
-[Features](#features) &bull;
-[Installation](#installation) &bull;
-[Quick Start](#quick-start) &bull;
-[Usage](#usage) &bull;
-[Credentials](#credentials) &bull;
-[Can I trust Deliver?](#can-i-trust-deliver) &bull;
-[Tips](#tips) &bull;
-[Need help?](#need-help)
+<p align="center">
+    <a href="#features">Features</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#quick-start">Quick Start</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#credentials">Credentials</a> &bull; 
+    <a href="#can-i-trust-deliver">Can I trust Deliver?</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
+    <a href="#need-help">Need help?</a>
+</p>
 
 -------
 
