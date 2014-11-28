@@ -5,6 +5,7 @@ module Snapshot
       self.check_simulators
       self.check_xctool
       self.check_for_automation_subfolder
+      self.check_simctl
     end
 
     def self.check_xcode_select
@@ -47,6 +48,12 @@ module Snapshot
     def self.check_for_automation_subfolder
       if File.directory?"./Automation" or File.exists?"./Automation"
         raise "Seems like you have an 'Automation' folder in the current directory. You need to delete/rename it!".red
+      end
+    end
+
+    def self.check_simctl
+      unless `xcrun simctl`.include?"openurl"
+        raise "Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and Mac OS installed.".red
       end
     end
   end
