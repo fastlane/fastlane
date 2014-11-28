@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pem (0.1.4)
+    pem (0.2.0)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -9,7 +9,6 @@ PATH
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
-      security (~> 0.1.3)
 
 GEM
   remote: https://rubygems.org/
