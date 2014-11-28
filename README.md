@@ -86,6 +86,7 @@ In case you prefer environment variables:
 
 - ```PEM_USERNAME```
 - ```PEM_APP_IDENTIFIER```
+- ```PEM_TEAM_ID```
 
 # How does it work?
 There are 2 actions involved:
