@@ -84,10 +84,40 @@ module PEM
 
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
+        
+        all(".button.large.blue.signin-button").first.click
 
         begin
-          all(".button.large.blue.signin-button").first.click
+          if page.has_content?"Select Your Team" # If the user is not on multiple teams
+            team_id = ENV["PEM_TEAM_ID"]
+            unless team_id
+              Helper.log.info "You can store you preferred team using the environment variable `PEM_TEAM_ID`".green
+              Helper.log.info "Your ID belongs to the following teams:".green
+              
+              teams = find("select").all('option') # Grab all the teams data
+              teams.each_with_index do |val, index|
+                team_text = val.text
+                description_text = val.value
+                description_text = " (#{description_text})" unless description_text.empty? # Include the team description if any
+                Helper.log.info "\t#{index + 1}. #{team_text}#{description_text}".green # Print the team index and team name
+              end
+              
+              team_index = ask("Please select the team number you would like to access: ".green)
+              team_id = teams[team_index.to_i - 1].value # Select the desired team
+            end
+          within 'select' do
+            find("option[value='#{team_id}']").select_option
+          end
+            
+         all("#saveTeamSelection_saveTeamSelection").first.click
+         end
+        rescue Exception => ex
+          Helper.log.debug ex
+          raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
+        end
 
+        begin
+          
           wait_for_elements('#aprerelease')
         rescue Exception => ex
           Helper.log.debug ex

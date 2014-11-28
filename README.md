@@ -84,6 +84,7 @@ In case you prefer environment variables:
 
 - ```PEM_USERNAME```
 - ```PEM_APP_IDENTIFIER```
+- ```PEM_TEAM_ID```
 - ```PEM_CERT_SIGNING_REQUEST``` in case you want to pass your own signing request file
 
 # How does it work?
