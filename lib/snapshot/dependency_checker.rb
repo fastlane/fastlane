@@ -24,6 +24,7 @@ module Snapshot
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to add new simulators using Xcode"
         Helper.log.fatal "# Xcode => Window => Devices"
+        Helper.log.fatal "# Please run `instruments -s` to verify your xcode path"
         Helper.log.fatal '#############################################################'
         raise "Create the new simulators and run this script again"
       end
