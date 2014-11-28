@@ -25,7 +25,6 @@ module Deliver
         end
 
         if @errors.count > 0
-          Helper.log.debug(caller)
           raise TransporterTransferError.new(@errors.join("\n"))
         end
 

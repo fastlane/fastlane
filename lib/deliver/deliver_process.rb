@@ -226,10 +226,10 @@ module Deliver
       if @deploy_information[:blocks][:error]
         # Custom error handling, we just call this one
         @deploy_information[:blocks][:error].call(ex)
-      else
-        # Re-Raise the exception
-        raise ex
       end
+      
+      # Re-Raise the exception
+      raise ex
     end
 
     private

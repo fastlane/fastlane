@@ -107,12 +107,12 @@ module Deliver
           @errors << ex.to_s
         end
 
-        if @errors.count > 0
-          raise TransporterTransferError.new(@errors.join("\n"))
-        end
-
         if @warnings.count > 0
           Helper.log.warn(@warnings.join("\n"))
+        end
+
+        if @errors.count > 0
+          raise TransporterTransferError.new(@errors.join("\n"))
         end
 
         true
