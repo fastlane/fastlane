@@ -42,13 +42,15 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
-[Features](#features) &bull;
-[Installation](#installation) &bull;
-[UI Automation](#ui-automation) &bull;
-[Quick Start](#quick-start) &bull;
-[Usage](#usage) &bull;
-[Tips](#tips) &bull;
-[Need help?](#need-help)
+<p align="center">
+    <a href="#features">Features</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#ui-automation">UI Automation</a> &bull; 
+    <a href="#quick-start">Quick Start</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
+    <a href="#need-help">Need help?</a>
+</p>
 
 -------
 
