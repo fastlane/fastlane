@@ -61,7 +61,7 @@ module Snapshot
         build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
         [
           build_command,
-          "-sdk iphoneos",
+          "-sdk iphonesimulator",
           "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
           "-#{proj_key} '#{proj_path}'",
           "-scheme '#{scheme}'",
