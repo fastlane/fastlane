@@ -9,34 +9,21 @@ module PEM
 
       dev = PEM::DeveloperCenter.new
 
-      keychain = "PEM.keychain"
-
       cert_file = dev.fetch_cer_file(app_identifier, production)
-      rsa_file = [TMP_FOLDER, 'myrsa'].join('/')
+      rsa_file = File.join(TMP_FOLDER, 'private_key.key')
 
-      previous_keychain = command("security default-keychain")
-
-
-
-      command("security create-keychain -p '' #{keychain}") # create a new keychain for this type
-
-      command("security list-keychains -d user -s #{keychain}") # add it to the list of keychains
-
-      command("openssl genrsa -out '#{rsa_file}' 2048") # generate a new RSA file
-      command("security import '#{rsa_file}' -P '' -k #{keychain}") # import the RSA file into the Keychain
-      command("security import '#{cert_file}' -k #{keychain}") # import the profile from Apple into the Keychain
-
-      p12_file = [TMP_FOLDER, "push_prod.12"].join('/')
-
-      command("security export -k '#{keychain}' -t all -f pkcs12 -P '' -o #{p12_file}") # export code signing identity
+      pem_temp = File.join(TMP_FOLDER, 'pem_temp.pem')
 
       certificate_type = (production ? 'production' : 'development')
-      pem_file = [TMP_FOLDER, "#{certificate_type}_#{app_identifier}.pem"].join('')
-      command("openssl pkcs12 -passin pass: -nodes -in #{p12_file} -out #{pem_file}")
 
-      command("security delete-keychain #{keychain}")
 
-      command("security list-keychains -d user -s #{previous_keychain}") # switch back to default keychain
+      pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{app_identifier}.pem")
+      command("openssl x509 -inform der -in '#{cert_file}' -out #{pem_temp}")
+      content = File.read(pem_temp) + File.read(rsa_file)
+      File.write(pem_file, content)
+      
+
+      File.delete(rsa_file)
 
       return pem_file
     end

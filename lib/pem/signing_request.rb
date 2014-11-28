@@ -1,16 +1,7 @@
 module PEM
   class SigningRequest
     def self.get_path
-      return ENV["PEM_CERT_SIGNING_REQUEST"] if (ENV["PEM_CERT_SIGNING_REQUEST"] and File.exists?(ENV["PEM_CERT_SIGNING_REQUEST"]))
-
-      # Check if there is one in the current directory
-      files = Dir["./*.certSigningRequest"]
-      if files.count == 1
-        Helper.log.info "Found a .certSigningRequest at the current folder. Using that."
-        return files.first
-      end
-
-      return self.generate
+      self.generate
     end
 
     def self.generate
@@ -28,6 +19,8 @@ module PEM
        
       path = File.join(TMP_FOLDER, 'PEMCertificateSigningRequest.certSigningRequest')
       File.write(path, csr.to_pem)
+      File.write(File.join(TMP_FOLDER, 'private_key.key'), @key)
+
       Helper.log.info "Successfully generated .certSigningRequest at path '#{path}'"
       return path
     end

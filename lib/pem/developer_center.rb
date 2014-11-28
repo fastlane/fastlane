@@ -179,33 +179,9 @@ module PEM
         if not download_button
           Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no #{certificate_type} certificate yet."
           create_push_for_app(app_identifier, production)
-
-          download_button = find_download_button(section_title)
-          raise "Could not find download button for #{section_title}. Check out: '#{current_url}'" unless download_button
+        else
+          raise "Could not create a new push profile for app '#{app_identifier}'. There is already a profile active.".red
         end
-
-
-        Helper.log.info "Going to download the latest profile"
-
-        # It is enabled, now just download it
-        # Taken from http://stackoverflow.com/a/17111206/445598
-        sleep 2
-
-        host = Capybara.current_session.current_host
-        url = download_button['href']
-        url = [host, url].join('')
-        
-        myacinfo = page.driver.cookies['myacinfo'].value # some magic Apple, which is required for the profile download
-        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
-
-        raise "Something went wrong when downloading the certificate" unless data
-
-        path = "#{TMP_FOLDER}/aps_#{certificate_type}_#{app_identifier}.cer"
-        File.write(path, data)
-
-        Helper.log.info "Successfully downloaded latest .cer file."
-        return path
-
       rescue Exception => ex
         error_occured(ex)
       end
@@ -252,8 +228,30 @@ module PEM
           sleep 2
         end
 
-        open_app_page(app_identifier)
-        click_on "Edit"
+        certificate_type = (production ? 'production' : 'development')
+
+        # Download the newly created certificate
+        Helper.log.info "Going to download the latest profile"
+
+        # It is enabled, now just download it
+        sleep 2
+
+        download_button = first(".button.small.blue")
+        host = Capybara.current_session.current_host
+        url = download_button['href']
+        url = [host, url].join('')
+        puts url
+        
+        myacinfo = page.driver.cookies['myacinfo'].value # some magic Apple, which is required for the profile download
+        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
+
+        raise "Something went wrong when downloading the certificate" unless data
+
+        path = "#{TMP_FOLDER}/aps_#{certificate_type}_#{app_identifier}.cer"
+        File.write(path, data)
+
+        Helper.log.info "Successfully downloaded latest .cer file."
+        return path
       end
 
 
