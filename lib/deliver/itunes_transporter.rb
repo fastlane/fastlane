@@ -131,6 +131,9 @@ module Deliver
              $1.include?"This Apple ID has been locked for security reasons"
 
             Deliver::PasswordManager.shared_manager.password_seems_wrong
+          elsif $1.include?"Redundant Binary Upload. There already exists a binary upload with build"
+            Helper.log.fatal $1
+            Helper.log.fatal "You have to change the build number of your app to upload your ipa file"
           end
 
           output_done = true

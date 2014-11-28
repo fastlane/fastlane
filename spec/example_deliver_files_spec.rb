@@ -70,6 +70,14 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
           end
 
+          it "Raises an exception when iTunes Transporter results in an error" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
+            
+            expect {
+              Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+            }.to raise_exception("ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"")
+          end
+
           it "Sets all the available metadata" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
@@ -191,7 +199,9 @@ describe Deliver do
             it "Error on ipa upload" do
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt") # the ipa file
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              }.to raise_exception
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -199,7 +209,10 @@ describe Deliver do
 
             it "Error on app metadata upload" do
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt")
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              }.to raise_exception
+
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -209,7 +222,9 @@ describe Deliver do
               Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
 
               expect(File.exists?@tests_path).to eq(false)
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              }.to raise_exception
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
