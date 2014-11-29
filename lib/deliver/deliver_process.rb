@@ -15,7 +15,7 @@ module Deliver
     # @return (Deliver::App) The App that is currently being edited.
     attr_accessor :app
 
-    # @return (Hash) All the updated/new information we got from the Deliverfile. 
+    # @return (Hash) All the updated/new information we got from the Deliverfile.
     #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
 
@@ -28,7 +28,7 @@ module Deliver
       begin
         run_unit_tests
         fetch_information_from_ipa_file
-        
+
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
         verify_ipa_file
@@ -38,7 +38,7 @@ module Deliver
         load_metadata_from_config_json_folder # the json file generated from the quick start
         set_app_metadata
         set_screenshots
-        
+
         verify_pdf_file
 
         trigger_metadata_upload
@@ -68,11 +68,13 @@ module Deliver
     def fetch_information_from_ipa_file
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
-      
-      used_ipa_file = @deploy_information[:ipa] || @deploy_information[:beta_ipa]
+
+
+
+      used_ipa_file = @deploy_information[:ipa]
 
       if used_ipa_file
-        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_type)
+        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_strategy)
 
         # We are able to fetch some metadata directly from the ipa file
         # If they were also given in the Deliverfile, we will compare the values
@@ -84,9 +86,6 @@ module Deliver
     def verify_ipa_file
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless @app_version
-      if (@deploy_information[Deliverer::ValKey::IPA] and @deploy_information[Deliverer::ValKey::BETA_IPA])
-        raise Deliverfile::Deliverfile::DeliverfileDSLError.new("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red) 
-      end
     end
 
     def create_app
@@ -148,7 +147,7 @@ module Deliver
 
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
-      
+
       # Check if there is a Snapfile
       if File.exists?('./Snapfile') and not screens_path
 
@@ -258,16 +257,16 @@ module Deliver
         return app_version
       end
 
-      def upload_type
-        @deploy_information[Deliverer::ValKey::UPLOAD_TYPE]
+      def upload_strategy
+        @deploy_information[Deliverer::ValKey::UPLOAD_STRATEGY]
       end
 
       def is_release_build?
-        upload_type == Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
+        upload_strategy == Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
       end
 
       def is_beta_build?
-        upload_type == Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
+        upload_strategy == Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
       end
   end
 end

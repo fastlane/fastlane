@@ -13,11 +13,11 @@ module Deliver
 
         class DeliverfileDSLError < StandardError
         end
-        
+
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :beta_ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, :submit_further_information]
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, :submit_further_information]
 
           if allowed.include?(method_sym)
             value = arguments.first || block.call
@@ -25,7 +25,7 @@ module Deliver
             unless value
               Helper.log.error(caller)
               Helper.log.fatal("No value or block passed to method '#{method_sym}'")
-              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) 
+              raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red)
             end
 
             if (not value.kind_of?Hash) and (not not_translated.include?method_sym)
@@ -57,10 +57,10 @@ module Deliver
         # This method can be used to set a default language, which is used
         # when passing a string to metadata changes, instead of a hash
         # containing multiple languages.
-        # 
+        #
         # This is approach only is recommend for deployments where you are only
         # supporting one language.
-        # 
+        #
         # The language itself must be included in {Deliver::Languages::ALL_LANGUAGES}.
         # @example
         #  default_language 'en-US'
@@ -113,17 +113,17 @@ module Deliver
         end
 
         # Set the apps new version number.
-        # 
-        # If you do not set this, it will automatically being fetched from the 
+        #
+        # If you do not set this, it will automatically being fetched from the
         # IPA file.
         def version(value = nil)
           value ||= yield if block_given?
           raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) unless value
           raise DeliverfileDSLError.new("The app version should be a string".red) unless value.kind_of?(String)
-          
+
           @deliver_data.set_new_value(Deliverer::ValKey::APP_VERSION, value)
         end
-        
+
         private
           def validate_ipa(value)
             raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value

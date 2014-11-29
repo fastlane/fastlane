@@ -1,7 +1,7 @@
 module Deliver
   # This class will collect the deploy data from different places
   # This will trigger:
-  # 
+  #
   # - Parsing the Deliverfile
   # - Temporary storing all the information got from the file, until the file finished executing
   # - Triggering the upload process itself using the DeliverProcess class
@@ -18,7 +18,7 @@ module Deliver
       APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
-      UPLOAD_TYPE = :upload_type
+      UPLOAD_STRATEGY = :upload_strategy
       DESCRIPTION = :description
       TITLE = :title
       CHANGELOG = :changelog
@@ -39,16 +39,17 @@ module Deliver
       ERROR = :error
     end
 
-    
+
     # Start a new deployment process based on the given Deliverfile
     # @param (String) path The path to the Deliverfile.
     # @param (Hash) hash You can pass a hash instead of a path to basically
     #  give all the information required (see {Deliverer::ValKey} for available options)
-    # @param (Bool) force Runs a deployment without verifying any information. This can be 
+    # @param (Bool) force Runs a deployment without verifying any information. This can be
     # used for build servers. If this is set to false a PDF summary will be generated and opened
-    def initialize(path = nil, hash: nil, force: false)
+    def initialize(path = nil, hash: nil, force: false, upload_strategy: upload_strategy)
       @deliver_process = DeliverProcess.new
       @deliver_process.deploy_information[ValKey::SKIP_PDF] = true if force
+      @deliver_process.deploy_information[ValKey::UPLOAD_STRATEGY] = upload_strategy
 
       if hash
         hash.each do |key, value|
@@ -58,21 +59,21 @@ module Deliver
 
         finished_executing_deliver_file
       else
-        @deliver_file = Deliver::Deliverfile::Deliverfile.new(self, path)
+        @deliver_file = Deliver::Deliverfile::Deliverfile.new(self, path, upload_strategy)
       end
 
       # Do not put code here...
     end
 
     # This method is internally called from the Deliverfile DSL
-    # to set a value for a given key. This method will also verify if 
+    # to set a value for a given key. This method will also verify if
     # the key is valid.
     def set_new_value(key, value)
       unless self.class.all_available_keys_to_set.include?key
         raise "Invalid key '#{key}', must be contained in Deliverer::ValKey.".red
       end
 
-      if @deliver_process.deploy_information[key]      
+      if @deliver_process.deploy_information[key]
         Helper.log.warn("You already set a value for key '#{key}'. Overwriting value '#{value}' with new value.")
       end
 
@@ -85,7 +86,7 @@ module Deliver
     end
 
     # An array of all available options to be set a deployment_information.
-    # 
+    #
     # Is used to verify user inputs
     # @return (Hash) The array of symbols
     def self.all_available_keys_to_set
@@ -93,16 +94,16 @@ module Deliver
     end
 
     # An array of all available blocks to be set for a deployment
-    # 
+    #
     # Is used to verify user inputs
     # @return (Hash) The array of symbols
     def self.all_available_blocks_to_set
       Deliverer::AllBlocks.constants.collect { |a| Deliverer::AllBlocks.const_get(a) }
     end
 
-    # This method will take care of the actual deployment process, after we 
-    # received all information from the Deliverfile. 
-    # 
+    # This method will take care of the actual deployment process, after we
+    # received all information from the Deliverfile.
+    #
     # This method will be called from the {Deliver::Deliverfile} after
     # it is finished executing the Ruby script.
     def finished_executing_deliver_file
