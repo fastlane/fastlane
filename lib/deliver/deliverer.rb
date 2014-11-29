@@ -18,9 +18,11 @@ module Deliver
       APPLE_ID = :apple_id
       APP_VERSION = :version
       IPA = :ipa
-      UPLOAD_STRATEGY = :upload_strategy
       DESCRIPTION = :description
       TITLE = :title
+      BETA_IPA = :beta_ipa
+      IS_BETA_IPA = :is_beta_ipa
+      SKIP_DEPLOY = :skip_deploy
       CHANGELOG = :changelog
       SUPPORT_URL = :support_url
       PRIVACY_URL = :privacy_url
@@ -46,10 +48,11 @@ module Deliver
     #  give all the information required (see {Deliverer::ValKey} for available options)
     # @param (Bool) force Runs a deployment without verifying any information. This can be
     # used for build servers. If this is set to false a PDF summary will be generated and opened
-    def initialize(path = nil, hash: nil, force: false, upload_strategy: upload_strategy)
+    def initialize(path = nil, hash: nil, force: false, is_beta_ipa: false, skip_deploy: false)
       @deliver_process = DeliverProcess.new
       @deliver_process.deploy_information[ValKey::SKIP_PDF] = true if force
-      @deliver_process.deploy_information[ValKey::UPLOAD_STRATEGY] = upload_strategy
+      @deliver_process.deploy_information[ValKey::IS_BETA_IPA] = is_beta_ipa
+      @deliver_process.deploy_information[ValKey::SKIP_DEPLOY] = skip_deploy
 
       if hash
         hash.each do |key, value|
@@ -59,7 +62,7 @@ module Deliver
 
         finished_executing_deliver_file
       else
-        @deliver_file = Deliver::Deliverfile::Deliverfile.new(self, path, upload_strategy)
+        @deliver_file = Deliver::Deliverfile::Deliverfile.new(self, path)
       end
 
       # Do not put code here...

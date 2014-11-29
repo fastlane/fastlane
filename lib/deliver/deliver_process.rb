@@ -15,6 +15,9 @@ module Deliver
     # @return (Deliver::App) The App that is currently being edited.
     attr_accessor :app
 
+    # @return (Deliver::IpaUploader) The IPA uploader that is currently being used.
+    attr_accessor :ipa
+
     # @return (Hash) All the updated/new information we got from the Deliverfile.
     #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
@@ -69,11 +72,21 @@ module Deliver
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
 
-
-
-      used_ipa_file = @deploy_information[:ipa]
+      if is_release_build?
+        used_ipa_file = @deploy_information[:ipa]
+      elsif is_beta_build?
+        used_ipa_file = @deploy_information[:beta_ipa]
+      end
 
       if used_ipa_file
+        upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
+        if is_beta_build?
+          upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
+        end
+        if skip_deployment?
+          upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_JUST_UPLOAD
+        end
+
         @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_strategy)
 
         # We are able to fetch some metadata directly from the ipa file
@@ -257,16 +270,16 @@ module Deliver
         return app_version
       end
 
-      def upload_strategy
-        @deploy_information[Deliverer::ValKey::UPLOAD_STRATEGY]
+      def  skip_deployment?
+        @deploy_information[Deliverer::ValKey::SKIP_DEPLOY]
       end
 
       def is_release_build?
-        upload_strategy == Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
+        is_beta_build? == false
       end
 
       def is_beta_build?
-        upload_strategy == Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
+          @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
       end
   end
 end

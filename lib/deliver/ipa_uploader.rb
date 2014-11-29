@@ -2,7 +2,7 @@ require 'zip'
 require 'plist'
 
 module Deliver
-  class IpaUploaderError < StandardError 
+  class IpaUploaderError < StandardError
   end
 
   IPA_UPLOAD_STRATEGY_APP_STORE = 1
@@ -13,13 +13,14 @@ module Deliver
   # Metadata + IPA file can not be handled in one file
   class IpaUploader < AppMetadata
     attr_accessor :app
+    attr_accessor :publish_strategy
 
     # Create a new uploader for one ipa file. This will only upload the ipa and no
     # other app metadata.
     # @param app (Deliver::App) The app for which the ipa should be uploaded for
     # @param dir (String) The path to where we can store (copy) the ipa file. Usually /tmp/
     # @param ipa_path (String) The path to the IPA file which should be uploaded
-    # @param publish_strategy (Int) If it's a beta build, it will be released to the testers. 
+    # @param publish_strategy (Int) If it's a beta build, it will be released to the testers.
     # If it's a production build it will be released into production. Otherwise no action.
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
     def initialize(app, dir, ipa_path, publish_strategy)
@@ -85,7 +86,7 @@ module Deliver
       return is_okay
     end
 
-    
+
 
     private
       # This method will trigger the iTunesConnect class to choose the latest build
@@ -94,7 +95,7 @@ module Deliver
           return publish_production_build(submit_information)
         elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
-        end 
+        end
         return false
       end
 

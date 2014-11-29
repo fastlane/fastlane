@@ -17,7 +17,7 @@ module Deliver
       #  results of running this deliverfile
       # @param (String) path (optional) to the file itself. This must also include the
       #  filename itself.
-      def initialize(deliver_data, path = nil, upload_strategy)
+      def initialize(deliver_data, path = nil)
         path ||= "./#{FILE_NAME}"
         raise "#{FILE_NAME} not found at path '#{path}'".red unless File.exists?(path.to_s)
 
