@@ -290,6 +290,7 @@ You can easily create screenshots completely automatically in the background usi
 - Run ```snapshot init``` in your project folder
 - You can edit the new ```snapshot.js``` file with your UI Automation code
 - Run ```snapshot``` to test if the screenshots work as expected
+- Remove the line ```screenshot_folder``` from your ```Deliverfile``` to automatically create new screenshots for each deployment. 
 
 From now on, when you start ```deliver```, it will first create the new screenshots for you, which then will be uploaded to iTunes Connect.
 
