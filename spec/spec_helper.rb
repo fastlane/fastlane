@@ -24,3 +24,12 @@ module OS
     (/darwin/ =~ RUBY_PLATFORM) != nil
   end
 end
+
+
+RSpec.configure do |config|
+  config.after(:each) do |test|
+    count = Deliver::ItunesTransporter.number_of_mock_files
+    Deliver::ItunesTransporter.clear_mock_files
+    raise "Looks like there are were too many mock files set in the Deliver::ItunesTransporter in this test: '#{test.metadata[:example_group][:full_description]}'" if count > 0
+  end
+end
