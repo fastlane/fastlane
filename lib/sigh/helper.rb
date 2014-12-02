@@ -6,7 +6,7 @@ module Sigh
     # Logging happens using this method
     def self.log
       if is_test?
-        @@log ||= Logger.new(nil) # don't show any logs when running tests
+        @@log ||= Logger.new(STDOUT) # don't show any logs when running tests
       else
         @@log ||= Logger.new(STDOUT)
       end
