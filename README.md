@@ -50,6 +50,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 - Support for **multiple Teams**
+- Support for Enterprise Profiles
 
 ### Why not let Xcode do the work?
 

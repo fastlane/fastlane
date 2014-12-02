@@ -145,7 +145,9 @@ module Sigh
     def run(app_identifier, type, cert_name = nil)
       cert = maintain_app_certificate(app_identifier, type)
 
-      cert_name ||= "#{type}_#{app_identifier}.mobileprovision" # default name
+      type_name = type
+      type_name = "Distribution" if type == APPSTORE # both enterprise and App Store
+      cert_name ||= "#{type_name}_#{app_identifier}.mobileprovision" # default name
       cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
 
       output_path = TMP_FOLDER + cert_name
@@ -170,8 +172,17 @@ module Sigh
 
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
         certs['provisioningProfiles'].each do |current_cert|
-          next if type == DEVELOPMENT and current_cert['type'] != "iOS Development"
-          next if type != DEVELOPMENT and current_cert['type'] != 'iOS Distribution'
+          if type == DEVELOPMENT
+            if current_cert['type'] != "iOS Development"
+              next
+            end
+          end
+
+          if type != DEVELOPMENT
+            if not ['iOS Distribution', 'iOS UniversalDistribution'].include?current_cert['type']
+              next
+            end
+          end
           
           details = profile_details(current_cert['provisioningProfileId'])
 
@@ -214,8 +225,16 @@ module Sigh
       visit create_url
 
       # 1) Select the profile type (AppStore, Adhoc)
-      wait_for_elements('#type-production')
-      value = 'store'
+      enterprise = false
+
+      begin
+        wait_for_elements('#type-production')
+      rescue Exception => ex
+        wait_for_elements('#type-inhouse') # enterprise accounts
+        enterprise = true
+      end
+
+      value = (enterprise ? 'inhouse' : 'store')
       value = 'limited' if type == DEVELOPMENT
       value = 'adhoc' if type == ADHOC
 
