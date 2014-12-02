@@ -25,9 +25,6 @@ module Snapshot
     # @return (String) The path, in which the screenshots should be stored
     attr_accessor :screenshots_path
 
-    # @return (String) The path, in which the HTML file should be exported to
-    attr_accessor :html_path
-
     # @return (String) The build command, wich should build the app to '/tmp/snapshot'
     attr_accessor :build_command
 
@@ -80,8 +77,6 @@ module Snapshot
 
       self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil) # prefer workspaces ofc
       self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
-
-      self.html_path = './screenshots.html'
 
       empty = Proc.new {}
       self.blocks = {

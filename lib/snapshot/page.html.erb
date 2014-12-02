@@ -40,10 +40,11 @@
             <% screens.each do |screen_path| %>
               <% next if screen_path.include?"_framed.png" %>
               <td>
+                <% path = screen_path.gsub("./screenshots/", "./") %>
                 <% screen_size = FastImage.size(screen_path) %>
-                <a href="<%= screen_path %>" target="_blank">
+                <a href="<%= path %>" target="_blank">
                   <img class="screenshot" 
-                         src="<%= screen_path %>",
+                         src="<%= path %>",
                        style="width: <%= [(screen_size[0] / divide_size_by).round, max_width].min %>px;" />
                 </a>
               </td>

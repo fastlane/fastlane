@@ -187,12 +187,6 @@ By default, ```snapshot``` will look for your project in the current directory. 
 project_path "./my_project/Project.xcworkspace"
 ```
 
-### HTML Report Path
-After all screenshots were created, a HTML file will be generated, to quickly get an overview of all screens on all devices. You can set a custom export path, to easily integrate the HTML report as ```Jenkins``` test result page.
-```ruby
-html_path "~/Desktop/screens.html"
-```
-
 ### iOS Version
 I'll try to keep the script up to date. If you need to change the iOS version, you can do it like this:
 
