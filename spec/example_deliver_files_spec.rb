@@ -136,7 +136,7 @@ describe Deliver do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshotsFallbackDefaultLanguage")
-            expect(deliv.deliver_process.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp"})
+            expect(deliv.deliver_process.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp/notHere"})
           end
 
           it "Does not require an app version, when an ipa is given" do

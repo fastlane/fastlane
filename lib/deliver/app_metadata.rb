@@ -300,7 +300,7 @@ module Deliver
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
-        resulting_path = "#{current_path}/*.{png,PNG,jpg,JPG,jpeg,JPEG}"
+        resulting_path = "#{current_path}/**/*.{png,PNG,jpg,JPG,jpeg,JPEG}"
 
         raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
 
