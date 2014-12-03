@@ -20,20 +20,25 @@ program :help_formatter, :compact
 global_option('--verbose') { $verbose = true }
 
 command :run do |c|
-  c.syntax = 'fastlane run'
+  c.syntax = 'fastlane run [lane]'
   c.description = 'Drive the fastlane for a specific environment.'
 
   c.action do |args, options|
     FastLane::UpdateChecker.verify_latest_version
     
-    ff = FastLane::FastFile.new(File.join(FastLane::FastlaneFolder.path, 'Fastfile'))
+    if FastLane::FastlaneFolder.path
+      ff = FastLane::FastFile.new(File.join(FastLane::FastlaneFolder.path, 'Fastfile'))
 
-    if args.count == 0
-      raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
-    end
+      if args.count == 0
+        raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
+      end
 
-    args.each do |key|
-      ff.runner.execute(key)
+      args.each do |key|
+        ff.runner.execute(key)
+      end
+    else
+      create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
+      FastLane::Setup.new.run if create
     end
   end
 end

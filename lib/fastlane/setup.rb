@@ -17,7 +17,7 @@ module FastLane
     def show_infos
       Helper.log.info "This setup will help you get up and running in no time.".green
       Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
-      Helper.log.info "into the subfolder `fastlane` if they exist.\n".green
+      Helper.log.info "into the subfolder `fastlane`.\n".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
