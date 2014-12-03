@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.3.6)
+    deliver (0.3.7)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -31,18 +31,18 @@ GEM
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
-    commander (4.2.0)
+    commander (4.2.1)
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastimage (1.6.3)
+    fastimage (1.6.4)
       addressable (~> 2.3, >= 2.3.5)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
-    mime-types (2.4.2)
+    mime-types (2.4.3)
     mini_portile (0.6.0)
     multi_json (1.10.1)
     nokogiri (1.6.3.1)
@@ -86,7 +86,7 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    snapshot (0.3.1)
+    snapshot (0.3.2)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
@@ -96,7 +96,7 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.3.5)
+    websocket-driver (0.4.0)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.4)
