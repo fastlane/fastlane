@@ -2,7 +2,7 @@ module Snapshot
   class SnapfileCreator
     # This method will take care of creating a Snapfile
     def self.create(path)
-      snapfile_path = [path, 'Snapfile'].join("/")
+      snapfile_path = File.join(path, 'Snapfile')
 
       raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use Snapshot.".red if File.exists?(snapfile_path)
 

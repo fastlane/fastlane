@@ -50,7 +50,8 @@ command :init do |c|
   c.description = "Creates a new Snapfile in the current directory"
 
   c.action do |args, options|
-    Snapshot::SnapfileCreator.create('.')
+    path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+    Snapshot::SnapfileCreator.create(path)
   end
 end
 
