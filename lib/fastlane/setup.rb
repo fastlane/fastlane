@@ -23,7 +23,7 @@ module FastLane
     end
 
     def copy_existing_files
-      files = ['Deliverfile', 'Snapfile']
+      files = ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
       files.each do |current|
         if File.exists?current
           file_name = File.basename(current)
