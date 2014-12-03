@@ -24,6 +24,7 @@ describe FastLane do
         expect(File.exists?('/tmp/fastlane/before_all')).to eq(true)
         expect(File.exists?('/tmp/fastlane/deploy')).to eq(true)
         expect(File.exists?('/tmp/fastlane/test')).to eq(false)
+        expect(File.exists?('/tmp/fastlane/after_all')).to eq(true)
 
         ff.runner.execute(:test)
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)

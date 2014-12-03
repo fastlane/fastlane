@@ -16,7 +16,7 @@ module FastLane
     def self.create_folder!
       path = "./#{FOLDER_NAME}"
       FileUtils.mkdir_p path
-      Helper.log.info "Created new folder '#{path}'. You can rename it to '.#{FOLDER_NAME}' to hide it.".green
+      Helper.log.info "Created new folder '#{path}'.".green
     end
   end
 end
