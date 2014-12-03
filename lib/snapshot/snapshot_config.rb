@@ -45,12 +45,14 @@ module Snapshot
       path ||= './Snapfile'
       set_defaults
 
-      if path and File.exists?path
+      if File.exists?path
+        Helper.log.info "Using '#{path}'".green
         self.snapshot_file = SnapshotFile.new(path, self)
       else
         if path != './Snapfile'
           raise "Could not find Snapfile at path '#{path}'. Make sure you pass the full path, including 'Snapfile'".red
         else
+          # Using default settings, since user didn't provide a path
           Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now.".red
         end
       end
