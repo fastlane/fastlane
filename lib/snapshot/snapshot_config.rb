@@ -77,8 +77,14 @@ module Snapshot
 
       self.screenshots_path = './screenshots'
 
-      self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil) # prefer workspaces ofc
-      self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
+      folders = ["./*.xcworkspace"] # we prefer workspaces
+      folders << "../*.xcworkspace" if Helper.fastlane_enabled?
+      folders << "./*.xcodeproj"
+      folders << "../*.xcodeproj" if Helper.fastlane_enabled?
+
+      folders.each do |current|
+        self.project_path ||= (File.expand_path(Dir[current].first) rescue nil)
+      end
 
       empty = Proc.new {}
       self.blocks = {

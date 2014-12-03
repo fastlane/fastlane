@@ -33,8 +33,15 @@ command :run do |c|
   c.option '--snapfile STRING', String, 'Custom path for your Snapfile'
 
   c.action do |args, options|
-    Snapshot::SnapshotConfig.shared_instance(options.snapfile) if options.snapfile # to set the custom Snapfile path if given
-    Snapshot::Runner.new.work
+    if Snapshot::Helper.fastlane_enabled?
+      Dir.chdir('./fastlane') do # switch the context
+        Snapshot::SnapshotConfig.shared_instance(options.snapfile)
+        Snapshot::Runner.new.work
+      end
+    else
+      Snapshot::SnapshotConfig.shared_instance(options.snapfile) # to set the custom Snapfile path if given
+      Snapshot::Runner.new.work
+    end
   end
 end
 
@@ -46,3 +53,4 @@ command :init do |c|
     Snapshot::SnapfileCreator.create('.')
   end
 end
+

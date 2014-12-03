@@ -59,6 +59,7 @@ module Snapshot
         proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
 
         build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
+
         [
           build_command,
           "-sdk iphonesimulator",
