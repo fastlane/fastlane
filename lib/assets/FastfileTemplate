@@ -1,0 +1,11 @@
+before_all do
+  system("pod install")
+end
+
+lane :test do 
+  snapshot
+end
+
+lane :deploy do
+  deliver
+end

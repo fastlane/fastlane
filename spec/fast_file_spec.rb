@@ -1,4 +1,3 @@
-require 'pry'
 describe FastLane do
   describe FastLane::FastFile do
     describe "#initialize" do
@@ -15,7 +14,7 @@ describe FastLane do
       end
     end
 
-    describe "Dffferent Fastfiles" do
+    describe "Different Fastfiles" do
       it "execute different envs" do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
