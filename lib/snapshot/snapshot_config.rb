@@ -99,7 +99,7 @@ module Snapshot
 
     # Returns the file name of the project
     def project_name
-      (self.project_path.split('/').last.split('.').first rescue nil)
+      File.basename(self.project_path, ".*" )
     end
 
     # The JavaScript UIAutomation file
@@ -117,7 +117,7 @@ module Snapshot
     # The scheme to use (either it's set, or there is only one, or user has to enter it)
     def scheme
       begin
-        command = "cd '#{project_path.split('/')[0..-2].join('/')}'; xcodebuild -list"
+        command = "cd '#{File.expand_path('..', project_path)}'; xcodebuild -list"
         schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
         Helper.log.debug "Found available schemes: #{schemes}"
 
