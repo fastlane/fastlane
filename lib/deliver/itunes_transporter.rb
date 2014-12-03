@@ -16,8 +16,9 @@ module Deliver
     ERROR_REGEX = />\s*ERROR:\s+(.+)/
     WARNING_REGEX = />\s*WARN:\s+(.+)/
     OUTPUT_REGEX = />\s+(.+)/
+    RETURN_VALUE_REGEX = />\sDBG-X:\sReturning\s+(\d+)/
 
-    private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX
+    private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
@@ -112,7 +113,7 @@ module Deliver
         end
 
         if @errors.count > 0
-          raise TransporterTransferError.new(@errors.join("\n"))
+          Helper.log.error(@errors.join("\n"))
         end
 
         true
@@ -141,6 +142,17 @@ module Deliver
           @warnings << $1
           Helper.log.warn "[Transporter Warning Output]: #{$1}".yellow
           output_done = true
+        end
+
+        if line =~ RETURN_VALUE_REGEX
+          if $1.to_i != 0
+            Helper.log.fatal "Transporter transfer failed.".red
+            Helper.log.warn(@warnings.join("\n").yellow)
+            Helper.log.error(@errors.join("\n").red)
+            raise "Return status of iTunes Transporter was #{$1}: #{@errors.join('\n')}".red
+          else
+            Helper.log.info "iTunes Transporter successfully finished its job".green
+          end
         end
 
         if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX

@@ -85,7 +85,7 @@ describe Deliver do
             
             expect {
               Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
-            }.to raise_exception("ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"")
+            }.to raise_exception("Return status of iTunes Transporter was 1: ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"".red)
           end
 
           it "Sets all the available metadata" do
