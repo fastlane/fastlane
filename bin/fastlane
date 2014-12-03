@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'fastlane'
+require 'commander/import'
+require 'fastlane/update_checker'
+
+HighLine.track_eof = false
+
+
+# Commander
+program :version, FastLane::VERSION
+program :description, 'CLI for \'fastlane\' - iOS Deployment pipeline'
+program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
+program :help, 'Website', 'http://felixkrause.at'
+program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
+program :help_formatter, :compact
+
+global_option('--verbose') { $verbose = true }
+
+command :run do |c|
+  c.syntax = 'fastlane run'
+  c.description = 'Drive the fastlane for a specific environment.'
+
+  c.action do |args, options|
+    FastLane::UpdateChecker.verify_latest_version
+    
+    ff = FastLane::FastFile.new(File.join(config_path, 'Fastfile'))
+    args.each do |key|
+      ff.runner.execute(key)
+    end
+  end
+end
+
+command :init do |c|
+  c.syntax = 'fastlane init'
+  c.description = 'Helps you setting up fastlane based on your existing tools.'
+
+  c.action do |args, options|
+    FastLane::UpdateChecker.verify_latest_version
+
+  end
+end
+
+default_command :run
+
+
+def config_path
+  './.fastlane/'
+end
