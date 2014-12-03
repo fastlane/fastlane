@@ -29,6 +29,13 @@ describe FastLane do
         ff.runner.execute(:test)
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)
       end
+
+      it "raises an error if lane is not available" do
+        ff = FastLane::FastFile.new('./spec/fixtures/Fastfiles/Fastfile1')
+        expect {
+          ff.runner.execute(:not_here)
+        }.to raise_exception("Could not find action for type 'not_here'. Available lanes: test, deploy".red)
+      end
     end
   end
 end

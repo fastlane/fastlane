@@ -2,12 +2,15 @@ module FastLane
   class Runner
 
     def execute(key)
+      key = key.to_sym
+      Helper.log.info "Driving the lane '#{key}'".green
+
       @before_all.call if @before_all
       
       if blocks[key]
         blocks[key].call
       else
-        raise "Could not find action for type '#{key}'".red
+        raise "Could not find action for type '#{key}'. Available lanes: #{blocks.keys.join(', ')}".red
       end
     end
 
