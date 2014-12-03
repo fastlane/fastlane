@@ -28,10 +28,10 @@ module Snapshot
       html_path = [lib_path, "snapshot/page.html.erb"].join('/')
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
-      export_path = "./screenshots/screenshots.html"
+      export_path = "#{screens_path}/screenshots.html"
       File.write(export_path, html)
 
-      Helper.log.info "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'".green
+      Helper.log.info "Successfully created HTML file with an overview of all the screenshots: '#{File.expand_path(export_path)}'".green
     end
 
     private
