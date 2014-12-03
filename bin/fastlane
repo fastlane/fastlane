@@ -27,6 +27,11 @@ command :run do |c|
     FastLane::UpdateChecker.verify_latest_version
     
     ff = FastLane::FastFile.new(File.join(config_path, 'Fastfile'))
+
+    if args.count == 0
+      raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
+    end
+
     args.each do |key|
       ff.runner.execute(key)
     end

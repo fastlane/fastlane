@@ -10,8 +10,12 @@ module FastLane
       if blocks[key]
         blocks[key].call
       else
-        raise "Could not find action for type '#{key}'. Available lanes: #{blocks.keys.join(', ')}".red
+        raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
       end
+    end
+
+    def available_lanes
+      blocks.keys
     end
 
     # Called internally
