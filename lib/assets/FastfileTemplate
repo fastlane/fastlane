@@ -1,11 +1,26 @@
 before_all do
-  system("pod install")
+  [[BEFORE_ALL]]system("pod install")
 end
 
 lane :test do 
   snapshot
+  xctool
+end
+
+lane :beta do
+  snapshot
+  xctool
+  # sigh
+  # system('your_script.sh')
 end
 
 lane :deploy do
+  snapshot
+  xctool
+  # sigh
   deliver
+end
+
+after_all do
+  # Send message on Slack, send success Email, ...
 end
