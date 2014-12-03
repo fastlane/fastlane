@@ -128,7 +128,7 @@ module Deliver
         matching.each do |key, value|
           if current[key]
             @deploy_information[value] ||= {}
-            @deploy_information[value][language] = current[key]
+            @deploy_information[value][language] ||= current[key]
           end
         end
       end

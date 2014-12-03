@@ -70,6 +70,16 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
           end
 
+          it "overwrites the config from metadata.json when set in the Deliverfile" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileChangelog")
+            expect(meta.deliver_process.deploy_information[:changelog]['en-US']).to eq("It works")
+            expect(meta.deliver_process.deploy_information[:title]['en-US']).to eq("Overwritten")
+
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:title").first.content).to eq("Overwritten")
+          end
+
           it "Raises an exception when iTunes Transporter results in an error" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
             
