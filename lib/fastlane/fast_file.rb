@@ -21,5 +21,9 @@ module FastLane
     def before_all(&block)
       @runner.set_before_all(block)
     end
+
+    def method_missing(method_sym, *arguments, &block)
+      raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
+    end
   end
 end

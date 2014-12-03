@@ -7,6 +7,12 @@ describe FastLane do
           FastLane::FastFile.new('./spec/fixtures/Fastfiles/FastfileNotHere')
         }.to raise_exception "Could not find Fastfile at path './spec/fixtures/Fastfiles/FastfileNotHere'".red
       end
+
+      it "raises an error if unknow method is called" do
+        expect {
+          FastLane::FastFile.new('./spec/fixtures/Fastfiles/FastfileInvalid')
+        }.to raise_exception "Could not find method 'laneasdf'. Use `lane :name do ... end`".red
+      end
     end
 
     describe "Dffferent Fastfiles" do
