@@ -6,6 +6,7 @@ PATH
       colored
       commander (~> 4.2.0)
       deliver
+      fastlane
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)

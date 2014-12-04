@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
   spec.add_dependency 'deliver' # password manager
+  spec.add_dependency 'fastlane'
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
