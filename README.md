@@ -52,7 +52,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Support for **multiple Teams**
 - Support for Enterprise Profiles
 
-You can use [PEM](https://github.com/KrauseFx/PEM) to automate iOS Push profiles.
+To automate iOS Push profiles you can use [PEM](https://github.com/KrauseFx/PEM).
 
 ### Why not let Xcode do the work?
 
