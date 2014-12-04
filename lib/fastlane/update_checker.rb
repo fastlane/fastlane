@@ -1,6 +1,6 @@
 require 'open-uri'
 
-module FastLane
+module Fastlane
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
     # This method will check if the latest version is installed and show a warning if that's not the case
@@ -33,7 +33,7 @@ module FastLane
 
     # The currently used version of this gem
     def self.current_version
-      FastLane::VERSION
+      Fastlane::VERSION
     end
 
     private

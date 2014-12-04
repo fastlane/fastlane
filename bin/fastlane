@@ -10,7 +10,7 @@ HighLine.track_eof = false
 
 
 # Commander
-program :version, FastLane::VERSION
+program :version, Fastlane::VERSION
 program :description, 'CLI for \'fastlane\' - iOS Deployment pipeline'
 program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
 program :help, 'Website', 'http://felixkrause.at'
@@ -24,10 +24,10 @@ command :run do |c|
   c.description = 'Drive the fastlane for a specific environment.'
 
   c.action do |args, options|
-    FastLane::UpdateChecker.verify_latest_version
+    Fastlane::UpdateChecker.verify_latest_version
     
-    if FastLane::FastlaneFolder.path
-      ff = FastLane::FastFile.new(File.join(FastLane::FastlaneFolder.path, 'Fastfile'))
+    if Fastlane::FastlaneFolder.path
+      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
       if args.count == 0
         raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
@@ -38,7 +38,7 @@ command :run do |c|
       end
     else
       create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
-      FastLane::Setup.new.run if create
+      Fastlane::Setup.new.run if create
     end
   end
 end
@@ -48,8 +48,8 @@ command :init do |c|
   c.description = 'Helps you setting up fastlane based on your existing tools.'
 
   c.action do |args, options|
-    FastLane::UpdateChecker.verify_latest_version
-    FastLane::Setup.new.run
+    Fastlane::UpdateChecker.verify_latest_version
+    Fastlane::Setup.new.run
   end
 end
 

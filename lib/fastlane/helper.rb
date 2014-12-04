@@ -1,6 +1,6 @@
 require 'logger'
 
-module FastLane
+module Fastlane
   module Helper
 
     # Logging happens using this method

@@ -1,4 +1,4 @@
-module FastLane
+module Fastlane
   class FastFile
     attr_accessor :runner
 

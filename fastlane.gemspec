@@ -5,7 +5,7 @@ require 'fastlane/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
-  spec.version       = FastLane::VERSION
+  spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]
   spec.summary       = %q{To be announced}

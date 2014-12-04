@@ -1,4 +1,4 @@
-module FastLane
+module Fastlane
   class Setup
     def run
       raise "Fastlane already set up at path #{folder}".yellow if FastlaneFolder.setup?

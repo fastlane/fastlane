@@ -1,4 +1,4 @@
-module FastLane
+module Fastlane
   class Runner
 
     def execute(key)

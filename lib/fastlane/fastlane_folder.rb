@@ -1,4 +1,4 @@
-module FastLane
+module Fastlane
   class FastlaneFolder
     FOLDER_NAME = 'fastlane'
     
