@@ -21,7 +21,7 @@ Sigh
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
 
 
-Tired of manually creating, renewing and downloading your provisioning profiles?
+Tired of manually creating, renewing and downloading your iOS provisioning profiles?
 
 ```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
 
@@ -52,10 +52,12 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Support for **multiple Teams**
 - Support for Enterprise Profiles
 
+You can use [PEM](https://github.com/KrauseFx/PEM) to automate iOS Push profiles.
+
 ### Why not let Xcode do the work?
 
 - ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
-- Xcode sometimes invalidates all existing profiles ([Proof](assets/SignErrors.png))
+- Xcode sometimes invalidates all existing profiles ([Screenshot](assets/SignErrors.png))
 - You have control over what happens
 - You still get to have the signing files, which you can then use for your build scripts or store in git
 
