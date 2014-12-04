@@ -5,7 +5,8 @@ $:.push File.expand_path("../../lib", __FILE__)
 require 'sigh'
 require 'commander/import'
 require 'sigh/update_checker'
-require 'deliver/password_manager'
+require 'fastlane/password_manager'
+require 'fastlane/appfile_config'
 
 HighLine.track_eof = false
 
@@ -57,15 +58,17 @@ end
 default_command :renew
 
 def username(options)
-  user = nil
-  user = options.username if options.username
-  user = ENV["SIGH_USERNAME"] if ENV["SIGH_USERNAME"]
+  user = options.username
+  user ||= ENV["SIGH_USERNAME"]
+  user ||= Fastlane::AppfileConfig.try_fetch_value(:apple_id)
   
-  Deliver::PasswordManager.shared_manager(user) if user
+  Fastlane::PasswordManager.shared_manager(user) if user
 end
 
 def app_identifier(options)
-  return options.identifier if options.identifier
-  return ENV["SIGH_APP_IDENTIFIER"] if ENV["SIGH_APP_IDENTIFIER"]
-  return ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  value = options.identifier
+  value ||= ENV["SIGH_APP_IDENTIFIER"]
+  value ||= Fastlane::AppfileConfig.try_fetch_value(:app_identifier)
+  value ||= ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  return value
 end
