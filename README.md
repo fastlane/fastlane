@@ -19,9 +19,11 @@ Pem - Maintain your push certificates
 [![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
 
 
-Tired of manually creating and maintaining your push notification profiles? Tired of generating a ```pem``` file for your server? 
+Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a ```pem``` file for your server? 
 
 ```PEM``` does all that for, just by running ```pem```.
+
+To automate iOS Provisioning profiles you can use [sigh](https://github.com/KrauseFx/sigh).
 
 Felix Krause ([@KrauseFx](https://twitter.com/KrauseFx)) the developer of ```PEM```<br />
 Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates<br />
