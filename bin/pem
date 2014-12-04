@@ -50,9 +50,9 @@ end
 default_command :renew
 
 def username(options)
-  user = nil
-  user = options.username if options.username
-  user = ENV["PEM_USERNAME"] if ENV["PEM_USERNAME"]
+  user = options.username
+  user ||= ENV["PEM_USERNAME"]
+  user ||= Fastlane::AppfileConfig.try_fetch_value(:apple_id)
   
   Fastlane::PasswordManager.shared_manager(user) if user
 end
