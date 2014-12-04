@@ -6,6 +6,7 @@ require 'pem'
 require 'commander/import'
 require 'pem/update_checker'
 require 'fastlane/password_manager'
+require 'fastlane/appfile_config'
 
 HighLine.track_eof = false
 
@@ -57,7 +58,9 @@ def username(options)
 end
 
 def app_identifier(options)
-  return options.identifier if options.identifier
-  return ENV["PEM_APP_IDENTIFIER"] if ENV["PEM_APP_IDENTIFIER"]
-  return ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  value = options.identifier
+  value ||= ENV["PEM_APP_IDENTIFIER"]
+  value ||= Fastlane::AppfileConfig.try_fetch_value(:app_identifier)
+  value ||= ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  return value
 end
