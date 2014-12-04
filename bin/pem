@@ -5,7 +5,7 @@ $:.push File.expand_path("../../lib", __FILE__)
 require 'pem'
 require 'commander/import'
 require 'pem/update_checker'
-require 'deliver/password_manager'
+require 'fastlane/password_manager'
 
 HighLine.track_eof = false
 
@@ -53,7 +53,7 @@ def username(options)
   user = options.username if options.username
   user = ENV["PEM_USERNAME"] if ENV["PEM_USERNAME"]
   
-  Deliver::PasswordManager.shared_manager(user) if user
+  Fastlane::PasswordManager.shared_manager(user) if user
 end
 
 def app_identifier(options)

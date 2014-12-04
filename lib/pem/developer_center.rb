@@ -1,4 +1,4 @@
-require 'deliver/password_manager'
+require 'fastlane/password_manager'
 require 'open-uri'
 require 'openssl'
 
@@ -54,7 +54,7 @@ module PEM
 
     # Loggs in a user with the given login data on the Dev Center Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {Deliver::PasswordManager}.
+    # Automatically be fetched using the {Fastlane::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -67,8 +67,8 @@ module PEM
       begin
         Helper.log.info "Login into iOS Developer Center"
 
-        user ||= Deliver::PasswordManager.shared_manager.username
-        password ||= Deliver::PasswordManager.shared_manager.password
+        user ||= Fastlane::PasswordManager.shared_manager.username
+        password ||= Fastlane::PasswordManager.shared_manager.password
 
         result = visit DEVELOPER_CENTER_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'

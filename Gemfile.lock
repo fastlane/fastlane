@@ -5,7 +5,7 @@ PATH
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      deliver
+      fastlane
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
@@ -29,24 +29,14 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    deliver (0.3.6)
-      capybara (~> 2.4.3)
-      colored
-      commander (~> 4.2.0)
-      fastimage (~> 1.6.3)
-      highline (~> 1.6.21)
-      json
-      nokogiri (~> 1.6.3.1)
-      plist (~> 3.1.0)
-      poltergeist (~> 1.5.1)
-      prawn
-      rubyzip (~> 1.1.6)
-      security (~> 0.1.3)
-      snapshot
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastimage (1.6.4)
-      addressable (~> 2.3, >= 2.3.5)
+    fastlane (0.0.1)
+      colored
+      commander (~> 4.2.0)
+      highline (~> 1.6.21)
+      json
+      security (~> 0.1.3)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
@@ -55,16 +45,11 @@ GEM
     multi_json (1.10.1)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
-    pdf-core (0.4.0)
-    plist (3.1.0)
     poltergeist (1.5.1)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    prawn (1.3.0)
-      pdf-core (~> 0.4.0)
-      ttfunk (~> 1.4.0)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -85,7 +70,6 @@ GEM
     rspec-mocks (3.1.2)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.1)
-    rubyzip (1.1.6)
     safe_yaml (1.0.4)
     security (0.1.3)
     simplecov (0.9.1)
@@ -94,13 +78,6 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    snapshot (0.3.2)
-      colored
-      commander (~> 4.2.0)
-      fastimage (~> 1.6.3)
-      highline (~> 1.6.21)
-      json
-    ttfunk (1.4.0)
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
