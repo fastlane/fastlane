@@ -22,12 +22,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'security', '~> 0.1.3' # Mac OS Keychain manager
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
-  spec.add_dependency 'deliver' # password manager
   spec.add_dependency 'fastlane'
 
   # Frontend Scripting
