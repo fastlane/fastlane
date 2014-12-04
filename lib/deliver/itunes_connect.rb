@@ -369,7 +369,7 @@ module Deliver
     # This can easily cause exceptions, which will be shown on iTC.
     # @param app (Deliver::App) the app you want to submit
     # @param perms (Hash) information about content rights, ...
-    def submit_for_review!(app, perms = nil)
+    def submit_for_review!(app, perms = nil, version_number)
       begin
         verify_app(app)
         open_app_page(app)
@@ -422,7 +422,7 @@ module Deliver
             end
 
             begin
-              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click')
+              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click') unless version_number == "1.0"
               first(:xpath, "#{basic}.exportCompliance.usesEncryption.value' and @radio-value='#{perms[:export_compliance][:cryptography_enabled]}']//input").trigger('click')
               first(:xpath, "#{basic}.exportCompliance.isExempt.value' and @radio-value='#{perms[:export_compliance][:is_exempt]}']//input").trigger('click')
             rescue
