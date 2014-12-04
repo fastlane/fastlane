@@ -433,7 +433,7 @@ module Sigh
       def wait_for_variable(name)
         method = Proc.new { |n|
           retval = page.html.match(/var #{n} = "(.*)"/)
-          ratval[1] unless retval == nil
+          retval[1] unless retval == nil
         }
         success = Proc.new { |r| r != nil }
         return wait_for(method, name, success)
