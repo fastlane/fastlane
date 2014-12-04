@@ -369,7 +369,7 @@ module Deliver
     # This can easily cause exceptions, which will be shown on iTC.
     # @param app (Deliver::App) the app you want to submit
     # @param perms (Hash) information about content rights, ...
-    def submit_for_review!(app, perms = nil, version_number)
+    def submit_for_review!(app, perms = nil)
       begin
         verify_app(app)
         open_app_page(app)

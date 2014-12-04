@@ -107,7 +107,7 @@ module Deliver
         # Publish onto Production
         Helper.log.info "Putting the latest build onto production."
         if self.app.itc.put_build_into_production!(self.app, self.fetch_app_version)
-          if self.app.itc.submit_for_review!(self.app, submit_information, self.fetch_app_version)
+          if self.app.itc.submit_for_review!(self.app, submit_information)
             Helper.log.info "Successfully deployed a new update of your app. You can now enjoy a good cold Club Mate.".green
             return true
           end
