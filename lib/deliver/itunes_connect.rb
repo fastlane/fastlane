@@ -417,12 +417,15 @@ module Deliver
           # Export Compliance #
           #####################
           if page.has_content?"Export"
+            
+            encryption_updated_control = all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input")
+            
             if not perms[:export_compliance][:encryption_updated] and perms[:export_compliance][:cryptography_enabled]
               raise "encryption_updated must be enabled if cryptography_enabled is enabled!"
             end
 
             begin
-              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click') unless version_number == "1.0"
+              encryption_updated_control[0].trigger('click') if encryption_updated_control.count > 0
               first(:xpath, "#{basic}.exportCompliance.usesEncryption.value' and @radio-value='#{perms[:export_compliance][:cryptography_enabled]}']//input").trigger('click')
               first(:xpath, "#{basic}.exportCompliance.isExempt.value' and @radio-value='#{perms[:export_compliance][:is_exempt]}']//input").trigger('click')
             rescue
