@@ -164,7 +164,7 @@ module Sigh
           visit PROFILES_URL
         end
 
-        @list_certs_url = page.html.match(/var profileDataURL = "(.*)"/)[1]
+        @list_certs_url = wait_for_variable('profileDataURL')
         # list_certs_url will look like this: "https://developer.apple.com/services-account/..../account/ios/profile/listProvisioningProfiles.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=id&userLocale=en_US&teamId=xy&includeInactiveProfiles=true&onlyCountLists=true"
         Helper.log.info "Fetching all available provisioning profiles..."
 
@@ -351,9 +351,10 @@ module Sigh
         certs_url << "development" if type == DEVELOPMENT
         visit certs_url
 
-        certificateDataURL = page.html.match(/var certificateDataURL = "(.*)"/)[1]
-        certificateRequestTypes = page.html.match(/var certificateRequestTypes = "(.*)"/)[1]
-        certificateStatuses = page.html.match(/var certificateStatuses = "(.*)"/)[1]
+        certificateDataURL = wait_for_variable('certificateDataURL')
+        certificateRequestTypes = wait_for_variable('certificateRequestTypes')
+        certificateStatuses = wait_for_variable('certificateStatuses')
+
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
@@ -405,23 +406,37 @@ module Sigh
         system("open '#{path}'")
       end
 
-      def wait_for_elements(name)
+      def wait_for(method, parameter, success)
         counter = 0
-        results = all(name)
-        while results.count == 0      
-          # Helper.log.debug "Waiting for #{name}"
+        result = method.call(parameter)
+        while !success.call(result)     
           sleep 0.2
 
-          results = all(name)
+        result = method.call(parameter)
 
           counter += 1
           if counter > 100
             Helper.log.debug page.html
             Helper.log.debug caller
-            raise DeveloperCenterGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
+            raise DeveloperCenterGeneralError.new("Couldn't find '#{name}' after waiting for quite some time")
           end
         end
-        return results
+        return result
+      end
+
+      def wait_for_elements(name)
+        method = Proc.new { |n| all(name) }
+        success = Proc.new { |r| r.count > 0 }
+        return wait_for(method, name, success)
+      end
+
+      def wait_for_variable(name)
+        method = Proc.new { |n|
+          retval = page.html.match(/var #{n} = "(.*)"/)
+          retval[1] unless retval == nil
+        }
+        success = Proc.new { |r| r != nil }
+        return wait_for(method, name, success)
       end
   end
 end
