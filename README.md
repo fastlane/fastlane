@@ -20,6 +20,8 @@ FrameIt - Add gorgeous device frames around your screenshots
 
 Want a device frame around your screenshot? Do it in an instant!
 
+This library is not supposed to be used for App Store screenshots.
+
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
