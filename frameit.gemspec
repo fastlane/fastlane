@@ -29,6 +29,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mini_magick', '~> 3.8.1' # To open, edit and export PSD files
   spec.add_dependency 'deliver', '~> 0.3' # To determine the device type based on a screenshot file
 
+  spec.add_dependency 'fastlane'
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
