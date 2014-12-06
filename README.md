@@ -75,6 +75,9 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
+
+```PEM``` will never revoke your existing certificates. 
+
 You can pass parameters like this:
 
     pem -a at.felixkrause.app -u username
