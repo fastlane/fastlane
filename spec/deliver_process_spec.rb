@@ -7,10 +7,6 @@ describe Deliver do
         @version = '1.0'
         @identifier = 'at.felixkrause.iTanky'
         @ipa = "spec/fixtures/ipas/Example1.ipa"
-
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # metadata
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # ipa file
       end
 
       context "when there's a beta build defined" do
