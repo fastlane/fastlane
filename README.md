@@ -310,10 +310,26 @@ Change syntax highlighting to *Ruby*.
 These are features, which are implemented, but not yet fully tested and production ready. You can try it on your own risk.
 
 #### Distribute an ipa file to your TestFlight beta testers
+
+You can optionally specif `--beta` option to upload the ipa file to iTunes Connect and mark the uploaded build as Beta build.
+
+```
+deliver --beta
+```
+
+You should specify a beta ipa in your Deliverfile by using following syntax:
+
 ```ruby
 beta_ipa "./latest.ipa"
 ```
-This will upload the ipa file to iTunes Connect and mark the uploaded build as Beta build.
+
+#### Skipping distribution
+
+You can optionally skip distribution and just upload your IPA to iTunes Connect. To do so specify `--skip-deploy` option.
+
+```
+deliver --skip-deploy
+```
 
 # Need help?
 - If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
