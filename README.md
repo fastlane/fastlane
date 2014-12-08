@@ -59,7 +59,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Create hundreds of screenshots in multiple languages on all simulators
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Very easy to integrate with ```deliver```
+- Very easy to integrate with [```deliver```](https://github.com/KrauseFx/deliver)
+- Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - ```Snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
 After ```Snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
