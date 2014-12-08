@@ -9,13 +9,13 @@ module Snapshot
       FileUtils.rm_rf(BUILD_DIR)
     end
 
-    def build_app
+    def build_app(clean: false)
       command = SnapshotConfig.shared_instance.build_command
 
       if not command
         # That's the default case, user did not provide a custom build_command
         raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
-        command = generate_build_command
+        command = generate_build_command(clean: clean)
       end
 
       Helper.log.info "Building project '#{SnapshotConfig.shared_instance.project_name}' - this might take some time...".green
@@ -51,7 +51,7 @@ module Snapshot
         end
       end
 
-      def generate_build_command
+      def generate_build_command(clean: false)
         scheme = SnapshotConfig.shared_instance.scheme
 
         proj_path = SnapshotConfig.shared_instance.project_path
@@ -59,6 +59,11 @@ module Snapshot
         proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
 
         build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
+
+        actions = []
+        actions << 'clean' if clean
+        actions << "build"
+
         [
           build_command,
           "-sdk iphonesimulator",
@@ -68,7 +73,7 @@ module Snapshot
           "DSTROOT='#{BUILD_DIR}'",
           "OBJROOT='#{BUILD_DIR}'",
           "SYMROOT='#{BUILD_DIR}'",
-          "clean build"
+          actions.join(' ')
         ].join(' ')
       end
   end

@@ -31,10 +31,11 @@ command :run do |c|
   c.syntax = 'snapshot'
   c.description = 'Run the script, to take all the screenshots'
   c.option '--snapfile STRING', String, 'Custom path for your Snapfile'
+  c.option '--noclean', 'Skips the clean process when running snapshot.'
 
   c.action do |args, options|
     Snapshot::SnapshotConfig.shared_instance(options.snapfile) if options.snapfile # to set the custom Snapfile path if given
-    Snapshot::Runner.new.work
+    Snapshot::Runner.new.work(clean: !options.noclean)
   end
 end
 

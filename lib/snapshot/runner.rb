@@ -8,10 +8,10 @@ module Snapshot
       Snapshot::DependencyChecker.check_dependencies
     end
 
-    def work
+    def work(clean: false)
       SnapshotConfig.shared_instance.js_file # to verify the file can be found
 
-      Builder.new.build_app
+      Builder.new.build_app(clean: clean)
 
       counter = 0
       errors = []
