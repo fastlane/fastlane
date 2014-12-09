@@ -6,10 +6,12 @@ module Snapshot
 
 
     def initialize
-      FileUtils.rm_rf(BUILD_DIR)
+      
     end
 
-    def build_app(clean: false)
+    def build_app(clean: true)
+      FileUtils.rm_rf(BUILD_DIR) if clean
+
       command = SnapshotConfig.shared_instance.build_command
 
       if not command
@@ -51,7 +53,7 @@ module Snapshot
         end
       end
 
-      def generate_build_command(clean: false)
+      def generate_build_command(clean: true)
         scheme = SnapshotConfig.shared_instance.scheme
 
         proj_path = SnapshotConfig.shared_instance.project_path
