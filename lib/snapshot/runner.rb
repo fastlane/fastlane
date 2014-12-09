@@ -12,9 +12,11 @@ module Snapshot
       SnapshotConfig.shared_instance.js_file # to verify the file can be found
 
       Builder.new.build_app(clean: clean)
+      @app_path = Dir.glob("/tmp/snapshot/build/*.app").first
 
       counter = 0
       errors = []
+
       SnapshotConfig.shared_instance.devices.each do |device|
         
         SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device)  # Callback
@@ -57,12 +59,11 @@ module Snapshot
 
     def run_tests(device, language)
       Helper.log.info "Running tests on #{device} in language #{language}".green
-      app_path = Dir.glob("/tmp/snapshot/build/*.app").first
 
       clean_old_traces
 
       ENV['SNAPSHOT_LANGUAGE'] = language
-      command = generate_test_command(device, language, app_path)
+      command = generate_test_command(device, language)
       Helper.log.debug command.yellow
       
       retry_run = false
@@ -127,7 +128,7 @@ module Snapshot
       return Dir.glob("#{TRACE_DIR}/**/*.png").count
     end
 
-    def generate_test_command(device, language, app_path)
+    def generate_test_command(device, language)
       script_path = SnapshotConfig.shared_instance.js_file
 
       [
@@ -135,7 +136,7 @@ module Snapshot
         "-w '#{device}'",
         "-D '#{TRACE_DIR}/trace'",
         "-t 'Automation'",
-        "'#{app_path}'",
+        "'#{@app_path}'",
         "-e UIARESULTSPATH '#{TRACE_DIR}'",
         "-e UIASCRIPT '#{script_path}'",
         "-AppleLanguages '(#{language})'",
