@@ -129,11 +129,20 @@ From now on, you can run ```snapshot``` to create new screenshots of your app.
 
 # Usage
 
-Why should you have to remember complicated commands and parameters?
+```
+snapshot
+```
 
-Store your configuration in a text file to easily take screenshots from any computer.
+To skip cleaning the project:
+```
+snapshot --noclean
+```
 
 ## Snapfile
+
+#### Why should you have to remember complicated commands and parameters?
+
+Store your configuration in a text file to easily take screenshots from any computer.
 
 Create a file called ```Snapfile``` in your project directory.
 Once you created your configuration, just run ```snapshot```.
