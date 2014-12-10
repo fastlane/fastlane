@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "sigh"
   spec.version       = Sigh::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["krausefx@gmail.com"]
+  spec.email         = ["sigh@krausefx.com"]
   spec.summary       = %q{Create, Renew and Download your provisioning profiles - using one command}
   spec.description   = %q{Create, Renew and Download your provisioning profiles - using one command}
-  spec.homepage      = "http://felixkrause.at"
+  spec.homepage      = "http://krausefx.com"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
