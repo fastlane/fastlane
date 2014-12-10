@@ -246,7 +246,8 @@ module PEM
         click_next # "Continue"
 
         sleep 1
-        wait_for_elements(".button.small.center.back") # just to wait
+        wait_for_elements(".file-input.validate")
+        wait_for_elements(".button.small.center.back")
 
         # Upload CSR file
         first(:xpath, "//input[@type='file']").set PEM::SigningRequest.get_path
