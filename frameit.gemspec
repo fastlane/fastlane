@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "frameit"
   spec.version       = Frameit::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["krausefx@gmail.com"]
+  spec.email         = ["frameit@krausefx.com"]
   spec.summary       = %q{FrameIt - Want a device frame around your screenshots? Do it in an instant!}
   spec.description   = %q{Want a device frame around your iPhone app screenshots? Do it in an instant!}
-  spec.homepage      = "http://felixkrause.at"
+  spec.homepage      = "http://krausefx.com"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
