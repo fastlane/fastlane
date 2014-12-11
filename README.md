@@ -248,7 +248,7 @@ This is especially important if you have more than one iTunes Connect account in
     DELIVER_PASSWORD
     
 ## Implement your custom solution
-Take a look at [Using the exposed Ruby classes](use-the-exposed-ruby-classes).
+Take a look at [Using the exposed Ruby classes](#use-the-exposed-ruby-classes).
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
