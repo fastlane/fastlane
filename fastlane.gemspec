@@ -27,12 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
-  spec.add_dependency 'deliver' # password manager
-
-  # Frontend Scripting
-  spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
-  spec.add_dependency 'poltergeist', '~> 1.5.1' # headless Javascript browser for controlling iTC
-
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
