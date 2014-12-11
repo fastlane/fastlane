@@ -1,22 +1,22 @@
 before_all do
-  # system("./customShellScript.sh")
+  # sh "./customShellScript.sh"
   install_cocoapods
 end
 
 lane :test do 
-  xctool test
+  sh "xctool test"
   snapshot
 end
 
 lane :beta do
-  xctool test
+  sh "xctool test"
   snapshot
   # sigh
-  # system('your_script.sh')
+  # sh "your_script.sh"
 end
 
 lane :deploy do
-  xctool test
+  sh "xctool test"
   snapshot
   # sigh
   deliver

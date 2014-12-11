@@ -56,7 +56,7 @@ module Fastlane
 
       template.gsub!('deliver', '# deliver') unless enabled_tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless enabled_tools[:snapshot]
-      template.gsub!('xctool', '# xctool') unless enabled_tools[:xctool]
+      template.gsub!('sh "xctool', '# sh "xctool') unless enabled_tools[:xctool]
       template.gsub!('install_cocoapods', '# install_cocoapods') unless enabled_tools[:cocoapods]
 
       enabled_tools.each do |key, value|
