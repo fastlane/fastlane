@@ -1,22 +1,23 @@
 before_all do
-  [[BEFORE_ALL]]system("pod install")
+  # system("./customShellScript.sh")
+  install_cocoapods
 end
 
 lane :test do 
+  xctool test
   snapshot
-  xctool
 end
 
 lane :beta do
+  xctool test
   snapshot
-  xctool
   # sigh
   # system('your_script.sh')
 end
 
 lane :deploy do
+  xctool test
   snapshot
-  xctool
   # sigh
   deliver
 end

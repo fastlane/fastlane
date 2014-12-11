@@ -47,18 +47,17 @@ module Fastlane
 
     def generate_fastfile
       template = File.read("#{gem_path}/lib/assets/FastfileTemplate")
-      
-      before_all = (File.exists?("./Podfile")? '' : '# ')
-      template.gsub!('[[BEFORE_ALL]]', before_all)
 
       enabled_tools = {}
       enabled_tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
       enabled_tools[:snapshot] = File.exists?(File.join(folder, 'Snapfile'))
       enabled_tools[:xctool] = File.exists?('./.xctool-args')
+      enabled_tools[:cocoapods] = File.exists?('./Podfile')
 
       template.gsub!('deliver', '# deliver') unless enabled_tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless enabled_tools[:snapshot]
       template.gsub!('xctool', '# xctool') unless enabled_tools[:xctool]
+      template.gsub!('install_cocoapods', '# install_cocoapods') unless enabled_tools[:cocoapods]
 
       enabled_tools.each do |key, value|
         Helper.log.info "Found '#{key}' enabled.".magenta if value
