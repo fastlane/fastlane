@@ -136,7 +136,7 @@ It will show you the ```mobileprovision``` files like this:
 
 # Need help?
 - If there is a technical problem with ```sigh```, submit an issue. Run ```sigh --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: sigh@felixkrause.at
+- I'm available for contract work - drop me an email: sigh@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
