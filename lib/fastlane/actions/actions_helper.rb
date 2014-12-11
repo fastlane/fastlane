@@ -4,7 +4,8 @@ module Fastlane
     # This method will output the string and execute it
     def self.sh(command)
       Helper.log.info ["[SHELL]", command.yellow].join(': ')
-      `#{command}`
+      return `#{command}` unless Helper.is_test?
+      return command # only when running tests
     end
   end
 end

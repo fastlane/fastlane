@@ -36,6 +36,13 @@ describe Fastlane do
           ff.runner.execute(:not_here)
         }.to raise_exception("Could not find lane for type 'not_here'. Available lanes: test, deploy".red)
       end
+
+      it "runs pod install" do
+        result = Fastlane::FastFile.new.run("lane :test do 
+          install_cocoapods
+        end")
+        expect(result).to eq("pod install")
+      end
     end
   end
 end
