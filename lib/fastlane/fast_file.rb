@@ -9,6 +9,14 @@ module Fastlane
       @path = path
       @runner = Runner.new
 
+      # Load all actions
+      Dir.chdir("/Users/felixkrause/Apps/fastlane/lib") do # TODO: Remove
+        Dir['fastlane/actions/*.rb'].each do |file| 
+          require file
+        end
+      end
+
+
       content = File.read(path)
 
       eval(content) # this is okay in this case
@@ -27,7 +35,14 @@ module Fastlane
     end
 
     def method_missing(method_sym, *arguments, &block)
-      raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
+      # First, check if there is a predefined method in the actions folder
+      method = Fastlane::Actions.method(method_sym)
+      if method
+        method.call(arguments)
+      else
+        # Method not found
+        raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
+      end
     end
   end
 end
