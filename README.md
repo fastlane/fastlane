@@ -279,7 +279,7 @@ The only way to fix this, is a restart of the Mac.
 
 # Need help?
 - If there is a technical problem with ```Snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: snapshot@felixkrause.at
+- I'm available for contract work - drop me an email: snapshot@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
