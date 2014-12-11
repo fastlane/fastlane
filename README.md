@@ -317,7 +317,7 @@ This will upload the ipa file to iTunes Connect and mark the uploaded build as B
 
 # Need help?
 - If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: deliver@felixkrause.at
+- I'm available for contract work - drop me an email: deliver@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

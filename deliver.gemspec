@@ -7,14 +7,14 @@ Gem::Specification.new do |spec|
   spec.name          = "deliver"
   spec.version       = Deliver::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["krausefx@gmail.com"]
+  spec.email         = ["deliver@krausefx.com"]
   spec.summary       = %q{Deliver - Continuous Deployment for iOS - automatically publish new app updates and app screenshots to the AppStore}
   spec.description   = %q{Using Deliver you can easily integrate a real continuous delivery 
     solution for iOS applications. You can update the app metadata, upload screenshots 
     in all languages for different screensizes to iTunesConnect and even publish a new 
     ipa file to iTunesConnect. You define your prefered deployment information once in a so called
     Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
-  spec.homepage      = "http://felixkrause.at"
+  spec.homepage      = "http://krausefx.com"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
