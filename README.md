@@ -45,9 +45,10 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 # Features
-- Connect all tools, part of the ```fastlane``` tool chain in a meaningful way
+- Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together
 - Define different ```deployment lanes``` for App Store deployment, beta builds or testing
 - Deploy from any computer
+- Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update.
