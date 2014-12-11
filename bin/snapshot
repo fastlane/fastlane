@@ -31,12 +31,13 @@ command :run do |c|
   c.syntax = 'snapshot'
   c.description = 'Run the script, to take all the screenshots'
   c.option '--snapfile STRING', String, 'Custom path for your Snapfile'
+  c.option '--noclean', 'Skips the clean process when running snapshot.'
 
   c.action do |args, options|
     path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
     Dir.chdir(path) do # switch the context
       Snapshot::SnapshotConfig.shared_instance(options.snapfile)
-      Snapshot::Runner.new.work
+      Snapshot::Runner.new.work(clean: !options.noclean)
     end
   end
 end
@@ -50,4 +51,3 @@ command :init do |c|
     Snapshot::SnapfileCreator.create(path)
   end
 end
-

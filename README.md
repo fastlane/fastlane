@@ -59,11 +59,14 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Create hundreds of screenshots in multiple languages on all simulators
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Very easy to integrate with ```deliver```
+- Very easy to integrate with [```deliver```](https://github.com/KrauseFx/deliver)
+- Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - ```Snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
 After ```Snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
-![assets/htmlPage.png](assets/htmlPage.png)
+
+
+![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
 ## Why?
 This gem automatically switches the language and device type and runs the automation script to take all screenshots.
@@ -128,11 +131,20 @@ From now on, you can run ```snapshot``` to create new screenshots of your app.
 
 # Usage
 
-Why should you have to remember complicated commands and parameters?
+```
+snapshot
+```
 
-Store your configuration in a text file to easily take screenshots from any computer.
+To skip cleaning the project:
+```
+snapshot --noclean
+```
 
 ## Snapfile
+
+#### Why should you have to remember complicated commands and parameters?
+
+Store your configuration in a text file to easily take screenshots from any computer.
 
 Create a file called ```Snapfile``` in your project directory.
 Once you created your configuration, just run ```snapshot```.
@@ -267,7 +279,7 @@ The only way to fix this, is a restart of the Mac.
 
 # Need help?
 - If there is a technical problem with ```Snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: snapshot@felixkrause.at
+- I'm available for contract work - drop me an email: snapshot@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
