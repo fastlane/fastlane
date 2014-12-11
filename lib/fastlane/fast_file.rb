@@ -33,9 +33,8 @@ module Fastlane
 
     def method_missing(method_sym, *arguments, &block)
       # First, check if there is a predefined method in the actions folder
-      method = Fastlane::Actions.method(method_sym)
-      if defined?method
-        method.call(arguments)
+      if Fastlane::Actions.respond_to?(method_sym)
+        Fastlane::Actions.method(method_sym).call(arguments)
       else
         # Method not found
         raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
