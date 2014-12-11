@@ -38,10 +38,11 @@ describe Fastlane do
       end
 
       it "runs pod install" do
-        result = Fastlane::FastFile.new.run("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do 
           install_cocoapods
-        end")
-        expect(result).to eq("pod install")
+        end").runner.execute(:test)
+
+        expect(result.first).to eq("pod install")
       end
     end
   end

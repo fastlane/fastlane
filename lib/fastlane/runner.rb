@@ -7,13 +7,17 @@ module Fastlane
 
       @before_all.call if @before_all
       
+      return_val = nil
+
       if blocks[key]
-        blocks[key].call
+        return_val = blocks[key].call
       else
         raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
       end
 
       @after_all.call if @after_all
+
+      return return_val
     end
 
     def available_lanes

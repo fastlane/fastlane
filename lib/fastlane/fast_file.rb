@@ -9,14 +9,15 @@ module Fastlane
         @path = path
         content = File.read(path)
 
-        run(content)
+        parse(content)
       end
     end
 
-    def run(data)
+    def parse(data)
       @runner = Runner.new
       load_actions
-      eval(data).call # this is okay in this case
+      eval(data) # this is okay in this case
+      return self
     end
 
     def lane(key, &block)
