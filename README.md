@@ -115,7 +115,7 @@ Change syntax highlighting to *Ruby*.
 
 # Need help?
 - If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: fastlane@felixkrause.at
+- I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
