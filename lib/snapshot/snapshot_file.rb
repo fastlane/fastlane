@@ -54,7 +54,8 @@ module Snapshot
           else
             raise "The given project_path '#{path}' could not be found. Make sure to include the extension as well.".red
           end
-
+        when :html_path
+          raise "The `html_path` options was removed from snapshot. The default location is now the screenshots path. Please remove this line from your 'Snapfile'.".red
         # Blocks
         when :setup_for_device_change, :teardown_device, :setup_for_language_change, :teardown_language
           raise "#{method_sym} needs to have a block provided." unless block_given?
