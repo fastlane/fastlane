@@ -4,18 +4,21 @@ module Fastlane
     def execute(key)
       key = key.to_sym
       Helper.log.info "Driving the lane '#{key}'".green
-
-      @before_all.call if @before_all
-      
       return_val = nil
 
-      if blocks[key]
-        return_val = blocks[key].call
-      else
-        raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
-      end
+      Dir.chdir(Fastlane::FastlaneFolder.path) do # the file is located in the fastlane folder
+        @before_all.call if @before_all
+        
+        return_val = nil
 
-      @after_all.call if @after_all
+        if blocks[key]
+          return_val = blocks[key].call
+        else
+          raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
+        end
+
+        @after_all.call if @after_all
+      end
 
       return return_val
     end

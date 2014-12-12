@@ -16,7 +16,11 @@ module Fastlane
     def parse(data)
       @runner = Runner.new
       load_actions
-      eval(data) # this is okay in this case
+
+      Dir.chdir(Fastlane::FastlaneFolder.path) do # context: fastlane subfolder
+        eval(data) # this is okay in this case
+      end
+
       return self
     end
 
@@ -35,6 +39,8 @@ module Fastlane
     def method_missing(method_sym, *arguments, &block)
       # First, check if there is a predefined method in the actions folder
       if Fastlane::Actions.respond_to?(method_sym)
+        Helper.log.info "Step: #{method_sym.to_s}".green
+        
         Fastlane::Actions.method(method_sym).call(arguments)
       else
         # Method not found

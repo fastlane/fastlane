@@ -24,6 +24,7 @@ module Fastlane
           results << command # only when running tests
         end
       end
+
       return results
     end
   end
