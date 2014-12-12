@@ -27,5 +27,21 @@ module Fastlane
 
       return results
     end
+
+    # Is the required gem installed on the current machine
+    def self.gem_available?(name)
+      Gem::Specification.find_by_name(name)
+    rescue Gem::LoadError
+      false
+    rescue
+      Gem.available?(name)
+    end
+
+    # This will throw an exception if gem is missing
+    def self.need_gem!(name)
+      unless self.gem_available?(name)
+        raise "Gem '#{name}' is not installed. Run `sudo gem install #{name}` to install it. More information: https://github.com/KrauseFx/#{name}.".red
+      end
+    end
   end
 end
