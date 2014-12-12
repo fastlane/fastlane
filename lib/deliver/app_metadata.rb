@@ -1,9 +1,9 @@
 require 'nokogiri'
 
 module Deliver
-  class AppMetadataError < StandardError 
+  class AppMetadataError < StandardError
   end
-  class AppMetadataParameterError < StandardError 
+  class AppMetadataParameterError < StandardError
   end
 
   class AppMetadata
@@ -40,7 +40,7 @@ module Deliver
     # @param app [Deliver::App] The app this metadata is from/for
     # @param dir [String] The app this metadata is from/for
     # @param redownload_package [bool] When true
-    #  the current package will be downloaded from iTC before you can 
+    #  the current package will be downloaded from iTC before you can
     #  modify any values. This should only be false for unit tests
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct app object
     def initialize(app, dir, redownload_package = true)
@@ -53,7 +53,7 @@ module Deliver
         if redownload_package
           # Delete the one that may exists already
           unless Helper.is_test?
-            `rm -fr #{dir}/*.itmsp`
+            `rm -rf #{dir}/*.itmsp`
           end
 
           # we want to update the metadata, so first we have to download the existing one
@@ -93,10 +93,10 @@ module Deliver
         Helper.log.info("Locale '#{language}' already exists. Can not create it again.")
         return false
       end
-      
+
 
       locales = fetch_value("//x:locales").first
-      
+
       new_locale = @data.create_element('locale')
       new_locale['name'] = language
       locales << new_locale
@@ -110,7 +110,7 @@ module Deliver
 
       Helper.log.info("Successfully created the new locale '#{language}'. The default title '#{default_title}' was set, since it's required by iTunesConnect.")
       Helper.log.info("You can update the title using 'app.metadata.update_title'")
-      
+
       information[language] ||= {}
       information[language][:title] = { value: default_title, modified: true}
 
@@ -178,7 +178,7 @@ module Deliver
       update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
-        if keywords.sort != information[language][:keywords][:value].sort
+        if not information[language][:keywords] or keywords.sort != information[language][:keywords][:value].sort
           field.children.remove # remove old keywords
 
           node_set = Nokogiri::XML::NodeSet.new(@data)
@@ -218,14 +218,14 @@ module Deliver
 
     def add_screenshot(language, app_screenshot)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
-      
+
       create_locale_if_not_exists(language)
 
       # Fetch the 'software_screenshots' node (array) for the specific locale
       locales = self.fetch_value("//x:locale[@name='#{language}']")
 
       screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
-      
+
       if not screenshots or screenshots.children.count == 0
         screenshots.remove if screenshots
 
@@ -277,7 +277,7 @@ module Deliver
 
       new_screenshots.each do |key, value|
         if key.kind_of?String and value.kind_of?Array and value.count > 0 and value.first.kind_of?AppScreenshot
-          
+
           self.clear_all_screenshots(key)
 
           value.each do |screen|
@@ -291,24 +291,24 @@ module Deliver
     end
 
     # Automatically add all screenshots contained in the given directory to the app.
-    # 
+    #
     # This method will automatically detect which device type each screenshot is.
-    # 
+    #
     # This will also clear all existing screenshots before setting the new ones.
     # @param (Hash) hash A hash containing a different path for each locale ({Deliver::Languages::ALL_LANGUAGES})
     def set_screenshots_for_each_language(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
-        resulting_path = "#{current_path}/*.png"
+        resulting_path = "#{current_path}/**/*.{png,PNG,jpg,JPG,jpeg,JPEG}"
 
         raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
 
         if Dir[resulting_path].count == 0
-          Helper.log.error("No screenshots found at the given path '#{resulting_path}'") 
+          Helper.log.error("No screenshots found at the given path '#{resulting_path}'")
         else
           self.clear_all_screenshots(language)
-          
+
           Dir[resulting_path].sort.each do |path|
             add_screenshot(language, Deliver::AppScreenshot.new(path))
           end
@@ -318,7 +318,7 @@ module Deliver
       true
     end
 
-    # This method will run through all the available locales, check if there is 
+    # This method will run through all the available locales, check if there is
     # a folder for this language (e.g. 'en-US') and use all screenshots in there
     # @param (String) path A path to the folder, which contains a folder for each locale
     def set_all_screenshots_from_path(path)
@@ -383,7 +383,7 @@ module Deliver
         end
       end
 
-      # @return (Deliver::ItunesTransporter) The iTunesTranspoter which is
+      # @return (Deliver::ItunesTransporter) The iTunesTransporter which is
       #  used to upload/download the app metadata.
       def transporter
         @transporter ||= ItunesTransporter.new
@@ -402,7 +402,7 @@ module Deliver
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
           raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
-          
+
 
           field = locale.search(xpath_name).first
 
@@ -437,8 +437,6 @@ module Deliver
       # Checks if there is a non live version available
       # (a new version, or a new app)
       def verify_package
-        versions = fetch_value("//x:version")
-
         raise AppMetadataError.new("metadata_token is missing. This package seems to be broken") if fetch_value("//x:metadata_token").count != 1
       end
 
@@ -455,6 +453,9 @@ module Deliver
 
         # Remove all GameCenter related code
         fetch_value("//x:game_center").remove
+
+        # Remove all InApp purchases
+        fetch_value("//x:in_app_purchases").remove
 
         fetch_value("//x:software_screenshots").remove
       end
@@ -474,7 +475,7 @@ module Deliver
               modified: false
             }
           end
-          
+
           information[language][:keywords] = { value: [], modified: false}
           locale.search('keyword').each do |current|
             information[language][:keywords][:value] << current.content

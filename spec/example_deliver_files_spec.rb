@@ -70,6 +70,24 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
           end
 
+          it "overwrites the config from metadata.json when set in the Deliverfile" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileChangelog")
+            expect(meta.deliver_process.deploy_information[:changelog]['en-US']).to eq("It works")
+            expect(meta.deliver_process.deploy_information[:title]['en-US']).to eq("Overwritten")
+
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:title").first.content).to eq("Overwritten")
+          end
+
+          it "Raises an exception when iTunes Transporter results in an error" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
+            
+            expect {
+              Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+            }.to raise_exception("Return status of iTunes Transporter was 1: ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"".red)
+          end
+
           it "Sets all the available metadata" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
@@ -85,6 +103,20 @@ describe Deliver do
             expect(meta.deliver_process.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
             expect(meta.deliver_process.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
             expect(meta.deliver_process.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
+          end
+
+          it "Uses the given default language" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDefaultLanguage")
+            metadata = deliv.deliver_process.app.metadata
+
+            expect(deliv.deliver_process.deploy_information[:keywords]['pt-BR']).to eq(["banese", "banco", "sergipe", "finanças"])
+            expect(metadata.information['pt-BR'][:keywords][:value]).to eq(["banese", "banco", "sergipe", "finanças"])
+            expect(metadata.information['pt-BR'][:description][:value]).to eq("only description")
+            expect(metadata.information['pt-BR'][:support_url][:value]).to eq("something")
+            expect(metadata.information['pt-BR'][:version_whats_new][:value]).to eq("what's new?")
+            expect(deliv.deliver_process.deploy_information[:changelog]['pt-BR']).to eq("what's new?")
           end
 
           it "Uploads all the available screenshots" do
@@ -104,7 +136,7 @@ describe Deliver do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
             deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileScreenshotsFallbackDefaultLanguage")
-            expect(deliv.deliver_process.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp"})
+            expect(deliv.deliver_process.deploy_information[:screenshots_path]).to eq({"de-DE"=>"/tmp/notHere"})
           end
 
           it "Does not require an app version, when an ipa is given" do
@@ -177,7 +209,9 @@ describe Deliver do
             it "Error on ipa upload" do
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt") # the ipa file
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              }.to raise_exception
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -185,7 +219,10 @@ describe Deliver do
 
             it "Error on app metadata upload" do
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_invalid.txt")
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
+              }.to raise_exception
+
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
@@ -195,7 +232,9 @@ describe Deliver do
               Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
 
               expect(File.exists?@tests_path).to eq(false)
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              expect {
+                deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacksFailingTests")
+              }.to raise_exception
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)

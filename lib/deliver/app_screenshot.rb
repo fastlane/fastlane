@@ -59,7 +59,7 @@ module Deliver
 
     # Validates the given screenshots (size and format)
     def is_valid?
-      return false unless self.path.split(".").last == "png"
+      return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include? self.path.split(".").last
 
       size = FastImage.size(self.path)
 

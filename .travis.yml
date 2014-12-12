@@ -3,6 +3,9 @@ before_install: gem update --system
 rvm:
   - 2.0.0
   - 2.1.0
+notifications:
+  email:
+    - krausefx@gmail.com
 addons:
     code_climate:
-        repo_token: f7d5286e2b59ff6ad34882cb8646da3a110913e428464a87a4aee98646aaa337
+        repo_token: 260bfcb1b7acf86c3a2424724879c02401d7fc9fc59ac7ca7dfa4b8c39bd1015

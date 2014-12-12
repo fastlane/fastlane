@@ -1,3 +1,4 @@
+require 'json'
 require 'deliver/version'
 require 'deliver/helper'
 require 'deliver/app'

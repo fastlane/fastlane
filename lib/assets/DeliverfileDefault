@@ -1,6 +1,8 @@
 # For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
 # Everything next to a # is a comment and will be ignored
 
+email '[[EMAIL]]'
+# hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
 
 
 ########################################
@@ -9,6 +11,7 @@
 
 # The app identifier is required
 app_identifier "[[APP_IDENTIFIER]]"
+apple_id "[[APPLE_ID]]"
 
 
 # This folder has to include one folder for each language
@@ -31,6 +34,9 @@ config_json_folder './deliver'
 ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
+
+    # Attention: When you return a valid ipa file, this file will get uploaded and released
+    # If you only want to upload app metadata, remove the complete ipa block.
 
     # system("ipa build") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file

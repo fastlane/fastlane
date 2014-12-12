@@ -28,7 +28,7 @@ module Deliver
               raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red) 
             end
 
-            if value.kind_of?String and not not_translated.include?method_sym
+            if (not value.kind_of?Hash) and (not not_translated.include?method_sym)
               # The user should pass a hash for multi-lang values
               # Maybe he at least set a default language
               if @default_language
@@ -99,6 +99,17 @@ module Deliver
           validate_ipa(value)
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
+        end
+
+        # This will set the email address of the Apple ID to be used
+        def email(value)
+          value ||= yield if block_given?
+          PasswordManager.shared_manager(value)
+        end
+
+        # This will hide the output of the iTunes Connect transporter while uploading/downloading
+        def hide_transporter_output
+          ItunesTransporter.hide_transporter_output
         end
 
         # Set the apps new version number.

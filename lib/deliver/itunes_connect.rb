@@ -51,8 +51,11 @@ module Deliver
         Capybara::Poltergeist::Driver.new(a, {
           phantomjs_options: conf,
           phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
+          js_errors: false
         })
       end
+
+      page.driver.headers = { "Accept-Language" => "en" }
 
       self.login
     end
@@ -72,11 +75,13 @@ module Deliver
       begin
         Helper.log.info "Logging into iTunesConnect"
 
-        user ||= PasswordManager.new.username
-        password ||= PasswordManager.new.password
+        user ||= PasswordManager.shared_manager.username
+        password ||= PasswordManager.shared_manager.password
 
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
+
+        (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
 
         if page.has_content?"My Apps"
           # Already logged in
@@ -87,10 +92,17 @@ module Deliver
         fill_in "accountpassword", with: password
 
         begin
-          wait_for_elements(".enabled").first.click
-          wait_for_elements('.ng-scope.managedWidth')
-        rescue
-          ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you set them correctly")
+          (wait_for_elements(".enabled").first.click rescue nil) # Login Button
+          wait_for_elements('.homepageWrapper.ng-scope')
+          
+          if page.has_content?"My Apps"
+            # Everything looks good
+          else
+            raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.")
+          end
+        rescue Exception => ex
+          Helper.log.debug(ex)
+          raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
 
         Helper.log.info "Successfully logged into iTunesConnect"
@@ -119,7 +131,7 @@ module Deliver
         sleep 3
 
         if current_url.include?"wa/defaultError" # app could not be found
-          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.new.username}).".red
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.shared_manager.username}).".red
         end
 
         true
@@ -173,7 +185,12 @@ module Deliver
 
         open_app_page(app)
 
-        return first(".status.ready").text.split(" ").first
+        begin
+          return first(".status.ready").text.split(" ").first
+        rescue
+          Helper.log.debug "Could not fetch version number of the live version for app #{app}."
+          return nil
+        end
       rescue Exception => ex
         error_occured(ex)
       end
@@ -375,6 +392,9 @@ module Deliver
         raise "Some error occured when submitting the app for review: '#{current_url}'" if errors
 
         wait_for_elements(".savingWrapper.ng-scope.ng-pristine")
+        wait_for_elements(".radiostyle")
+        sleep 3
+        
         if page.has_content?"Content Rights"
           # Looks good.. just a few more steps
 
@@ -397,12 +417,14 @@ module Deliver
           # Export Compliance #
           #####################
           if page.has_content?"Export"
+            
             if not perms[:export_compliance][:encryption_updated] and perms[:export_compliance][:cryptography_enabled]
               raise "encryption_updated must be enabled if cryptography_enabled is enabled!"
             end
 
             begin
-              first(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input").trigger('click')
+              encryption_updated_control = all(:xpath, "#{basic}.exportCompliance.encryptionUpdated.value' and @radio-value='#{perms[:export_compliance][:encryption_updated]}']//input")
+              encryption_updated_control[0].trigger('click') if encryption_updated_control.count > 0
               first(:xpath, "#{basic}.exportCompliance.usesEncryption.value' and @radio-value='#{perms[:export_compliance][:cryptography_enabled]}']//input").trigger('click')
               first(:xpath, "#{basic}.exportCompliance.isExempt.value' and @radio-value='#{perms[:export_compliance][:is_exempt]}']//input").trigger('click')
             rescue
@@ -414,7 +436,7 @@ module Deliver
           ##################
           if page.has_content?"Content Rights"
             if not perms[:third_party_content][:contains_third_party_content] and perms[:third_party_content][:has_rights]
-              raise "contains_third_party_content must be enabled if has_rights is enabled"
+              raise "contains_third_party_content must be enabled if has_rights is enabled".red
             end
 
             begin
@@ -431,12 +453,12 @@ module Deliver
             first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
 
             if perms[:advertising_identifier]
-              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app"            
+              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app".red
             end
           end
           
 
-          Helper.log.info("Filled out the export compliance and other information on iTC")
+          Helper.log.info("Filled out the export compliance and other information on iTC".green)
 
           click_on "Submit"
           sleep 5
@@ -446,10 +468,10 @@ module Deliver
             Helper.log.info("Successfully submitted App for Review".green)
             return true
           else
-            raise "So close, it looks like there went something wrong with the actual deployment. Checkout '#{current_url}'"
+            raise "So close, it looks like there went something wrong with the actual deployment. Checkout '#{current_url}'".red
           end
         else
-          raise "Something is missing here."
+          raise "Something is missing here.".red
         end
         return false
       rescue Exception => ex

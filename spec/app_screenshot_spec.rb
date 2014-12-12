@@ -38,10 +38,13 @@ describe Deliver do
       end
 
       describe "#is_valid?" do
-        it "is not valid when it's not a png" do
+        it "is not valid when it's not a png or jpg" do
           expect(@item.is_valid?).to eq(true)
 
-          @item.path = "./something.jpg"
+          @item.path = "./spec/fixtures/screenshots/screenshot1.jpg"
+          expect(@item.is_valid?).to eq(true)
+
+          @item.path = "./spec/fixtures/screenshots/invalidImage.psd"
           expect(@item.is_valid?).to eq(false)
         end
 

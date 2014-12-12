@@ -7,7 +7,8 @@
 # 
 # Everything next to a # is a comment and will be ignored
 
-
+email "yourappleid@company.com"
+# hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
 
 ########################################
 # App Metadata
@@ -46,6 +47,9 @@ screenshots_path "./screenshots"
 ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
+
+    # Attention: When you return a valid ipa file, this file will get uploaded and released
+    # If you only want to upload app metadata, remove the complete ipa block.
 
     # system("ipa build") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file

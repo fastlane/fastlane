@@ -8,6 +8,11 @@ module Deliver
       @@mocking_file << file_name
     end
 
+    def self.number_of_mock_files
+      return @@mocking_file.count if defined?@@mocking_file
+      0
+    end
+
     def self.clear_mock_files
       @@mocking_file = []
     end
@@ -25,7 +30,6 @@ module Deliver
         end
 
         if @errors.count > 0
-          Helper.log.debug(caller)
           raise TransporterTransferError.new(@errors.join("\n"))
         end
 

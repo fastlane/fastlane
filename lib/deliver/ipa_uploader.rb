@@ -71,6 +71,8 @@ module Deliver
 
       if is_okay
         unless Helper.is_test?
+          `rm -rf ./#{@app.apple_id}.itmsp` # we don't need that any more
+
           return publish_on_itunes_connect(submit_information)
         end
       end
@@ -133,7 +135,7 @@ module Deliver
       def fetch_info_plist_file
         Zip::File.open(@ipa_file.path) do |zipfile|
           zipfile.each do |file|
-            if file.name.include?'.plist'
+            if file.name.include?'.plist' and not ['.bundle', '.framework'].any? { |a| file.name.include?a }
               # We can not be completely sure, that's the correct plist file, so we have to try
               begin
                 # The XML file has to be properly unpacked first
