@@ -149,9 +149,6 @@ module Deliver
       end
       
       if screens_path
-        if File.exists?('./Snapfile')
-          Helper.log.info("Found a Snapfile. Ignoring it. If you want 'deliver' to automatically take new screenshots for you, remove 'screenshots_path' from your 'Deliverfile'.".yellow)
-        end
         # Not using Snapfile. Not a good user.
         if not @app.metadata.set_all_screenshots_from_path(screens_path)
           # This path does not contain folders for each language
