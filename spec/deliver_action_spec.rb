@@ -6,7 +6,9 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do 
           deliver
         end").runner.execute(:test)
-        expect(result.first).to eq("deliver")
+
+        expect(result.first).to eq("deliver --force")
+        expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq("./screenshots")
       end
 
     end
