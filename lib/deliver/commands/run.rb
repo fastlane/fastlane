@@ -7,7 +7,7 @@ command :run do |c|
   c.action do |args, options|
     Deliver::DependencyChecker.check_dependencies
 
-    path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+    path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
     Dir.chdir(path) do # switch the context
       if File.exists?(deliver_path)
         # Everything looks alright, use the given Deliverfile
