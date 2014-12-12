@@ -16,7 +16,7 @@ module Snapshot
 
       if not command
         # That's the default case, user did not provide a custom build_command
-        raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
+        raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_path
         command = generate_build_command(clean: clean)
       end
 
