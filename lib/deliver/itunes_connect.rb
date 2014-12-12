@@ -4,6 +4,7 @@ require 'capybara'
 require 'capybara/poltergeist'
 require 'security'
 require 'fastimage'
+require 'fastlane/password_manager'
 
 
 module Deliver
@@ -62,7 +63,7 @@ module Deliver
 
     # Loggs in a user with the given login data on the iTC Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {Deliver::PasswordManager}.
+    # Automatically be fetched using the {Fastlane::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -75,8 +76,8 @@ module Deliver
       begin
         Helper.log.info "Logging into iTunesConnect"
 
-        user ||= PasswordManager.shared_manager.username
-        password ||= PasswordManager.shared_manager.password
+        user ||= Fastlane::PasswordManager.shared_manager.username
+        password ||= Fastlane::PasswordManager.shared_manager.password
 
         result = visit ITUNESCONNECT_URL
         raise "Could not open iTunesConnect" unless result['status'] == 'success'
@@ -131,7 +132,7 @@ module Deliver
         sleep 3
 
         if current_url.include?"wa/defaultError" # app could not be found
-          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{PasswordManager.shared_manager.username}).".red
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{Fastlane::PasswordManager.shared_manager.username}).".red
         end
 
         true

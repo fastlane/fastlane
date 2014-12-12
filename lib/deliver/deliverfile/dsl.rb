@@ -1,4 +1,5 @@
 # Inspired by https://github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/podfile/dsl.rb
+require 'fastlane/password_manager'
 
 module Deliver
   module Deliverfile
@@ -104,7 +105,7 @@ module Deliver
         # This will set the email address of the Apple ID to be used
         def email(value)
           value ||= yield if block_given?
-          PasswordManager.shared_manager(value)
+          Fastlane::PasswordManager.shared_manager(value)
         end
 
         # This will hide the output of the iTunes Connect transporter while uploading/downloading

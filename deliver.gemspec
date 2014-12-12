@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'security', '~> 0.1.3' # Mac OS Keychain manager
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
   spec.add_dependency 'nokogiri', '~> 1.6.3.1' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
@@ -36,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'prawn' # generating PDF file for the applied changes
 
-  spec.add_dependency 'snapshot' # creating new screenshots of your app
+  spec.add_dependency 'fastlane'
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC

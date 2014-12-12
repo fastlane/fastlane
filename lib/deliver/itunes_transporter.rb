@@ -1,6 +1,6 @@
 require 'pty'
 require 'shellwords'
-require 'deliver/password_manager'
+require 'fastlane/password_manager'
 
 
 module Deliver
@@ -29,8 +29,8 @@ module Deliver
     # If no username or password given, it will be taken from
     # the #{Deliver::PasswordManager}
     def initialize(user = nil, password = nil)
-      @user = (user || PasswordManager.shared_manager.username)
-      @password = (password || PasswordManager.shared_manager.password)
+      @user = (user || Fastlane::PasswordManager.shared_manager.username)
+      @password = (password || Fastlane::PasswordManager.shared_manager.password)
     end
 
     # Downloads the latest version of the app metadata package from iTC.
@@ -131,7 +131,7 @@ module Deliver
           if $1.include?"Your Apple ID or password was entered incorrectly" or
              $1.include?"This Apple ID has been locked for security reasons"
 
-            Deliver::PasswordManager.shared_manager.password_seems_wrong
+            Fastlane::PasswordManager.shared_manager.password_seems_wrong
           elsif $1.include?"Redundant Binary Upload. There already exists a binary upload with build"
             Helper.log.fatal $1
             Helper.log.fatal "You have to change the build number of your app to upload your ipa file"
