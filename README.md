@@ -283,16 +283,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 
 ## Automatically create screenshots
 
-You can easily create screenshots completely automatically in the background using [```snapshot```](https://github.com/KrauseFx/snapshot), the little brother of ```deliver```.
-
-**Getting started:**
-
-- Run ```snapshot init``` in your project folder
-- You can edit the new ```snapshot.js``` file with your UI Automation code
-- Run ```snapshot``` to test if the screenshots work as expected
-- Remove the line ```screenshot_folder``` from your ```Deliverfile``` to automatically create new screenshots for each deployment. 
-
-From now on, when you start ```deliver```, it will first create the new screenshots for you, which then will be uploaded to iTunes Connect.
+If you want to integrate ```deliver``` with ```snapshot```, check out [fastlane](https://github.com/KrauseFx/fastlane)!
 
 More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
