@@ -3,7 +3,7 @@ module Fastlane
   class AppfileConfig
 
     def self.try_fetch_value(key)
-      if File.exists?(self.default_path)
+      if self.default_path
         return self.new.data[key]
       end
       nil
