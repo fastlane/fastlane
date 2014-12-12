@@ -5,7 +5,6 @@ module Fastlane
 
       require 'frameit'
       require 'frameit/dependency_checker'
-      Frameit::DependencyChecker.check_dependencies
 
       color = Frameit::Editor::Color::BLACK
       color = Frameit::Editor::Color::SILVER if [:silver, :white].include?params.first

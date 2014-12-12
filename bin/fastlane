@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'fastlane'
 require 'commander/import'
-require 'fastlane/update_checker'
 
 HighLine.track_eof = false
 
@@ -24,8 +23,6 @@ command :run do |c|
   c.description = 'Drive the fastlane for a specific environment.'
 
   c.action do |args, options|
-    Fastlane::UpdateChecker.verify_latest_version
-    
     if Fastlane::FastlaneFolder.path
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
