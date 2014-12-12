@@ -78,9 +78,9 @@ module Snapshot
       self.screenshots_path = './screenshots'
 
       folders = ["./*.xcworkspace"] # we prefer workspaces
-      folders << "../*.xcworkspace" if Helper.fastlane_enabled?
       folders << "./*.xcodeproj"
-      folders << "../*.xcodeproj" if Helper.fastlane_enabled?
+      folders << "../*.xcworkspace"
+      folders << "../*.xcodeproj"
 
       folders.each do |current|
         self.project_path ||= (File.expand_path(Dir[current].first) rescue nil)
