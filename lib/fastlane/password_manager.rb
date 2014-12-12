@@ -1,4 +1,5 @@
 require 'security'
+require 'fastlane' # since other libraries might only import fastlane/password_manager
 require 'highline/import' # to hide the entered password
 
 module Fastlane
