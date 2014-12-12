@@ -1,3 +1,5 @@
+require 'pty'
+
 module Fastlane
   module Actions
     # Execute a shell command
@@ -7,10 +9,17 @@ module Fastlane
 
       results = []
       commands.each do |command|
-        Helper.log.info ["[SHELL]", command.yellow].join(': ')
+        Helper.log.info ["[SHELL COMMAND]", command.yellow].join(': ')
 
         unless Helper.is_test?
-          results << `#{command}` 
+
+          PTY.spawn(command) do |stdin, stdout, pid|
+            stdin.each do |line|
+              Helper.log.info ["[SHELL OUTPUT]", line.strip].join(': ')
+              results << line
+            end
+          end
+
         else
           results << command # only when running tests
         end
