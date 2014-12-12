@@ -30,6 +30,8 @@ module Fastlane
 
     # Is the required gem installed on the current machine
     def self.gem_available?(name)
+      return true if Helper.is_test?
+      
       Gem::Specification.find_by_name(name)
     rescue Gem::LoadError
       false
