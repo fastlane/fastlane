@@ -1,9 +1,18 @@
 module Fastlane
   module Actions
     def self.frameit(params)
+      need_gem!'frameit'
+
+      require 'frameit'
+      require 'frameit/dependency_checker'
+      Frameit::DependencyChecker.check_dependencies
+
+      color = Frameit::Editor::Color::BLACK
+      color = Frameit::Editor::Color::SILVER if [:silver, :white].include?params.first
+
       screenshots_folder = File.join(Fastlane::FastlaneFolder::path, self.snapshot_screenshots_folder)
       Dir.chdir(screenshots_folder) do
-        sh 'frameit'
+        Frameit::Editor.new.run('.', color)
       end
     end
   end
