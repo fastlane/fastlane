@@ -7,13 +7,16 @@ command :run do |c|
   c.action do |args, options|
     Deliver::DependencyChecker.check_dependencies
 
-    if File.exists?(deliver_path)
-      # Everything looks alright, use the given Deliverfile
-      Deliver::Deliverer.new(deliver_path, force: options.force)
-    else
-      Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
-      if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
-        Deliver::DeliverfileCreator.create(enclosed_directory)
+    path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+    Dir.chdir(path) do # switch the context
+      if File.exists?(deliver_path)
+        # Everything looks alright, use the given Deliverfile
+        Deliver::Deliverer.new(deliver_path, force: options.force)
+      else
+        Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
+        if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
+          Deliver::DeliverfileCreator.create(enclosed_directory)
+        end
       end
     end
   end
