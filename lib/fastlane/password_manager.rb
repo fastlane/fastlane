@@ -26,7 +26,8 @@ module Fastlane
     # @param id_to_use (String) Apple ID (e.g. steve@apple.com) which should be used for this upload.
     #  if given, only the password will be asked/loaded.
     def initialize(id_to_use = nil)
-      self.username ||= ENV["DELIVER_USER"] || id_to_use || load_from_keychain[0]
+      
+      self.username ||= ENV["DELIVER_USER"] || id_to_use || AppfileConfig.new.data[:apple_id] || load_from_keychain[0]
       self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
