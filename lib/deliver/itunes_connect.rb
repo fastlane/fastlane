@@ -1,4 +1,4 @@
-require 'deliver/password_manager'
+require 'fastlane/password_manager'
 
 require 'capybara'
 require 'capybara/poltergeist'

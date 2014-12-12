@@ -50,6 +50,11 @@ module Deliver
     def self.transporter_path
       self.xcode_path + '../Applications/Application\ Loader.app/Contents/MacOS/itms/bin/iTMSTransporter'
     end
+
+    def self.fastlane_enabled?
+      # This is called from the root context on the first start
+      @@enabled ||= File.directory?"./fastlane"
+    end
     
   end
 end

@@ -27,7 +27,7 @@ module Deliver
 
     # Returns a new instance of the iTunesTransporter.
     # If no username or password given, it will be taken from
-    # the #{Deliver::PasswordManager}
+    # the #{Fastlane::PasswordManager}
     def initialize(user = nil, password = nil)
       @user = (user || Fastlane::PasswordManager.shared_manager.username)
       @password = (password || Fastlane::PasswordManager.shared_manager.password)
