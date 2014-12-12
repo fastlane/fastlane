@@ -1,9 +1,6 @@
 module Fastlane
   # Access the content of the app file (e.g. app identifier and Apple ID)
   class AppfileConfig
-    def self.default_path
-      "./fastlane/Appfile"
-    end
 
     def self.try_fetch_value(key)
       if File.exists?(self.default_path)
@@ -13,7 +10,9 @@ module Fastlane
     end
 
     def initialize(path = nil)
-      path ||= AppfileConfig.default_path
+      ["./fastlane/Appfile", "./Appfile"].each do |current|
+        path ||= current if File.exists?current
+      end
 
       raise "Could not find Appfile at path '#{path}'".red unless File.exists?(path)
 
