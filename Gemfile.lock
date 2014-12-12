@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.0.1)
+    fastlane (0.1.0)
       colored
       commander (~> 4.2.0)
       highline (~> 1.6.21)
