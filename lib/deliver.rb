@@ -14,12 +14,14 @@ require 'deliver/deliverer'
 require 'deliver/ipa_uploader'
 require 'deliver/languages'
 require 'deliver/pdf_generator'
-require 'deliver/dependency_checker'
 require 'deliver/deliver_process'
+require 'deliver/dependency_checker'
+require 'deliver/update_checker'
 
 # Third Party code
 require 'colored'
 
 module Deliver
-  # Your code goes here...
+  Deliver::UpdateChecker.verify_latest_version
+  Deliver::DependencyChecker.check_dependencies
 end
