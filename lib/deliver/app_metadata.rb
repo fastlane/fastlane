@@ -312,6 +312,8 @@ module Deliver
           self.clear_all_screenshots(language)
 
           Dir[resulting_path].sort.each_with_index do |path, index|
+            next if resulting_path.include?"_framed."
+            
             begin
               add_screenshot(language, Deliver::AppScreenshot.new(path))
             rescue AppMetadataTooManyScreenshotsError => ex
