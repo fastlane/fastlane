@@ -1,5 +1,3 @@
-require 'snapshot/dependency_checker'
-
 module Snapshot
   class Builder
     BUILD_DIR = '/tmp/snapshot'

@@ -4,8 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'snapshot'
 require 'commander/import'
-require 'snapshot/update_checker'
-require 'snapshot/dependency_checker'
 require 'snapshot/snapfile_creator'
 require 'snapshot/snapshot_config'
 
@@ -22,8 +20,6 @@ program :help_formatter, :compact
 
 global_option('--verbose') { $verbose = true }
 
-
-Snapshot::UpdateChecker.verify_latest_version
 
 default_command :run
 

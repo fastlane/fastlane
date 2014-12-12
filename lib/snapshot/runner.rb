@@ -4,10 +4,6 @@ module Snapshot
   class Runner
     TRACE_DIR = '/tmp/snapshot_traces'
 
-    def initialize
-      Snapshot::DependencyChecker.check_dependencies
-    end
-
     def work(clean: true)
       SnapshotConfig.shared_instance.js_file # to verify the file can be found
 
