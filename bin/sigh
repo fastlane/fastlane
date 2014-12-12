@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'sigh'
 require 'commander/import'
-require 'sigh/update_checker'
 require 'deliver/password_manager'
 
 HighLine.track_eof = false
@@ -33,8 +32,6 @@ command :renew do |c|
   c.option '--development', 'Renew the development certificate instead of the production one'
 
   c.action do |args, options|
-    Sigh::UpdateChecker.verify_latest_version
-    
     app = app_identifier(options)
     username(options)
 
