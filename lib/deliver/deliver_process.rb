@@ -142,6 +142,11 @@ module Deliver
 
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
+
+      if (ENV["DELIVER_SCREENSHOTS_PATH"] || '').length > 0
+        Helper.log.warn "Overwriting screenshots path from config (#{screens_path}) with (#{ENV["DELIVER_SCREENSHOTS_PATH"]})".yellow
+        screens_path = ENV["DELIVER_SCREENSHOTS_PATH"]
+      end
       
       if screens_path
         if File.exists?('./Snapfile')
