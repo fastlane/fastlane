@@ -9,10 +9,17 @@ module Fastlane
       nil
     end
 
-    def initialize(path = nil)
+    def self.default_path
       ["./fastlane/Appfile", "./Appfile"].each do |current|
-        path ||= current if File.exists?current
+        return current if File.exists?current
       end
+      nil
+    end
+
+
+
+    def initialize(path = nil)
+      path ||= self.class.default_path      
 
       raise "Could not find Appfile at path '#{path}'".red unless File.exists?(path)
 
