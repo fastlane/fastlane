@@ -5,6 +5,8 @@ module Deliver
   end
   class AppMetadataParameterError < StandardError
   end
+  class AppMetadataTooManyScreenshotsError < StandardError
+  end
 
   class AppMetadata
     ITUNES_NAMESPACE = "http://apple.com/itunes/importer"
@@ -214,7 +216,7 @@ module Deliver
     # Appends another screenshot to the already existing ones
     # @param (String) language The language, which has to be in this list: {Deliver::Languages}.
     # @param (Deliver::AppScreenshot) app_screenshot The screenshot you want to add to the app metadata.
-    # @raise (AppMetadataParameterError) When there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS).
+    # @raise (AppMetadataTooManyScreenshotsError) When there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS).
 
     def add_screenshot(language, app_screenshot)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
@@ -246,7 +248,7 @@ module Deliver
         end
 
         if next_index > MAXIMUM_NUMBER_OF_SCREENSHOTS
-          raise AppMetadataParameterError.new("Only #{MAXIMUM_NUMBER_OF_SCREENSHOTS} screenshots are allowed per language per device type (#{app_screenshot.screen_size})")
+          raise AppMetadataTooManyScreenshotsError.new("Only #{MAXIMUM_NUMBER_OF_SCREENSHOTS} screenshots are allowed per language per device type (#{app_screenshot.screen_size})")
         end
 
         # Ready for storing the screenshot into the metadata.xml now
@@ -309,8 +311,12 @@ module Deliver
         else
           self.clear_all_screenshots(language)
 
-          Dir[resulting_path].sort.each do |path|
-            add_screenshot(language, Deliver::AppScreenshot.new(path))
+          Dir[resulting_path].sort.each_with_index do |path, index|
+            begin
+              add_screenshot(language, Deliver::AppScreenshot.new(path))
+            rescue AppMetadataTooManyScreenshotsError => ex
+              # We just use the first 5 ones
+            end
           end
         end
       end

@@ -296,12 +296,6 @@ describe Deliver do
 
             expect(results[1]['position']).to eq("1") # other screen size
           end
-
-          it "throws an exception when there are too many screenshots" do
-            expect {
-              @app.metadata.set_all_screenshots_from_path('./spec/fixtures/screenshots/tooMany/')
-            }.to raise_error("Only 5 screenshots are allowed per language per device type (iOS-3.5-in)")
-          end
         end
 
         describe "#add_screenshot" do
