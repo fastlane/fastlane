@@ -44,6 +44,15 @@ describe Fastlane do
 
         expect(result.first).to eq("pod install")
       end
+
+      it "raises an error if one lane is defined multiple times" do 
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+          end
+          lane :test do
+          end")
+        }.to raise_exception "Lane 'test' was defined multiple times!".red
+      end
     end
   end
 end

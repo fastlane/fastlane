@@ -37,6 +37,7 @@ module Fastlane
     end
 
     def set_block(key, block)
+      raise "Lane '#{key}' was defined multiple times!".red if blocks[key]
       blocks[key] = block
     end
 
