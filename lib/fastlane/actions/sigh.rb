@@ -5,7 +5,7 @@ module Fastlane
 
       require 'sigh'
 
-      app = AppfileConfig.new.data[:app_identifier]
+      app = AppfileConfig.try_fetch_value(:app_identifier)
       raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
 
       type = Sigh::DeveloperCenter::APPSTORE
