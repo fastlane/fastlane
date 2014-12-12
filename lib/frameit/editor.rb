@@ -49,7 +49,7 @@ module Frameit
 
             output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
             result.write output_path
-            Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
+            Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
           end
         rescue SystemExit, Interrupt => ex
           raise ex # system interrupted exception (ctrl + C)
