@@ -4,6 +4,7 @@ module Fastlane
       need_gem!'deliver'
 
       require 'deliver'
+      Deliver::DependencyChecker.check_dependencies
       ENV["DELIVER_SCREENSHOTS_PATH"] = self.snapshot_screenshots_folder
       
       force = false
