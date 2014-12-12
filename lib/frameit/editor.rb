@@ -29,6 +29,8 @@ module Frameit
 
       Dir.glob("#{path}/**/*.{png,PNG}").each do |screenshot|
         next if screenshot.include?"_framed.png"
+        next if screenshot.include?".itmsp/" # a package file, we don't want to modify that
+        
         begin
           template_path = get_template(screenshot)
           if template_path
