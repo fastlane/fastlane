@@ -27,8 +27,6 @@ module PEM
 
     def initialize
       FileUtils.mkdir_p TMP_FOLDER
-
-      DependencyChecker.check_dependencies
       
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist
