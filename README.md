@@ -36,7 +36,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
     <a href="#features">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
+    <a href="#jenkins-integration">Jenkins</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
@@ -48,6 +48,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together
 - Define different ```deployment lanes``` for App Store deployment, beta builds or testing
 - Deploy from any computer
+- [#jenkins-integration](Jenkins Integration): Show the output directly in the Jenkins test results
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
@@ -153,7 +154,7 @@ To upload a beta build for Apple Testflight: ```deliver :beta```.
 
 To don't submit the app for review: ```deliver :skip_deploy```
 
-You can combine those options: ```deliver :force, :beta, :skip_deploy```
+You can combine those options: ```deliver :force, :skip_deploy```
 
 #### [frameit](https://github.com/KrauseFx/frameit)
 By default, the device color will be black
@@ -191,6 +192,39 @@ after_all do
 end
 ```
 
+# Jenkins Integration
+
+## Installation
+The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [homebrew](http://brew.sh/):
+
+```brew update && brew install jenkins```
+
+From now on start ```Jenkins``` by running:
+````
+jenkins
+```
+
+Some developers report problems with homebrew and phantomjs when running [Jenkins](http://jenkins-ci.org/) as its own user.
+
+## Deploy Strategy
+
+You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
+
+You can set up your own ```Release``` job, which is only triggered manually.
+
+## Test Results
+
+
+## Plugins
+
+I recommend the following plugins:
+
+- **[JUnit Plugin](http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin):** Not sure if it's installed by default
+- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools
+- **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time
+
+If you use plugins which are helpful for the fastlane tools, please let me know.
+
 # Tips
 
 ## The other tools
@@ -201,25 +235,6 @@ Check out other tools in this collection to speed up your deployment process:
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
 - [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
-
-## Jenkins integration
-
-The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [homebrew](http://brew.sh/):
-
-```brew update && brew install jenkins```
-
-From now on start ```Jenkins``` by running:
-````
-jenkins
-```
-
-You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
-
-I recommend the following plugins:
-
-- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin)**: Used to show the coloured output of the fastlane tools
-
-If you use plugins which are helpful for the fastlane tools, please let me know.
 
 ## Editing the configuration files like ```Fastfile```
 Change syntax highlighting to *Ruby*.
