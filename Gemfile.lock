@@ -8,7 +8,7 @@ PATH
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
-      nokogiri (~> 1.6.3.1)
+      nokogiri (~> 1.6.5)
       plist (~> 3.1.0)
       poltergeist (~> 1.5.1)
       prawn
@@ -50,10 +50,10 @@ GEM
     json (1.8.1)
     method_source (0.8.2)
     mime-types (2.4.3)
-    mini_portile (0.6.0)
+    mini_portile (0.6.1)
     multi_json (1.10.1)
-    nokogiri (1.6.3.1)
-      mini_portile (= 0.6.0)
+    nokogiri (1.6.5)
+      mini_portile (~> 0.6.0)
     pdf-core (0.4.0)
     plist (3.1.0)
     poltergeist (1.5.1)
