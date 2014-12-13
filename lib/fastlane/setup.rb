@@ -37,7 +37,7 @@ module Fastlane
     def generate_app_metadata
       app_identifier = ask("App Identifier (at.felixkrause.app): ".yellow)
       apple_id = ask("Your Apple ID: ".yellow)
-      template = File.read("#{gem_path}/lib/assets/AppfileTemplate")
+      template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
       template.gsub!('[[APPLE_ID]]', apple_id)
       path = File.join(folder, "Appfile")
@@ -46,7 +46,7 @@ module Fastlane
     end
 
     def generate_fastfile
-      template = File.read("#{gem_path}/lib/assets/FastfileTemplate")
+      template = File.read("#{Helper.gem_path}/lib/assets/FastfileTemplate")
 
       enabled_tools = {}
       enabled_tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
