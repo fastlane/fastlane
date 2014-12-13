@@ -128,7 +128,17 @@ changelog({
     "de-DE" => "Dieses Update ist super"
 })
 ```
+If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. 
 
+#### Upload a new ipa for TestFlight beta testers
+
+In order to upload beta `.ipa` you need to specify beta_ipa path in your `Deliverfile`
+
+```ruby
+beta_ipa "./latest.ipa"
+```
+
+and provide `--beta` option when calling `deliver`.
 
 #### Implement blocks to run unit tests
 ```ruby
@@ -169,8 +179,8 @@ keywords ["keyword1", "something", "else"]
 #### Read content from somewhere external (file, web service, ...)
 ```ruby
 description({
-    "en-US" => File.read("changelog-en.txt")
-    "de-DE" => open("http://example.com/latest-changelog.txt").read
+    "en-US" => File.read("description-en.txt")
+    "de-DE" => open("http://example.com/app_description.txt").read
 })
 ```
 
@@ -300,15 +310,6 @@ You should not deploy a new App Store update after every commit, since you still
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
-
-## In progress
-These are features, which are implemented, but not yet fully tested and production ready. You can try it on your own risk.
-
-#### Distribute an ipa file to your TestFlight beta testers
-```ruby
-beta_ipa "./latest.ipa"
-```
-This will upload the ipa file to iTunes Connect and mark the uploaded build as Beta build.
 
 # Need help?
 - If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.

@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'json' # Because sometimes it's just not installed
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
-  spec.add_dependency 'nokogiri', '~> 1.6.3.1' # parsing and updating XML files
+  spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
