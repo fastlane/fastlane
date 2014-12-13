@@ -4,12 +4,12 @@ before_all do
 end
 
 lane :test do 
-  sh "xctool test"
+  xctool "test"
   snapshot
 end
 
 lane :beta do
-  sh "xctool test"
+  xctool "test"
   snapshot
   # sigh
   deliver :skip_deploy, :beta
@@ -17,7 +17,7 @@ lane :beta do
 end
 
 lane :deploy do
-  sh "xctool test"
+  xctool "test"
   snapshot
   # sigh
   deliver :skip_deploy, :force
