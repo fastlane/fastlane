@@ -150,7 +150,7 @@ If you don't want a PDF report, which you have to approve first, append ```:forc
 deliver :force
 ```
 
-To upload a beta build for Apple Testflight: ```deliver :beta```. 
+To upload a beta build for Apple Testflight: ```deliver :beta```
 
 To don't submit the app for review: ```deliver :skip_deploy```
 

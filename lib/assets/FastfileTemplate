@@ -12,6 +12,7 @@ lane :beta do
   sh "xctool test"
   snapshot
   # sigh
+  deliver :skip_deploy, :beta
   # sh "your_script.sh"
 end
 
@@ -19,7 +20,8 @@ lane :deploy do
   sh "xctool test"
   snapshot
   # sigh
-  deliver
+  deliver :skip_deploy, :force
+  # frameit
 end
 
 after_all do
