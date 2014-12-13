@@ -228,16 +228,21 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 
 # Credentials
-The used username (Apple ID) will be stored in the ```Deliverfile``` by default. When you run ```deliver``` for the first time on another computer, you will only be asked for the password.
 
-Therefore it is easy to switch between projects, without needing to logout and login again.
+If you're using [fastlane](https://github.com/KrauseFx/fastlane), please take a look at its [README](https://github.com/KrauseFx/fastlane) for more information about credentials.
+
+**When using *Deliver* without [fastlane](https://github.com/KrauseFx/fastlane):**
+
+The used username (Apple ID) will be stored in the ```Deliverfile``` by default. When you run ```deliver``` for the first time on another computer, you will only be asked for the password.
+With [fastlane](https://github.com/KrauseFx/fastlane) you can store your Apple ID in a so called ```Appfile```. 
+
+Therefore it is easy to switch between projects, without needing to logout and login again and providing the bundle identifier to be used.
 
 ## Use the Keychain
 The first time you use *Deliver* you have to enter your iTunes Connect 
 credentials. They will be stored in the Keychain. 
 
-If you decide to remove your
-credentials from the Keychain, just open the *Keychain Access*, select 
+If you decide to remove your credentials from the Keychain, just open the *Keychain Access*, select 
 *All Items* and search for 'deliver'.
 
 ## Use environment variables
@@ -253,7 +258,7 @@ Take a look at [Using the exposed Ruby classes](#use-the-exposed-ruby-classes).
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-```Deliver``` is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+```Deliver``` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
 Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
