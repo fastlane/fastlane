@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
+  spec.add_dependency 'nokogiri' # generating JUnit reports for Jenkins
 
   # Development only
   spec.add_development_dependency 'bundler'
