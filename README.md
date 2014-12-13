@@ -247,7 +247,6 @@ If you decide to remove your credentials from the Keychain, just open the *Keych
 
 ## Use environment variables
 You can use the following environment variables to use a specific account instead of the one stored in the keychain.
-This is especially important if you have more than one iTunes Connect account in your keychain:
 
     DELIVER_USER
     DELIVER_PASSWORD
