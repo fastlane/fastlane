@@ -24,15 +24,7 @@ command :run do |c|
 
   c.action do |args, options|
     if Fastlane::FastlaneFolder.path
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
-
-      if args.count == 0
-        raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
-      end
-
-      args.each do |key|
-        ff.runner.execute(key)
-      end
+      Fastlane::LaneManager.cruise_lanes(args)
     else
       create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
       Fastlane::Setup.new.run if create
