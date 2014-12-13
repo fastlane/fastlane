@@ -8,12 +8,20 @@ module Fastlane
         raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
       end
 
-      lanes.each do |key|
-        ff.runner.execute(key)
+      e = nil
+      begin
+        lanes.each do |key|
+          ff.runner.execute(key)
+        end
+      rescue Exception => ex
+        Helper.log.fatal ex
+        e = ex
       end
 
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions, File.join(Fastlane::FastlaneFolder.path, "report.xml"))
+
+      raise ex if ex
     end
   end
 end
