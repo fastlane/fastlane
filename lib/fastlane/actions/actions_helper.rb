@@ -58,8 +58,8 @@ module Fastlane
           Process.wait(pid)
         end
 
-        if $?.exitstatus.to_s != 0
-          raise "Exit status of command '#{command}' was '#{$?.exitstatus.to_s}' instead of 0. Build failed."
+        if $?.exitstatus.to_i != 0
+          raise "Exit status of command '#{command}' was #{$?.exitstatus.to_s} instead of 0. Build failed."
         end
       else
         result << command # only when running tests
