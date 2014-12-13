@@ -7,10 +7,13 @@ module Fastlane
       response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (y/n)".yellow, true)
 
       if response
-        FastlaneFolder.create_folder!
-        copy_existing_files
-        generate_app_metadata
-        generate_fastfile
+        response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
+        if response
+          FastlaneFolder.create_folder!
+          copy_existing_files
+          generate_app_metadata
+          generate_fastfile
+        end
       end
     end
 
