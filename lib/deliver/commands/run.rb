@@ -11,7 +11,8 @@ command :run do |c|
 
     if File.exists?(deliver_path)
       # Everything looks alright, use the given Deliverfile
-      Deliver::Deliverer.new(deliver_path, force: options.force, is_beta_build: options.beta, skip_deploy: options.skip_deploy)
+      options.default :beta => false, :skip_deploy => false
+      Deliver::Deliverer.new(deliver_path, force: options.force, is_beta_ipa: options.beta, skip_deploy: options.skip_deploy)
     else
       Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
       if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
