@@ -8,11 +8,12 @@ module Fastlane
 
       path ||= "./report.xml"
 
+
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.testsuites(name: "fastlane") {
           xml.testsuite(name: "deploy") {
-            results.reverse.each do |current|
-              xml.testcase(name: current[:name], time: current[:time]) {
+            results.each_with_index do |current, index|
+              xml.testcase(name: [index, current[:name]].join(": "), time: current[:time]) {
                 xml.failure(message: current[:error]) if current[:error]
                 xml.system_out current[:output] if current[:output]
               }
