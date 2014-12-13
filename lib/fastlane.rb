@@ -8,6 +8,8 @@ require 'fastlane/setup'
 require 'fastlane/fastlane_folder'
 require 'fastlane/appfile_config'
 require 'fastlane/update_checker'
+require 'fastlane/junit_generator'
+require 'fastlane/lane_manager'
 
 # Third Party code
 require 'colored'
