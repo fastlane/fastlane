@@ -270,7 +270,7 @@ module Deliver
         return app_version
       end
 
-      def  skip_deployment?
+      def skip_deployment?
         @deploy_information[Deliverer::ValKey::SKIP_DEPLOY]
       end
 
