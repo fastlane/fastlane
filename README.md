@@ -100,7 +100,10 @@ lane :appstore do
 end
 ```
 
-To launch the ```appstore``` lane now, run ```fastlane appstore``` and it will execute the given code.
+To launch the ```appstore``` lane
+```
+fastlane appstore
+```
 
 
 ### Actions
@@ -199,19 +202,29 @@ The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [hom
 
 ```brew update && brew install jenkins```
 
-From now on start ```Jenkins``` just by entering ```jenkins``` in your terminal.
+From now on start ```Jenkins``` by running:
+````
+jenkins
+```
 
 You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
 
 ## Editing the configuration files like ```Fastfile```
 Change syntax highlighting to *Ruby*.
 
-## Advanced options
+## Advanced
 #### Snapshot
 To skip cleaning the project on every build
 ```ruby
 snapshot :noclean
 ```
+
+#### Run multiple ```lanes```
+You can run multiple ```lanes``` (in the given order) using
+```
+fastlane test inhouse appstore
+````
+Keep in mind the ```before_all``` and ```after_all``` block will be executed for each of the ```lanes```.
 
 # Credentials
 Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
