@@ -169,8 +169,8 @@ keywords ["keyword1", "something", "else"]
 #### Read content from somewhere external (file, web service, ...)
 ```ruby
 description({
-    "en-US" => File.read("changelog-en.txt")
-    "de-DE" => open("http://example.com/latest-changelog.txt").read
+    "en-US" => File.read("description-en.txt")
+    "de-DE" => open("http://example.com/app_description.txt").read
 })
 ```
 
