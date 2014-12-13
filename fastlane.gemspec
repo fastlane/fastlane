@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["krausefx@gmail.com"]
+  spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = %q{To be announced}
   spec.description   = %q{To be announced}
   spec.homepage      = "http://felixkrause.at"
