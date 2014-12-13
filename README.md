@@ -72,22 +72,119 @@ The guide will create all the necessary files for you, using the existing app me
 
 - ```cd [your_project_folder]```
 - ```fastlane init```
-- TODO
+- Follow the guide, which will set up ```fastlane``` for you
+- Further customise the ```Fastfile``` using the next section
 
-
-### Customize the ```Fastfile```
-Open the ```Fastfile``` using a text editor and customize it even further. 
-
-# Usage
-
+# Customize the ```Fastfile```
 Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
 
+Open the ```Fastfile``` using a text editor and customize it even further. (Switch to *Ruby* Syntax Highlighting)
+
+### Lanes
+You can define multiple ```lanes``` which are different workflows for a release process.
+
+Examples are: ```appstore```, ```beta``` and ```test```.
+
+You define a ```lane``` like this (more details about the commands in the [Actions](#actions) section):
+```ruby
+lane :appstore do
+  puts "Ready to deploy to the App Store"
+  snapshot # create new screenshots
+  sigh     # download/generate the latest provisioning profile
+  deliver  # upload the screenshots, metadata and app to Apple
+  
+  frameit  # Add device frames around the screenshots
+  mail('felix@krausefx.com', :screenshots) # send screenshots to me
+end
+```
+
+To launch the ```appstore``` lane now, run ```fastlane appstore``` and it will execute the given code.
+
+
+### Actions
+There are some predefined actions you can use. If you have ideas for more, please let me know.
+
+#### [CocoaPods](http://cocoapods.org)
+Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app. 
+```ruby
+install_cocoapods # this will run pod install
+```
+
+
+#### [xctool](https://github.com/facebook/xctool)
+You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed throw [homebrew](http://brew.sh/).
+```ruby
+xctool "test"
+```
+
+#### [snapshot](https://github.com/KrauseFx/snapshot)
+```ruby
+snapshot
+```
+The generated screenshots will be located in ```./fastlane/screenshots/``` instead of the path you defined in your ```Snapfile```. The reason for that is that [```deliver```](https://github.com/KrauseFx/deliver) needs to access the generated screenshots to upload them.
+
+#### [sigh](https://github.com/KrauseFx/sigh)
+This will generate and download your App Store provisioning profile
+```ruby
+sigh
+```
+
+To use the Ad Hoc profile instead
+```ruby
+sigh :adhoc
+```
+
+#### [deliver](https://github.com/KrauseFx/deliver)
+```ruby
+deliver
+```
+
+If you don't want a PDF report, which you have to approve first, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server.
+```ruby
+deliver :force
+```
+
+#### [frameit](https://github.com/KrauseFx/frameit)
+By default, the device color will be black
+```ruby
+frameit
+```
+
+To use white (sorry, silver) device frames
+```ruby
+frameit :silver
+```
+
+#### Custom Scripts
+Run your own commands using
+```ruby
+sh "./your_bash_script.sh
+```
+
+### *before_all* block
+This block will get executed before running the requested lane. It supports the same actions as lanes do.
+
+```ruby
+before_all do
+  install_cocoapods
+  xctool "test"
+end
+```
+
+### *after_all* block
+This block will get executed after running the requested lane. It supports the same actions as lanes do.
+
+```ruby
+after_all do
+  mail('felix@krausefx.com', :screenshots)
+end
+```
 
 # Tips
 
-## Other helpful tools
+## The other tools
 Check out other tools in this collection to speed up your deployment process:
 - [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
@@ -109,8 +206,15 @@ From now on start ```Jenkins``` using
 
 You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
 
-## Editing the ```Fastfile```
+## Editing the configuration files like ```Fastfile```
 Change syntax highlighting to *Ruby*.
+
+## Advanced options
+#### Snapshot
+To skip cleaning the project on every build
+```ruby
+snapshot :noclean
+```
 
 # Credentials
 Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
