@@ -194,15 +194,12 @@ Check out other tools in this collection to speed up your deployment process:
 
 
 ## Jenkins integration
-TODO
 
-The recommended way to install ```Jenkins``` is through ```homebrew```:
+The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [homebrew](http://brew.sh/):
 
 ```brew update && brew install jenkins```
 
-From now on start ```Jenkins``` using
-
-```jenkins&```
+From now on start ```Jenkins``` just by entering ```jenkins``` in your terminal.
 
 You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
 
