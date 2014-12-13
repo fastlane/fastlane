@@ -2,22 +2,28 @@ require 'zip'
 require 'plist'
 
 module Deliver
-  class IpaUploaderError < StandardError 
+  class IpaUploaderError < StandardError
   end
+
+  IPA_UPLOAD_STRATEGY_APP_STORE = 1
+  IPA_UPLOAD_STRATEGY_BETA_BUILD = 2
+  IPA_UPLOAD_STRATEGY_JUST_UPLOAD = 3
 
   # This class takes care of preparing and uploading the given ipa file
   # Metadata + IPA file can not be handled in one file
   class IpaUploader < AppMetadata
     attr_accessor :app
+    attr_accessor :publish_strategy
 
     # Create a new uploader for one ipa file. This will only upload the ipa and no
     # other app metadata.
     # @param app (Deliver::App) The app for which the ipa should be uploaded for
     # @param dir (String) The path to where we can store (copy) the ipa file. Usually /tmp/
     # @param ipa_path (String) The path to the IPA file which should be uploaded
-    # @param is_beta_build (Bool) If it's a beta build, it will be released to the testers, otherwise into production
+    # @param publish_strategy (Int) If it's a beta build, it will be released to the testers.
+    # If it's a production build it will be released into production. Otherwise no action.
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
-    def initialize(app, dir, ipa_path, is_beta_build)
+    def initialize(app, dir, ipa_path, publish_strategy)
       ipa_path.strip! # remove unused white spaces
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
@@ -25,7 +31,7 @@ module Deliver
       super(app, dir, false)
 
       @ipa_file = Deliver::MetadataItem.new(ipa_path)
-      @is_beta_build = is_beta_build
+      @publish_strategy = publish_strategy
     end
 
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
@@ -80,14 +86,14 @@ module Deliver
       return is_okay
     end
 
-    
+
 
     private
       # This method will trigger the iTunesConnect class to choose the latest build
       def publish_on_itunes_connect(submit_information = nil)
-        if not @is_beta_build
+        if @publish_strategy == IPA_UPLOAD_STRATEGY_APP_STORE
           return publish_production_build(submit_information)
-        else
+        elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
         end
         return false

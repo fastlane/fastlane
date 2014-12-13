@@ -15,7 +15,10 @@ module Deliver
     # @return (Deliver::App) The App that is currently being edited.
     attr_accessor :app
 
-    # @return (Hash) All the updated/new information we got from the Deliverfile. 
+    # @return (Deliver::IpaUploader) The IPA uploader that is currently being used.
+    attr_accessor :ipa
+
+    # @return (Hash) All the updated/new information we got from the Deliverfile.
     #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
 
@@ -28,7 +31,7 @@ module Deliver
       begin
         run_unit_tests
         fetch_information_from_ipa_file
-        
+
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
         verify_ipa_file
@@ -38,7 +41,7 @@ module Deliver
         load_metadata_from_config_json_folder # the json file generated from the quick start
         set_app_metadata
         set_screenshots
-        
+
         verify_pdf_file
 
         trigger_metadata_upload
@@ -68,11 +71,23 @@ module Deliver
     def fetch_information_from_ipa_file
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
-      
-      used_ipa_file = @deploy_information[:ipa] || @deploy_information[:beta_ipa]
+
+      if is_release_build?
+        used_ipa_file = @deploy_information[:ipa]
+      elsif is_beta_build?
+        used_ipa_file = @deploy_information[:beta_ipa]
+      end
 
       if used_ipa_file
-        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, is_beta_build?)
+        upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
+        if is_beta_build?
+          upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD
+        end
+        if skip_deployment?
+          upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_JUST_UPLOAD
+        end
+
+        @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_strategy)
 
         # We are able to fetch some metadata directly from the ipa file
         # If they were also given in the Deliverfile, we will compare the values
@@ -84,9 +99,6 @@ module Deliver
     def verify_ipa_file
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless @app_version
-      if (@deploy_information[Deliverer::ValKey::IPA] and @deploy_information[Deliverer::ValKey::BETA_IPA])
-        raise Deliverfile::Deliverfile::DeliverfileDSLError.new("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red) 
-      end
     end
 
     def create_app
@@ -95,7 +107,7 @@ module Deliver
     end
 
     def verify_app_on_itunesconnect
-      if @ipa and not is_beta_build?
+      if @ipa and is_release_build?
         # This is a real release, which should also upload the ipa file onto production
         @app.create_new_version!(@app_version) unless Helper.is_test?
         @app.metadata.verify_version(@app_version)
@@ -148,7 +160,7 @@ module Deliver
 
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
-      
+
       # Check if there is a Snapfile
       if File.exists?('./Snapfile') and not screens_path
 
@@ -258,8 +270,16 @@ module Deliver
         return app_version
       end
 
+      def  skip_deployment?
+        @deploy_information[Deliverer::ValKey::SKIP_DEPLOY]
+      end
+
+      def is_release_build?
+        is_beta_build? == false
+      end
+
       def is_beta_build?
-        @deploy_information[Deliverer::ValKey::BETA_IPA] != nil
+          @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
       end
   end
 end

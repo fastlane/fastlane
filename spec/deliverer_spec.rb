@@ -10,7 +10,6 @@ describe Deliver do
       it "works with valid data" do
         Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
         Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # metadata
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # ipa file
 
         version = '1.0'
         identifier = 'at.felixkrause.iTanky'
@@ -19,12 +18,14 @@ describe Deliver do
         @meta = Deliver::Deliverer.new(nil, hash: {
           app_identifier: identifier,
           version: version,
-          ipa: ipa
-        })
+          ipa: ipa,
+        }, is_beta_ipa: true, skip_deploy: true,)
 
         expect(@meta.deliver_process.deploy_information[:version]).to eq(version)
         expect(@meta.deliver_process.deploy_information[:app_identifier]).to eq(identifier)
         expect(@meta.deliver_process.deploy_information[:ipa]).to eq(ipa)
+        expect(@meta.deliver_process.deploy_information[:is_beta_ipa]).to be_truthy
+        expect(@meta.deliver_process.deploy_information[:skip_deploy]).to be_truthy
       end
     end
 

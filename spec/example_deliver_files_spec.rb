@@ -22,12 +22,6 @@ describe Deliver do
           }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE.red)
         end
 
-        it "throws an exception when both ipa and beta_ipa are given" do
-          expect {
-            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileDuplicateIpa")
-          }.to raise_exception("You can not set both ipa and beta_ipa in one file. Either it's a beta build or a release build".red)
-        end
-
         it "throws an exception when block does not return anything" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingValue")
@@ -146,7 +140,7 @@ describe Deliver do
 
             expect(deliv.deliver_process.app.apple_id).to eq(464686641)
             expect(deliv.deliver_process.app.app_identifier).to eq('at.felixkrause.iTanky')
-            expect(deliv.deliver_process.deploy_information.values.count).to eq(3)
+            expect(deliv.deliver_process.deploy_information.values.count).to eq(5)
           end
 
           it "Let's the user specify which languages should be supported" do
