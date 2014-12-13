@@ -112,6 +112,20 @@ You should not deploy a new App Store update after every commit, since you still
 ## Editing the ```Fastfile```
 Change syntax highlighting to *Ruby*.
 
+# Credentials
+Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
+
+## Storing in the Keychain
+By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*"
+
+## Passing using environment variables
+```
+DELIVER_USER
+DELIVER_PASSWORD
+```
+
+## Implement your custom solution
+All ```fastlane``` tools are based on Ruby, you can take a look at the source to easily implement your own authentication solution.
 
 # Need help?
 - If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stacktrace.
