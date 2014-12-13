@@ -215,6 +215,12 @@ jenkins
 
 You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
 
+I recommend the following plugins:
+
+- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin)**: Used to show the coloured output of the fastlane tools
+
+If you use plugins which are helpful for the fastlane tools, please let me know.
+
 ## Editing the configuration files like ```Fastfile```
 Change syntax highlighting to *Ruby*.
 
