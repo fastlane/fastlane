@@ -149,6 +149,12 @@ If you don't want a PDF report, which you have to approve first, append ```:forc
 deliver :force
 ```
 
+To upload a beta build for Apple Testflight: ```deliver :beta```. 
+
+To don't submit the app for review: ```deliver :skip_deploy```
+
+You can combine those options: ```deliver :force, :beta, :skip_deploy```
+
 #### [frameit](https://github.com/KrauseFx/frameit)
 By default, the device color will be black
 ```ruby

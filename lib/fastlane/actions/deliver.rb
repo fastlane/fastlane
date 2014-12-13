@@ -8,10 +8,13 @@ module Fastlane
         require 'deliver'
         ENV["DELIVER_SCREENSHOTS_PATH"] = self.snapshot_screenshots_folder
         
-        force = false
-        force = true if params.first == :force
+        force = params.include?(:force)
+        beta = params.include?(:beta)
+        skip_deploy = params.include?(:skip_deploy)
 
-        Deliver::Deliverer.new(Deliver::Deliverfile::Deliverfile::FILE_NAME, force: force)
+        Deliver::Deliverer.new(Deliver::Deliverfile::Deliverfile::FILE_NAME, force: force, 
+                                                                       is_beta_ipa: beta, 
+                                                                       skip_deploy: skip_deploy)
       end
 
     end
