@@ -63,7 +63,8 @@ module Fastlane
       template.gsub!('install_cocoapods', '# install_cocoapods') unless enabled_tools[:cocoapods]
 
       enabled_tools.each do |key, value|
-        Helper.log.info "Found '#{key}' enabled.".magenta if value
+        Helper.log.info "'#{key}' enabled.".magenta if value
+        Helper.log.info "'#{key}' not enabled.".yellow unless value
       end
 
       path = File.join(folder, "Fastfile")
