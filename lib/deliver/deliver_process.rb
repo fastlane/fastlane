@@ -32,9 +32,10 @@ module Deliver
         run_unit_tests
         fetch_information_from_ipa_file
 
+        verify_ipa_file
+
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
-        verify_ipa_file
         create_app
         verify_app_on_itunesconnect
 
