@@ -5,7 +5,7 @@ PATH
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      fastlane
+      credentials_manager
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
@@ -29,15 +29,12 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
+    credentials_manager (0.0.1)
+      colored
+      highline (~> 1.6.21)
+      security (~> 0.1.3)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastlane (0.1.0)
-      colored
-      commander (~> 4.2.0)
-      highline (~> 1.6.21)
-      json
-      nokogiri (~> 1.6.5)
-      security (~> 0.1.3)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)

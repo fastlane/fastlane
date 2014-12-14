@@ -1,4 +1,4 @@
-require 'fastlane/password_manager'
+require 'credentials_manager/password_manager'
 require 'open-uri'
 require 'openssl'
 
@@ -55,7 +55,7 @@ module Sigh
 
     # Loggs in a user with the given login data on the Dev Center Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {Fastlane::PasswordManager}.
+    # Automatically be fetched using the {CredentialsManager::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -68,8 +68,8 @@ module Sigh
       begin
         Helper.log.info "Login into iOS Developer Center"
 
-        user ||= Fastlane::PasswordManager.shared_manager.username
-        password ||= Fastlane::PasswordManager.shared_manager.password
+        user ||= CredentialsManager::PasswordManager.shared_manager.username
+        password ||= CredentialsManager::PasswordManager.shared_manager.password
 
         result = visit PROFILES_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'

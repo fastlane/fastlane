@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
-  spec.add_dependency 'fastlane'
+  spec.add_dependency 'credentials_manager' # fastlane password manager
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
