@@ -51,9 +51,7 @@ module Frameit
             result.write output_path
             Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
           end
-        rescue SystemExit, Interrupt => ex
-          raise ex # system interrupted exception (ctrl + C)
-        rescue Exception => ex
+        rescue => ex
           Helper.log.error ex
         end
       end
