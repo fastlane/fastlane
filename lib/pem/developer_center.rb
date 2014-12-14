@@ -111,7 +111,7 @@ module PEM
             
          all("#saveTeamSelection_saveTeamSelection").first.click
          end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
         end
@@ -119,7 +119,7 @@ module PEM
         begin
           
           wait_for_elements('#aprerelease')
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
@@ -127,7 +127,7 @@ module PEM
         Helper.log.info "Login successful"
 
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -212,7 +212,7 @@ module PEM
         else
           raise "Could not create a new push profile for app '#{app_identifier}'. There is already a profile active.".red
         end
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -232,7 +232,7 @@ module PEM
           else
             raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
           end
-        rescue Exception => ex
+        rescue => ex
           error_occured(ex)
         end
       end

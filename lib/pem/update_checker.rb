@@ -25,7 +25,7 @@ module PEM
         if latest and Gem::Version.new(latest) > Gem::Version.new(current_version)
           return true
         end
-      rescue Exception => ex
+      rescue => ex
         Helper.log.error("Could not check if 'PEM' is up to date.")
       end
       return false
