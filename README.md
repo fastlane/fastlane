@@ -9,7 +9,7 @@
 -------
 
 <p align="center">
-    <img src="assets/fastlane.png">
+    
 </p>
 
 Fastlane - iOS Deployment without the hassle
@@ -19,6 +19,28 @@ Fastlane - iOS Deployment without the hassle
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
+
+## Beta Notes
+Please download this repository as zip.
+Unzip and open ```lib/fastlane/fast_file.rb``` line 58 and replace the path with the path of your extracted folder (pointing to the ```lib``` folder). I didn't have time to finish that last bit... If you can implement it, I'll happily merge a pull request.
+
+Run
+```
+sudo bundle install
+sudo rake install
+```
+
+Then run through each gem you are using (deliver, snapshot, frameit, sigh, PEM) on GitHub and download the latest version from the **develop** branch.
+For each app run the same commands
+```
+sudo bundle install
+sudo rake install
+```
+
+**Please read the rest of the README**
+
+Report any feedback directly to me via [Twitter](https://twitter.com/KrauseFx) or email.
+
 
 Automate the **whole** deployment process of your iOS apps using ```fastlane``` and all its tools:
 
@@ -57,7 +79,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Installation
 
-Install the gem
+Install the gem **NOT DURING BETA***
 
     sudo gem install fastlane
 
