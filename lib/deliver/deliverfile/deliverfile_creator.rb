@@ -1,4 +1,4 @@
-require 'fastlane/password_manager'
+require 'credentials_manager/password_manager'
 
 module Deliver
   # Helps new user quickly adopt Deliver
@@ -20,7 +20,7 @@ module Deliver
           "\nThis is necessary to fetch the latest metadata from your app and use it to create a Deliverfile for you." + 
           "\nIf you have previously entered your credentials already, you will not be asked again."
 
-        if Fastlane::PasswordManager.shared_manager.username and Fastlane::PasswordManager.shared_manager.password
+        if CredentialsManager::PasswordManager.shared_manager.username and CredentialsManager::PasswordManager.shared_manager.password
           identifier = ''
           while identifier.length < 3
             identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
@@ -93,7 +93,7 @@ module Deliver
         deliver.gsub!("[[APP_IDENTIFIER]]", app.app_identifier)
         deliver.gsub!("[[APP_NAME]]", project_name)
         deliver.gsub!("[[APPLE_ID]]", app.apple_id.to_s)
-        deliver.gsub!("[[EMAIL]]", Fastlane::PasswordManager.shared_manager.username)
+        deliver.gsub!("[[EMAIL]]", CredentialsManager::PasswordManager.shared_manager.username)
 
         return deliver
       end
