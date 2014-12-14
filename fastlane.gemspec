@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = %q{To be announced}
-  spec.description   = %q{To be announced}
-  spec.homepage      = "http://felixkrause.at"
+  spec.summary       = %q{Continuous Deployment for iOS}
+  spec.description   = %q{Continuous Deployment for iOS}
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
