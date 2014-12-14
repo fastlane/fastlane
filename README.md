@@ -101,7 +101,7 @@ lane :appstore do
 end
 ```
 
-To launch the ```appstore``` lane
+To launch the ```appstore``` lane run
 ```
 fastlane appstore
 ```
@@ -150,11 +150,9 @@ If you don't want a PDF report, which you have to approve first, append ```:forc
 deliver :force
 ```
 
-To upload a beta build for Apple Testflight: ```deliver :beta```
-
-To don't submit the app for review: ```deliver :skip_deploy```
-
-You can combine those options: ```deliver :force, :skip_deploy```
+- ```deliver :beta```: Upload a beta build for Apple Testflight
+- ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
+- ```deliver :force, :skip_deploy```: Combine options using ```,```
 
 #### [frameit](https://github.com/KrauseFx/frameit)
 By default, the device color will be black
