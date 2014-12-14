@@ -1,4 +1,5 @@
 require 'credentials_manager/password_manager'
+require 'credentials_manager/appfile_config'
 
 module Deliver
   # Helps new user quickly adopt Deliver
@@ -21,7 +22,7 @@ module Deliver
           "\nIf you have previously entered your credentials already, you will not be asked again."
 
         if CredentialsManager::PasswordManager.shared_manager.username and CredentialsManager::PasswordManager.shared_manager.password
-          identifier = ''
+          identifier = ((CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue '') || '')
           while identifier.length < 3
             identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
           end
