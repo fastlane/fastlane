@@ -130,7 +130,7 @@ snapshot
 The generated screenshots will be located in ```./fastlane/screenshots/``` instead of the path you defined in your ```Snapfile```. The reason for that is that [```deliver```](https://github.com/KrauseFx/deliver) needs to access the generated screenshots to upload them.
 
 #### [sigh](https://github.com/KrauseFx/sigh)
-This will generate and download your App Store provisioning profile
+This will generate and download your App Store provisioning profile. ```sigh``` will store the generated profile in the ```./fastlane``` folder.
 ```ruby
 sigh
 ```

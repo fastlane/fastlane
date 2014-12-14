@@ -14,7 +14,10 @@ module Fastlane
         type = Sigh::DeveloperCenter::DEVELOPMENT if params.first == :development
         
         path = Sigh::DeveloperCenter.new.run(app, type)
-        sh_no_action "open '#{path}'"
+        output_path = File.join('.', File.basename(path))
+        FileUtils.mv(path, output_path)
+        Helper.log.info "Exported provisioning profile to '#{File.expand_path(output_path)}'".green
+        sh_no_action "open '#{output_path}'"
       end
     end
   end
