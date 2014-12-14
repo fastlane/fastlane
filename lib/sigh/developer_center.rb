@@ -30,8 +30,6 @@ module Sigh
 
     def initialize
       FileUtils.mkdir_p TMP_FOLDER
-
-      DependencyChecker.check_dependencies
       
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist
@@ -244,7 +242,16 @@ module Sigh
       # 2) Select the App ID
       while not page.has_content?"Select App ID" do sleep 1 end
       # example: <option value="RGAWZGXSY4">ABP (5A997XSHK2.net.sunapps.34)</option>
-      first(:xpath, "//option[contains(text(), '.#{app_identifier})')]").select_option
+      identifiers = all(:xpath, "//option[contains(text(), '.#{app_identifier})')]")
+      if identifiers.count == 0
+        puts "Couldn't find App ID '#{app_identifier}'\nonly found:".red
+        all(:xpath, "//option").each do |current|
+          puts "\t- #{current.text}".yellow
+        end
+        raise "Could not find Apple ID '#{app_identifier}'.".red
+      else
+        identifiers.first.select_option
+      end
       click_next
 
       # 3) Select the certificate
