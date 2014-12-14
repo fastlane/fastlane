@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'credentials_manager/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "CredentialsManager"
+  spec.name          = "credentials_manager"
   spec.version       = CredentialsManager::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["krausefx@gmail.com"]

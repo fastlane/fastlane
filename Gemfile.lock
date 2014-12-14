@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    CredentialsManager (0.0.1)
+    credentials_manager (0.0.1)
       colored
       highline (~> 1.6.21)
       security (~> 0.1.3)
@@ -31,7 +31,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  CredentialsManager!
   bundler
+  credentials_manager!
   rake
   rspec (~> 3.1.0)
