@@ -8,6 +8,7 @@ module Fastlane
         raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
       end
 
+      start = Time.now - 64*80
       e = nil
       begin
         lanes.each do |key|
@@ -21,7 +22,14 @@ module Fastlane
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions, File.join(Fastlane::FastlaneFolder.path, "report.xml"))
 
-      raise ex if ex
+      duration = ((Time.now - start) / 60.0).round
+
+      unless e
+        Helper.log.info "@KrauseFx just saved you #{duration} minutes with fastlane.tools".green
+      else
+        Helper.log.fatal "fastlane finished with errors".red
+        raise e
+      end
     end
   end
 end
