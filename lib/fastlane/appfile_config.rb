@@ -23,7 +23,10 @@ module Fastlane
 
       raise "Could not find Appfile at path '#{path}'".red unless File.exists?(path)
 
-      eval(File.read(path))
+      full_path = File.expand_path(path)
+      Dir.chdir(File.expand_path('..', path)) do
+        eval(File.read(full_path))
+      end
     end
 
     def data
