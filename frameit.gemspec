@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'mini_magick', '~> 3.8.1' # To open, edit and export PSD files
-  spec.add_dependency 'deliver', '~> 0.3' # To determine the device type based on a screenshot file
+  spec.add_dependency 'deliver', '> 0.3' # To determine the device type based on a screenshot file
 
   spec.add_dependency 'fastlane'
 
