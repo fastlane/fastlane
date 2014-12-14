@@ -151,7 +151,7 @@ module Snapshot
           end
           return self.manual_scheme
         end
-      rescue Exception => ex
+      rescue => ex
         raise "Could not fetch available schemes: #{ex}".red
       end
     end

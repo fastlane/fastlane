@@ -23,9 +23,7 @@ module Snapshot
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
-          rescue SystemExit, Interrupt => ex
-            raise ex # system interrupted exception (ctrl + C)
-          rescue StandardError => ex
+          rescue => ex
             Helper.log.error(ex)
           end
           SnapshotConfig.shared_instance.blocks[:teardown_language].call(language, device) # Callback

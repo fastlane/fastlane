@@ -28,7 +28,7 @@ module Snapshot
           all_lines << line
           begin
             parse_build_line(line) if line.length > 2
-          rescue Exception => ex
+          rescue => ex
             Helper.log.fatal all_lines.join("\n")
             raise ex
           end
