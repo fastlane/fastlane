@@ -5,7 +5,6 @@ PATH
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
-      fastlane
       highline (~> 1.6.21)
       json
 
@@ -23,12 +22,6 @@ GEM
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane (0.1.0)
-      colored
-      commander (~> 4.2.0)
-      highline (~> 1.6.21)
-      json
-      security (~> 0.1.3)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
@@ -50,7 +43,6 @@ GEM
     rspec-mocks (3.1.3)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    security (0.1.3)
     simplecov (0.9.1)
       docile (~> 1.1.0)
       multi_json (~> 1.0)

@@ -27,8 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
 
-  spec.add_dependency 'fastlane'
-
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
