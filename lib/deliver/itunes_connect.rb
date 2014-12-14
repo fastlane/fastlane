@@ -101,7 +101,7 @@ module Deliver
           else
             raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.")
           end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug(ex)
           raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
@@ -109,7 +109,7 @@ module Deliver
         Helper.log.info "Successfully logged into iTunesConnect"
 
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -136,7 +136,7 @@ module Deliver
         end
 
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -192,7 +192,7 @@ module Deliver
           Helper.log.debug "Could not fetch version number of the live version for app #{app}."
           return nil
         end
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -243,7 +243,7 @@ module Deliver
             if created_version != version_number
               raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
             end
-          rescue Exception => ex
+          rescue => ex
             # Can not fetch the version number of the new version (this happens, when it's e.g. 'Developer Rejected')
             unless page.has_content?version_number
               raise "Some other version was created instead of the one you defined ('#{version_number}')."
@@ -252,7 +252,7 @@ module Deliver
         end
 
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -276,7 +276,7 @@ module Deliver
     #     Capybara.ignore_hidden_elements = true
     #     first(:button, "Save").click
 
-    #   rescue Exception => ex
+    #   rescue => ex
     #     error_occured(ex)
     #   end
     # end
@@ -310,7 +310,7 @@ module Deliver
 
 
         return true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -361,7 +361,7 @@ module Deliver
         raise "Could not put build itself onto production. Try opening '#{current_url}'" if error
 
         return true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -475,7 +475,7 @@ module Deliver
           raise "Something is missing here.".red
         end
         return false
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end

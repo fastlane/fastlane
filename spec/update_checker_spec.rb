@@ -11,6 +11,7 @@ describe Deliver do
   describe Deliver::UpdateChecker do
     describe "#verify_latest_version" do
       it "checks for the latest version" do
+        mock_ruby_gems_response("0.3")
         expect(Deliver::UpdateChecker.verify_latest_version).to eq(false)
       end
     end

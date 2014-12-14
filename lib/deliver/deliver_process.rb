@@ -42,7 +42,7 @@ module Deliver
         trigger_ipa_upload
 
         call_success_block
-      rescue Exception => ex
+      rescue => ex
         call_error_block(ex)
       end
     end

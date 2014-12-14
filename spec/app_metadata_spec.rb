@@ -58,7 +58,7 @@ describe Deliver do
             begin
               @app.metadata.update_title({ 'de' => 'asdf' })
               raise "No exception was raised"
-            rescue Exception => ex
+            rescue => ex
               expect(ex.to_s).to include("Language 'de' is invalid. It must be in [")
             end
           end

@@ -103,7 +103,7 @@ module Deliver
               parse_line(line) # this is where the parsing happens
             end
           end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.fatal(ex.to_s)
           @errors << ex.to_s
         end
