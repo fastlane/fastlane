@@ -14,7 +14,7 @@ module Fastlane
         lanes.each do |key|
           ff.runner.execute(key)
         end
-      rescue Exception => ex
+      rescue => ex
         Helper.log.fatal ex
         e = ex
       end

@@ -17,7 +17,7 @@ module Fastlane
 
       begin
         yield
-      rescue Exception => ex
+      rescue => ex
         exc = ex
         error = caller.join("\n") + "\n\n" + ex.to_s
       end
