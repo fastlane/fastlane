@@ -8,7 +8,7 @@ module Fastlane
         raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
       end
 
-      start = Time.now - 64*80
+      start = Time.now
       e = nil
       begin
         lanes.each do |key|
