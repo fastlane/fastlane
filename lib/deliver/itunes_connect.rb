@@ -2,7 +2,6 @@ require 'fastlane/password_manager'
 
 require 'capybara'
 require 'capybara/poltergeist'
-require 'security'
 require 'fastimage'
 require 'fastlane/password_manager'
 
