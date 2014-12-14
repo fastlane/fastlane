@@ -97,7 +97,9 @@ lane :appstore do
   deliver  # upload the screenshots, metadata and app to Apple
   
   frameit  # Add device frames around the screenshots
-  mail('felix@krausefx.com', :screenshots) # send screenshots to me
+
+  sh "./upload_screenshots_to_s3.sh" # Example
+  say "Successfully depoyed new version to the App Store!"
 end
 ```
 
@@ -186,7 +188,8 @@ This block will get executed after running the requested lane. It supports the s
 
 ```ruby
 after_all do
-  mail('felix@krausefx.com', :screenshots)
+  say "Successfully finished deployment!"
+  sh "./send_screenshots_to_team.sh" # Example
 end
 ```
 

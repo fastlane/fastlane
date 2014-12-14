@@ -36,6 +36,11 @@ module Fastlane
       @runner.set_after_all(block)
     end
 
+    def say(value)
+      value ||= yield
+      Fastlane::Actions.method('say').call([value])
+    end
+
     def method_missing(method_sym, *arguments, &block)
       # First, check if there is a predefined method in the actions folder
       if Fastlane::Actions.respond_to?(method_sym)
