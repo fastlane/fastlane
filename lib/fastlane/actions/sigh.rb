@@ -2,11 +2,10 @@ module Fastlane
   module Actions
     def self.sigh(params)
       execute_action("sigh") do
-        need_gem!'sigh'
-
         require 'sigh'
+        require 'credentials_manager/appfile_config'
 
-        app = AppfileConfig.try_fetch_value(:app_identifier)
+        app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
         raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
 
         type = Sigh::DeveloperCenter::APPSTORE

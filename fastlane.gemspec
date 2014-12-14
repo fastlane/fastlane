@@ -27,6 +27,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
 
+  spec.add_dependency 'credentials_manager'
+  spec.add_dependency 'deliver'
+  spec.add_dependency 'snapshot'
+  spec.add_dependency 'frameit'
+  spec.add_dependency 'pem'
+  spec.add_dependency 'sigh'
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'

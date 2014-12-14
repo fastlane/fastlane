@@ -3,10 +3,7 @@ module Fastlane
     def self.frameit(params)
       
       execute_action("frameit") do
-        need_gem!'frameit'
-
         require 'frameit'
-        require 'frameit/dependency_checker'
 
         color = Frameit::Editor::Color::BLACK
         color = Frameit::Editor::Color::SILVER if [:silver, :white].include?params.first

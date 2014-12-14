@@ -3,9 +3,8 @@ module Fastlane
     def self.deliver(params)
 
       execute_action("deliver") do
-        need_gem!'deliver'
-
         require 'deliver'
+        
         ENV["DELIVER_SCREENSHOTS_PATH"] = self.snapshot_screenshots_folder
         
         force = params.include?(:force)

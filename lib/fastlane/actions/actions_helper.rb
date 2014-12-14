@@ -78,12 +78,5 @@ module Fastlane
     rescue
       Gem.available?(name)
     end
-
-    # This will throw an exception if gem is missing
-    def self.need_gem!(name)
-      unless self.gem_available?(name)
-        raise "Gem '#{name}' is not installed. Run `sudo gem install #{name}` to install it. More information: https://github.com/KrauseFx/#{name}.".red
-      end
-    end
   end
 end
