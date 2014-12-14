@@ -339,7 +339,7 @@ module Deliver
         begin
           first('a', :text => BUTTON_ADD_NEW_BUILD).click
           wait_for_elements(".buildModalList")
-          sleep 1
+          sleep 5
         rescue
           if page.has_content?"Upload Date"
             # That's fine, the ipa was already selected
