@@ -4,7 +4,7 @@ module Fastlane
       raise "Fastlane already set up at path #{folder}".yellow if FastlaneFolder.setup?
 
       show_infos
-      response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (y/n)".yellow, true)
+      response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)".yellow, true)
 
       if response
         response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
@@ -12,6 +12,8 @@ module Fastlane
           FastlaneFolder.create_folder!
           copy_existing_files
           generate_app_metadata
+          detect_installed_tools # after copying the existing files
+          ask_to_enable_other_tools
           generate_fastfile
         end
       end
@@ -49,21 +51,51 @@ module Fastlane
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
     end
 
+    def detect_installed_tools
+      @tools = {}
+      @tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
+      @tools[:snapshot] = File.exists?(File.join(folder, 'Snapfile'))
+      @tools[:xctool] = File.exists?('./.xctool-args')
+      @tools[:cocoapods] = File.exists?('./Podfile') 
+      @tools[:sigh] = false
+    end
+
+    def ask_to_enable_other_tools
+      unless @tools[:deliver]
+        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
+          Helper.log.info "Loading up 'deliver', this might take a few seconds"
+          require 'deliver'
+          Deliver::DeliverfileCreator.create(folder)
+          @tools[:deliver] = true
+        end
+      end
+
+      unless @tools[:snapshot]
+        if agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
+          Helper.log.info "Loading up 'snapshot', this might take a few seconds"
+
+          require 'snapshot' # we need both requires
+          require 'snapshot/snapfile_creator'
+          Snapshot::SnapfileCreator.create(folder)
+          @tools[:snapshot] = true
+        end
+      end
+
+      if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
+        @tools[:sigh] = true
+      end
+    end
+
     def generate_fastfile
       template = File.read("#{Helper.gem_path}/lib/assets/FastfileTemplate")
 
-      enabled_tools = {}
-      enabled_tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
-      enabled_tools[:snapshot] = File.exists?(File.join(folder, 'Snapfile'))
-      enabled_tools[:xctool] = File.exists?('./.xctool-args')
-      enabled_tools[:cocoapods] = File.exists?('./Podfile')
+      template.gsub!('deliver', '# deliver') unless @tools[:deliver]
+      template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
+      template.gsub!('sigh', '# sigh') unless @tools[:sigh]
+      template.gsub!('sh "xctool', '# sh "xctool') unless @tools[:xctool]
+      template.gsub!('install_cocoapods', '# install_cocoapods') unless @tools[:cocoapods]
 
-      template.gsub!('deliver', '# deliver') unless enabled_tools[:deliver]
-      template.gsub!('snapshot', '# snapshot') unless enabled_tools[:snapshot]
-      template.gsub!('sh "xctool', '# sh "xctool') unless enabled_tools[:xctool]
-      template.gsub!('install_cocoapods', '# install_cocoapods') unless enabled_tools[:cocoapods]
-
-      enabled_tools.each do |key, value|
+      @tools.each do |key, value|
         Helper.log.info "'#{key}' enabled.".magenta if value
         Helper.log.info "'#{key}' not enabled.".yellow unless value
       end
