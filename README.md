@@ -97,6 +97,10 @@ If you want to generate a **Development** profile:
 
     sigh --development
 
+To generate the profile in a specific directory: 
+
+    sigh -o "~/Certificates/"
+
 By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
     sigh --skip_install
