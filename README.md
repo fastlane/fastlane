@@ -30,7 +30,8 @@ sudo bundle install
 sudo rake install
 ```
 
-Then run through each gem you are using (deliver, snapshot, frameit, sigh, PEM) on GitHub and download the latest version from the **develop** branch.
+Then run through each gem you are using (deliver, snapshot, frameit, sigh, PEM) on GitHub and download the latest version from the **develop** branch. Put them into wherever you are storing fastlane with the postfix ```-develop``` (i.e. ```sigh-develop```).
+
 For each app run the same commands
 ```
 sudo bundle install
