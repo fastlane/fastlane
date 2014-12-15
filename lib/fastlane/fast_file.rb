@@ -55,8 +55,8 @@ module Fastlane
 
     private
       def load_actions
-        Dir.chdir("/Users/felixkrause/Apps/fastlane/lib") do # TODO: Remove
-          Dir['fastlane/actions/*.rb'].each do |file| 
+        Dir.chdir(File.dirname(__FILE__)) do
+          Dir[File.expand_path 'actions/*.rb', File.dirname(__FILE__)].each do |file|
             require file
           end
         end
