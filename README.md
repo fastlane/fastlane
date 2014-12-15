@@ -21,10 +21,7 @@ Fastlane - iOS Deployment without the hassle
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
 
 ## Beta Notes
-Please download this repository as zip.
-Unzip and open ```lib/fastlane/fast_file.rb``` line 58 and replace the path with the path of your extracted folder (pointing to the ```lib``` folder). I didn't have time to finish that last bit... If you can implement it, I'll happily merge a pull request.
-
-Run
+Please download this repository as zip and run
 ```
 sudo bundle install
 sudo rake install
