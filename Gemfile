@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gem 'deliver', :path => 'deliver-develop'
 gem 'sigh', :path => 'sigh-develop'
-# gem 'snapshot', :path => 'snapshot-develop'
+gem 'snapshot', :path => 'snapshot-develop'
 # gem 'frameit', :path => 'frameit-develop'
 # gem 'pem', :path => 'pem-develop'
 
