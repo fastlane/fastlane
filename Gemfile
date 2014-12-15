@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in deliver.gemspec
+gem 'deliver', :path => 'deliver-develop'
+gem 'sigh', :path => 'sigh-develop'
+
+# Specify your gem's dependencies in fastlane.gemspec
 gemspec
