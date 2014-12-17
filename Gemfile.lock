@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.4.0.beta1)
+    deliver (0.4.0)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -39,13 +39,6 @@ GEM
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane (0.1.0)
-      colored
-      commander (~> 4.2.0)
-      highline (~> 1.6.21)
-      json
-      nokogiri
-      security (~> 0.1.3)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
@@ -97,14 +90,15 @@ GEM
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
-      fastlane
       highline (~> 1.6.21)
       json
     ttfunk (1.4.0)
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.4.0)
+    websocket-driver (0.5.0)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.1)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.4)
