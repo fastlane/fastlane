@@ -79,9 +79,9 @@ module Deliver
         used_ipa_file = @deploy_information[:beta_ipa]
       end
       
-      unless (used_ipa_file || '').length > 0
-        missing = is_release_build?? "ipa" : "beta_ipa"
-        raise "Could not find an ipa file for '#{missing}' mode. Provide one using `#{missing} do ... end`.".red
+      if (used_ipa_file || '').length == 0 and is_beta_build?
+        # Beta Release but no ipa given
+        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end`.".red
       end
 
       if used_ipa_file

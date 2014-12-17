@@ -77,7 +77,7 @@ module Deliver
 
       if is_okay
         unless Helper.is_test?
-          `rm -rf ./#{@app.apple_id}.itmsp` # we don't need that any more
+          `rm -rf ./#{@app.apple_id}.itmsp` # we don't need this file any more
 
           return publish_on_itunes_connect(submit_information)
         end
