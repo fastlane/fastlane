@@ -12,8 +12,8 @@ HighLine.track_eof = false
 # Commander
 program :version, Deliver::VERSION
 program :description, 'CLI for \'Deliver\' - Automate uploading of app metadata, screenshots and app updates to Apple'
-program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
-program :help, 'Website', 'http://felixkrause.at'
+program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
+program :help, 'Website', 'http://krausefx.com'
 program :help, 'GitHub', 'https://github.com/krausefx/deliver'
 program :help_formatter, :compact
 
