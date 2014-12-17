@@ -44,6 +44,8 @@ end
 
 # ipa "./latest.ipa" # this can be used, if you prefer manually building the ipa file
 
+# beta_ipa "./ad_hoc_build.ipa" # upload ipa file using `deliver --beta`
+
 # unit_tests do
 #   system("xctool test")
 # end
