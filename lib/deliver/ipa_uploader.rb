@@ -77,7 +77,7 @@ module Deliver
 
       if is_okay
         unless Helper.is_test?
-          `rm -rf ./#{@app.apple_id}.itmsp` # we don't need that any more
+          `rm -rf ./#{@app.apple_id}.itmsp` # we don't need this file any more
 
           return publish_on_itunes_connect(submit_information)
         end
@@ -90,13 +90,14 @@ module Deliver
 
     private
       # This method will trigger the iTunesConnect class to choose the latest build
+      # @return Was it successful?
       def publish_on_itunes_connect(submit_information = nil)
         if @publish_strategy == IPA_UPLOAD_STRATEGY_APP_STORE
           return publish_production_build(submit_information)
         elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
         end
-        return false
+        return true
       end
 
       def publish_beta_build

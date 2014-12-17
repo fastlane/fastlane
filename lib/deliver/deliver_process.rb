@@ -26,9 +26,10 @@ module Deliver
         run_unit_tests
         fetch_information_from_ipa_file
 
+        verify_ipa_file
+
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
-        verify_ipa_file
         create_app
         verify_app_on_itunesconnect
 
@@ -70,6 +71,11 @@ module Deliver
         used_ipa_file = @deploy_information[:ipa]
       elsif is_beta_build?
         used_ipa_file = @deploy_information[:beta_ipa]
+      end
+      
+      if (used_ipa_file || '').length == 0 and is_beta_build?
+        # Beta Release but no ipa given
+        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end`.".red
       end
 
       if used_ipa_file
