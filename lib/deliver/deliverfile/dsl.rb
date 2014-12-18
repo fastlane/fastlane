@@ -86,7 +86,7 @@ module Deliver
         #  IPA file.
         def ipa(value = nil)
           value ||= yield if block_given?
-          validate_ipa(value)
+          validate_ipa(value) if value
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
         end
@@ -96,7 +96,7 @@ module Deliver
         #  IPA file.
         def beta_ipa(value = nil)
           value ||= yield if block_given?
-          validate_ipa(value)
+          validate_ipa(value) if value
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
         end
