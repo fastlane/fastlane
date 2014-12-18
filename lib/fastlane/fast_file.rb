@@ -17,7 +17,7 @@ module Fastlane
       @runner = Runner.new
       load_actions
 
-      Dir.chdir(Fastlane::FastlaneFolder.path) do # context: fastlane subfolder
+      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         eval(data) # this is okay in this case
       end
 
