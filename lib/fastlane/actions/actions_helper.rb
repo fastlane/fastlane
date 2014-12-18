@@ -37,7 +37,7 @@ module Fastlane
     # This method will output the string and execute it
     def self.sh(command)
       self.execute_action(command) do
-        sh_no_action(command)
+        return sh_no_action(command)
       end
     end
 

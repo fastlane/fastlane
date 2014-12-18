@@ -9,6 +9,8 @@ module Fastlane
         clean = true
         clean = false if params.first == :noclean
 
+        return clean if Helper.is_test?
+
         Snapshot::SnapshotConfig.shared_instance
         Snapshot::Runner.new.work(clean: clean)
       end

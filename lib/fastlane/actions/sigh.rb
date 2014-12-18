@@ -5,13 +5,15 @@ module Fastlane
         require 'sigh'
         require 'credentials_manager/appfile_config'
 
-        app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-        raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
-
         type = Sigh::DeveloperCenter::APPSTORE
         type = Sigh::DeveloperCenter::ADHOC if params.first == :adhoc
         type = Sigh::DeveloperCenter::DEVELOPMENT if params.first == :development
         
+        return type if Helper.is_test?
+
+        app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+        raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
+
         path = Sigh::DeveloperCenter.new.run(app, type)
         output_path = File.join('.', File.basename(path))
         FileUtils.mv(path, output_path)

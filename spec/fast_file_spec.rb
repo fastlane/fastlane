@@ -42,7 +42,7 @@ describe Fastlane do
           install_cocoapods
         end").runner.execute(:test)
 
-        expect(result.first).to eq("pod install")
+        expect(result).to eq("pod install")
       end
 
       it "raises an error if one lane is defined multiple times" do 
