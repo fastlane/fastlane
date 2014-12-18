@@ -5,7 +5,7 @@ PATH
       colored
       commander (~> 4.2.0)
       credentials_manager
-      deliver
+      deliver (>= 0.5.0)
       frameit
       highline (~> 1.6.21)
       json
@@ -57,7 +57,7 @@ GEM
     frameit (0.1.5)
       colored
       commander (~> 4.2.0)
-      deliver (> 0.3)
+      deliver (~> 0.3)
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
@@ -77,7 +77,7 @@ GEM
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      credentials_manager
+      deliver
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
@@ -113,14 +113,15 @@ GEM
     rubyzip (1.1.6)
     safe_yaml (1.0.4)
     security (0.1.3)
-    sigh (0.1.4)
+    sigh (0.1.3)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      credentials_manager
+      deliver
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
+      security (~> 0.1.3)
     simplecov (0.9.1)
       docile (~> 1.1.0)
       multi_json (~> 1.0)

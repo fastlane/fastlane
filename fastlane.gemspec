@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
 
   spec.add_dependency 'credentials_manager'
-  spec.add_dependency 'deliver'
+  spec.add_dependency 'deliver', '>= 0.5.0'
   spec.add_dependency 'snapshot'
   spec.add_dependency 'frameit'
   spec.add_dependency 'pem'

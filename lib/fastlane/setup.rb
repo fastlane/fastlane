@@ -9,12 +9,21 @@ module Fastlane
       if response
         response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
         if response
-          FastlaneFolder.create_folder!
-          copy_existing_files
-          generate_app_metadata
-          detect_installed_tools # after copying the existing files
-          ask_to_enable_other_tools
-          generate_fastfile
+          begin
+            FastlaneFolder.create_folder!
+            copy_existing_files
+            generate_app_metadata
+            detect_installed_tools # after copying the existing files
+            ask_to_enable_other_tools
+            generate_fastfile
+            asdlkjlkjsdflkjdf
+          rescue => ex
+            # Something went wrong with the setup, clear the folder again
+            # and restore previous files
+            Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
+            restore_previous_state
+            raise ex
+          end
         end
       end
     end
@@ -28,9 +37,12 @@ module Fastlane
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
 
+    def files_to_copy
+      ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
+    end
+
     def copy_existing_files
-      files = ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
-      files.each do |current|
+      files_to_copy.each do |current|
         if File.exists?current
           file_name = File.basename(current)
           to_path = File.join(folder, file_name)
@@ -107,6 +119,21 @@ module Fastlane
 
     def folder
       FastlaneFolder.path
+    end
+
+    def restore_previous_state
+      # Move all moved files back
+      files_to_copy.each do |current|
+        from_path = File.join(folder, current)
+        to_path = File.basename(current)
+        if File.exists?from_path
+          Helper.log.info "Moving '#{from_path}' to '#{to_path}'".yellow
+          FileUtils.mv(from_path, to_path)
+        end
+      end
+
+      Helper.log.info "Deleting the 'fastlane' folder".yellow
+      FileUtils.rm_rf(folder) 
     end
   end
 end
