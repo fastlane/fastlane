@@ -186,7 +186,7 @@ To use white (sorry, silver) device frames
 frameit :silver
 ```
 
-#### increment_build_number
+#### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
 This method will increment the **build number**, not the app version. Usually this is just an auto incremented number. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
 ```ruby
