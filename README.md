@@ -111,9 +111,11 @@ You define a ```lane``` like this (more details about the commands in the [Actio
 ```ruby
 lane :appstore do
   puts "Ready to deploy to the App Store"
-  snapshot # create new screenshots
-  sigh     # download/generate the latest provisioning profile
-  deliver  # upload the screenshots, metadata and app to Apple
+  xctool                  # run unit tests
+  increment_build_number  # increment the build number by one
+  snapshot                # create new screenshots
+  sigh                    # download/generate the latest provisioning profile
+  deliver                 # upload the screenshots, metadata and app to Apple
   
   frameit  # Add device frames around the screenshots
 
@@ -185,6 +187,24 @@ To use white (sorry, silver) device frames
 ```ruby
 frameit :silver
 ```
+
+#### increment_build_number
+This method will increment the **build number**, not the app version. Usually this is just an auto incremented number. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
+
+```ruby
+increment_build_number
+```
+
+To set your own build number use
+```ruby
+increment_build_number '75'
+```
+
+To use the Jenkins build number
+```ruby
+increment_build_number '#{JENKINS_}'
+```
+
 
 #### Custom Scripts
 Run your own commands using
