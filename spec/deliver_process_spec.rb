@@ -9,6 +9,27 @@ describe Deliver do
         @ipa = "spec/fixtures/ipas/Example1.ipa"
       end
 
+      context "loads app_identifier from Appfile if existing" do
+        let (:app_identifier) { 'net.sunapps.54' }
+        before(:each) do
+          @app_file = File.join(Dir.pwd, "Appfile") 
+          File.write(@app_file, "app_identifier '#{app_identifier}'")
+          @process = Deliver::DeliverProcess.new({version: '1.0'})
+
+          expect {
+            @process.run # this will then fetch the app identifier from the app config
+          }.to raise_error "You have to set a mock file for this test!"
+        end
+
+        it "uses the given app identifier" do
+          expect(@process.app_identifier).to eq(app_identifier)
+        end
+
+        after(:each) do
+          File.delete(@app_file)
+        end
+      end
+
       context "when there's a beta build defined" do
         before(:each) do
           beta_ipa = "spec/fixtures/ipas/Example2.ipa"

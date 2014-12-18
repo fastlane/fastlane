@@ -16,6 +16,9 @@ module Deliver
     #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
 
+    # @return (String): The app identifier of the currently used app (e.g. com.krausefx.app)
+    attr_accessor :app_identifier
+
     def initialize(deploy_information = nil)
       @deploy_information = deploy_information || {}
       @deploy_information[:blocks] ||= {}
@@ -96,7 +99,12 @@ module Deliver
       end
     end
 
+    def fetch_app_identifier_from_app_file
+      @app_identifier = (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
+    end
+
     def verify_ipa_file
+      fetch_app_identifier_from_app_file unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless @app_version
     end
