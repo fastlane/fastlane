@@ -128,11 +128,11 @@ changelog({
     "de-DE" => "Dieses Update ist super"
 })
 ```
-If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. 
+If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. This will upload the ipa file and app metadata, but will not submit the app for review.
 
 #### Upload a new ipa for TestFlight beta testers
 
-In order to upload beta `.ipa` you need to specify beta_ipa path in your `Deliverfile`
+In order to upload an `.ipa` file for Apple TestFlight you need to specify `beta_ipa` path in your `Deliverfile`
 
 ```ruby
 beta_ipa "./latest.ipa"
