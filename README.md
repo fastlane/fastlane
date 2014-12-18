@@ -238,11 +238,9 @@ The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [hom
 ```brew update && brew install jenkins```
 
 From now on start ```Jenkins``` by running:
-````
+```
 jenkins
 ```
-
-Some developers report problems with homebrew and phantomjs when running [Jenkins](http://jenkins-ci.org/) as its own user.
 
 ## Deploy Strategy
 
@@ -252,6 +250,17 @@ You can set up your own ```Release``` job, which is only triggered manually.
 
 ## Test Results
 
+In your Jenkins build step, there should be as little code as possible, ideally only `fastlane beta`.
+
+To show the deployment result right in Jenkins: 
+
+- *Add post-build action*
+- *Publish JUnit test result report*
+- *Test report XMLs*: `**/report.xml`
+
+Save and run. The result should look like this: 
+
+![JenkinsIntegration](assets/JenkinsIntegration.png)
 
 ## Plugins
 
