@@ -84,21 +84,19 @@ module Deliver
         # Pass the path to the ipa file which should be uploaded
         # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
         #  IPA file.
-        def ipa(value = nil)
-          value ||= yield if block_given?
-          validate_ipa(value) if value
+        def ipa(value = nil, &block)
+          validate_ipa!(value) if value # to catch errors early
 
-          @deliver_data.set_new_value(Deliverer::ValKey::IPA, value)
+          @deliver_data.set_new_value(Deliverer::ValKey::IPA, (value || block))
         end
 
         # Pass the path to the ipa file (beta version) which should be uploaded
         # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
         #  IPA file.
-        def beta_ipa(value = nil)
-          value ||= yield if block_given?
-          validate_ipa(value) if value
+        def beta_ipa(value = nil, &block)
+          validate_ipa!(value) if value # to catch errors early
 
-          @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, value)
+          @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, (value || block))
         end
 
         # This will set the email address of the Apple ID to be used
@@ -124,11 +122,13 @@ module Deliver
           @deliver_data.set_new_value(Deliverer::ValKey::APP_VERSION, value)
         end
 
-        private
-          def validate_ipa(value)
-            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
-            raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
-          end
+        # Only verifies the file type of the ipa path and if the file can be found. Is also called from deliver_process
+        # This will raise a DeliverfileDSLError if something goes wrong
+        def self.validate_ipa!(value)
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.kind_of?String
+          raise DeliverfileDSLError.new(INVALID_IPA_FILE_GIVEN.red) unless value.include?".ipa"
+        end
       end
     end
   end
