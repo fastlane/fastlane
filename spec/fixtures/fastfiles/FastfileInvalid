@@ -1,0 +1,3 @@
+laneasdf :test do 
+  File.write('/tmp/fastlane/test', '1')
+end
