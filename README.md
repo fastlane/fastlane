@@ -45,7 +45,7 @@ Automate the **whole** deployment process of your iOS apps using ```fastlane``` 
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Creates perfect screenshots of your app in all languages on all device types automatically
 - [```frameit```](https://github.com/KrauseFx/frameit): Adds device frames around your screenshots to use on your website
 - [```PEM```](https://github.com/KrauseFx/PEM): Creates push certificates for your server
-- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintainces and repairs provisioning profiles for you
+- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintains and repairs provisioning profiles for you
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -95,12 +95,12 @@ The guide will create all the necessary files for you, using the existing app me
 - Follow the guide, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` using the next section
 
-# Customize the ```Fastfile```
+# Customise the ```Fastfile```
 Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
 
-Open the ```Fastfile``` using a text editor and customize it even further. (Switch to *Ruby* Syntax Highlighting)
+Open the ```Fastfile``` using a text editor and customise it even further. (Switch to *Ruby* Syntax Highlighting)
 
 ### Lanes
 You can define multiple ```lanes``` which are different workflows for a release process.
@@ -118,7 +118,7 @@ lane :appstore do
   frameit  # Add device frames around the screenshots
 
   sh "./upload_screenshots_to_s3.sh" # Example
-  say "Successfully depoyed new version to the App Store!"
+  say "Successfully deployed new version to the App Store!"
 end
 ```
 
@@ -171,7 +171,7 @@ If you don't want a PDF report, which you have to approve first, append ```:forc
 deliver :force
 ```
 
-- ```deliver :beta```: Upload a beta build for Apple Testflight
+- ```deliver :beta```: Upload a beta build for Apple TestFlight
 - ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
 - ```deliver :force, :skip_deploy```: Combine options using ```,```
 
@@ -289,7 +289,7 @@ DELIVER_PASSWORD
 All ```fastlane``` tools are based on Ruby, you can take a look at the source to easily implement your own authentication solution.
 
 # Need help?
-- If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stacktrace.
+- If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
 - I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 # License
