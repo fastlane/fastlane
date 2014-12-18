@@ -81,7 +81,7 @@ module Deliver
       
       if (used_ipa_file || '').length == 0 and is_beta_build?
         # Beta Release but no ipa given
-        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end`.".red
+        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
       end
 
       if used_ipa_file
