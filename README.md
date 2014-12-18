@@ -198,12 +198,6 @@ To set your own build number use
 increment_build_number '75'
 ```
 
-To use the Jenkins build number
-```ruby
-increment_build_number ENV['BUILD_NUMBER']
-```
-
-
 #### Custom Scripts
 Run your own commands using
 ```ruby
@@ -247,6 +241,12 @@ jenkins
 You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
 
 You can set up your own ```Release``` job, which is only triggered manually.
+
+To use the Jenkins build number, add this to your `lane`:
+
+```ruby
+increment_build_number ENV['BUILD_NUMBER']
+```
 
 ## Test Results
 
