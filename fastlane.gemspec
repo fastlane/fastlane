@@ -29,10 +29,10 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'credentials_manager'
   spec.add_dependency 'deliver', '>= 0.5.0'
-  spec.add_dependency 'snapshot'
-  spec.add_dependency 'frameit'
-  spec.add_dependency 'pem'
-  spec.add_dependency 'sigh'
+  spec.add_dependency 'snapshot', '>= 0.4.0'
+  spec.add_dependency 'frameit', '>= 0.2.0'
+  spec.add_dependency 'pem', '>= 0.3.0'
+  spec.add_dependency 'sigh', '>= 0.2.0'
 
   # Development only
   spec.add_development_dependency 'bundler'

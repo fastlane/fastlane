@@ -6,13 +6,13 @@ PATH
       commander (~> 4.2.0)
       credentials_manager
       deliver (>= 0.5.0)
-      frameit
+      frameit (>= 0.2.0)
       highline (~> 1.6.21)
       json
       nokogiri (~> 1.6.5)
-      pem
-      sigh
-      snapshot
+      pem (>= 0.3.0)
+      sigh (>= 0.2.0)
+      snapshot (>= 0.4.0)
 
 GEM
   remote: https://rubygems.org/
@@ -54,10 +54,10 @@ GEM
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    frameit (0.1.5)
+    frameit (0.2.0)
       colored
       commander (~> 4.2.0)
-      deliver (~> 0.3)
+      deliver (> 0.3)
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
@@ -73,11 +73,11 @@ GEM
     nokogiri (1.6.5)
       mini_portile (~> 0.6.0)
     pdf-core (0.4.0)
-    pem (0.2.1)
+    pem (0.3.0)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      deliver
+      credentials_manager
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
@@ -113,22 +113,21 @@ GEM
     rubyzip (1.1.6)
     safe_yaml (1.0.4)
     security (0.1.3)
-    sigh (0.1.3)
+    sigh (0.2.0)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      deliver
+      credentials_manager
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
-      security (~> 0.1.3)
     simplecov (0.9.1)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    snapshot (0.3.3)
+    snapshot (0.4.0)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
