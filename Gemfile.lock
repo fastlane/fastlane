@@ -1,12 +1,11 @@
 PATH
   remote: .
   specs:
-    frameit (0.1.5)
+    frameit (0.2.0)
       colored
       commander (~> 4.2.0)
       deliver (> 0.3)
       fastimage (~> 1.6.3)
-      fastlane
       highline (~> 1.6.21)
       json
       mini_magick (~> 3.8.1)
@@ -49,13 +48,6 @@ GEM
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane (0.1.0)
-      colored
-      commander (~> 4.2.0)
-      highline (~> 1.6.21)
-      json
-      nokogiri (~> 1.6.5)
-      security (~> 0.1.3)
     highline (1.6.21)
     json (1.8.1)
     method_source (0.8.2)
