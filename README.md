@@ -105,7 +105,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 
 # Need help?
 - If there is a technical problem with ```FrameIt```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
-- I'm available for contract work - drop me an email: frameit@felixkrause.at
+- I'm available for contract work - drop me an email: frameit@krausefx.com
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
