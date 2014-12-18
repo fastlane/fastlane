@@ -312,7 +312,7 @@ You should not deploy a new App Store update after every commit, since you still
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
+- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stack trace.
 - I'm available for contract work - drop me an email: deliver@krausefx.com
 
 # License
