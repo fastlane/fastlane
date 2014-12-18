@@ -200,7 +200,7 @@ increment_build_number '75'
 
 To use the Jenkins build number
 ```ruby
-increment_build_number '#{JENKINS_}'
+increment_build_number ENV['BUILD_NUMBER']
 ```
 
 
