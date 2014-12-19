@@ -236,6 +236,10 @@ From now on start ```Jenkins``` by running:
 jenkins
 ```
 
+To store the password in the Keychain of your remote machine, I recommend running `sigh` or `deliver` using ssh or remote desktop at least once.
+
+If you're using `Jenkins` as its own user, you might run into problems with `homebrew` and `phantomjs`.
+
 ## Deploy Strategy
 
 You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
@@ -248,29 +252,40 @@ To use the Jenkins build number, add this to your `lane`:
 increment_build_number ENV['BUILD_NUMBER']
 ```
 
-## Test Results
+## Plugins
 
-In your Jenkins build step, there should be as little code as possible, ideally only `fastlane beta`.
+I recommend the following plugins:
 
-To show the deployment result right in Jenkins: 
+- **[JUnit Plugin](http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin):** Not sure if it's installed by default.
+- **[HTML Publisher Plugin](https://wiki.jenkins-ci.org/display/JENKINS/HTML+Publisher+Plugin):** Can be used to show the generated screenshots right inside Jenkins.
+- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools. Dont' forget to enable `Color ANSI Console Output` in the `Build Environment` or your project.
+- **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time.
+
+## Build Step
+Use the following as your build step:
+```
+fastlane appstore --trace
+```
+Replace `appstore` with the lane you want to use. I recommend appending the `--trace` to make debugging easier in case something goes wrong. 
+
+## Test Results and Screenshtos
+
+To show the deployment result right in `Jenkins`
 
 - *Add post-build action*
 - *Publish JUnit test result report*
 - *Test report XMLs*: `**/report.xml`
 
+To show the generated screenhots right in `Jenkins`
+
+- *Add post-build action*
+- *Publish HTML reports*
+- *HTML directory to archive*: `path/fastlane/screenshots`
+- *Index page*: `screenshots.html`
+
 Save and run. The result should look like this: 
 
 ![JenkinsIntegration](assets/JenkinsIntegration.png)
-
-## Plugins
-
-I recommend the following plugins:
-
-- **[JUnit Plugin](http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin):** Not sure if it's installed by default
-- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools
-- **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time
-
-If you use plugins which are helpful for the fastlane tools, please let me know.
 
 # Tips
 
