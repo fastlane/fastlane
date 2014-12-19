@@ -127,6 +127,8 @@ To launch the ```appstore``` lane run
 fastlane appstore
 ```
 
+When one command fails, the execution will be aborted.
+
 
 ### Actions
 There are some predefined actions you can use. If you have ideas for more, please let me know.
@@ -270,13 +272,13 @@ Replace `appstore` with the lane you want to use. I recommend appending the `--t
 
 ## Test Results and Screenshtos
 
-To show the deployment result right in `Jenkins`
+To show the **deployment result** right in `Jenkins`
 
 - *Add post-build action*
 - *Publish JUnit test result report*
 - *Test report XMLs*: `**/report.xml`
 
-To show the generated screenhots right in `Jenkins`
+To show the **generated screenhots** right in `Jenkins`
 
 - *Add post-build action*
 - *Publish HTML reports*
