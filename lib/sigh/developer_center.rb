@@ -386,8 +386,13 @@ module Sigh
         host = Capybara.current_session.current_host
         url = [host, url].join('')
 
-        myacinfo = page.driver.cookies['myacinfo'].value # some Apple magic, which is required for the profile download
-        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
+        cookieString = ""
+        
+        page.driver.cookies.each do |key, cookie|
+          cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
+        end 
+        
+        data = open(url, {'Cookie' => cookieString}).read
 
         raise "Something went wrong when downloading the file from the Dev Center" unless data
         Helper.log.info "Successfully downloaded provisioning profile"
