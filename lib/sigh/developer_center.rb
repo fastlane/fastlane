@@ -128,7 +128,11 @@ module Sigh
           visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
         rescue Exception => ex
           Helper.log.debug ex
-          raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+          if page.has_content?"Getting Started"
+            raise "There was no valid signing certificate found. Please log in and follow the 'Getting Started guide' on '#{current_url}'".red
+          else
+            raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+          end
         end
 
 
