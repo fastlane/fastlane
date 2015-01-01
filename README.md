@@ -239,30 +239,7 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 # Credentials
 
-If you're using [fastlane](https://github.com/KrauseFx/fastlane), please take a look at its [README](https://github.com/KrauseFx/fastlane) for more information about credentials.
-
-**When using *Deliver* without [fastlane](https://github.com/KrauseFx/fastlane):**
-
-The used username (Apple ID) will be stored in the ```Deliverfile``` by default. When you run ```deliver``` for the first time on another computer, you will only be asked for the password.
-With [fastlane](https://github.com/KrauseFx/fastlane) you can store your Apple ID in a so called ```Appfile```. 
-
-Therefore it is easy to switch between projects, without needing to logout and login again and providing the bundle identifier to be used.
-
-## Use the Keychain
-The first time you use *Deliver* you have to enter your iTunes Connect 
-credentials. They will be stored in the Keychain. 
-
-If you decide to remove your credentials from the Keychain, just open the *Keychain Access*, select 
-*All Items* and search for 'deliver'.
-
-## Use environment variables
-You can use the following environment variables to use a specific account instead of the one stored in the keychain.
-
-    DELIVER_USER
-    DELIVER_PASSWORD
-    
-## Implement your custom solution
-Take a look at [Using the exposed Ruby classes](#use-the-exposed-ruby-classes).
+Take a look at the [fastlane README](https://github.com/KrauseFx/fastlane#credentials) for more information about the stored credentials.
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
@@ -302,11 +279,7 @@ If you want to integrate ```deliver``` with ```snapshot```, check out [fastlane]
 More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
 ## Jenkins integration
-Depending on how you set up your Jenkins instance, there might be problems with the ```phantomjs``` dependency.
-
-I've been using [Jenkins App](https://github.com/stisti/jenkins-app) for a long time, where ```Deliver``` works just fine. 
-
-You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane#jenkins-integration).
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
