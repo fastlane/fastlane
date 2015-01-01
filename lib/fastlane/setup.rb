@@ -16,7 +16,7 @@ module Fastlane
             detect_installed_tools # after copying the existing files
             ask_to_enable_other_tools
             generate_fastfile
-            asdlkjlkjsdflkjdf
+            Helper.log.info "Successfully finished setting up fastlane".green
           rescue => ex
             # Something went wrong with the setup, clear the folder again
             # and restore previous files

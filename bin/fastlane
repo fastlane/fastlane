@@ -37,7 +37,6 @@ command :init do |c|
   c.description = 'Helps you setting up fastlane based on your existing tools.'
 
   c.action do |args, options|
-    Fastlane::UpdateChecker.verify_latest_version
     Fastlane::Setup.new.run
   end
 end
