@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.4.1)
+    deliver (0.4.2)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -61,7 +61,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (1.5.2)
+    rack (1.6.0)
     rack-test (0.6.2)
       rack (>= 1.0)
     rake (10.3.2)
@@ -96,7 +96,7 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.5.0)
+    websocket-driver (0.5.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.1)
     xpath (2.0.0)
