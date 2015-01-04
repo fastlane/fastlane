@@ -22,6 +22,7 @@ app_identifier "[Your App Identifier, e.g. at.felixkrause.app_name]"
 
 # This folder has to include one folder for each language
 # More information about automatic screenshot upload: 
+# https://github.com/KrauseFx/deliver#upload-screenshots-to-itunes-connect
 screenshots_path "./screenshots"
 
 
