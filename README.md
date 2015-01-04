@@ -20,8 +20,7 @@ Deliver - Continuous Deployment for iOS
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
 
-Updating your iOS app should not be painful and time consuming. Automate the 
-whole process to start with Continuous Deployment.
+Updating your iOS app should not be painful and time consuming.
 
 ```Deliver``` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates just by using one command.
 
