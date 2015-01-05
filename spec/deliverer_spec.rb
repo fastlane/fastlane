@@ -18,7 +18,7 @@ describe Deliver do
             version: version,
             ipa: ipa,
           }, is_beta_ipa: true, skip_deploy: true)
-        }.to raise_exception "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end`.".red
+        }.to raise_exception "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
       end
 
       it "works with valid data" do

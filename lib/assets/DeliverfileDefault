@@ -16,6 +16,7 @@ apple_id "[[APPLE_ID]]"
 
 # This folder has to include one folder for each language
 # More information about automatic screenshot upload: 
+# https://github.com/KrauseFx/deliver#upload-screenshots-to-itunes-connect
 screenshots_path "./deliver/screenshots/"
 
 

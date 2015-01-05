@@ -302,16 +302,18 @@ module Deliver
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
-        resulting_path = "#{current_path}/**/*.{png,PNG,jpg,JPG,jpeg,JPEG}"
+        resulting_path = "#{current_path}/**/*.{png,jpg,jpeg}"
 
         raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
 
-        if Dir[resulting_path].count == 0
+        # https://stackoverflow.com/questions/21688855/
+        # File::FNM_CASEFOLD = ignore case
+        if Dir.glob(resulting_path, File::FNM_CASEFOLD).count == 0
           Helper.log.error("No screenshots found at the given path '#{resulting_path}'")
         else
           self.clear_all_screenshots(language)
 
-          Dir[resulting_path].sort.each_with_index do |path, index|
+          Dir.glob(resulting_path, File::FNM_CASEFOLD).sort.each do |path|
             next if path.include?"_framed."
 
             begin

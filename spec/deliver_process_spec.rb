@@ -50,6 +50,33 @@ describe Deliver do
         end
       end
 
+      it "doesn't show error if production ipa is not given and beta build should be uploaded" do
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+        Deliver::Deliverer.new('spec/fixtures/Deliverfiles/DeliverfileBetaProductionIpa', 
+                              force: false, 
+                              is_beta_ipa: true, 
+                              skip_deploy: true)
+      end
+
+      it "only runs the ipa block which is should be uploaded" do
+        FileUtils.rm("/tmp/deliver_ipa.txt") rescue nil
+        FileUtils.rm("/tmp/deliver_beta_ipa.txt") rescue nil
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+        Deliver::Deliverer.new('spec/fixtures/Deliverfiles/DeliverfileBetaProductionOnlyOne', 
+                              force: false, 
+                              is_beta_ipa: false, 
+                              skip_deploy: true)
+
+        expect(File.exists?("/tmp/deliver_ipa.txt")).to eq(true)
+        expect(File.exists?("/tmp/deliver_beta_ipa.txt")).to eq(false)
+      end
+
       context "when there's no beta build defined" do
 
         before(:each) do

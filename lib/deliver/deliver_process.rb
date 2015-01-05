@@ -75,10 +75,17 @@ module Deliver
       elsif is_beta_build?
         used_ipa_file = @deploy_information[:beta_ipa]
       end
+
+      if used_ipa_file.kind_of?Proc
+        # The user provided a block. We only want to execute the block now, since it might be a long build step
+        used_ipa_file = used_ipa_file.call
+
+        Deliverfile::Deliverfile::DSL.validate_ipa!(used_ipa_file)
+      end
       
       if (used_ipa_file || '').length == 0 and is_beta_build?
         # Beta Release but no ipa given
-        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end`.".red
+        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
       end
 
       if used_ipa_file
