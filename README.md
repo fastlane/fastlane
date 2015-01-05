@@ -152,7 +152,7 @@ snapshot
 ```
 The generated screenshots will be located in ```./fastlane/screenshots/``` instead of the path you defined in your ```Snapfile```. The reason for that is that [```deliver```](https://github.com/KrauseFx/deliver) needs to access the generated screenshots to upload them.
 
-To enable `snapshot` being able to run without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot/tree/develop#run-in-continuous-integration)
+To enable `snapshot` being able to run without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot/tree/develop#run-in-continuous-integration).
 
 #### [sigh](https://github.com/KrauseFx/sigh)
 This will generate and download your App Store provisioning profile. ```sigh``` will store the generated profile in the ```./fastlane``` folder.
@@ -260,7 +260,6 @@ increment_build_number ENV['BUILD_NUMBER']
 
 I recommend the following plugins:
 
-- **[JUnit Plugin](http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin):** Not sure if it's installed by default.
 - **[HTML Publisher Plugin](https://wiki.jenkins-ci.org/display/JENKINS/HTML+Publisher+Plugin):** Can be used to show the generated screenshots right inside Jenkins.
 - **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools. Dont' forget to enable `Color ANSI Console Output` in the `Build Environment` or your project.
 - **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time.
@@ -323,7 +322,7 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
 
 ## Storing in the Keychain
-By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*"
+By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*".
 
 ## Passing using environment variables
 ```
