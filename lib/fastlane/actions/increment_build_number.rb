@@ -10,9 +10,9 @@ module Fastlane
           Dir.chdir("..") do
             custom_number = (params.first rescue nil)
             if custom_number
-              return sh "agvtool new-version -all #{custom_number}"
+              return sh_no_action "agvtool new-version -all #{custom_number}"
             else
-              return sh "agvtool next-version -all"
+              return sh_no_action "agvtool next-version -all"
             end
           end
         end
