@@ -125,7 +125,8 @@ module Snapshot
       begin
         project_key = 'project'
         project_key = 'workspace' if project_path.end_with?'.xcworkspace'
-        command = "xcodebuild -#{project_key} #{project_path} -list"
+        command = "xcodebuild -#{project_key} '#{project_path}' -list"
+        Helper.log.debug command
         
         schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
         Helper.log.debug "Found available schemes: #{schemes}"
