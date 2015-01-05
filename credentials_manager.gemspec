@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "credentials_manager"
   spec.version       = CredentialsManager::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["krausefx@gmail.com"]
+  spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = %q{Password manager used in Fastlane.tools}
   spec.description   = %q{Password manager used in Fastlane.tools}
   spec.homepage      = "http://fastlane.tools"
