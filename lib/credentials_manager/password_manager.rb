@@ -1,5 +1,6 @@
 require 'security'
 require 'highline/import' # to hide the entered password
+require 'credentials_manager/appfile_config'
 
 module CredentialsManager
   # Handles reading out the password from the keychain or asking for login data
