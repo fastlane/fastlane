@@ -21,6 +21,8 @@ module Fastlane
         exc = ex
         error = caller.join("\n") + "\n\n" + ex.to_s
       end
+    ensure
+      # This is also called, when the block has a return statement
       duration = Time.now - start
 
       self.executed_actions << {
