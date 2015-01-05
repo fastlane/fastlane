@@ -264,7 +264,7 @@ security authorizationdb read system.privilege.taskport > /tmp/system.privilege.
 /usr/libexec/PlistBuddy -c "Set :allow-root true" /tmp/system.privilege.taskport.plist
 sudo security authorizationdb write system.privilege.taskport < /tmp/system.privilege.taskport.plist
 ```
-I found this solution in the [`Subliminal`-Wiki](https://github.com/inkling/Subliminal/wiki/Continuous-Integration#faq).
+I found this solution in the [`Subliminal` wiki](https://github.com/inkling/Subliminal/wiki/Continuous-Integration#faq).
 
 ## Specify a custom ```Snapfile```
 
