@@ -3,7 +3,7 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'snapshot'
-require 'commander'
+require 'commander/import'
 require 'snapshot/snapfile_creator'
 require 'snapshot/snapshot_config'
 
