@@ -277,7 +277,7 @@ To show the **deployment result** right in `Jenkins`
 
 - *Add post-build action*
 - *Publish JUnit test result report*
-- *Test report XMLs*: `**/report.xml`
+- *Test report XMLs*: `fastlane/report.xml`
 
 To show the **generated screenhots** right in `Jenkins`
 
