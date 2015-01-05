@@ -5,7 +5,7 @@ module PEM
     end
 
     def self.generate
-      Helper.log.info "Couldn't find a signing certificate in the current folder. Creating one for you now.".green
+      Helper.log.info "Creating a signing certificate for you.".green
       @key = OpenSSL::PKey::RSA.new 2048
  
       # Generate CSR

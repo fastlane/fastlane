@@ -27,8 +27,6 @@ module PEM
 
     def initialize
       FileUtils.mkdir_p TMP_FOLDER
-
-      DependencyChecker.check_dependencies
       
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist
@@ -246,7 +244,8 @@ module PEM
         click_next # "Continue"
 
         sleep 1
-        wait_for_elements(".button.small.center.back") # just to wait
+        wait_for_elements(".file-input.validate")
+        wait_for_elements(".button.small.center.back")
 
         # Upload CSR file
         first(:xpath, "//input[@type='file']").set PEM::SigningRequest.get_path
@@ -272,14 +271,23 @@ module PEM
         url = [host, url].join('')
         puts url
         
-        myacinfo = page.driver.cookies['myacinfo'].value # some magic Apple, which is required for the profile download
-        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
+        cookieString = ""
+        
+        page.driver.cookies.each do |key, cookie|
+          cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
+        end  
+        
+        data = open(url, {'Cookie' => cookieString}).read
 
         raise "Something went wrong when downloading the certificate" unless data
 
-        path = "#{TMP_FOLDER}/aps_#{certificate_type}_#{app_identifier}.cer"
-        File.write(path, data)
-
+        path = "#{TMP_FOLDER}aps_#{certificate_type}_#{app_identifier}.cer"
+        dataWritten = File.write(path, data)
+        
+        if dataWritten == 0
+          raise "Can't write to #{TMP_FOLDER}"
+        end
+        
         Helper.log.info "Successfully downloaded latest .cer file."
         return path
       end

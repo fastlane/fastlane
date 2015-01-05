@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'pem'
 require 'commander/import'
-require 'pem/update_checker'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 
@@ -33,8 +32,6 @@ command :renew do |c|
   c.action do |args, options|
     app = app_identifier(options)
     username(options)
-
-    PEM::UpdateChecker.verify_latest_version
 
     path = PEM::CertManager.new.run(app, !options.development)
 
