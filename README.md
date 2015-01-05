@@ -238,7 +238,7 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 # Credentials
 
-Take a look at the [fastlane README](https://github.com/KrauseFx/fastlane#credentials) for more information about the stored credentials.
+Take a look at the [`fastlane` README](https://github.com/KrauseFx/fastlane#credentials) for more information about the stored credentials.
 
 # Can I trust *Deliver*? 
 ###How does this thing even work? Is magic involved? 🎩###
