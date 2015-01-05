@@ -148,69 +148,9 @@ module PEM
           first(:css, '#pushEnabled').click
         end
 
-        sleep 1
-
-        # Example code
-        # <div class="appCertificates">
-        #   <h3>Apple Push Notification service SSL Certificates</h3>
-        #   <p>To configure push notifications for this iOS App ID, a Client SSL Certificate that allows your notification server to connect to the Apple Push Notification Service is required. Each iOS App ID requires its own Client SSL Certificate. Manage and generate your certificates below.</p>
-        #   <div class="title" data-hires-status="replaced">Development SSL Certificate</div>
-        #   <div class="createCertificate">
-        #     <p>Create  certificate to use for this App ID.</p>
-        #       <a class="button small navLink development enabled" href="/account/ios/certificate/certificateRequest.action?appIdId=...&amp;types=..."><span>Create Certificate...</span></a>
-        #   </div>              
-        #   <div class="title" data-hires-status="replaced">Production SSL Certificate</div>
-        #   <div class="certificate">
-        #     <dl>
-        #       <dt>Name:</dt>
-        #       <dd>Apple Production iOS Push Services: net.sunapps.151</dd>
-        #       <dt>Type:</dt>
-        #       <dd>APNs Production iOS</dd>
-        #       <dt>Expires:</dt>
-        #       <dd>Nov 14, 2015</dd>
-        #     </dl>
-        #     <a class="button small revoke-button" href="https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action?content-type=application/x-www-form-urlencoded&amp;accept=application/json&amp;requestId=....;userLocale=en_US&amp;teamId=...&amp;certificateId=...&amp;type=...."><span>Revoke</span></a>
-        #     <a class="button small download-button" href="/account/ios/certificate/certificateContentDownload.action?displayId=....&amp;type=..."><span>Download</span></a>                  
-        #   </div>
-        #   <div class="createCertificate">
-        #     <p>Create an additional certificate to use for this App ID.</p>
-        #       <a class="button small navLink distribution enabled" href="/account/ios/certificate/certificateRequest.action?appIdId=...&amp;types=..."><span>Create Certificate...</span></a>              
-        #   </div>
-        # </div>
-
-        def find_download_button(section_title)
-          wait_for_elements(".formContent")
-
-          certificates_block = first('.appCertificates')
-          download_button = nil
-
-          found_section = false
-          certificates_block.all(:xpath, "./div").each do |div|
-            if found_section
-              # We're now in the second part, we only care about production certificates
-              if (download_button = div.first(".download-button"))
-                return download_button
-              end
-            end
-
-            found_section = false if div["class"] == 'title' # next section, might be from dev to production
-            found_section = true if div.text == section_title
-          end
-          nil
-        end
-
-        section_title = (production ? PRODUCTION_SSL_CERTIFICATE_TITLE : DEVELOPMENT_SSL_CERTIFICATE_TITLE)
-        certificate_type = (production ? 'production' : 'development')
-
-        download_button = find_download_button(section_title)
-
-        if not download_button
-          Helper.log.warn "Push for app '#{app_identifier}' is enabled, but there is no #{certificate_type} certificate yet."
-          create_push_for_app(app_identifier, production)
-        else
-          raise "Could not create a new push profile for app '#{app_identifier}'. There is already a profile active.".red
-        end
-      rescue Exception => ex
+        Helper.log.warn "Creating push certificate for app '#{app_identifier}'."
+        create_push_for_app(app_identifier, production)
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -237,7 +177,11 @@ module PEM
 
       def create_push_for_app(app_identifier, production)
         element_name = (production ? '.button.small.navLink.distribution.enabled' : '.button.small.navLink.development.enabled')
-        wait_for_elements(element_name).last.click # Create Certificate button
+        begin
+          wait_for_elements(element_name).first.click # Create Certificate button
+        rescue
+          raise "Could not create a new push profile for app '#{app_identifier}'. There are already 2 certificates active. Please revoke one to let PEM create a new one\n\n#{current_url}".red
+        end
 
         sleep 2
 
@@ -269,7 +213,7 @@ module PEM
         host = Capybara.current_session.current_host
         url = download_button['href']
         url = [host, url].join('')
-        puts url
+        Helper.log.info "Downloading URL: '#{url}'"
         
         cookieString = ""
         
