@@ -255,6 +255,17 @@ Check out other tools in this collection to speed up your deployment process:
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
 - [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
+## Run in Continuous Integration
+If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
+
+You can disable this dialog, running the following command:
+```
+security authorizationdb read system.privilege.taskport > /tmp/system.privilege.taskport.plist
+/usr/libexec/PlistBuddy -c "Set :allow-root true" /tmp/system.privilege.taskport.plist
+sudo security authorizationdb write system.privilege.taskport < /tmp/system.privilege.taskport.plist
+```
+I found this solution in the [`Subliminal`-Wiki](https://github.com/inkling/Subliminal/wiki/Continuous-Integration#faq).
+
 ## Specify a custom ```Snapfile```
 
     snapshot --snapfile ./SpecialSnapfile
