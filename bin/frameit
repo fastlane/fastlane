@@ -4,8 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'frameit'
 require 'commander/import'
-require 'frameit/update_checker'
-require 'frameit/dependency_checker'
 
 HighLine.track_eof = false
 
@@ -21,8 +19,6 @@ program :help_formatter, :compact
 global_option('--verbose') { $verbose = true }
 
 
-Frameit::UpdateChecker.verify_latest_version
-
 default_command :black
 
 
@@ -31,7 +27,6 @@ command :black do |c|
   c.description = "Adds a black frame around all screenshots."
 
   c.action do |args, options|
-    Frameit::DependencyChecker.check_dependencies
     Frameit::Editor.new.run('.', Frameit::Editor::Color::BLACK)
   end
 end
@@ -41,7 +36,6 @@ command :silver do |c|
   c.description = "Adds a silver frame around all screenshots."
   
   c.action do |args, options|
-    Frameit::DependencyChecker.check_dependencies
     Frameit::Editor.new.run('.', Frameit::Editor::Color::SILVER)
   end
 end
@@ -51,7 +45,6 @@ command :setup do |c|
   c.description = "Helps you adding new frames."
   
   c.action do |args, options|
-    Frameit::DependencyChecker.check_dependencies
     Frameit::FrameConverter.new.run
   end
 end

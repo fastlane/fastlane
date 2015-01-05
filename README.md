@@ -2,7 +2,8 @@
   <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
   <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
   <b>FrameIt</b> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a>
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
+  <a href="https://github.com/KrauseFx/sigh">Sigh</a>
 </p>
 -------
 
@@ -19,15 +20,19 @@ FrameIt - Add gorgeous device frames around your screenshots
 
 Want a device frame around your screenshot? Do it in an instant!
 
+This library is not supposed to be used for App Store screenshots.
+
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
-[Features](#features) &bull;
-[Installation](#installation) &bull;
-[Usage](#usage) &bull;
-[Tips](#tips) &bull;
-[Need help?](#need-help)
+<p align="center">
+    <a href="#features">Features</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
+    <a href="#need-help">Need help?</a>
+</p>
 
 -------
 
@@ -91,7 +96,7 @@ Check out other tools in this collection to speed up your deployment process:
 - [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-
+- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
 ## Generate screenshots
 Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.

@@ -29,6 +29,8 @@ module Frameit
 
       Dir.glob("#{path}/**/*.{png,PNG}").each do |screenshot|
         next if screenshot.include?"_framed.png"
+        next if screenshot.include?".itmsp/" # a package file, we don't want to modify that
+        
         begin
           template_path = get_template(screenshot)
           if template_path
@@ -47,11 +49,9 @@ module Frameit
 
             output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
             result.write output_path
-            Helper.log.info "Successfully framed screenshot at path '#{output_path}'".green
+            Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
           end
-        rescue SystemExit, Interrupt => ex
-          raise ex # system interrupted exception (ctrl + C)
-        rescue Exception => ex
+        rescue => ex
           Helper.log.error ex
         end
       end
