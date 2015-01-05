@@ -128,7 +128,11 @@ module Sigh
           visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
         rescue => ex
           Helper.log.debug ex
-          raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+          if page.has_content?"Getting Started"
+            raise "There was no valid signing certificate found. Please log in and follow the 'Getting Started guide' on '#{current_url}'".red
+          else
+            raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+          end
         end
 
 
@@ -386,8 +390,13 @@ module Sigh
         host = Capybara.current_session.current_host
         url = [host, url].join('')
 
-        myacinfo = page.driver.cookies['myacinfo'].value # some Apple magic, which is required for the profile download
-        data = open(url, {'Cookie' => "myacinfo=#{myacinfo}"}).read
+        cookieString = ""
+        
+        page.driver.cookies.each do |key, cookie|
+          cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
+        end 
+        
+        data = open(url, {'Cookie' => cookieString}).read
 
         raise "Something went wrong when downloading the file from the Dev Center" unless data
         Helper.log.info "Successfully downloaded provisioning profile"
