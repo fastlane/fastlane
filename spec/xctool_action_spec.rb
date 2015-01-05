@@ -7,7 +7,7 @@ describe Fastlane do
           xctool 'build test'
         end").runner.execute(:test)
 
-        expect(result.first).to eq("xctool build test")
+        expect(result).to eq("xctool build test")
       end
     end
   end

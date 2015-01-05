@@ -21,6 +21,8 @@ module Fastlane
         exc = ex
         error = caller.join("\n") + "\n\n" + ex.to_s
       end
+    ensure
+      # This is also called, when the block has a return statement
       duration = Time.now - start
 
       self.executed_actions << {
@@ -37,7 +39,7 @@ module Fastlane
     # This method will output the string and execute it
     def self.sh(command)
       self.execute_action(command) do
-        sh_no_action(command)
+        return sh_no_action(command)
       end
     end
 

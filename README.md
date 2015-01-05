@@ -45,7 +45,7 @@ Automate the **whole** deployment process of your iOS apps using ```fastlane``` 
 - [```snapshot```](https://github.com/KrauseFx/snapshot): Creates perfect screenshots of your app in all languages on all device types automatically
 - [```frameit```](https://github.com/KrauseFx/frameit): Adds device frames around your screenshots to use on your website
 - [```PEM```](https://github.com/KrauseFx/PEM): Creates push certificates for your server
-- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintainces and repairs provisioning profiles for you
+- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintains and repairs provisioning profiles for you
 
 Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -95,12 +95,12 @@ The guide will create all the necessary files for you, using the existing app me
 - Follow the guide, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` using the next section
 
-# Customize the ```Fastfile```
+# Customise the ```Fastfile```
 Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily deploy from any computer.
 
-Open the ```Fastfile``` using a text editor and customize it even further. (Switch to *Ruby* Syntax Highlighting)
+Open the ```Fastfile``` using a text editor and customise it even further. (Switch to *Ruby* Syntax Highlighting)
 
 ### Lanes
 You can define multiple ```lanes``` which are different workflows for a release process.
@@ -110,15 +110,15 @@ Examples are: ```appstore```, ```beta``` and ```test```.
 You define a ```lane``` like this (more details about the commands in the [Actions](#actions) section):
 ```ruby
 lane :appstore do
-  puts "Ready to deploy to the App Store"
-  snapshot # create new screenshots
-  sigh     # download/generate the latest provisioning profile
-  deliver  # upload the screenshots, metadata and app to Apple
-  
-  frameit  # Add device frames around the screenshots
-
+  xctool                  # run unit tests
+  increment_build_number  # increment the build number by one
+  snapshot                # create new screenshots
+  sigh                    # download/generate the latest provisioning profile
+  deliver                 # upload the screenshots, metadata and app to Apple
+  frameit                 # Add device frames around the screenshots
   sh "./upload_screenshots_to_s3.sh" # Example
-  say "Successfully depoyed new version to the App Store!"
+
+  say "Successfully deployed new version to the App Store!"
 end
 ```
 
@@ -126,6 +126,8 @@ To launch the ```appstore``` lane run
 ```
 fastlane appstore
 ```
+
+When one command fails, the execution will be aborted.
 
 
 ### Actions
@@ -150,6 +152,8 @@ snapshot
 ```
 The generated screenshots will be located in ```./fastlane/screenshots/``` instead of the path you defined in your ```Snapfile```. The reason for that is that [```deliver```](https://github.com/KrauseFx/deliver) needs to access the generated screenshots to upload them.
 
+To enable `snapshot` being able to run without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot/tree/develop#run-in-continuous-integration).
+
 #### [sigh](https://github.com/KrauseFx/sigh)
 This will generate and download your App Store provisioning profile. ```sigh``` will store the generated profile in the ```./fastlane``` folder.
 ```ruby
@@ -171,7 +175,7 @@ If you don't want a PDF report, which you have to approve first, append ```:forc
 deliver :force
 ```
 
-- ```deliver :beta```: Upload a beta build for Apple Testflight
+- ```deliver :beta```: Upload a beta build for Apple TestFlight
 - ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
 - ```deliver :force, :skip_deploy```: Combine options using ```,```
 
@@ -184,6 +188,18 @@ frameit
 To use white (sorry, silver) device frames
 ```ruby
 frameit :silver
+```
+
+#### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
+This method will increment the **build number**, not the app version. Usually this is just an auto incremented number. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
+
+```ruby
+increment_build_number
+```
+
+To set your own build number use
+```ruby
+increment_build_number '75'
 ```
 
 #### Custom Scripts
@@ -220,11 +236,13 @@ The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [hom
 ```brew update && brew install jenkins```
 
 From now on start ```Jenkins``` by running:
-````
+```
 jenkins
 ```
 
-Some developers report problems with homebrew and phantomjs when running [Jenkins](http://jenkins-ci.org/) as its own user.
+To store the password in the Keychain of your remote machine, I recommend running `sigh` or `deliver` using ssh or remote desktop at least once.
+
+If you're using `Jenkins` as its own user, you might run into problems with `homebrew` and `phantomjs`.
 
 ## Deploy Strategy
 
@@ -232,18 +250,45 @@ You should **not** deploy a new App Store update after every commit, since you s
 
 You can set up your own ```Release``` job, which is only triggered manually.
 
-## Test Results
+To use the Jenkins build number, add this to your `lane`:
 
+```ruby
+increment_build_number ENV['BUILD_NUMBER']
+```
 
 ## Plugins
 
 I recommend the following plugins:
 
-- **[JUnit Plugin](http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin):** Not sure if it's installed by default
-- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools
-- **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time
+- **[HTML Publisher Plugin](https://wiki.jenkins-ci.org/display/JENKINS/HTML+Publisher+Plugin):** Can be used to show the generated screenshots right inside Jenkins.
+- **[AnsiColor Plugin](https://wiki.jenkins-ci.org/display/JENKINS/AnsiColor+Plugin):** Used to show the coloured output of the fastlane tools. Dont' forget to enable `Color ANSI Console Output` in the `Build Environment` or your project.
+- **[Rebuild Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Rebuild+Plugin):** This plugin will save you a lot of time.
 
-If you use plugins which are helpful for the fastlane tools, please let me know.
+## Build Step
+Use the following as your build step:
+```
+fastlane appstore --trace
+```
+Replace `appstore` with the lane you want to use. I recommend appending the `--trace` to make debugging easier in case something goes wrong. 
+
+## Test Results and Screenshtos
+
+To show the **deployment result** right in `Jenkins`
+
+- *Add post-build action*
+- *Publish JUnit test result report*
+- *Test report XMLs*: `fastlane/report.xml`
+
+To show the **generated screenhots** right in `Jenkins`
+
+- *Add post-build action*
+- *Publish HTML reports*
+- *HTML directory to archive*: `path/fastlane/screenshots`
+- *Index page*: `screenshots.html`
+
+Save and run. The result should look like this: 
+
+![JenkinsIntegration](assets/JenkinsIntegration.png)
 
 # Tips
 
@@ -277,7 +322,7 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
 
 ## Storing in the Keychain
-By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*"
+By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*".
 
 ## Passing using environment variables
 ```
@@ -289,7 +334,7 @@ DELIVER_PASSWORD
 All ```fastlane``` tools are based on Ruby, you can take a look at the source to easily implement your own authentication solution.
 
 # Need help?
-- If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stacktrace.
+- If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
 - I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 # License

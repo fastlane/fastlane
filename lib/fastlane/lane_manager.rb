@@ -20,7 +20,7 @@ module Fastlane
       end
 
       # Finished with all the lanes
-      Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions, File.join(Fastlane::FastlaneFolder.path, "report.xml"))
+      Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
 
       duration = ((Time.now - start) / 60.0).round
 

@@ -3,7 +3,7 @@ module Fastlane
     def self.install_cocoapods(params)
       execute_action("cocoapods") do
         Dir.chdir("..") do
-          sh("pod install")
+          return sh_no_action("pod install")
         end
       end
     end

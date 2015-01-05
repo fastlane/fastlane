@@ -2,11 +2,11 @@ require 'nokogiri'
 
 module Fastlane
   class JUnitGenerator
-    def self.generate(results, path = nil)
+    def self.generate(results)
       # Junit file documentation: http://llg.cubic.org/docs/junit/
       # And http://nelsonwells.net/2012/09/how-jenkins-ci-parses-and-displays-junit-output/
 
-      path ||= "./report.xml"
+      path = File.join(Fastlane::FastlaneFolder.path, "report.xml")
 
 
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
@@ -21,7 +21,7 @@ module Fastlane
           }
         }
       end
-      result = builder.to_xml.gsub("system_", "system-")
+      result = builder.to_xml.gsub("system_", "system-").gsub("", " ") # Jenkins can not parse 'ESC' symbol
 
       File.write(path, result)
     end
