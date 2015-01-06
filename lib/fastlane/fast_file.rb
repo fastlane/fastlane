@@ -37,6 +37,7 @@ module Fastlane
     end
 
     def say(value)
+      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Fastlane::Actions.method('say').call([value])
     end

@@ -8,7 +8,7 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to eq(true)
 
-        expect(ENV['SNAPSHOT_SCREENSHOTS_PATH']).to eq("./screenshots")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH]).to eq(Dir.pwd)
       end
 
       it "works with :noclean" do
@@ -17,7 +17,7 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to eq(false)
 
-        expect(ENV['SNAPSHOT_SCREENSHOTS_PATH']).to eq("./screenshots")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH]).to eq(Dir.pwd)
       end
 
     end

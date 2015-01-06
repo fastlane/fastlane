@@ -13,15 +13,24 @@ module Fastlane
         execute_action("increment_build_number") do
           Dir.chdir("..") do
             custom_number = (params.first rescue nil)
+
+            command = nil
             if custom_number
-              sh_no_action "agvtool new-version -all #{custom_number}"
+              command = "agvtool new-version -all #{custom_number}"
             else
-              sh_no_action "agvtool next-version -all"
+              command = "agvtool next-version -all"
             end
+
+            sh_no_action command
 
             # Store the new number in the shared hash
             build_number = `agvtool what-version`.split("\n").last.to_i
-            self.lane_context[SharedValues::BUILD_NUMBER] = build_number if build_number > 0
+
+            if Helper.is_test?
+              build_number = command
+            end
+
+            self.lane_context[SharedValues::BUILD_NUMBER] = build_number
           end
         end
       rescue => ex

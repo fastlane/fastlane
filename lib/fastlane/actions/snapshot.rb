@@ -12,7 +12,10 @@ module Fastlane
         clean = true
         clean = false if params.first == :noclean
 
-        return clean if Helper.is_test?
+        if Helper.is_test?
+          self.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
+          return clean 
+        end
 
         Snapshot::SnapshotConfig.shared_instance
         Snapshot::Runner.new.work(clean: clean)
