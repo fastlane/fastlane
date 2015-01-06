@@ -12,6 +12,7 @@ module Fastlane
       e = nil
       begin
         lanes.each do |key|
+          Actions.lane_context[Actions::SharedValues::LANE_NAME] = key
           ff.runner.execute(key)
         end
       rescue => ex
