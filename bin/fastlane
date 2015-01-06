@@ -3,42 +3,52 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'fastlane'
-require 'commander/import'
+require 'commander'
 
 HighLine.track_eof = false
 
 
-# Commander
-program :version, Fastlane::VERSION
-program :description, 'CLI for \'fastlane\' - iOS Deployment pipeline'
-program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
-program :help, 'Website', 'http://krausefx.com'
-program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
-program :help_formatter, :compact
+class FastlaneApplication
+  include Commander::Methods
 
-global_option('--verbose') { $verbose = true }
+  def run
+    program :version, Fastlane::VERSION
+    program :description, 'CLI for \'fastlane\' - iOS Deployment pipeline'
+    program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
+    program :help, 'Website', 'http://krausefx.com'
+    program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
+    program :help_formatter, :compact
 
-command :run do |c|
-  c.syntax = 'fastlane run [lane]'
-  c.description = 'Drive the fastlane for a specific environment.'
+    global_option('--verbose') { $verbose = true }
 
-  c.action do |args, options|
-    if Fastlane::FastlaneFolder.path
-      Fastlane::LaneManager.cruise_lanes(args)
-    else
-      create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
-      Fastlane::Setup.new.run if create
+    command :run do |c|
+      c.syntax = 'fastlane run [lane]'
+      c.description = 'Drive the fastlane for a specific environment.'
+
+      c.action do |args, options|
+        if Fastlane::FastlaneFolder.path
+          Fastlane::LaneManager.cruise_lanes(args)
+        else
+          create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
+          Fastlane::Setup.new.run if create
+        end
+      end
     end
+
+    command :init do |c|
+      c.syntax = 'fastlane init'
+      c.description = 'Helps you setting up fastlane based on your existing tools.'
+
+      c.action do |args, options|
+        Fastlane::Setup.new.run
+      end
+    end
+
+    default_command :run
+
+    run!
   end
 end
 
-command :init do |c|
-  c.syntax = 'fastlane init'
-  c.description = 'Helps you setting up fastlane based on your existing tools.'
+FastlaneApplication.new.run if $0 == __FILE__
 
-  c.action do |args, options|
-    Fastlane::Setup.new.run
-  end
-end
-
-default_command :run
