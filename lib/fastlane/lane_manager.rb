@@ -15,6 +15,10 @@ module Fastlane
           ff.runner.execute(key)
         end
       rescue => ex
+        if Actions.shared_hash.count > 0
+          Helper.log.info "Variable Dump:".yellow
+          Helper.log.info Actions.shared_hash
+        end
         Helper.log.fatal ex
         e = ex
       end

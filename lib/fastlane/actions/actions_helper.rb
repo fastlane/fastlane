@@ -6,6 +6,11 @@ module Fastlane
       @@executed_actions ||= []
     end
 
+    # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
+    def self.shared_hash
+      @@shared_hash ||= {}
+    end
+
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
     def self.execute_action(step_name)
