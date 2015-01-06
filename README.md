@@ -122,12 +122,15 @@ If you want to have the screenshots inside a device frame, with a background and
 This will submit a new update to Apple
 ```ruby
 ipa "./latest.ipa"
+
 changelog({
     "en-US" => "This update adds cool new features",
     "de-DE" => "Dieses Update ist super"
 })
 ```
 If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. This will upload the ipa file and app metadata, but will not submit the app for review.
+
+The changelog is only used for App Store submission, not for TestFlight builds.
 
 #### Upload a new ipa for TestFlight beta testers
 
