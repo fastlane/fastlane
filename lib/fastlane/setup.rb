@@ -98,7 +98,7 @@ module Fastlane
         Helper.log.info "The 'screenshots' folder inside the 'deliver' folder will not be used.".yellow
         Helper.log.info "Instead the 'screenshots' folder inside the 'fastlane' folder will be used.".yellow
         Helper.log.info "Click Enter to confirm".green
-        gets
+        STDIN.gets
       end
 
       if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
