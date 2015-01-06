@@ -93,6 +93,14 @@ module Fastlane
         end
       end
 
+      if @tools[:snapshot] and @tools[:deliver]
+        # Deliver is already installed
+        Helper.log.info "The 'screenshots' folder inside the 'deliver' folder will not be used.".yellow
+        Helper.log.info "Instead the 'screenshots' folder inside the 'fastlane' folder will be used.".yellow
+        Helper.log.info "Click Enter to confirm".green
+        gets
+      end
+
       if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
         @tools[:sigh] = true
       end
