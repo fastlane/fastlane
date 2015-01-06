@@ -1,11 +1,15 @@
 module Fastlane
   module Actions
+    module SharedValues
+      
+    end
+
     def self.deliver(params)
 
       execute_action("deliver") do
         require 'deliver'
         
-        ENV["DELIVER_SCREENSHOTS_PATH"] = self.snapshot_screenshots_folder
+        ENV["DELIVER_SCREENSHOTS_PATH"] = self.shared_hash[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
         
         force = params.include?(:force)
         beta = params.include?(:beta)
