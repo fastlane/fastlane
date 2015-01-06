@@ -80,5 +80,23 @@ module Fastlane
         require file
       end
     end
+
+    def self.load_external_actions(path)
+      raise "You need to pass a valid path" unless File.exists?path
+
+      Dir[File.expand_path '*.rb', path].each do |file|
+        require file
+
+        method_name = File.basename(file).gsub(".rb", "")
+        if self.respond_to?method_name
+          Helper.log.info "Succesfully loaded custom action '#{file}'"
+        else
+          Helper.log.error "Looks like something is wrong with the plugin '#{file}'."
+          Helper.log.error "Make sure, the method name matches the file name."
+          Helper.log.error "For more information, check out the docs: https://github.com/KrauseFx/fastlane"
+          raise "Plugin '#{method_name}' is damaged!"
+        end
+      end
+    end
   end
 end
