@@ -250,12 +250,6 @@ You should **not** deploy a new App Store update after every commit, since you s
 
 You can set up your own ```Release``` job, which is only triggered manually.
 
-To use the Jenkins build number, add this to your `lane`:
-
-```ruby
-increment_build_number ENV['BUILD_NUMBER']
-```
-
 ## Plugins
 
 I recommend the following plugins:
