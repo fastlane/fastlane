@@ -17,7 +17,7 @@ module Fastlane
           raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
         end
 
-        @after_all.call if @after_all
+        @after_all.call if @after_all # this is only called if no exception was raised before
       end
 
       return return_val

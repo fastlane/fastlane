@@ -222,6 +222,8 @@ end
 ### *after_all* block
 This block will get executed after running the requested lane. It supports the same actions as lanes do.
 
+It will only be called, if the selected lane was executed **successfully**.
+
 ```ruby
 after_all do
   say "Successfully finished deployment!"
