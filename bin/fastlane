@@ -50,5 +50,4 @@ class FastlaneApplication
   end
 end
 
-FastlaneApplication.new.run if $0 == __FILE__
-
+FastlaneApplication.new.run
