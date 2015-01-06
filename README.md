@@ -195,22 +195,17 @@ frameit :silver
 This method will increment the **build number**, not the app version. Usually this is just an auto incremented number. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
 ```ruby
-increment_build_number
+increment_build_number # automatically increment by one
+increment_build_number '75' # set a specific number
 ```
 
-To set your own build number use
-```ruby
-increment_build_number '75'
-```
-
-#### Custom Scripts
-Run your own commands using
+#### Custom Shell Scripts
 ```ruby
 sh "./your_bash_script.sh
 ```
 
 ### *before_all* block
-This block will get executed before running the requested lane. It supports the same actions as lanes do.
+This block will get executed *before* running the requested lane. It supports the same actions as lanes.
 
 ```ruby
 before_all do
@@ -220,7 +215,7 @@ end
 ```
 
 ### *after_all* block
-This block will get executed after running the requested lane. It supports the same actions as lanes do.
+This block will get executed *after* running the requested lane. It supports the same actions as lanes.
 
 It will only be called, if the selected lane was executed **successfully**.
 
@@ -228,6 +223,18 @@ It will only be called, if the selected lane was executed **successfully**.
 after_all do
   say "Successfully finished deployment!"
   sh "./send_screenshots_to_team.sh" # Example
+end
+```
+
+### *error* block
+This block will get executed when an error occurs, in any of the blocks (*before_all*, the lane itself or *after_all*). 
+```ruby
+error do |lane, exception|
+  slack({
+    message: "Successfully deployed new App Update for [AppName](http://link.com).",
+    success: false,
+    channel: 'development'
+  })
 end
 ```
 

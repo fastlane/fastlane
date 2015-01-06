@@ -35,6 +35,10 @@ module Fastlane
       @runner.set_after_all(block)
     end
 
+    def error(&block)
+      @runner.set_error(block)
+    end
+
     def say(value)
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
