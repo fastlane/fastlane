@@ -18,7 +18,7 @@ module Fastlane
             FileUtils.mkdir(File.join(folder, "actions"))
             generate_fastfile
             Helper.log.info "Successfully finished setting up fastlane".green
-          rescue => ex
+          rescue Exception => ex # this will also be caused by Ctrl + C
             # Something went wrong with the setup, clear the folder again
             # and restore previous files
             Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
