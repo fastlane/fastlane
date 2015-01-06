@@ -122,8 +122,8 @@ If you want to have the screenshots inside a device frame, with a background and
 This will submit a new update to Apple
 ```ruby
 ipa do 
-  system("ipa build")
-  "./name.ipa"
+    system("ipa build")
+    "./name.ipa"
 end
 
 changelog({
@@ -141,8 +141,8 @@ In order to upload an `.ipa` file for Apple TestFlight you need to specify `beta
 
 ```ruby
 beta_ipa do 
-  system("ipa build")
-  "./name.ipa"
+    system("ipa build")
+    "./name.ipa"
 end
 ```
 
