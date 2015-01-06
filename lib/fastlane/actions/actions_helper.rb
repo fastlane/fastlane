@@ -75,15 +75,10 @@ module Fastlane
       return result
     end
 
-    # Is the required gem installed on the current machine
-    def self.gem_available?(name)
-      return true if Helper.is_test?
-      
-      Gem::Specification.find_by_name(name)
-    rescue Gem::LoadError
-      false
-    rescue
-      Gem.available?(name)
+    def self.load_default_actions
+      Dir[File.expand_path '*.rb', File.dirname(__FILE__)].each do |file|
+        require file
+      end
     end
   end
 end

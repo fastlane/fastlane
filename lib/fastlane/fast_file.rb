@@ -15,7 +15,6 @@ module Fastlane
 
     def parse(data)
       @runner = Runner.new
-      load_actions
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         eval(data) # this is okay in this case
@@ -53,14 +52,5 @@ module Fastlane
         raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
       end
     end
-
-    private
-      def load_actions
-        Dir.chdir(File.dirname(__FILE__)) do
-          Dir[File.expand_path 'actions/*.rb', File.dirname(__FILE__)].each do |file|
-            require file
-          end
-        end
-      end
   end
 end

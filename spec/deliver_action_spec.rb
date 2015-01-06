@@ -12,8 +12,6 @@ describe Fastlane do
         FileUtils.mkdir_p(test_path)
         File.write(@app_file, "app_identifier '#{app_identifier}'; apple_id '#{apple_id}'")
         File.write(@deliver_file, "")
-
-        Fastlane::FastFile.new.parse("") # to load all modules
       end
 
       it "works with default setting" do
