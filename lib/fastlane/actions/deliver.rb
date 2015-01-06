@@ -9,7 +9,7 @@ module Fastlane
       execute_action("deliver") do
         require 'deliver'
         
-        ENV["DELIVER_SCREENSHOTS_PATH"] = self.shared_hash[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
+        ENV["DELIVER_SCREENSHOTS_PATH"] = self.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
         
         force = params.include?(:force)
         beta = params.include?(:beta)

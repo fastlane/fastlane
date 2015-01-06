@@ -21,7 +21,7 @@ module Fastlane
 
             # Store the new number in the shared hash
             build_number = `agvtool what-version`.split("\n").last.to_i
-            self.shared_hash[SharedValues::BUILD_NUMBER] = build_number if build_number > 0
+            self.lane_context[SharedValues::BUILD_NUMBER] = build_number if build_number > 0
           end
         end
       rescue => ex

@@ -7,8 +7,8 @@ module Fastlane
     end
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
-    def self.shared_hash
-      @@shared_hash ||= {}
+    def self.lane_context
+      @@lane_context ||= {}
     end
 
     # Pass a block which should be tracked. One block = one testcase
