@@ -15,6 +15,7 @@ module Fastlane
             generate_app_metadata
             detect_installed_tools # after copying the existing files
             ask_to_enable_other_tools
+            FileUtils.mkdir(File.join(folder, "actions"))
             generate_fastfile
             Helper.log.info "Successfully finished setting up fastlane".green
           rescue => ex
