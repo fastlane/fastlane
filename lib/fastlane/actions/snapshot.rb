@@ -19,7 +19,7 @@ module Fastlane
 
         results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
 
-        self.shared_hash[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = results_path
+        self.shared_hash[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
       end
     end
   end
