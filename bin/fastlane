@@ -4,6 +4,7 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'fastlane'
 require 'commander'
+require 'fastlane/new_action'
 
 HighLine.track_eof = false
 
@@ -41,6 +42,15 @@ class FastlaneApplication
 
       c.action do |args, options|
         Fastlane::Setup.new.run
+      end
+    end
+
+    command :new_action do |c|
+      c.syntax = 'fastlane new_action'
+      c.description = 'Create a new custom action for fastlane.'
+
+      c.action do |args, options|
+        Fastlane::NewAction.run
       end
     end
 

@@ -20,4 +20,8 @@ module Fastlane
   UpdateChecker.verify_latest_version
 
   Fastlane::Actions.load_default_actions
+
+  if Fastlane::FastlaneFolder.path
+    Fastlane::Actions.load_external_actions(File.join(Fastlane::FastlaneFolder.path, "actions"))
+  end
 end

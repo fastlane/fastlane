@@ -55,6 +55,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
     <a href="#features">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
+    <a href="#customise-the-fastfile">Customise</a> &bull; 
+    <a href="#extensions">Extensions</a> &bull; 
     <a href="#jenkins-integration">Jenkins</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
@@ -227,7 +229,18 @@ after_all do
 end
 ```
 
+# Extensions
+Why only use the default actions? Create your own to extend the functionality of `fastlane`.
+
+Just run `fastlane new_action`. Enter the name of the action and edit the generated Ruby file in `fastlane/actions/[action_name].rb`.
+
+From then on, you can just start using your action in your `Fastfile`.
+
+If you think your extension can be used by other developers as well, let me know, and we can bundle it with `fastlane`.
+
 # Jenkins Integration
+
+`fastlane` automatically generates a JUnit report for you. This allows Continuous Integration systems, like `Jenkins`, access the results of your deployment. 
 
 ## Installation
 The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [homebrew](http://brew.sh/):
