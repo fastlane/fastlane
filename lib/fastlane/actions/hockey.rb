@@ -1,4 +1,3 @@
-require 'pry'
 # TODO: Workaround, since hockeyapp.rb from shenzhen includes the code for commander
 def command(param)
 end
@@ -20,7 +19,6 @@ module Fastlane
 
       execute_action("hockey") do
         Dir.chdir("..") do # go up from the fastlane folder, to the project folder
-          require 'pry'
           require 'shenzhen'
           require 'shenzhen/plugins/hockeyapp'
 
