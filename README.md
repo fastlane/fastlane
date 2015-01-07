@@ -360,9 +360,9 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder. 
 
 #### Load own actions from external folder
-Add this to the top of your `Fastfile` (`.` is the `fastlane` folder)
+Add this to the top of your `Fastfile` (*.* is the `fastlane` folder)
 ```ruby
-actions_path '../custom_actions'
+actions_path '../custom_actions_folder/'
 ```
 
 # Credentials
