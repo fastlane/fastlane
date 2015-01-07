@@ -26,6 +26,10 @@ describe Fastlane do
       end
     end
 
+    it "#load_default_actions" do
+      expect(Fastlane::Actions.load_default_actions.count).to be > 6
+    end
+
     describe "#load_external_actions" do
       it "can load custom paths" do
         Fastlane::Actions.load_external_actions("spec/fixtures/actions")
