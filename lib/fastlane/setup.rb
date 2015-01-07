@@ -114,7 +114,7 @@ module Fastlane
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
       template.gsub!('sh "xctool', '# sh "xctool') unless @tools[:xctool]
-      template.gsub!('install_cocoapods', '# install_cocoapods') unless @tools[:cocoapods]
+      template.gsub!('cocoapods', '# cocoapods') unless @tools[:cocoapods]
 
       @tools.each do |key, value|
         Helper.log.info "'#{key}' enabled.".magenta if value

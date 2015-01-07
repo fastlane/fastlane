@@ -1,12 +1,10 @@
 module Fastlane
   module Actions
-    def self.say(params)
-
-      execute_action("say") do
+    class SayAction
+      def self.run(params)
         text = params.join(' ')
-        sh_no_action("say '#{text}'")
+        Actions.sh("say '#{text}'")
       end
-
     end
   end
 end

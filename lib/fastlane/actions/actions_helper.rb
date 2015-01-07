@@ -47,12 +47,9 @@ module Fastlane
     # Execute a shell command
     # This method will output the string and execute it
     def self.sh(command)
-      self.execute_action(command) do
-        return sh_no_action(command)
-      end
+      return sh_no_action(command)
     end
 
-    # Same as self.sh, but without wrapping it into its own test case. Call this from other custom actions
     def self.sh_no_action(command)
       command = command.join(" ") if command.kind_of?Array # since it's an array of one element when running from the Fastfile
       Helper.log.info ["[SHELL COMMAND]", command.yellow].join(': ')
@@ -90,15 +87,26 @@ module Fastlane
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file
+        
+        file_name = File.basename(file).gsub(".rb", "")
 
-        method_name = File.basename(file).gsub(".rb", "")
-        if self.respond_to?method_name
-          Helper.log.info "Successfully loaded custom action '#{file}'.".green
-        else
-          Helper.log.error "Looks like something is wrong with the plugin '#{file}'."
-          Helper.log.error "Make sure, the method name matches the file name."
+        class_name = file_name.classify + "Action"
+        class_ref = nil
+        begin
+          class_ref = Fastlane::Actions.const_get(class_name)
+
+          if class_ref.respond_to?(:run)
+            Helper.log.info "Successfully loaded custom action '#{file}'.".green
+          else
+            Helper.log.error "Could not find method 'run' in class #{class_name}.".red
+            Helper.log.error "For more information, check out the docs: https://github.com/KrauseFx/fastlane"
+            raise "Plugin '#{file_name}' is damaged!"
+          end
+        rescue NameError => ex
+          # Action not found
+          Helper.log.error "Could not find '#{class_name}' class defined.".red
           Helper.log.error "For more information, check out the docs: https://github.com/KrauseFx/fastlane"
-          raise "Plugin '#{method_name}' is damaged!"
+          raise "Plugin '#{file_name}' is damaged!"
         end
       end
     end

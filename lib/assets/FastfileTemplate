@@ -9,7 +9,7 @@ before_all do
   # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
 
   # sh "./customShellScript.sh"
-  install_cocoapods
+  cocoapods
 end
 
 lane :test do 

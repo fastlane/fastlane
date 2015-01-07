@@ -10,7 +10,7 @@ describe Fastlane do
       it "raises an error if unknow method is called" do
         expect {
           Fastlane::FastFile.new('./spec/fixtures/Fastfiles/FastfileInvalid')
-        }.to raise_exception "Could not find method 'laneasdf'. Use `lane :name do ... end`".red
+        }.to raise_exception "Could not find method 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
     end
 
@@ -40,7 +40,7 @@ describe Fastlane do
 
       it "runs pod install" do
         result = Fastlane::FastFile.new.parse("lane :test do 
-          install_cocoapods
+          cocoapods
         end").runner.execute(:test)
 
         expect(result).to eq("pod install")

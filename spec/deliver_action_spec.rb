@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Deliver Integration" do
-      let (:test_path) { "/tmp/fastlane/tests" }
+      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
       let (:app_identifier) { "net.sunapps.54" }
       let (:apple_id) { "krausefx@gmail.com" }
 

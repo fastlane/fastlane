@@ -138,7 +138,7 @@ There are some predefined actions you can use. If you have ideas for more, pleas
 #### [CocoaPods](http://cocoapods.org)
 Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app. 
 ```ruby
-install_cocoapods # this will run pod install
+cocoapods # this will run pod install
 ```
 
 
@@ -199,7 +199,7 @@ increment_build_number # automatically increment by one
 increment_build_number '75' # set a specific number
 ```
 
-#### [HockeyApp](https://hockeyapp.net)
+#### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
   api_token: '...',
@@ -219,7 +219,7 @@ This block will get executed *before* running the requested lane. It supports th
 
 ```ruby
 before_all do
-  install_cocoapods
+  cocoapods
   xctool "test"
 end
 ```
