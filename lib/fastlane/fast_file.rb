@@ -48,6 +48,12 @@ module Fastlane
       end
     end
 
+    def actions_path(path)
+      raise "Path '#{path}' not found!".red unless File.directory?path
+
+      Actions.load_external_actions(path)
+    end
+
     # Execute shell command
     def sh(command)
       Actions.execute_action(command) do

@@ -359,6 +359,12 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 #### Hide the `fastlane` folder
 Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder. 
 
+#### Load own actions from external folder
+Add this to the top of your `Fastfile` (`.` is the `fastlane` folder)
+```ruby
+actions_path '../custom_actions'
+```
+
 # Credentials
 Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
 
