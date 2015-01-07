@@ -22,6 +22,7 @@ module Fastlane
   Fastlane::Actions.load_default_actions
 
   if Fastlane::FastlaneFolder.path
-    Fastlane::Actions.load_external_actions(File.join(Fastlane::FastlaneFolder.path, "actions"))
+    actions_path = File.join(Fastlane::FastlaneFolder.path, "actions")
+    Fastlane::Actions.load_external_actions(actions_path) if File.directory?actions_path
   end
 end
