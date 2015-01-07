@@ -21,7 +21,11 @@ module Fastlane
       template = File.read("#{Helper.gem_path}/lib/assets/custom_action_template.rb")
       template.gsub!('[[NAME]]', name)
       template.gsub!('[[NAME_UP]]', name.upcase)
-      path = File.join(FastlaneFolder.path, "actions", "#{name}.rb")
+
+      actions_path = File.join(FastlaneFolder.path, "actions")
+      FileUtils.mkdir_p(actions_path) unless File.directory?actions_path
+
+      path = File.join(actions_path, "#{name}.rb")
       File.write(path, template)
       Helper.log.info "Created new action file '#{path}'. Edit it to implement your custom action.".green
     end
