@@ -12,6 +12,7 @@ module Fastlane
         color = Frameit::Editor::Color::SILVER if [:silver, :white].include?params.first
 
         screenshots_folder = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
+        
         Dir.chdir(screenshots_folder) do
           Frameit::Editor.new.run('.', color)
         end
