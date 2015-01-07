@@ -6,7 +6,8 @@ module Fastlane
       # Junit file documentation: http://llg.cubic.org/docs/junit/
       # And http://nelsonwells.net/2012/09/how-jenkins-ci-parses-and-displays-junit-output/
 
-      path = File.join(Fastlane::FastlaneFolder.path, "report.xml")
+      containing_folder = Fastlane::FastlaneFolder.path || Dir.pwd
+      path = File.join(containing_folder, "report.xml")
 
 
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
@@ -24,6 +25,8 @@ module Fastlane
       result = builder.to_xml.gsub("system_", "system-").gsub("", " ") # Jenkins can not parse 'ESC' symbol
 
       File.write(path, result)
+
+      return path
     end
   end
 end

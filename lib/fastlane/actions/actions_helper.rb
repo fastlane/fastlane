@@ -37,8 +37,7 @@ module Fastlane
       self.executed_actions << {
         name: step_name,
         error: error,
-        time: duration,
-        started: start
+        time: duration
         # output: captured_output
       }
       raise exc if exc

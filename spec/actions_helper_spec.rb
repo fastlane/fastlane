@@ -7,7 +7,6 @@ describe Fastlane do
         Fastlane::Actions.execute_action(step_name) {} 
         result = Fastlane::Actions.executed_actions.last
         expect(result[:name]).to eq(step_name)
-        expect(result[:started]).to be > (Time.now - 500)
         expect(result[:error]).to eq(nil)
       end
 
@@ -20,7 +19,6 @@ describe Fastlane do
 
         result = Fastlane::Actions.executed_actions.last
         expect(result[:name]).to eq(step_name)
-        expect(result[:started]).to be > (Time.now - 500)
         expect(result[:error]).to include"Some error"
         expect(result[:error]).to include"actions_helper.rb"
       end
