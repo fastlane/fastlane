@@ -207,7 +207,7 @@ hockey({
   notes: "Changelog"
 })
 ```
-More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)
+More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
 
 #### Custom Shell Scripts
 ```ruby
@@ -327,10 +327,6 @@ Check out other tools in this collection to speed up your deployment process:
 - [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
 - [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
 - [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
-
-
-## Editing the configuration files like ```Fastfile```
-Change syntax highlighting to *Ruby*.
 
 ## Advanced
 #### Lane Context
