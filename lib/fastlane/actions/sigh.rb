@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      SIGH_PROFILE_PATH = :SIGH_PROFILE_PATH
+    end
+
     def self.sigh(params)
       execute_action("sigh") do
         require 'sigh'
@@ -15,10 +19,12 @@ module Fastlane
         raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
 
         path = Sigh::DeveloperCenter.new.run(app, type)
-        output_path = File.join('.', File.basename(path))
+        output_path = File.expand_path(File.join('.', File.basename(path)))
         FileUtils.mv(path, output_path)
-        Helper.log.info "Exported provisioning profile to '#{File.expand_path(output_path)}'".green
+        Helper.log.info "Exported provisioning profile to '#{output_path}'".green
         sh_no_action "open '#{output_path}'"
+
+        self.lane_context[SharedValues::SIGH_PROFILE_PATH] = output_path # absolute URL
       end
     end
   end

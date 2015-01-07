@@ -93,7 +93,7 @@ module Fastlane
 
         method_name = File.basename(file).gsub(".rb", "")
         if self.respond_to?method_name
-          Helper.log.info "Succesfully loaded custom action '#{file}'"
+          Helper.log.info "Successfully loaded custom action '#{file}'.".green
         else
           Helper.log.error "Looks like something is wrong with the plugin '#{file}'."
           Helper.log.error "Make sure, the method name matches the file name."
