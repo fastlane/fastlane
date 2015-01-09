@@ -114,6 +114,7 @@ module Deliver
 
         if @errors.count > 0
           Helper.log.error(@errors.join("\n"))
+          return false
         end
 
         true
