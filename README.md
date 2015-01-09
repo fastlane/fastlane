@@ -148,6 +148,8 @@ You can run any xctool action. This will require having [xctool](https://github.
 xctool "test"
 ```
 
+It is recommended to have the `xctool` configuration stored in a [`xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
 #### [snapshot](https://github.com/KrauseFx/snapshot)
 ```ruby
 snapshot
