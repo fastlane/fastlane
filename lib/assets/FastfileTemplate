@@ -13,15 +13,15 @@ before_all do
   # increment_build_number
   
   cocoapods
+
+  xctool
 end
 
 lane :test do 
-  xctool "test"
   snapshot
 end
 
 lane :beta do
-  xctool "test"
   snapshot
   sigh
   deliver :skip_deploy, :beta
@@ -29,7 +29,6 @@ lane :beta do
 end
 
 lane :deploy do
-  xctool "test"
   snapshot
   sigh
   deliver :skip_deploy, :force
