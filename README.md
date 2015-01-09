@@ -313,7 +313,7 @@ To show the **generated screenhots** right in `Jenkins`
 
 - *Add post-build action*
 - *Publish HTML reports*
-- *HTML directory to archive*: `path/fastlane/screenshots`
+- *HTML directory to archive*: `fastlane/screenshots`
 - *Index page*: `screenshots.html`
 
 Save and run. The result should look like this: 
