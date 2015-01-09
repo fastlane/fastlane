@@ -408,7 +408,13 @@ module Deliver
               contains_third_party_content: false,
               has_rights: false
             },
-            advertising_identifier: false
+            advertising_identifier: {
+              use_idfa: false,
+			  serve_advertisement: false,
+	  	      attribute_advertisement: false,
+	  	      attribute_actions: false,
+	  	      limit_ad_tracking: false
+	    	}
           }
 
           basic = "//*[@itc-radio='submitForReviewAnswers"
@@ -460,7 +466,7 @@ module Deliver
 				if perms[:advertising_identifier][:attribute_advertisement]
 					first(:xpath, "#{checkbox}.adIdInfo.tracksInstall.value']//a").click
 				end
-				if perms[:advertising_identifier][:attribut_actions]
+				if perms[:advertising_identifier][:attribute_actions]
 					first(:xpath, "#{checkbox}.adIdInfo.tracksAction.value']//a").click
 				end
 				if perms[:advertising_identifier][:limit_ad_tracking]
