@@ -112,15 +112,16 @@ Examples are: ```appstore```, ```beta``` and ```test```.
 You define a ```lane``` like this (more details about the commands in the [Actions](#actions) section):
 ```ruby
 lane :appstore do
-  xctool                  # run unit tests
-  increment_build_number  # increment the build number by one
-  snapshot                # create new screenshots
-  sigh                    # download/generate the latest provisioning profile
-  deliver                 # upload the screenshots, metadata and app to Apple
-  frameit                 # Add device frames around the screenshots
-  sh "./upload_screenshots_to_s3.sh" # Example
+  increment_build_number
+  cocoapods
+  xctool
+  snapshot
+  sigh
+  deliver
+  frameit
+  sh "./customScript.sh"
 
-  say "Successfully deployed new version to the App Store!"
+  slack
 end
 ```
 
