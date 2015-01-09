@@ -54,7 +54,7 @@ module Fastlane
     end
 
     def generate_app_metadata
-      app_identifier = ask("App Identifier (at.felixkrause.app): ".yellow)
+      app_identifier = ask("App Identifier (com.krausefx.app): ".yellow)
       apple_id = ask("Your Apple ID: ".yellow)
       template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)

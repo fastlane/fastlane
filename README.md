@@ -68,6 +68,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 # Features
 - Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together
 - Define different ```deployment lanes``` for App Store deployment, beta builds or testing
+- Write your [own actions](#extensions) (extensions) to extend the functionality of `fastlane`
 - Deploy from any computer
 - [Jenkins Integration](#jenkins-integration): Show the output directly in the Jenkins test results
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
@@ -148,7 +149,7 @@ cocoapods # this will run pod install
 #### [xctool](https://github.com/facebook/xctool)
 You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed throw [homebrew](http://brew.sh/).
 ```ruby
-xctool "test"
+xctool :test
 ```
 
 It is recommended to have the `xctool` configuration stored in a [`xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
@@ -158,7 +159,7 @@ It is recommended to have the `xctool` configuration stored in a [`xctool-args`]
 snapshot
 ```
 
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot/tree/develop#run-in-continuous-integration).
+To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
 
 #### [sigh](https://github.com/KrauseFx/sigh)
 This will generate and download your App Store provisioning profile. ```sigh``` will store the generated profile in the ```./fastlane``` folder.
@@ -225,7 +226,6 @@ This block will get executed *before* running the requested lane. It supports th
 ```ruby
 before_all do
   cocoapods
-  xctool "test"
 end
 ```
 
@@ -259,7 +259,7 @@ end
 # Extensions
 Why only use the default actions? Create your own to extend the functionality of `fastlane`.
 
-Just run `fastlane new_action`. Enter the name of the action and edit the generated Ruby file in `fastlane/actions/[action_name].rb`.
+Just run `fastlane new_action`. Then enter the name of the action and edit the generated Ruby file in `fastlane/actions/[action_name].rb`.
 
 From then on, you can just start using your action in your `Fastfile`.
 
