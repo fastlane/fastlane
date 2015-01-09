@@ -21,7 +21,8 @@
     app.networkActivityIndicatorVisible = YES;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIApplication* app = [UIApplication sharedApplication];
+        // To test, if Snapshot waits until the loading indicator is hidden
+        UIApplication *app = [UIApplication sharedApplication];
         app.networkActivityIndicatorVisible = NO;
     });
     return YES;
