@@ -13,9 +13,7 @@ module Fastlane
         
         require 'slack-notifier'
 
-        success = true
-
-        color = (success ? 'good' : 'danger')
+        color = (options[:success] ? 'good' : 'danger')
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
         url = ENV["SLACK_URL"]
@@ -27,8 +25,7 @@ module Fastlane
         notifier = Slack::Notifier.new url
 
         notifier.username = 'fastlane'
-        notifier.channel  = "##{options[:channel]}" if options[:channel].to_s.length > 0
-        notifier.channel = '#random'
+        notifier.channel = "##{options[:channel]}" if options[:channel].to_s.length > 0
 
         test_result = {
           fallback: options[:message],
@@ -42,7 +39,7 @@ module Fastlane
             },
             {
               title: "Test Result",
-              value: (success ? "Success" : "Error"),
+              value: (options[:success] ? "Success" : "Error"),
               short: true
             }
           ]

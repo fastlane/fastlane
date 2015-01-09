@@ -3,7 +3,7 @@ require 'nokogiri'
 module Fastlane
   class JUnitGenerator
     def self.generate(results)
-      # Junit file documentation: http://llg.cubic.org/docs/junit/
+      # JUnit file documentation: http://llg.cubic.org/docs/junit/
       # And http://nelsonwells.net/2012/09/how-jenkins-ci-parses-and-displays-junit-output/
 
       containing_folder = Fastlane::FastlaneFolder.path || Dir.pwd
