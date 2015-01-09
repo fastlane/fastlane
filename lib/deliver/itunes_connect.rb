@@ -412,6 +412,7 @@ module Deliver
           }
 
           basic = "//*[@itc-radio='submitForReviewAnswers"
+          checkbox = "//*[@itc-checkbox='submitForReviewAnswers"
 
           #####################
           # Export Compliance #
@@ -450,10 +451,21 @@ module Deliver
           # Advertising Identifier #
           ##########################
           if page.has_content?"Advertising Identifier"
-            first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
+            first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier][:use_idfa]}']//a").click rescue nil
 
-            if perms[:advertising_identifier]
-              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manually submit the app".red
+            if perms[:advertising_identifier][:use_idfa]
+				if perms[:advertising_identifier][:serve_advertisement]
+					first(:xpath, "#{checkbox}.adIdInfo.servesAds.value']//a").click
+				end
+				if perms[:advertising_identifier][:attribute_advertisement]
+					first(:xpath, "#{checkbox}.adIdInfo.tracksInstall.value']//a").click
+				end
+				if perms[:advertising_identifier][:attribut_actions]
+					first(:xpath, "#{checkbox}.adIdInfo.tracksAction.value']//a").click
+				end
+				if perms[:advertising_identifier][:limit_ad_tracking]
+					first(:xpath, "#{checkbox}.adIdInfo.limitsTracking.value']//a").click
+				end
             end
           end
           
