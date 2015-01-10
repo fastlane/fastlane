@@ -35,7 +35,6 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#credentials">Credentials</a> &bull; 
     <a href="#can-i-trust-deliver">Can I trust deliver?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
@@ -243,7 +242,8 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 # Credentials
 
-Take a look at the [`fastlane` README](https://github.com/KrauseFx/fastlane#credentials) for more information about the stored credentials.
+A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
+
 
 # Can I trust `deliver`? 
 ###How does this thing even work? Is magic involved? 🎩###
