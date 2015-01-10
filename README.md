@@ -257,7 +257,7 @@ In case you want to skip this process, just add ```skip_alpha_removal``` to your
 
 ## [`fastlane`](http://fastlane.tools) Toolchain
 
-- [`fastlane`](http://fastlane.tools) Connect all deployment tools into one streamlined workflow
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
