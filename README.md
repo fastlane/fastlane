@@ -260,13 +260,13 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 
 # Tips
 
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
-- [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
 
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Available language codes
 ```ruby
