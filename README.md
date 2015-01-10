@@ -28,7 +28,6 @@ Upload screenshots, metadata and your app to the App Store using a single comman
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 -------
 <p align="center">
@@ -44,6 +43,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
+<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
