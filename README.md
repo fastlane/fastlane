@@ -385,10 +385,7 @@ actions_path '../custom_actions_folder/'
 ```
 
 # Credentials
-Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
-
-## Storing in the Keychain
-By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*".
+A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
 
 ## Passing using environment variables
 ```
