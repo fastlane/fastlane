@@ -8,13 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Deliver::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["deliver@krausefx.com"]
-  spec.summary       = %q{Deliver - Continuous Deployment for iOS - automatically publish new app updates and app screenshots to the AppStore}
-  spec.description   = %q{Using Deliver you can easily integrate a real continuous delivery 
-    solution for iOS applications. You can update the app metadata, upload screenshots 
-    in all languages for different screensizes to iTunesConnect and even publish a new 
-    ipa file to iTunesConnect. You define your prefered deployment information once in a so called
-    Deliverfile and store it in git, to easily deploy from every machine, even your Continuos Integration server}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Upload screenshots, metadata and your app to the App Store using a single command}
+  spec.description   = %q{Upload screenshots, metadata and your app to the App Store using a single command}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -51,5 +47,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'codeclimate-test-reporter'
 
 
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
+  spec.post_install_message = "deliver requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end
