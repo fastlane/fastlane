@@ -98,7 +98,7 @@ To run the setup process again to add new frames use:
 
 ## [`fastlane`](http://fastlane.tools) Toolchain
 
-- [`fastlane`](http://fastlane.tools) Connect all deployment tools into one streamlined workflow
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
