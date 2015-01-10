@@ -261,7 +261,7 @@ In case you want to skip this process, just add ```skip_alpha_removal``` to your
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
