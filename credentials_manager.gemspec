@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = CredentialsManager::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = %q{Password manager used in Fastlane.tools}
-  spec.description   = %q{Password manager used in Fastlane.tools}
+  spec.summary       = %q{Password manager used in fastlane.tools}
+  spec.description   = %q{Password manager used in fastlane.tools}
   spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
