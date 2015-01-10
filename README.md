@@ -16,18 +16,19 @@
 
 deliver
 ============
-Upload screenshots, metadata and your app to the App Store using a single command
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
+Upload screenshots, metadata and your app to the App Store using a single command
+
 `deliver` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates using the command line.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>, a tool to connect all deployment steps into one streamlined workflow.</h5>
+<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 -------
 <p align="center">
