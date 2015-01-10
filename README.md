@@ -14,21 +14,20 @@
     <img src="assets/deliver.png">
 </p>
 
-Deliver - Continuous Deployment for iOS
+deliver
 ============
+Upload screenshots, metadata and your app to the App Store using a single command
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
+`deliver` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates using the command line.
 
-Updating your iOS app should not be painful and time consuming.
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-```Deliver``` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates just by using one command.
-
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
-
+<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>, a tool to connect all deployment steps into one streamlined workflow.</h5>
 
 -------
 <p align="center">
@@ -37,7 +36,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
     <a href="#credentials">Credentials</a> &bull; 
-    <a href="#can-i-trust-deliver">Can I trust Deliver?</a> &bull; 
+    <a href="#can-i-trust-deliver">Can I trust deliver?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
@@ -49,9 +48,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Upload hundreds of screenshots with different languages from different devices
 - Upload a new ipa file to iTunes Connect without Xcode from any computer
 - Update app metadata
-- Easily implement a real Continuous Deployment process
+- Easily implement a real Continuous Deployment process using [fastlane](https://github.com/KrauseFx/fastlane)
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
-- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots taken for all screen sizes)
+- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1)
 - Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
 
 # Installation
@@ -196,7 +195,7 @@ ipa do
     # number or changing the app identifier
   
     system("ipa build --verbose") # build your project using Shenzhen
-    "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
+    "./AppName.ipa" # Tell 'deliver' where it can find the finished ipa file
 end
 ```
 
@@ -245,14 +244,14 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 Take a look at the [`fastlane` README](https://github.com/KrauseFx/fastlane#credentials) for more information about the stored credentials.
 
-# Can I trust *Deliver*? 
+# Can I trust `deliver`? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-```Deliver``` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+`deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
 Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
-```Deliver``` uses the following techniques under the hood:
+```deliver``` uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to fetch the latest app metadata from iTunes Connect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
 - With the iTMSTransporter you cannot create new version on iTunes Connect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
@@ -289,7 +288,7 @@ Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` 
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stack trace.
+- If there is a technical problem with ```deliver```, submit an issue. Run ```deliver --trace``` to get the stack trace.
 - I'm available for contract work - drop me an email: deliver@krausefx.com
 
 # License
