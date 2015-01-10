@@ -1,7 +1,6 @@
 # For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
 # Everything next to a # is a comment and will be ignored
 
-email '[[EMAIL]]'
 # hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
 
 
@@ -39,7 +38,7 @@ ipa do
     # Attention: When you return a valid ipa file, this file will get uploaded and released
     # If you only want to upload app metadata, remove the complete ipa block.
 
-    # system("ipa build") # build your project using Shenzhen
+    # system("ipa build --verbose") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 
@@ -48,9 +47,10 @@ end
 # beta_ipa "./ad_hoc_build.ipa" # upload ipa file using `deliver --beta`
 
 # unit_tests do
+#   If you use fastlane (http://github.com/krausefx/fastlane), run the tests there
 #   system("xctool test")
 # end
 
 success do
-  system("say 'Successfully deployed a new version.'")
+  # system("say 'Successfully deployed a new version.'")
 end
