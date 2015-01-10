@@ -22,7 +22,7 @@ deliver
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
-Upload screenshots, metadata and your app to the App Store using a single command
+###### Upload screenshots, metadata and your app to the App Store using a single command
 
 `deliver` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates using the command line.
 
