@@ -1,5 +1,7 @@
+<h3 align="center">
+  fastlane
+</h3>
 <p align="center">
-  <b>Fastlane</b><br />
   <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
   <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
   <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
@@ -12,13 +14,14 @@
     
 </p>
 
-Fastlane - iOS Deployment without the hassle
+Fastlane
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
+###### Connect all deployment tools into one streamlined workflow
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -299,13 +302,13 @@ Save and run. The result should look like this:
 
 # Tips
 
-## The other tools
-Check out other tools in this collection to speed up your deployment process:
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
-- [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
+
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Advanced
 #### Lane Context
@@ -386,15 +389,6 @@ actions_path '../custom_actions_folder/'
 
 # Credentials
 A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
-
-## Passing using environment variables
-```
-DELIVER_USER
-DELIVER_PASSWORD
-```
-
-## Implement your custom solution
-All ```fastlane``` tools are based on Ruby, you can take a look at the source to easily implement your own authentication solution.
 
 # Need help?
 - If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
