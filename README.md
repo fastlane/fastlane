@@ -14,18 +14,18 @@
     <img src="assets/frameit.png">
 </p>
 
-FrameIt - Add gorgeous device frames around your screenshots
+frameit
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/frameit/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
 
-Want a device frame around your screenshot? Do it in an instant!
+###### Quickly put your screenshots into the right device frames
 
-This library is not supposed to be used for App Store screenshots.
+This tool is not supposed to be used for App Store screenshots. Instead it should be used to prepare screenshots for websites, emails and prints.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
@@ -38,6 +38,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 </p>
 
 -------
+<h5 align="center"><code>frameit</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
 
 
 # Features
@@ -64,7 +66,7 @@ Install the gem
 
     sudo gem install frameit
 
-Because of legal reasons, I can not pre-package the device frames with ```FrameIt```.
+Because of legal reasons, I can not pre-package the device frames with ```frameit```.
 
 The process of adding is really easy, just run ```frameit``` and the guide will help you set it up.
 You only have to do this once per computer.
@@ -112,7 +114,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 - ```rm -rf ~/.frameit```
 
 # Need help?
-- If there is a technical problem with ```FrameIt```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
+- If there is a technical problem with ```frameit```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: frameit@krausefx.com
 
 # License
