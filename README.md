@@ -140,14 +140,17 @@ beta_ipa "./latest.ipa"
 and provide `--beta` option when calling `deliver`.
 
 #### Implement blocks to run unit tests
+If you're using [fastlane](http://github.com/krausefx/fastlane), run tests and error blocks there.
+
+If you only use `deliver`, you can use the following blocks:
+
 ```ruby
 unit_tests do
     system("xctool test")
 end
 
 success do
-    notifier = Slack::Notifier.new("SlackTeam", "SlackToken")
-    notifier.ping "Successfully deployed new version"
+    system("Say 'success'")
 end
 
 error do |exception|
@@ -155,7 +158,6 @@ error do |exception|
     raise "Something went wrong: #{exception}"    
 end
 ```
-For this example I used [slack-notifier](https://github.com/stevenosloan/slack-notifier).
 
 
 #### Set a default language if you are lucky enough to only maintain one language
@@ -190,7 +192,7 @@ ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
   
-    system("ipa build") # build your project using Shenzhen
+    system("ipa build --verbose") # build your project using Shenzhen
     "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 ```
