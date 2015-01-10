@@ -16,18 +16,18 @@
 
 sigh
 ============
-#### Because you would rather spend your time building stuff than fighting provisioning
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sigh/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
 
+###### Because you would rather spend your time building stuff than fighting provisioning
 
 Tired of manually creating, renewing and downloading your iOS provisioning profiles?
 
 ```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 
@@ -43,6 +43,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 
+<h5 align="center"><code>sigh</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
+
 # Features
 
 - **Download** the latest provisioning profile for your app
@@ -52,7 +55,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 - Support for **multiple Teams**
-- Support for Enterprise Profiles
+- Support for **Enterprise Profiles**
 
 To automate iOS Push profiles you can use [PEM](https://github.com/KrauseFx/PEM).
 
