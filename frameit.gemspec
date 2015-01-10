@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Frameit::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["frameit@krausefx.com"]
-  spec.summary       = %q{FrameIt - Want a device frame around your screenshots? Do it in an instant!}
-  spec.description   = %q{Want a device frame around your iPhone app screenshots? Do it in an instant!}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Quickly put your screenshots into the right device frames}
+  spec.description   = %q{Quickly put your screenshots into the right device frames}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
