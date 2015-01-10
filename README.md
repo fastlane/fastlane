@@ -20,35 +20,7 @@ Fastlane - iOS Deployment without the hassle
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
 
-## Beta Notes
-Please download this repository as zip and run
-```
-sudo bundle install
-sudo rake install
-```
-
-Then run through each gem you are using (deliver, snapshot, frameit, sigh, PEM) on GitHub and download the latest version from the **develop** branch.
-For each app run the same commands
-```
-sudo bundle install
-sudo rake install
-```
-
-**Please read the rest of the README**
-
-Report any feedback directly to me via [Twitter](https://twitter.com/KrauseFx) or email.
-
-
-Automate the **whole** deployment process of your iOS apps using ```fastlane``` and all its tools:
-
-- [```deliver```](https://github.com/KrauseFx/deliver): Uploads app screenshots, metadata and app updates to iTunes Connect
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Creates perfect screenshots of your app in all languages on all device types automatically
-- [```frameit```](https://github.com/KrauseFx/frameit): Adds device frames around your screenshots to use on your website
-- [```PEM```](https://github.com/KrauseFx/PEM): Creates push certificates for your server
-- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintains and repairs provisioning profiles for you
-
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
-
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 <p align="center">
@@ -79,7 +51,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Installation
 
-Install the gem **NOT DURING BETA***
+I recommend following the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/GUIDE.md) to get started.
+
+If you are familiar with the command line and Ruby, install `fastlane` yourself:
 
     sudo gem install fastlane
 
