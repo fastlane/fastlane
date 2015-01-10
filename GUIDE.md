@@ -10,19 +10,43 @@ By default, the listed commands will use `sudo`. If you don't want this, you can
 
 **Requirements**
 
-- Ruby 2.0 or newer
 - Mac OS 10.9 or newer
+- Ruby 2.0 or newer (`ruby -v`)
+- Xcode
 
-Install the gem and all its dependencies
-      sudo gem install fastlane
+## Xcode
+Additionally to an Xcode installation, you also need the Xcode command line tools set up
+
+    xcode-select --install
+
+## [Homebrew](http://brew.sh/)
+You don't have to use [homebrew](http://brew.sh/) to install the dependencies. It's the easiest way to get started.
+
+If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/).
+
+### [PhantomJS](http://phantomjs.org/)
+
+
+    brew doctor && brew update && brew install makedepend && brew install phantomjs
+
+## [Nokogiri](http://www.nokogiri.org/)
+
+    sudo gem install nokogiri
+
+This can be a pain sometimes, in case you're running into problems, take a look at the [official installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html).
+
+
+## [fastlane](https://github.com/KrauseFx/fastlane)
+
+Install the gem and all its dependencies (might take a few minutes)
+
+    sudo gem install fastlane
 
 # Setting up `fastlane`
 
-## Before you start
+Before changing anything, I recommend commiting everything in `version control` (e.g. git), in case something goes wrong.
 
-- Before changing anything, I recommend commiting everything in `version control` (e.g. git), in case something goes wrong.
-
-## Start
+## Get it up and running
 When running the setup commands, please read the instructions shown in the terminal. There is usually a reason they are there.
 
 `fastlane` can create all necessary files and folders for you
