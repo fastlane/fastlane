@@ -14,13 +14,14 @@
     <img src="assets/snapshot.png">
 </p>
 
-Snapshot - Create iOS App Screenshots
+snapshot
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/snapshot/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
+###### Automate taking localized screenshots of your iOS app on every device
 
 You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
 What's missing?
@@ -41,7 +42,7 @@ It's hard to get everything right!
 
 This gem solves all those problems. It will run completely in the background - you can do something else, while your computer takes the screenshots for you.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
@@ -57,16 +58,19 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 
+<h5 align="center"><code>snapshot</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
+
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Very easy to integrate with [```deliver```](https://github.com/KrauseFx/deliver)
+- Integrated with [`fastlane`](http://fastlane.tools) and [`deliver`](https://github.com/KrauseFx/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
-- ```Snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
+- ```snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
-After ```Snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
+After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
 
 
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
@@ -86,7 +90,7 @@ This gem automatically switches the language and device type and runs the automa
 I've been using many other solutions out there. Unfortunately none of them were perfect. The biggest issue was random timeouts of ```Instruments``` when starting the script. This problem is solved with ```snapshot```
 
 - **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
-- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This is the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```Snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
+- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This is the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
 - **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately it has a lot of open issues with the latest release of Xcode. Also, it requires modifications of your Xcode project and schemes, which might break some other things.
 
 # Installation
@@ -292,7 +296,7 @@ Unfortunately ```Instruments``` sometimes decides, to not respond to anything. W
 The only way to fix this, is a restart of the Mac. 
 
 # Need help?
-- If there is a technical problem with ```Snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
+- If there is a technical problem with ```snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: snapshot@krausefx.com
 
 # License
