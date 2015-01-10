@@ -68,6 +68,6 @@ def app_identifier(options)
   value = options.identifier
   value ||= ENV["SIGH_APP_IDENTIFIER"]
   value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-  value ||= ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  value ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
   return value
 end

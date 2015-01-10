@@ -87,7 +87,7 @@ Yes, that's the whole command!
 
 You can pass your bundle identifier and username like this:
 
-    sigh -a at.felixkrause.app -u username
+    sigh -a com.krausefx.app -u username
 
 If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
@@ -111,7 +111,7 @@ In case you prefer environment variables:
 
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
-- ```SIGH_TEAM_ID``` (The exact name of your preferred team for this account)
+- ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
 
 # How does it work?
 
