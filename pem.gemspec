@@ -8,9 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = PEM::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["pem@krausefx.com"]
-  spec.summary       = %q{Tired of creating and maintaining your push certification profiles? PEM does all that for you.}
-  spec.description   = %q{Tired of creating and maintaining your push certification profiles? PEM helps you creating and maintaining your iOS push notification certificates.}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Automatically generate and renew your push notification profiles}
+  spec.description   = %q{Automatically generate and renew your push notification profiles}
+  spec.homepage      = "http://fastlane.tools"
+
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'

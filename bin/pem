@@ -12,9 +12,9 @@ HighLine.track_eof = false
 
 # Commander
 program :version, PEM::VERSION
-program :description, 'CLI for \'PEM\' - Automate maintaining of push notification profiles.'
+program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
 program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
-program :help, 'Website', 'http://krausefx.com'
+program :help, 'Website', 'http://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/PEM'
 program :help_formatter, :compact
 
