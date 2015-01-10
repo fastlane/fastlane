@@ -24,10 +24,17 @@ You don't have to use [homebrew](http://brew.sh/) to install the dependencies. I
 
 If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/).
 
+### Init [Homebrew](http://brew.sh/)
+
+    brew doctor && brew update
+
 ### [PhantomJS](http://phantomjs.org/)
 
+    brew install makedepend && brew install phantomjs
 
-    brew doctor && brew update && brew install makedepend && brew install phantomjs
+### [xctool](https://github.com/facebook/xctool) (optional)
+
+    brew install xctool
 
 ## [Nokogiri](http://www.nokogiri.org/)
 
@@ -86,6 +93,9 @@ For example, try running the following (depending on what you plan on using):
 - [xctool](https://github.com/facebook/xctool) (which you should [configure correctly](https://github.com/krausefx/fastlane#xctool))
 
 All those tools have detailed instructions on how to set them up. It's easier to set them up now, then later.
+
+## Enable `Instruments` CLI
+If you want to use [snapshot](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), please follow [this step](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), to authorize snapshot running using [`fastlane`](https://github.com/KrauseFx/fastlane).
 
 ## Configure the `Fastfile`
 
@@ -166,8 +176,6 @@ Everything you did in this guide, was stored in the filesystem in configuration 
     fastlane appstore
 
 as a build step, and you're done.
-
-If you're using [snapshot](https://github.com/KrauseFx/snapshot), please follow [this step](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), to authorize snapshot running.
 
 ### Even better Jenkins integration
 For a more detailed CI-setup, which also shows you test results and the latest screenshots, take a look at the [Jenkins Guide](https://github.com/krausefx/fastlane#jenkins-integration). 
