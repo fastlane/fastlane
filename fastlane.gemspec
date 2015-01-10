@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = %q{Continuous Deployment for iOS}
-  spec.description   = %q{Continuous Deployment for iOS}
+  spec.summary       = %q{Connect all iOS deployment tools into one streamlined workflow}
+  spec.description   = %q{Connect all iOS deployment tools into one streamlined workflow}
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
