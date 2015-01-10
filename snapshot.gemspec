@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Snapshot::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["snapshot@krausefx.com"]
-  spec.summary       = %q{Snapshot - Create hundreds of iOS app screenshots automatically}
-  spec.description   = %q{Take the pain out of taking iOS app screenshots.}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Automate taking localized screenshots of your iOS app on every device}
+  spec.description   = %q{Automate taking localized screenshots of your iOS app on every device}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
