@@ -56,5 +56,5 @@ end
 def app_identifier(options)
   return options.identifier if options.identifier
   return ENV["PEM_APP_IDENTIFIER"] if ENV["PEM_APP_IDENTIFIER"]
-  return ask("App Identifier (Bundle ID, e.g. at.felixkrause.app): ")
+  return ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
 end
