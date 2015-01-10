@@ -127,14 +127,13 @@ In case you prefer environment variables:
 ```sigh``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
+## [`fastlane`](http://fastlane.tools) Toolchain
 
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
-- [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
