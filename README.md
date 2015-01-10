@@ -255,12 +255,13 @@ In case you want to skip this process, just add ```skip_alpha_removal``` to your
 
 # Tips
 
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command.
-- [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
+
+- [`fastlane`](http://fastlane.tools) Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
