@@ -451,7 +451,7 @@ module Deliver
             first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier]}']//input").trigger('click') rescue nil
 
             if perms[:advertising_identifier]
-              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manally submit the app".red
+              raise "Sorry, the advertising_identifier menu is not yet supported. Open '#{current_url}' in your browser and manually submit the app".red
             end
           end
           

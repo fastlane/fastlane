@@ -123,7 +123,11 @@ If you want to have the screenshots inside a device frame, with a background and
 #### Upload a new ipa file with a changelog to the App Store
 This will submit a new update to Apple
 ```ruby
-ipa "./latest.ipa"
+ipa do 
+    system("ipa build")
+    "./name.ipa"
+end
+
 changelog({
     "en-US" => "This update adds cool new features",
     "de-DE" => "Dieses Update ist super"
@@ -131,12 +135,17 @@ changelog({
 ```
 If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. This will upload the ipa file and app metadata, but will not submit the app for review.
 
+The changelog is only used for App Store submission, not for TestFlight builds.
+
 #### Upload a new ipa for TestFlight beta testers
 
 In order to upload an `.ipa` file for Apple TestFlight you need to specify `beta_ipa` path in your `Deliverfile`
 
 ```ruby
-beta_ipa "./latest.ipa"
+beta_ipa do 
+    system("ipa build")
+    "./name.ipa"
+end
 ```
 
 and provide `--beta` option when calling `deliver`.

@@ -80,6 +80,8 @@ module Deliver
 
       if result
         Helper.log.info "Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.".green
+
+        FileUtils.rm_rf(dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
       end
 
       result

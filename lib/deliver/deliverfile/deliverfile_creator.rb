@@ -15,7 +15,7 @@ module Deliver
       project_name ||= Dir.pwd.split("/").last
 
       if agree("Do you want Deliver to automatically create the Deliverfile for you based " + 
-              "on your current app? (y/n)", true)
+              "on your current app? The app has to be in the App Store to use this feature. (y/n)", true)
 
         puts "\n\nFirst, you need to login with your iTunesConnect credentials. ".yellow + 
           "\nThis is necessary to fetch the latest metadata from your app and use it to create a Deliverfile for you." + 
