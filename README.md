@@ -1,5 +1,7 @@
+<h3 align="center">
+  fastlane
+</h3>
 <p align="center">
-  <b>Fastlane</b><br />
   <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
   <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
   <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
@@ -12,43 +14,16 @@
     
 </p>
 
-Fastlane - iOS Deployment without the hassle
+Fastlane
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
+###### Connect all deployment tools into one streamlined workflow
 
-## Beta Notes
-Please download this repository as zip and run
-```
-sudo bundle install
-sudo rake install
-```
-
-Then run through each gem you are using (deliver, snapshot, frameit, sigh, PEM) on GitHub and download the latest version from the **develop** branch.
-For each app run the same commands
-```
-sudo bundle install
-sudo rake install
-```
-
-**Please read the rest of the README**
-
-Report any feedback directly to me via [Twitter](https://twitter.com/KrauseFx) or email.
-
-
-Automate the **whole** deployment process of your iOS apps using ```fastlane``` and all its tools:
-
-- [```deliver```](https://github.com/KrauseFx/deliver): Uploads app screenshots, metadata and app updates to iTunes Connect
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Creates perfect screenshots of your app in all languages on all device types automatically
-- [```frameit```](https://github.com/KrauseFx/frameit): Adds device frames around your screenshots to use on your website
-- [```PEM```](https://github.com/KrauseFx/PEM): Creates push certificates for your server
-- [```sigh```](https://github.com/KrauseFx/sigh): Creates, maintains and repairs provisioning profiles for you
-
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
-
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 <p align="center">
@@ -79,7 +54,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 # Installation
 
-Install the gem **NOT DURING BETA***
+I recommend following the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/GUIDE.md) to get started.
+
+If you are familiar with the command line and Ruby, install `fastlane` yourself:
 
     sudo gem install fastlane
 
@@ -325,13 +302,13 @@ Save and run. The result should look like this:
 
 # Tips
 
-## The other tools
-Check out other tools in this collection to speed up your deployment process:
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
-- [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
+
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Advanced
 #### Lane Context
@@ -411,19 +388,7 @@ actions_path '../custom_actions_folder/'
 ```
 
 # Credentials
-Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/password_manager.rb)
-
-## Storing in the Keychain
-By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the Keychain app switching to *All Items* and searching for "*deliver*".
-
-## Passing using environment variables
-```
-DELIVER_USER
-DELIVER_PASSWORD
-```
-
-## Implement your custom solution
-All ```fastlane``` tools are based on Ruby, you can take a look at the source to easily implement your own authentication solution.
+A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
 
 # Need help?
 - If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
