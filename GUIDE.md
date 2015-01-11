@@ -5,6 +5,18 @@ This guide will help you set up Continuous Deployment for your iOS project.
 
 It will help you set up all needed build tools. I tested everything with a fresh Yosemite installation.
 
+-------
+<p align="center">
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#setting-up-fastlane">Setting up</a> &bull; 
+    <a href="#jenkins-integration">Jenkins</a> &bull; 
+    <a href="#example-project">Example Project</a> &bull; 
+    <a href="#help">Help</a>
+</p>
+
+-------
+
+
 #### Notes about this guide
 If you don't want to use `sudo`, you can follow the [CocoaPods Guide](http://guides.cocoapods.org/using/getting-started.html#sudo-less-installation) of a *sudo-less installation*.
 
@@ -163,7 +175,7 @@ Now it's the time to adapt the `Fastfile` to implement your deployment pipeline.
 
 Add as many lanes as you want and test them by running `fastlane [lane name] --trace`. I recommend putting the `--trace` at the end to get the full stack trace in case something goes wrong.
 
-## Use your existing build scripts
+### Use your existing build scripts
 
     sh "./script.sh"
 
@@ -172,7 +184,7 @@ This will execute your existing build script. Everything inside the `"` will be 
 ### Create your own actions (build steps)
 If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [this guide](https://github.com/krausefx/fastlane#extensions).
 
-### [Jenkins](http://jenkins-ci.org/) Integration
+# [Jenkins](http://jenkins-ci.org/) Integration
 (or any other Continuous Integration system)
 
 Deploying from your own computer isn't cool. You know what's cool? Letting a remote server publish app updates for you.
@@ -184,7 +196,7 @@ Everything you did in this guide, was stored in the filesystem in configuration 
 
 as a build step on your server, and you're good to go.
 
-#### Even better Jenkins integration
+### Even better Jenkins integration
 For a more detailed CI-setup, which also shows you test results and the latest screenshots, take a look at the [Jenkins Guide](https://github.com/krausefx/fastlane#jenkins-integration). 
 
 
