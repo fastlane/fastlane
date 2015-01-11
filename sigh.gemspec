@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Sigh::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["sigh@krausefx.com"]
-  spec.summary       = %q{Create, Renew and Download your provisioning profiles - using one command}
-  spec.description   = %q{Create, Renew and Download your provisioning profiles - using one command}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Because you would rather spend your time building stuff than fighting provisioning}
+  spec.description   = %q{Because you would rather spend your time building stuff than fighting provisioning}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -41,5 +41,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'codeclimate-test-reporter'
 
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
+  spec.post_install_message = "sigh requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end

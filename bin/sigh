@@ -12,9 +12,9 @@ HighLine.track_eof = false
 
 # Commander
 program :version, Sigh::VERSION
-program :description, 'CLI for \'sigh\' - Automatic maintaining of iOS certificates'
+program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
 program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
-program :help, 'Website', 'http://krausefx.com'
+program :help, 'Website', 'http://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/sigh'
 program :help_formatter, :compact
 
