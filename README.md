@@ -83,7 +83,7 @@ This does the following:
 
 You can pass parameters like this:
 
-    pem -a at.felixkrause.app -u username
+    pem -a com.krausefx.app -u username
 
 If you want to generate a development certificate instead:
 
