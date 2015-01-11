@@ -1,10 +1,12 @@
-From 0 to 100% automatic Deployment
+From manually to fully automatic app deployments
 -----------------------------------
 
-This guide will help you set up Continuous Deployment for your iOS project.
+This guide will help you set up Continuous Deployment for your iOS project. 
 
-# Notes about this guide
-By default, the listed commands will use `sudo`. If you don't want this, you can follow the [CocoaPods Guide](http://guides.cocoapods.org/using/getting-started.html#sudo-less-installation) of a *sudo-less installation*.
+It will help you set up all needed build tools. I tested everything with a fresh Yosemite installation.
+
+#### Notes about this guide
+If you don't want to use `sudo`, you can follow the [CocoaPods Guide](http://guides.cocoapods.org/using/getting-started.html#sudo-less-installation) of a *sudo-less installation*.
 
 # Installation
 
@@ -14,36 +16,36 @@ By default, the listed commands will use `sudo`. If you don't want this, you can
 - Ruby 2.0 or newer (`ruby -v`)
 - Xcode
 
-## Xcode
+### Xcode
 Additionally to an Xcode installation, you also need the Xcode command line tools set up
 
     xcode-select --install
 
-## [Homebrew](http://brew.sh/)
+### [Homebrew](http://brew.sh/)
 You don't have to use [homebrew](http://brew.sh/) to install the dependencies. It's the easiest way to get started.
 
 If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/).
 
-### Init [Homebrew](http://brew.sh/)
+#### Init [Homebrew](http://brew.sh/)
 
     brew doctor && brew update
 
-### [PhantomJS](http://phantomjs.org/)
+#### [PhantomJS](http://phantomjs.org/)
 
     brew install makedepend && brew install phantomjs
 
-### [xctool](https://github.com/facebook/xctool) (optional)
+#### [xctool](https://github.com/facebook/xctool) (optional)
 
     brew install xctool
 
-## [Nokogiri](http://www.nokogiri.org/)
+### [Nokogiri](http://www.nokogiri.org/)
 
     sudo gem install nokogiri
 
 This can be a pain sometimes, in case you're running into problems, take a look at the [official installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html).
 
 
-## [fastlane](https://github.com/KrauseFx/fastlane)
+### [fastlane](https://github.com/KrauseFx/fastlane)
 
 Install the gem and all its dependencies (might take a few minutes)
 
@@ -51,12 +53,12 @@ Install the gem and all its dependencies (might take a few minutes)
 
 # Setting up `fastlane`
 
-Before changing anything, I recommend commiting everything in `version control` (e.g. git), in case something goes wrong.
+Before changing anything, I recommend commiting everything in `git`, in case something goes wrong.
 
 ## Get it up and running
 When running the setup commands, please read the instructions shown in the terminal. There is usually a reason they are there.
 
-`fastlane` can create all necessary files and folders for you
+`fastlane` will create all necessary files and folders for you
 
     fastlane init
     
@@ -79,10 +81,10 @@ What did this setup do?
 - Created `fastlane/Appfile`, which stores your *Apple ID* and *Bundle Identifier*
 - Created `fastlane/Fastfile`, which stores your deployment pipelines
 
-The setup automatically detected, which tools you're using (e.g. [`deliver`](https://github.com/KrauseFx/deliver), [CocoaPods](http://cocoapods.org/), [xctool](https://github.com/facebook/xctool))
+The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/KrauseFx/deliver), [CocoaPods](http://cocoapods.org/), [xctool](https://github.com/facebook/xctool))
 
-## Individual Tools
-Before getting to the big picture, make sure, all tools are correctly set up. 
+### Individual Tools
+Before running `fastlane`, make sure, all tools are correctly set up. 
 
 For example, try running the following (depending on what you plan on using):
 
@@ -92,12 +94,12 @@ For example, try running the following (depending on what you plan on using):
 - [frameit](https://github.com/KrauseFx/frameit)
 - [xctool](https://github.com/facebook/xctool) (which you should [configure correctly](https://github.com/krausefx/fastlane#xctool))
 
-All those tools have detailed instructions on how to set them up. It's easier to set them up now, then later.
+All those tools have detailed instructions on how to set them up. It's easier to set them up now, than later.
 
-## Enable `Instruments` CLI
+### Enable `Instruments` CLI
 If you want to use [snapshot](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), please follow [this step](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), to authorize snapshot running using [`fastlane`](https://github.com/KrauseFx/fastlane).
 
-## Configure the `Fastfile`
+### Configure the `Fastfile`
 
 First, think about what different builds you'll need. Some ideas:
 
@@ -156,16 +158,21 @@ You should hear your computer speaking to you, which is great!
 
 A list of available actions can be found on the [`fastlane` project page](https://github.com/KrauseFx/fastlane#actions).
 
+#### Update the `Fastfile`
+Now it's the time to adapt the `Fastfile` to implement your deployment pipeline. You should use `increment_build_number` when you want to upload builds to iTunes Connect ([Activate incrementing build numbers](https://developer.apple.com/library/ios/qa/qa1827/_index.html))
+
+Add as many lanes as you want and test them by running `fastlane [lane name] --trace`. I recommend putting the `--trace` at the end to get the full stack trace in case something goes wrong.
+
 ## Use your existing build scripts
 
     sh "./script.sh"
 
-This will execute your existing build script. Everything inside the `"` will be executed in your shell.
+This will execute your existing build script. Everything inside the `"` will be executed in the shell.
 
-## Create your own actions (build steps)
+### Create your own actions (build steps)
 If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [this guide](https://github.com/krausefx/fastlane#extensions).
 
-## [Jenkins](http://jenkins-ci.org/) Integration
+### [Jenkins](http://jenkins-ci.org/) Integration
 (or any other Continuous Integration system)
 
 Deploying from your own computer isn't cool. You know what's cool? Letting a remote server publish app updates for you.
@@ -175,13 +182,20 @@ Everything you did in this guide, was stored in the filesystem in configuration 
 
     fastlane appstore
 
-as a build step, and you're done.
+as a build step on your server, and you're good to go.
 
-### Even better Jenkins integration
+#### Even better Jenkins integration
 For a more detailed CI-setup, which also shows you test results and the latest screenshots, take a look at the [Jenkins Guide](https://github.com/krausefx/fastlane#jenkins-integration). 
 
 
-## Deploy strategy
-Is described in the [fastlane instructions](https://github.com/KrauseFx/fastlane#deploy-strategy).
+### Deploy strategy
+Tips about when to deploy can be found in the [fastlane Jenkins instructions](https://github.com/KrauseFx/fastlane#deploy-strategy).
+
+# Example project
+Take a look at a project with `fastlane` already set up: [fastlane-example](https://github.com/krausefx/fastlane-example)
 
 
+# Help
+
+- If something is unclear or you need help, submit an issue. 
+- I'm available for contract work - drop me an email: fastlane@krausefx.com
