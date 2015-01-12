@@ -15,15 +15,13 @@ module Fastlane
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
           return clean 
         end
+        
+        Snapshot::SnapshotConfig.shared_instance
+        Snapshot::Runner.new.work(clean: clean)
 
-        Dir.chdir(FastlaneFolder.path) do
-          Snapshot::SnapshotConfig.shared_instance
-          Snapshot::Runner.new.work(clean: clean)
+        results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
 
-          results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
-
-          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
-        end
+        Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
       end
     end
   end

@@ -16,9 +16,7 @@ module Fastlane
     def parse(data)
       @runner = Runner.new
 
-      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
-        eval(data) # this is okay in this case
-      end
+      eval(data) # this is okay in this case
 
       return self
     end
@@ -76,10 +74,8 @@ module Fastlane
       if class_ref and class_ref.respond_to?(:run)
         Helper.log.info "Step: #{method_sym.to_s}".green
 
-        Dir.chdir("..") do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(method_sym) do
-            class_ref.run(arguments)
-          end
+        Actions.execute_action(method_sym) do
+          class_ref.run(arguments)
         end
       else
         raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
