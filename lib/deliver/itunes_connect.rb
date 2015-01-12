@@ -410,10 +410,10 @@ module Deliver
             },
             advertising_identifier: {
               use_idfa: false,
-			  serve_advertisement: false,
-	  	      attribute_advertisement: false,
-	  	      attribute_actions: false,
-	  	      limit_ad_tracking: false
+              serve_advertisement: false,
+              attribute_advertisement: false,
+              attribute_actions: false,
+              limit_ad_tracking: false
 	    	}
           }
 
