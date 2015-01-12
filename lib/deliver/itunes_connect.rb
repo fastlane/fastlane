@@ -414,7 +414,7 @@ module Deliver
               attribute_advertisement: false,
               attribute_actions: false,
               limit_ad_tracking: false
-	    	}
+            }
           }
 
           basic = "//*[@itc-radio='submitForReviewAnswers"
