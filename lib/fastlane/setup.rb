@@ -33,6 +33,7 @@ module Fastlane
       Helper.log.info "This setup will help you get up and running in no time.".green
       Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
       Helper.log.info "into the subfolder `fastlane`.\n".green
+      Helper.log.info "This means, your build script might need to be adapted after this change.".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
@@ -95,7 +96,8 @@ module Fastlane
 
       if @tools[:snapshot] and @tools[:deliver]
         # Deliver is already installed
-        Helper.log.info "The 'screenshots' folder inside the 'fastlane' folder will be used.".yellow
+        Helper.log.info "The 'screenshots' folder inside the 'deliver' folder will not be used.".yellow
+        Helper.log.info "Instead the 'screenshots' folder inside the 'fastlane' folder will be used.".yellow
         Helper.log.info "Click Enter to confirm".green
         STDIN.gets
       end

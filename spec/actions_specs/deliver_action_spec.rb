@@ -18,7 +18,6 @@ describe Fastlane do
         test_val = "test_val"
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
 
-        # Go to tmp folder
         Dir.chdir(test_path) do
           expect {
             

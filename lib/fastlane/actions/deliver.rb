@@ -14,9 +14,12 @@ module Fastlane
         beta = params.include?(:beta)
         skip_deploy = params.include?(:skip_deploy)
 
-        Deliver::Deliverer.new(nil, force: force, 
-                              is_beta_ipa: beta, 
-                              skip_deploy: skip_deploy)
+        Dir.chdir(FastlaneFolder.path || Dir.pwd) do
+          # This should be executed in the fastlane folder
+          Deliver::Deliverer.new(nil, force: force, 
+                                is_beta_ipa: beta, 
+                                skip_deploy: skip_deploy)
+        end
       end
     end
   end

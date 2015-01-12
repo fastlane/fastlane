@@ -6,17 +6,21 @@ module Fastlane
       Helper.log.info "Driving the lane '#{key}'".green
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = key
 
-      @before_all.call if @before_all
-      
       return_val = nil
 
-      if blocks[key]
-        return_val = blocks[key].call
-      else
-        raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
-      end
+      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # the file is located in the fastlane folder
+        @before_all.call if @before_all
+        
+        return_val = nil
 
-      @after_all.call(key) if @after_all # this is only called if no exception was raised before
+        if blocks[key]
+          return_val = blocks[key].call
+        else
+          raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
+        end
+
+        @after_all.call(key) if @after_all # this is only called if no exception was raised before
+      end
 
       return return_val
     rescue => ex

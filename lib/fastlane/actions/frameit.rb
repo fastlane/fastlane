@@ -14,7 +14,7 @@ module Fastlane
         screenshots_folder = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
         screenshots_folder ||= FastlaneFolder.path
 
-        Dir.chdir(screenshots_folder) do # we only want to run over the newly generated screenshots
+        Dir.chdir(screenshots_folder) do
           Frameit::Editor.new.run('.', color)
         end
       end
