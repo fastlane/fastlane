@@ -1,4 +1,4 @@
-From manually to fully automatic app deployments
+From manual to fully automatic app deployments
 -----------------------------------
 
 This guide will help you set up Continuous Deployment for your iOS project. 
