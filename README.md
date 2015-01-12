@@ -2,11 +2,11 @@
   fastlane
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">Sigh</a>
+  <a href="https://github.com/KrauseFx/sigh">sigh</a>
 </p>
 -------
 
@@ -48,8 +48,10 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - [Jenkins Integration](#jenkins-integration): Show the output directly in the Jenkins test results
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
+- Easy setup, which helps you getting up and running very fast
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
-- Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update.
+- Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
+- Very flexible configuration using a fully customizable `Fastfile`
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
 
 # Installation
@@ -74,8 +76,10 @@ The guide will create all the necessary files for you, using the existing app me
 
 - ```cd [your_project_folder]```
 - ```fastlane init```
-- Follow the guide, which will set up ```fastlane``` for you
+- Follow the setup assistent, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` using the next section
+
+For a more detailed setup, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/GUIDE.md).
 
 # Customise the ```Fastfile```
 Why should you have to remember complicated commands and parameters?
