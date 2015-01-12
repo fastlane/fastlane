@@ -113,7 +113,7 @@ module Fastlane
       template.gsub!('deliver', '# deliver') unless @tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
-      template.gsub!('sh "xctool', '# sh "xctool') unless @tools[:xctool]
+      template.gsub!('xctool', '# xctool') unless @tools[:xctool]
       template.gsub!('cocoapods', '# cocoapods') unless @tools[:cocoapods]
 
       @tools.each do |key, value|
