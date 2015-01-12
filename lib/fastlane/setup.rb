@@ -33,7 +33,6 @@ module Fastlane
       Helper.log.info "This setup will help you get up and running in no time.".green
       Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
       Helper.log.info "into the subfolder `fastlane`.\n".green
-      Helper.log.info "This means, your build script might need to be adapted after this change.".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
@@ -54,6 +53,8 @@ module Fastlane
     end
 
     def generate_app_metadata
+      Helper.log.info "------------------------------"
+      Helper.log.info "To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.".green
       app_identifier = ask("App Identifier (com.krausefx.app): ".yellow)
       apple_id = ask("Your Apple ID: ".yellow)
       template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
@@ -81,6 +82,14 @@ module Fastlane
           Deliver::DeliverfileCreator.create(folder)
           @tools[:deliver] = true
         end
+      else
+        # deliver already enabled
+        Helper.log.info "-------------------------------------------------------------------------------------------"
+        Helper.log.info "Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile".yellow
+        Helper.log.info "Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building".yellow
+        Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
+        Helper.log.info "Please read the above carefully and click Enter to confirm.".green
+        STDIN.gets
       end
 
       unless @tools[:snapshot]
