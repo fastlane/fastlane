@@ -43,12 +43,13 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Features
 - Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together
 - Define different ```deployment lanes``` for App Store deployment, beta builds or testing
-- Write your [own actions](#extensions) (extensions) to extend the functionality of `fastlane`
 - Deploy from any computer
 - [Jenkins Integration](#jenkins-integration): Show the output directly in the Jenkins test results
+- Write your [own actions](#extensions) (extensions) to extend the functionality of `fastlane`
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
 - Easy setup, which helps you getting up and running very fast
+- Shared context, which is used to let the different deployment steps communicate with each other
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
 - Very flexible configuration using a fully customizable `Fastfile`
