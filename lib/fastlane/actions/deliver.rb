@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      
+      DELIVER_IPA_PATH = :DELIVER_IPA_PATH
     end
 
     class DeliverAction
@@ -19,6 +19,8 @@ module Fastlane
           Deliver::Deliverer.new(nil, force: force, 
                                 is_beta_ipa: beta, 
                                 skip_deploy: skip_deploy)
+
+          ENV[Actions::SharedValues::DELIVER_IPA_PATH] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
         end
       end
     end
