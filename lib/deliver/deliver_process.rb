@@ -88,6 +88,8 @@ module Deliver
         raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
       end
 
+      ENV["DELIVER_IPA_PATH"] = used_ipa_file
+
       if used_ipa_file
         upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
         if is_beta_build?
