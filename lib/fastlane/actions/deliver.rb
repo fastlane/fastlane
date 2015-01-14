@@ -20,7 +20,7 @@ module Fastlane
                                 is_beta_ipa: beta, 
                                 skip_deploy: skip_deploy)
 
-          ENV[Actions::SharedValues::DELIVER_IPA_PATH] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
+          ENV[Actions::SharedValues::DELIVER_IPA_PATH.to_s] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
         end
       end
     end
