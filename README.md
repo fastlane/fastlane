@@ -197,6 +197,12 @@ hockey({
 ```
 More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
 
+#### [Testmunk](http://testmunk.com)
+Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple testcase you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. 
+```ruby
+
+```
+
 #### Custom Shell Scripts
 ```ruby
 sh "./your_bash_script.sh
