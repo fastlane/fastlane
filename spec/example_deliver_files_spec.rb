@@ -3,9 +3,10 @@ describe Deliver do
     describe "#initialize" do
       describe "Different Deliverfiles" do
         it "raises an error when file was not found" do
+          error_path = File.expand_path("./Deliverfile")
           expect {
             Deliver::Deliverer.new(nil)
-          }.to raise_exception "Deliverfile not found at path './Deliverfile'".red
+          }.to raise_exception "Deliverfile not found at path '#{error_path}'".red
         end
 
         it "raises an error if some key information is missing" do
