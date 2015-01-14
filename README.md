@@ -73,7 +73,7 @@ If you want to take a look at a project, already using `fastlane`, check out the
 # Quick Start
 
 
-The guide will create all the necessary files for you, using the existing app metadata from iTunes Connect.
+The setup assistent will create all the necessary files for you, using the existing app metadata from iTunes Connect.
 
 - ```cd [your_project_folder]```
 - ```fastlane init```
