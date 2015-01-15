@@ -1,4 +1,4 @@
-require 'deliver/password_manager'
+require 'credentials_manager/password_manager'
 require 'open-uri'
 require 'openssl'
 
@@ -55,7 +55,7 @@ module Sigh
 
     # Loggs in a user with the given login data on the Dev Center Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {Deliver::PasswordManager}.
+    # Automatically be fetched using the {CredentialsManager::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -68,8 +68,8 @@ module Sigh
       begin
         Helper.log.info "Login into iOS Developer Center"
 
-        user ||= Deliver::PasswordManager.shared_manager.username
-        password ||= Deliver::PasswordManager.shared_manager.password
+        user ||= CredentialsManager::PasswordManager.shared_manager.username
+        password ||= CredentialsManager::PasswordManager.shared_manager.password
 
         result = visit PROFILES_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
@@ -118,7 +118,7 @@ module Sigh
             result = visit PROFILES_URL
             raise "Could not open Developer Center" unless result['status'] == 'success'
           end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
         end
@@ -126,7 +126,7 @@ module Sigh
         begin
           wait_for_elements('.ios.profiles.gridList')
           visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           if page.has_content?"Getting Started"
             raise "There was no valid signing certificate found. Please log in and follow the 'Getting Started guide' on '#{current_url}'".red
@@ -139,7 +139,7 @@ module Sigh
         Helper.log.info "Login successful"
         
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -214,7 +214,7 @@ module Sigh
         # After creating the profile, we need to download it
         return maintain_app_certificate(app_identifier, type) # recursive
 
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -231,7 +231,7 @@ module Sigh
 
       begin
         wait_for_elements('#type-production')
-      rescue Exception => ex
+      rescue => ex
         wait_for_elements('#type-inhouse') # enterprise accounts
         enterprise = true
       end

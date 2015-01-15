@@ -1,31 +1,37 @@
+<h3 align="center">
+  <a href="https://github.com/KrauseFx/fastlane">
+    <img src="assets/fastlane.png" width="150" />
+    <br />
+    fastlane
+  </a>
+</h3>
 <p align="center">
-<a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
-<a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-<b>Sigh</b>
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
+  <b>sigh</b>
 </p>
-
 -------
 
 <p align="center">
     <img src="assets/sigh.png">
 </p>
 
-Sigh
+sigh
 ============
-#### Because you would rather spend your time building stuff than fighting provisioning
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sigh/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
 
+###### Because you would rather spend your time building stuff than fighting provisioning
 
 Tired of manually creating, renewing and downloading your iOS provisioning profiles?
 
 ```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 
@@ -41,6 +47,9 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 
+<h5 align="center"><code>sigh</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
+
 # Features
 
 - **Download** the latest provisioning profile for your app
@@ -50,7 +59,7 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 - Support for **multiple Teams**
-- Support for Enterprise Profiles
+- Support for **Enterprise Profiles**
 
 To automate iOS Push profiles you can use [PEM](https://github.com/KrauseFx/PEM).
 
@@ -87,7 +96,7 @@ Yes, that's the whole command!
 
 You can pass your bundle identifier and username like this:
 
-    sigh -a at.felixkrause.app -u username
+    sigh -a com.krausefx.app -u username
 
 If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
@@ -111,7 +120,7 @@ In case you prefer environment variables:
 
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
-- ```SIGH_TEAM_ID``` (The exact name of your preferred team for this account)
+- ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
 
 # How does it work?
 
@@ -122,14 +131,13 @@ In case you prefer environment variables:
 ```sigh``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
+## [`fastlane`](http://fastlane.tools) Toolchain
 
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
-- [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Sigh::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["sigh@krausefx.com"]
-  spec.summary       = %q{Create, Renew and Download your provisioning profiles - using one command}
-  spec.description   = %q{Create, Renew and Download your provisioning profiles - using one command}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Because you would rather spend your time building stuff than fighting provisioning}
+  spec.description   = %q{Because you would rather spend your time building stuff than fighting provisioning}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -22,12 +22,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'security', '~> 0.1.3' # Mac OS Keychain manager
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
 
-  spec.add_dependency 'deliver' # password manager
+  spec.add_dependency 'credentials_manager' # fastlane password manager
 
   # Frontend Scripting
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
@@ -42,5 +41,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'codeclimate-test-reporter'
 
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
+  spec.post_install_message = "sigh requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end

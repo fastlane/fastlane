@@ -1,15 +1,14 @@
 PATH
   remote: .
   specs:
-    sigh (0.1.5)
+    sigh (0.2.0)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
-      deliver
+      credentials_manager
       highline (~> 1.6.21)
       json
       poltergeist (~> 1.5.1)
-      security (~> 0.1.3)
 
 GEM
   remote: https://rubygems.org/
@@ -22,7 +21,7 @@ GEM
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
     cliver (0.3.2)
-    codeclimate-test-reporter (0.4.3)
+    codeclimate-test-reporter (0.4.5)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
@@ -30,54 +29,31 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    deliver (0.5.0)
-      capybara (~> 2.4.3)
+    credentials_manager (0.1.0)
       colored
-      commander (~> 4.2.0)
-      fastimage (~> 1.6.3)
-      fastlane
       highline (~> 1.6.21)
-      json
-      nokogiri (~> 1.6.5)
-      plist (~> 3.1.0)
-      poltergeist (~> 1.5.1)
-      prawn
-      rubyzip (~> 1.1.6)
+      security (~> 0.1.3)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastimage (1.6.6)
-      addressable (~> 2.3, >= 2.3.5)
-    fastlane (0.1.0)
-      colored
-      commander (~> 4.2.0)
-      highline (~> 1.6.21)
-      json
-      nokogiri (~> 1.6.5)
-      security (~> 0.1.3)
     highline (1.6.21)
-    json (1.8.1)
+    json (1.8.2)
     method_source (0.8.2)
     mime-types (2.4.3)
-    mini_portile (0.6.1)
+    mini_portile (0.6.2)
     multi_json (1.10.1)
     nokogiri (1.6.5)
       mini_portile (~> 0.6.0)
-    pdf-core (0.4.0)
-    plist (3.1.0)
     poltergeist (1.5.1)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    prawn (1.3.0)
-      pdf-core (~> 0.4.0)
-      ttfunk (~> 1.4.0)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rack (1.6.0)
-    rack-test (0.6.2)
+    rack-test (0.6.3)
       rack (>= 1.0)
     rake (10.4.2)
     rspec (3.1.0)
@@ -92,7 +68,6 @@ GEM
     rspec-mocks (3.1.3)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    rubyzip (1.1.6)
     safe_yaml (1.0.4)
     security (0.1.3)
     simplecov (0.9.1)
@@ -101,7 +76,6 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    ttfunk (1.4.0)
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
