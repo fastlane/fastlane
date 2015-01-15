@@ -127,7 +127,7 @@ cocoapods # this will run pod install
 
 
 #### [xctool](https://github.com/facebook/xctool)
-You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed throw [homebrew](http://brew.sh/).
+You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
 ```ruby
 xctool :test
 ```
