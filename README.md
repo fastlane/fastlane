@@ -205,7 +205,7 @@ testmunk
 
 #### Custom Shell Scripts
 ```ruby
-sh "./your_bash_script.sh
+sh "./your_bash_script.sh"
 ```
 
 ### *before_all* block
