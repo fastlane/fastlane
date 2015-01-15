@@ -1,9 +1,16 @@
+<h3 align="center">
+  <a href="https://github.com/KrauseFx/fastlane">
+    <img src="assets/fastlane.png" width="150" />
+    <br />
+    fastlane
+  </a>
+</h3>
 <p align="center">
-    <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-    <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-    <a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
-    <b>PEM</b> &bull; 
-    <a href="https://github.com/KrauseFx/sigh">Sigh</a>
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
+  <b>PEM</b> &bull; 
+  <a href="https://github.com/KrauseFx/sigh">sigh</a>
 </p>
 -------
 
@@ -11,7 +18,7 @@
     <img src="assets/pem.png">
 </p>
 
-Pem - Maintain your push certificates
+PEM - Maintain your push certificates
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -105,12 +112,14 @@ There are 2 actions involved:
 ```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
 
 # Tips
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
-- [```FrameIt```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
+
+## [`fastlane`](http://fastlane.tools) Toolchain
+
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

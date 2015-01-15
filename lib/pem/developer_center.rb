@@ -1,4 +1,4 @@
-require 'deliver/password_manager'
+require 'credentials_manager/password_manager'
 require 'open-uri'
 require 'openssl'
 
@@ -52,7 +52,7 @@ module PEM
 
     # Loggs in a user with the given login data on the Dev Center Frontend.
     # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {Deliver::PasswordManager}.
+    # Automatically be fetched using the {CredentialsManager::PasswordManager}.
     # This method will also automatically be called when triggering other 
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
@@ -65,8 +65,8 @@ module PEM
       begin
         Helper.log.info "Login into iOS Developer Center"
 
-        user ||= Deliver::PasswordManager.shared_manager.username
-        password ||= Deliver::PasswordManager.shared_manager.password
+        user ||= CredentialsManager::PasswordManager.shared_manager.username
+        password ||= CredentialsManager::PasswordManager.shared_manager.password
 
         result = visit DEVELOPER_CENTER_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
@@ -109,7 +109,7 @@ module PEM
             
          all("#saveTeamSelection_saveTeamSelection").first.click
          end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
         end
@@ -117,7 +117,7 @@ module PEM
         begin
           
           wait_for_elements('#aprerelease')
-        rescue Exception => ex
+        rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
         end
@@ -125,7 +125,7 @@ module PEM
         Helper.log.info "Login successful"
 
         true
-      rescue Exception => ex
+      rescue => ex
         error_occured(ex)
       end
     end
@@ -170,7 +170,7 @@ module PEM
           else
             raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
           end
-        rescue Exception => ex
+        rescue => ex
           error_occured(ex)
         end
       end
