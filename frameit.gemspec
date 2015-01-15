@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Frameit::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["frameit@krausefx.com"]
-  spec.summary       = %q{FrameIt - Want a device frame around your screenshots? Do it in an instant!}
-  spec.description   = %q{Want a device frame around your iPhone app screenshots? Do it in an instant!}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Quickly put your screenshots into the right device frames}
+  spec.description   = %q{Quickly put your screenshots into the right device frames}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'mini_magick', '~> 3.8.1' # To open, edit and export PSD files
-  spec.add_dependency 'deliver', '~> 0.3' # To determine the device type based on a screenshot file
+  spec.add_dependency 'deliver', '> 0.3' # To determine the device type based on a screenshot file
 
   # Development only
   spec.add_development_dependency 'bundler'

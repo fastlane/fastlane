@@ -1,9 +1,16 @@
+<h3 align="center">
+  <a href="https://github.com/KrauseFx/fastlane">
+    <img src="assets/fastlane.png" width="150" />
+    <br />
+    fastlane
+  </a>
+</h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">Deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-  <b>FrameIt</b> &bull; 
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
+  <b>frameit</b> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">Sigh</a>
+  <a href="https://github.com/KrauseFx/sigh">sigh</a>
 </p>
 -------
 
@@ -11,18 +18,18 @@
     <img src="assets/frameit.png">
 </p>
 
-FrameIt - Add gorgeous device frames around your screenshots
+frameit
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/frameit/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
 
-Want a device frame around your screenshot? Do it in an instant!
+###### Quickly put your screenshots into the right device frames
 
-This library is not supposed to be used for App Store screenshots.
+This tool is not supposed to be used for App Store screenshots. Instead it should be used to prepare screenshots for websites, emails and prints.
 
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
@@ -35,6 +42,8 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 </p>
 
 -------
+<h5 align="center"><code>frameit</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
 
 
 # Features
@@ -61,7 +70,7 @@ Install the gem
 
     sudo gem install frameit
 
-Because of legal reasons, I can not pre-package the device frames with ```FrameIt```.
+Because of legal reasons, I can not pre-package the device frames with ```frameit```.
 
 The process of adding is really easy, just run ```frameit``` and the guide will help you set it up.
 You only have to do this once per computer.
@@ -91,12 +100,13 @@ To run the setup process again to add new frames use:
 
 # Tips
 
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
-- [```deliver```](https://github.com/KrauseFx/deliver): Deploy screenshots, app metadata and app updates to the App Store using just one command
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
+
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Generate screenshots
 Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
@@ -109,7 +119,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 - ```rm -rf ~/.frameit```
 
 # Need help?
-- If there is a technical problem with ```FrameIt```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
+- If there is a technical problem with ```frameit```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
 - I'm available for contract work - drop me an email: frameit@krausefx.com
 
 # License

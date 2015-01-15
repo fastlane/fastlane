@@ -10,9 +10,9 @@ HighLine.track_eof = false
 
 # Commander
 program :version, Frameit::VERSION
-program :description, 'Find all screenshots in current folder and put a nice frame around it. This will duplicate the images.'
-program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
-program :help, 'Website', 'http://felixkrause.at'
+program :description, 'Quickly put your screenshots into the right device frames'
+program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
+program :help, 'Website', 'http://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/frameit'
 program :help_formatter, :compact
 
