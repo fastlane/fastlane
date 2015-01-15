@@ -36,7 +36,6 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
-
 # Features
 - Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together
 - Define different ```deployment lanes``` for App Store deployment, beta builds or testing
@@ -51,6 +50,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
 - Very flexible configuration using a fully customizable `Fastfile`
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
+
+##### Take a look at the [fastlane website](http://fastlane.tools) for more information about why and when to use `fastlane`.
 
 # Installation
 
