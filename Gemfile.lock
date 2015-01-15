@@ -29,7 +29,7 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    credentials_manager (0.0.1)
+    credentials_manager (0.1.0)
       colored
       highline (~> 1.6.21)
       security (~> 0.1.3)
