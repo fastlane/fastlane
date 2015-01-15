@@ -1,5 +1,5 @@
 <h3 align="center">
-  ![assets/fastlane_text.png](fastlane Logo)
+  <img src="assets/fastlane_text.png" alt="fastlane Logo" />
 </h3>
 <p align="center">
   <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
