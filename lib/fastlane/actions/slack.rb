@@ -46,7 +46,7 @@ module Fastlane
         }
 
         notifier.ping "", 
-                      # icon_url: 'TODO',
+                      icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
                       attachments: [test_result]
 
         Helper.log.info "Successfully sent Slack notification"
