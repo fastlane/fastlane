@@ -77,8 +77,14 @@ module Snapshot
 
       self.screenshots_path = './screenshots'
 
-      self.project_path = (Dir.glob("./*.xcworkspace").first rescue nil) # prefer workspaces ofc
-      self.project_path ||= (Dir.glob("./*.xcodeproj").first rescue nil)
+      folders = ["./*.xcworkspace"] # we prefer workspaces
+      folders << "./*.xcodeproj"
+      folders << "../*.xcworkspace"
+      folders << "../*.xcodeproj"
+
+      folders.each do |current|
+        self.project_path ||= (File.expand_path(Dir[current].first) rescue nil)
+      end
 
       empty = Proc.new {}
       self.blocks = {
@@ -149,7 +155,7 @@ module Snapshot
           end
           return self.manual_scheme
         end
-      rescue Exception => ex
+      rescue => ex
         raise "Could not fetch available schemes: #{ex}".red
       end
     end

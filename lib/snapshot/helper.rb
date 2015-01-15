@@ -47,5 +47,9 @@ module Snapshot
       `xcode-select -p`.gsub("\n", '') + "/"
     end
 
+    def self.fastlane_enabled?
+      # This is called from the root context on the first start
+      @@enabled ||= File.directory?"./fastlane"
+    end
   end
 end

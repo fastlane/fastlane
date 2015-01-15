@@ -1,5 +1,3 @@
-require 'snapshot/dependency_checker'
-
 module Snapshot
   class Builder
     BUILD_DIR = '/tmp/snapshot'
@@ -16,7 +14,7 @@ module Snapshot
 
       if not command
         # That's the default case, user did not provide a custom build_command
-        raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_name
+        raise "Could not find project. Please pass the path to your project using 'project_path'.".red unless SnapshotConfig.shared_instance.project_path
         command = generate_build_command(clean: clean)
       end
 
@@ -30,7 +28,7 @@ module Snapshot
           all_lines << line
           begin
             parse_build_line(line) if line.length > 2
-          rescue Exception => ex
+          rescue => ex
             Helper.log.fatal all_lines.join("\n")
             raise ex
           end

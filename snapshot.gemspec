@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Snapshot::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["snapshot@krausefx.com"]
-  spec.summary       = %q{Snapshot - Create hundreds of iOS app screenshots automatically}
-  spec.description   = %q{Take the pain out of taking iOS app screenshots.}
-  spec.homepage      = "http://krausefx.com"
+  spec.summary       = %q{Automate taking localized screenshots of your iOS app on every device}
+  spec.description   = %q{Automate taking localized screenshots of your iOS app on every device}
+  spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-
 
   # Development only
   spec.add_development_dependency 'bundler'

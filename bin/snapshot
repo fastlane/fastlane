@@ -4,8 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'snapshot'
 require 'commander/import'
-require 'snapshot/update_checker'
-require 'snapshot/dependency_checker'
 require 'snapshot/snapfile_creator'
 require 'snapshot/snapshot_config'
 
@@ -14,16 +12,14 @@ HighLine.track_eof = false
 
 # Commander
 program :version, Snapshot::VERSION
-program :description, 'CLI for \'Snapshot\' - Automatic taking of screenshots on all simulator types in all languages.'
-program :help, 'Author', 'Felix Krause <krausefx@gmail.com>'
-program :help, 'Website', 'http://felixkrause.at'
+program :description, 'CLI for \'Snapshot\' - Automate taking localized screenshots of your iOS app on every device'
+program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
+program :help, 'Website', 'http://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/snapshot'
 program :help_formatter, :compact
 
 global_option('--verbose') { $verbose = true }
 
-
-Snapshot::UpdateChecker.verify_latest_version
 
 default_command :run
 
@@ -34,8 +30,11 @@ command :run do |c|
   c.option '--noclean', 'Skips the clean process when running snapshot.'
 
   c.action do |args, options|
-    Snapshot::SnapshotConfig.shared_instance(options.snapfile) if options.snapfile # to set the custom Snapfile path if given
-    Snapshot::Runner.new.work(clean: !options.noclean)
+    path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+    Dir.chdir(path) do # switch the context
+      Snapshot::SnapshotConfig.shared_instance(options.snapfile)
+      Snapshot::Runner.new.work(clean: !options.noclean)
+    end
   end
 end
 
@@ -44,6 +43,7 @@ command :init do |c|
   c.description = "Creates a new Snapfile in the current directory"
 
   c.action do |args, options|
-    Snapshot::SnapfileCreator.create('.')
+    path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+    Snapshot::SnapfileCreator.create(path)
   end
 end
