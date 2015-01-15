@@ -1,9 +1,16 @@
+<h3 align="center">
+  <a href="https://github.com/KrauseFx/fastlane">
+    <img src="assets/fastlane.png" width="150" />
+    <br />
+    fastlane
+  </a>
+</h3>
 <p align="center">
-<b>Deliver</b> &bull; 
-<a href="https://github.com/KrauseFx/snapshot">Snapshot</a> &bull; 
-<a href="https://github.com/KrauseFx/frameit">FrameIt</a> &bull; 
-<a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-<a href="https://github.com/KrauseFx/sigh">Sigh</a>
+  <b>deliver</b> &bull; 
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
+  <a href="https://github.com/KrauseFx/sigh">sigh</a>
 </p>
 -------
 
@@ -11,7 +18,7 @@
     <img src="assets/deliver.png">
 </p>
 
-Deliver - Continuous Deployment for iOS
+deliver
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -19,12 +26,11 @@ Deliver - Continuous Deployment for iOS
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
+###### Upload screenshots, metadata and your app to the App Store using a single command
 
-Updating your iOS app should not be painful and time consuming.
+`deliver` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates using the command line.
 
-```Deliver``` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates just by using one command.
-
-Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
@@ -33,22 +39,22 @@ Follow the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#credentials">Credentials</a> &bull; 
-    <a href="#can-i-trust-deliver">Can I trust Deliver?</a> &bull; 
+    <a href="#can-i-trust-deliver">Can I trust deliver?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
 -------
 
+<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
 - Upload a new ipa file to iTunes Connect without Xcode from any computer
 - Update app metadata
-- Easily implement a real Continuous Deployment process
+- Easily implement a real Continuous Deployment process using [fastlane](https://github.com/KrauseFx/fastlane)
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
-- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) (Yes, those are screenshots taken for all screen sizes)
+- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1)
 - Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
 
 # Installation
@@ -149,14 +155,17 @@ end
 and provide `--beta` option when calling `deliver`.
 
 #### Implement blocks to run unit tests
+If you're using [fastlane](http://github.com/krausefx/fastlane), run tests and error blocks there.
+
+If you only use `deliver`, you can use the following blocks:
+
 ```ruby
 unit_tests do
     system("xctool test")
 end
 
 success do
-    notifier = Slack::Notifier.new("SlackTeam", "SlackToken")
-    notifier.ping "Successfully deployed new version"
+    system("Say 'success'")
 end
 
 error do |exception|
@@ -164,7 +173,6 @@ error do |exception|
     raise "Something went wrong: #{exception}"    
 end
 ```
-For this example I used [slack-notifier](https://github.com/stevenosloan/slack-notifier).
 
 
 #### Set a default language if you are lucky enough to only maintain one language
@@ -199,8 +207,8 @@ ipa do
     # Add any code you want, like incrementing the build 
     # number or changing the app identifier
   
-    system("ipa build") # build your project using Shenzhen
-    "./AppName.ipa" # Tell 'Deliver' where it can find the finished ipa file
+    system("ipa build --verbose") # build your project using Shenzhen
+    "./AppName.ipa" # Tell 'deliver' where it can find the finished ipa file
 end
 ```
 
@@ -246,36 +254,18 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 
 # Credentials
-The used username (Apple ID) will be stored in the ```Deliverfile``` by default. When you run ```deliver``` for the first time on another computer, you will only be asked for the password.
 
-Therefore it is easy to switch between projects, without needing to logout and login again.
+A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
 
-## Use the Keychain
-The first time you use *Deliver* you have to enter your iTunes Connect 
-credentials. They will be stored in the Keychain. 
 
-If you decide to remove your
-credentials from the Keychain, just open the *Keychain Access*, select 
-*All Items* and search for 'deliver'.
-
-## Use environment variables
-You can use the following environment variables to use a specific account instead of the one stored in the keychain.
-This is especially important if you have more than one iTunes Connect account in your keychain:
-
-    DELIVER_USER
-    DELIVER_PASSWORD
-    
-## Implement your custom solution
-Take a look at [Using the exposed Ruby classes](#use-the-exposed-ruby-classes).
-
-# Can I trust *Deliver*? 
+# Can I trust `deliver`? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-```Deliver``` is fully open source, you can take a look at it. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+`deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
 Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
-```Deliver``` uses the following techniques under the hood:
+```deliver``` uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to fetch the latest app metadata from iTunes Connect and upload the updated app metadata back to Apple. It is also used to upload the ipa file. iTMSTransporter is a command line tool provided by Apple.
 - With the iTMSTransporter you cannot create new version on iTunes Connect or actually publish the newly uploaded ipa file. This is why there is some browser scripting involved, using [Capybara](https://github.com/jnicklas/capybara) and [Poltergeist](https://github.com/teampoltergeist/poltergeist).
@@ -283,13 +273,13 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 
 # Tips
 
-## Other helpful tools
-Check out other tools in this collection to speed up your deployment process:
-- [```snapshot```](https://github.com/KrauseFx/snapshot): Create hundreds of screenshots of your iPhone app... while doing something else.
-- [```frameit```](https://github.com/KrauseFx/frameit): Want a device frame around your screenshot? Do it in an instant!
-- [```PEM```](https://github.com/KrauseFx/pem): Tired of manually creating and maintaining your push certification profiles?
-- [```sigh```](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning.
+## [`fastlane`](http://fastlane.tools) Toolchain
 
+- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 ## Available language codes
 ```ruby
@@ -301,31 +291,18 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 
 ## Automatically create screenshots
 
-You can easily create screenshots completely automatically in the background using [```snapshot```](https://github.com/KrauseFx/snapshot), the little brother of ```deliver```.
-
-**Getting started:**
-
-- Run ```snapshot init``` in your project folder
-- You can edit the new ```snapshot.js``` file with your UI Automation code
-- Run ```snapshot``` to test if the screenshots work as expected
-- Remove the line ```screenshots_path``` from your ```Deliverfile``` to automatically create new screenshots for each deployment. 
-
-From now on, when you start ```deliver```, it will first create the new screenshots for you, which then will be uploaded to iTunes Connect.
+If you want to integrate ```deliver``` with ```snapshot```, check out [fastlane](https://github.com/KrauseFx/fastlane)!
 
 More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
 ## Jenkins integration
-Depending on how you set up your Jenkins instance, there might be problems with the ```phantomjs``` dependency.
-
-I've been using [Jenkins App](https://github.com/stisti/jenkins-app) for a long time, where ```Deliver``` works just fine. 
-
-You should not deploy a new App Store update after every commit, since you still have to wait for your review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane#jenkins-integration).
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```Deliver```, submit an issue. Run ```deliver --trace``` to get the stacktrace.
+- If there is a technical problem with ```deliver```, submit an issue. Run ```deliver --trace``` to get the stack trace.
 - I'm available for contract work - drop me an email: deliver@krausefx.com
 
 # License

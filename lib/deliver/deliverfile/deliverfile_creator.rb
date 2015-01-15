@@ -1,3 +1,6 @@
+require 'credentials_manager/password_manager'
+require 'credentials_manager/appfile_config'
+
 module Deliver
   # Helps new user quickly adopt Deliver
   class DeliverfileCreator
@@ -12,14 +15,14 @@ module Deliver
       project_name ||= Dir.pwd.split("/").last
 
       if agree("Do you want Deliver to automatically create the Deliverfile for you based " + 
-              "on your current app? The app has to be in the AppStore to use this feature. (y/n)", true)
+              "on your current app? The app has to be in the App Store to use this feature. (y/n)", true)
 
         puts "\n\nFirst, you need to login with your iTunesConnect credentials. ".yellow + 
           "\nThis is necessary to fetch the latest metadata from your app and use it to create a Deliverfile for you." + 
           "\nIf you have previously entered your credentials already, you will not be asked again."
 
-        if Deliver::PasswordManager.shared_manager.username and Deliver::PasswordManager.shared_manager.password
-          identifier = ''
+        if CredentialsManager::PasswordManager.shared_manager.username and CredentialsManager::PasswordManager.shared_manager.password
+          identifier = ((CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue '') || '')
           while identifier.length < 3
             identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
           end
@@ -91,7 +94,7 @@ module Deliver
         deliver.gsub!("[[APP_IDENTIFIER]]", app.app_identifier)
         deliver.gsub!("[[APP_NAME]]", project_name)
         deliver.gsub!("[[APPLE_ID]]", app.apple_id.to_s)
-        deliver.gsub!("[[EMAIL]]", PasswordManager.shared_manager.username)
+        deliver.gsub!("[[EMAIL]]", CredentialsManager::PasswordManager.shared_manager.username)
 
         return deliver
       end

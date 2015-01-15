@@ -1,15 +1,9 @@
-require 'snapshot'
-
 module Deliver
   # This class takes care of verifying all inputs and triggering the upload process
   class DeliverProcess
 
     # DeliverUnitTestsError is triggered, when the unit tests of the given block failed.
     class DeliverUnitTestsError < StandardError
-    end
-
-    # DeliverUnitTestsError is triggered, when the unit tests of the given block failed.
-    class DeliverUIAutomationError < StandardError
     end
 
     # @return (Deliver::App) The App that is currently being edited.
@@ -21,6 +15,9 @@ module Deliver
     # @return (Hash) All the updated/new information we got from the Deliverfile.
     #  is used to store the deploy information until the Deliverfile finished running.
     attr_accessor :deploy_information
+
+    # @return (String): The app identifier of the currently used app (e.g. com.krausefx.app)
+    attr_accessor :app_identifier
 
     def initialize(deploy_information = nil)
       @deploy_information = deploy_information || {}
@@ -49,7 +46,7 @@ module Deliver
         trigger_ipa_upload
 
         call_success_block
-      rescue Exception => ex
+      rescue => ex
         call_error_block(ex)
       end
     end
@@ -91,6 +88,8 @@ module Deliver
         raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
       end
 
+      ENV["DELIVER_IPA_PATH"] = used_ipa_file
+
       if used_ipa_file
         upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_APP_STORE
         if is_beta_build?
@@ -109,7 +108,12 @@ module Deliver
       end
     end
 
+    def fetch_app_identifier_from_app_file
+      @app_identifier = (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
+    end
+
     def verify_ipa_file
+      fetch_app_identifier_from_app_file unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless @app_identifier
       raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless @app_version
     end
@@ -174,23 +178,12 @@ module Deliver
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
 
-      # Check if there is a Snapfile
-      if File.exists?('./Snapfile') and not screens_path
-
-        Helper.log.info("Found a Snapfile, using it to create new screenshots.".green)
-        begin
-          Snapshot::Runner.new.work
-          Helper.log.info("Looking for screenshots in './screenshots'.".yellow)
-          @app.metadata.set_all_screenshots_from_path('./screenshots')
-        rescue Exception => ex
-          # There were some UI Automation errors
-          raise DeliverUIAutomationError.new(ex)
-        end
-
-      elsif screens_path
-        if File.exists?('./Snapfile')
-          Helper.log.info("Found a Snapfile. Ignoring it. If you want 'deliver' to automatically take new screenshots for you, remove 'screenshots_path' from your 'Deliverfile'.".yellow)
-        end
+      if (ENV["DELIVER_SCREENSHOTS_PATH"] || '').length > 0
+        Helper.log.warn "Overwriting screenshots path from config (#{screens_path}) with (#{ENV["DELIVER_SCREENSHOTS_PATH"]})".yellow
+        screens_path = ENV["DELIVER_SCREENSHOTS_PATH"]
+      end
+      
+      if screens_path
         # Not using Snapfile. Not a good user.
         if not @app.metadata.set_all_screenshots_from_path(screens_path)
           # This path does not contain folders for each language

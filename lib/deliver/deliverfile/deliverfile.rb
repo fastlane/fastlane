@@ -19,7 +19,7 @@ module Deliver
       #  filename itself.
       def initialize(deliver_data, path = nil)
         path ||= "./#{FILE_NAME}"
-        raise "#{FILE_NAME} not found at path '#{path}'".red unless File.exists?(path.to_s)
+        raise "#{FILE_NAME} not found at path '#{File.expand_path(path)}'".red unless File.exists?(path.to_s)
 
         self.path = path
         @deliver_data = deliver_data

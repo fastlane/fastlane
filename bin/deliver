@@ -4,23 +4,19 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'deliver'
 require 'commander/import'
-require 'deliver/update_checker'
 
 HighLine.track_eof = false
 
 
 # Commander
 program :version, Deliver::VERSION
-program :description, 'CLI for \'Deliver\' - Automate uploading of app metadata, screenshots and app updates to Apple'
+program :description, 'CLI for \'Deliver\' - Upload screenshots, metadata and your app to the App Store using a single command'
 program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
-program :help, 'Website', 'http://krausefx.com'
+program :help, 'Website', 'http://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/deliver'
 program :help_formatter, :compact
 
 global_option('--verbose') { $verbose = true }
-
-
-Deliver::UpdateChecker.verify_latest_version
 
 
 default_command :run

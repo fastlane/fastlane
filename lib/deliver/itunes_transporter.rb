@@ -1,6 +1,6 @@
 require 'pty'
 require 'shellwords'
-require 'deliver/password_manager'
+require 'credentials_manager/password_manager'
 
 
 module Deliver
@@ -27,10 +27,10 @@ module Deliver
 
     # Returns a new instance of the iTunesTransporter.
     # If no username or password given, it will be taken from
-    # the #{Deliver::PasswordManager}
+    # the #{CredentialsManager::PasswordManager}
     def initialize(user = nil, password = nil)
-      @user = (user || PasswordManager.shared_manager.username)
-      @password = (password || PasswordManager.shared_manager.password)
+      @user = (user || CredentialsManager::PasswordManager.shared_manager.username)
+      @password = (password || CredentialsManager::PasswordManager.shared_manager.password)
     end
 
     # Downloads the latest version of the app metadata package from iTC.
@@ -105,7 +105,7 @@ module Deliver
               parse_line(line) # this is where the parsing happens
             end
           end
-        rescue Exception => ex
+        rescue => ex
           Helper.log.fatal(ex.to_s)
           @errors << ex.to_s
         end
@@ -116,6 +116,7 @@ module Deliver
 
         if @errors.count > 0
           Helper.log.error(@errors.join("\n"))
+          return false
         end
 
         true
@@ -133,7 +134,7 @@ module Deliver
           if $1.include?"Your Apple ID or password was entered incorrectly" or
              $1.include?"This Apple ID has been locked for security reasons"
 
-            Deliver::PasswordManager.shared_manager.password_seems_wrong
+            CredentialsManager::PasswordManager.shared_manager.password_seems_wrong unless Helper.is_test?
           elsif $1.include?"Redundant Binary Upload. There already exists a binary upload with build"
             Helper.log.fatal $1
             Helper.log.fatal "You have to change the build number of your app to upload your ipa file"

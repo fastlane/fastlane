@@ -2,6 +2,12 @@
 require "codeclimate-test-reporter"
 CodeClimate::TestReporter.start
 
+# This module is only used to check the environment is currently a testing env
+# Needs to be above the `require 'deliver'`
+module SpecHelper
+  
+end
+
 require 'deliver'
 require 'webmock/rspec'
 
@@ -12,11 +18,6 @@ require 'mocking/transporter_mocking'
 
 ENV["DELIVER_USER"] = "DELIVERUSER"
 ENV["DELIVER_PASSWORD"] = "DELIVERPASS"
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
-  
-end
 
 
 module OS

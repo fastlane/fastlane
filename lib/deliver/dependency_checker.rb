@@ -1,6 +1,7 @@
 module Deliver
   class DependencyChecker
     def self.check_dependencies
+      return if Helper.is_test?
       self.check_phantom_js
       self.check_xcode_select
     end

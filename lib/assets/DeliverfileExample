@@ -7,17 +7,11 @@
 # 
 # Everything next to a # is a comment and will be ignored
 
-email "yourappleid@company.com"
 # hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
 
 ########################################
 # App Metadata
 ########################################
-
-
-
-# The app identifier is required
-app_identifier "[Your App Identifier, e.g. at.felixkrause.app_name]"
 
 
 # This folder has to include one folder for each language
@@ -52,21 +46,22 @@ ipa do
     # Attention: When you return a valid ipa file, this file will get uploaded and released
     # If you only want to upload app metadata, remove the complete ipa block.
 
-    # system("ipa build") # build your project using Shenzhen
+    # system("ipa build --verbose") # build your project using Shenzhen
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 
 # ipa "./latest.ipa" # this can be used instead of the `do` block, if you prefer manually building the ipa file
 
 # beta_ipa do
-    # system("ipa build") # customize this to build beta version
+    # system("ipa build --verbose") # customize this to build beta version
     # "./ad_hoc_build.ipa" # upload ipa file using `deliver --beta`
 # end
 
 # unit_tests do
+#   If you use fastlane (http://github.com/krausefx/fastlane), run the tests there
 #   system("xctool test")
 # end
 
 success do
-  system("say 'Successfully deployed a new version.'")
+  # system("say 'Successfully deployed a new version.'")
 end
