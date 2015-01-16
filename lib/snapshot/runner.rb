@@ -64,24 +64,37 @@ module Snapshot
 
       lines = []
       errors = []
-      PTY.spawn(command) do |stdin, stdout, pid|
-        stdin.each do |line|
-          lines << line
-          begin
-            result = parse_test_line(line)
+      PTY.spawn(command) do |stdout, stdin, pid|
 
-            case result
-              when :retry
-                retry_run = true
-              when :screenshot
-                Helper.log.info "Successfully took screenshot 📱"
-              end
+        # Waits for process so that we can see if anything has failed
+        begin
+          stdout.sync
+
+          stdout.each do |line|
+            lines << line
+            begin
+              result = parse_test_line(line)
+              case result
+                when :retry
+                  retry_run = true
+                when :screenshot
+                  Helper.log.info "Successfully took screenshot 📱"
+                when :need_permission
+                  raise "Looks like you may need to grant permission for Instruments to analyze other processes.\nPlease run this command: \"#{command}\""
+                end
             rescue Exception => ex
               Helper.log.error lines.join('')
               Helper.log.error ex.to_s.red
               errors << ex.to_s
             end
+          end
+
+        rescue Errno::EIO => e
+          # We could maybe do something like this
+        ensure
+          ::Process.wait pid
         end
+
       end
 
       if retry_run
@@ -98,6 +111,8 @@ module Snapshot
         return :retry
       elsif line.include?"Screenshot captured"
         return :screenshot
+      elsif line.include? "Instruments wants permission to analyze other processes"
+        return :need_permission
       elsif line =~ /.*Error: (.*)/
         raise "UIAutomation Error: #{$1}"
       elsif line =~ /Instruments Usage Error :(.*)/

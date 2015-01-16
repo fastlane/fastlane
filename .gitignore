@@ -8,6 +8,11 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+screenshots/
+.DS_STORE
+
+## Xcode:
+*.xcuserdatad/
 
 ## Specific to RubyMotion:
 .dat*
