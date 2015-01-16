@@ -49,7 +49,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Features
 
 Put a gorgeous device frame around your iOS screenshots just by running one simple command. Support for:
-- iPhone 6 Plus, iPhone 6, iPhone 5s and iPad Air
+- iPhone 6 Plus, iPhone 6, iPhone 5s and iPad Mini
 - Portrait and Landscape
 - Black and Silver devices
 
