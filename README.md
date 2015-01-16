@@ -402,7 +402,7 @@ actions_path '../custom_actions_folder/'
 ```
 
 # Credentials
-A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 
 # Need help?
 - If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
