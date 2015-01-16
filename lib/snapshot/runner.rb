@@ -80,7 +80,7 @@ module Snapshot
                 when :screenshot
                   Helper.log.info "Successfully took screenshot 📱"
                 when :need_permission
-                  raise "Looks like you may need to grant permission for Instruments to analyze other processes.\nPlease run this command: \"#{command}\""
+                  raise "Looks like you may need to grant permission for Instruments to analyze other processes.\nPlease Ctrc + C and run this command: \"#{command}\""
                 end
             rescue Exception => ex
               Helper.log.error lines.join('')
