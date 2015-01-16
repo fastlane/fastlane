@@ -22,11 +22,15 @@ module Fastlane
         require 'shenzhen/plugins/hockeyapp'
 
         raise "No API Token for Hockey given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
-        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless File.exists?(options[:ipa])
+        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
+        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exists?(options[:ipa])
 
         Helper.log.info "Starting with ipa upload to HockeyApp... this could take some time.".green
         
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
+
+        return if Helper.is_test?
+
         response = client.upload_build(options[:ipa], options)
         case response.status
           when 200...300
