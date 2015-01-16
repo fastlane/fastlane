@@ -82,11 +82,11 @@ module Snapshot
                 when :need_permission
                   raise "Looks like you may need to grant permission for Instruments to analyze other processes.\nPlease run this command: \"#{command}\""
                 end
-              rescue Exception => ex
-                Helper.log.error lines.join('')
-                Helper.log.error ex.to_s.red
-                errors << ex.to_s
-              end
+            rescue Exception => ex
+              Helper.log.error lines.join('')
+              Helper.log.error ex.to_s.red
+              errors << ex.to_s
+            end
           end
 
         rescue Errno::EIO => e
