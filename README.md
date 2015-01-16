@@ -247,6 +247,8 @@ end
 # Extensions
 Why only use the default actions? Create your own to extend the functionality of `fastlane`.
 
+The build step you create will behave exactly like the built in actions.
+
 Just run `fastlane new_action`. Then enter the name of the action and edit the generated Ruby file in `fastlane/actions/[action_name].rb`.
 
 From then on, you can just start using your action in your `Fastfile`.
