@@ -3,13 +3,13 @@ describe Fastlane do
     describe "#initialize" do
       it "raises an error if file does not exist" do
         expect {
-          Fastlane::FastFile.new('./spec/fixtures/Fastfiles/FastfileNotHere')
-        }.to raise_exception "Could not find Fastfile at path './spec/fixtures/Fastfiles/FastfileNotHere'".red
+          Fastlane::FastFile.new('./spec/fixtures/fastfiles/fastfileNotHere')
+        }.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/FastfileNotHere'".red
       end
 
       it "raises an error if unknow method is called" do
         expect {
-          Fastlane::FastFile.new('./spec/fixtures/Fastfiles/FastfileInvalid')
+          Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
         }.to raise_exception "Could not find method 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
     end
@@ -19,7 +19,7 @@ describe Fastlane do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
 
-        ff = Fastlane::FastFile.new('./spec/fixtures/Fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
         expect(File.exists?('/tmp/fastlane/before_all')).to eq(true)
         expect(File.exists?('/tmp/fastlane/deploy')).to eq(true)
@@ -32,7 +32,7 @@ describe Fastlane do
       end
 
       it "raises an error if lane is not available" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/Fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         expect {
           ff.runner.execute(:not_here)
         }.to raise_exception("Could not find lane for type 'not_here'. Available lanes: test, deploy, error_causing_lane".red)
@@ -50,7 +50,7 @@ describe Fastlane do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
 
-        ff = Fastlane::FastFile.new('./spec/fixtures/Fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         expect {
           ff.runner.execute(:error_causing_lane)
         }.to raise_exception("divided by 0")

@@ -20,7 +20,7 @@ module Fastlane
             command = "agvtool next-version -all"
           end
 
-          Actions.sh command
+          Actions.sh command unless Helper.is_test?
 
           # Store the new number in the shared hash
           build_number = `agvtool what-version`.split("\n").last.to_i
