@@ -45,6 +45,7 @@ module Deliver
         rescue
           unless Helper.is_test?
             Helper.log.info "Could not find Apple ID based on the app identifier in the US App Store. Maybe the app is not yet in the store?".yellow
+            Helper.log.info "You can provde the Apple ID of your app using `apple_id '974739333'` in your `Deliverfile`".green
 
             while ((self.apple_id || '').to_s.length == 0) || ((self.apple_id || 0).to_i == 0)
               self.apple_id = ask("\nApple ID of your app (e.g. 284882215): ")
