@@ -8,7 +8,7 @@ PATH
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
-      mini_magick (~> 3.8.1)
+      mini_magick (~> 4.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -52,8 +52,7 @@ GEM
     json (1.8.2)
     method_source (0.8.2)
     mime-types (2.4.3)
-    mini_magick (3.8.1)
-      subexec (~> 0.2.1)
+    mini_magick (4.0.2)
     mini_portile (0.6.2)
     multi_json (1.10.1)
     nokogiri (1.6.5)
@@ -96,7 +95,6 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    subexec (0.2.3)
     ttfunk (1.4.0)
     websocket-driver (0.5.1)
       websocket-extensions (>= 0.1.0)
