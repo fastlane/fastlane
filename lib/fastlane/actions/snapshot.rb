@@ -6,8 +6,6 @@ module Fastlane
 
     class SnapshotAction
       def self.run(params)
-        require 'snapshot'
-
         clean = true
         clean = false if params.first == :noclean
 
@@ -15,6 +13,8 @@ module Fastlane
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
           return clean 
         end
+
+        require 'snapshot'
 
         Dir.chdir(FastlaneFolder.path) do
           Snapshot::SnapshotConfig.shared_instance
