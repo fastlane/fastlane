@@ -15,9 +15,10 @@ module Fastlane
             generate_app_metadata
             detect_installed_tools # after copying the existing files
             ask_to_enable_other_tools
+            FileUtils.mkdir(File.join(folder, "actions"))
             generate_fastfile
             Helper.log.info "Successfully finished setting up fastlane".green
-          rescue => ex
+          rescue Exception => ex # this will also be caused by Ctrl + C
             # Something went wrong with the setup, clear the folder again
             # and restore previous files
             Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
@@ -32,7 +33,6 @@ module Fastlane
       Helper.log.info "This setup will help you get up and running in no time.".green
       Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
       Helper.log.info "into the subfolder `fastlane`.\n".green
-      Helper.log.info "This means, your build script might need to be adapted after this change.".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
@@ -53,7 +53,9 @@ module Fastlane
     end
 
     def generate_app_metadata
-      app_identifier = ask("App Identifier (at.felixkrause.app): ".yellow)
+      Helper.log.info "------------------------------"
+      Helper.log.info "To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.".green
+      app_identifier = ask("App Identifier (com.krausefx.app): ".yellow)
       apple_id = ask("Your Apple ID: ".yellow)
       template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
@@ -80,6 +82,14 @@ module Fastlane
           Deliver::DeliverfileCreator.create(folder)
           @tools[:deliver] = true
         end
+      else
+        # deliver already enabled
+        Helper.log.info "-------------------------------------------------------------------------------------------"
+        Helper.log.info "Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile".yellow
+        Helper.log.info "Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building".yellow
+        Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
+        Helper.log.info "Please read the above carefully and click Enter to confirm.".green
+        STDIN.gets
       end
 
       unless @tools[:snapshot]
@@ -93,6 +103,14 @@ module Fastlane
         end
       end
 
+      if @tools[:snapshot] and @tools[:deliver]
+        # Deliver is already installed
+        Helper.log.info "The 'screenshots' folder inside the 'deliver' folder will not be used.".yellow
+        Helper.log.info "Instead the 'screenshots' folder inside the 'fastlane' folder will be used.".yellow
+        Helper.log.info "Click Enter to confirm".green
+        STDIN.gets
+      end
+
       if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
         @tools[:sigh] = true
       end
@@ -104,8 +122,8 @@ module Fastlane
       template.gsub!('deliver', '# deliver') unless @tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
-      template.gsub!('sh "xctool', '# sh "xctool') unless @tools[:xctool]
-      template.gsub!('install_cocoapods', '# install_cocoapods') unless @tools[:cocoapods]
+      template.gsub!('xctool', '# xctool') unless @tools[:xctool]
+      template.gsub!('cocoapods', '# cocoapods') unless @tools[:cocoapods]
 
       @tools.each do |key, value|
         Helper.log.info "'#{key}' enabled.".magenta if value

@@ -1,23 +1,30 @@
 module Fastlane
   module Actions
-    def self.snapshot(params)
-      execute_action("snapshot") do
+    module SharedValues
+      SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
+    end
+
+    class SnapshotAction
+      def self.run(params)
         require 'snapshot'
-        
-        ENV['SNAPSHOT_SCREENSHOTS_PATH'] = self.snapshot_screenshots_folder
 
         clean = true
         clean = false if params.first == :noclean
 
-        return clean if Helper.is_test?
+        if Helper.is_test?
+          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
+          return clean 
+        end
 
-        Snapshot::SnapshotConfig.shared_instance
-        Snapshot::Runner.new.work(clean: clean)
+        Dir.chdir(FastlaneFolder.path) do
+          Snapshot::SnapshotConfig.shared_instance
+          Snapshot::Runner.new.work(clean: clean)
+
+          results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+
+          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
+        end
       end
-    end
-
-    def self.snapshot_screenshots_folder
-      './screenshots'
     end
   end
 end

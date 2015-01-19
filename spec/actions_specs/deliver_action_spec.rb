@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Deliver Integration" do
-      let (:test_path) { "/tmp/fastlane/tests" }
+      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
       let (:app_identifier) { "net.sunapps.54" }
       let (:apple_id) { "krausefx@gmail.com" }
 
@@ -15,6 +15,9 @@ describe Fastlane do
       end
 
       it "works with default setting" do
+        test_val = "test_val"
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
+
         Dir.chdir(test_path) do
           expect {
             
@@ -24,7 +27,7 @@ describe Fastlane do
 
           }.to raise_error('You have to pass a valid version number using the Deliver file. (e.g. \'version "1.0"\')'.red)
 
-          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq("./screenshots")
+          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
         end
       end
 

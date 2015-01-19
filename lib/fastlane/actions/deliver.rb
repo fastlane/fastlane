@@ -1,21 +1,28 @@
 module Fastlane
   module Actions
-    def self.deliver(params)
+    module SharedValues
+      DELIVER_IPA_PATH = :DELIVER_IPA_PATH
+    end
 
-      execute_action("deliver") do
+    class DeliverAction
+      def self.run(params)
         require 'deliver'
         
-        ENV["DELIVER_SCREENSHOTS_PATH"] = self.snapshot_screenshots_folder
+        ENV["DELIVER_SCREENSHOTS_PATH"] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
         
         force = params.include?(:force)
         beta = params.include?(:beta)
         skip_deploy = params.include?(:skip_deploy)
 
-        Deliver::Deliverer.new(Deliver::Deliverfile::Deliverfile::FILE_NAME, force: force, 
-                                                                       is_beta_ipa: beta, 
-                                                                       skip_deploy: skip_deploy)
-      end
+        Dir.chdir(FastlaneFolder.path || Dir.pwd) do
+          # This should be executed in the fastlane folder
+          Deliver::Deliverer.new(nil, force: force, 
+                                is_beta_ipa: beta, 
+                                skip_deploy: skip_deploy)
 
+          ENV[Actions::SharedValues::DELIVER_IPA_PATH.to_s] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
+        end
+      end
     end
   end
 end

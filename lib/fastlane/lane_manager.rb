@@ -15,6 +15,10 @@ module Fastlane
           ff.runner.execute(key)
         end
       rescue => ex
+        if Actions.lane_context.count > 0
+          Helper.log.info "Variable Dump:".yellow
+          Helper.log.info Actions.lane_context
+        end
         Helper.log.fatal ex
         e = ex
       end

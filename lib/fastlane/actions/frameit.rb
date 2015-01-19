@@ -1,19 +1,23 @@
 module Fastlane
   module Actions
-    def self.frameit(params)
+    module SharedValues
       
-      execute_action("frameit") do
+    end
+
+    class FrameitAction
+      def self.run(params)
         require 'frameit'
 
         color = Frameit::Editor::Color::BLACK
         color = Frameit::Editor::Color::SILVER if [:silver, :white].include?params.first
 
-        screenshots_folder = File.join(Fastlane::FastlaneFolder::path, self.snapshot_screenshots_folder)
+        screenshots_folder = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
+        screenshots_folder ||= FastlaneFolder.path
+
         Dir.chdir(screenshots_folder) do
           Frameit::Editor.new.run('.', color)
         end
       end
-
     end
   end
 end

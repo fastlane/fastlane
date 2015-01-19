@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = %q{Continuous Deployment for iOS}
-  spec.description   = %q{Continuous Deployment for iOS}
+  spec.summary       = %q{Connect all iOS deployment tools into one streamlined workflow}
+  spec.description   = %q{Connect all iOS deployment tools into one streamlined workflow}
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
+  spec.add_dependency 'shenzhen', '~> 0.10.3' # to upload to Hockey
 
   spec.add_dependency 'credentials_manager'
   spec.add_dependency 'deliver', '>= 0.5.0'

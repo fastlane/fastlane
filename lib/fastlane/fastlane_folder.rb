@@ -5,8 +5,8 @@ module Fastlane
     def self.path
       return "./#{FOLDER_NAME}/" if File.directory?"./#{FOLDER_NAME}/"
       return "./.#{FOLDER_NAME}/" if File.directory?"./.#{FOLDER_NAME}/" # hidden folder
-      return "./" if File.directory?"../#{FOLDER_NAME}/" # inside the folder
-      return "./" if File.directory?"../.#{FOLDER_NAME}/" # inside the folder and hidden
+      return "./" if File.basename(Dir.getwd) == FOLDER_NAME and File.exists?"Fastfile" # inside the folder
+      return "./" if File.basename(Dir.getwd) == FOLDER_NAME and File.exists?"Fastfile" # inside the folder and hidden
       return nil
     end
 

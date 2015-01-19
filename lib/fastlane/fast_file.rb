@@ -15,7 +15,6 @@ module Fastlane
 
     def parse(data)
       @runner = Runner.new
-      load_actions
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         eval(data) # this is okay in this case
@@ -36,30 +35,55 @@ module Fastlane
       @runner.set_after_all(block)
     end
 
+    def error(&block)
+      @runner.set_error(block)
+    end
+
+    # Speak out loud
     def say(value)
+      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
-      Fastlane::Actions.method('say').call([value])
+      Actions.execute_action('say') do
+        Fastlane::Actions::SayAction.run([value])  
+      end
+    end
+
+    def actions_path(path)
+      raise "Path '#{path}' not found!".red unless File.directory?path
+
+      Actions.load_external_actions(path)
+    end
+
+    # Execute shell command
+    def sh(command)
+      Actions.execute_action(command) do
+        Actions.sh_no_action(command)
+      end
     end
 
     def method_missing(method_sym, *arguments, &block)
       # First, check if there is a predefined method in the actions folder
-      if Fastlane::Actions.respond_to?(method_sym)
-        Helper.log.info "Step: #{method_sym.to_s}".green
-        
-        Fastlane::Actions.method(method_sym).call(arguments)
-      else
-        # Method not found
-        raise "Could not find method '#{method_sym}'. Use `lane :name do ... end`".red
-      end
-    end
 
-    private
-      def load_actions
-        Dir.chdir(File.dirname(__FILE__)) do
-          Dir[File.expand_path 'actions/*.rb', File.dirname(__FILE__)].each do |file|
-            require file
+      class_name = method_sym.to_s.classify + "Action"
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError => ex
+        # Action not found
+        raise "Could not find method '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+      end
+
+      if class_ref and class_ref.respond_to?(:run)
+        Helper.log.info "Step: #{method_sym.to_s}".green
+
+        Dir.chdir("..") do # go up from the fastlane folder, to the project folder
+          Actions.execute_action(method_sym) do
+            class_ref.run(arguments)
           end
         end
+      else
+        raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
       end
+    end
   end
 end
