@@ -20,16 +20,18 @@ module Fastlane
             command = "agvtool next-version -all"
           end
 
-          Actions.sh command unless Helper.is_test?
-
-          # Store the new number in the shared hash
-          build_number = `agvtool what-version`.split("\n").last.to_i
-
           if Helper.is_test?
             build_number = command
-          end
+          else
 
-          Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+            Actions.sh command
+
+            # Store the new number in the shared hash
+            build_number = `agvtool what-version`.split("\n").last.to_i
+
+            Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+            
+          end
         rescue => ex
           Helper.log.error "Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html".yellow
           raise ex

@@ -4,7 +4,7 @@ describe Fastlane do
       it "raises an error if file does not exist" do
         expect {
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/fastfileNotHere')
-        }.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/FastfileNotHere'".red
+        }.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'".red
       end
 
       it "raises an error if unknow method is called" do
