@@ -6,3 +6,6 @@ rvm:
 notifications:
   email:
     - fastlane@krausefx.com
+addons:
+    code_climate:
+        repo_token: 262bfc07c9d6b60a1010d751bd154790c043a05bb8115c1ba992eeb1d2af1044
