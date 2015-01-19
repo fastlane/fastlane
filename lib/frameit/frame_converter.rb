@@ -54,6 +54,10 @@ module Frameit
 
     # Converts all the PSD files to trimmed PNG files
     def convert_frames
+      MiniMagick.configure do |config|
+        config.validate_on_create = false
+      end
+
       Dir["#{templates_path}/**/*.psd"].each do |psd|
         resulting_path = psd.gsub('.psd', '.png')
         unless File.exists?resulting_path
