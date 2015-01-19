@@ -6,6 +6,8 @@ module Fastlane
 
     class FrameitAction
       def self.run(params)
+        return if Helper.is_test?
+        
         require 'frameit'
 
         color = Frameit::Editor::Color::BLACK
