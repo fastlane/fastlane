@@ -8,10 +8,6 @@
 # App Metadata
 ########################################
 
-# The app identifier is required
-app_identifier "[[APP_IDENTIFIER]]"
-apple_id "[[APPLE_ID]]"
-
 
 # This folder has to include one folder for each language
 # More information about automatic screenshot upload: 
@@ -22,7 +18,6 @@ screenshots_path "./deliver/screenshots/"
 # version '1.2' # you can pass this if you want to verify the version number with the ipa file
 
 config_json_folder './deliver'
-
 
 ########################################
 # Building and Testing
