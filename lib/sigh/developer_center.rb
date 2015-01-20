@@ -428,13 +428,13 @@ module Sigh
         while !success.call(result)     
           sleep 0.2
 
-        result = method.call(parameter)
+          result = method.call(parameter)
 
           counter += 1
           if counter > 100
             Helper.log.debug page.html
             Helper.log.debug caller
-            raise DeveloperCenterGeneralError.new("Couldn't find '#{name}' after waiting for quite some time")
+            raise DeveloperCenterGeneralError.new("Couldn't find '#{parameter}' after waiting for quite some time")
           end
         end
         return result
