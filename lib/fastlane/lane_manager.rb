@@ -29,7 +29,11 @@ module Fastlane
       duration = ((Time.now - start) / 60.0).round
 
       unless e
-        Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
+        if duration > 5
+          Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
+        else
+          Helper.log.info "fastlane.tools finished successfully 🎉".green
+        end
       else
         Helper.log.fatal "fastlane finished with errors".red
         raise e
