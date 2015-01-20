@@ -128,7 +128,7 @@ In case you prefer environment variables:
 
 
 ## How is my password stored?
-```sigh``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
+```sigh``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
 
 # Tips
 ## [`fastlane`](http://fastlane.tools) Toolchain
