@@ -121,6 +121,7 @@ In case you prefer environment variables:
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
 - ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
+- `SIGH_DISABLE_OPEN_ERROR` - in case of error, `sigh` won't open Preview with a screenshot of the error when this variable is set.
 
 # How does it work?
 
