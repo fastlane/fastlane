@@ -41,6 +41,8 @@ module Deliver
     def initialize
       super
 
+      return if Helper.is_test?
+
       DependencyChecker.check_dependencies
       
       Capybara.run_server = false
