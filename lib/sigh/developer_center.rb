@@ -419,7 +419,7 @@ module Sigh
       def snap
         path = "Error#{Time.now.to_i}.png"
         save_screenshot(path, :full => true)
-        system("open '#{path}'")
+        system("open '#{path}'") unless ENV['SIGH_DISABLE_OPEN_ERROR']
       end
 
       def wait_for(method, parameter, success)
