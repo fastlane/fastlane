@@ -9,12 +9,12 @@ module Produce
     def initialize
       Helper.log.info "Loaded config".green
       @config = {
-        :bundle_identifier => 'tools.fastlane.automatic2',
-        :app_name => 'Created by Fastlane2',
-        :primary_language => 'de-DE',
+        :bundle_identifier => 'tools.fastlane.automatic',
+        :app_name => 'Created by Fastlane',
+        :primary_language => 'German',
         :version => '0.1',
-        :SKU => 13,
-        :pricing => nil,
+        :sku => 1343,
+        :pricing_tier => 0,
         :rating => nil,
         :app_review => {
 

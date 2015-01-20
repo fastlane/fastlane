@@ -1,7 +1,6 @@
 require 'credentials_manager/password_manager'
 require 'open-uri'
 require 'openssl'
-require 'pry'
 
 require 'capybara'
 require 'capybara/poltergeist'
@@ -193,10 +192,6 @@ module Produce
         end
 
         false
-      end
-
-      def post_ajax(url)
-        JSON.parse(page.evaluate_script("$.ajax({type: 'POST', url: '#{url}', async: false})")['responseText'])
       end
 
       def click_next

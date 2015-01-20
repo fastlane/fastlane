@@ -5,6 +5,7 @@ require 'produce/config'
 require 'produce/manager'
 require 'produce/dependency_checker'
 require 'produce/developer_center'
+require 'produce/itunes_connect'
 require 'produce/update_checker'
 
 # Third Party code
