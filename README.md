@@ -109,7 +109,7 @@ There are 2 actions involved:
 
 
 ## How is my password stored?
-```PEM``` uses the password manager from [```Deliver```](https://github.com/KrauseFx/deliver#can-i-trust-deliver). Take a look the [Deliver README](https://github.com/KrauseFx/deliver#can-i-trust-deliver) for more information.
+```PEM``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
 
 # Tips
 
