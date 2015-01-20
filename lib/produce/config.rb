@@ -7,19 +7,30 @@ module Produce
     end
 
     def initialize
-      Helper.log.info "Loaded config".green
       @config = {
-        :bundle_identifier => 'tools.fastlane.automatic',
-        :app_name => 'Created by Fastlane',
-        :primary_language => 'German',
-        :version => '0.1',
-        :sku => 1343,
-        :pricing_tier => 0,
-        :rating => nil,
-        :app_review => {
-
-        }
+        :bundle_identifier => ENV['PRODUCE_APP_IDENTIFIER'],
+        :app_name => ENV['PRODUCE_APP_NAME'],
+        :primary_language => ENV['PRODUCE_LANGUAGE'],
+        :version => ENV['PRODUCE_VERSION'],
+        :sku => ENV['PRODUCE_SKU']
       }
+
+      @config[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      @config[:bundle_identifier] ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
+      @config[:app_name] ||= ask("App Name: ")
+      
+      while @config[:primary_language].to_s.length == 0
+        input = ask("Primary Language (e.g. 'English', 'German'): ")
+        input = input.split.map(&:capitalize).join(' ')
+        if not AvailableDefaultLanguages.all_langauges.include?(input)
+          Helper.log.error "Could not find langauge #{input} - available languages: #{AvailableDefaultLanguages.all_langauges}"
+        else
+          @config[:primary_language] = input
+        end
+      end
+
+      @config[:version] ||= ask("Initial version number (e.g. '1.0'): ")
+      @config[:sku] ||= ask("SKU Number (e.g. '1234'): ")
     end
 
     def self.val(key)
