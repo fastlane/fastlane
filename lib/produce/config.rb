@@ -24,7 +24,6 @@ module Produce
 
     def self.val(key)
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of?Symbol
-      puts self.shared_config.config
       self.shared_config.config[key]
     end
   end
