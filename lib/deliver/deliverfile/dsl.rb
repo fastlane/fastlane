@@ -18,12 +18,15 @@ module Deliver
         # Setting all the metadata
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
-          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, :submit_further_information]
+          not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, 
+                            :submit_further_information, :copyright, :category_primary, :category_secondary,
+                            :automatic_release, :app_review_information]
 
           if allowed.include?(method_sym)
-            value = arguments.first || block.call
+            value = arguments.first
+            value = block.call if (value == nil and block != nil)
 
-            unless value
+            if value == nil
               Helper.log.error(caller)
               Helper.log.fatal("No value or block passed to method '#{method_sym}'")
               raise DeliverfileDSLError.new(MISSING_VALUE_ERROR_MESSAGE.red)

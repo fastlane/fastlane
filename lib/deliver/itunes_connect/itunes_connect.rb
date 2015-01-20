@@ -9,6 +9,7 @@ require 'deliver/itunes_connect/itunes_connect_reader'
 require 'deliver/itunes_connect/itunes_connect_helper'
 require 'deliver/itunes_connect/itunes_connect_new_version'
 require 'deliver/itunes_connect/itunes_connect_login'
+require 'deliver/itunes_connect/itunes_connect_additional'
 
 module Deliver
   # Everything that can't be achived using the {Deliver::ItunesTransporter}

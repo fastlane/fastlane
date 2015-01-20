@@ -42,6 +42,8 @@ module Deliver
 
         verify_pdf_file
 
+        additional_itc_information # e.g. copyright, age rating
+
         trigger_metadata_upload
         trigger_ipa_upload
 
@@ -224,6 +226,14 @@ module Deliver
     def trigger_metadata_upload
       result = @app.metadata.upload!
       raise "Error uploading app metadata".red unless result == true
+    end
+
+    def additional_itc_information
+      # e.g. rating or copyright
+      itc = ItunesConnect.new
+      itc.set_copyright!(@app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
+      itc.set_app_review_information!(@app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
+      itc.set_release_after_approval!(@app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]
     end
 
     def trigger_ipa_upload
