@@ -19,7 +19,7 @@ module Deliver
         def method_missing(method_sym, *arguments, &block)
           allowed = Deliver::Deliverer.all_available_keys_to_set
           not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, 
-                            :submit_further_information, :copyright, :category_primary, :category_secondary,
+                            :submit_further_information, :copyright, :primary_category, :secondary_category,
                             :automatic_release, :app_review_information]
 
           if allowed.include?(method_sym)

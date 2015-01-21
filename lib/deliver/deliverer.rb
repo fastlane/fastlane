@@ -35,8 +35,8 @@ module Deliver
       SUBMIT_FURTHER_INFORMATION = :submit_further_information # export compliance, content rights and advertising identifier
       
       COPYRIGHT = :copyright
-      CATEGORY_PRIMARY = :category_primary
-      CATEGORY_SECONDARY = :category_secondary
+      PRIMARY_CATEGORY = :primary_category
+      SECONDARY_CATEGORY = :secondary_category
       
       AUTOMATIC_RELEASE = :automatic_release # should the update go live after approval
 

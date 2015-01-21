@@ -16,7 +16,7 @@ module Deliver
           visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
 
           wait_for_elements('.page-subnav')
-          sleep 3
+          sleep 5
 
           if current_url.include?"wa/defaultError" # app could not be found
             raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{CredentialsManager::PasswordManager.shared_manager.username}).".red
