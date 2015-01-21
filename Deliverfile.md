@@ -37,7 +37,7 @@ These URLs are shown in the AppStore
 An array of keywords
 ```ruby
 keywords({
-  "de" => ["Keyword1", "Keyword2"]
+  "en-US" => ["Keyword1", "Keyword2"]
 })
 ```
 
