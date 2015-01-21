@@ -177,7 +177,7 @@ end
 ```
 
 
-#### Set a default language if you are lucky enough to only maintain one language
+#### Set a default language if you only maintain one language
 ```ruby
 default_language "en-US"
 version "1.2"
