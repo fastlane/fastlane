@@ -117,8 +117,6 @@ module Produce
 
         initial_create
 
-        set_pricing
-
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
 
         Helper.log.info "Finished creating new app '#{Config.val(:app_name)}' on iTunes Connect".green
@@ -148,21 +146,6 @@ module Produce
       wait_for_elements(".language.hasPopOver") # looking good
 
       Helper.log.info "Successfully created new app '#{Config.val(:app_name)}' on iTC. Setting up the initial information now.".green
-    end
-
-    def set_pricing
-      tier = Config.val(:pricing_tier)
-      raise "Invalid tier '#{tier}' given, must be 0 to 94".red unless (tier.to_i >= 0 and tier.to_i <= 94)
-
-      click_on "Pricing"
-      wait_for_elements("#pricingPopup > option[value='#{tier}']").first.select_option
-      wait_for_elements(".saveChangesActionButton").last.click # Save
-
-      raise "Something went wrong when storing the pricing information".red unless wait_for_elements(".completed-icon").count == 1
-      Helper.log.info "Successfully set the pricing to #{tier} Tier".green
-
-      wait_for_elements(".cancelActionButton").last.click
-      sleep 5 # this usually takes some time
     end
 
     private

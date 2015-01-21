@@ -12,8 +12,7 @@ module Produce
         :app_name => ENV['PRODUCE_APP_NAME'],
         :primary_language => ENV['PRODUCE_LANGUAGE'],
         :version => ENV['PRODUCE_VERSION'],
-        :sku => ENV['PRODUCE_SKU'],
-        :pricing_tier => ENV['PRODUCE_PRICING_TIER']
+        :sku => ENV['PRODUCE_SKU']
       }
 
       @config[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
@@ -32,7 +31,6 @@ module Produce
 
       @config[:version] ||= ask("Initial version number (e.g. '1.0'): ")
       @config[:sku] ||= ask("SKU Number (e.g. '1234'): ")
-      @config[:pricing_tier] ||= ask("Pricing Tier ('0' for free): ")
     end
 
     def self.val(key)
