@@ -1,0 +1,56 @@
+[
+  {
+    "comment": "Cartoon or Fantasy Violence",
+    "level": 0
+  },
+  {
+    "comment": "Realistic Voilence",
+    "level": 0
+  },
+  {
+    "comment": "Prolonged Graphic or Sadistic Realistic",
+    "level": 0
+  },
+  {
+    "comment": "Profanity or Crude Humor",
+    "level": 0
+  },
+  {
+    "comment": "Mature/Suggestive Themes",
+    "level": 0
+  },
+  {
+    "comment": "Horror/Fear Themes",
+    "level": 0
+  },
+  {
+    "comment": "Medical/Treatment Information",
+    "level": 0
+  },
+  {
+    "comment": "Alcohol, Tobacco, or Drug Use or References",
+    "level": 0
+  },  
+  {
+    "comment": "Simulated Gambling",
+    "level": 0
+  },
+  {
+    "comment": "Sexual Content or Nudity",
+    "level": 0
+  },
+  {
+    "comment": "Graphic Sexual Content and Nudity",
+    "level": 9
+  },
+  {
+    "type": "boolean",
+    "comment": "Unrestricted Web Access",
+    "level": 0
+  },
+  {
+    "type": "boolean",
+    "comment": "Gambling and Contests",
+    "level": 0
+  }
+]
