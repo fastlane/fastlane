@@ -108,7 +108,7 @@ Run ```deliver init``` to create a new ```Deliverfile```. You can either let the
 
 Once you created your configuration, just run ```deliver```.
 
-All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/feature/producer/Deliverfile.md).
+All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md).
 
 Here are a few examples:
 #### Upload screenshots to iTunes Connect
@@ -225,7 +225,7 @@ As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed w
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 
 
-All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/feature/producer/Deliverfile.md).
+All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md).
 
 **Some examples:**
 
