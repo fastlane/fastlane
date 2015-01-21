@@ -20,7 +20,7 @@ module Deliver
           allowed = Deliver::Deliverer.all_available_keys_to_set
           not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, 
                             :submit_further_information, :copyright, :primary_category, :secondary_category,
-                            :automatic_release, :app_review_information]
+                            :automatic_release, :app_review_information, :ratings_config_path]
 
           if allowed.include?(method_sym)
             value = arguments.first

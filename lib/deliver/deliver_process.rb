@@ -239,6 +239,9 @@ module Deliver
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
       secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
       itc.set_categories!(@app, primary, secondary) if (primary or secondary)
+
+      # App Rating
+      itc.set_app_rating!(@app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
     end
 
     def trigger_ipa_upload

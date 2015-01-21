@@ -39,6 +39,7 @@ module Deliver
       SECONDARY_CATEGORY = :secondary_category
       
       AUTOMATIC_RELEASE = :automatic_release # should the update go live after approval
+      RATINGS_CONFIG_PATH = :ratings_config_path # a path to the configuration for the app's ratings
 
       APP_REVIEW_INFORMATION = :app_review_information
       # Supported
