@@ -199,6 +199,16 @@ Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found ne
 
 More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
 
+#### [Crashlytics](https://try.crashlytics.com)
+```ruby
+crashlytics({
+  crashlytics_path: './path',
+  api_token: '...',
+  build_secret: '...',
+  ipa_path: './app.ipa'
+})
+```
+
 #### [Slack](http://slack.com)
 Send a message to **#channel** (by default) or a direct message to **@username** with success (green) or failure (red) status.
 

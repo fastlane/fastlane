@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
-  spec.add_dependency 'shenzhen', '~> 0.10.3' # to upload to Hockey
+  spec.add_dependency 'shenzhen', '~> 0.10.3' # to upload to Hockey and Crashlytics
 
   spec.add_dependency 'credentials_manager'
   spec.add_dependency 'deliver', '>= 0.5.0'
