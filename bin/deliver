@@ -3,31 +3,76 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'deliver'
-require 'commander/import'
+require 'commander'
 
 HighLine.track_eof = false
 
+class FastlaneApplication
+  include Commander::Methods
 
-# Commander
-program :version, Deliver::VERSION
-program :description, 'CLI for \'Deliver\' - Upload screenshots, metadata and your app to the App Store using a single command'
-program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
-program :help, 'Website', 'http://fastlane.tools'
-program :help, 'GitHub', 'https://github.com/krausefx/deliver'
-program :help_formatter, :compact
+  def run
+    program :version, Deliver::VERSION
+    program :description, 'CLI for \'Deliver\' - Upload screenshots, metadata and your app to the App Store using a single command'
+    program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
+    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/krausefx/deliver'
+    program :help_formatter, :compact
 
-global_option('--verbose') { $verbose = true }
+    global_option('--verbose') { $verbose = true }
+
+    command :run do |c|
+      c.syntax = 'deliver'
+      c.description = 'Run a deploy process using the Deliverfile in the current folder'
+      c.option '--force', 'Runs a deployment without verifying any information (PDF file). This can be used for build servers.'
+      c.option '--beta', 'Runs a deployment to beta build on iTunes Connect'
+      c.option '--skip-deploy', 'Skips deployment on iTunes Connect'
+      c.action do |args, options|
+        path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
+        Dir.chdir(path) do # switch the context
+          if File.exists?(deliver_path)
+            # Everything looks alright, use the given Deliverfile
+            options.default :beta => false, :skip_deploy => false
+            Deliver::Deliverer.new(deliver_path, force: options.force, is_beta_ipa: options.beta, skip_deploy: options.skip_deploy)
+          else
+            Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
+            if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
+              Deliver::DeliverfileCreator.create(enclosed_directory)
+            end
+          end
+        end
+      end
+    end
+
+    command :init do |c|
+      c.syntax = 'deliver init'
+      c.description = "Creates a new Deliverfile in the current directory"
+
+      c.action do |args, options|
+        Deliver::DeliverfileCreator.create(enclosed_directory)
+      end
+    end
 
 
-default_command :run
+    def set_username(username)
+      user = username
+      user ||= ENV["PRODUCE_USERNAME"]
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)      
+      CredentialsManager::PasswordManager.shared_manager(user) if user
+    end
 
-require 'deliver/commands'
+    default_command :run
+
+    run!
+  end
+end
 
 def deliver_path
-  [enclosed_directory, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
+  File.join(enclosed_directory, Deliver::Deliverfile::Deliverfile::FILE_NAME)
 end
 
 # The directoy in which the Deliverfile and metadata should be created
 def enclosed_directory
   "."
 end
+
+FastlaneApplication.new.run
