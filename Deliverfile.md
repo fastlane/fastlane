@@ -68,11 +68,12 @@ The english name of the category you want to set (e.g. `Business`, `Books`)
 ##### secondary_category
 The english name of the secondary category you want to set
 
+##### automatic_release
+Should the app be released to all users once Apple approves it? If set to no, you'll have to manually release the update once it got approved.
+
 ##### app_review_information
 Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. Check out the [example](#example-deliverfile).
 
-##### automatic_release
-Should the app be released to all users once Apple approves it? If set to no, you'll have to manually release the update once it got approved.
 
 ```ruby
 app_review_information({
