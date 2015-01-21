@@ -9,7 +9,7 @@ module Deliver
     # @param deliver_path (String) The path in which the Deliverfile should be created
     # @param project_name (String) The default name of the project, which is used in the generated Deliverfile
     def self.create(deliver_path, project_name = nil)
-      deliver_file_path = [deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME].join("/")
+      deliver_file_path = File.join(deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME)
       raise "Deliverfile already exists at path '#{deliver_file_path}'. Run 'deliver' to use Deliver.".red if File.exists?(deliver_file_path)
 
       project_name ||= Dir.pwd.split("/").last
