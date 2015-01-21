@@ -35,3 +35,5 @@ keywords({
 })
 
 missing_method_call_should_not_cause_an_error
+
+price_tier 5

@@ -175,7 +175,10 @@ module Deliver
       @app.metadata.update_privacy_url(@deploy_information[Deliverer::ValKey::PRIVACY_URL]) if @deploy_information[Deliverer::ValKey::PRIVACY_URL]
 
       @app.metadata.update_keywords(@deploy_information[Deliverer::ValKey::KEYWORDS]) if @deploy_information[Deliverer::ValKey::KEYWORDS]
+
+      @app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER]) if @deploy_information[Deliverer::ValKey::PRICE_TIER]
     end
+
 
     def set_screenshots
       screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]

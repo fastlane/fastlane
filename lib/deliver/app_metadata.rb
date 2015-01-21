@@ -198,6 +198,16 @@ module Deliver
       end
     end
 
+    # Updates the price tier of the given app
+    # @param (Integer) tier The tier that should be used from now on
+    def update_price_tier(tier)
+      raise "Price Tier '#{tier}' must be of type integer".red unless tier.kind_of?Integer
+      raise "Invalid price tier '#{tier}' given, must be 0 to 94".red unless (tier.to_i >= 0 and tier.to_i <= 87)
+
+      price = fetch_value("//x:wholesale_price_tier").last
+      price.content = tier
+    end
+
     #####################################################
     # @!group Manually fetching elements from the metadata.xml
     #####################################################

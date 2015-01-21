@@ -63,6 +63,7 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version").first['string']).to eq("943.0")
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").count).to eq(1) # one language only
             expect(meta.deliver_process.app.metadata.fetch_value("//x:version_whats_new").first.content).to eq(thanks_for_facebook)
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:wholesale_price_tier").first.content).to eq(0.to_s)
           end
 
           it "overwrites the config from metadata.json when set in the Deliverfile" do
@@ -98,6 +99,7 @@ describe Deliver do
             expect(meta.deliver_process.deploy_information[:support_url].values.first).to eq("http://support.sunapps.net")
             expect(meta.deliver_process.deploy_information[:title]).to eq({"en-US"=>"The ultimate iPhone app"})
             expect(meta.deliver_process.deploy_information[:keywords]).to eq({"en-US"=>["keyword1", "something", "else"]})
+            expect(meta.deliver_process.deploy_information[:price_tier]).to eq(5)
           end
 
           it "Uses the given default language" do
