@@ -25,6 +25,19 @@ module Fastlane
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
         raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exists?(options[:ipa])
 
+        if options[:dsym]
+          options[:dsym_filename] = options[:dsym]
+        else  
+          dsym_path = options[:ipa].gsub("ipa", "app.dSYM.zip")
+          if File.exists?(dsym_path)
+            options[:dsym_filename] = dsym_path
+          else
+            Helper.log.info "Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly".yellow
+          end
+        end
+
+        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exists?(options[:dsym_filename])) 
+
         Helper.log.info "Starting with ipa upload to HockeyApp... this could take some time.".green
         
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
