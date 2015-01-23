@@ -1,16 +1,16 @@
 module Fastlane
   module Actions
     module SharedValues
-      
+
     end
 
     class SlackAction
       def self.run(params)
-        options = { message: '', 
-                    success: true, 
+        options = { message: '',
+                    success: true,
                     channel: nil
                   }.merge(params.first || {})
-        
+
         require 'slack-notifier'
 
         color = (options[:success] ? 'good' : 'danger')
@@ -45,7 +45,7 @@ module Fastlane
           ]
         }
 
-        notifier.ping "", 
+        notifier.ping "",
                       icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
                       attachments: [test_result]
 

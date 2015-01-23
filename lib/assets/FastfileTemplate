@@ -1,4 +1,4 @@
-# Customise this file, documentation can be found here: 
+# Customise this file, documentation can be found here:
 # https://github.com/krausefx/fastlane#customise-the-fastfile
 
 # Change the syntax highlighting to Ruby
@@ -11,13 +11,13 @@ before_all do
   # sh "./customShellScript.sh"
 
   # increment_build_number
-  
+
   cocoapods
 
   xctool
 end
 
-lane :test do 
+lane :test do
   snapshot
 end
 
