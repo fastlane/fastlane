@@ -26,7 +26,7 @@ module Fastlane
 
         notifier.username = 'fastlane'
         notifier.channel = "#{options[:channel]}" if options[:channel].to_s.length > 0
-        notifier.channel = "##{notifier.channel}" unless ["#", "@"].include? notifier.channel[0] #send msg to channel by default
+        notifier.channel = "##{notifier.channel}" unless ["#", "@"].include? notifier.channel[0] # send message to channel by default
 
         test_result = {
           fallback: options[:message],
