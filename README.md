@@ -199,6 +199,17 @@ Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found ne
 
 More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
 
+#### [Slack](http://slack.com)
+Send a message to **#channel** (by default) or a direct message to **@username** with success (green) or failure (red) status.
+
+```ruby
+  slack({
+    message: "HELLO WORLD!",
+    channel: "#channel",
+    success: true,
+  })
+```
+
 #### [Testmunk](http://testmunk.com)
 Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
 ```ruby
