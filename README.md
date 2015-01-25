@@ -204,7 +204,7 @@ Send a message to **#channel** (by default) or a direct message to **@username**
 
 ```ruby
   slack({
-    message: "HELLO WORLD!",
+    message: "App successfully released!",
     channel: "#channel",
     success: true,
   })
@@ -253,8 +253,7 @@ This block will get executed when an error occurs, in any of the blocks (*before
 error do |lane, exception|
   slack({
     message: "Successfully deployed new App Update for [AppName](http://link.com).",
-    success: false,
-    channel: 'development'
+    success: false
   })
 end
 ```
