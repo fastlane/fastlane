@@ -39,34 +39,6 @@ module Snapshot
         Helper.log.error "-----------------------------------------------------------"
         raise "Finished generating #{counter} screenshots with #{errors.count} errors.".red
       else
-
-        Helper.log.info "Rotating landscape left images"
-        PTY.spawn( "find #{SnapshotConfig.shared_instance.screenshots_path} -name '*landscapeleft*png' -type f -exec sips -r -90 {} \\\; >/dev/null" ) do |r, w, pid|
-          r.sync
-          r.each do |line|
-            # We need to read this otherwise things hang
-          end
-          ::Process.wait pid
-        end
-
-        Helper.log.info "Rotating landscape right images"
-        PTY.spawn( "find #{SnapshotConfig.shared_instance.screenshots_path} -name '*landscaperight*png' -type f -exec sips -r 90 {} \\\; >/dev/null" ) do |r, w, pid|
-          r.sync
-          r.each do |line|
-            # We need to read this otherwise things hang
-          end
-          ::Process.wait pid
-        end
-
-        Helper.log.info "Rotating portrait upsidedown images"
-        PTY.spawn( "find #{SnapshotConfig.shared_instance.screenshots_path} -name '*portrait_upsidedown*png' -type f -exec sips -r 180 {} \\\; >/dev/null" ) do |r, w, pid|
-          r.sync
-          r.each do |line|
-            # We need to read this otherwise things hang
-          end
-          ::Process.wait pid
-        end
-
         Helper.log.info "Successfully finished generating #{counter} screenshots.".green
       end
       
@@ -158,6 +130,8 @@ module Snapshot
       unless SnapshotConfig.shared_instance.skip_alpha_removal
         ScreenshotFlatten.new.run(TRACE_DIR)
       end
+
+      ScreenshotRotate.new.run(TRACE_DIR)
 
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
