@@ -152,7 +152,9 @@ module Produce
       def app_exists?
         open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
 
-        return all("option[value='#{Config.val(:bundle_identifier)}']").count == 0
+        sleep 4
+
+        return (all("option[value='#{Config.val(:bundle_identifier)}']").count == 0)
       end
 
       def open_new_app_popup
