@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    credentials_manager (0.1.0)
+    credentials_manager (0.1.1)
       colored
       highline (~> 1.6.21)
       security (~> 0.1.3)
