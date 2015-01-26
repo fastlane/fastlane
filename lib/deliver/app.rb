@@ -119,12 +119,12 @@ module Deliver
     end
 
 
-    # # Uploads a new app icon to iTunesConnect. This uses a headless browser
-    # # which makes this command quite slow.
-    # # @param (path) a path to the new app icon. The image must have the resolution of 1024x1024
-    # def update_app_icon!(path)
-    #   itc.update_app_icon!(self, path)
-    # end
+    # Uploads a new app icon to iTunesConnect. This uses a headless browser
+    # which makes this command quite slow.
+    # @param (path) a path to the new app icon. The image must have the resolution of 1024x1024
+    def upload_app_icon!(path)
+      itc.upload_app_icon!(self, path)
+    end
 
     #####################################################
     # @!group Destructive/Constructive methods

@@ -108,7 +108,9 @@ Run ```deliver init``` to create a new ```Deliverfile```. You can either let the
 
 Once you created your configuration, just run ```deliver```.
 
-Here are a few example files:
+All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md).
+
+Here are a few examples:
 #### Upload screenshots to iTunes Connect
 ```ruby
 app_identifier "net.sunapps.1"
@@ -175,7 +177,7 @@ end
 ```
 
 
-#### Set a default language if you are lucky enough to only maintain one language
+#### Set a default language if you only maintain one language
 ```ruby
 default_language "en-US"
 version "1.2"
@@ -223,7 +225,7 @@ As you can see, the ```Deliverfile``` is a normal Ruby file, which is executed w
 running a deployment. Therefore it's possible to fully customise the behaviour
 on a deployment. 
 
-All available commands with a short description can be found in the [wiki](https://github.com/KrauseFx/deliver/wiki/All-available-commands-of-the-Deliverfile).
+All available commands with a short description can be found in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md).
 
 **Some examples:**
 

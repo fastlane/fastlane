@@ -33,6 +33,25 @@ module Deliver
       CONFIG_JSON_FOLDER = :config_json_folder # Path to a folder containing a configuration file and including screenshots
       SKIP_PDF = :skip_pdf
       SUBMIT_FURTHER_INFORMATION = :submit_further_information # export compliance, content rights and advertising identifier
+      PRICE_TIER = :price_tier
+      APP_ICON = :app_icon
+      
+      COPYRIGHT = :copyright
+      PRIMARY_CATEGORY = :primary_category
+      SECONDARY_CATEGORY = :secondary_category
+      
+      AUTOMATIC_RELEASE = :automatic_release # should the update go live after approval
+      RATINGS_CONFIG_PATH = :ratings_config_path # a path to the configuration for the app's ratings
+
+      APP_REVIEW_INFORMATION = :app_review_information
+      # Supported
+        # first_name
+        # last_name
+        # phone_number
+        # email_address
+        # demo_user
+        # demo_password
+        # notes
     end
 
     module AllBlocks
