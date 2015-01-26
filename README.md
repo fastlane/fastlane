@@ -28,7 +28,7 @@ produce
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-##### This tool was financed by [AppInstitute](http://appinstitute.co.uk/).
+##### This tool was sponsored by [AppInstitute](http://appinstitute.co.uk/).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
