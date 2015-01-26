@@ -26,7 +26,9 @@ produce
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/produce/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/produce.svg?style=flat)](http://rubygems.org/gems/produce)
 
-###### Create new iOS apps using your command line
+###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
+
+##### This tool was financed by [AppInstitute](http://appinstitute.co.uk/).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
