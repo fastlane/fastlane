@@ -58,10 +58,10 @@ module CredentialsManager
 
     private
       def ask_for_login
-        puts "---------------------------------------------------------------------------".green
-        puts "The login information you enter now will be stored in your keychain        ".green
-        puts "More information about that on GitHub: https://github.com/KrauseFx/fastlane".green
-        puts "---------------------------------------------------------------------------".green
+        puts "-------------------------------------------------------------------------------------".green
+        puts "The login information you enter will be stored in your Mac OS Keychain".green
+        puts "More information about that on GitHub: https://github.com/KrauseFx/CredentialsManager".green
+        puts "-------------------------------------------------------------------------------------".green
 
         username_was_there = self.username
 
