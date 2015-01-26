@@ -245,6 +245,9 @@ module Deliver
 
       # App Rating
       itc.set_app_rating!(@app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
+
+      # App Icon
+      itc.upload_app_icon!(@app, @deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
     end
 
     def trigger_ipa_upload

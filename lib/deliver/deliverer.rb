@@ -34,6 +34,7 @@ module Deliver
       SKIP_PDF = :skip_pdf
       SUBMIT_FURTHER_INFORMATION = :submit_further_information # export compliance, content rights and advertising identifier
       PRICE_TIER = :price_tier
+      APP_ICON = :app_icon
       
       COPYRIGHT = :copyright
       PRIMARY_CATEGORY = :primary_category

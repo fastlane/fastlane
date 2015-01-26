@@ -56,6 +56,12 @@ Pass the price tier as number. This will be active from the current day.
 price_tier 0
 ```
 
+##### app_icon
+A path to a new app icon, which must be exactly 1024x1024px
+```ruby
+app_icon './AppIcon.png'
+```
+
 ##### copyright
 The up to date copyright information.
 ```ruby

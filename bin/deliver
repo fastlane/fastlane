@@ -55,7 +55,7 @@ class FastlaneApplication
 
     def set_username(username)
       user = username
-      user ||= ENV["PRODUCE_USERNAME"]
+      user ||= ENV["DELIVER_USERNAME"]
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)      
       CredentialsManager::PasswordManager.shared_manager(user) if user
     end

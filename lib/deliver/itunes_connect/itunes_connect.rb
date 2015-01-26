@@ -9,6 +9,7 @@ require 'deliver/itunes_connect/itunes_connect_reader'
 require 'deliver/itunes_connect/itunes_connect_helper'
 require 'deliver/itunes_connect/itunes_connect_new_version'
 require 'deliver/itunes_connect/itunes_connect_login'
+require 'deliver/itunes_connect/itunes_connect_app_icon'
 require 'deliver/itunes_connect/itunes_connect_app_rating'
 require 'deliver/itunes_connect/itunes_connect_additional'
 
