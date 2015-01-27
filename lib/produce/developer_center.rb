@@ -96,9 +96,9 @@ module Produce
 
         begin
           if page.has_content?"Select Team" # If the user is not on multiple teams
-            team_id = ENV["SIGH_TEAM_ID"]
+            team_id = ENV["PRODUCE_TEAM_ID"]
             unless team_id
-              Helper.log.info "You can store you preferred team using the environment variable `SIGH_TEAM_ID`".green
+              Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID`".green
               Helper.log.info "Your ID belongs to the following teams:".green
               
               teams = find("div.input").all('.team-value') # Grab all the teams data
