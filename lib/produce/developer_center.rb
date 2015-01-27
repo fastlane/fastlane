@@ -116,7 +116,12 @@ module Produce
               team_id = teams[team_index.to_i - 1].find(".radio").value
             end
 
-            first(:xpath, "//input[@type='radio' and @value='#{team_id}']").click # Select the desired team
+            team_button = first(:xpath, "//input[@type='radio' and @value='#{team_id}']") # Select the desired team
+            if team_button
+              team_button.click
+            else
+              raise DeveloperCenterLoginError.new("Error finding given team '#{team_id}'. Run again, without passing a Team ID to get a list of available options.".red)
+            end
             all(".button.large.blue.submit").first.click
 
             result = visit APPS_URL
