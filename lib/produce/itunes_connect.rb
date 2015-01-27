@@ -1,6 +1,5 @@
 require 'capybara'
 require 'capybara/poltergeist'
-require 'fastimage'
 require 'credentials_manager/password_manager'
 
 module Produce
@@ -103,6 +102,16 @@ module Produce
     end
 
     def run
+      if ENV["CREATED_NEW_APP_ID"].to_i > 0
+        # We just created this App ID, this takes about 3 minutes to show up on iTunes Connect
+        Helper.log.info "Waiting for 3 minutes to make sure, the App ID is synced to iTunes Connect".yellow
+        sleep 180
+        unless app_exists?
+          Helper.log.info "Couldn't find new app yet, we're waiting for another 2 minutes.".yellow
+          sleep 120
+        end
+      end
+
       create_new_app
     rescue => ex
       error_occured(ex)
@@ -159,6 +168,7 @@ module Produce
 
       def open_new_app_popup
         visit APPS_URL
+        sleep 5 # this usually takes some time 
 
         wait_for_elements(NEW_APP_CLASS).first.click
         wait_for_elements('#new-menu > * > a').first.click # Create a new App

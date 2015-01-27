@@ -156,7 +156,8 @@ module Produce
 
     def create_new_app
       if app_exists?
-        Helper.log.info "App '#{Config.val(:app_name)}' exists already, nothing to do on the Dev Center".green
+        Helper.log.info "App '#{Config.val(:app_name)}' already exists, nothing to do on the Dev Center".green
+        ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
         Helper.log.info "Creating new app '#{Config.val(:app_name)}' on the Apple Dev Center".green
@@ -176,6 +177,8 @@ module Produce
         click_on "Done"
 
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
+
+        ENV["CREATED_NEW_APP_ID"] = Time.now.to_s
 
         Helper.log.info "Finished creating new app '#{Config.val(:app_name)}' on the Dev Center".green
       end
