@@ -103,10 +103,13 @@ module Produce
               
               teams = find("div.input").all('.team-value') # Grab all the teams data
               teams.each_with_index do |val, index|
+                team_id = '"' + val.find("input").value + '"'
                 team_text = val.find(".label-primary").text
                 description_text = val.find(".label-secondary").text
-                description_text = " (#{description_text})" unless description_text.empty? # Include the team description if any
-                Helper.log.info "\t#{index + 1}. #{team_text}#{description_text}".green # Print the team index and team name
+                description_text = "(#{description_text})" unless description_text.empty? # Include the team description if any
+                index_text = (index + 1).to_s + "."
+
+                Helper.log.info [index_text, team_id, team_text, description_text].join(" ").green
               end
 
               team_index = ask("Please select the team number you would like to access: ".green)
