@@ -131,6 +131,8 @@ module Snapshot
         ScreenshotFlatten.new.run(TRACE_DIR)
       end
 
+      ScreenshotRotate.new.run(TRACE_DIR)
+
       Dir.glob("#{TRACE_DIR}/**/*.png") do |file|
         FileUtils.cp_r(file, resulting_path + '/')
       end
