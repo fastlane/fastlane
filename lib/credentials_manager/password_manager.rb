@@ -27,7 +27,7 @@ module CredentialsManager
     #  if given, only the password will be asked/loaded.
     def initialize(id_to_use = nil)
       
-      self.username ||= ENV["DELIVER_USER"] || id_to_use || AppfileConfig.try_fetch_value(:apple_id) || load_from_keychain[0]
+      self.username ||= id_to_use || ENV["DELIVER_USER"] || AppfileConfig.try_fetch_value(:apple_id) || load_from_keychain[0]
       self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
