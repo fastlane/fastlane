@@ -23,7 +23,6 @@ class FastlaneApplication
 
     always_trace!
 
-    global_option('--verbose') { $verbose = true }
     global_option('-u', '--username STRING', 'Your Apple ID username')
 
     command :create do |c|
