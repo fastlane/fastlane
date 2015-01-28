@@ -49,7 +49,7 @@ module Deliver
         started = Time.now
 
         # Wait, while iTunesConnect is processing the uploaded file
-        while page.has_content?"Uploaded"
+        while (page.has_content?"Uploaded" or page.has_content?"Processing")
           # iTunesConnect is super slow... so we have to wait...
           Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
             "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 

@@ -53,12 +53,31 @@ class FastlaneApplication
       end
     end
 
+    command :testflight do |c|
+      c.syntax = 'deliver testflight'
+      c.description = "Uploads a given ipa file to the new Apple TestFlight"
+      c.option '-a', '--app_id String', String, 'The App ID (numeric, like 956814360)'
+      c.option '-u', '--username String', String, 'Your Apple ID'
+
+      c.action do |args, options|
+        ipa_path = args.first || determine_ipa
+
+        set_username(options.username)
+
+        Deliver::Testflight.upload!(ipa_path, options.app_id, options.skip_deploy)
+      end
+    end
 
     def set_username(username)
       user = username
       user ||= ENV["DELIVER_USERNAME"]
-      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)      
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
       CredentialsManager::PasswordManager.shared_manager(user) if user
+    end
+
+    def determine_ipa
+      return Dir['*.ipa'].first if Dir["*.ipa"].count == 1
+      return ask("Path to IPA file to upload: ".green)
     end
 
     default_command :run

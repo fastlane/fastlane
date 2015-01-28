@@ -36,6 +36,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 -------
 <p align="center">
     <a href="#features">Features</a> &bull; 
+    <a href="#testflight">TestFlight</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
@@ -56,6 +57,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
 - Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1)
 - Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
+- Upload new builds to the new Apple TestFlight
 
 # Installation
 
@@ -74,6 +76,38 @@ Install phantomjs (this is needed to control the iTunes Connect frontend)
 If you don't already have homebrew installed, [install it here](http://brew.sh/).
 
 To create new screenshots automatically, check out my other open source project [Snapshot](https://github.com/KrauseFx/snapshot).
+
+# TestFlight
+
+To upload a new build to Apple `TestFlight` use the following command:
+
+```
+deliver testflight
+```
+
+This will auotmatically look for an ipa file in the current directory.
+
+`deliver` currently supports **Internal Testers** only.
+
+## More options:
+
+Pass the Apple ID and bundle identifier to be used:
+
+```
+deliver testflight -u felix@krausefx.com -a com.krausefx.app
+```
+
+To skip the submission of the beta version, use
+
+```
+deliver testflight --skip-deploy
+```
+
+To build and upload the ipa in one step, you can use [shenzhen](https://github.com/nomad/shenzhen):
+
+```
+ipa build && deliver testflight
+```
 
 # Quick Start
 

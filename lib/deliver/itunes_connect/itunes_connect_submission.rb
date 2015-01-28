@@ -19,15 +19,16 @@ module Deliver
         end
 
         if first(".switcher.ng-binding")['class'].include?"checked"
-          Helper.log.warn("Beta Build seems to be already active. Take a look at '#{current_url}'")
+          Helper.log.info("Beta is already active. Take a look at '#{current_url}'.")
           return true
         end
 
         first(".switcher.ng-binding").click
         if page.has_content?"Are you sure you want to start testing"
           click_on "Start"
-        end
 
+          Helper.log.info "Successfully enabled beta builds".green
+        end
 
         return true
       rescue => ex
@@ -102,7 +103,7 @@ module Deliver
             Helper.log.info("App is already Waiting For Review")
             return true
           else
-            raise "Couldn't find button with name '#{BUTTON_STRING_SUBMIT_FOR_REVIEW}'"
+            raise "Couldn't find button with name '#{BUTTON_STRING_SUBMIT_FOR_REVIEW}'!"
           end
         end
 
