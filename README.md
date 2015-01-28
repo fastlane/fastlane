@@ -148,7 +148,7 @@ It will show you the ```mobileprovision``` files like this:
 
 
 # Need help?
-- If there is a technical problem with ```sigh```, submit an issue. Run ```sigh --trace``` to get the stacktrace.
+- If there is a technical problem with ```sigh```, submit an issue.
 - I'm available for contract work - drop me an email: sigh@krausefx.com
 
 # License
