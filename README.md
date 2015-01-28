@@ -99,7 +99,7 @@ Specify the `ipa` file to be used:
 deliver testflight ./my_app.ipa
 ```
 
-Pass the Apple ID and App ID to be used:
+Pass the Apple ID and App ID to be used (optional):
 
 ```
 deliver testflight -u felix@krausefx.com -a 862582703
