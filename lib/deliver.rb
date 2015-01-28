@@ -17,6 +17,7 @@ require 'deliver/pdf_generator'
 require 'deliver/deliver_process'
 require 'deliver/dependency_checker'
 require 'deliver/update_checker'
+require 'deliver/ipa_file_analyser'
 
 # Third Party code
 require 'colored'

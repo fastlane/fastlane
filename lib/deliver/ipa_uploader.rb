@@ -36,16 +36,12 @@ module Deliver
 
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def fetch_app_identifier
-      plist = fetch_info_plist_file
-      return plist['CFBundleIdentifier'] if plist
-      return nil
+      return IpaFileAnalyser.fetch_app_identifier(@ipa_file.path)
     end
 
     # Fetches the app version from the given ipa file.
     def fetch_app_version
-      plist = fetch_info_plist_file
-      return plist['CFBundleShortVersionString'] if plist
-      return nil
+      return IpaFileAnalyser.fetch_app_version(@ipa_file.path)
     end
 
 
@@ -137,32 +133,5 @@ module Deliver
         asset = @data.xpath('//x:asset', "x" => Deliver::AppMetadata::ITUNES_NAMESPACE).first
         asset << @ipa_file.create_xml_node(@data)
       end
-
-      def fetch_info_plist_file
-        Zip::File.open(@ipa_file.path) do |zipfile|
-          zipfile.each do |file|
-            if file.name.include?'.plist' and not ['.bundle', '.framework'].any? { |a| file.name.include?a }
-              # We can not be completely sure, that's the correct plist file, so we have to try
-              begin
-                # The XML file has to be properly unpacked first
-                tmp_path = "/tmp/deploytmp.plist"
-                File.write(tmp_path, zipfile.read(file))
-                system("plutil -convert xml1 #{tmp_path}")
-                result = Plist::parse_xml(tmp_path)
-                File.delete(tmp_path)
-
-                if result['CFBundleIdentifier'] or result['CFBundleVersion']
-                  return result
-                end
-              rescue
-                # We don't really care, look for another XML file
-              end
-            end
-          end
-        end
-
-        nil
-      end
-
   end
 end
