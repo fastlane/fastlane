@@ -455,7 +455,6 @@ module Sigh
 
           counter += 1
           if counter > 100
-            Helper.log.debug page.html
             Helper.log.debug caller
             raise DeveloperCenterGeneralError.new("Couldn't find '#{parameter}' after waiting for quite some time")
           end
