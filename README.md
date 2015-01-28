@@ -304,7 +304,7 @@ Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` 
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```deliver```, submit an issue. Run ```deliver --trace``` to get the stack trace.
+- If there is a technical problem with ```deliver```, submit an issue.
 - I'm available for contract work - drop me an email: deliver@krausefx.com
 
 # License
