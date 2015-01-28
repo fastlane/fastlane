@@ -261,13 +261,15 @@ module Deliver
     end
 
     def call_success_block
-      @deploy_information[:blocks][:success].call if @deploy_information[:blocks][:success]
+      if @deploy_information[:blocks][:success]
+        @deploy_information[:blocks][:success].call(hash_for_callback)
+      end
     end
 
     def call_error_block(ex)
       if @deploy_information[:blocks][:error]
         # Custom error handling, we just call this one
-        @deploy_information[:blocks][:error].call(ex)
+        @deploy_information[:blocks][:error].call(hash_for_callback(ex))
       end
       
       # Re-Raise the exception
@@ -278,6 +280,19 @@ module Deliver
       #####################################################
       # @!group All the helper methods
       #####################################################
+
+      def hash_for_callback(error = nil)
+        {
+          error: error,
+          app_version: @app_version,
+          app_identifier: @app_identifier,
+          skipped_deploy: skip_deployment?,
+          is_release_build: is_release_build?,
+          is_beta_build: is_beta_build?,
+          ipa_path: ENV["DELIVER_IPA_PATH"]
+        }
+      end
+
       def verify_app_identifier(app_identifier)
         if app_identifier
           if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
@@ -309,7 +324,7 @@ module Deliver
       end
 
       def is_beta_build?
-          @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
+        @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
       end
   end
 end

@@ -201,6 +201,39 @@ describe Deliver do
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(true)
               expect(File.exists?@error_path).to eq(false)
+
+              # Check the hash that should be stored
+              error = JSON.parse(File.read(@success_path))
+              expect(error['app_identifier']).to eq('at.felixkrause.iTanky')
+              expect(error['app_version']).to eq('1.0')
+              expect(error['error']).to eq(nil)
+              expect(error['ipa_path']).to eq('./spec/fixtures/ipas/Example1.ipa')
+              expect(error['is_beta_build']).to eq(false)
+              expect(error['is_release_build']).to eq(true)
+              expect(error['skipped_deploy']).to eq(false)
+            end
+
+            it "Successful with custom parameters" do
+              expect(File.exists?@tests_path).to eq(false)
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks", 
+                                force: true, 
+                                is_beta_ipa: true, 
+                                skip_deploy: true)
+              expect(File.exists?@tests_path).to eq(true)
+              expect(File.exists?@success_path).to eq(true)
+              expect(File.exists?@error_path).to eq(false)
+
+              # Check the hash that should be stored
+              error = JSON.parse(File.read(@success_path))
+              expect(error['app_identifier']).to eq('at.felixkrause.iTanky')
+              expect(error['app_version']).to eq('1.0')
+              expect(error['error']).to eq(nil)
+              expect(error['ipa_path']).to eq('./spec/fixtures/ipas/Example1.ipa')
+              expect(error['is_beta_build']).to eq(true)
+              expect(error['is_release_build']).to eq(false)
+              expect(error['skipped_deploy']).to eq(true)
             end
 
             it "Error on ipa upload" do
@@ -212,6 +245,16 @@ describe Deliver do
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(false)
               expect(File.exists?@error_path).to eq(true)
+
+              # Check the hash that should be stored
+              error = JSON.parse(File.read(@error_path))
+              expect(error['app_identifier']).to eq('at.felixkrause.iTanky')
+              expect(error['app_version']).to eq('1.0')
+              expect(error['error']).to eq('Error uploading ipa file'.red)
+              expect(error['ipa_path']).to eq('./spec/fixtures/ipas/Example1.ipa')
+              expect(error['is_beta_build']).to eq(false)
+              expect(error['is_release_build']).to eq(true)
+              expect(error['skipped_deploy']).to eq(false)
             end
 
             it "Error on app metadata upload" do
