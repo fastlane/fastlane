@@ -24,12 +24,11 @@ class FastlaneApplication
     always_trace!
 
     global_option('--verbose') { $verbose = true }
+    global_option('-u', '--username STRING', 'Your Apple ID username')
 
     command :create do |c|
       c.syntax = 'produce create'
       c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
-
-      c.option '-u', '--username STRING', String, 'Your Apple ID username'
 
       c.action do |args, options|
         set_username(options.username)
