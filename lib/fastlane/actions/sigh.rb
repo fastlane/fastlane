@@ -10,8 +10,8 @@ module Fastlane
         require 'credentials_manager/appfile_config'
 
         type = Sigh::DeveloperCenter::APPSTORE
-        type = Sigh::DeveloperCenter::ADHOC if params.first == :adhoc
-        type = Sigh::DeveloperCenter::DEVELOPMENT if params.first == :development
+        type = Sigh::DeveloperCenter::ADHOC if params.include? :adhoc
+        type = Sigh::DeveloperCenter::DEVELOPMENT if params.include? :development
         
         return type if Helper.is_test?
 
@@ -22,7 +22,7 @@ module Fastlane
         output_path = File.expand_path(File.join('.', File.basename(path)))
         FileUtils.mv(path, output_path)
         Helper.log.info "Exported provisioning profile to '#{output_path}'".green
-        Actions.sh "open '#{output_path}'"
+        Actions.sh "open '#{output_path}'" unless params.include? :skip_install
 
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = output_path # absolute URL
       end
