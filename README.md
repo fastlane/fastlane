@@ -119,7 +119,7 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 - ```rm -rf ~/.frameit```
 
 # Need help?
-- If there is a technical problem with ```frameit```, submit an issue. Run ```frameit --trace``` to get the stacktrace.
+- If there is a technical problem with ```frameit```, submit an issue.
 - I'm available for contract work - drop me an email: frameit@krausefx.com
 
 # License
