@@ -129,7 +129,7 @@ It will show you the ```pem``` files like this:
 
 
 # Need help?
-- If there is a technical problem with ```PEM```, submit an issue. Run ```pem --trace``` to get the stacktrace.
+- If there is a technical problem with ```PEM```, submit an issue.
 - I'm available for contract work - drop me an email: pem@krausefx.com
 
 # License
