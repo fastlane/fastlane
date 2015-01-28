@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.7.1)
+    deliver (0.7.2)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -26,7 +26,7 @@ GEM
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
     cliver (0.3.2)
-    codeclimate-test-reporter (0.4.5)
+    codeclimate-test-reporter (0.4.6)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
@@ -34,7 +34,7 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    credentials_manager (0.1.1)
+    credentials_manager (0.1.2)
       colored
       highline (~> 1.6.21)
       security (~> 0.1.3)
