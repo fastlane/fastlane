@@ -89,7 +89,9 @@ This will auotmatically look for an ipa file in the current directory.
 
 `deliver` currently supports **Internal Testers** only.
 
-## More options:
+Make sure to increase your build number before building and uploading your app.
+
+#### More options:
 
 Pass the Apple ID and bundle identifier to be used:
 
