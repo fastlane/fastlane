@@ -104,7 +104,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 
 # Need help?
-- If there is a technical problem with `produce`, submit an issue. Run `produce --trace` to get the stacktrace.
+- If there is a technical problem with `produce`, submit an issue.
 - I'm available for contract work - drop me an email: produce@krausefx.com
 
 # License
