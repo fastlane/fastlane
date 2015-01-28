@@ -18,14 +18,15 @@ class FastlaneApplication
     program :help, 'GitHub', 'https://github.com/krausefx/deliver'
     program :help_formatter, :compact
 
+    global_option '--force', 'Runs a deployment without verifying any information (PDF file). This can be used for build servers.'
+    global_option '--beta', 'Upload a beta build to iTunes Connect. This uses the `beta_ipa` block.'
+    global_option '--skip-deploy', 'Skips submission of the build on iTunes Connect. This will only upload the ipa and/or metadata.'
+
     always_trace!
 
     command :run do |c|
       c.syntax = 'deliver'
       c.description = 'Run a deploy process using the Deliverfile in the current folder'
-      c.option '--force', 'Runs a deployment without verifying any information (PDF file). This can be used for build servers.'
-      c.option '--beta', 'Runs a deployment to beta build on iTunes Connect'
-      c.option '--skip-deploy', 'Skips deployment on iTunes Connect'
       c.action do |args, options|
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
