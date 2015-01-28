@@ -3,61 +3,71 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'pem'
-require 'commander/import'
+require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 
 HighLine.track_eof = false
 
+class FastlaneApplication
+  include Commander::Methods
 
-# Commander
-program :version, PEM::VERSION
-program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
-program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
-program :help, 'Website', 'http://fastlane.tools'
-program :help, 'GitHub', 'https://github.com/krausefx/PEM'
-program :help_formatter, :compact
+  def run
+    program :version, PEM::VERSION
+    program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
+    program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
+    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/krausefx/PEM'
+    program :help_formatter, :compact
 
-global_option('--verbose') { $verbose = true }
+    always_trace!
 
+    global_option('-u', '--username STRING', 'Your Apple ID username')
 
-command :renew do |c|
-  c.syntax = 'pem renew'
-  c.description = 'Renews the certificate (in case it expired) and returns the path to the generated pem file'
+    command :renew do |c|
+      c.syntax = 'pem renew'
+      c.description = 'Renews the certificate (in case it expired) and returns the path to the generated pem file'
 
-  c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
-  c.option '-u', '--username STRING', String, 'Your Apple ID username'
-  c.option '--development', 'Renew the development push certificate instead of the production one'
+      c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
+      c.option '-u', '--username STRING', String, 'Your Apple ID username'
+      c.option '--development', 'Renew the development push certificate instead of the production one'
 
-  c.action do |args, options|
-    app = app_identifier(options)
-    username(options)
+      c.action do |args, options|
+        app = app_identifier(options)
+        username(options)
 
-    path = PEM::CertManager.new.run(app, !options.development)
+        path = PEM::CertManager.new.run(app, !options.development)
 
-    if path
-      file_name = File.basename(path)
-      output = "./#{file_name}"
-      FileUtils.mv(path, output)
-      puts output.green
+        if path
+          file_name = File.basename(path)
+          output = "./#{file_name}"
+          FileUtils.mv(path, output)
+          puts output.green
+        end
+      end
     end
+
+    default_command :renew
+
+    run!
   end
+
+  def username(options)
+    user = options.username
+    user ||= ENV["PEM_USERNAME"]
+    user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+    
+    CredentialsManager::PasswordManager.shared_manager(user) if user
+  end
+
+  def app_identifier(options)
+    value = options.identifier
+    value ||= ENV["PEM_APP_IDENTIFIER"]
+    value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+    value ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
+    return value
+  end
+
 end
 
-default_command :renew
-
-def username(options)
-  user = options.username
-  user ||= ENV["PEM_USERNAME"]
-  user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-  
-  CredentialsManager::PasswordManager.shared_manager(user) if user
-end
-
-def app_identifier(options)
-  value = options.identifier
-  value ||= ENV["PEM_APP_IDENTIFIER"]
-  value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-  value ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
-  return value
-end
+FastlaneApplication.new.run
