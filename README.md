@@ -99,10 +99,10 @@ Specify the `ipa` file to be used:
 deliver testflight ./my_app.ipa
 ```
 
-Pass the Apple ID and bundle identifier to be used:
+Pass the Apple ID and App ID to be used:
 
 ```
-deliver testflight -u felix@krausefx.com -a com.krausefx.app
+deliver testflight -u felix@krausefx.com -a 862582703
 ```
 
 To build and upload the ipa in one step, you can use [shenzhen](https://github.com/nomad/shenzhen):
