@@ -173,7 +173,7 @@ A list of available actions can be found on the [`fastlane` project page](https:
 #### Update the `Fastfile`
 Now it's the time to adapt the `Fastfile` to implement your deployment pipeline. You should use `increment_build_number` when you want to upload builds to iTunes Connect ([Activate incrementing build numbers](https://developer.apple.com/library/ios/qa/qa1827/_index.html))
 
-Add as many lanes as you want and test them by running `fastlane [lane name] --trace`. I recommend putting the `--trace` at the end to get the full stack trace in case something goes wrong.
+Add as many lanes as you want and test them by running `fastlane [lane name]`.
 
 ### Use your existing build scripts
 

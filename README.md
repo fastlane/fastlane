@@ -291,9 +291,9 @@ I recommend the following plugins:
 ## Build Step
 Use the following as your build step:
 ```
-fastlane appstore --trace
+fastlane appstore
 ```
-Replace `appstore` with the lane you want to use. I recommend appending the `--trace` to make debugging easier in case something goes wrong. 
+Replace `appstore` with the lane you want to use.
 
 ## Test Results and Screenshtos
 
@@ -406,7 +406,7 @@ actions_path '../custom_actions_folder/'
 A detailed description about your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 
 # Need help?
-- If there is a technical problem with ```fastlane```, submit an issue. Run ```fastlane --trace``` to get the stack trace.
+- If there is a technical problem with ```fastlane```, submit an issue.
 - I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 # License
