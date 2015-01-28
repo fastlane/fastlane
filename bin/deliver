@@ -60,7 +60,7 @@ class FastlaneApplication
       c.option '-u', '--username String', String, 'Your Apple ID'
 
       c.action do |args, options|
-        ipa_path = args.first || determine_ipa
+        ipa_path = (args.first || determine_ipa) + '' # unfreeze the string
 
         set_username(options.username)
 

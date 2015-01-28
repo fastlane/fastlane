@@ -93,6 +93,12 @@ Make sure to increase your build number before building and uploading your app.
 
 #### More options:
 
+Specify the `ipa` file to be used: 
+
+```
+deliver testflight ./my_app.ipa
+```
+
 Pass the Apple ID and bundle identifier to be used:
 
 ```
