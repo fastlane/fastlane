@@ -50,7 +50,3 @@ command :setup do |c|
 end
 
 alias_command :white, :silver
-
-def shared_run(c)
-  c.description = 'Find all screenshots in current folder and put a nice frame around it. This will duplicate the images.'
-end
