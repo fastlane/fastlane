@@ -32,7 +32,7 @@ class SighApplication
     global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
     global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
     global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (ex. "Nov 11, 2017")'
-    global_option '-f', '--filename STRING', String, 'Filename to use for profile'
+    global_option '-f', '--filename STRING', String, 'Filename to use for the provisioning profile'
 
     command :renew do |c|
       c.syntax = 'sigh renew'
