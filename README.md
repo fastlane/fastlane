@@ -301,7 +301,7 @@ Unfortunately ```Instruments``` sometimes decides, to not respond to anything. W
 The only way to fix this, is a restart of the Mac. 
 
 # Need help?
-- If there is a technical problem with ```snapshot```, submit an issue. Run ```snapshot --trace``` to get the stacktrace.
+- If there is a technical problem with ```snapshot```, submit an issue.
 - I'm available for contract work - drop me an email: snapshot@krausefx.com
 
 # License
