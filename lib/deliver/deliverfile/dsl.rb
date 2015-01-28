@@ -90,7 +90,7 @@ module Deliver
         # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
         #  IPA file.
         def ipa(value = nil, &block)
-          validate_ipa!(value) if value # to catch errors early
+          DSL.validate_ipa!(value) if value # to catch errors early
 
           @deliver_data.set_new_value(Deliverer::ValKey::IPA, (value || block))
         end
@@ -99,7 +99,7 @@ module Deliver
         # @raise (DeliverfileDSLError) occurs when you pass an invalid path to the
         #  IPA file.
         def beta_ipa(value = nil, &block)
-          validate_ipa!(value) if value # to catch errors early
+          DSL.validate_ipa!(value) if value # to catch errors early
 
           @deliver_data.set_new_value(Deliverer::ValKey::BETA_IPA, (value || block))
         end
