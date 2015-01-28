@@ -68,7 +68,7 @@ module PEM
         user ||= CredentialsManager::PasswordManager.shared_manager.username
         password ||= CredentialsManager::PasswordManager.shared_manager.password
 
-        result = visit DEVELOPER_CENTER_URL
+        result = visit APP_IDS_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
 
         wait_for_elements(".button.blue").first.click
@@ -86,37 +86,17 @@ module PEM
         all(".button.large.blue.signin-button").first.click
 
         begin
-          if page.has_content?"Select Your Team" # If the user is not on multiple teams
-            team_id = ENV["PEM_TEAM_ID"]
-            unless team_id
-              Helper.log.info "You can store you preferred team using the environment variable `PEM_TEAM_ID`".green
-              Helper.log.info "Your ID belongs to the following teams:".green
-              
-              teams = find("select").all('option') # Grab all the teams data
-              teams.each_with_index do |val, index|
-                team_text = val.text
-                description_text = val.value
-                description_text = " (#{description_text})" unless description_text.empty? # Include the team description if any
-                Helper.log.info "\t#{index + 1}. #{team_text}#{description_text}".green # Print the team index and team name
-              end
-              
-              team_index = ask("Please select the team number you would like to access: ".green)
-              team_id = teams[team_index.to_i - 1].value # Select the desired team
-            end
-          within 'select' do
-            find("option[value='#{team_id}']").select_option
+          if page.has_content?"Select Team" # If the user is not on multiple teams
+            select_team
           end
-            
-         all("#saveTeamSelection_saveTeamSelection").first.click
-         end
         rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
         end
 
         begin
-          
-          wait_for_elements('#aprerelease')
+          visit APP_IDS_URL
+          wait_for_elements('.ios.bundles.gridList')
         rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
@@ -128,6 +108,49 @@ module PEM
       rescue => ex
         error_occured(ex)
       end
+    end
+
+    def select_team
+      team_id = ENV["PEM_TEAM_ID"]
+      team_id = nil if team_id.to_s.length == 0
+
+      unless team_id
+        Helper.log.info "You can store you preferred team using the environment variable `PEM_TEAM_ID`".green
+        Helper.log.info "Your ID belongs to the following teams:".green
+      end
+      
+      available_options = []
+
+      teams = find("div.input").all('.team-value') # Grab all the teams data
+      teams.each_with_index do |val, index|
+        current_team_id = '"' + val.find("input").value + '"'
+        team_text = val.find(".label-primary").text
+        description_text = val.find(".label-secondary").text
+        description_text = "(#{description_text})" unless description_text.empty? # Include the team description if any
+        index_text = (index + 1).to_s + "."
+
+        available_options << [index_text, current_team_id, team_text, description_text].join(" ")
+      end
+
+      unless team_id
+        puts available_options.join("\n").green
+        team_index = ask("Please select the team number you would like to access: ".green)
+        team_id = teams[team_index.to_i - 1].find(".radio").value
+      end
+
+      team_button = first(:xpath, "//input[@type='radio' and @value='#{team_id}']") # Select the desired team
+      if team_button
+        team_button.click
+      else
+        Helper.log.fatal "Could not find given Team. Available options: ".red
+        puts available_options.join("\n").yellow
+        raise DeveloperCenterLoginError.new("Error finding given team #{team_id}.".red)
+      end
+
+      all(".button.large.blue.submit").first.click
+
+      result = visit APP_IDS_URL
+      raise "Could not open Developer Center" unless result['status'] == 'success'
     end
 
     # This method will enable push for the given app
@@ -160,6 +183,7 @@ module PEM
       def open_app_page(app_identifier)
         begin
           visit APP_IDS_URL
+          sleep 5
 
           apps = all(:xpath, "//td[@title='#{app_identifier}']")
           if apps.count == 1
@@ -264,7 +288,6 @@ module PEM
 
           counter += 1
           if counter > 100
-            Helper.log.debug page.html
             Helper.log.debug caller
             raise DeveloperCenterGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
           end
