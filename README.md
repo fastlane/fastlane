@@ -206,9 +206,9 @@ success do
     system("Say 'success'")
 end
 
-error do |exception|
+error do |information|
     # custom exception handling here
-    raise "Something went wrong: #{exception}"    
+    raise "Something went wrong: #{information['error']}"    
 end
 ```
 
