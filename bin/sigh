@@ -52,7 +52,7 @@ class SighApplication
           output_path = options.output || '.'
           output = File.join(output_path.gsub("~", ENV["HOME"]), file_name)
           FileUtils.mv(path, output)
-          system("open '#{output}'") unless options.skip_install
+          system("open -g '#{output}'") unless options.skip_install
           puts output.green
         end
       end
