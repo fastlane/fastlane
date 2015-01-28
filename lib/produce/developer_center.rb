@@ -97,7 +97,7 @@ module Produce
         begin
           if page.has_content?"Select Team" # If the user is not on multiple teams
             team_id = ENV["PRODUCE_TEAM_ID"]
-            unless team_id
+            unless team_id.to_s.length > 0
               Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID`".green
               Helper.log.info "Your ID belongs to the following teams:".green
               
