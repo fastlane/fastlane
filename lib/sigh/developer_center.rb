@@ -95,28 +95,7 @@ module Sigh
 
         begin
           if page.has_content?"Select Team" # If the user is not on multiple teams
-            team_id = ENV["SIGH_TEAM_ID"]
-            unless team_id
-              Helper.log.info "You can store you preferred team using the environment variable `SIGH_TEAM_ID`".green
-              Helper.log.info "Your ID belongs to the following teams:".green
-              
-              teams = find("div.input").all('.team-value') # Grab all the teams data
-              teams.each_with_index do |val, index|
-                team_text = val.find(".label-primary").text
-                description_text = val.find(".label-secondary").text
-                description_text = " (#{description_text})" unless description_text.empty? # Include the team description if any
-                Helper.log.info "\t#{index + 1}. #{team_text}#{description_text}".green # Print the team index and team name
-              end
-
-              team_index = ask("Please select the team number you would like to access: ".green)
-              team_id = teams[team_index.to_i - 1].find(".radio").value
-            end
-
-            first(:xpath, "//input[@type='radio' and @value='#{team_id}']").click # Select the desired team
-            all(".button.large.blue.submit").first.click
-
-            result = visit PROFILES_URL
-            raise "Could not open Developer Center" unless result['status'] == 'success'
+            select_team
           end
         rescue => ex
           Helper.log.debug ex
@@ -142,6 +121,50 @@ module Sigh
       rescue => ex
         error_occured(ex)
       end
+    end
+
+
+    def select_team
+      team_id = ENV["SIGH_TEAM_ID"]
+      team_id = nil if team_id.to_s.length == 0
+
+      unless team_id
+        Helper.log.info "You can store you preferred team using the environment variable `SIGH_TEAM_ID`".green
+        Helper.log.info "Your ID belongs to the following teams:".green
+      end
+      
+      available_options = []
+
+      teams = find("div.input").all('.team-value') # Grab all the teams data
+      teams.each_with_index do |val, index|
+        current_team_id = '"' + val.find("input").value + '"'
+        team_text = val.find(".label-primary").text
+        description_text = val.find(".label-secondary").text
+        description_text = "(#{description_text})" unless description_text.empty? # Include the team description if any
+        index_text = (index + 1).to_s + "."
+
+        available_options << [index_text, current_team_id, team_text, description_text].join(" ")
+      end
+
+      unless team_id
+        puts available_options.join("\n").green
+        team_index = ask("Please select the team number you would like to access: ".green)
+        team_id = teams[team_index.to_i - 1].find(".radio").value
+      end
+
+      team_button = first(:xpath, "//input[@type='radio' and @value='#{team_id}']") # Select the desired team
+      if team_button
+        team_button.click
+      else
+        Helper.log.fatal "Could not find given Team. Available options: ".red
+        puts available_options.join("\n").yellow
+        raise DeveloperCenterLoginError.new("Error finding given team #{team_id}.".red)
+      end
+
+      all(".button.large.blue.submit").first.click
+
+      result = visit PROFILES_URL
+      raise "Could not open Developer Center" unless result['status'] == 'success'
     end
 
     def run(app_identifier, type, cert_name = nil)
@@ -248,7 +271,7 @@ module Sigh
       # example: <option value="RGAWZGXSY4">ABP (5A997XSHK2.net.sunapps.34)</option>
       identifiers = all(:xpath, "//option[contains(text(), '.#{app_identifier})')]")
       if identifiers.count == 0
-        puts "Couldn't find App ID '#{app_identifier}'\nonly found:".red
+        puts "Couldn't find App ID '#{app_identifier}'\nonly found the following bundle identifiers:".red
         all(:xpath, "//option").each do |current|
           puts "\t- #{current.text}".yellow
         end
