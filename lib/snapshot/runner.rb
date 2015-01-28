@@ -73,6 +73,7 @@ module Snapshot
           stdout.each do |line|
             lines << line
             begin
+              puts line.strip if $verbose
               result = parse_test_line(line)
               case result
                 when :retry

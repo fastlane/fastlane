@@ -23,6 +23,7 @@ class SnapshotApplication
 
     global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
     global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
+    global_option('--verbose', 'Shows all output printed by Instruments.') { $verbose = true }
 
     always_trace!
 
