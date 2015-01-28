@@ -72,7 +72,6 @@ module Deliver
 
           counter += 1
           if counter > 100
-            Helper.log.debug page.html
             Helper.log.debug caller
             raise ItunesConnectGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
           end
