@@ -21,6 +21,8 @@ class FastlaneApplication
     program :help, 'GitHub', 'https://github.com/krausefx/produce'
     program :help_formatter, :compact
 
+    always_trace!
+
     global_option('--verbose') { $verbose = true }
 
     command :create do |c|
