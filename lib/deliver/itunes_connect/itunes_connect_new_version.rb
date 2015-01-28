@@ -33,15 +33,15 @@ module Deliver
           end
         else
           Helper.log.warn "Can not create version #{version_number} on iTunesConnect. Maybe it was already created."
-          Helper.log.info "Check out '#{current_url}' what's the latest version."
 
           begin
-            created_version = first(".status.waiting").text.split(" ").first
+            created_version = wait_for_elements("input[ng-model='versionInfo.version.value']").first.value
             if created_version != version_number
-              raise "Some other version ('#{created_version}') was created instead of the one you defined ('#{version_number}')"
+              update_existing_version_number!(app, version_number)
             end
           rescue => ex
             # Can not fetch the version number of the new version (this happens, when it's e.g. 'Developer Rejected')
+            Helper.log.error ex
             unless page.has_content?version_number
               raise "Some other version was created instead of the one you defined ('#{version_number}')."
             end
@@ -52,6 +52,16 @@ module Deliver
       rescue => ex
         error_occured(ex)
       end
+    end
+
+    def update_existing_version_number!(app, version_number)
+      Helper.log.warn "There is already a new version created, which does not match the current version: '#{version_number}'"
+
+      version_input = wait_for_elements("input[ng-model='versionInfo.version.value']").first
+      version_input.set version_number
+      click_on "Save"
+
+      Helper.log.warn "Changed the version number of the latest version to '#{version_number}'".green
     end
   end
 end

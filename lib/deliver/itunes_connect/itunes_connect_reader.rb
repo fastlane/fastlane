@@ -47,7 +47,9 @@ module Deliver
         open_app_page(app)
 
         begin
-          return first(".status.ready").text.split(" ").first
+          version_number = wait_for_elements("input[ng-model='versionInfo.version.value']").first.value
+          version_number ||= first(".status.ready").text.split(" ").first
+          return version_number
         rescue
           Helper.log.debug "Could not fetch version number of the live version for app #{app}."
           return nil
