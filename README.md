@@ -97,12 +97,6 @@ Pass the Apple ID and bundle identifier to be used:
 deliver testflight -u felix@krausefx.com -a com.krausefx.app
 ```
 
-To skip the submission of the beta version, use
-
-```
-deliver testflight --skip-deploy
-```
-
 To build and upload the ipa in one step, you can use [shenzhen](https://github.com/nomad/shenzhen):
 
 ```
