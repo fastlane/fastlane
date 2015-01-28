@@ -22,20 +22,18 @@ class SighApplication
 
     always_trace!
 
-    global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
-    global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
+    global_option '--adhoc', 'By default, sigh will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
+    global_option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
+    global_option '--development', 'Renew the development certificate instead of the production one.'
+
+    global_option '-a', '--identifier STRING', String, 'The bundle identifier of your app.'
+    global_option '-u', '--username STRING', String, 'Your Apple ID username.'
+    global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
+    global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
 
     command :renew do |c|
       c.syntax = 'sigh renew'
       c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
-
-      c.option '-a', '--identifier STRING', String, 'The bundle identifier of your app'
-      c.option '-u', '--username STRING', String, 'Your Apple ID username'
-      c.option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
-      c.option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
-      c.option '--adhoc', 'By default, sigh will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
-      c.option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
-      c.option '--development', 'Renew the development certificate instead of the production one'
 
       c.action do |args, options|
         app = app_identifier(options)
