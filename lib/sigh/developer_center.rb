@@ -168,7 +168,6 @@ module Sigh
     end
 
     def run(app_identifier, type, cert_name = nil, force, cert_date)
-
       cert = maintain_app_certificate(app_identifier, type, force, cert_date)
 
       type_name = type
@@ -416,7 +415,10 @@ module Sigh
           end
         end
 
-        raise "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+        error_message_no_cert_with_date = "Could not find a Certificate with expiry date '#{cert_date}'. Please open #{current_url} and make sure you have a signing profile created.".red
+        error_message_no_cert = "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+
+        raise cert_date ? error_message_no_cert_with_date : error_message_no_cert
       end
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file

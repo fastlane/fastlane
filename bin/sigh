@@ -49,6 +49,7 @@ class SighApplication
         path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
 
         if path
+          file_name = options.filename || File.basename(path)
           if options.filename == nil
             file_name = File.basename(path)
           else
