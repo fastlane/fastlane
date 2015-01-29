@@ -13,22 +13,27 @@ module Deliver
         click_on "Prerelease"
 
         wait_for_preprocessing
+        
+        beta_switch = (all(".switcher.ng-binding").first rescue nil)
 
-        if all(".switcher.ng-binding").count == 0
+        unless beta_switch
           raise "Could not find beta build on '#{current_url}'. Make sure it is available there"
         end
 
-        if first(".switcher.ng-binding")['class'].include?"checked"
-          Helper.log.info("Beta is already active. Take a look at '#{current_url}'.")
-          return true
+
+        # Toggeling beta builds, since Apple's TestFlight does not publish the update to testers automatically
+        if beta_switch['class'].include?"checked"
+          # Disable beta tests first
+          beta_switch.click
+          all("a").find { |a| a.text == "Stop Testing" }.click
         end
 
-        first(".switcher.ng-binding").click
-        if page.has_content?"Are you sure you want to start testing"
+        beta_switch.click
+        if page.has_content?"Are you sure you want to start testing" # this only happens on the first time
           click_on "Start"
-
-          Helper.log.info "Successfully enabled beta builds".green
         end
+
+        Helper.log.info "Successfully enabled latest beta build.".green
 
         return true
       rescue => ex
