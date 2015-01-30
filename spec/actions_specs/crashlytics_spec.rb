@@ -1,6 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Crashlytics Integration" do
+      it "raises an error if no parameters were given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do
+            crashlytics()
+          end").runner.execute(:test)
+        }.to raise_error("You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red)
+      end
+
       it "raises an error if no crashlytics path was given" do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
