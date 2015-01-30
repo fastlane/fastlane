@@ -112,7 +112,7 @@ module Produce
         end
       end
 
-      create_new_app
+      return create_new_app
     rescue => ex
       error_occured(ex)
     end
@@ -131,7 +131,30 @@ module Produce
         Helper.log.info "Finished creating new app '#{Config.val(:app_name)}' on iTunes Connect".green
       end
 
-      return true
+      return fetch_apple_id
+    end
+
+    def fetch_apple_id
+      # First try it using the Apple API
+      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{Config.val(:bundle_identifier)}").read)
+
+      if data['resultCount'] == 0 or true
+        visit current_url
+        sleep 10
+        first("input[ng-model='searchModel']").set Config.val(:bundle_identifier)
+
+        if all("div[bo-bind='app.name']").count == 2
+          raise "There were multiple results when looking for the new app. This might be due to having same app identifiers included in each other (see generated screenshots)".red
+        end
+
+        app_url = first("a[bo-href='appBundleLink(app.adamId, app.type)']")[:href]
+        apple_id = app_url.split('/').last
+
+        Helper.log.info "Found Apple ID #{apple_id}".green
+        return apple_id
+      else
+        return data['results'].first['trackId'] # already in the store
+      end
     end
 
     def initial_create

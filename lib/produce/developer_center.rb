@@ -100,7 +100,7 @@ module Produce
           end
         rescue => ex
           Helper.log.debug ex
-          raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
+          raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we couldn't select the one specified.")
         end
 
         begin
