@@ -128,8 +128,11 @@ module Produce
       team_id = ENV["PRODUCE_TEAM_ID"]
       team_id = nil if team_id.to_s.length == 0
 
-      unless team_id
-        Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID`".green
+      team_name = ENV["PRODUCE_TEAM_NAME"]
+      team_name = nil if team_name.to_s.length == 0
+
+      if team_id == nil and team_name == nil
+        Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID` or `PRODUCE_TEAM_NAME`".green
         Helper.log.info "Your ID belongs to the following teams:".green
       end
       
@@ -146,19 +149,36 @@ module Produce
         available_options << [index_text, current_team_id, team_text, description_text].join(" ")
       end
 
-      unless team_id
-        puts available_options.join("\n").green
-        team_index = ask("Please select the team number you would like to access: ".green)
-        team_id = teams[team_index.to_i - 1].find(".radio").value
-      end
+      if team_name
+        # Search for name
+        found_it = false
+        all("label.label-primary").each do |current|
+          if current.text.downcase.gsub(/\s+/, "") == team_name.downcase.gsub(/\s+/, "")
+            current.click # select the team by name
+            found_it = true
+          end
+        end
 
-      team_button = first(:xpath, "//input[@type='radio' and @value='#{team_id}']") # Select the desired team
-      if team_button
-        team_button.click
+        unless found_it
+          available_teams = all("label.label-primary").collect { |a| a.text }
+          raise DeveloperCenterLoginError.new("Could not find Team with name '#{team_name}'. Available Teams: #{available_teams}".red)
+        end
       else
-        Helper.log.fatal "Could not find given Team. Available options: ".red
-        puts available_options.join("\n").yellow
-        raise DeveloperCenterLoginError.new("Error finding given team #{team_id}.".red)
+        # Search by ID/Index
+        unless team_id
+          puts available_options.join("\n").green
+          team_index = ask("Please select the team number you would like to access: ".green)
+          team_id = teams[team_index.to_i - 1].find(".radio").value
+        end
+
+        team_button = first(:xpath, "//input[@type='radio' and @value='#{team_id}']") # Select the desired team
+        if team_button
+          team_button.click
+        else
+          Helper.log.fatal "Could not find given Team. Available options: ".red
+          puts available_options.join("\n").yellow
+          raise DeveloperCenterLoginError.new("Error finding given team #{team_id}.".red)
+        end
       end
 
       all(".button.large.blue.submit").first.click
