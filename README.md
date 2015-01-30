@@ -81,6 +81,7 @@ In case you want to pass more information to `produce`:
 - `PRODUCE_VERSION` (the initial app version)
 - `PRODUCE_SKU` (the SKU you want to use, which must be a unique number)
 - `PRODUCE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
+- `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
 
 # How does it work?
 
