@@ -10,7 +10,7 @@ describe Fastlane do
               ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
             })
           end").runner.execute(:test)
-        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: '/path'`".red)
+        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
       end
 
       it "raises an error if the given crashlytics path was not found" do
@@ -23,7 +23,7 @@ describe Fastlane do
               ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
             })
           end").runner.execute(:test)
-        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: '/path'`".red)
+        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
       end
 
       it "raises an error if no api token was given" do
@@ -59,7 +59,7 @@ describe Fastlane do
               build_secret: 'wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: '/path/app.ipa'`".red)
+        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
       end
 
       it "raises an error if the given ipa path was not found" do
@@ -72,7 +72,7 @@ describe Fastlane do
               ipa_path: './fastlane/wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: '/path/app.ipa'`".red)
+        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
       end
 
       it "works with valid parameters" do
