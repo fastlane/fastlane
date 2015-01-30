@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      
+      PRODUCE_APPLE_ID = :PRODUCE_APPLE_ID
     end
 
     class ProduceAction
@@ -22,7 +22,12 @@ module Fastlane
           
           CredentialsManager::PasswordManager.shared_manager(ENV['PRODUCE_USERNAME']) if ENV['PRODUCE_USERNAME']
           Produce::Config.shared_config # to ask for missing information right in the beginning
-          Produce::Manager.start_producing
+          
+          apple_id = Produce::Manager.start_producing.to_s
+
+
+          Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
+          ENV["PRODUCE_APPLE_ID"] = apple_id
         end
       end
     end
