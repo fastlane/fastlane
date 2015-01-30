@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.1.3)
+    fastlane (0.1.4)
       colored
       commander (~> 4.2.0)
       credentials_manager
@@ -14,7 +14,7 @@ PATH
       produce (>= 0.1.0)
       shenzhen (~> 0.11.0)
       sigh (>= 0.2.0)
-      slack-notifier
+      slack-notifier (~> 1.0)
       snapshot (>= 0.4.0)
 
 GEM
