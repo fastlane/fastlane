@@ -14,6 +14,7 @@ PATH
       produce (>= 0.1.0)
       shenzhen (~> 0.11.0)
       sigh (>= 0.2.0)
+      slack-notifier
       snapshot (>= 0.4.0)
 
 GEM
@@ -164,6 +165,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    slack-notifier (1.0.0)
     slop (3.6.0)
     snapshot (0.4.4)
       colored
