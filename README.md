@@ -152,6 +152,12 @@ To skip cleaning the project:
 snapshot --noclean
 ```
 
+By default, `snapshot`, will re-install the app, to make sure it's in a clean state. In case you don't want this run
+
+```
+SNAPSHOT_SKIP_UNINSTALL=1 snapshot
+```
+
 ## Snapfile
 
 #### Why should you have to remember complicated commands and parameters?

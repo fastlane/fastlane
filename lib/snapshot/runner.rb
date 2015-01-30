@@ -20,7 +20,7 @@ module Snapshot
         SnapshotConfig.shared_instance.languages.each do |language|
           SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
 
-          reinstall_app(device, language)
+          reinstall_app(device, language) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
