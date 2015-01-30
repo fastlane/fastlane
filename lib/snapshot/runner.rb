@@ -20,6 +20,7 @@ module Snapshot
         SnapshotConfig.shared_instance.languages.each do |language|
           SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
 
+          reinstall_app(device, language)
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
@@ -50,6 +51,33 @@ module Snapshot
       FileUtils.mkdir_p(TRACE_DIR)
     end
 
+    def reinstall_app(device, language)
+      def find_simulator(name) # fetches the UDID of the simulator type
+        all = `instruments -s`.split("\n")
+        all.each do |current|
+          return current.match(/\[(.*)\]/)[1] if current.include?name
+        end
+        raise "Could not find simulator '#{name}' to install the app on."
+      end
+
+      def app_identifier
+        @app_identifier ||= (ENV["SNAPSHOT_APP_IDENTIFIER"] || `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/*.plist`)
+      end
+
+      def com(cmd)
+        puts cmd.magenta
+        result = `#{cmd}`
+        puts result if result.to_s.length > 0
+      end
+
+      udid = find_simulator(device)
+      com("killall 'iOS Simulator'")
+      com("xcrun simctl boot '#{udid}'")
+      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
+      sleep 3
+      com("xcrun simctl install '#{udid}' '#{@app_path}'")
+      com("xcrun simctl shutdown '#{udid}'")
+    end
 
     def run_tests(device, language)
       Helper.log.info "Running tests on #{device} in language #{language}".green
