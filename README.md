@@ -83,6 +83,27 @@ In case you want to pass more information to `produce`:
 - `PRODUCE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
 - `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
 
+## `fastlane` Integration
+
+Your `Fastfile`
+```ruby
+lane :appstore do
+  produce({
+    ...
+  })
+
+  deliver
+end
+```
+
+To use the newly generated app in `deliver`, you have to adapt your `Deliverfile`:
+
+```ruby
+apple_id ENV['PRODUCE_APPLE_ID']
+```
+
+This will tell `deliver`, which `App ID` to use, since the app is not yet available in the App Store.
+
 # How does it work?
 
 ```produce``` will access the ```iOS Dev Center``` to create your `App ID`. Check out the full source code: [developer_center.rb](https://github.com/KrauseFx/produce/blob/master/lib/produce/developer_center.rb).
