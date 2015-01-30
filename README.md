@@ -153,6 +153,22 @@ To use the Ad Hoc profile instead
 sigh :adhoc
 ```
 
+#### [produce](https://github.com/KrauseFx/produce)
+
+Create new apps on iTunes Connect and Apple Developer Portal. If the app already exists, `produce` will not do anything.
+
+```ruby
+produce({
+  produce_username: 'felix@krausefx.com',
+  produce_app_identifier: 'com.krausefx.app',
+  produce_app_name: 'MyApp',
+  produce_language: 'English',
+  produce_version: '1.0',
+  produce_sku: 123,
+  produce_team_name: 'SunApps GmbH' # only necessary when in multiple teams
+})
+```
+
 #### [deliver](https://github.com/KrauseFx/deliver)
 ```ruby
 deliver

@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 0.2.0'
   spec.add_dependency 'pem', '>= 0.3.0'
   spec.add_dependency 'sigh', '>= 0.2.0'
+  spec.add_dependency 'produce', '>= 0.1.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
