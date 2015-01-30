@@ -6,7 +6,6 @@ require 'produce'
 require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
-require 'pry'
 
 HighLine.track_eof = false
 
