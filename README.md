@@ -3,7 +3,7 @@ CredentialsManager
 
 ```CredentialsManager``` is used by most of the tools part of the [fastlane.tools](https://fastlane.tools) toolchain.
 
-Every code, related to your username and password can be found here: [password_manager.rb](httpshttps://github.com/KrauseFx/CredentialsManager/blob/master/lib/credentials_manager/password_manager.rb)
+Every code, related to your username and password can be found here: [password_manager.rb](https://github.com/KrauseFx/CredentialsManager/blob/master/lib/credentials_manager/password_manager.rb)
 
 ## Storing in the Keychain
 By default, when entering your Apple credentials, they will be stored in the Keychain from Mac OS X. You can easily delete them, by opening the "Keychain App" switching to *All Items* and searching for "*deliver*".
