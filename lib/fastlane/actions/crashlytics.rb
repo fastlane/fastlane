@@ -9,9 +9,9 @@ module Fastlane
         require "shenzhen"
         require "shenzhen/plugins/crashlytics"
 
-        params = params.first
+        assert_params_given!(params)
 
-        raise "You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red unless params
+        params = params.first
 
         crashlytics_path = params[:crashlytics_path]
         api_token        = params[:api_token]
@@ -37,6 +37,13 @@ module Fastlane
           Helper.log.fatal "Error uploading to Crashlytics."
           raise "Error when trying to upload ipa to Crashlytics".red
         end
+      end
+
+      private
+
+      def self.assert_params_given!(params)
+        return unless params.empty?
+        raise "You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red
       end
 
       def self.assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
@@ -65,6 +72,9 @@ module Fastlane
         return if ipa_path && File.exists?(ipa_path)
         raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red
       end
+
+      private_class_method :assert_params_given!, :assert_valid_params!,
+        :assert_valid_crashlytics_path!, :assert_valid_api_token!, :assert_valid_build_secret!, :assert_valid_ipa_path!
     end
   end
 end
