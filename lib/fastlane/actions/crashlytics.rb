@@ -11,6 +11,8 @@ module Fastlane
 
         params = params.first
 
+        raise "You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red unless params
+
         crashlytics_path = params[:crashlytics_path]
         api_token        = params[:api_token]
         build_secret     = params[:build_secret]
