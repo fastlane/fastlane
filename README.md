@@ -83,20 +83,26 @@ In case you want to pass more information to `produce`:
 - `PRODUCE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
 - `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
 
-## `fastlane` Integration
+## [`fastlane`](https://github.com/KrauseFx/fastlane) Integration
 
-Your `Fastfile`
+Your `Fastfile` should look like this
 ```ruby
 lane :appstore do
   produce({
-    ...
+    produce_username: 'felix@krausefx.com',
+    produce_app_identifier: 'com.krausefx.app',
+    produce_app_name: 'MyApp',
+    produce_language: 'English',
+    produce_version: '1.0',
+    produce_sku: 123,
+    produce_team_name: 'SunApps GmbH' # only necessary when in multiple teams
   })
 
   deliver
 end
 ```
 
-To use the newly generated app in `deliver`, you have to adapt your `Deliverfile`:
+To use the newly generated app in `deliver`, you need to add this line to your `Deliverfile`:
 
 ```ruby
 apple_id ENV['PRODUCE_APPLE_ID']
