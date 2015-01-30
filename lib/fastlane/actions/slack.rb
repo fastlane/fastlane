@@ -25,8 +25,10 @@ module Fastlane
         notifier = Slack::Notifier.new url
 
         notifier.username = 'fastlane'
-        notifier.channel = "#{options[:channel]}" if options[:channel].to_s.length > 0
-        notifier.channel = "##{notifier.channel}" unless ["#", "@"].include? notifier.channel[0] # send message to channel by default
+        if options[:channel].to_s.length > 0
+          notifier.channel = options[:channel] 
+          notifier.channel = ('#' + notifier.channel) unless ["#", "@"].include?notifier.channel[0] # send message to channel by default
+        end
 
         test_result = {
           fallback: options[:message],
