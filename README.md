@@ -10,7 +10,8 @@
   <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <b>PEM</b> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a>
+  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
+  <a href="https://github.com/KrauseFx/produce">produce</a>
 </p>
 -------
 
@@ -120,6 +121,7 @@ There are 2 actions involved:
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
