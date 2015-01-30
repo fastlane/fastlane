@@ -217,7 +217,7 @@ Send a message to **#channel** (by default) or a direct message to **@username**
   slack({
     message: "App successfully released!",
     channel: "#channel",
-    success: true,
+    success: true
   })
 ```
 
