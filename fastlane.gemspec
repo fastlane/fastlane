@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
   spec.add_dependency 'shenzhen', '~> 0.11.0' # to upload to Hockey and Crashlytics
+  spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
 
   spec.add_dependency 'credentials_manager'
   spec.add_dependency 'deliver', '>= 0.5.0'
@@ -34,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 0.2.0'
   spec.add_dependency 'pem', '>= 0.3.0'
   spec.add_dependency 'sigh', '>= 0.2.0'
+  spec.add_dependency 'produce', '>= 0.1.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
