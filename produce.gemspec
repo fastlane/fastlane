@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Produce::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["produce@krausefx.com"]
-  spec.summary       = %q{Because you would rather spend your time building stuff than fighting provisioning}
-  spec.description   = %q{Because you would rather spend your time building stuff than fighting provisioning}
+  spec.summary       = %q{Create new iOS apps on iTunes Connect and Dev Portal using the command line}
+  spec.description   = %q{Create new iOS apps on iTunes Connect and Dev Portal using the command line}
   spec.homepage      = "http://fastlane.tools"
   spec.license       = "MIT"
 
