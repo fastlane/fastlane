@@ -242,8 +242,11 @@ This can be used to
 
 To run a shell script, just use ```system('./script.sh')```.
 ```ruby
-setup_for_device_change do |device| 
-  puts "Preparing device: #{device}"
+setup_for_device_change do |device, udid|
+  puts "Preparing device: #{device} with udid #{udid}"
+
+  # Completely reset the device before we start taking screenshots
+  system("xcrun simctl erase #{udid}")
 end
 
 setup_for_language_change do |lang, device|
