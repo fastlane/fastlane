@@ -45,6 +45,8 @@ module Snapshot
           @config.build_command = value
         when :skip_alpha_removal
           @config.skip_alpha_removal = true
+        when :clear_previous_screenshots
+          @config.clear_previous_screenshots = true
         when :project_path
           raise "project_path has to be an String".red unless value.kind_of?String
 

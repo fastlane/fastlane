@@ -13,6 +13,8 @@ module Snapshot
       counter = 0
       errors = []
 
+      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if SnapshotConfig.shared_instance.clear_previous_screenshots
+
       SnapshotConfig.shared_instance.devices.each do |device|
         
         SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device, udid_for_simulator(device))  # Callback

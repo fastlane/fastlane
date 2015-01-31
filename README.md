@@ -276,6 +276,15 @@ This is only required in case there is a problem automatically detecting it.
 SNAPSHOT_APP_IDENTIFIER="com.krausefx.app" snapshot
 ```
 
+### Clear old screenshots
+
+If you add this line in your `Snapfile`, the previously generated screenshots will be deleted before generating new ones:
+
+```ruby
+clear_previous_screenshots
+```
+
+
 # Tips
 
 ## [`fastlane`](http://fastlane.tools) Toolchain

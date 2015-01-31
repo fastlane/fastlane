@@ -28,8 +28,11 @@ module Snapshot
     # @return (String) The build command, wich should build the app to '/tmp/snapshot'
     attr_accessor :build_command
 
-    # @return (BOOl) Skip the removal of the alpha channel from the screenshots
+    # @return (BOOL) Skip the removal of the alpha channel from the screenshots
     attr_accessor :skip_alpha_removal
+
+    # @return (BOOL) Clear previously generated screenshots before creating new ones
+    attr_accessor :clear_previous_screenshots
 
     # @return (Hash) All the blocks, which are called on specific actions
     attr_accessor :blocks
