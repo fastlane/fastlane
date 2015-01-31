@@ -15,7 +15,7 @@ module Snapshot
 
       SnapshotConfig.shared_instance.devices.each do |device|
         
-        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device)  # Callback
+        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device, udid_for_simulator(device))  # Callback
 
         SnapshotConfig.shared_instance.languages.each do |language|
           SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
