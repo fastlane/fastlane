@@ -423,9 +423,14 @@ end
 ```
 
 #### Snapshot
-To skip cleaning the project on every build
+To skip cleaning the project on every build:
 ```ruby
 snapshot :noclean
+```
+
+To show the output of `UIAutomation`:
+```ruby
+snapshot :verbose
 ```
 
 #### Run multiple ```lanes```
