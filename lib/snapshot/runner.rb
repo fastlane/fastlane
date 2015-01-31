@@ -15,7 +15,7 @@ module Snapshot
 
       SnapshotConfig.shared_instance.devices.each do |device|
         
-        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device)  # Callback
+        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device, udid_for_simulator(device))  # Callback
 
         SnapshotConfig.shared_instance.languages.each do |language|
           SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
@@ -51,14 +51,15 @@ module Snapshot
       FileUtils.mkdir_p(TRACE_DIR)
     end
 
-    def reinstall_app(device, language)
-      def find_simulator(name) # fetches the UDID of the simulator type
-        all = `instruments -s`.split("\n")
-        all.each do |current|
-          return current.match(/\[(.*)\]/)[1] if current.include?name
-        end
-        raise "Could not find simulator '#{name}' to install the app on."
+    def udid_for_simulator(name) # fetches the UDID of the simulator type
+      all = `instruments -s`.split("\n")
+      all.each do |current|
+        return current.match(/\[(.*)\]/)[1] if current.include?name
       end
+      raise "Could not find simulator '#{name}' to install the app on."
+    end
+
+    def reinstall_app(device, language)
 
       def app_identifier
         @app_identifier ||= ENV["SNAPSHOT_APP_IDENTIFIER"] 
@@ -73,7 +74,7 @@ module Snapshot
         puts result if result.to_s.length > 0
       end
 
-      udid = find_simulator(device)
+      udid = udid_for_simulator(device)
 
 
       com("killall 'iOS Simulator'")
