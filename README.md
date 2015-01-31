@@ -197,6 +197,8 @@ to your test file.
 js_file './path/file.js'
 ```
 
+You can add a custom script for iPads: `./path/file-iPad.js` and it will automatically be used if found. Just append the `-iPad` to your existing file.
+
 ### Scheme
 To not be asked which scheme to use, just set it like this:
 ```ruby

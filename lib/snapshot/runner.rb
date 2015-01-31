@@ -5,7 +5,7 @@ module Snapshot
     TRACE_DIR = '/tmp/snapshot_traces'
 
     def work(clean: true)
-      SnapshotConfig.shared_instance.js_file # to verify the file can be found
+      SnapshotConfig.shared_instance.js_file # to verify the file can be found earlier
 
       Builder.new.build_app(clean: clean)
       @app_path = Dir.glob("/tmp/snapshot/build/*.app").first
@@ -176,7 +176,8 @@ module Snapshot
     end
 
     def generate_test_command(device, language)
-      script_path = SnapshotConfig.shared_instance.js_file
+      is_ipad = (device.downcase.include?'ipad')
+      script_path = SnapshotConfig.shared_instance.js_file(is_ipad)
 
       [
         "instruments",

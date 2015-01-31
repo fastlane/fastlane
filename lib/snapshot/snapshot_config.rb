@@ -109,15 +109,28 @@ module Snapshot
     end
 
     # The JavaScript UIAutomation file
-    def js_file
-      return manual_js_file if manual_js_file
+    def js_file(ipad = false)
+      result = manual_js_file
 
-      files = Dir.glob("./*.js").delete_if { |path| path.include?"SnapshotHelper.js" }
-      if files.count == 1
-        return files.first
-      else
+      unless result
+        files = Dir.glob("./*.js").delete_if { |path| (path.include?"SnapshotHelper.js" or path.include?"iPad.js") }
+        if files.count == 1
+          result = files.first
+        end
+      end
+
+      if ipad
+        ipad_file = result.split('.js').join('/') + '-iPad.js'
+        if File.exists?(ipad_file)
+          result = ipad_file
+        end
+      end
+
+      unless File.exists?result
         raise "Could not determine which UIAutomation file to use. Please pass a path to your Javascript file using 'js_file'.".red
       end
+
+      return result
     end
 
     # The scheme to use (either it's set, or there is only one, or user has to enter it)
