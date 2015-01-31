@@ -52,9 +52,9 @@ module Fastlane
                       icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
                       attachments: [test_result]
 
-        unless result.code == 200
+        unless result.code.to_i == 200
           Helper.log.debug result
-          raise "Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel".red
+          raise "Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.".red
         else
           Helper.log.info "Successfully sent Slack notification".green
         end

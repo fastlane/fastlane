@@ -7,7 +7,8 @@ module Fastlane
     class SnapshotAction
       def self.run(params)
         clean = true
-        clean = false if params.first == :noclean
+        clean = false if params.include?(:noclean)
+        $verbose = true if params.include?(:verbose)
 
         if Helper.is_test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
