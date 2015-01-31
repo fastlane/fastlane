@@ -78,6 +78,7 @@ module Snapshot
 
 
       com("killall 'iOS Simulator'")
+      sleep 3
       com("xcrun simctl boot '#{udid}'")
       com("xcrun simctl uninstall booted '#{app_identifier}'")
       sleep 3

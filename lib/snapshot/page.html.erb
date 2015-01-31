@@ -41,7 +41,7 @@
               <% next if screen_path.include?"_framed.png" %>
               <td>
                 <% path = screen_path.gsub("./screenshots/", "./") %>
-                <% screen_size = FastImage.size(screen_path) %>
+                <% screen_size = FastImage.size(File.join('screenshots', screen_path)) %>
                 <a href="<%= path %>" target="_blank">
                   <img class="screenshot" 
                          src="<%= path %>",

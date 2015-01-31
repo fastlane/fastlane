@@ -9,17 +9,19 @@ module Snapshot
       @data = {}
 
       Dir["#{screens_path}/*"].sort.each do |language_path|
-        language = language_path.split('/').last
-        Dir[[language_path, '*'].join('/')].sort.each do |screenshot|
+        language = File.basename(language_path)
+        Dir[File.join(language_path, '*')].sort.each do |screenshot|
 
           available_devices.each do |key_name, output_name|
 
-            if screenshot.split('/').last.include?key_name
+            if File.basename(screenshot).include?key_name
               # This screenshot it from this device
               @data[language] ||= {}
               @data[language][output_name] ||= []
-              @data[language][output_name] << screenshot
-              break # to not include iPhone 6 and 6 Plus
+
+              resulting_path = File.join('.', language, File.basename(screenshot))
+              @data[language][output_name] << resulting_path
+              break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
             end
           end
         end
