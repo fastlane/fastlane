@@ -51,14 +51,15 @@ module Snapshot
       FileUtils.mkdir_p(TRACE_DIR)
     end
 
-    def reinstall_app(device, language)
-      def find_simulator(name) # fetches the UDID of the simulator type
-        all = `instruments -s`.split("\n")
-        all.each do |current|
-          return current.match(/\[(.*)\]/)[1] if current.include?name
-        end
-        raise "Could not find simulator '#{name}' to install the app on."
+    def udid_for_simulator(name) # fetches the UDID of the simulator type
+      all = `instruments -s`.split("\n")
+      all.each do |current|
+        return current.match(/\[(.*)\]/)[1] if current.include?name
       end
+      raise "Could not find simulator '#{name}' to install the app on."
+    end
+
+    def reinstall_app(device, language)
 
       def app_identifier
         @app_identifier ||= (ENV["SNAPSHOT_APP_IDENTIFIER"] || `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/*.plist`)
@@ -70,7 +71,7 @@ module Snapshot
         puts result if result.to_s.length > 0
       end
 
-      udid = find_simulator(device)
+      udid = udid_for_simulator(device)
       com("killall 'iOS Simulator'")
       com("xcrun simctl boot '#{udid}'")
       com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
