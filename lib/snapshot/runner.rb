@@ -61,7 +61,10 @@ module Snapshot
       end
 
       def app_identifier
-        @app_identifier ||= (ENV["SNAPSHOT_APP_IDENTIFIER"] || `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/*.plist`)
+        @app_identifier ||= ENV["SNAPSHOT_APP_IDENTIFIER"] 
+        @app_identifier ||= `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/Info.plist`
+        @app_identifier ||= `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/*.plist`
+        @app_identifier.strip
       end
 
       def com(cmd)
@@ -71,12 +74,14 @@ module Snapshot
       end
 
       udid = find_simulator(device)
+
+
       com("killall 'iOS Simulator'")
       com("xcrun simctl boot '#{udid}'")
-      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
+      com("xcrun simctl uninstall booted '#{app_identifier}'")
       sleep 3
-      com("xcrun simctl install '#{udid}' '#{@app_path}'")
-      com("xcrun simctl shutdown '#{udid}'")
+      com("xcrun simctl install booted '#{@app_path}'")
+      com("xcrun simctl shutdown booted")
     end
 
     def run_tests(device, language)
