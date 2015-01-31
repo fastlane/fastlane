@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.1.4)
+    fastlane (0.1.5)
       colored
       commander (~> 4.2.0)
       credentials_manager
@@ -167,7 +167,7 @@ GEM
     simplecov-html (0.8.0)
     slack-notifier (1.0.0)
     slop (3.6.0)
-    snapshot (0.4.4)
+    snapshot (0.4.7)
       colored
       commander (~> 4.2.0)
       fastimage (~> 1.6.3)
