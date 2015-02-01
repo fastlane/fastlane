@@ -25,11 +25,14 @@ class SighApplication
     global_option '--adhoc', 'By default, sigh will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
     global_option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
     global_option '--development', 'Renew the development certificate instead of the production one.'
+    global_option '--force', 'Renew non-development provisioning profiles regardless of state.'
 
     global_option '-a', '--identifier STRING', String, 'The bundle identifier of your app.'
     global_option '-u', '--username STRING', String, 'Your Apple ID username.'
     global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
     global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
+    global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (e.g. "Nov 11, 2017")'
+    global_option '-f', '--filename STRING', String, 'Filename to use for the provisioning profile'
 
     command :renew do |c|
       c.syntax = 'sigh renew'
@@ -43,10 +46,15 @@ class SighApplication
         type = Sigh::DeveloperCenter::ADHOC if options.adhoc 
         type = Sigh::DeveloperCenter::DEVELOPMENT if options.development
         
-        path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name)
+        path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
 
         if path
-          file_name = File.basename(path)
+          file_name = options.filename || File.basename(path)
+          if options.filename == nil
+            file_name = File.basename(path)
+          else
+            file_name = options.filename
+          end
           output_path = options.output || '.'
           output = File.join(output_path.gsub("~", ENV["HOME"]), file_name)
           FileUtils.mv(path, output)
