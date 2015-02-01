@@ -110,22 +110,24 @@ If you want to generate a **Development** profile:
 To generate the profile in a specific directory: 
 
     sigh -o "~/Certificates/"
+    
+### Advanced
 
 By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
     sigh --skip_install
+    
+To save the provisioning profile under a specific name, use the -f option:
 
-If you need the provisioning profile to be renewed regardless of it's state use the --force option. This gives you a profile with the maximum lifetime:
+    sigh -a com.krausefx.app -u username -f "myProfile.mobileprovision"
+
+If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime:
 
     sigh --force -a com.krausefx.app -u username
 
 To renew a valid profile with a different certificate, look up the expiry date of the certificate you want to sign with in the Apple Developer Portal under Production Certificates. Copy the date string from there and use the following:
 
     sigh --force -a com.krausefx.app -u username -d "Nov 11, 2017"
-
-To save the provisioning profile under a specific name, use the -f option:
-
-    sigh -a com.krausefx.app -u username -f "myProfile.mobileprovision"
 
 
 ## Environment Variables
