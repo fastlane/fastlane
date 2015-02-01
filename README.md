@@ -10,7 +10,8 @@
   <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a>
+  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
+  <a href="https://github.com/KrauseFx/produce">produce</a>
 </p>
 -------
 
@@ -318,6 +319,7 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 
 ## Available language codes
 ```ruby
