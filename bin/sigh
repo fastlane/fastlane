@@ -25,13 +25,13 @@ class SighApplication
     global_option '--adhoc', 'By default, sigh will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
     global_option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
     global_option '--development', 'Renew the development certificate instead of the production one.'
-    global_option '--force', 'Renew the provisioning profile regardless of state.'
+    global_option '--force', 'Renew non-development provisioning profiles regardless of state.'
 
     global_option '-a', '--identifier STRING', String, 'The bundle identifier of your app.'
     global_option '-u', '--username STRING', String, 'Your Apple ID username.'
     global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
     global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
-    global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (ex. "Nov 11, 2017")'
+    global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (e.g. "Nov 11, 2017")'
     global_option '-f', '--filename STRING', String, 'Filename to use for the provisioning profile'
 
     command :renew do |c|
