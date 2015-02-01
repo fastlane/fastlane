@@ -402,7 +402,7 @@ module Sigh
           if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
             # The other profiles are push profiles
             # We only care about the distribution profile
-            if cert_date == nil
+            unless cert_date
               return current_cert # mostly we only care about the 'certificateId'
             else
               if current_cert['expirationDateString'] == cert_date
