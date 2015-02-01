@@ -220,7 +220,7 @@ module Sigh
             end
 
             # We found the correct certificate
-            if force && type != DEVELOPMENT
+            if force and type != DEVELOPMENT
               provisioningProfileId = current_cert['provisioningProfileId']
               renew_profile(provisioningProfileId, type, cert_date) # This one needs to be forcefully renewed
               return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
