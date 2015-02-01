@@ -51,8 +51,6 @@ describe Deliver do
       end
 
       it "doesn't show error if production ipa is not given and beta build should be uploaded" do
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
-        Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
         Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
         Deliver::Deliverer.new('spec/fixtures/Deliverfiles/DeliverfileBetaProductionIpa', 

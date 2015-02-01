@@ -36,15 +36,21 @@ module Deliver
         create_app
         verify_app_on_itunesconnect
 
-        load_metadata_from_config_json_folder # the json file generated from the quick start
-        set_app_metadata
-        set_screenshots
+        unless is_beta_build?
+          # App Metdata will not be updated for beta builds
 
-        verify_pdf_file
+          load_metadata_from_config_json_folder # the json file generated from the quick start
+          set_app_metadata
+          set_screenshots
 
-        additional_itc_information # e.g. copyright, age rating
+          verify_pdf_file
 
-        trigger_metadata_upload
+          additional_itc_information # e.g. copyright, age rating
+
+          trigger_metadata_upload
+        end
+
+        # Always upload a new ipa (except if none was given)
         trigger_ipa_upload
 
         call_success_block
@@ -207,7 +213,7 @@ module Deliver
     end
 
     def verify_pdf_file
-      if @deploy_information[Deliverer::ValKey::SKIP_PDF] or is_beta_build?
+      if @deploy_information[Deliverer::ValKey::SKIP_PDF]
         Helper.log.debug "PDF verify was skipped"
       else
         # Everything is prepared for the upload

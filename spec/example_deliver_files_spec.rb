@@ -215,7 +215,7 @@ describe Deliver do
 
             it "Successful with custom parameters" do
               expect(File.exists?@tests_path).to eq(false)
-              Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+              Deliver::ItunesTransporter.clear_mock_files # we don't even download the app metadata
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
               deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks", 
                                 force: true, 

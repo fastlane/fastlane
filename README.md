@@ -191,7 +191,7 @@ beta_ipa do
 end
 ```
 
-and provide `--beta` option when calling `deliver`.
+and provide `--beta` option when calling `deliver`. When running `deliver` with the `--beta` flag enabled, it will **not** upload new app metadata.
 
 #### Implement blocks to run unit tests
 If you're using [fastlane](http://github.com/krausefx/fastlane), run tests and error blocks there.
