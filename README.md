@@ -118,13 +118,13 @@ If you need the provisioning profile to be renewed regardless of it's state:
 
     sigh --renew --force -a com.krausefx.app -u username
 
-To save the provisioning profile under a specific name:
-
-    sigh --renew -a com.krausefx.app -u username -f "myProfile.mobileprovision"
-
 To renew a valid profile with a different certificate, look up the expiry date of the certificate you want to sign with in the Apple Developer Portal under Production Certificates. Copy the date string from there and use the following:
 
     sigh --renew --force -a com.krausefx.app -u username -d "Nov 11, 2017"
+
+To save the provisioning profile under a specific name:
+
+    sigh --renew --force -a com.krausefx.app -u username -f "myProfile.mobileprovision"
 
 
 ## Environment Variables
