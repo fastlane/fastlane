@@ -50,7 +50,6 @@ describe Deliver do
       expect(metadata['en-US']['title']).to eq('Default English Title')
       expect(metadata['de-DE']['title']).to eq('Example App Title')
       expect(metadata['de-DE']['description']).to include('3D GPS Birdiebuch')
-      expect(metadata['de-DE']['version_whats_new']).to include('- Changelog Line 1')
       expect(metadata['de-DE']['software_url']).to eq('http://sunapps.net')
       expect(metadata['de-DE']['support_url']).to eq('http://www.sunapps.net/')
       expect(metadata['de-DE']['keywords']).to eq(%w|personal sunapps sun sunapps felix krause|)
