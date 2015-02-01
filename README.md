@@ -114,7 +114,7 @@ By default, ```sigh``` will install the downloaded profile on your machine. If y
 
     sigh --skip_install
 
-If you need the provisioning profile to be renewed regardless of it's state use the --force option. This gives you a profile with the maximum profile lifetime:
+If you need the provisioning profile to be renewed regardless of it's state use the --force option. This gives you a profile with the maximum lifetime:
 
     sigh --renew --force -a com.krausefx.app -u username
 
