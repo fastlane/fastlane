@@ -10,8 +10,8 @@ module Produce
 
     attr_reader :config
 
+    # Leaved to keep Fastline from crashing. Should be removed upon version bump.
     def self.shared_config
-      @@shared ||= self.new
     end
 
     def self.shared_config= config
