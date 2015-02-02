@@ -3,20 +3,30 @@ module Produce
     attr_reader :config
 
     def self.shared_config
-      @@shared ||= self.new
+      @@shared ||= self.new(options)
     end
 
-    def initialize
-      @config = {
-        :bundle_identifier => ENV['PRODUCE_APP_IDENTIFIER'],
-        :app_name => ENV['PRODUCE_APP_NAME'],
-        :primary_language => ENV['PRODUCE_LANGUAGE'],
-        :version => ENV['PRODUCE_VERSION'],
-        :sku => ENV['PRODUCE_SKU'],
-        :skip_itc => ENV['PRODUCE_SKIP_ITC']
-      }
+    def self.shared_config= config
+      @@shared = config
+    end
 
-      @config[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+    def env_options
+      hash = {
+        bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
+        app_name: ENV['PRODUCE_APP_NAME'],
+        version: ENV['PRODUCE_VERSION'],
+        sku: ENV['PRODUCE_SKU'],
+        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
+      }
+      hash[:primary_language] = 
+        ENV['PRODUCE_LANGUAGE'] if is_valid_language?(ENV['PRODUCE_LANGUAGE'])
+      hash[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      hash
+    end
+
+    def initialize(options = {})
+      @config = env_options.merge(options)
+
       @config[:bundle_identifier] ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
       @config[:app_name] ||= ask("App Name: ")
       
@@ -37,8 +47,16 @@ module Produce
     end
 
     def self.val(key)
-      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of?Symbol
+      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
       self.shared_config.config[key]
+    end
+
+    def is_valid_language? language
+      AvailableDefaultLanguages.all_langauges.include? language
+    end
+
+    def skip_itc? value
+      %w( true t 1 yes y ).include? value.to_s.downcase
     end
   end
 end
