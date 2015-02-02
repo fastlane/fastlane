@@ -53,8 +53,11 @@ module Produce
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
-        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
+        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
+        team_id: ENV['PRODUCE_TEAM_ID'],
+        team_name: ENV['PRODUCE_TEAM_NAME']
       }
+      
       if ENV['PRODUCE_LANGUAGE']
         language = ENV['PRODUCE_LANGUAGE'].split.map(&:capitalize).join(' ')
         if is_valid_language?(language)
@@ -66,6 +69,11 @@ module Produce
       hash[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       hash.delete_if { |key, value| value.nil? }
       hash
+    end
+
+
+    def has_key?(key)
+      @config.has_key? key
     end
 
     def is_valid_language? language
