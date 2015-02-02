@@ -205,6 +205,7 @@ module Deliver
       raise "Invalid price tier '#{tier}' given, must be 0 to 94".red unless (tier.to_i >= 0 and tier.to_i <= 87)
 
       price = fetch_value("//x:wholesale_price_tier").last
+      raise "No initial pricing found, please set the pricing at least once on iTunes Connect.".red unless price
       price.content = tier
     end
 
