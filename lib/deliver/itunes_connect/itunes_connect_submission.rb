@@ -13,24 +13,23 @@ module Deliver
         click_on "Prerelease"
 
         wait_for_preprocessing
+
+        # Beta Switches
+        if all(".switcher.ng-binding.checked").count == 0
+          raise "Looks like Beta Testing is not yet enabled for this app. Open '#{current_url}' and enable TestFlight Beta Testing.".red
+        end
         
-        beta_switch = (all(".switcher.ng-binding").first rescue nil)
-
-        unless beta_switch
-          raise "Could not find beta build on '#{current_url}'. Make sure it is available there"
+        if all(".bt-version > a").count == 0
+          raise "Couldn't find any builds. Please check the iTunes Conncet page: '#{current_url}'".red
         end
 
+        first(".bt-version > a").click
 
-        # Toggeling beta builds, since Apple's TestFlight does not publish the update to testers automatically
-        if beta_switch['class'].include?"checked"
-          # Disable beta tests first
-          beta_switch.click
-          all("a").find { |a| a.text == "Stop Testing" }.click
-        end
-
-        beta_switch.click
-        if page.has_content?"Are you sure you want to start testing" # this only happens on the first time
-          click_on "Start"
+        email = wait_for_elements("input[ng-model='testinfo.data.details[currentLoc].feedbackEmail.value']").first
+        if email.value.to_s.length == 0
+          # Some value is needed to actually distribute the beta version
+          email.set CredentialsManager::PasswordManager.shared_manager.username
+          click_on "Save"
         end
 
         Helper.log.info "Successfully enabled latest beta build.".green
