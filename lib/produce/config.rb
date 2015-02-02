@@ -1,6 +1,6 @@
 module Produce
   class Config
-    attr_accessor :config
+    attr_reader :config
 
     def self.shared_config
       @@shared ||= self.new
