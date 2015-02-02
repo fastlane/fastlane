@@ -8,14 +8,8 @@ module Produce
       primary_language: "Primary Language (e.g. 'English', 'German'): "
     }
 
-    attr_reader :config
-
     # Leaved to keep Fastline from crashing. Should be removed upon version bump.
     def self.shared_config
-    end
-
-    def self.shared_config= config
-      @@shared = config
     end
 
     def self.env_options
