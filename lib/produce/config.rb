@@ -24,8 +24,11 @@ module Produce
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
-        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
+        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
+        team_id: ENV['PRODUCE_TEAM_ID'],
+        team_name: ENV['PRODUCE_TEAM_NAME']
       }
+      
       if ENV['PRODUCE_LANGUAGE']
         language = ENV['PRODUCE_LANGUAGE']
         if is_valid_language?(language)
