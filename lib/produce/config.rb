@@ -24,8 +24,11 @@ module Produce
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
-        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
+        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
+        team_id: ENV['PRODUCE_TEAM_ID'],
+        team_name: ENV['PRODUCE_TEAM_NAME']
       }
+      
       if ENV['PRODUCE_LANGUAGE']
         language = ENV['PRODUCE_LANGUAGE'].split.map(&:capitalize).join(' ')
         if is_valid_language?(language)
@@ -46,8 +49,8 @@ module Produce
     def self.val(key)
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
 
-      unless self.shared_config.config.has_key? key
-        self.shared_config.config[key] = ask(ASK_MESSAGES[key]) do |q|
+      unless shared_config.config.has_key? key
+        shared_config.config[key] = ask(ASK_MESSAGES[key]) do |q|
           case key
           when :primary_language
             q.validate = lambda { |val| is_valid_language?(val) }
@@ -60,6 +63,10 @@ module Produce
       end
 
       return self.shared_config.config[key]
+    end
+
+    def self.has_key?(key)
+      shared_config.config.has_key? key
     end
 
     def self.is_valid_language? language

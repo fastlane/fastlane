@@ -125,11 +125,8 @@ module Produce
     end
 
     def select_team
-      team_id = ENV["PRODUCE_TEAM_ID"]
-      team_id = nil if team_id.to_s.length == 0
-
-      team_name = ENV["PRODUCE_TEAM_NAME"]
-      team_name = nil if team_name.to_s.length == 0
+      team_id = Config.val(:team_id) if Config.has_key?(:team_id)
+      team_name = Config.val(:team_name) if Config.has_key?(:team_name)
 
       if team_id == nil and team_name == nil
         Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID` or `PRODUCE_TEAM_NAME`".green
