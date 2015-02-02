@@ -22,7 +22,6 @@ module Produce
     NEW_APP_CLASS = ".new-button.ng-isolate-scope"
     
     def initialize(config)
-      super
       @config = config
 
       DependencyChecker.check_dependencies
