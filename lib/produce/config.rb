@@ -26,8 +26,14 @@ module Produce
         sku: ENV['PRODUCE_SKU'],
         skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
       }
-      hash[:primary_language] = 
-        ENV['PRODUCE_LANGUAGE'] if is_valid_language?(ENV['PRODUCE_LANGUAGE'])
+      if ENV['PRODUCE_LANGUAGE']
+        language = ENV['PRODUCE_LANGUAGE']
+        if is_valid_language?(language)
+          hash[:primary_language] = language
+        else
+          Helper.log.error "PRODUCE_LANGUAGE is set to #{language} but it's not one of available languages. You'll be asked to set language again if needed."
+        end
+      end
       hash[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       hash.delete_if { |key, value| value.nil? }
       hash
@@ -58,12 +64,7 @@ module Produce
 
     def is_valid_language? language
       language = language.split.map(&:capitalize).join(' ')
-      if AvailableDefaultLanguages.all_langauges.include?(input)
-        true
-      else
-        Helper.log.error "Could not find langauge #{language} - available languages: #{AvailableDefaultLanguages.all_langauges}"
-        false
-      else
+      AvailableDefaultLanguages.all_langauges.include? language
     end
 
     def skip_itc? value
