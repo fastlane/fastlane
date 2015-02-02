@@ -42,7 +42,7 @@ module Produce
       return @config[key]
     end
 
-    # Aliases `[key]` to `val(key)` because Ruby allows that.
+    # Aliases `[key]` to `val(key)` because Ruby can do it.
     alias_method :[], :val
 
     # Returns true if option for the given key is present.
