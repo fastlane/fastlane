@@ -12,10 +12,17 @@ module Produce
     def self.shared_config
     end
 
+    # Creates new Config instance using ENV variables.
+    # @param options (Hash) (optional) config options hash. If duplicates keys
+    # specified by ENV variable, `options` has value will be used.
+    # @return (Config) created Config instance
     def initialize(options = {})
       @config = env_options.merge(options)
     end
 
+    # Retrieves the value for given `key`. If not found, will promt user with
+    # `ASK_MESSAGES[key]` till gets valid response. Thus, always returns value.
+    # Raises exception if given `key` is not Symbol or unknown.
     def val(key)
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
 
@@ -35,6 +42,7 @@ module Produce
       return @config[key]
     end
 
+    # Aliases `[key]` to `val(key)` because Ruby allows that.
     alias_method :[], :val
 
     private
