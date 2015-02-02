@@ -9,20 +9,20 @@ module Deliver
       #  this action
       # @raise [ItunesConnectLoginError] Login data is wrong
       def open_app_page(app)
-          verify_app(app)
+        verify_app(app)
 
-          Helper.log.info "Opening detail page for app #{app}"
+        Helper.log.info "Opening detail page for app #{app}"
 
-          visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
+        visit APP_DETAILS_URL.gsub("[[app_id]]", app.apple_id.to_s)
 
-          wait_for_elements('.page-subnav')
-          sleep 5
+        wait_for_elements('.page-subnav')
+        sleep 5
 
-          if current_url.include?"wa/defaultError" # app could not be found
-            raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{CredentialsManager::PasswordManager.shared_manager.username}).".red
-          end
+        if current_url.include?"wa/defaultError" # app could not be found
+          raise "Could not open app details for app '#{app}'. Make sure you're using the correct Apple ID and the correct Apple developer account (#{CredentialsManager::PasswordManager.shared_manager.username}).".red
+        end
 
-          true
+        true
       rescue => ex
         error_occured(ex)
       end
@@ -49,7 +49,7 @@ module Deliver
         started = Time.now
 
         # Wait, while iTunesConnect is processing the uploaded file
-        while (page.has_content?"Uploaded" or page.has_content?"Processing")
+        while (page.has_content?"Uploaded")
           # iTunesConnect is super slow... so we have to wait...
           Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
             "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
