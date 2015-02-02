@@ -5,6 +5,23 @@ module Fastlane
     end
 
     class SlackAction
+      def self.git_branch
+        s = `git rev-parse --abbrev-ref HEAD`
+        return s if s.to_s.length > 0
+        return nil
+      end
+
+      def self.git_author
+        s = `git log --name-status HEAD^..HEAD`
+        s = s.match(/Author:.*<(.*)>/)[1]
+        return s if s.to_s.length > 0
+        return nil
+      rescue
+        return nil
+      end
+
+
+
       def self.run(params)
         options = { message: '',
                     success: true,
@@ -47,6 +64,22 @@ module Fastlane
             }
           ]
         }
+
+        if git_branch
+          test_result[:fields] << {
+            title: "Git Branch",
+            value: git_branch,
+            short: true
+          }
+        end
+
+        if git_author
+          test_result[:fields] << {
+            title: "Git Author",
+            value: git_author,
+            short: true
+          }
+        end
 
         result = notifier.ping "",
                       icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
