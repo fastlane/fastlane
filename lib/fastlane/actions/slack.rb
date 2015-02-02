@@ -6,9 +6,10 @@ module Fastlane
 
     class SlackAction
       def self.git_branch
-        s = `git rev-parse --abbrev-ref HEAD`
-        return s if s.to_s.length > 0
-        return nil
+        return nil # not working on Jenkins
+        # s = `git rev-parse --abbrev-ref HEAD`
+        # return s if s.to_s.length > 0
+        # return nil
       end
 
       def self.git_author
