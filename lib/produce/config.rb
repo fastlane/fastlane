@@ -8,7 +8,7 @@ module Produce
       primary_language: "Primary Language (e.g. 'English', 'German'): "
     }
 
-    # Leaved to keep Fastline from crashing. Should be removed upon version bump.
+    # Left to prevent fastlane from crashing. Should be removed upon version bump.
     def self.shared_config
     end
 
