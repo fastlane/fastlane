@@ -1,5 +1,13 @@
 module Produce
   class Config
+    ASK_MESSAGES = {
+      bundle_identifier: "App Identifier (Bundle ID, e.g. com.krausefx.app): ",
+      app_name: "App Name: ",
+      version: "Initial version number (e.g. '1.0'): ",
+      sku: "SKU Number (e.g. '1234'): ",
+      primary_language: "Primary Language (e.g. 'English', 'German'): "
+    }
+
     attr_reader :config
 
     def self.shared_config
@@ -21,38 +29,39 @@ module Produce
       hash[:primary_language] = 
         ENV['PRODUCE_LANGUAGE'] if is_valid_language?(ENV['PRODUCE_LANGUAGE'])
       hash[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      hash.delete_if { |key, value| value.nil? }
       hash
     end
 
     def initialize(options = {})
       @config = env_options.merge(options)
-
-      @config[:bundle_identifier] ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
-      @config[:app_name] ||= ask("App Name: ")
-      
-      if @config[:skip_itc].to_s.length == 0
-        while @config[:primary_language].to_s.length == 0
-          input = ask("Primary Language (e.g. 'English', 'German'): ")
-          input = input.split.map(&:capitalize).join(' ')
-          if not AvailableDefaultLanguages.all_langauges.include?(input)
-            Helper.log.error "Could not find langauge #{input} - available languages: #{AvailableDefaultLanguages.all_langauges}"
-          else
-            @config[:primary_language] = input
-          end
-        end
-
-        @config[:version] ||= ask("Initial version number (e.g. '1.0'): ")
-        @config[:sku] ||= ask("SKU Number (e.g. '1234'): ")
-      end
     end
 
     def self.val(key)
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
-      self.shared_config.config[key]
+
+      unless self.shared_config.config.has_key? key
+        validation = case key
+        when :primary_language
+          lambda { |val| is_valid_language?(val) }
+        else
+          lambda { |val| !val.strip.empty? }
+        end
+
+        self.shared_config.config[key] = ask(ASK_MESSAGES[key]) { |q| q.validate = validation }
+      end
+
+      return self.shared_config.config[key]
     end
 
     def is_valid_language? language
-      AvailableDefaultLanguages.all_langauges.include? language
+      language = language.split.map(&:capitalize).join(' ')
+      if AvailableDefaultLanguages.all_langauges.include?(input)
+        true
+      else
+        Helper.log.error "Could not find langauge #{language} - available languages: #{AvailableDefaultLanguages.all_langauges}"
+        false
+      else
     end
 
     def skip_itc? value
