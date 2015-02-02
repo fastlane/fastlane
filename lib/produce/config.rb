@@ -12,7 +12,34 @@ module Produce
     def self.shared_config
     end
 
-    def self.env_options
+    def initialize(options = {})
+      @config = env_options.merge(options)
+    end
+
+    def val(key)
+      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
+
+      unless @config.has_key? key
+        @config[key] = ask(ASK_MESSAGES[key]) do |q|
+          case key
+          when :primary_language
+            q.validate = lambda { |val| is_valid_language?(val) }
+            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
+          else
+            q.validate = lambda { |val| !val.empty? }
+            q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
+          end
+        end
+      end
+
+      return @config[key]
+    end
+
+    alias_method :[], :val
+
+    private
+
+    def env_options
       hash = {
         bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
         app_name: ENV['PRODUCE_APP_NAME'],
@@ -33,35 +60,12 @@ module Produce
       hash
     end
 
-    def initialize(options = {})
-      @config = Config.env_options.merge(options)
-    end
-
-    def self.val(key)
-      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
-
-      unless self.shared_config.config.has_key? key
-        self.shared_config.config[key] = ask(ASK_MESSAGES[key]) do |q|
-          case key
-          when :primary_language
-            q.validate = lambda { |val| is_valid_language?(val) }
-            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
-          else
-            q.validate = lambda { |val| !val.empty? }
-            q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
-          end
-        end
-      end
-
-      return self.shared_config.config[key]
-    end
-
-    def self.is_valid_language? language
+    def is_valid_language? language
       language = language.split.map(&:capitalize).join(' ')
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
-    def self.skip_itc? value
+    def skip_itc? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
   end
