@@ -126,6 +126,8 @@ module Produce
 
         initial_create
 
+        initial_pricing
+
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
 
         Helper.log.info "Finished creating new app '#{Config.val(:app_name)}' on iTunes Connect".green
@@ -178,6 +180,13 @@ module Produce
       wait_for_elements(".language.hasPopOver") # looking good
 
       Helper.log.info "Successfully created new app '#{Config.val(:app_name)}' on iTC. Setting up the initial information now.".green
+    end
+
+    def initial_pricing
+      sleep 3
+      click_on "Pricing"
+      first('#pricingPopup > option[value="3"]').select_option
+      first('.saveChangesActionButton').click
     end
 
     private
