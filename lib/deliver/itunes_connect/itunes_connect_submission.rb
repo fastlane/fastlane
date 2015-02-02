@@ -10,7 +10,9 @@ module Deliver
 
         Helper.log.info("Choosing the latest build on iTunesConnect for beta distribution")
 
+        sleep 3
         click_on "Prerelease"
+        sleep 3
 
         wait_for_preprocessing
 
