@@ -119,10 +119,10 @@ module Produce
 
     def create_new_app
       if app_exists?
-        Helper.log.info "App '#{config[:app_name]}' exists already, nothing to do on iTunes Connect".green
+        Helper.log.info "App '#{@config[:app_name]}' exists already, nothing to do on iTunes Connect".green
         # Nothing to do here
       else
-        Helper.log.info "Creating new app '#{config[:app_name]}' on iTunes Connect".green
+        Helper.log.info "Creating new app '#{@config[:app_name]}' on iTunes Connect".green
 
         initial_create
 
@@ -130,7 +130,7 @@ module Produce
 
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
 
-        Helper.log.info "Finished creating new app '#{config[:app_name]}' on iTunes Connect".green
+        Helper.log.info "Finished creating new app '#{@config[:app_name]}' on iTunes Connect".green
       end
 
       return fetch_apple_id
@@ -138,12 +138,12 @@ module Produce
 
     def fetch_apple_id
       # First try it using the Apple API
-      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{config[:bundle_identifier]}").read)
+      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{@config[:bundle_identifier]}").read)
 
       if data['resultCount'] == 0 or true
         visit current_url
         sleep 10
-        first("input[ng-model='searchModel']").set config[:bundle_identifier]
+        first("input[ng-model='searchModel']").set @config[:bundle_identifier]
 
         if all("div[bo-bind='app.name']").count == 2
           raise "There were multiple results when looking for the new app. This might be due to having same app identifiers included in each other (see generated screenshots)".red
@@ -163,12 +163,12 @@ module Produce
       open_new_app_popup
       
       # Fill out the initial information
-      wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set config[:app_name]
-      wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set config[:version]
-      wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set config[:sku]
+      wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set @config[:app_name]
+      wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
+      wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
       
-      wait_for_elements("option[value='#{config[:bundle_identifier]}']").first.select_option
-      all(:xpath, "//option[text()='#{config[:primary_language]}']").first.select_option
+      wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
+      all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
 
       click_on "Create"
       sleep 5 # this usually takes some time
@@ -179,7 +179,7 @@ module Produce
 
       wait_for_elements(".language.hasPopOver") # looking good
 
-      Helper.log.info "Successfully created new app '#{config[:app_name]}' on iTC. Setting up the initial information now.".green
+      Helper.log.info "Successfully created new app '#{@config[:app_name]}' on iTC. Setting up the initial information now.".green
     end
 
     def initial_pricing
@@ -195,7 +195,7 @@ module Produce
 
         sleep 4
 
-        return (all("option[value='#{config[:bundle_identifier]}']").count == 0)
+        return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
       end
 
       def open_new_app_popup
