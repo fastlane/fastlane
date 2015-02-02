@@ -11,7 +11,7 @@ module Produce
     attr_reader :config
 
     def self.shared_config
-      @@shared ||= self.new(options)
+      @@shared ||= self.new
     end
 
     def self.shared_config= config
@@ -41,14 +41,16 @@ module Produce
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
 
       unless self.shared_config.config.has_key? key
-        validation = case key
-        when :primary_language
-          lambda { |val| is_valid_language?(val) }
-        else
-          lambda { |val| !val.strip.empty? }
+        self.shared_config.config[key] = ask(ASK_MESSAGES[key]) do |q|
+          case key
+          when :primary_language
+            q.validate = lambda { |val| is_valid_language?(val) }
+            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
+          else
+            q.validate = lambda { |val| !val.empty? }
+            q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
+          end
         end
-
-        self.shared_config.config[key] = ask(ASK_MESSAGES[key]) { |q| q.validate = validation }
       end
 
       return self.shared_config.config[key]
