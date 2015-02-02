@@ -45,6 +45,11 @@ module Produce
     # Aliases `[key]` to `val(key)` because Ruby allows that.
     alias_method :[], :val
 
+    # Returns true if option for the given key is present.
+    def has_key?(key)
+      @config.has_key? key
+    end
+
     private
 
     def env_options
@@ -71,10 +76,6 @@ module Produce
       hash
     end
 
-
-    def has_key?(key)
-      @config.has_key? key
-    end
 
     def is_valid_language? language
       AvailableDefaultLanguages.all_langauges.include? language
