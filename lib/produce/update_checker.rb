@@ -33,7 +33,7 @@ module Produce
 
     # The currently used version of this gem
     def self.current_version
-      Sigh::VERSION
+      Produce::VERSION
     end
 
     private
