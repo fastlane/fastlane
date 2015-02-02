@@ -27,7 +27,7 @@ module Produce
         skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC'])
       }
       if ENV['PRODUCE_LANGUAGE']
-        language = ENV['PRODUCE_LANGUAGE']
+        language = ENV['PRODUCE_LANGUAGE'].split.map(&:capitalize).join(' ')
         if is_valid_language?(language)
           hash[:primary_language] = language
         else
@@ -63,7 +63,6 @@ module Produce
     end
 
     def self.is_valid_language? language
-      language = language.split.map(&:capitalize).join(' ')
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
