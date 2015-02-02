@@ -18,7 +18,7 @@ module Produce
       @@shared = config
     end
 
-    def env_options
+    def self.env_options
       hash = {
         bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
         app_name: ENV['PRODUCE_APP_NAME'],
@@ -40,7 +40,7 @@ module Produce
     end
 
     def initialize(options = {})
-      @config = env_options.merge(options)
+      @config = Config.env_options.merge(options)
     end
 
     def self.val(key)
@@ -62,12 +62,12 @@ module Produce
       return self.shared_config.config[key]
     end
 
-    def is_valid_language? language
+    def self.is_valid_language? language
       language = language.split.map(&:capitalize).join(' ')
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
-    def skip_itc? value
+    def self.skip_itc? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
   end
