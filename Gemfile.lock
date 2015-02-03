@@ -1,14 +1,14 @@
 PATH
   remote: .
   specs:
-    sigh (0.2.1)
+    sigh (0.2.2)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
       credentials_manager
       highline (~> 1.6.21)
       json
-      phantomjs
+      phantomjs (~> 1.9.8)
       poltergeist (~> 1.5.1)
 
 GEM
