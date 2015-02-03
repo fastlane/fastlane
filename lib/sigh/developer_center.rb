@@ -168,8 +168,8 @@ module Sigh
       raise "Could not open Developer Center" unless result['status'] == 'success'
     end
 
-    def run(app_identifier, type, cert_name = nil)
-      cert = maintain_app_certificate(app_identifier, type)
+    def run(app_identifier, type, cert_name = nil, force, cert_date)
+      cert = maintain_app_certificate(app_identifier, type, force, cert_date)
 
       type_name = type
       type_name = "Distribution" if type == APPSTORE # both enterprise and App Store
@@ -182,7 +182,7 @@ module Sigh
       return output_path
     end
 
-    def maintain_app_certificate(app_identifier, type)
+    def maintain_app_certificate(app_identifier, type, force, cert_date)
       begin
         if type == DEVELOPMENT 
           visit PROFILES_URL_DEV
@@ -221,11 +221,15 @@ module Sigh
             end
 
             # We found the correct certificate
-            if current_cert['status'] == 'Active'
+            if force and type != DEVELOPMENT
+              provisioningProfileId = current_cert['provisioningProfileId']
+              renew_profile(provisioningProfileId, type, cert_date) # This one needs to be forcefully renewed
+              return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
+            elsif current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif ['Expired', 'Invalid'].include?current_cert['status']
-              renew_profile(current_cert['provisioningProfileId'], type) # This one needs to be renewed
-              return maintain_app_certificate(app_identifier, type) # recursive
+              renew_profile(current_cert['provisioningProfileId'], type, cert_date) # This one needs to be renewed
+              return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
             end
 
             break
@@ -234,18 +238,18 @@ module Sigh
 
         Helper.log.info "Could not find existing profile. Trying to create a new one."
         # Certificate does not exist yet, we need to create a new one
-        create_profile(app_identifier, type)
+        create_profile(app_identifier, type, cert_date)
         # After creating the profile, we need to download it
-        return maintain_app_certificate(app_identifier, type) # recursive
+        return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
 
       rescue => ex
         error_occured(ex)
       end
     end
 
-    def create_profile(app_identifier, type)
+    def create_profile(app_identifier, type, cert_date)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificate = code_signing_certificate(type)
+      certificate = code_signing_certificate(type, cert_date)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
@@ -315,8 +319,8 @@ module Sigh
       wait_for_elements('.row-details')
     end
 
-    def renew_profile(profile_id, type)
-      certificate = code_signing_certificate type
+    def renew_profile(profile_id, type, cert_date)
+      certificate = code_signing_certificate(type, cert_date)
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
@@ -380,7 +384,7 @@ module Sigh
         # "certificateTypeDisplayId"=>"...",
         # "serialNum"=>"....",
         # "typeString"=>"iOS Distribution"},
-      def code_signing_certificate(type)
+      def code_signing_certificate(type, cert_date)
         certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type="
         certs_url << "distribution" if type != DEVELOPMENT
         certs_url << "development" if type == DEVELOPMENT
@@ -399,13 +403,23 @@ module Sigh
           if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
             # The other profiles are push profiles
             # We only care about the distribution profile
-            return current_cert # mostly we only care about the 'certificateId'
-          elsif type == DEVELOPMENT and current_cert['typeString'] == 'iOS Development' 
+            unless cert_date
+              return current_cert # mostly we only care about the 'certificateId'
+            else
+              if current_cert['expirationDateString'] == cert_date
+                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located"
+                return current_cert
+              end
+            end
+          elsif type == DEVELOPMENT and current_cert['typeString'] == 'iOS Development'
             return current_cert # mostly we only care about the 'certificateId'
           end
         end
 
-        raise "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+        error_message_no_cert_with_date = "Could not find a Certificate with expiry date '#{cert_date}'. Please open #{current_url} and make sure you have a signing profile created.".red
+        error_message_no_cert = "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+
+        raise cert_date ? error_message_no_cert_with_date : error_message_no_cert
       end
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file
