@@ -81,10 +81,6 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-Install phantomjs (this is needed to control the Apple Developer Portal)
-
-    brew update && brew install phantomjs
-
 If you don't already have homebrew installed, [install it here](http://brew.sh/).
 
 # Usage

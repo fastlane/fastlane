@@ -42,6 +42,7 @@ module Sigh
       Capybara.register_driver :poltergeist do |a|
         conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
         Capybara::Poltergeist::Driver.new(a, {
+          phantomjs: Phantomjs.path,
           phantomjs_options: conf,
           phantomjs_logger: File.open("#{TMP_FOLDER}/poltergeist_log.txt", "a"),
           js_errors: false
