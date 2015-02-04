@@ -10,6 +10,7 @@ require 'produce/update_checker'
 require 'produce/available_default_languages'
 
 # Third Party code
+require 'phantomjs/poltergeist'
 require 'colored'
 
 module Produce
