@@ -4,6 +4,7 @@ require 'openssl'
 
 require 'capybara'
 require 'capybara/poltergeist'
+require 'phantomjs/poltergeist'
 
 module Produce
   class DeveloperCenter

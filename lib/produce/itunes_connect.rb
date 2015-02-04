@@ -1,6 +1,7 @@
 require 'capybara'
 require 'capybara/poltergeist'
 require 'credentials_manager/password_manager'
+require 'phantomjs/poltergeist'
 
 module Produce
   # Every method you call here, might take a time
