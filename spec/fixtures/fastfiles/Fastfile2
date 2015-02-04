@@ -1,0 +1,23 @@
+before_all do |lane|
+  File.write("/tmp/fastlane/before_all_#{lane}", '1') if lane
+end
+
+lane :test do 
+  File.write('/tmp/fastlane/test', '1')
+end
+
+lane :deploy do
+  File.write('/tmp/fastlane/deploy', '1')
+end
+
+after_all do |lane|
+  File.write('/tmp/fastlane/after_all', lane)
+end
+
+lane :error_causing_lane do
+  1/0
+end
+
+error do |lane, exception|
+  File.write('/tmp/fastlane/error', lane)
+end

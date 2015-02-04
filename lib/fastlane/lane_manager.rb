@@ -1,11 +1,25 @@
 module Fastlane
   class LaneManager
-    def self.cruise_lanes(lanes)
+    def self.cruise_lanes(lanes, env=nil)
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env
       raise 'lanes must be an array' unless lanes.is_a?(Array)
+
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
       if lanes.count == 0
         raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
+      end
+
+      # Making sure the default '.env' and '.env.default' get loaded
+      env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
+      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", '.env.default')
+      Dotenv.load(env_file, env_default_file)
+
+      # Loads .env file for the environment passed in through options
+      if env
+        env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.#{env}")
+        Helper.log.info "Loading from '#{env_file}'".green
+        Dotenv.overload(env_file)
       end
 
       start = Time.now
@@ -39,5 +53,6 @@ module Fastlane
         raise e
       end
     end
+
   end
 end
