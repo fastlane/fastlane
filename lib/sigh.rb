@@ -7,6 +7,7 @@ require 'sigh/update_checker'
 
 # Third Party code
 require 'colored'
+require 'phantomjs/poltergeist'
 
 module Sigh
   TMP_FOLDER = "/tmp/sigh/"
