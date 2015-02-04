@@ -324,8 +324,6 @@ jenkins
 
 To store the password in the Keychain of your remote machine, I recommend running `sigh` or `deliver` using ssh or remote desktop at least once.
 
-If you're using `Jenkins` as its own user, you might run into problems with `homebrew` and `phantomjs`.
-
 ## Deploy Strategy
 
 You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 

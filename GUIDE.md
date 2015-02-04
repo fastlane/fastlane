@@ -42,10 +42,6 @@ If you don't have [homebrew](http://brew.sh/) already installed, follow the guid
 
     brew doctor && brew update
 
-#### [PhantomJS](http://phantomjs.org/)
-
-    brew install makedepend && brew install phantomjs
-
 #### [xctool](https://github.com/facebook/xctool) (optional)
 
     brew install xctool
