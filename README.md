@@ -242,7 +242,7 @@ Send a message to **#channel** (by default) or a direct message to **@username**
 Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
 
 ```ruby
-  ENV["HIPCHAT_API_TOKEN"] = "your api token"
+  ENV["HIPCHAT_API_TOKEN"] = "Your API token"
   ENV["HIPCHAT_API_VERSION"] = "1 for API version 1 or 2 for API version 2"
 
   hipchat({
