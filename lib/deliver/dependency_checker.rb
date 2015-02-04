@@ -2,21 +2,7 @@ module Deliver
   class DependencyChecker
     def self.check_dependencies
       return if Helper.is_test?
-      self.check_phantom_js
       self.check_xcode_select
-    end
-    
-    def self.check_phantom_js
-      if `which phantomjs`.length == 0
-        # Missing brew dependency
-        Helper.log.fatal '#############################################################'
-        Helper.log.fatal "# You have to install phantomjs to use deliver"
-        Helper.log.fatal "# phantomjs is used to control the iTunesConnect frontend"
-        Helper.log.fatal "# Install Homebrew using http://brew.sh/" if `which brew`.length == 0
-        Helper.log.fatal "# Run 'brew update && brew install phantomjs' and start deliver again"
-        Helper.log.fatal '#############################################################'
-        raise "Run 'brew update && brew install phantomjs' and start deliver again"
-      end
     end
 
     def self.check_xcode_select

@@ -2,6 +2,7 @@ require 'capybara'
 require 'capybara/poltergeist'
 require 'fastimage'
 require 'credentials_manager/password_manager'
+require 'phantomjs/poltergeist'
 
 # Import all the actions
 require 'deliver/itunes_connect/itunes_connect_submission'
@@ -58,6 +59,7 @@ module Deliver
       Capybara.register_driver :poltergeist do |a|
         conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
         Capybara::Poltergeist::Driver.new(a, {
+          phantomjs: Phantomjs.path,
           phantomjs_options: conf,
           phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
           js_errors: false
