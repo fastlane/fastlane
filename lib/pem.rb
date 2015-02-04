@@ -8,6 +8,7 @@ require 'pem/cert_manager'
 require 'pem/signing_request'
 
 # Third Party code
+require 'phantomjs/poltergeist'
 require 'colored'
 
 module PEM

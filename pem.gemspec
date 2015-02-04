@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'credentials_manager' # fastlane password manager
 
   # Frontend Scripting
+  spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
   spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
   spec.add_dependency 'poltergeist', '~> 1.5.1' # headless Javascript browser for controlling iTC
 
@@ -41,6 +42,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'codeclimate-test-reporter'
-
-  spec.post_install_message = "This gem requires phantomjs. Install it using 'brew update && brew install phantomjs'"
 end
