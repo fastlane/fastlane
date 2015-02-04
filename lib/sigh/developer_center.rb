@@ -366,9 +366,9 @@ module Sigh
         end
       end
 
-      # Returns a hash, that contains information about the iOS certificate
+      # Returns a array of hashs, that contains information about the iOS certificate
       # @example
-        # {"certRequestId"=>"B23Q2P396B",
+        # [{"certRequestId"=>"B23Q2P396B",
         # "name"=>"SunApps GmbH",
         # "statusString"=>"Issued",
         # "expirationDate"=>"2015-11-25T22:45:50Z",
@@ -384,7 +384,8 @@ module Sigh
         # "certificateTypeDisplayId"=>"...",
         # "serialNum"=>"....",
         # "typeString"=>"iOS Distribution"},
-      def code_signing_certificate(type, cert_date)
+        # {another sertificate...}]
+      def code_signing_certificates(type, cert_date)
         certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type="
         certs_url << "distribution" if type != DEVELOPMENT
         certs_url << "development" if type == DEVELOPMENT
@@ -399,27 +400,38 @@ module Sigh
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
 
         certs = post_ajax(url)['certRequests']
+
+        ret_certs = []
+        certificate_name = ENV['SIGH_CERTIFICATE']
+
+        # The other profiles are push profiles
+        certificate_type = type == DEVELOPMENT ? 'iOS Development' : 'iOS Distribution'
         certs.each do |current_cert|
-          if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
-            # The other profiles are push profiles
-            # We only care about the distribution profile
-            unless cert_date
-              return current_cert # mostly we only care about the 'certificateId'
-            else
-              if current_cert['expirationDateString'] == cert_date
-                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located"
-                return current_cert
-              end
+          next unless current_cert['typeString'] == certificate_type
+
+          if cert_date || certificate_name
+            if current_cert['expirationDateString'] == cert_date
+              Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located"
+              ret_certs << current_cert
             end
-          elsif type == DEVELOPMENT and current_cert['typeString'] == 'iOS Development'
-            return current_cert # mostly we only care about the 'certificateId'
+            if current_cert['name'] == certificate_name
+              Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{certificate_name}' located"
+              ret_certs << current_cert
+            end
+          else
+            ret_certs << current_cert
           end
         end
 
-        error_message_no_cert_with_date = "Could not find a Certificate with expiry date '#{cert_date}'. Please open #{current_url} and make sure you have a signing profile created.".red
-        error_message_no_cert = "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+        return ret_certs unless !ret_certs.empty?
 
-        raise cert_date ? error_message_no_cert_with_date : error_message_no_cert
+        predicates = []
+        predicates << "name: #{certificate_name}" if certificate_name
+        predicates << "expiry date: #{cert_date}" if cert_date
+
+        predicates_str = " with #{predicates.join(' or ')}"
+
+        raise "Could not find a Certificate#{predicates_str}. Please open #{current_url} and make sure you have a signing profile created.".red
       end
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file
