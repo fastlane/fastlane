@@ -40,13 +40,20 @@ module Fastlane
         # The args we will build with
         build_args = nil
 
-        # The output path of the IPA
-        absolute_ipa_path = nil
+        # The output directory of the IPA and DSYM
+        absolute_dest_directory = nil
 
         # Allows for a whole variety of configurations
         if params.first.is_a? Hash
-          destination = params.first[:destination]
+
+          # Used to get the final path of the IPA and DSYM
+          if dest = params.first[:destination]
+            absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
+          end
+
+          # Maps nice developer build parameters to Shenzhen args
           build_args = params_to_build_args(params.first)
+
         else
           build_args = params
         end
@@ -55,9 +62,9 @@ module Fastlane
 
         Actions.sh "ipa build #{build_args}"
         
-        absolute_ipa_path ||= find_ipa_file
-        absolute_ipa_path = File.join(Dir.pwd, absolute_ipa_path)
-        absolute_dsym_path = File.join(Dir.pwd, find_dsym_file)
+        absolute_dest_directory ||= Dir.pwd
+        absolute_ipa_path = find_ipa_file(absolute_dest_directory)
+        absolute_dsym_path = find_dsym_file(absolute_dest_directory)
 
         Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
         Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
@@ -76,12 +83,14 @@ module Fastlane
         end.compact
       end
 
-      def self.find_ipa_file
-        Dir["*"].sort { |a,b| File.mtime(a) <=> File.mtime(b) }.find { |f| f.end_with? ".ipa"}
+      def self.find_ipa_file(dir)
+        # Finds last modified .ipa in the destination directory
+        Dir[File.join(dir, "*.ipa")].sort { |a,b| File.mtime(a) <=> File.mtime(b) }.first
       end
 
-      def self.find_dsym_file
-        Dir["*"].sort { |a,b| File.mtime(a) <=> File.mtime(b) }.find { |f| f.end_with? ".dSYM.zip"}
+      def self.find_dsym_file(dir)
+        # Finds last modified .dSYM.zip in the destination directory
+        Dir[File.join(dir, "*.dSYM.zip")].sort { |a,b| File.mtime(a) <=> File.mtime(b) }.first
       end
 
     end
