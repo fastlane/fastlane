@@ -27,11 +27,16 @@ module Deliver
 
         first(".bt-version > a").click
 
-        email = wait_for_elements("input[ng-model='testinfo.data.details[currentLoc].feedbackEmail.value']").first
-        if email.value.to_s.length == 0
-          # Some value is needed to actually distribute the beta version
-          email.set CredentialsManager::PasswordManager.shared_manager.username
-          click_on "Save"
+        
+        # Inside the build now, enabling the 'Save' button
+        save_button = wait_for_elements(".formActionButtons.btn-actions > button").first
+
+        if save_button
+          # First, enable the save button
+          evaluate_script("$('.formActionButtons.btn-actions > button').removeAttr('disabled')")
+          save_button.click
+        else
+          raise "Couldn't find the save button, looks like there is an internet connection problem.".red
         end
 
         Helper.log.info "Successfully enabled latest beta build.".green
