@@ -423,7 +423,7 @@ module Sigh
           end
         end
 
-        return ret_certs unless !ret_certs.empty?
+        return ret_certs unless ret_certs.empty?
 
         predicates = []
         predicates << "name: #{certificate_name}" if certificate_name
