@@ -200,7 +200,7 @@ module Sigh
 
           if details['provisioningProfile']['appId']['identifier'] == app_identifier
             # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-            next if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
+            next if type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
 
             # that's an App Store profile ... skipping it
             next if type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
