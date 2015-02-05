@@ -249,7 +249,7 @@ module Sigh
 
     def create_profile(app_identifier, type, cert_date)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificate = code_signing_certificate(type, cert_date)
+      certificates = code_signing_certificates(type, cert_date)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
@@ -272,7 +272,7 @@ module Sigh
       click_next
 
       # 2) Select the App ID
-      while not page.has_content?"Select App ID" do sleep 1 end
+      sleep 1 while !page.has_content? "Select App ID"
       # example: <option value="RGAWZGXSY4">ABP (5A997XSHK2.net.sunapps.34)</option>
       identifiers = all(:xpath, "//option[contains(text(), '.#{app_identifier})')]")
       if identifiers.count == 0
@@ -287,19 +287,32 @@ module Sigh
       click_next
 
       # 3) Select the certificate
-      while not page.has_content?"Select certificates" do sleep 1 end
+      sleep 1 while !page.has_content? "Select certificates"
       sleep 3
-      Helper.log.info "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
+      Helper.log.info "Using certificates: #{certificates.map { |c| "#{c['ownerName']} (#{c['certificateId']})" } }"
 
       # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]"> (production)
-      id = certificate["certificateId"]
-      certs = all(:xpath, "//input[@type='radio' and @value='[#{id}]']") if type != DEVELOPMENT # production uses radio and has a [] around the value
-      certs = all(:xpath, "//input[@type='checkbox' and @value='#{id}']") if type == DEVELOPMENT # development uses a checkbox and has no [] around the value
-      if certs.count != 1
-        Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs.count}"
+
+      clicked = false
+      certificates.each do |cert|
+        cert_id = cert['certificateId']
+        input = if type == DEVELOPMENT
+          # development uses a checkbox and has no [] around the value
+          first(:xpath, "//input[@type='checkbox' and @value='#{cert_id}']")
+        else
+          break if clicked
+          # production uses radio and has a [] around the value
+          first(:xpath, "//input[@type='radio' and @value='[#{cert_id}]']")
+        end
+        if input
+          input.click
+          clicked = true
+        end
+      end
+
+      if !clicked
         raise "Could not find certificate in the list of available certificates."
       end
-      certs.first.click
       click_next
 
       if type != APPSTORE
@@ -320,7 +333,7 @@ module Sigh
     end
 
     def renew_profile(profile_id, type, cert_date)
-      certificate = code_signing_certificate(type, cert_date)
+      certificate = code_signing_certificates(type, cert_date).first
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
