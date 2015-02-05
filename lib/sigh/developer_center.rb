@@ -75,19 +75,15 @@ module Sigh
         result = visit PROFILES_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
 
-        if page.has_content?"Member Center"
-          # Already logged in
-          return true
-        end
+        # Already logged in
+        return true if page.has_content? "Member Center"
 
         (wait_for_elements(".button.blue").first.click rescue nil) # maybe already logged in
 
         (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
 
-        if page.has_content?"Member Center"
-          # Already logged in
-          return true
-        end
+        # Already logged in
+        return true if page.has_content? "Member Center"
 
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
@@ -95,9 +91,8 @@ module Sigh
         all(".button.large.blue.signin-button").first.click
 
         begin
-          if page.has_content?"Select Team" # If the user is not on multiple teams
-            select_team
-          end
+          # If the user is not on multiple teams
+          select_team if page.has_content? "Select Team"
         rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
@@ -197,37 +192,27 @@ module Sigh
         certs = post_ajax(@list_certs_url)
 
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
+        required_cert_types = type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution']
         certs['provisioningProfiles'].each do |current_cert|
-          if type == DEVELOPMENT
-            if current_cert['type'] != "iOS Development"
-              next
-            end
-          end
-
-          if type != DEVELOPMENT
-            if not ['iOS Distribution', 'iOS UniversalDistribution'].include?current_cert['type']
-              next
-            end
-          end
+          next unless required_cert_types.include?(current_cert['type'])
           
           details = profile_details(current_cert['provisioningProfileId'])
 
           if details['provisioningProfile']['appId']['identifier'] == app_identifier
-            if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
-              next # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-            end
-            if type != APPSTORE and details['provisioningProfile']['deviceCount'] == 0
-              next # that's an App Store profile ... skipping it
-            end
+            # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
+            next if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
+
+            # that's an App Store profile ... skipping it
+            next if type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
 
             # We found the correct certificate
-            if force and type != DEVELOPMENT
+            if force && type != DEVELOPMENT
               provisioningProfileId = current_cert['provisioningProfileId']
               renew_profile(provisioningProfileId, type, cert_date) # This one needs to be forcefully renewed
               return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
             elsif current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
-            elsif ['Expired', 'Invalid'].include?current_cert['status']
+            elsif ['Expired', 'Invalid'].include? current_cert['status']
               renew_profile(current_cert['provisioningProfileId'], type, cert_date) # This one needs to be renewed
               return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
             end
@@ -264,7 +249,7 @@ module Sigh
         enterprise = true
       end
 
-      value = (enterprise ? 'inhouse' : 'store')
+      value = enterprise ? 'inhouse' : 'store'
       value = 'limited' if type == DEVELOPMENT
       value = 'adhoc' if type == ADHOC
 
@@ -400,8 +385,7 @@ module Sigh
         # {another sertificate...}]
       def code_signing_certificates(type, cert_date)
         certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type="
-        certs_url << "distribution" if type != DEVELOPMENT
-        certs_url << "development" if type == DEVELOPMENT
+        certs_url << (type == DEVELOPMENT ? 'development' : 'distribution')
         visit certs_url
 
         certificateDataURL = wait_for_variable('certificateDataURL')
@@ -488,7 +472,7 @@ module Sigh
       def wait_for(method, parameter, success)
         counter = 0
         result = method.call(parameter)
-        while !success.call(result)     
+        while !success.call(result)
           sleep 0.2
 
           result = method.call(parameter)
