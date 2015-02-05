@@ -40,13 +40,13 @@ module Fastlane
         # The args we will build with
         build_args = nil
 
-        # The output directory of the IPA and DSYM
+        # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
         # Allows for a whole variety of configurations
         if params.first.is_a? Hash
 
-          # Used to get the final path of the IPA and DSYM
+          # Used to get the final path of the IPA and dSYM
           if dest = params.first[:destination]
             absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
           end
@@ -58,14 +58,16 @@ module Fastlane
           build_args = params
         end
 
+        # Joins args into space delimited string
         build_args = build_args.join(' ')
-
         Actions.sh "ipa build #{build_args}"
         
+        # Finds absolute path of IPA and dSYM
         absolute_dest_directory ||= Dir.pwd
         absolute_ipa_path = find_ipa_file(absolute_dest_directory)
         absolute_dsym_path = find_dsym_file(absolute_dest_directory)
 
+        # Sets shared values to use after this action is performed
         Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
         Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
       end
