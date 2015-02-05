@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.7.6)
+    deliver (0.7.7)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.2.0)
@@ -83,7 +83,7 @@ GEM
     rspec-mocks (3.1.3)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    rubyzip (1.1.6)
+    rubyzip (1.1.7)
     safe_yaml (1.0.4)
     security (0.1.3)
     simplecov (0.9.1)
