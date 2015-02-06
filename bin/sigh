@@ -7,8 +7,6 @@ require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 
-require 'phantomjs/poltergeist'
-
 HighLine.track_eof = false
 
 class SighApplication

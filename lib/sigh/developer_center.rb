@@ -4,6 +4,7 @@ require 'openssl'
 
 require 'capybara'
 require 'capybara/poltergeist'
+require 'phantomjs/poltergeist'
 
 module Sigh
   class DeveloperCenter
@@ -163,7 +164,7 @@ module Sigh
       raise "Could not open Developer Center" unless result['status'] == 'success'
     end
 
-    def run(app_identifier, type, cert_name = nil, force, cert_date)
+    def run(app_identifier, type, cert_name = nil, force = false, cert_date = nil)
       cert = maintain_app_certificate(app_identifier, type, force, cert_date)
 
       type_name = type
