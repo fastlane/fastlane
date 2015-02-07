@@ -1,2 +1,5 @@
 pkg
 .idea
+
+# RVM stuff
+.ruby-gemset
