@@ -96,7 +96,7 @@ module Deliver
       end
 
       if @deliver_process.deploy_information[key]
-        Helper.log.warn("You already set a value for key '#{key}'. Overwriting value '#{value}' with new value.")
+        Helper.log.warn("You already set a value for key '#{key}'. Overwriting with new value '#{value}'.")
       end
 
       @deliver_process.deploy_information[key] = value
