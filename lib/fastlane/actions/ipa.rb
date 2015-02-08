@@ -63,7 +63,7 @@ module Fastlane
 
         if Helper.is_test?
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.ipa")
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.app.dSTM.zip")
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.app.dSYM.zip")
           return build_args 
         end
 
