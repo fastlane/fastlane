@@ -6,10 +6,10 @@ module Fastlane
 
     class SlackAction
       def self.git_branch
-        return nil # not working on Jenkins
-        # s = `git rev-parse --abbrev-ref HEAD`
-        # return s if s.to_s.length > 0
-        # return nil
+        return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
+        s = `git rev-parse --abbrev-ref HEAD`
+        return s if s.to_s.length > 0
+        return nil
       end
 
       def self.git_author
@@ -21,7 +21,11 @@ module Fastlane
         return nil
       end
 
-
+      def self.last_git_commit
+        s = `git log -1 --pretty=%B`.strip
+        return s if s.to_s.length > 0
+        return nil
+      end
 
       def self.run(params)
         options = { message: '',
@@ -79,6 +83,14 @@ module Fastlane
             title: "Git Author",
             value: git_author,
             short: true
+          }
+        end
+
+        if last_git_commit
+          test_result[:fields] << {
+            title: "Git Commit",
+            value: last_git_commit,
+            short: false
           }
         end
 
