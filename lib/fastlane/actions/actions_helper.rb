@@ -66,10 +66,10 @@ module Fastlane
         end
 
         if $?.exitstatus.to_i != 0
-          raise "Exit status of command '#{command}' was #{$?.exitstatus.to_s} instead of 0. Build failed."
+          raise "Exit status of command '#{command}' was #{$?.exitstatus.to_s} instead of 0. \n#{result}" # this will also append the output to the exception (for the Jenkins reports)
         end
       else
-        result << command # only when running tests
+        result << command # only for the tests
       end
 
       return result
