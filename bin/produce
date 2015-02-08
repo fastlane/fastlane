@@ -31,7 +31,6 @@ class FastlaneApplication
       c.action do |args, options|
         set_username(options.username)
 
-        Produce::Config.shared_config # to ask for missing information right in the beginning
         puts Produce::Manager.start_producing
       end
     end
