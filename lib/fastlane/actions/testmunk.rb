@@ -21,7 +21,7 @@ module Fastlane
         raise "Please pass your Testmunk API Key using `ENV['TESTMUNK_API'] = 'value'`" unless ENV['TESTMUNK_API']
         raise "Please pass your Testmunk app name using `ENV['TESTMUNK_APP'] = 'value'`" unless ENV['TESTMUNK_APP']
 
-        ipa_path = ENV['TESTMUNK_IPA'] || ENV[Actions::SharedValues::DELIVER_IPA_PATH.to_s]
+        ipa_path = ENV['TESTMUNK_IPA'] || ENV[Actions::SharedValues::IPA_OUTPUT_PATH.to_s]
         raise "Please pass a path to your ipa file using `ENV['TESTMUNK_IPA'] = 'value'`" unless ipa_path
 
         Helper.log.info "Testmunk: Uploading the .ipa and starting your tests".green

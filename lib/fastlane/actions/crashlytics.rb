@@ -16,7 +16,7 @@ module Fastlane
         crashlytics_path = params[:crashlytics_path]
         api_token        = params[:api_token]
         build_secret     = params[:build_secret]
-        ipa_path         = params[:ipa_path]
+        ipa_path         = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         notes_path       = params[:notes_path]
         emails           = params[:emails]
         groups           = params[:groups]

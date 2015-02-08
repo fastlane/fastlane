@@ -18,6 +18,9 @@ module Fastlane
           notify: 1
         }.merge(params.first)
 
+        options[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+        options[:dsym] ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
+
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
