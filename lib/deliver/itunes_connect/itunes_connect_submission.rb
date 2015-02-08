@@ -34,6 +34,14 @@ module Deliver
         if save_button
           # First, enable the save button
           evaluate_script("$('.formActionButtons.btn-actions > button').removeAttr('disabled')")
+
+          # Maybe we have a 'What to Test' to fill in
+          to_test = ENV["DELIVER_WHAT_TO_TEST"]
+          if to_test
+            text_area = first('span[ng-show="testinfo.data.details[currentLoc].whatsNew.isEditable"] > * > textarea')
+            text_area.set to_test if text_area
+          end
+
           save_button.click
         else
           raise "Couldn't find the save button, looks like there is an internet connection problem.".red

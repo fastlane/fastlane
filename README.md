@@ -108,6 +108,12 @@ To build and upload the ipa in one step, you can use [shenzhen](https://github.c
 ipa build && deliver testflight
 ```
 
+You can pass the "What to Test" value using the environment variable `DELIVER_WHAT_TO_TEST`:
+
+```
+DELIVER_WHAT_TO_TEST="Try the brand new project button" deliver testflight
+```
+
 # Quick Start
 
 
