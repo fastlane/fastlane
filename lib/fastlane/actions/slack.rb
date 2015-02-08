@@ -79,11 +79,15 @@ module Fastlane
         end
 
         if git_author
-          test_result[:fields] << {
-            title: "Git Author",
-            value: git_author,
-            short: true
-          }
+          if ENV["FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS"] and success
+            # We only show the git author if the build failed
+          else
+            test_result[:fields] << {
+              title: "Git Author",
+              value: git_author,
+              short: true
+            }
+          end
         end
 
         if last_git_commit
