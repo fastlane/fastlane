@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      DELIVER_IPA_PATH = :DELIVER_IPA_PATH
+      
     end
 
     class DeliverAction
@@ -20,7 +20,7 @@ module Fastlane
                                 is_beta_ipa: beta, 
                                 skip_deploy: skip_deploy)
 
-          ENV[Actions::SharedValues::DELIVER_IPA_PATH.to_s] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
         end
       end
     end
