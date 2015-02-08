@@ -70,7 +70,9 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        Actions.sh "ipa build #{build_args}"
+        command = "ipa build #{build_args}"
+        Helper.log.debug command
+        Actions.sh command
         
         # Finds absolute path of IPA and dSYM
         absolute_ipa_path = find_ipa_file(absolute_dest_directory)
