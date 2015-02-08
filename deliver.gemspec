@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
   spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
+  spec.add_dependency 'commander', '~> 4.3.0' # CLI parser
   spec.add_dependency 'prawn' # generating PDF file for the applied changes
 
   spec.add_dependency 'credentials_manager' # fastlane password manager

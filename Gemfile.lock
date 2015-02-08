@@ -4,7 +4,7 @@ PATH
     deliver (0.7.7)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.2.0)
+      commander (~> 4.3.0)
       credentials_manager
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
@@ -20,7 +20,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.6)
+    addressable (2.3.7)
     capybara (2.4.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -32,7 +32,7 @@ GEM
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
-    commander (4.2.1)
+    commander (4.3.0)
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
