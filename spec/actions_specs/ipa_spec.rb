@@ -76,17 +76,17 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result.size).to eq(11)
-        expect(result).to include('-w Test.xcworkspace')
-        expect(result).to include('-p Test.xcproject')
-        expect(result).to include('-c Release')
-        expect(result).to include('-s TestScheme')
+        expect(result).to include('-w "Test.xcworkspace"')
+        expect(result).to include('-p "Test.xcproject"')
+        expect(result).to include('-c "Release"')
+        expect(result).to include('-s "TestScheme"')
         expect(result).to include('--clean')
         expect(result).to include('--archive')
-        expect(result).to include('-d Nowhere')
-        expect(result).to include('-m Sure')
-        expect(result).to include('-i bourne')
-        expect(result).to include('--sdk 10.0')
-        expect(result).to include('--ipa JoshIsAwesome.ipa')
+        expect(result).to include('-d "Nowhere"')
+        expect(result).to include('-m "Sure"')
+        expect(result).to include('-i "bourne"')
+        expect(result).to include('--sdk "10.0"')
+        expect(result).to include('--ipa "JoshIsAwesome.ipa"')
       end
 
       it "works with object argument with all and extras" do

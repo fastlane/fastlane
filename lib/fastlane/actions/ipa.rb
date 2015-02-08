@@ -93,7 +93,8 @@ module Fastlane
         params.collect do |k,v|
           v ||= ''
           if args = ARGS_MAP[k]
-           "#{ARGS_MAP[k]} \"#{v}\"".strip
+            value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
+            "#{ARGS_MAP[k]} #{value}".strip
           end
         end.compact
       end
