@@ -51,12 +51,15 @@ module Snapshot
       if File.exists?path
         Helper.log.info "Using '#{path}'".green
         self.snapshot_file = SnapshotFile.new(path, self)
+
+        self.verify_devices
       else
         if path != './Snapfile'
           raise "Could not find Snapfile at path '#{path}'. Make sure you pass the full path, including 'Snapfile'".red
         else
           # Using default settings, since user didn't provide a path
           Helper.log.error "Could not find './Snapfile'. It is recommended to create a file using 'snapshot init' into the current directory. Using the defaults now.".red
+          self.verify_devices
         end
       end
 
@@ -65,13 +68,6 @@ module Snapshot
 
     def set_defaults
       self.ios_version = '8.1'
-
-      self.devices = [
-        "iPhone 6 (#{self.ios_version} Simulator)",
-        "iPhone 6 Plus (#{self.ios_version} Simulator)",
-        "iPhone 5 (#{self.ios_version} Simulator)",
-        "iPhone 4s (#{self.ios_version} Simulator)"
-      ]
 
       self.languages = [
         'de-DE',
@@ -96,6 +92,33 @@ module Snapshot
         setup_for_language_change: empty,
         teardown_language: empty
       }
+    end
+
+    # This has to be done after parsing the Snapfile (iOS version)
+    def set_default_simulators
+      self.devices ||= [
+        "iPhone 6 (#{self.ios_version} Simulator)",
+        "iPhone 6 Plus (#{self.ios_version} Simulator)",
+        "iPhone 5 (#{self.ios_version} Simulator)",
+        "iPhone 4s (#{self.ios_version} Simulator)"
+      ]
+    end
+
+    # This method takes care of appending the iOS version to the simulator name
+    def verify_devices
+      self.set_default_simulators
+
+      actual_devices = []
+      self.devices.each do |current|
+        current += " (#{self.ios_version} Simulator)" unless current.include?"Simulator"
+
+        unless Simulators.available_devices.include?current
+          raise "Device '#{current}' not found. Available device types: #{Simulators.available_devices}".red
+        else
+          actual_devices << current
+        end
+      end
+      self.devices = actual_devices
     end
 
     def load_env

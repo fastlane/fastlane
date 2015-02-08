@@ -24,7 +24,8 @@ module Snapshot
 
       case method_sym
         when :devices
-          self.verify_devices(value)
+          raise "Devices has to be an array".red unless value.kind_of?Array
+          @config.devices = value
         when :languages
           @config.languages = value
         when :ios_version
@@ -65,20 +66,6 @@ module Snapshot
         else
           Helper.log.error "Unknown method #{method_sym}"
         end
-    end
-
-    def verify_devices(value)
-      raise "Devices has to be an array".red unless value.kind_of?Array
-      @config.devices = []
-      value.each do |current|
-        current += " (#{@config.ios_version} Simulator)" unless current.include?"Simulator"
-
-        unless Simulators.available_devices.include?current
-          raise "Device '#{current}' not found. Available device types: #{Simulators.available_devices}".red
-        else
-          @config.devices << current
-        end
-      end
     end
   end
 end
