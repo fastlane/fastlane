@@ -16,6 +16,14 @@ module Deliver
 
         wait_for_preprocessing
 
+        # We might have to wait until the second part of "Processing" is finished
+        while first("tr > td.bt-internal").text == "Processing"
+          Helper.log.debug "iTC needs some more processing... Waiting even longer..."
+          sleep 10
+          visit current_url
+          sleep 10
+        end
+
         # Beta Switches
         if all(".switcher.ng-binding.checked").count == 0
           raise "Looks like Beta Testing is not yet enabled for this app. Open '#{current_url}' and enable TestFlight Beta Testing.".red
