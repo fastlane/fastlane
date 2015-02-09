@@ -76,19 +76,15 @@ module Sigh
         result = visit PROFILES_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
 
-        if page.has_content?"Member Center"
-          # Already logged in
-          return true
-        end
+        # Already logged in
+        return true if page.has_content? "Member Center"
 
         (wait_for_elements(".button.blue").first.click rescue nil) # maybe already logged in
 
         (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
 
-        if page.has_content?"Member Center"
-          # Already logged in
-          return true
-        end
+        # Already logged in
+        return true if page.has_content? "Member Center"
 
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
@@ -96,9 +92,8 @@ module Sigh
         all(".button.large.blue.signin-button").first.click
 
         begin
-          if page.has_content?"Select Team" # If the user is not on multiple teams
-            select_team
-          end
+          # If the user is not on multiple teams
+          select_team if page.has_content? "Select Team"
         rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
@@ -198,37 +193,27 @@ module Sigh
         certs = post_ajax(@list_certs_url)
 
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
+        required_cert_types = type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution']
         certs['provisioningProfiles'].each do |current_cert|
-          if type == DEVELOPMENT
-            if current_cert['type'] != "iOS Development"
-              next
-            end
-          end
-
-          if type != DEVELOPMENT
-            if not ['iOS Distribution', 'iOS UniversalDistribution'].include?current_cert['type']
-              next
-            end
-          end
+          next unless required_cert_types.include?(current_cert['type'])
           
           details = profile_details(current_cert['provisioningProfileId'])
 
           if details['provisioningProfile']['appId']['identifier'] == app_identifier
-            if type == APPSTORE and details['provisioningProfile']['deviceCount'] > 0
-              next # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-            end
-            if type != APPSTORE and details['provisioningProfile']['deviceCount'] == 0
-              next # that's an App Store profile ... skipping it
-            end
+            # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
+            next if type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
+
+            # that's an App Store profile ... skipping it
+            next if type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
 
             # We found the correct certificate
-            if force and type != DEVELOPMENT
+            if force && type != DEVELOPMENT
               provisioningProfileId = current_cert['provisioningProfileId']
               renew_profile(provisioningProfileId, type, cert_date) # This one needs to be forcefully renewed
               return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
             elsif current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
-            elsif ['Expired', 'Invalid'].include?current_cert['status']
+            elsif ['Expired', 'Invalid'].include? current_cert['status']
               renew_profile(current_cert['provisioningProfileId'], type, cert_date) # This one needs to be renewed
               return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
             end
@@ -250,7 +235,7 @@ module Sigh
 
     def create_profile(app_identifier, type, cert_date)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificate = code_signing_certificate(type, cert_date)
+      certificates = code_signing_certificates(type, cert_date)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
@@ -265,7 +250,7 @@ module Sigh
         enterprise = true
       end
 
-      value = (enterprise ? 'inhouse' : 'store')
+      value = enterprise ? 'inhouse' : 'store'
       value = 'limited' if type == DEVELOPMENT
       value = 'adhoc' if type == ADHOC
 
@@ -273,7 +258,7 @@ module Sigh
       click_next
 
       # 2) Select the App ID
-      while not page.has_content?"Select App ID" do sleep 1 end
+      sleep 1 while !page.has_content? "Select App ID"
       # example: <option value="RGAWZGXSY4">ABP (5A997XSHK2.net.sunapps.34)</option>
       identifiers = all(:xpath, "//option[contains(text(), '.#{app_identifier})')]")
       if identifiers.count == 0
@@ -288,19 +273,32 @@ module Sigh
       click_next
 
       # 3) Select the certificate
-      while not page.has_content?"Select certificates" do sleep 1 end
+      sleep 1 while !page.has_content? "Select certificates"
       sleep 3
-      Helper.log.info "Using certificate ID '#{certificate['certificateId']}' from '#{certificate['ownerName']}'"
+      Helper.log.info "Using certificates: #{certificates.map { |c| "#{c['ownerName']} (#{c['certificateId']})" } }"
 
       # example: <input type="radio" name="certificateIds" class="validate" value="[XC5PH8D47H]"> (production)
-      id = certificate["certificateId"]
-      certs = all(:xpath, "//input[@type='radio' and @value='[#{id}]']") if type != DEVELOPMENT # production uses radio and has a [] around the value
-      certs = all(:xpath, "//input[@type='checkbox' and @value='#{id}']") if type == DEVELOPMENT # development uses a checkbox and has no [] around the value
-      if certs.count != 1
-        Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs.count}"
+
+      clicked = false
+      certificates.each do |cert|
+        cert_id = cert['certificateId']
+        input = if type == DEVELOPMENT
+          # development uses a checkbox and has no [] around the value
+          first(:xpath, "//input[@type='checkbox' and @value='#{cert_id}']")
+        else
+          break if clicked
+          # production uses radio and has a [] around the value
+          first(:xpath, "//input[@type='radio' and @value='[#{cert_id}]']")
+        end
+        if input
+          input.click
+          clicked = true
+        end
+      end
+
+      if !clicked
         raise "Could not find certificate in the list of available certificates."
       end
-      certs.first.click
       click_next
 
       if type != APPSTORE
@@ -321,7 +319,7 @@ module Sigh
     end
 
     def renew_profile(profile_id, type, cert_date)
-      certificate = code_signing_certificate(type, cert_date)
+      certificate = code_signing_certificates(type, cert_date).first
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
@@ -367,9 +365,9 @@ module Sigh
         end
       end
 
-      # Returns a hash, that contains information about the iOS certificate
+      # Returns a array of hashs, that contains information about the iOS certificate
       # @example
-        # {"certRequestId"=>"B23Q2P396B",
+        # [{"certRequestId"=>"B23Q2P396B",
         # "name"=>"SunApps GmbH",
         # "statusString"=>"Issued",
         # "expirationDate"=>"2015-11-25T22:45:50Z",
@@ -385,10 +383,10 @@ module Sigh
         # "certificateTypeDisplayId"=>"...",
         # "serialNum"=>"....",
         # "typeString"=>"iOS Distribution"},
-      def code_signing_certificate(type, cert_date)
+        # {another sertificate...}]
+      def code_signing_certificates(type, cert_date)
         certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type="
-        certs_url << "distribution" if type != DEVELOPMENT
-        certs_url << "development" if type == DEVELOPMENT
+        certs_url << (type == DEVELOPMENT ? 'development' : 'distribution')
         visit certs_url
 
         certificateDataURL = wait_for_variable('certificateDataURL')
@@ -400,27 +398,38 @@ module Sigh
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
 
         certs = post_ajax(url)['certRequests']
+
+        ret_certs = []
+        certificate_name = ENV['SIGH_CERTIFICATE']
+
+        # The other profiles are push profiles
+        certificate_type = type == DEVELOPMENT ? 'iOS Development' : 'iOS Distribution'
         certs.each do |current_cert|
-          if type != DEVELOPMENT and current_cert['typeString'] == 'iOS Distribution' 
-            # The other profiles are push profiles
-            # We only care about the distribution profile
-            unless cert_date
-              return current_cert # mostly we only care about the 'certificateId'
-            else
-              if current_cert['expirationDateString'] == cert_date
-                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located"
-                return current_cert
-              end
+          next unless current_cert['typeString'] == certificate_type
+
+          if cert_date || certificate_name
+            if current_cert['expirationDateString'] == cert_date
+              Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located"
+              ret_certs << current_cert
             end
-          elsif type == DEVELOPMENT and current_cert['typeString'] == 'iOS Development'
-            return current_cert # mostly we only care about the 'certificateId'
+            if current_cert['name'] == certificate_name
+              Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{certificate_name}' located"
+              ret_certs << current_cert
+            end
+          else
+            ret_certs << current_cert
           end
         end
 
-        error_message_no_cert_with_date = "Could not find a Certificate with expiry date '#{cert_date}'. Please open #{current_url} and make sure you have a signing profile created.".red
-        error_message_no_cert = "Could not find a Certificate. Please open #{current_url} and make sure you have a signing profile created.".red
+        return ret_certs unless ret_certs.empty?
 
-        raise cert_date ? error_message_no_cert_with_date : error_message_no_cert
+        predicates = []
+        predicates << "name: #{certificate_name}" if certificate_name
+        predicates << "expiry date: #{cert_date}" if cert_date
+
+        predicates_str = " with #{predicates.join(' or ')}"
+
+        raise "Could not find a Certificate#{predicates_str}. Please open #{current_url} and make sure you have a signing profile created.".red
       end
 
       # Download a file from the dev center, by using a HTTP client. This will return the content of the file
@@ -464,7 +473,7 @@ module Sigh
       def wait_for(method, parameter, success)
         counter = 0
         result = method.call(parameter)
-        while !success.call(result)     
+        while !success.call(result)
           sleep 0.2
 
           result = method.call(parameter)
