@@ -3,7 +3,7 @@ PATH
   specs:
     snapshot (0.4.7)
       colored
-      commander (~> 4.2.0)
+      commander (~> 4.3.0)
       fastimage (~> 1.6.3)
       highline (~> 1.6.21)
       json
@@ -11,12 +11,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.6)
+    addressable (2.3.7)
     codeclimate-test-reporter (0.4.5)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     colored (1.2)
-    commander (4.2.1)
+    commander (4.3.0)
       highline (~> 1.6.11)
     diff-lcs (1.2.5)
     docile (1.1.5)
