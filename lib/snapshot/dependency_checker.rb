@@ -37,11 +37,11 @@ module Snapshot
 
     def self.check_xctool
       if not self.xctool_installed?
-        Helper.log.error '#############################################################'
-        Helper.log.error "# xctool is recommended to build the apps"
-        Helper.log.error "# Install it using 'brew install xctool'"
-        Helper.log.error "# Falling back to xcode build instead "
-        Helper.log.error '#############################################################'
+        Helper.log.info '#############################################################'
+        Helper.log.info "# xctool is recommended to build the apps"
+        Helper.log.info "# Install it using 'brew install xctool'"
+        Helper.log.info "# Falling back to xcode build instead "
+        Helper.log.info '#############################################################'
       end
     end
 
