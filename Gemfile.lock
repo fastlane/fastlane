@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.7.7)
+    deliver (0.7.8)
       capybara (~> 2.4.3)
       colored
       commander (~> 4.3.0)
