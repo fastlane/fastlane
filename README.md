@@ -125,12 +125,16 @@ To renew a valid profile with a different certificate, look up the expiry date o
 
     sigh --force -a com.krausefx.app -u username -d "Nov 11, 2017"
 
+By default, ```sigh``` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either set it's name to `SIGH_CERTIFICATE` environment variable, or pass expiry date of the certificate as argument:
+
+    sigh -a com.krausefx.app -d "Nov 11, 2017"
 
 ## Environment Variables
 In case you prefer environment variables:
 
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
+- ```SIGH_CERTIFICATE```
 - ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
 - `SIGH_DISABLE_OPEN_ERROR` - in case of error, `sigh` won't open Preview with a screenshot of the error when this variable is set.
 
