@@ -61,9 +61,13 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 This does the following:
 
+Check if any of the available signing certificates is installed.  
+
+Only if a new certificate needs to be created:
+
 - Create a new private key
 - Create a new signing request
-- Generates, downloads and installs the certificate
+- Generate, downloads and installs the certificate
 - Import all the generated files into your Keychain
 
 
