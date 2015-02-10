@@ -275,14 +275,5 @@ module Produce
         success = Proc.new { |r| r.count > 0 }
         return wait_for(method, name, success)
       end
-
-      def wait_for_variable(name)
-        method = Proc.new { |n|
-          retval = page.html.match(/var #{n} = "(.*)"/)
-          retval[1] unless retval == nil
-        }
-        success = Proc.new { |r| r != nil }
-        return wait_for(method, name, success)
-      end
   end
 end
