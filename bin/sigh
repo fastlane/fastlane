@@ -32,6 +32,7 @@ class SighApplication
     global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
     global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
     global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (e.g. "Nov 11, 2017")'
+    global_option '-c', '--cert_owner STRING', String, 'The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")'
     global_option '-f', '--filename STRING', String, 'Filename to use for the provisioning profile'
 
     command :renew do |c|
@@ -45,7 +46,9 @@ class SighApplication
         type = Sigh::DeveloperCenter::APPSTORE
         type = Sigh::DeveloperCenter::ADHOC if options.adhoc 
         type = Sigh::DeveloperCenter::DEVELOPMENT if options.development
-        
+
+        ENV['SIGH_CERTIFICATE'] = options.cert_owner if options.cert_owner
+
         path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
 
         if path

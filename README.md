@@ -123,7 +123,7 @@ If you need the provisioning profile to be renewed regardless of its state use t
 
 By default, ```sigh``` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
-    sigh -d "SunApps GmbH"
+    sigh -c "SunApps GmbH"
 
 
     sigh -d "Nov 11, 2017"
