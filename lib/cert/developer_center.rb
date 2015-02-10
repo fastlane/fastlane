@@ -117,8 +117,10 @@ module Cert
 
     # This will check if there is at least one of the certificates already installed on the local machine
     def run
-      if find_existing_cert
+      file = find_existing_cert
+      if file
         # We don't need to do anything :)
+        ENV["CER_FILE_PATH"] = file
       else
         create_certificate
       end
@@ -128,7 +130,6 @@ module Cert
 
     def find_existing_cert
       visit "#{CERTS_URL}?type=distribution"
-      wait_for_elements("form[name='certificateSave']")
 
       # Download all available certs to check if they are installed using the SHA1 hash
       certs = code_signing_certificate
@@ -142,7 +143,7 @@ module Cert
         if Cert::CertChecker.is_installed?output
           # We'll use this one, since it's installed on the local machine
           Helper.log.info "Found the certificate #{display_id}-#{type_id} which is installed on the local machine. Using this one.".green
-          return true
+          return output
         end
       end
 
