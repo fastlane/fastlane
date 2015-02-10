@@ -253,7 +253,7 @@ end
 
 setup_for_language_change do |lang, device|
   puts "Running #{lang} on #{device}"
-  system("./popuplateDatabase.sh")
+  system("./populateDatabase.sh")
 end
 
 teardown_language do |lang, device|
@@ -265,6 +265,8 @@ teardown_device do |device|
   system("./cleanup.sh")
 end
 ```
+
+If you want to run a script before each run of the app, it's enough to only implement the `setup_for_language_change` callback.
 
 ### Skip alpha removal from screenshots
 In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
