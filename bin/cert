@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'cert'
+require 'commander'
+require 'credentials_manager/password_manager'
+require 'credentials_manager/appfile_config'
+
+HighLine.track_eof = false
+
+class CertApplication
+  include Commander::Methods
+
+  def run
+    program :version, Cert::VERSION
+    program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
+    program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
+    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/krausefx/cert'
+    program :help_formatter, :compact
+
+    always_trace!
+
+    global_option '-u', '--username STRING', 'Your Apple ID username'
+
+    command :create do |c|
+      c.syntax = 'cert create'
+      c.description = 'Create new iOS code signing certificates'
+
+      c.action do |args, options|
+        # TODO
+      end
+    end
+
+    default_command :create
+
+    run!
+  end
+end
+
+CertApplication.new.run
