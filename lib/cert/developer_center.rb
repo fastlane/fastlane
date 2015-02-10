@@ -124,6 +124,9 @@ module Cert
       else
         create_certificate
       end
+
+      # Import it into the Keychain
+      KeychainImporter::import_file(ENV["CER_FILE_PATH"])
     rescue => ex
       error_occured(ex)
     end
@@ -195,7 +198,8 @@ module Cert
       download_button = wait_for_elements(".button.small.blue").first
       url = download_button['href']
       
-      download_url(url, File.join(TMP_FOLDER, "certificate.cer"))
+      path = File.join(TMP_FOLDER, "certificate.cer")
+      download_url(url, path)
       
       ENV["CER_FILE_PATH"] = path
       Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green

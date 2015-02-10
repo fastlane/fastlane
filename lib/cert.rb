@@ -7,6 +7,7 @@ require 'cert/update_checker'
 require 'cert/cert_runner'
 require 'cert/cert_checker'
 require 'cert/signing_request'
+require 'cert/keychain_importer'
 
 # Third Party code
 require 'phantomjs/poltergeist'
