@@ -124,9 +124,6 @@ module Cert
       else
         create_certificate
       end
-
-      # Import it into the Keychain
-      KeychainImporter::import_file(ENV["CER_FILE_PATH"])
     rescue => ex
       error_occured(ex)
     end
@@ -203,6 +200,8 @@ module Cert
       
       ENV["CER_FILE_PATH"] = path
       Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green
+
+      KeychainImporter::import_file(path)
     rescue => ex
       error_occured(ex)
     end
