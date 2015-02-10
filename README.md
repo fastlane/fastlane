@@ -50,6 +50,8 @@ Alexander Schuch ([@schuchalexander](https://twitter.com/schuchalexander)) who a
 
 -------
 
+<h5 align="center"><code>PEM</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
 
