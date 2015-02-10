@@ -65,8 +65,6 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-If you don't already have homebrew installed, [install it here](http://brew.sh/).
-
 # Usage
 
     pem
