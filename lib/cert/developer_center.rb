@@ -122,12 +122,20 @@ module Cert
       Helper.log.info "Creating a new code signing certificate"
 
       # select certificate type
-      first("label[for='type-iosNoOCSP']").click
+      app_store_toggle = first("input#type-iosNoOCSP")
+      if !!app_store_toggle['disabled']
+        # Limit of certificates already reached
+        raise "Could not create another certificate, reached the maximum number of available certificates.".red
+      end
+
+      app_store_toggle.click
+
       click_next # submit the certificate type
       click_next # information about how to upload the file (no action required on this step)
 
       Helper.log.info "Uploading the cert signing request"
-      cert_signing_request = File.expand_path("~/Downloads/tiroch.certSigningRequest")
+      cert_signing_request = Cert::SigningRequest.get_path
+
       wait_for_elements("input[name='upload']").first.set cert_signing_request # upload the cert signing request
       click_next
 
@@ -207,7 +215,7 @@ module Cert
 
         all(".button.large.blue.submit").first.click
 
-        result = visit APP_IDS_URL
+        result = visit CERTS_URL
         raise "Could not open Developer Center" unless result['status'] == 'success'
       end
 
