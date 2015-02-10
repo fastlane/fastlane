@@ -30,7 +30,9 @@ module Produce
 
 
 
-    def initialize
+    def initialize(config)
+      @config = config
+
       FileUtils.mkdir_p TMP_FOLDER
       
       Capybara.run_server = false
@@ -127,8 +129,8 @@ module Produce
     end
 
     def select_team
-      team_id = Config.val(:team_id) if Config.has_key?(:team_id)
-      team_name = Config.val(:team_name) if Config.has_key?(:team_name)
+      team_id = @config[:team_id] if @config.has_key?(:team_id)
+      team_name = @config[:team_name] if @config.has_key?(:team_name)
 
       if team_id == nil and team_name == nil
         Helper.log.info "You can store you preferred team using the environment variable `PRODUCE_TEAM_ID` or `PRODUCE_TEAM_NAME`".green
@@ -194,14 +196,14 @@ module Produce
 
     def create_new_app
       if app_exists?
-        Helper.log.info "App '#{Config.val(:app_name)}' already exists, nothing to do on the Dev Center".green
+        Helper.log.info "App '#{@config[:app_name]}' already exists, nothing to do on the Dev Center".green
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
-        Helper.log.info "Creating new app '#{Config.val(:app_name)}' on the Apple Dev Center".green
+        Helper.log.info "Creating new app '#{@config[:app_name]}' on the Apple Dev Center".green
         visit CREATE_APP_URL
-        wait_for_elements("*[name='appIdName']").first.set Config.val(:app_name)
-        wait_for_elements("*[name='explicitIdentifier']").first.set Config.val(:bundle_identifier)
+        wait_for_elements("*[name='appIdName']").first.set @config[:app_name]
+        wait_for_elements("*[name='explicitIdentifier']").first.set @config[:bundle_identifier]
         click_next
 
         sleep 3 # sometimes this takes a while and we don't want to timeout
@@ -218,7 +220,7 @@ module Produce
 
         ENV["CREATED_NEW_APP_ID"] = Time.now.to_s
 
-        Helper.log.info "Finished creating new app '#{Config.val(:app_name)}' on the Dev Center".green
+        Helper.log.info "Finished creating new app '#{@config[:app_name]}' on the Dev Center".green
       end
 
       return true
@@ -232,7 +234,7 @@ module Produce
         wait_for_elements("td[aria-describedby='grid-table_identifier']").each do |app|
           identifier = app['title']
 
-          return true if identifier.to_s == Config.val(:bundle_identifier).to_s
+          return true if identifier.to_s == @config[:bundle_identifier].to_s
         end
 
         false

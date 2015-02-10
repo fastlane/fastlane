@@ -8,17 +8,51 @@ module Produce
       primary_language: "Primary Language (e.g. 'English', 'German'): "
     }
 
-    attr_reader :config
-
+    # Left to prevent fastlane from crashing. Should be removed upon version bump.
     def self.shared_config
-      @@shared ||= self.new
     end
 
-    def self.shared_config= config
-      @@shared = config
+    # Creates new Config instance using ENV variables.
+    # @param options (Hash) (optional) config options hash. If duplicates keys
+    # specified by ENV variable, `options` has value will be used.
+    # @return (Config) created Config instance
+    def initialize(options = {})
+      @config = env_options.merge(options)
     end
 
-    def self.env_options
+    # Retrieves the value for given `key`. If not found, will promt user with
+    # `ASK_MESSAGES[key]` till gets valid response. Thus, always returns value.
+    # Raises exception if given `key` is not Symbol or unknown.
+    def val(key)
+      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
+
+      unless @config.has_key? key
+        @config[key] = ask(ASK_MESSAGES[key]) do |q|
+          case key
+          when :primary_language
+            q.validate = lambda { |val| is_valid_language?(val) }
+            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
+          else
+            q.validate = lambda { |val| !val.empty? }
+            q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
+          end
+        end
+      end
+
+      return @config[key]
+    end
+
+    # Aliases `[key]` to `val(key)` because Ruby can do it.
+    alias_method :[], :val
+
+    # Returns true if option for the given key is present.
+    def has_key?(key)
+      @config.has_key? key
+    end
+
+    private
+
+    def env_options
       hash = {
         bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
         app_name: ENV['PRODUCE_APP_NAME'],
@@ -42,38 +76,12 @@ module Produce
       hash
     end
 
-    def initialize(options = {})
-      @config = Config.env_options.merge(options)
-    end
 
-    def self.val(key)
-      raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
-
-      unless shared_config.config.has_key? key
-        shared_config.config[key] = ask(ASK_MESSAGES[key]) do |q|
-          case key
-          when :primary_language
-            q.validate = lambda { |val| is_valid_language?(val) }
-            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
-          else
-            q.validate = lambda { |val| !val.empty? }
-            q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
-          end
-        end
-      end
-
-      return self.shared_config.config[key]
-    end
-
-    def self.has_key?(key)
-      shared_config.config.has_key? key
-    end
-
-    def self.is_valid_language? language
+    def is_valid_language? language
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
-    def self.skip_itc? value
+    def skip_itc? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
   end
