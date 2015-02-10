@@ -119,16 +119,19 @@ If you need the provisioning profile to be renewed regardless of its state use t
 
     sigh --force -a com.krausefx.app -u username
 
-To renew a valid profile with a different certificate, look up the expiry date of the certificate you want to sign with in the Apple Developer Portal under Production Certificates. Copy the date string from there and use the following:
+By default, ```sigh``` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
-    sigh --force -a com.krausefx.app -u username -d "Nov 11, 2017"
+    sigh -c "SunApps GmbH"
 
+
+    sigh -d "Nov 11, 2017"
 
 ## Environment Variables
 In case you prefer environment variables:
 
 - ```SIGH_USERNAME```
 - ```SIGH_APP_IDENTIFIER```
+- ```SIGH_CERTIFICATE``` (The name of the certificate to use)
 - ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
 - `SIGH_DISABLE_OPEN_ERROR` - in case of error, `sigh` won't open Preview with a screenshot of the error when this variable is set.
 
