@@ -5,6 +5,7 @@ require 'cert/dependency_checker'
 require 'cert/developer_center'
 require 'cert/update_checker'
 require 'cert/cert_runner'
+require 'cert/cert_checker'
 require 'cert/signing_request'
 
 # Third Party code

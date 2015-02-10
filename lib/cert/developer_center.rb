@@ -115,7 +115,45 @@ module Cert
       end
     end
 
-    def create_cert
+    # This will check if there is at least one of the certificates already installed on the local machine
+    def run
+      if find_existing_cert
+        # We don't need to do anything :)
+      else
+        create_certificate
+      end
+    rescue => ex
+      error_occured(ex)
+    end
+
+    def find_existing_cert
+      visit "#{CERTS_URL}?type=distribution"
+      wait_for_elements("form[name='certificateSave']")
+
+      # Download all available certs to check if they are installed using the SHA1 hash
+      certs = code_signing_certificate
+      certs.each do |current|
+        display_id = current['certificateId']
+        type_id = current['certificateTypeDisplayId']
+        url = "/account/ios/certificate/certificateContentDownload.action?displayId=#{display_id}&type=#{type_id}"
+
+        output = File.join(TMP_FOLDER, "#{display_id}-#{type_id}.cer")
+        download_url(url, output)
+        if Cert::CertChecker.is_installed?output
+          # We'll use this one, since it's installed on the local machine
+          Helper.log.info "Found the certificate #{display_id}-#{type_id} which is installed on the local machine. Using this one.".green
+          return true
+        end
+      end
+
+      Helper.log.info "Couldn't find an existing certificate... creating a new one"
+      return false
+    rescue => ex
+      error_occured(ex)
+    end
+
+    # This will actually create a new certificate
+    def create_certificate
       visit CREATE_CERT_URL
       wait_for_elements("form[name='certificateSave']")
 
@@ -131,13 +169,18 @@ module Cert
       app_store_toggle.click
 
       click_next # submit the certificate type
+      sleep 2
       click_next # information about how to upload the file (no action required on this step)
 
-      Helper.log.info "Uploading the cert signing request"
       cert_signing_request = Cert::SigningRequest.get_path
+      Helper.log.info "Uploading the cert signing request '#{cert_signing_request}'"
+      
 
       wait_for_elements("input[name='upload']").first.set cert_signing_request # upload the cert signing request
+      sleep 1
       click_next
+
+      sleep 3
 
       while all(:css, '.loadingMessage').count > 0
         Helper.log.debug "Waiting for iTC to generate the profile"
@@ -147,35 +190,21 @@ module Cert
       Helper.log.info "Downloading newly generated certificate"
       sleep 2
 
-
       # Now download the certificate
-      download_button = first(".button.small.blue")
-      host = Capybara.current_session.current_host
+      download_button = wait_for_elements(".button.small.blue").first
       url = download_button['href']
-      url = [host, url].join('')
-      Helper.log.info "Downloading URL: '#{url}'"
-
-      cookieString = ""
-      page.driver.cookies.each do |key, cookie|
-        cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
-      end  
-      data = open(url, {'Cookie' => cookieString}).read
-
-      raise "Something went wrong when downloading the certificate" unless data
-
-      path = File.join(TMP_FOLDER, "certificate.cer")
-      dataWritten = File.write(path, data)
       
-      if dataWritten == 0
-        raise "Can't write to #{TMP_FOLDER}"
-      end
+      download_url(url, File.join(TMP_FOLDER, "certificate.cer"))
       
+      ENV["CER_FILE_PATH"] = path
       Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green
+    rescue => ex
+      error_occured(ex)
     end
 
 
-
     private
+
       def select_team
         team_id = ENV["CERT_TEAM_ID"]
         team_id = nil if team_id.to_s.length == 0
@@ -219,6 +248,70 @@ module Cert
         raise "Could not open Developer Center" unless result['status'] == 'success'
       end
 
+      def download_url(url, output_path)
+        host = Capybara.current_session.current_host
+        url = [host, url].join('')
+        Helper.log.info "Downloading URL: '#{url}'"
+
+        cookieString = ""
+        page.driver.cookies.each do |key, cookie|
+          cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
+        end  
+        data = open(url, {'Cookie' => cookieString}).read
+
+        raise "Something went wrong when downloading the certificate" unless data
+
+        dataWritten = File.write(output_path, data)
+        
+        if dataWritten == 0
+          raise "Can't write to #{output_path}"
+        end
+      end
+
+      # Returns a hash, that contains information about the iOS certificate
+      # @example
+        # {"certRequestId"=>"B23Q2P396B",
+        # "name"=>"SunApps GmbH",
+        # "statusString"=>"Issued",
+        # "expirationDate"=>"2015-11-25T22:45:50Z",
+        # "expirationDateString"=>"Nov 25, 2015",
+        # "ownerType"=>"team",
+        # "ownerName"=>"SunApps GmbH",
+        # "ownerId"=>"....",
+        # "canDownload"=>true,
+        # "canRevoke"=>true,
+        # "certificateId"=>"....",
+        # "certificateStatusCode"=>0,
+        # "certRequestStatusCode"=>4,
+        # "certificateTypeDisplayId"=>"...",
+        # "serialNum"=>"....",
+        # "typeString"=>"iOS Distribution"},
+      def code_signing_certificate
+        certs_url = "https://developer.apple.com/account/ios/certificate/certificateList.action?type=distribution"
+        visit certs_url
+
+        certificateDataURL = wait_for_variable('certificateDataURL')
+        certificateRequestTypes = wait_for_variable('certificateRequestTypes')
+        certificateStatuses = wait_for_variable('certificateStatuses')
+
+        url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
+
+        # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
+
+        available = []
+
+        certs = post_ajax(url)['certRequests']
+        certs.each do |current_cert|
+          if current_cert['typeString'] == 'iOS Distribution' 
+            # The other profiles are push profiles
+            # We only care about the distribution profile
+            available << current_cert # mostly we only care about the 'certificateId'
+          end
+        end
+
+        return available        
+      end
+
       def click_next
         wait_for_elements('.button.small.blue.right.submit').last.click
       end
@@ -234,22 +327,40 @@ module Cert
         system("open '#{path}'")
       end
 
-      def wait_for_elements(name)
+      def post_ajax(url)
+        JSON.parse(page.evaluate_script("$.ajax({type: 'POST', url: '#{url}', async: false})")['responseText'])
+      end
+
+      def wait_for(method, parameter, success)
         counter = 0
-        results = all(name)
-        while results.count == 0      
-          # Helper.log.debug "Waiting for #{name}"
+        result = method.call(parameter)
+        while !success.call(result)     
           sleep 0.2
 
-          results = all(name)
+          result = method.call(parameter)
 
           counter += 1
           if counter > 100
             Helper.log.debug caller
-            raise DeveloperCenterGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
+            raise DeveloperCenterGeneralError.new("Couldn't find '#{parameter}' after waiting for quite some time")
           end
         end
-        return results
+        return result
+      end
+
+      def wait_for_elements(name)
+        method = Proc.new { |n| all(name) }
+        success = Proc.new { |r| r.count > 0 }
+        return wait_for(method, name, success)
+      end
+
+      def wait_for_variable(name)
+        method = Proc.new { |n|
+          retval = page.html.match(/var #{n} = "(.*)"/)
+          retval[1] unless retval == nil
+        }
+        success = Proc.new { |r| r != nil }
+        return wait_for(method, name, success)
       end
   end
 end
