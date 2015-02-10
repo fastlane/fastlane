@@ -258,7 +258,7 @@ module PEM
           raise "Can't write to #{TMP_FOLDER}"
         end
         
-        Helper.log.info "Successfully downloaded latest .cer file."
+        Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green
         return path
       end
 
