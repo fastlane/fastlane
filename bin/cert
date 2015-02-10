@@ -29,8 +29,18 @@ class CertApplication
       c.description = 'Create new iOS code signing certificates'
 
       c.action do |args, options|
-        # TODO
+        username(options)
+        
+        Cert::CertRunner.run
       end
+    end
+
+    def username(options)
+      user = options.username
+      user ||= ENV["CERT_USERNAME"]
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      
+      CredentialsManager::PasswordManager.shared_manager(user) if user
     end
 
     default_command :create

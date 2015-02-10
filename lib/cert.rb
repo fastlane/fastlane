@@ -4,7 +4,7 @@ require 'cert/helper'
 require 'cert/dependency_checker'
 require 'cert/developer_center'
 require 'cert/update_checker'
-require 'cert/cert_manager'
+require 'cert/cert_runner'
 require 'cert/signing_request'
 
 # Third Party code
