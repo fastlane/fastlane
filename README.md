@@ -27,13 +27,14 @@ cert - Create new iOS code signing certificates
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/cert/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
 
+###### Create new iOS code signing certificates from the command line. 
 
+##### This tool was sponsored by [AppInstitute](http://appinstitute.co.uk/).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
     <a href="#how-does-it-work">How does it work?</a> &bull; 
@@ -43,9 +44,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
-# Features
+<h5 align="center"><code>cert</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
-Create new iOS distribution certificates from the command line. 
 
 
 # Installation
