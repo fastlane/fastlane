@@ -11,6 +11,12 @@ module Deliver
       size = FastImage.size(path)
       raise "App icon must have the resolution of 1024x1024px".red unless (size[0] == 1024 and size[1] == 1024)
 
+      # Remove alpha channel
+      Helper.log.info "Removing alpha channel from provided App Icon (iTunes Connect requirement)".green
+      
+      `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null because there is warning because of the extension
+      `sips -s format png '#{path}'`
+
       begin
         verify_app(app)
         open_app_page(app)

@@ -50,7 +50,7 @@ module Deliver
 
       result = execute_transporter(command)
 
-      itmsp_path = [dir, "#{app.apple_id}.itmsp"].join('/')
+      itmsp_path = File.join(dir, "#{app.apple_id}.itmsp")
       if result and File.directory?itmsp_path
         Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
       else
