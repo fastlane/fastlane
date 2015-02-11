@@ -19,14 +19,14 @@ module Fastlane
 
         # Available options: https://deploygate.com/docs/api
         options = {
-            ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+          ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
         }.merge(params.first || {})
         assert_options!(options)
 
         Helper.log.info "Starting with ipa upload to DeployGate... this could take some time ⏳".green
         client = Shenzhen::Plugins::DeployGate::Client.new(
-            options.delete(:api_token),
-            options.delete(:user)
+          options.delete(:api_token),
+          options.delete(:user)
         )
 
         return if Helper.is_test?
@@ -59,26 +59,28 @@ module Fastlane
             Actions.lane_context[SharedValues::DEPLOYGATE_REVISION] = res['revision']
             Actions.lane_context[SharedValues::DEPLOYGATE_APP_INFO] = res
           else
-            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}"
+            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
             help_message(response)
             return
           end
         else
-          Helper.log.fatal "Error uploading to DeployGate: #{response.body}"
+          Helper.log.fatal "Error uploading to DeployGate: #{response.body}".red
           return
         end
         true
       end
 
       def self.help_message(response)
-        case response.body['message']
-          when 'you are not authenticated'
-            Helper.log.error "Invalid API Token specified."
-          when 'application create error: permit'
-            Helper.log.error "Access denied: May be trying to upload to wrong user or updating app you join as a tester?"
-          when 'application create error: limit'
-            Helper.log.error "Plan limit: You have reached to the limit of current plan or your plan was expired."
-        end
+        message =
+          case response.body['message']
+            when 'you are not authenticated'
+              "Invalid API Token specified."
+            when 'application create error: permit'
+              "Access denied: May be trying to upload to wrong user or updating app you join as a tester?"
+            when 'application create error: limit'
+              "Plan limit: You have reached to the limit of current plan or your plan was expired."
+          end
+        Helper.log.error message.red if message
       end
     end
   end

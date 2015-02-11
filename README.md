@@ -229,6 +229,8 @@ Additionally you can specify `notes_path`, `emails` and `groups`.
 
 #### [DeployGate](https://deploygate.com/)
 
+You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).
+
 ```ruby
 deploygate({
   api_token: '...',
@@ -238,7 +240,7 @@ deploygate({
 })
 ```
 
-If you put `deploygate` after `ipa` action, you don't have to specify IPA file path. It will be extracted from lane context automatically.
+If you put `deploygate` after `ipa` action, you don't have to specify IPA file path, as it is extracted from the lane context automatically.
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
 
