@@ -226,6 +226,12 @@ I'll try to keep the script up to date. If you need to change the iOS version, y
 ios_version "9.0"
 ```
 
+### Custom Args for the build command
+
+```ruby
+custom_args "GCC_PREPROCESSOR_DEFINITIONS='SCREENSHOTS'"
+```
+
 ### Custom Build Command
 If for some reason, the default build command does not work for your project, you can pass your own build script. The script will be executed **once** before the tests are being run.
 

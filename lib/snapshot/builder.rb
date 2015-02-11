@@ -58,7 +58,8 @@ module Snapshot
         proj_key = 'project'
         proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
 
-        build_command = (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
+        pre_command = SnapshotConfig.shared_instance.custom_args || ENV["SNAPSHOT_CUSTOM_ARGS"] || ''
+        build_command = pre_command + ' ' + (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
 
         actions = []
         actions << 'clean' if clean

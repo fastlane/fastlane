@@ -34,6 +34,9 @@ module Snapshot
     # @return (BOOL) Clear previously generated screenshots before creating new ones
     attr_accessor :clear_previous_screenshots
 
+    # @return (String) This will be prepended before the actual build command
+    attr_accessor :custom_args
+
     # @return (Hash) All the blocks, which are called on specific actions
     attr_accessor :blocks
 
