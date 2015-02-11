@@ -41,6 +41,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#features">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
+    <a href="#usage">Resign</a> &bull; 
     <a href="#how-does-it-work">How does it work?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
@@ -123,8 +124,22 @@ By default, ```sigh``` will include all certificates on development profiles, an
 
     sigh -c "SunApps GmbH"
 
+Or identify be expire date if you're using the same names for multiple certificates
 
     sigh -d "Nov 11, 2017"
+
+# Resign
+
+If you generated your `ipa` file but want to apply a different code signing onto the ipa file, you can use `sigh resign`:
+
+
+    sigh resign
+
+`sigh` will find the ipa file and the provisioning profile for you if they are located in the current folder.
+
+You can pass more information using the command line:
+
+    sigh resign ./path/app.ipa -i "iPhone Distribution: Felix Krause" -p "my_profile.mobileprovision"
 
 ## Environment Variables
 In case you prefer environment variables:
