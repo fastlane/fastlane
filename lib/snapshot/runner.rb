@@ -34,6 +34,8 @@ module Snapshot
         SnapshotConfig.shared_instance.blocks[:teardown_device].call(device) # Callback
       end
 
+      `killall "iOS Simulator"` # close the simulator after the script is finished
+
       ReportsGenerator.new.generate
 
       if errors.count > 0
