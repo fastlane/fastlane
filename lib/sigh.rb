@@ -4,6 +4,7 @@ require 'sigh/helper'
 require 'sigh/dependency_checker'
 require 'sigh/developer_center'
 require 'sigh/update_checker'
+require 'sigh/resign'
 
 # Third Party code
 require 'colored'

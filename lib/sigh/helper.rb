@@ -45,5 +45,14 @@ module Sigh
       return "" if self.is_test? and not OS.mac?
       `xcode-select -p`.gsub("\n", '') + "/"
     end
+
+    # Path to the installed gem to load resources (e.g. resign.sh)
+    def self.gem_path
+      if not Helper.is_test? and Gem::Specification::find_all_by_name('sigh').any?
+        return Gem::Specification.find_by_name('sigh').gem_dir
+      else
+        return './'
+      end
+    end
   end
 end
