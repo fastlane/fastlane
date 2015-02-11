@@ -161,7 +161,7 @@ module Snapshot
     end
 
     def copy_screenshots(language)
-      resulting_path = [SnapshotConfig.shared_instance.screenshots_path, language].join('/')
+      resulting_path = File.join(SnapshotConfig.shared_instance.screenshots_path, language)
 
       FileUtils.mkdir_p resulting_path
 

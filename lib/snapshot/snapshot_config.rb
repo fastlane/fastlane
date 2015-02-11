@@ -152,7 +152,7 @@ module Snapshot
         end
       end
 
-      unless File.exists?result
+      unless File.exists?(result || '')
         raise "Could not determine which UIAutomation file to use. Please pass a path to your Javascript file using 'js_file'.".red
       end
 
