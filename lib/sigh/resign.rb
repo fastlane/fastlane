@@ -1,8 +1,8 @@
 module Sigh
   # Resigns an existing ipa file
   class Resign
-    def run(options)
-      get_inputs(options)
+    def run(options, args)
+      get_inputs(options, args)
 
       command = [
         @resign_path,
@@ -16,14 +16,16 @@ module Sigh
       puts `#{command}`
     end
 
-    def get_inputs(options)
+    def get_inputs(options, args)
       @resign_path = File.join(Helper.gem_path, 'lib', 'assets', 'resign.sh')
       raise "Could not find resign.sh file. Please try re-installing the gem.".red unless File.exists?@resign_path
 
-      @ipa = options.ipa || find_ipa || ask("Path to ipa file: ")
+      @ipa = args.first || find_ipa || ask("Path to ipa file: ")
+      validate_ipa_file!
       @signing_identity = options.signing_identity || ask_for_signing_identity
       validate_signing_identity
       @provisioning_profile = options.provisioning_profile || find_provisioning_profile || ask("Path to provisioning file: ")
+      validate_provisioning_file!
     end
 
     def find_ipa
@@ -34,15 +36,28 @@ module Sigh
       Dir[File.join(Dir.pwd, "*.mobileprovision")].sort { |a,b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
+    def validate_ipa_file!
+      raise "ipa file could not be found or is not an ipa file (#{@ipa})".red unless (File.exists?(@ipa) and @ipa.end_with?".ipa")
+    end
+
+    def validate_provisioning_file!
+      raise "Provisioning profile file could not be found or is not a .mobileprovision file (#{@provisioning_profile})".red unless (File.exists?(@provisioning_profile) and @provisioning_profile.end_with?".mobileprovision")
+    end
+
     def validate_signing_identity
       while not installed_identies.include?@signing_identity
-        Helper.log.error "Couldn't find signing identity '#{@signing_identity}'. Available identities: \n\t#{installed_identies.join("\n\t")}\n"
+        Helper.log.error "Couldn't find signing identity '#{@signing_identity}'."
         @signing_identity = ask_for_signing_identity
       end
     end
 
+    def print_available_identities
+      Helper.log.info "Available identities: \n\t#{installed_identies.join("\n\t")}\n"
+    end
+
     def ask_for_signing_identity
-      ask("Signing Identity (e.g. 'iPhone Distribution: SunApps GmbH (5A997XAHK2)'): ")
+      print_available_identities
+      ask("Signing Identity: ")
     end
 
     # Array of available signing identities
