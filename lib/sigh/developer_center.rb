@@ -404,6 +404,12 @@ module Sigh
 
         # The other profiles are push profiles
         certificate_type = type == DEVELOPMENT ? 'iOS Development' : 'iOS Distribution'
+        
+        # New profiles first
+        certs.sort! do |a, b|
+          Time.parse(b['expirationDate']) <=> Time.parse(a['expirationDate'])
+        end
+
         certs.each do |current_cert|
           next unless current_cert['typeString'] == certificate_type
 
