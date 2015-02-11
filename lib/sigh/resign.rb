@@ -13,7 +13,13 @@ module Sigh
       ].join(' ')
 
       puts command.magenta
-      puts `#{command}`
+      output = `#{command}`
+      puts output
+      if output.include?"Assuming Distribution Identity"
+        Helper.log.info "Successfully signed #{@ipa}!".green
+      else
+        Helper.log.fatal "Something went wrong while code signing #{@ipa}".red
+      end
     end
 
     def get_inputs(options, args)
