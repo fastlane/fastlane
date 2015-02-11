@@ -336,7 +336,7 @@ module Sigh
         wait_for_elements('.row-details')
         click_on "Done"
       else
-        Helper.log.info "Looking for certificate: #{certificate}. Found: #{certs}"
+        Helper.log.info "Looking for certificate: #{certificate}."
         raise "Could not find certificate in the list of available certificates."
       end
     end
