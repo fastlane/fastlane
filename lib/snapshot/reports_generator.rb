@@ -27,7 +27,7 @@ module Snapshot
         end
       end
 
-      html_path = File.join(lib_path, "snapshot/page.html.erb"])
+      html_path = File.join(lib_path, "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
