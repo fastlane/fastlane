@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    sigh (0.3.1)
+    sigh (0.3.2)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.3.0)
+      commander (~> 4)
       credentials_manager
       highline (~> 1.6.21)
       json

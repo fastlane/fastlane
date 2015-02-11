@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json' # Because sometimes it's just not installed
   spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
   spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '~> 4.3.0' # CLI parser
+  spec.add_dependency 'commander', '~> 4' # CLI parser
 
   spec.add_dependency 'credentials_manager' # fastlane password manager
 
