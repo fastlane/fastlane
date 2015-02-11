@@ -182,7 +182,8 @@ module Deliver
           "-m upload",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
-          "-f '#{source}'"
+          "-f '#{source}'",
+          ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
         ].join(' ')
       end
 
