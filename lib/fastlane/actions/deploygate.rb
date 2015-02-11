@@ -19,17 +19,19 @@ module Fastlane
 
         # Available options: https://deploygate.com/docs/api
         options = {
-          visibility: 'private',
-          ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-        }.merge(params.first)
+            ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+        }.merge(params.first || {})
         assert_options!(options)
 
-        Helper.log.info "Starting with ipa upload to DeployGate... this could take some time.".green
-        client = Shenzhen::Plugins::DeployGate::Client.new(options[:api_token], options[:username])
+        Helper.log.info "Starting with ipa upload to DeployGate... this could take some time ⏳".green
+        client = Shenzhen::Plugins::DeployGate::Client.new(
+            options.delete(:api_token),
+            options.delete(:user)
+        )
 
         return if Helper.is_test?
 
-        response = client.upload_build(options[:ipa], options)
+        response = client.upload_build(options.delete(:ipa), options)
         if parse_response(response)
           Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
           Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green
@@ -42,7 +44,7 @@ module Fastlane
 
       def self.assert_options!(options)
         raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
-        raise "No Username for app given, pass using `username: 'username'`".red unless options[:username].to_s.length > 0
+        raise "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
         raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exists?(options[:ipa])
       end

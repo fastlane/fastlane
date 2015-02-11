@@ -14,7 +14,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              username: 'deploygate',
+              user: 'deploygate',
             })
           end").runner.execute(:test)
         }.to raise_error
@@ -36,7 +36,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
               api_token: 'thisistest',
-              username: 'deploygate',
+              user: 'deploygate',
             })
           end").runner.execute(:test)
         }.to raise_error
@@ -47,7 +47,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
               api_token: 'thisistest',
-              username: 'deploygate',
+              user: 'deploygate',
               ipa_path: './fastlane/nonexistent'
             })
           end").runner.execute(:test)
@@ -59,7 +59,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              username: 'deploygate',
+              user: 'deploygate',
               api_token: 'thisistest',
             })
           end").runner.execute(:test)
