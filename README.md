@@ -20,7 +20,7 @@
     <img src="assets/cert.png">
 </p>
 
-cert - Create new iOS code signing certificates
+cert - Create new iOS signing certificates
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
