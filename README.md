@@ -170,17 +170,36 @@ produce({
 })
 ```
 
+#### ipa
+
+Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
+
+```ruby
+ipa({
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "Debug",
+})
+```
+
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To use also use it in `deliver` update your `Deliverfile`:
+
+```ruby
+ipa ENV["IPA_OUTPUT_PATH"]
+beta_ipa ENV["IPA_OUTPUT_PATH"]
+```
+
 #### [deliver](https://github.com/KrauseFx/deliver)
 ```ruby
 deliver
 ```
 
-If you don't want a PDF report, which you have to approve first, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server.
-```ruby
-deliver :force
-```
+To upload a new build to TestFlight use ```deliver :beta```.
 
-- ```deliver :beta```: Upload a beta build for Apple TestFlight
+If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver :force`
+
+Other options
+
 - ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
 - ```deliver :force, :skip_deploy```: Combine options using ```,```
 
