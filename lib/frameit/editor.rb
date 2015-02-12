@@ -48,6 +48,7 @@ module Frameit
             end
 
             output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+            result.format "png"
             result.write output_path
             Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
           end
