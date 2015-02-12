@@ -24,7 +24,7 @@ module Deliver
     # If it's a production build it will be released into production. Otherwise no action.
     # @raise (IpaUploaderError) Is thrown when the ipa file was not found or is not valid
     def initialize(app, dir, ipa_path, publish_strategy)
-      ipa_path.strip! # remove unused white spaces
+      ipa_path.dup.strip! # remove unused white spaces
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' not found") unless File.exists?(ipa_path)
       raise IpaUploaderError.new("IPA on path '#{ipa_path}' is not a valid IPA file") unless ipa_path.include?".ipa"
 
