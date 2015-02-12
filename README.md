@@ -178,7 +178,7 @@ Build your app right inside `fastlane` and the path to the resulting ipa is auto
 ipa({
   workspace: "MyApp.xcworkspace",
   configuration: "Debug",
-  scheme: "Debug",
+  scheme: "MyApp",
 })
 ```
 
