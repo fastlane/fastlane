@@ -83,7 +83,7 @@ In case you prefer environment variables:
 
 - ```CERT_USERNAME```
 - ```CERT_TEAM_ID```
-- ```CERT_KEYCHAIN```
+- ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain in case you don't want to use the default one
 
 # How does it work?
 
