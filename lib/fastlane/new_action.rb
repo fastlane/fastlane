@@ -7,7 +7,7 @@ module Fastlane
     end
 
     def self.fetch_name
-      puts "Must be lower case, and use a'_' between words. Do not use a '.'".green
+      puts "Must be lower case, and use a '_' between words. Do not use '.'".green
       puts "examples: 'testflight', 'upload_to_s3'".green
       name = ask("Name of your action: ")
       while not name_valid?name
@@ -23,7 +23,7 @@ module Fastlane
       template.gsub!('[[NAME_UP]]', name.upcase)
       template.gsub!('[[NAME_CLASS]]', name.classify + "Action")
 
-      actions_path = File.join(FastlaneFolder.path, "actions")
+      actions_path = File.join((FastlaneFolder.path || Dir.pwd), "actions")
       FileUtils.mkdir_p(actions_path) unless File.directory?actions_path
 
       path = File.join(actions_path, "#{name}.rb")
