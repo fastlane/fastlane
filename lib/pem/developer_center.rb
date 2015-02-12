@@ -187,6 +187,10 @@ module PEM
           visit APP_IDS_URL
           sleep 5
 
+          wait_for_elements(".toolbar-button.search").first.click
+          fill_in "bundle-list-search", with: app_identifier
+          sleep 5
+
           apps = all(:xpath, "//td[@title='#{app_identifier}']")
           if apps.count == 1
             apps.first.click
