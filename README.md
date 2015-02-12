@@ -182,7 +182,7 @@ ipa({
 })
 ```
 
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To use also use it in `deliver` update your `Deliverfile`:
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To also use it in `deliver` update your `Deliverfile`:
 
 ```ruby
 ipa ENV["IPA_OUTPUT_PATH"]
