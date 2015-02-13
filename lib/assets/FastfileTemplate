@@ -12,6 +12,12 @@ before_all do
 
   # increment_build_number
 
+  ipa({
+    workspace: "MyApp.xcworkspace",
+    configuration: "Debug",
+    scheme: "MyApp",
+  })
+
   cocoapods
 
   xctool
