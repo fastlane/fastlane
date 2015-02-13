@@ -21,7 +21,7 @@ module Fastlane
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
           raise "No HIPCHAT_API_TOKEN given.".red
         end
-        if api_version.nil? || ![1,2].include?(api_version[0].to_i)
+        if api_version.nil? || ![1, 2].include?(api_version[0].to_i)
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
           raise "No HIPCHAT_API_VERSION given.".red
         end

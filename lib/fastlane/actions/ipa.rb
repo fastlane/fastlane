@@ -90,7 +90,7 @@ module Fastlane
         params = params.delete_if { |k, v| (k != :clean && k != :archive ) && v.nil? }
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
-        params.collect do |k,v|
+        params.collect do |k, v|
           v ||= ''
           if args = ARGS_MAP[k]
             value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
@@ -101,12 +101,12 @@ module Fastlane
 
       def self.find_ipa_file(dir)
         # Finds last modified .ipa in the destination directory
-        Dir[File.join(dir, "*.ipa")].sort { |a,b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, "*.ipa")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
 
       def self.find_dsym_file(dir)
         # Finds last modified .dSYM.zip in the destination directory
-        Dir[File.join(dir, "*.dSYM.zip")].sort { |a,b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, "*.dSYM.zip")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
 
     end
