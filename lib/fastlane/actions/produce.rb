@@ -25,7 +25,6 @@ module Fastlane
           
           apple_id = Produce::Manager.start_producing.to_s
 
-
           Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
           ENV["PRODUCE_APPLE_ID"] = apple_id
         end

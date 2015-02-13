@@ -8,7 +8,6 @@ require 'fastlane/new_action'
 
 HighLine.track_eof = false
 
-
 class FastlaneApplication
   include Commander::Methods
 

@@ -9,7 +9,6 @@ module Fastlane
       containing_folder = Fastlane::FastlaneFolder.path || Dir.pwd
       path = File.join(containing_folder, "report.xml")
 
-
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.testsuites(name: "fastlane") {
           xml.testsuite(name: "deploy") {
