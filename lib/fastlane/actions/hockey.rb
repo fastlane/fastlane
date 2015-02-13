@@ -30,7 +30,7 @@ module Fastlane
 
         if options[:dsym]
           options[:dsym_filename] = options[:dsym]
-        else  
+        else
           dsym_path = options[:ipa].gsub("ipa", "app.dSYM.zip")
           if File.exists?(dsym_path)
             options[:dsym_filename] = dsym_path
@@ -39,10 +39,10 @@ module Fastlane
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exists?(options[:dsym_filename])) 
+        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exists?(options[:dsym_filename]))
 
         Helper.log.info "Starting with ipa upload to HockeyApp... this could take some time.".green
-        
+
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
         return if Helper.is_test?
@@ -54,7 +54,7 @@ module Fastlane
 
             Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
             Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
-            
+
             Helper.log.info "Public Download URL: #{url}" if url
             Helper.log.info "Build successfully uploaded to HockeyApp!".green
           else

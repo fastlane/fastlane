@@ -12,7 +12,7 @@ module Fastlane
         type = Sigh::DeveloperCenter::APPSTORE
         type = Sigh::DeveloperCenter::ADHOC if params.include? :adhoc
         type = Sigh::DeveloperCenter::DEVELOPMENT if params.include? :development
-        
+
         return type if Helper.is_test?
 
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)

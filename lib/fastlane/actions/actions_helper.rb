@@ -19,7 +19,7 @@ module Fastlane
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
     def self.execute_action(step_name)
       raise "No block given".red unless block_given?
-      
+
       start = Time.now
       error = nil
       exc = nil
@@ -86,7 +86,7 @@ module Fastlane
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file
-        
+
         file_name = File.basename(file).gsub(".rb", "")
 
         class_name = file_name.classify + "Action"

@@ -12,7 +12,7 @@ module Fastlane
 
         if Helper.is_test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
-          return clean 
+          return clean
         end
 
         require 'snapshot'

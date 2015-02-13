@@ -6,19 +6,19 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    # -w, --workspace WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory) 
-    # -p, --project PROJECT Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed) 
-    # -c, --configuration CONFIGURATION Configuration used to build 
-    # -s, --scheme SCHEME  Scheme used to build app 
-    # --xcconfig XCCONFIG  use an extra XCCONFIG file to build the app 
-    # --xcargs XCARGS      pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args. 
-    # --[no-]clean         Clean project before building 
-    # --[no-]archive       Archive project after building 
-    # -d, --destination DESTINATION Destination. Defaults to current directory 
-    # -m, --embed PROVISION Sign .ipa file with .mobileprovision 
-    # -i, --identity IDENTITY Identity to be used along with --embed 
-    # --sdk SDK            use SDK as the name or path of the base SDK when building the project 
-    # --ipa IPA            specify the name of the .ipa file to generate (including file extension) 
+    # -w, --workspace WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)
+    # -p, --project PROJECT Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)
+    # -c, --configuration CONFIGURATION Configuration used to build
+    # -s, --scheme SCHEME  Scheme used to build app
+    # --xcconfig XCCONFIG  use an extra XCCONFIG file to build the app
+    # --xcargs XCARGS      pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.
+    # --[no-]clean         Clean project before building
+    # --[no-]archive       Archive project after building
+    # -d, --destination DESTINATION Destination. Defaults to current directory
+    # -m, --embed PROVISION Sign .ipa file with .mobileprovision
+    # -i, --identity IDENTITY Identity to be used along with --embed
+    # --sdk SDK            use SDK as the name or path of the base SDK when building the project
+    # --ipa IPA            specify the name of the .ipa file to generate (including file extension)
 
     ARGS_MAP = {
       workspace: '-w',
@@ -36,7 +36,7 @@ module Fastlane
 
     class IpaAction
       def self.run(params)
-        
+
         # The args we will build with
         build_args = nil
 
@@ -64,7 +64,7 @@ module Fastlane
         if Helper.is_test?
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.ipa")
           Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.app.dSYM.zip")
-          return build_args 
+          return build_args
         end
 
         # Joins args into space delimited string
@@ -73,7 +73,7 @@ module Fastlane
         command = "ipa build #{build_args}"
         Helper.log.debug command
         Actions.sh command
-        
+
         # Finds absolute path of IPA and dSYM
         absolute_ipa_path = find_ipa_file(absolute_dest_directory)
         absolute_dsym_path = find_dsym_file(absolute_dest_directory)

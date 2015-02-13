@@ -10,7 +10,7 @@ module Fastlane
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # the file is located in the fastlane folder
         @before_all.call if @before_all
-        
+
         return_val = nil
 
         if blocks[key]

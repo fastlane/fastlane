@@ -70,7 +70,7 @@ module Fastlane
       @tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
       @tools[:snapshot] = File.exists?(File.join(folder, 'Snapfile'))
       @tools[:xctool] = File.exists?('./.xctool-args')
-      @tools[:cocoapods] = File.exists?('./Podfile') 
+      @tools[:cocoapods] = File.exists?('./Podfile')
       @tools[:sigh] = false
     end
 
@@ -143,7 +143,7 @@ module Fastlane
       end
 
       Helper.log.info "Deleting the 'fastlane' folder".yellow
-      FileUtils.rm_rf(folder) 
+      FileUtils.rm_rf(folder)
     end
   end
 end

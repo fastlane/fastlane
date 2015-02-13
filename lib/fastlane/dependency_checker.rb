@@ -3,7 +3,7 @@ module Fastlane
     def self.check_dependencies
       self.check_xcode_select unless Helper.is_test?
     end
-  
+
     def self.check_xcode_select
       unless `xcode-select -v`.include?"xcode-select version "
         Helper.log.fatal '#############################################################'

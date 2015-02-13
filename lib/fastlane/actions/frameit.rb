@@ -1,13 +1,13 @@
 module Fastlane
   module Actions
     module SharedValues
-      
+
     end
 
     class FrameitAction
       def self.run(params)
         return if Helper.is_test?
-        
+
         require 'frameit'
 
         color = Frameit::Editor::Color::BLACK

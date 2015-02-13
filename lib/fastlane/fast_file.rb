@@ -44,7 +44,7 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        Fastlane::Actions::SayAction.run([value])  
+        Fastlane::Actions::SayAction.run([value])
       end
     end
 

@@ -6,7 +6,7 @@ module Fastlane
 
     class IncrementBuildNumberAction
       def self.run(params)
-        # More information about how to set up your project and how it works: 
+        # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 

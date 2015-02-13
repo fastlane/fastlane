@@ -1,7 +1,7 @@
 module Fastlane
   class FastlaneFolder
     FOLDER_NAME = 'fastlane'
-    
+
     def self.path
       return "./#{FOLDER_NAME}/" if File.directory?"./#{FOLDER_NAME}/"
       return "./.#{FOLDER_NAME}/" if File.directory?"./.#{FOLDER_NAME}/" # hidden folder
