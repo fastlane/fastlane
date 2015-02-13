@@ -36,9 +36,8 @@ module Fastlane
       Fastlane::VERSION
     end
 
-    private
-      def self.fetch_latest
-        JSON.parse(open("http://rubygems.org/api/v1/gems/fastlane.json").read)["version"]
-      end
+    private_class_method def self.fetch_latest
+      JSON.parse(open("http://rubygems.org/api/v1/gems/fastlane.json").read)["version"]
+    end
   end
 end
