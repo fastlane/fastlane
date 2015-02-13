@@ -43,7 +43,7 @@ module Fastlane
 
     def copy_existing_files
       files_to_copy.each do |current|
-        if File.exist?current
+        if File.exist?(current)
           file_name = File.basename(current)
           to_path = File.join(folder, file_name)
           Helper.log.info "Moving '#{current}' to '#{to_path}'".green
@@ -136,7 +136,7 @@ module Fastlane
       files_to_copy.each do |current|
         from_path = File.join(folder, current)
         to_path = File.basename(current)
-        if File.exist?from_path
+        if File.exist?(from_path)
           Helper.log.info "Moving '#{from_path}' to '#{to_path}'".yellow
           FileUtils.mv(from_path, to_path)
         end

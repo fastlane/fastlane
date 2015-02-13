@@ -50,7 +50,7 @@ module Fastlane
     end
 
     def self.sh_no_action(command)
-      command = command.join(" ") if command.kind_of?Array # since it's an array of one element when running from the Fastfile
+      command = command.join(" ") if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
       Helper.log.info ["[SHELL COMMAND]", command.yellow].join(': ')
 
       result = ""
@@ -82,7 +82,7 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise "You need to pass a valid path" unless File.exist?path
+      raise "You need to pass a valid path" unless File.exist?(path)
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file

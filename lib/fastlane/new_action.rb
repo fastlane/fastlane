@@ -10,7 +10,7 @@ module Fastlane
       puts "Must be lower case, and use a '_' between words. Do not use '.'".green
       puts "examples: 'testflight', 'upload_to_s3'".green
       name = ask("Name of your action: ")
-      while !name_valid?name
+      while !name_valid?(name)
         puts "Name invalid!"
         name = ask("Name of your action: ")
       end
@@ -24,7 +24,7 @@ module Fastlane
       template.gsub!('[[NAME_CLASS]]', name.classify + "Action")
 
       actions_path = File.join((FastlaneFolder.path || Dir.pwd), "actions")
-      FileUtils.mkdir_p(actions_path) unless File.directory?actions_path
+      FileUtils.mkdir_p(actions_path) unless File.directory?(actions_path)
 
       path = File.join(actions_path, "#{name}.rb")
       File.write(path, template)
