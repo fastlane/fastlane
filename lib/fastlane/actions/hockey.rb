@@ -26,20 +26,20 @@ module Fastlane
 
         raise "No API Token for Hockey given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exists?(options[:ipa])
+        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
 
         if options[:dsym]
           options[:dsym_filename] = options[:dsym]
         else
           dsym_path = options[:ipa].gsub("ipa", "app.dSYM.zip")
-          if File.exists?(dsym_path)
+          if File.exist?(dsym_path)
             options[:dsym_filename] = dsym_path
           else
             Helper.log.info "Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly".yellow
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exists?(options[:dsym_filename]))
+        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exist?(options[:dsym_filename]))
 
         Helper.log.info "Starting with ipa upload to HockeyApp... this could take some time.".green
 

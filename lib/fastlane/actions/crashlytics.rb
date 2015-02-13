@@ -54,7 +54,7 @@ module Fastlane
       end
 
       def self.assert_valid_crashlytics_path!(crashlytics_path)
-        return if crashlytics_path && File.exists?(crashlytics_path)
+        return if crashlytics_path && File.exist?(crashlytics_path)
         raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red
       end
 
@@ -69,7 +69,7 @@ module Fastlane
       end
 
       def self.assert_valid_ipa_path!(ipa_path)
-        return if ipa_path && File.exists?(ipa_path)
+        return if ipa_path && File.exist?(ipa_path)
         raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red
       end
 

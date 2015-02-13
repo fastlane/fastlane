@@ -5,7 +5,7 @@ module Fastlane
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       if (path || '').length > 0
-        raise "Could not find Fastfile at path '#{path}'".red unless File.exists?path
+        raise "Could not find Fastfile at path '#{path}'".red unless File.exist?path
         @path = path
         content = File.read(path)
 

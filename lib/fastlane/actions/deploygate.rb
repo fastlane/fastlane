@@ -46,7 +46,7 @@ module Fastlane
         raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
         raise "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exists?(options[:ipa])
+        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
       end
 
       def self.parse_response(response)

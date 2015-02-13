@@ -82,7 +82,7 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise "You need to pass a valid path" unless File.exists?path
+      raise "You need to pass a valid path" unless File.exist?path
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file
