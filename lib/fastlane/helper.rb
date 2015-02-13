@@ -47,12 +47,12 @@ module Fastlane
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? and not OS.mac?
+      return "" if self.is_test? && !OS.mac?
       `xcode-select -p`.gsub("\n", '') + "/"
     end
 
     def self.gem_path
-      if not Helper.is_test? and Gem::Specification::find_all_by_name('fastlane').any?
+      if !Helper.is_test? && Gem::Specification::find_all_by_name('fastlane').any?
         return Gem::Specification.find_by_name('fastlane').gem_dir
       else
         return './'

@@ -73,7 +73,7 @@ module Fastlane
         raise "Could not find method '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
 
-      if class_ref and class_ref.respond_to?(:run)
+      if class_ref && class_ref.respond_to?(:run)
         Helper.log.info "Step: #{method_sym.to_s}".green
 
         Dir.chdir("..") do # go up from the fastlane folder, to the project folder

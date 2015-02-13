@@ -22,7 +22,7 @@ module Fastlane
     def self.update_available?
       begin
         latest = fetch_latest
-        if latest and Gem::Version.new(latest) > Gem::Version.new(current_version)
+        if latest && Gem::Version.new(latest) > Gem::Version.new(current_version)
           return true
         end
       rescue => ex
