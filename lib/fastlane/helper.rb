@@ -11,12 +11,12 @@ module Fastlane
     # Logging happens using this method
     def self.log
       if test?
-        @@log ||= Logger.new(nil) # don't show any logs when running tests
+        @log ||= Logger.new(nil) # don't show any logs when running tests
       else
-        @@log ||= Logger.new(STDOUT)
+        @log ||= Logger.new(STDOUT)
       end
 
-      @@log.formatter = proc do |severity, datetime, _progname, msg|
+      @log.formatter = proc do |severity, datetime, _progname, msg|
         string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
         second = "#{msg}\n"
 
@@ -35,7 +35,7 @@ module Fastlane
         [string, second].join('')
       end
 
-      @@log
+      @log
     end
 
     # @return true if the currently running program is a unit test

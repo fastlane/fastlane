@@ -7,12 +7,12 @@ module Fastlane
     end
 
     def self.executed_actions
-      @@executed_actions ||= []
+      @executed_actions ||= []
     end
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
-      @@lane_context ||= {}
+      @lane_context ||= {}
     end
 
     # Pass a block which should be tracked. One block = one testcase
