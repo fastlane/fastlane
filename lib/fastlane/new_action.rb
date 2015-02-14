@@ -32,8 +32,9 @@ module Fastlane
     end
 
     private
-      def self.name_valid?(name)
-        name == name.downcase && name.length > 0 && !name.include?('.')
-      end
+
+    def self.name_valid?(name)
+      name == name.downcase && name.length > 0 && !name.include?('.')
+    end
   end
 end

@@ -51,8 +51,9 @@ module Fastlane
     end
 
     private
-      def blocks
-        @blocks ||= {}
-      end
+
+    def blocks
+      @blocks ||= {}
+    end
   end
 end
