@@ -2,7 +2,7 @@ require 'logger'
 
 class String
   def classify
-    self.split('_').collect!{ |w| w.capitalize }.join
+    self.split('_').collect!(&:capitalize).join
   end
 end
 
