@@ -61,7 +61,7 @@ module Fastlane
       end
     end
 
-    def method_missing(method_sym, *arguments, &block)
+    def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
       class_name = method_sym.to_s.classify + "Action"

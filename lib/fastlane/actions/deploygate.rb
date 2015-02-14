@@ -1,5 +1,5 @@
 # TODO: Workaround, since deploygate.rb from shenzhen includes the code for commander
-def command(param)
+def command(_param)
 end
 
 module Fastlane
