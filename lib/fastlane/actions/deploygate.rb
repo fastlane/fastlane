@@ -19,7 +19,7 @@ module Fastlane
 
         # Available options: https://deploygate.com/docs/api
         options = {
-          ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+          ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         }.merge(params.first || {})
         assert_options!(options)
 
