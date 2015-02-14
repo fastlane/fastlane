@@ -11,8 +11,8 @@ module Fastlane
     end
 
     def self.setup?
-      return false unless self.path
-      File.exist?(self.path)
+      return false unless path
+      File.exist?(path)
     end
 
     def self.create_folder!

@@ -34,7 +34,7 @@ module Fastlane
       # This is also called, when the block has a return statement
       duration = Time.now - start
 
-      self.executed_actions << {
+      executed_actions << {
         name: step_name,
         error: error,
         time: duration

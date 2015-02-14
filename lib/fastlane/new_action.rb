@@ -2,8 +2,8 @@ module Fastlane
   # Guides the new user through creating a new action
   module NewAction
     def self.run
-      name = self.fetch_name
-      self.generate_action(name)
+      name = fetch_name
+      generate_action(name)
     end
 
     def self.fetch_name
