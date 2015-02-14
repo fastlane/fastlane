@@ -10,16 +10,16 @@ module Fastlane
       path = File.join(containing_folder, 'report.xml')
 
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
-        xml.testsuites(name: 'fastlane') {
-          xml.testsuite(name: 'deploy') {
+        xml.testsuites(name: 'fastlane') do
+          xml.testsuite(name: 'deploy') do
             results.each_with_index do |current, index|
-              xml.testcase(name: [index, current[:name]].join(': '), time: current[:time]) {
+              xml.testcase(name: [index, current[:name]].join(': '), time: current[:time]) do
                 xml.failure(message: current[:error]) if current[:error]
                 xml.system_out current[:output] if current[:output]
-              }
+              end
             end
-          }
-        }
+          end
+        end
       end
       result = builder.to_xml.gsub('system_', 'system-').gsub("", ' ') # Jenkins can not parse 'ESC' symbol
 
