@@ -31,7 +31,7 @@ module Fastlane
 
         if api_version.to_i == 1
           ########## running on V1 ##########
-          if isUser(channel)
+          if user?(channel)
             raise "HipChat private message not working with API V1 please use API V2 instead".red
           else
             uri = URI.parse('https://api.hipchat.com/v1/rooms/message')
@@ -40,7 +40,7 @@ module Fastlane
           end
         else
           ########## running on V2 ##########
-          if isUser(channel)
+          if user?(channel)
             channel.slice!(0)
             params = {'message' => message, 'message_format' => 'html'}
             json_headers = {"Content-Type" => "application/json",
@@ -51,20 +51,20 @@ module Fastlane
             http.use_ssl = true
 
             response = http.post(uri.path, params.to_json, json_headers)
-            checkResponseCode(response, channel)
+            check_response_code(response, channel)
           else
             uri = URI.parse("https://api.hipchat.com/v2/room/#{channel}/notification")
             response = Net::HTTP.post_form(uri, {"from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "message" => message})
-            checkResponseCode(response, channel)
+            check_response_code(response, channel)
           end
         end
       end
 
-      def self.isUser(channel)
+      def self.user?(channel)
         channel.to_s.start_with?('@')
       end
 
-      def self.checkResponseCode(response, channel)
+      def self.check_response_code(response, channel)
         case response.code.to_i
           when 200, 204
             true
