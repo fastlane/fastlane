@@ -5,27 +5,24 @@ module Fastlane
 
       show_infos
       response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)".yellow, true)
-
-      if response
-        response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
-        if response
-          begin
-            FastlaneFolder.create_folder!
-            copy_existing_files
-            generate_app_metadata
-            detect_installed_tools # after copying the existing files
-            ask_to_enable_other_tools
-            FileUtils.mkdir(File.join(folder, "actions"))
-            generate_fastfile
-            Helper.log.info "Successfully finished setting up fastlane".green
-          rescue Exception => ex # this will also be caused by Ctrl + C
-            # Something went wrong with the setup, clear the folder again
-            # and restore previous files
-            Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
-            restore_previous_state
-            raise ex
-          end
-        end
+      return unless response
+      response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
+      return unless response
+      begin
+        FastlaneFolder.create_folder!
+        copy_existing_files
+        generate_app_metadata
+        detect_installed_tools # after copying the existing files
+        ask_to_enable_other_tools
+        FileUtils.mkdir(File.join(folder, "actions"))
+        generate_fastfile
+        Helper.log.info "Successfully finished setting up fastlane".green
+      rescue Exception => ex # this will also be caused by Ctrl + C
+        # Something went wrong with the setup, clear the folder again
+        # and restore previous files
+        Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
+        restore_previous_state
+        raise ex
       end
     end
 
@@ -102,9 +99,7 @@ module Fastlane
         end
       end
 
-      if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
-        @tools[:sigh] = true
-      end
+      @tools[:sigh] = true if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
     end
 
     def generate_fastfile
