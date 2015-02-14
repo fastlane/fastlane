@@ -25,7 +25,7 @@ module Fastlane
 
         Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
 
-        return if Helper.is_test?
+        return if Helper.test?
 
         client = Shenzhen::Plugins::Crashlytics::Client.new(crashlytics_path, api_token, build_secret)
 

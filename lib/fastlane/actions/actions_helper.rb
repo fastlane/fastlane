@@ -54,7 +54,7 @@ module Fastlane
       Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ')
 
       result = ''
-      unless Helper.is_test?
+      unless Helper.test?
 
         PTY.spawn(command) do |stdin, _stdout, pid|
           stdin.each do |line|

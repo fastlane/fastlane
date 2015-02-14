@@ -1,7 +1,7 @@
 module Fastlane
   class DependencyChecker
     def self.check_dependencies
-      check_xcode_select unless Helper.is_test?
+      check_xcode_select unless Helper.test?
     end
 
     def self.check_xcode_select

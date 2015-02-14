@@ -15,7 +15,7 @@ module Fastlane
           ENV[key.to_s.upcase] = value.to_s
         end
 
-        return if Helper.is_test?
+        return if Helper.test?
 
         Dir.chdir(FastlaneFolder.path || Dir.pwd) do
           # This should be executed in the fastlane folder

@@ -20,7 +20,7 @@ module Fastlane
             command = 'agvtool next-version -all'
           end
 
-          if Helper.is_test?
+          if Helper.test?
             Actions.lane_context[SharedValues::BUILD_NUMBER] = command
           else
 

@@ -29,7 +29,7 @@ module Fastlane
           options.delete(:user)
         )
 
-        return if Helper.is_test?
+        return if Helper.test?
 
         response = client.upload_build(options.delete(:ipa), options)
         if parse_response(response)

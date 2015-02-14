@@ -45,7 +45,7 @@ module Fastlane
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
-        return if Helper.is_test?
+        return if Helper.test?
 
         response = client.upload_build(options[:ipa], options)
         case response.status

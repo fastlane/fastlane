@@ -10,7 +10,7 @@ module Fastlane
         clean = false if params.include?(:noclean)
         $verbose = true if params.include?(:verbose)
 
-        if Helper.is_test?
+        if Helper.test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
           return clean
         end
