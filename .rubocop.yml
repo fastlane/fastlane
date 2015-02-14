@@ -1,7 +1,7 @@
 # Custom config file for Rubocop static code analysis
 
 Metrics/LineLength:
-  Max: 120
+  Max: 160
 
 Metrics/MethodLength:
   Max: 20

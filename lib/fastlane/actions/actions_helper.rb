@@ -66,7 +66,8 @@ module Fastlane
         end
 
         if $CHILD_STATUS.exitstatus.to_i != 0
-          raise "Exit status of command '#{command}' was #{$CHILD_STATUS.exitstatus.to_s} instead of 0. \n#{result}" # this will also append the output to the exception (for the Jenkins reports)
+          # this will also append the output to the exception (for the Jenkins reports)
+          raise "Exit status of command '#{command}' was #{$CHILD_STATUS.exitstatus.to_s} instead of 0. \n#{result}"
         end
       else
         result << command # only for the tests

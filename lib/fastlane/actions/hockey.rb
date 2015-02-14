@@ -39,7 +39,8 @@ module Fastlane
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exist?(options[:dsym_filename]))
+        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] &&
+                                                                                                !File.exist?(options[:dsym_filename]))
 
         Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
 

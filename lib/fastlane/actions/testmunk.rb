@@ -1,5 +1,8 @@
 # How it works:
-# You can run your functional calabash testcases on real ios hardware. Follow the steps to set up your free account on testmunk.com or see below. After tests are executed you will get an email with test results. An API extension to see test results directly in Jenkins is in the works.
+# You can run your functional calabash testcases on real ios hardware.
+# Follow the steps to set up your free account on testmunk.com or see below.
+# After tests are executed you will get an email with test results.
+# An API extension to see test results directly in Jenkins is in the works.
 
 # Setup
 # 1) Create a free account on testmunk.com

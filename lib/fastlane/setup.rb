@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/LineLength
+
 module Fastlane
   class Setup
     def run
