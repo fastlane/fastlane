@@ -14,7 +14,6 @@ module Fastlane
 
     class TestmunkAction
       def self.run(params)
-
         raise "Please pass your Testmunk email address using `ENV['TESTMUNK_EMAIL'] = 'value'`" unless ENV['TESTMUNK_EMAIL']
         raise "Please pass your Testmunk API Key using `ENV['TESTMUNK_API'] = 'value'`" unless ENV['TESTMUNK_API']
         raise "Please pass your Testmunk app name using `ENV['TESTMUNK_APP'] = 'value'`" unless ENV['TESTMUNK_APP']

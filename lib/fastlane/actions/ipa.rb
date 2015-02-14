@@ -36,7 +36,6 @@ module Fastlane
 
     class IpaAction
       def self.run(params)
-
         # The args we will build with
         build_args = nil
 
