@@ -51,7 +51,7 @@ module Fastlane
     end
 
     def self.gem_path
-      if !Helper.test? && Gem::Specification::find_all_by_name('fastlane').any?
+      if !Helper.test? && Gem::Specification.find_all_by_name('fastlane').any?
         return Gem::Specification.find_by_name('fastlane').gem_dir
       else
         return './'
