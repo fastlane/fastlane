@@ -35,16 +35,16 @@ module Fastlane
             raise "HipChat private message not working with API V1 please use API V2 instead".red
           else
             uri = URI.parse('https://api.hipchat.com/v1/rooms/message')
-            response = Net::HTTP.post_form(uri, {"from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "room_id" => channel, "message" => message})
+            response = Net::HTTP.post_form(uri, { "from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "room_id" => channel, "message" => message })
             checkResponseCodeForRoom(response, channel)
           end
         else
           ########## running on V2 ##########
           if user?(channel)
             channel.slice!(0)
-            params = {'message' => message, 'message_format' => 'html'}
-            json_headers = {"Content-Type" => "application/json",
-                            "Accept" => "application/json", "Authorization" => "Bearer #{api_token}"}
+            params = { 'message' => message, 'message_format' => 'html' }
+            json_headers = { "Content-Type" => "application/json",
+                             "Accept" => "application/json", "Authorization" => "Bearer #{api_token}" }
 
             uri = URI.parse("https://api.hipchat.com/v2/user/#{channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
@@ -54,7 +54,7 @@ module Fastlane
             check_response_code(response, channel)
           else
             uri = URI.parse("https://api.hipchat.com/v2/room/#{channel}/notification")
-            response = Net::HTTP.post_form(uri, {"from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "message" => message})
+            response = Net::HTTP.post_form(uri, { "from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "message" => message })
             check_response_code(response, channel)
           end
         end
