@@ -15,9 +15,10 @@ module Fastlane
 
         Dir.chdir(FastlaneFolder.path || Dir.pwd) do
           # This should be executed in the fastlane folder
-          Deliver::Deliverer.new(nil, force: force,
-                                is_beta_ipa: beta,
-                                skip_deploy: skip_deploy)
+          Deliver::Deliverer.new(nil,
+                                 force: force,
+                                 is_beta_ipa: beta,
+                                 skip_deploy: skip_deploy)
 
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
         end
