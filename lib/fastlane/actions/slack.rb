@@ -98,8 +98,8 @@ module Fastlane
         end
 
         result = notifier.ping "",
-                      icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                      attachments: [test_result]
+                               icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+                               attachments: [test_result]
 
         unless result.code.to_i == 200
           Helper.log.debug result

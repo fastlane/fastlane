@@ -73,8 +73,12 @@ module Fastlane
         raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red
       end
 
-      private_class_method :assert_params_given!, :assert_valid_params!,
-        :assert_valid_crashlytics_path!, :assert_valid_api_token!, :assert_valid_build_secret!, :assert_valid_ipa_path!
+      private_class_method :assert_params_given!,
+                           :assert_valid_params!,
+                           :assert_valid_crashlytics_path!,
+                           :assert_valid_api_token!,
+                           :assert_valid_build_secret!,
+                           :assert_valid_ipa_path!
     end
   end
 end
