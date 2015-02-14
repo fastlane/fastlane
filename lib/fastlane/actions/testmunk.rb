@@ -9,7 +9,6 @@
 module Fastlane
   module Actions
     module SharedValues
-
     end
 
     class TestmunkAction

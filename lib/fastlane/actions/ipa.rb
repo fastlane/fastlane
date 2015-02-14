@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     module SharedValues
       IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
@@ -109,6 +108,5 @@ module Fastlane
       end
 
     end
-
   end
 end

@@ -8,7 +8,6 @@ end
 
 module Fastlane
   module Helper
-
     # Logging happens using this method
     def self.log
       if is_test?
