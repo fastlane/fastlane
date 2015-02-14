@@ -86,7 +86,7 @@ module Fastlane
 
       def self.params_to_build_args(params)
         # Remove nil value params unless :clean or :archive
-        params = params.delete_if { |k, v| (k != :clean && k != :archive ) && v.nil? }
+        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
