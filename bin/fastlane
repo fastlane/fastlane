@@ -25,7 +25,7 @@ class FastlaneApplication
       c.syntax = 'fastlane run [lane]'
       c.description = 'Drive the fastlane for a specific environment.'
 
-      c.action do |args, options|
+      c.action do |args, _options|
         if Fastlane::FastlaneFolder.path
           Fastlane::LaneManager.cruise_lanes(args)
         else
@@ -39,7 +39,7 @@ class FastlaneApplication
       c.syntax = 'fastlane init'
       c.description = 'Helps you setting up fastlane based on your existing tools.'
 
-      c.action do |args, options|
+      c.action do |_args, _options|
         Fastlane::Setup.new.run
       end
     end
@@ -48,7 +48,7 @@ class FastlaneApplication
       c.syntax = 'fastlane new_action'
       c.description = 'Create a new custom action for fastlane.'
 
-      c.action do |args, options|
+      c.action do |_args, _options|
         Fastlane::NewAction.run
       end
     end

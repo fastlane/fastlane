@@ -17,7 +17,7 @@ module Fastlane
         @@log ||= Logger.new(STDOUT)
       end
 
-      @@log.formatter = proc do |severity, datetime, progname, msg|
+      @@log.formatter = proc do |severity, datetime, _progname, msg|
         string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
         second = "#{msg}\n"
 

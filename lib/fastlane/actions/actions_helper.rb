@@ -56,7 +56,7 @@ module Fastlane
       result = ""
       unless Helper.is_test?
 
-        PTY.spawn(command) do |stdin, stdout, pid|
+        PTY.spawn(command) do |stdin, _stdout, pid|
           stdin.each do |line|
             Helper.log.info ["[SHELL OUTPUT]", line.strip].join(': ')
             result << line
