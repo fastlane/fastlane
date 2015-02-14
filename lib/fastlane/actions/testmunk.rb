@@ -20,7 +20,7 @@ module Fastlane
         ipa_path = ENV['TESTMUNK_IPA'] || ENV[Actions::SharedValues::IPA_OUTPUT_PATH.to_s]
         raise "Please pass a path to your ipa file using `ENV['TESTMUNK_IPA'] = 'value'`" unless ipa_path
 
-        Helper.log.info "Testmunk: Uploading the .ipa and starting your tests".green
+        Helper.log.info 'Testmunk: Uploading the .ipa and starting your tests'.green
 
         response = system("#{"curl -H 'Accept: application/vnd.testmunk.v1+json'" +
             " -F 'file=@#{ipa_path}' -F 'autoStart=true'" +
@@ -28,9 +28,9 @@ module Fastlane
             " https://#{ENV['TESTMUNK_API']}@api.testmunk.com/apps/#{ENV['TESTMUNK_APP']}/testruns"}")
 
         if response
-          Helper.log.info "Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.".green
+          Helper.log.info 'Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.'.green
         else
-          raise "Something went wrong while uploading your app to Testmunk".red
+          raise 'Something went wrong while uploading your app to Testmunk'.red
         end
       end
     end

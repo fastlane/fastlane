@@ -4,9 +4,9 @@ module Fastlane
       raise "Fastlane already set up at path #{folder}".yellow if FastlaneFolder.setup?
 
       show_infos
-      response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)".yellow, true)
+      response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
       return unless response
-      response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
+      response = agree('Do you have everything commited in version control? If not please do so! (y/n)'.yellow, true)
       return unless response
       begin
         FastlaneFolder.create_folder!
@@ -14,18 +14,19 @@ module Fastlane
         generate_app_metadata
         detect_installed_tools # after copying the existing files
         ask_to_enable_other_tools
-        FileUtils.mkdir(File.join(folder, "actions"))
+        FileUtils.mkdir(File.join(folder, 'actions'))
         generate_fastfile
-        Helper.log.info "Successfully finished setting up fastlane".green
+        Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue Exception => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
         # and restore previous files
-        Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
+        Helper.log.fatal 'Error occured with the setup program! Reverting changes now!'.red
         restore_previous_state
         raise ex
       end
     end
 
+    # rubocop:disable Style/StringLiterals
     def show_infos
       Helper.log.info "This setup will help you get up and running in no time.".green
       Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
@@ -33,6 +34,7 @@ module Fastlane
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
       Helper.log.info "the tool automatically for you. Have fun! ".green
     end
+    # rubocop:enable Style/StringLiterals
 
     def files_to_copy
       ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
@@ -49,14 +51,14 @@ module Fastlane
     end
 
     def generate_app_metadata
-      Helper.log.info "------------------------------"
-      Helper.log.info "To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.".green
-      app_identifier = ask("App Identifier (com.krausefx.app): ".yellow)
-      apple_id = ask("Your Apple ID: ".yellow)
+      Helper.log.info '------------------------------'
+      Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
+      app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
+      apple_id = ask('Your Apple ID: '.yellow)
       template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
       template.gsub!('[[APPLE_ID]]', apple_id)
-      path = File.join(folder, "Appfile")
+      path = File.join(folder, 'Appfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
     end
@@ -70,6 +72,7 @@ module Fastlane
       @tools[:sigh] = false
     end
 
+    # rubocop:disable Style/StringLiterals
     def ask_to_enable_other_tools
       unless @tools[:deliver]
         if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
@@ -87,6 +90,7 @@ module Fastlane
         Helper.log.info "Please read the above carefully and click Enter to confirm.".green
         STDIN.gets
       end
+      # rubocop:enable Style/StringLiterals
 
       unless @tools[:snapshot]
         if agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
@@ -116,7 +120,7 @@ module Fastlane
         Helper.log.info "'#{key}' not enabled.".yellow unless value
       end
 
-      path = File.join(folder, "Fastfile")
+      path = File.join(folder, 'Fastfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your own deployment lanes.".green
     end

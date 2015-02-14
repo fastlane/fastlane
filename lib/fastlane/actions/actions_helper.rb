@@ -18,7 +18,7 @@ module Fastlane
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
     def self.execute_action(step_name)
-      raise "No block given".red unless block_given?
+      raise 'No block given'.red unless block_given?
 
       start = Time.now
       error = nil
@@ -50,15 +50,15 @@ module Fastlane
     end
 
     def self.sh_no_action(command)
-      command = command.join(" ") if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
-      Helper.log.info ["[SHELL COMMAND]", command.yellow].join(': ')
+      command = command.join(' ') if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
+      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ')
 
-      result = ""
+      result = ''
       unless Helper.is_test?
 
         PTY.spawn(command) do |stdin, _stdout, pid|
           stdin.each do |line|
-            Helper.log.info ["[SHELL OUTPUT]", line.strip].join(': ')
+            Helper.log.info ['[SHELL OUTPUT]', line.strip].join(': ')
             result << line
           end
 
@@ -82,14 +82,14 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise "You need to pass a valid path" unless File.exist?(path)
+      raise 'You need to pass a valid path' unless File.exist?(path)
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file
 
-        file_name = File.basename(file).gsub(".rb", "")
+        file_name = File.basename(file).gsub('.rb', '')
 
-        class_name = file_name.classify + "Action"
+        class_name = file_name.classify + 'Action'
         class_ref = nil
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
@@ -98,13 +98,13 @@ module Fastlane
             Helper.log.info "Successfully loaded custom action '#{file}'.".green
           else
             Helper.log.error "Could not find method 'run' in class #{class_name}.".red
-            Helper.log.error "For more information, check out the docs: https://github.com/KrauseFx/fastlane"
+            Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
             raise "Plugin '#{file_name}' is damaged!"
           end
         rescue NameError => ex
           # Action not found
           Helper.log.error "Could not find '#{class_name}' class defined.".red
-          Helper.log.error "For more information, check out the docs: https://github.com/KrauseFx/fastlane"
+          Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
           raise "Plugin '#{file_name}' is damaged!"
         end
       end

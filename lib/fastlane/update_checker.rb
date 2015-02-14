@@ -9,7 +9,7 @@ module Fastlane
         v = fetch_latest
         puts '#######################################################################'.green
         puts "# fastlane #{v} is available.".green
-        puts "# It is recommended to use the latest version.".green
+        puts "# It is recommended to use the latest version.".green # rubocop:disable Style/StringLiterals
         puts "# Update using '(sudo) gem update fastlane'.".green
         puts "# To see what's new, open https://github.com/KrauseFx/fastlane/releases.".green
         puts '#######################################################################'.green
@@ -38,7 +38,7 @@ module Fastlane
     end
 
     def self.fetch_latest
-      JSON.parse(open("http://rubygems.org/api/v1/gems/fastlane.json").read)["version"]
+      JSON.parse(open('http://rubygems.org/api/v1/gems/fastlane.json').read)['version']
     end
     private_class_method :fetch_latest
   end

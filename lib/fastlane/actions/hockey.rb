@@ -13,7 +13,7 @@ module Fastlane
       def self.run(params)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
         options = {
-          notes: "No changelog given",
+          notes: 'No changelog given',
           status: 2,
           notify: 1
         }.merge(params.first)
@@ -31,7 +31,7 @@ module Fastlane
         if options[:dsym]
           options[:dsym_filename] = options[:dsym]
         else
-          dsym_path = options[:ipa].gsub("ipa", "app.dSYM.zip")
+          dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
           if File.exist?(dsym_path)
             options[:dsym_filename] = dsym_path
           else
@@ -41,7 +41,7 @@ module Fastlane
 
         raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] && !File.exist?(options[:dsym_filename]))
 
-        Helper.log.info "Starting with ipa upload to HockeyApp... this could take some time.".green
+        Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
@@ -56,10 +56,10 @@ module Fastlane
             Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
 
             Helper.log.info "Public Download URL: #{url}" if url
-            Helper.log.info "Build successfully uploaded to HockeyApp!".green
+            Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
           else
             Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
-            raise "Error when trying to upload ipa to HockeyApp".red
+            raise 'Error when trying to upload ipa to HockeyApp'.red
           end
       end
     end

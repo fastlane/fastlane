@@ -60,8 +60,8 @@ module Fastlane
         absolute_dest_directory ||= Dir.pwd
 
         if Helper.is_test?
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.ipa")
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.app.dSYM.zip")
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.ipa')
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.app.dSYM.zip')
           return build_args
         end
 
@@ -91,7 +91,7 @@ module Fastlane
         params.collect do |k, v|
           v ||= ''
           if args = ARGS_MAP[k]
-            value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
+            value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
             "#{ARGS_MAP[k]} #{value}".strip
           end
         end.compact
@@ -99,12 +99,12 @@ module Fastlane
 
       def self.find_ipa_file(dir)
         # Finds last modified .ipa in the destination directory
-        Dir[File.join(dir, "*.ipa")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, '*.ipa')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
 
       def self.find_dsym_file(dir)
         # Finds last modified .dSYM.zip in the destination directory
-        Dir[File.join(dir, "*.dSYM.zip")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, '*.dSYM.zip')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
     end
   end

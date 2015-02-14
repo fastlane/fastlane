@@ -20,19 +20,19 @@ module Fastlane
         string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
         second = "#{msg}\n"
 
-        if severity == "DEBUG"
+        if severity == 'DEBUG'
           string = string.magenta
-        elsif severity == "INFO"
+        elsif severity == 'INFO'
           string = string.white
-        elsif severity == "WARN"
+        elsif severity == 'WARN'
           string = string.yellow
-        elsif severity == "ERROR"
+        elsif severity == 'ERROR'
           string = string.red
-        elsif severity == "FATAL"
+        elsif severity == 'FATAL'
           string = string.red.bold
         end
 
-        [string, second].join("")
+        [string, second].join('')
       end
 
       @@log
@@ -46,8 +46,8 @@ module Fastlane
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? && !OS.mac?
-      `xcode-select -p`.gsub("\n", '') + "/"
+      return '' if self.is_test? && !OS.mac?
+      `xcode-select -p`.gsub("\n", '') + '/'
     end
 
     def self.gem_path

@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         require 'deliver'
 
-        ENV["DELIVER_SCREENSHOTS_PATH"] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
+        ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
 
         force = params.include?(:force)
         beta = params.include?(:beta)
@@ -20,7 +20,7 @@ module Fastlane
                                  is_beta_ipa: beta,
                                  skip_deploy: skip_deploy)
 
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = ENV["DELIVER_IPA_PATH"] # deliver will store it in the environment
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = ENV['DELIVER_IPA_PATH'] # deliver will store it in the environment
         end
       end
     end

@@ -23,7 +23,7 @@ module Fastlane
         }.merge(params.first || {})
         assert_options!(options)
 
-        Helper.log.info "Starting with ipa upload to DeployGate... this could take some time ⏳".green
+        Helper.log.info 'Starting with ipa upload to DeployGate... this could take some time ⏳'.green
         client = Shenzhen::Plugins::DeployGate::Client.new(
           options.delete(:api_token),
           options.delete(:user)
@@ -36,7 +36,7 @@ module Fastlane
           Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
           Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green
         else
-          raise "Error when trying to upload ipa to DeployGate".red
+          raise 'Error when trying to upload ipa to DeployGate'.red
         end
       end
 
@@ -74,11 +74,11 @@ module Fastlane
         message =
           case response.body['message']
             when 'you are not authenticated'
-              "Invalid API Token specified."
+              'Invalid API Token specified.'
             when 'application create error: permit'
-              "Access denied: May be trying to upload to wrong user or updating app you join as a tester?"
+              'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
             when 'application create error: limit'
-              "Plan limit: You have reached to the limit of current plan or your plan was expired."
+              'Plan limit: You have reached to the limit of current plan or your plan was expired.'
           end
         Helper.log.error message.red if message
       end

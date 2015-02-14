@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+$LOAD_PATH.push File.expand_path('../../lib', __FILE__)
 
 require 'fastlane'
 require 'commander'
@@ -29,7 +29,7 @@ class FastlaneApplication
         if Fastlane::FastlaneFolder.path
           Fastlane::LaneManager.cruise_lanes(args)
         else
-          create = agree("Could not find fastlane in current directory. Would you like to set it up? (y/n)".yellow, true)
+          create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
           Fastlane::Setup.new.run if create
         end
       end

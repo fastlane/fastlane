@@ -6,8 +6,8 @@ module Fastlane
   module Actions
     class CrashlyticsAction
       def self.run(params)
-        require "shenzhen"
-        require "shenzhen/plugins/crashlytics"
+        require 'shenzhen'
+        require 'shenzhen/plugins/crashlytics'
 
         assert_params_given!(params)
 
@@ -23,7 +23,7 @@ module Fastlane
 
         assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
 
-        Helper.log.info "Uploading the IPA to Crashlytics. Go for a coffee ☕️.".green
+        Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
 
         return if Helper.is_test?
 
@@ -32,10 +32,10 @@ module Fastlane
         response = client.upload_build(ipa_path, file: ipa_path, notes: notes_path, emails: emails, groups: groups)
 
         if response
-          Helper.log.info "Build successfully uploaded to Crashlytics".green
+          Helper.log.info 'Build successfully uploaded to Crashlytics'.green
         else
-          Helper.log.fatal "Error uploading to Crashlytics."
-          raise "Error when trying to upload ipa to Crashlytics".red
+          Helper.log.fatal 'Error uploading to Crashlytics.'
+          raise 'Error when trying to upload ipa to Crashlytics'.red
         end
       end
 
@@ -43,7 +43,7 @@ module Fastlane
 
       def self.assert_params_given!(params)
         return unless params.empty?
-        raise "You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red
+        raise 'You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics'.red
       end
 
       def self.assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)

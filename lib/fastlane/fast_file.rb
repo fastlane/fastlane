@@ -63,7 +63,7 @@ module Fastlane
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
-      class_name = method_sym.to_s.classify + "Action"
+      class_name = method_sym.to_s.classify + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
@@ -75,7 +75,7 @@ module Fastlane
       if class_ref && class_ref.respond_to?(:run)
         Helper.log.info "Step: #{method_sym.to_s}".green
 
-        Dir.chdir("..") do # go up from the fastlane folder, to the project folder
+        Dir.chdir('..') do # go up from the fastlane folder, to the project folder
           Actions.execute_action(method_sym) do
             class_ref.run(arguments)
           end

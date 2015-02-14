@@ -16,7 +16,7 @@ module Fastlane
         return type if Helper.is_test?
 
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-        raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
+        raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
         path = Sigh::DeveloperCenter.new.run(app, type)
         output_path = File.expand_path(File.join('.', File.basename(path)))

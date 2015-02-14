@@ -13,29 +13,29 @@ module Fastlane
         require 'net/http'
         require 'uri'
 
-        api_token = ENV["HIPCHAT_API_TOKEN"]
-        api_version = ENV["HIPCHAT_API_VERSION"]
+        api_token = ENV['HIPCHAT_API_TOKEN']
+        api_version = ENV['HIPCHAT_API_VERSION']
 
         unless api_token
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
-          raise "No HIPCHAT_API_TOKEN given.".red
+          raise 'No HIPCHAT_API_TOKEN given.'.red
         end
         if api_version.nil? || ![1, 2].include?(api_version[0].to_i)
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
-          raise "No HIPCHAT_API_VERSION given.".red
+          raise 'No HIPCHAT_API_VERSION given.'.red
         end
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
-        message = "<table><tr><td><img src=\"https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png\" style=\"width:50px;height:auto\"></td><td>" + options[:message] + "</td></tr></table>"
+        message = "<table><tr><td><img src=\"https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png\" style=\"width:50px;height:auto\"></td><td>" + options[:message] + '</td></tr></table>'
 
         if api_version.to_i == 1
           ########## running on V1 ##########
           if user?(channel)
-            raise "HipChat private message not working with API V1 please use API V2 instead".red
+            raise 'HipChat private message not working with API V1 please use API V2 instead'.red
           else
             uri = URI.parse('https://api.hipchat.com/v1/rooms/message')
-            response = Net::HTTP.post_form(uri, { "from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "room_id" => channel, "message" => message })
+            response = Net::HTTP.post_form(uri, { 'from' => 'fastlane', 'auth_token' => api_token, 'color' => color, 'message_format' => 'html', 'room_id' => channel, 'message' => message })
             checkResponseCodeForRoom(response, channel)
           end
         else
@@ -43,8 +43,8 @@ module Fastlane
           if user?(channel)
             channel.slice!(0)
             params = { 'message' => message, 'message_format' => 'html' }
-            json_headers = { "Content-Type" => "application/json",
-                             "Accept" => "application/json", "Authorization" => "Bearer #{api_token}" }
+            json_headers = { 'Content-Type' => 'application/json',
+                             'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
             uri = URI.parse("https://api.hipchat.com/v2/user/#{channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
@@ -54,7 +54,7 @@ module Fastlane
             check_response_code(response, channel)
           else
             uri = URI.parse("https://api.hipchat.com/v2/room/#{channel}/notification")
-            response = Net::HTTP.post_form(uri, { "from" => "fastlane", "auth_token" => api_token, "color" => color, "message_format" => "html", "message" => message })
+            response = Net::HTTP.post_form(uri, { 'from' => 'fastlane', 'auth_token' => api_token, 'color' => color, 'message_format' => 'html', 'message' => message })
             check_response_code(response, channel)
           end
         end
