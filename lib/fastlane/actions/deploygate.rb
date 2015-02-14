@@ -40,14 +40,15 @@ module Fastlane
         end
       end
 
-      private_class_method def self.assert_options!(options)
+      def self.assert_options!(options)
         raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
         raise "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
         raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
       end
+      private_class_method :assert_options!
 
-      private_class_method def self.parse_response(response)
+      def self.parse_response(response)
         if response.body && response.body.key?('error')
           unless response.body['error']
             res = response.body['results']
@@ -67,8 +68,9 @@ module Fastlane
         end
         true
       end
+      private_class_method :parse_response
 
-      private_class_method def self.help_message(response)
+      def self.help_message(response)
         message =
           case response.body['message']
             when 'you are not authenticated'
@@ -80,6 +82,7 @@ module Fastlane
           end
         Helper.log.error message.red if message
       end
+      private_class_method :help_message
     end
   end
 end
