@@ -1,6 +1,5 @@
 module Fastlane
   class Runner
-
     def execute(key)
       key = key.to_sym
       Helper.log.info "Driving the lane '#{key}'".green

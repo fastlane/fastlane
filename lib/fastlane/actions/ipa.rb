@@ -106,7 +106,6 @@ module Fastlane
         # Finds last modified .dSYM.zip in the destination directory
         Dir[File.join(dir, "*.dSYM.zip")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
-
     end
   end
 end
