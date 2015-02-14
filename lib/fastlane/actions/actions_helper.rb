@@ -50,7 +50,7 @@ module Fastlane
     end
 
     def self.sh_no_action(command)
-      command = command.join(" ") if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
+      command = command.join(" ") if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
       Helper.log.info ["[SHELL COMMAND]", command.yellow].join(': ')
 
       result = ""
