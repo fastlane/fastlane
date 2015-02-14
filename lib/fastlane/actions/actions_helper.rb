@@ -46,7 +46,7 @@ module Fastlane
     # Execute a shell command
     # This method will output the string and execute it
     def self.sh(command)
-      return sh_no_action(command)
+      sh_no_action(command)
     end
 
     def self.sh_no_action(command)
@@ -72,7 +72,7 @@ module Fastlane
         result << command # only for the tests
       end
 
-      return result
+      result
     end
 
     def self.load_default_actions

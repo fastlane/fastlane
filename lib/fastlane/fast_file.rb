@@ -20,7 +20,7 @@ module Fastlane
         eval(data) # this is okay in this case
       end
 
-      return self
+      self
     end
 
     def lane(key, &block)

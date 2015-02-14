@@ -25,7 +25,7 @@ module Fastlane
 
       File.write(path, result)
 
-      return path
+      path
     end
   end
 end

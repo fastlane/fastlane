@@ -62,7 +62,7 @@ module Fastlane
       end
 
       def self.isUser(channel)
-        return channel.to_s.start_with?('@')
+        channel.to_s.start_with?('@')
       end
 
       def self.checkResponseCode(response, channel)

@@ -28,7 +28,8 @@ module Fastlane
       rescue => ex
         Helper.log.error("Could not check if 'fastlane' is up to date.")
       end
-      return false
+
+      false
     end
 
     # The currently used version of this gem

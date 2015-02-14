@@ -9,7 +9,7 @@ module Fastlane
         return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
         s = `git rev-parse --abbrev-ref HEAD`
         return s if s.to_s.length > 0
-        return nil
+        nil
       end
 
       def self.git_author
@@ -24,7 +24,7 @@ module Fastlane
       def self.last_git_commit
         s = `git log -1 --pretty=%B`.strip
         return s if s.to_s.length > 0
-        return nil
+        nil
       end
 
       def self.run(params)
