@@ -9,7 +9,7 @@ module Fastlane
         v = fetch_latest
         puts '#######################################################################'.green
         puts "# fastlane #{v} is available.".green
-        puts "# It is recommended to use the latest version.".green # rubocop:disable Style/StringLiterals
+        puts '# It is recommended to use the latest version.'.green
         puts "# Update using '(sudo) gem update fastlane'.".green
         puts "# To see what's new, open https://github.com/KrauseFx/fastlane/releases.".green
         puts '#######################################################################'.green

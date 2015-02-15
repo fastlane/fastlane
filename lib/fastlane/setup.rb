@@ -28,15 +28,13 @@ module Fastlane
       end
     end
 
-    # rubocop:disable Style/StringLiterals
     def show_infos
-      Helper.log.info "This setup will help you get up and running in no time.".green
-      Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
+      Helper.log.info 'This setup will help you get up and running in no time.'.green
+      Helper.log.info 'First, it will move the config files from `deliver` and `snapshot`'.green
       Helper.log.info "into the subfolder `fastlane`.\n".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
-      Helper.log.info "the tool automatically for you. Have fun! ".green
+      Helper.log.info 'the tool automatically for you. Have fun! '.green
     end
-    # rubocop:enable Style/StringLiterals
 
     def files_to_copy
       ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
@@ -74,7 +72,6 @@ module Fastlane
       @tools[:sigh] = false
     end
 
-    # rubocop:disable Style/StringLiterals
     def ask_to_enable_other_tools
       unless @tools[:deliver]
         if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
@@ -85,14 +82,13 @@ module Fastlane
         end
       else
         # deliver already enabled
-        Helper.log.info "-------------------------------------------------------------------------------------------"
-        Helper.log.info "Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile".yellow
-        Helper.log.info "Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building".yellow
+        Helper.log.info '-------------------------------------------------------------------------------------------'
+        Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
+        Helper.log.info 'Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building'.yellow
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
-        Helper.log.info "Please read the above carefully and click Enter to confirm.".green
+        Helper.log.info 'Please read the above carefully and click Enter to confirm.'.green
         STDIN.gets
       end
-      # rubocop:enable Style/StringLiterals
 
       unless @tools[:snapshot]
         if agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
