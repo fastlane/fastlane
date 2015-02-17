@@ -76,7 +76,7 @@ module Fastlane
       end
 
       def self.check_response_code(response, channel)
-        case response.code.to_i
+          case response.code.to_i
           when 200, 204
             true
           when 404

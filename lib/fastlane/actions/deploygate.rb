@@ -72,14 +72,14 @@ module Fastlane
 
       def self.help_message(response)
         message =
-          case response.body['message']
+            case response.body['message']
             when 'you are not authenticated'
               'Invalid API Token specified.'
             when 'application create error: permit'
               'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
             when 'application create error: limit'
               'Plan limit: You have reached to the limit of current plan or your plan was expired.'
-          end
+            end
         Helper.log.error message.red if message
       end
       private_class_method :help_message
