@@ -40,13 +40,13 @@ describe Fastlane do
 
       it "current: Pre-Release - new official version" do
         mock_ruby_gems_response('0.9.1')
-        Fastlane::UpdateChecker.stub(:current_version) { '0.9.1.pre' }
+        allow(Fastlane::UpdateChecker).to receive(:current_version) { '0.9.1.pre' }
         expect(Fastlane::UpdateChecker.update_available?).to eq(true)
       end
 
       it "a new pre-release when pre-release is installed" do
         mock_ruby_gems_response('0.9.1.pre2')
-        Fastlane::UpdateChecker.stub(:current_version) { '0.9.1.pre1' }
+        allow(Fastlane::UpdateChecker).to receive(:current_version) { '0.9.1.pre1' }
         expect(Fastlane::UpdateChecker.update_available?).to eq(true)
       end
     end
