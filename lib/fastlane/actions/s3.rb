@@ -74,7 +74,7 @@ module Fastlane
 
         #####################################
         #
-        # Does plist stuff
+        # html and plist building
         #
         #####################################
 
@@ -117,7 +117,7 @@ module Fastlane
 
         #####################################
         #
-        # Does upload to s3 stuff
+        # html and plist uploading
         #
         #####################################
 
