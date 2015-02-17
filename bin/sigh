@@ -43,13 +43,13 @@ class SighApplication
         app = app_identifier(options)
         username(options)
 
-        type = Sigh::DeveloperCenter::APPSTORE
-        type = Sigh::DeveloperCenter::ADHOC if options.adhoc 
-        type = Sigh::DeveloperCenter::DEVELOPMENT if options.development
+        type = FastlaneCore::DeveloperCenter::APPSTORE
+        type = FastlaneCore::DeveloperCenter::ADHOC if options.adhoc 
+        type = FastlaneCore::DeveloperCenter::DEVELOPMENT if options.development
 
         ENV['SIGH_CERTIFICATE'] = options.cert_owner if options.cert_owner
 
-        path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
+        path = FastlaneCore::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
 
         if path
           file_name = options.filename || File.basename(path)
