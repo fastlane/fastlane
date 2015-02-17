@@ -1,4 +1,3 @@
-require 'json'
 require 'sigh/version'
 require 'sigh/dependency_checker'
 require 'sigh/developer_center'

@@ -1,4 +1,3 @@
-require 'fastlane_core'
 require 'fastlane_core/developer_center/developer_center'
 
 module FastlaneCore
@@ -8,7 +7,6 @@ module FastlaneCore
     ADHOC = "AdHoc"
     DEVELOPMENT = "Development"
 
-    PROFILES_URL = "https://developer.apple.com/account/ios/profile/profileList.action?type=production"
     PROFILES_URL_DEV = "https://developer.apple.com/account/ios/profile/profileList.action?type=limited"
 
     
