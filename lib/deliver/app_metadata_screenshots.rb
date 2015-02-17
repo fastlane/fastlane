@@ -5,9 +5,9 @@ module Deliver
     #####################################################
 
     # Removes all currently enabled screenshots for the given language.
-    # @param (String) language The language, which has to be in this list: {Deliver::Languages}.
+    # @param (String) language The language, which has to be in this list: {FastlaneCore::Languages}.
     def clear_all_screenshots(language)
-      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
       update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
         field.children.remove # remove all the screenshots
@@ -17,12 +17,12 @@ module Deliver
     end
 
     # Appends another screenshot to the already existing ones
-    # @param (String) language The language, which has to be in this list: {Deliver::Languages}.
+    # @param (String) language The language, which has to be in this list: {FastlaneCore::Languages}.
     # @param (Deliver::AppScreenshot) app_screenshot The screenshot you want to add to the app metadata.
     # @raise (AppMetadataTooManyScreenshotsError) When there are already 5 screenshots (MAXIMUM_NUMBER_OF_SCREENSHOTS).
 
     def add_screenshot(language, app_screenshot)
-      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+      raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
       create_locale_if_not_exists(language)
 
@@ -100,14 +100,14 @@ module Deliver
     # This method will automatically detect which device type each screenshot is.
     #
     # This will also clear all existing screenshots before setting the new ones.
-    # @param (Hash) hash A hash containing a different path for each locale ({Deliver::Languages::ALL_LANGUAGES})
+    # @param (Hash) hash A hash containing a different path for each locale ({FastlaneCore::Languages::ALL_LANGUAGES})
     def set_screenshots_for_each_language(hash)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
         resulting_path = "#{current_path}/**/*.{png,jpg,jpeg}"
 
-        raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless Languages::ALL_LANGUAGES.include?language
+        raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
         # https://stackoverflow.com/questions/21688855/
         # File::FNM_CASEFOLD = ignore case
@@ -138,7 +138,7 @@ module Deliver
       raise AppMetadataParameterError.new("Parameter needs to be a path (string)") unless path.kind_of?String
 
       found = false
-      Deliver::Languages::ALL_LANGUAGES.each do |language|
+      FastlaneCore::Languages::ALL_LANGUAGES.each do |language|
         full_path = path + "/#{language}"
         if File.directory?(full_path)
           found = true

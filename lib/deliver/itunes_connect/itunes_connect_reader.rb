@@ -1,4 +1,4 @@
-module Deliver  
+module FastlaneCore  
   # For all the information reading (e.g. version number)
   class ItunesConnect
     # This method will fetch the current status ({Deliver::App::AppStatus})
@@ -17,14 +17,14 @@ module Deliver
         if page.has_content?WAITING_FOR_REVIEW
           # That's either Upload Received or Waiting for Review
           if page.has_content?"To submit a new build, you must remove this version from review"
-            return App::AppStatus::WAITING_FOR_REVIEW
+            return Deliver::App::AppStatus::WAITING_FOR_REVIEW
           else
-            return App::AppStatus::UPLOAD_RECEIVED
+            return Deliver::App::AppStatus::UPLOAD_RECEIVED
           end
         elsif page.has_content?BUTTON_STRING_NEW_VERSION
-          return App::AppStatus::READY_FOR_SALE
+          return Deliver::App::AppStatus::READY_FOR_SALE
         elsif page.has_content?BUTTON_STRING_SUBMIT_FOR_REVIEW
-          return App::AppStatus::PREPARE_FOR_SUBMISSION
+          return Deliver::App::AppStatus::PREPARE_FOR_SUBMISSION
         else
           raise "App status not yet implemented"
         end

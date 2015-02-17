@@ -211,7 +211,7 @@ describe Deliver do
           it "throws an exception when language is invalid" do
             expect {
               @app.metadata.clear_all_screenshots("de")
-            }.to raise_error("The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES")
+            }.to raise_error("The specified language could not be found. Make sure it is available in FastlaneCore::Languages::ALL_LANGUAGES")
           end
         end
 

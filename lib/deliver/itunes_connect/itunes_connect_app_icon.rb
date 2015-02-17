@@ -1,6 +1,6 @@
 require 'fastimage'
 
-module Deliver  
+module FastlaneCore  
   class ItunesConnect
     # Uploading a new full size app icon
 

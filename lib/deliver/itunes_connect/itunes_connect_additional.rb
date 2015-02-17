@@ -1,4 +1,4 @@
-module Deliver  
+module FastlaneCore  
   class ItunesConnect
     # This file sets additional information like copyright and age rating
 

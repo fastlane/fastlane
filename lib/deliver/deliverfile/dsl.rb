@@ -66,7 +66,7 @@ module Deliver
         # This is approach only is recommend for deployments where you are only
         # supporting one language.
         #
-        # The language itself must be included in {Deliver::Languages::ALL_LANGUAGES}.
+        # The language itself must be included in {FastlaneCore::Languages::ALL_LANGUAGES}.
         # @example
         #  default_language 'en-US'
         # @example

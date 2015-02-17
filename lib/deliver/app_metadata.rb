@@ -36,7 +36,7 @@ module Deliver
 
     private_constant :METADATA_FILE_NAME, :MAXIMUM_NUMBER_OF_SCREENSHOTS
 
-    INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in Deliver::Languages::ALL_LANGUAGES"
+    INVALID_LANGUAGE_ERROR = "The specified language could not be found. Make sure it is available in FastlaneCore::Languages::ALL_LANGUAGES"
 
     # You don't have to manually create an AppMetadata object. It will
     # be created when you access the app's metadata ({Deliver::App#metadata})
@@ -83,13 +83,13 @@ module Deliver
     end
 
     # Adds a new locale (language) to the given app
-    # @param language (Deliver::Languages::ALL_LANGUAGES) the language you want to
+    # @param language (FastlaneCore::Languages::ALL_LANGUAGES) the language you want to
     #  this app
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     # @return (Bool) Is true, if the language was created. False, when the language alreade existed
     def add_new_locale(language)
-      unless Deliver::Languages::ALL_LANGUAGES.include?language
-        raise "Language '#{language}' is invalid. It must be in #{Deliver::Languages::ALL_LANGUAGES}."
+      unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
+        raise "Language '#{language}' is invalid. It must be in #{FastlaneCore::Languages::ALL_LANGUAGES}."
       end
 
       if information[language] != nil
@@ -126,7 +126,7 @@ module Deliver
     #####################################################
 
     # Updates the app title
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_title(hash)
@@ -134,7 +134,7 @@ module Deliver
     end
 
     # Updates the app description which is shown in the AppStore
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_description(hash)
@@ -142,7 +142,7 @@ module Deliver
     end
 
     # Updates the app changelog of the latest version
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
@@ -150,7 +150,7 @@ module Deliver
     end
 
     # Updates the Marketing URL
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_marketing_url(hash)
@@ -158,7 +158,7 @@ module Deliver
     end
 
     # Updates the Support URL
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_support_url(hash)
@@ -166,7 +166,7 @@ module Deliver
     end
 
     # Updates the Privacy URL
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_privacy_url(hash)
@@ -174,7 +174,7 @@ module Deliver
     end
 
     # Updates the app keywords
-    # @param (Hash) hash The hash should contain the correct language codes ({Deliver::Languages})
+    # @param (Hash) hash The hash should contain the correct language codes ({FastlaneCore::Languages})
     #  as keys. The value should be an array of keywords (each keyword is a string)
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_keywords(hash)
@@ -272,7 +272,7 @@ module Deliver
 
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
-          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless Languages::ALL_LANGUAGES.include?language
+          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
 
           field = locale.search(xpath_name).first

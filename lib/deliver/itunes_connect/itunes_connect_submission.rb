@@ -1,4 +1,4 @@
-module Deliver  
+module FastlaneCore
   # Everything related to submitting the app
   class ItunesConnect
     BUTTON_ADD_NEW_BUILD = 'Click + to add a build before you submit your app.'

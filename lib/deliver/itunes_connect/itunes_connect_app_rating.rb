@@ -1,6 +1,6 @@
 require 'json'
 
-module Deliver  
+module FastlaneCore  
   class ItunesConnect
     # Setting the app's age restrictions
 
