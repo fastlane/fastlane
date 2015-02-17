@@ -5,7 +5,6 @@ require 'fastlane_core/update_checker'
 
 # Third Party code
 require 'colored'
-require 'phantomjs/poltergeist'
 
 module FastlaneCore
 
