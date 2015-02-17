@@ -1,17 +1,10 @@
-require 'json'
 require 'cert/version'
-require 'cert/helper'
 require 'cert/dependency_checker'
 require 'cert/developer_center'
-require 'cert/update_checker'
 require 'cert/cert_runner'
 require 'cert/cert_checker'
 require 'cert/signing_request'
 require 'cert/keychain_importer'
-
-# Third Party code
-require 'phantomjs/poltergeist'
-require 'colored'
 
 module Cert
   TMP_FOLDER = "/tmp/cert/"
