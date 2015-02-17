@@ -42,7 +42,7 @@ module Fastlane
                                                   'room_id' => channel,
                                                   'message' => message })
 
-            checkResponseCodeForRoom(response, channel)
+            check_response_code(response, channel)
           end
         else
           ########## running on V2 ##########
