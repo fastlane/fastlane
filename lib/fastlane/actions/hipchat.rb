@@ -27,7 +27,7 @@ module Fastlane
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
-        message = "<table><tr><td><img src=\"https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png\" style=\"width:50px;height:auto\"></td><td>" + options[:message] + '</td></tr></table>'
+        message = "<table><tr><td><img src=\"https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png\" width=\"50\" height=\"50\"></td><td>" + options[:message] + '</td></tr></table>'
 
         if api_version.to_i == 1
           ########## running on V1 ##########
