@@ -2,17 +2,17 @@ module Fastlane
   # Guides the new user through creating a new action
   module NewAction
     def self.run
-      name = self.fetch_name
-      self.generate_action(name)
+      name = fetch_name
+      generate_action(name)
     end
 
     def self.fetch_name
       puts "Must be lower case, and use a '_' between words. Do not use '.'".green
       puts "examples: 'testflight', 'upload_to_s3'".green
-      name = ask("Name of your action: ")
-      while not name_valid?name
-        puts "Name invalid!"
-        name = ask("Name of your action: ")
+      name = ask('Name of your action: ')
+      while !name_valid?(name)
+        puts 'Name invalid!'
+        name = ask('Name of your action: ')
       end
       name
     end
@@ -21,10 +21,10 @@ module Fastlane
       template = File.read("#{Helper.gem_path}/lib/assets/custom_action_template.rb")
       template.gsub!('[[NAME]]', name)
       template.gsub!('[[NAME_UP]]', name.upcase)
-      template.gsub!('[[NAME_CLASS]]', name.classify + "Action")
+      template.gsub!('[[NAME_CLASS]]', name.classify + 'Action')
 
-      actions_path = File.join((FastlaneFolder.path || Dir.pwd), "actions")
-      FileUtils.mkdir_p(actions_path) unless File.directory?actions_path
+      actions_path = File.join((FastlaneFolder.path || Dir.pwd), 'actions')
+      FileUtils.mkdir_p(actions_path) unless File.directory?(actions_path)
 
       path = File.join(actions_path, "#{name}.rb")
       File.write(path, template)
@@ -32,8 +32,9 @@ module Fastlane
     end
 
     private
-      def self.name_valid?(name)
-        name == name.downcase and name.length > 0 and not name.include?"."
-      end
+
+    def self.name_valid?(name)
+      name == name.downcase && name.length > 0 && !name.include?('.')
+    end
   end
 end

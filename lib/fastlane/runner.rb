@@ -1,6 +1,5 @@
 module Fastlane
   class Runner
-
     def execute(key)
       key = key.to_sym
       Helper.log.info "Driving the lane '#{key}'".green
@@ -10,7 +9,7 @@ module Fastlane
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # the file is located in the fastlane folder
         @before_all.call if @before_all
-        
+
         return_val = nil
 
         if blocks[key]
@@ -51,8 +50,9 @@ module Fastlane
     end
 
     private
-      def blocks
-        @blocks ||= {}
-      end
+
+    def blocks
+      @blocks ||= {}
+    end
   end
 end

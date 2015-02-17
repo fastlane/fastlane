@@ -12,11 +12,11 @@ module Fastlane
         type = Sigh::DeveloperCenter::APPSTORE
         type = Sigh::DeveloperCenter::ADHOC if params.include? :adhoc
         type = Sigh::DeveloperCenter::DEVELOPMENT if params.include? :development
-        
-        return type if Helper.is_test?
+
+        return type if Helper.test?
 
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-        raise "No app_identifier definied in `./fastlane/Appfile`".red unless app
+        raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
         path = Sigh::DeveloperCenter.new.run(app, type)
         output_path = File.expand_path(File.join('.', File.basename(path)))

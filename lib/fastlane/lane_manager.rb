@@ -1,7 +1,7 @@
 module Fastlane
   class LaneManager
     def self.cruise_lanes(lanes)
-      raise "lanes must be an array" unless lanes.kind_of?Array
+      raise 'lanes must be an array' unless lanes.is_a?(Array)
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
       if lanes.count == 0
@@ -16,7 +16,7 @@ module Fastlane
         end
       rescue => ex
         if Actions.lane_context.count > 0
-          Helper.log.info "Variable Dump:".yellow
+          Helper.log.info 'Variable Dump:'.yellow
           Helper.log.info Actions.lane_context
         end
         Helper.log.fatal ex
@@ -32,10 +32,10 @@ module Fastlane
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
-          Helper.log.info "fastlane.tools finished successfully 🎉".green
+          Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
       else
-        Helper.log.fatal "fastlane finished with errors".red
+        Helper.log.fatal 'fastlane finished with errors'.red
         raise e
       end
     end

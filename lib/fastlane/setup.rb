@@ -1,40 +1,39 @@
+# rubocop:disable Metrics/LineLength
+
 module Fastlane
   class Setup
     def run
       raise "Fastlane already set up at path #{folder}".yellow if FastlaneFolder.setup?
 
       show_infos
-      response = agree("Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)".yellow, true)
-
-      if response
-        response = agree("Do you have everything commited in version control? If not please do so! (y/n)".yellow, true)
-        if response
-          begin
-            FastlaneFolder.create_folder!
-            copy_existing_files
-            generate_app_metadata
-            detect_installed_tools # after copying the existing files
-            ask_to_enable_other_tools
-            FileUtils.mkdir(File.join(folder, "actions"))
-            generate_fastfile
-            Helper.log.info "Successfully finished setting up fastlane".green
-          rescue Exception => ex # this will also be caused by Ctrl + C
-            # Something went wrong with the setup, clear the folder again
-            # and restore previous files
-            Helper.log.fatal "Error occured with the setup program! Reverting changes now!".red
-            restore_previous_state
-            raise ex
-          end
-        end
+      response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
+      return unless response
+      response = agree('Do you have everything commited in version control? If not please do so! (y/n)'.yellow, true)
+      return unless response
+      begin
+        FastlaneFolder.create_folder!
+        copy_existing_files
+        generate_app_metadata
+        detect_installed_tools # after copying the existing files
+        ask_to_enable_other_tools
+        FileUtils.mkdir(File.join(folder, 'actions'))
+        generate_fastfile
+        Helper.log.info 'Successfully finished setting up fastlane'.green
+      rescue Exception => ex # this will also be caused by Ctrl + C
+        # Something went wrong with the setup, clear the folder again
+        # and restore previous files
+        Helper.log.fatal 'Error occured with the setup program! Reverting changes now!'.red
+        restore_previous_state
+        raise ex
       end
     end
 
     def show_infos
-      Helper.log.info "This setup will help you get up and running in no time.".green
-      Helper.log.info "First, it will move the config files from `deliver` and `snapshot`".green
+      Helper.log.info 'This setup will help you get up and running in no time.'.green
+      Helper.log.info 'First, it will move the config files from `deliver` and `snapshot`'.green
       Helper.log.info "into the subfolder `fastlane`.\n".green
       Helper.log.info "Fastlane will check what tools you're already using and set up".green
-      Helper.log.info "the tool automatically for you. Have fun! ".green
+      Helper.log.info 'the tool automatically for you. Have fun! '.green
     end
 
     def files_to_copy
@@ -43,34 +42,33 @@ module Fastlane
 
     def copy_existing_files
       files_to_copy.each do |current|
-        if File.exists?current
-          file_name = File.basename(current)
-          to_path = File.join(folder, file_name)
-          Helper.log.info "Moving '#{current}' to '#{to_path}'".green
-          FileUtils.mv(current, to_path)
-        end
+        next unless File.exist?(current)
+        file_name = File.basename(current)
+        to_path = File.join(folder, file_name)
+        Helper.log.info "Moving '#{current}' to '#{to_path}'".green
+        FileUtils.mv(current, to_path)
       end
     end
 
     def generate_app_metadata
-      Helper.log.info "------------------------------"
-      Helper.log.info "To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.".green
-      app_identifier = ask("App Identifier (com.krausefx.app): ".yellow)
-      apple_id = ask("Your Apple ID: ".yellow)
+      Helper.log.info '------------------------------'
+      Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
+      app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
+      apple_id = ask('Your Apple ID: '.yellow)
       template = File.read("#{Helper.gem_path}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
       template.gsub!('[[APPLE_ID]]', apple_id)
-      path = File.join(folder, "Appfile")
+      path = File.join(folder, 'Appfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
     end
 
     def detect_installed_tools
       @tools = {}
-      @tools[:deliver] = File.exists?(File.join(folder, 'Deliverfile'))
-      @tools[:snapshot] = File.exists?(File.join(folder, 'Snapfile'))
-      @tools[:xctool] = File.exists?('./.xctool-args')
-      @tools[:cocoapods] = File.exists?('./Podfile') 
+      @tools[:deliver] = File.exist?(File.join(folder, 'Deliverfile'))
+      @tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
+      @tools[:xctool] = File.exist?('./.xctool-args')
+      @tools[:cocoapods] = File.exist?('./Podfile')
       @tools[:sigh] = false
     end
 
@@ -84,11 +82,11 @@ module Fastlane
         end
       else
         # deliver already enabled
-        Helper.log.info "-------------------------------------------------------------------------------------------"
-        Helper.log.info "Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile".yellow
-        Helper.log.info "Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building".yellow
+        Helper.log.info '-------------------------------------------------------------------------------------------'
+        Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
+        Helper.log.info 'Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building'.yellow
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
-        Helper.log.info "Please read the above carefully and click Enter to confirm.".green
+        Helper.log.info 'Please read the above carefully and click Enter to confirm.'.green
         STDIN.gets
       end
 
@@ -103,9 +101,7 @@ module Fastlane
         end
       end
 
-      if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
-        @tools[:sigh] = true
-      end
+      @tools[:sigh] = true if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
     end
 
     def generate_fastfile
@@ -122,7 +118,7 @@ module Fastlane
         Helper.log.info "'#{key}' not enabled.".yellow unless value
       end
 
-      path = File.join(folder, "Fastfile")
+      path = File.join(folder, 'Fastfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your own deployment lanes.".green
     end
@@ -136,14 +132,14 @@ module Fastlane
       files_to_copy.each do |current|
         from_path = File.join(folder, current)
         to_path = File.basename(current)
-        if File.exists?from_path
+        if File.exist?(from_path)
           Helper.log.info "Moving '#{from_path}' to '#{to_path}'".yellow
           FileUtils.mv(from_path, to_path)
         end
       end
 
       Helper.log.info "Deleting the 'fastlane' folder".yellow
-      FileUtils.rm_rf(folder) 
+      FileUtils.rm_rf(folder)
     end
   end
 end

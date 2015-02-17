@@ -4,13 +4,12 @@ module Fastlane
 
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
-      if (path || '').length > 0
-        raise "Could not find Fastfile at path '#{path}'".red unless File.exists?path
-        @path = path
-        content = File.read(path)
+      return unless (path || '').length > 0
+      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+      @path = path
+      content = File.read(path)
 
-        parse(content)
-      end
+      parse(content)
     end
 
     def parse(data)
@@ -20,7 +19,7 @@ module Fastlane
         eval(data) # this is okay in this case
       end
 
-      return self
+      self
     end
 
     def lane(key, &block)
@@ -44,12 +43,12 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        Fastlane::Actions::SayAction.run([value])  
+        Fastlane::Actions::SayAction.run([value])
       end
     end
 
     def actions_path(path)
-      raise "Path '#{path}' not found!".red unless File.directory?path
+      raise "Path '#{path}' not found!".red unless File.directory?(path)
 
       Actions.load_external_actions(path)
     end
@@ -61,10 +60,10 @@ module Fastlane
       end
     end
 
-    def method_missing(method_sym, *arguments, &block)
+    def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
-      class_name = method_sym.to_s.classify + "Action"
+      class_name = method_sym.to_s.classify + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
@@ -73,10 +72,10 @@ module Fastlane
         raise "Could not find method '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
 
-      if class_ref and class_ref.respond_to?(:run)
+      if class_ref && class_ref.respond_to?(:run)
         Helper.log.info "Step: #{method_sym.to_s}".green
 
-        Dir.chdir("..") do # go up from the fastlane folder, to the project folder
+        Dir.chdir('..') do # go up from the fastlane folder, to the project folder
           Actions.execute_action(method_sym) do
             class_ref.run(arguments)
           end
