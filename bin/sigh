@@ -48,6 +48,7 @@ class SighApplication
         type = FastlaneCore::DeveloperCenter::DEVELOPMENT if options.development
 
         ENV['SIGH_CERTIFICATE'] = options.cert_owner if options.cert_owner
+        ENV['FASTLANE_TEAM_ID'] ||= ENV["SIGH_TEAM_ID"]
 
         path = FastlaneCore::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
 
