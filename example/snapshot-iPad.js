@@ -1,5 +1,7 @@
 #import "SnapshotHelper.js"
 
+// If you want to use the same file for both iPhone and iPad, just delete the '-iPad.js' file
+
 var target = UIATarget.localTarget();
 var app = target.frontMostApp();
 var window = app.mainWindow();
