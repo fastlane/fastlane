@@ -1,107 +1,14 @@
-require 'capybara'
-require 'capybara/poltergeist'
-require 'credentials_manager/password_manager'
-require 'phantomjs/poltergeist'
+require 'fastlane_core/itunes_connect/itunes_connect'
 
-module Produce
+module FastlaneCore
   # Every method you call here, might take a time
   class ItunesConnect
-    # This error occurs only if there is something wrong with the given login data
-    class ItunesConnectLoginError < StandardError 
-    end
-
-    # This error can occur for many reaons. It is
-    # usually raised when a UI element could not be found
-    class ItunesConnectGeneralError < StandardError
-    end
-
-    include Capybara::DSL
+    
 
     ITUNESCONNECT_URL = "https://itunesconnect.apple.com/"
     APPS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app"
 
     NEW_APP_CLASS = ".new-button.ng-isolate-scope"
-    
-    def initialize(config)
-      @config = config
-
-      DependencyChecker.check_dependencies
-      
-      Capybara.run_server = false
-      Capybara.default_driver = :poltergeist
-      Capybara.javascript_driver = :poltergeist
-      Capybara.current_driver = :poltergeist
-      Capybara.app_host = ITUNESCONNECT_URL
-
-      # Since Apple has some SSL errors, we have to configure the client properly:
-      # https://github.com/ariya/phantomjs/issues/11239
-      Capybara.register_driver :poltergeist do |a|
-        conf = ['--debug=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
-        Capybara::Poltergeist::Driver.new(a, {
-          phantomjs: Phantomjs.path,
-          phantomjs_options: conf,
-          phantomjs_logger: File.open("/tmp/poltergeist_log.txt", "a"),
-          js_errors: false
-        })
-      end
-
-      page.driver.headers = { "Accept-Language" => "en" }
-
-      self.login
-    end
-
-    # Loggs in a user with the given login data on the iTC Frontend.
-    # You don't need to pass a username and password. It will
-    # Automatically be fetched using the {CredentialsManager::PasswordManager}.
-    # This method will also automatically be called when triggering other 
-    # actions like {#open_app_page}
-    # @param user (String) (optional) The username/email address
-    # @param password (String) (optional) The password
-    # @return (bool) true if everything worked fine
-    # @raise [ItunesConnectGeneralError] General error while executing 
-    #  this action
-    # @raise [ItunesConnectLoginError] Login data is wrong
-    def login(user = nil, password = nil)
-      begin
-        Helper.log.info "Logging into iTunesConnect"
-
-        user ||= CredentialsManager::PasswordManager.shared_manager.username
-        password ||= CredentialsManager::PasswordManager.shared_manager.password
-
-        result = visit ITUNESCONNECT_URL
-        raise "Could not open iTunesConnect" unless result['status'] == 'success'
-
-        (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
-
-        if page.has_content?"My Apps"
-          # Already logged in
-          return true
-        end
-
-        fill_in "accountname", with: user
-        fill_in "accountpassword", with: password
-
-        begin
-          (wait_for_elements(".enabled").first.click rescue nil) # Login Button
-          wait_for_elements('.homepageWrapper.ng-scope')
-          
-          if page.has_content?"My Apps"
-            # Everything looks good
-          else
-            raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.")
-          end
-        rescue => ex
-          Helper.log.debug(ex)
-          raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
-        end
-
-        Helper.log.info "Successfully logged into iTunesConnect"
-
-        true
-      rescue => ex
-        error_occured(ex)
-      end
-    end
 
     def run
       if ENV["CREATED_NEW_APP_ID"].to_i > 0
@@ -209,35 +116,6 @@ module Produce
 
         sleep 5 # this usually takes some time - this is important
         wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']") # finish loading
-      end
-
-      def error_occured(ex)
-        snap
-        raise ex # re-raise the error after saving the snapshot
-      end
-
-      def snap
-        path = "Error#{Time.now.to_i}.png"
-        save_screenshot(path, :full => true)
-        system("open '#{path}'")
-      end
-
-      def wait_for_elements(name)
-        counter = 0
-        results = all(name)
-        while results.count == 0      
-          # Helper.log.debug "Waiting for #{name}"
-          sleep 0.2
-
-          results = all(name)
-
-          counter += 1
-          if counter > 100
-            Helper.log.debug caller
-            raise ItunesConnectGeneralError.new("Couldn't find element '#{name}' after waiting for quite some time")
-          end
-        end
-        return results
       end
   end
 end
