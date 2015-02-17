@@ -15,8 +15,6 @@ require 'fastlane_core'
 require 'colored'
 
 module Fastlane
-  TMP_FOLDER = '/tmp/fastlane/'
-
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   FastlaneCore::UpdateChecker.verify_latest_version('fastlane', Fastlane::VERSION)
