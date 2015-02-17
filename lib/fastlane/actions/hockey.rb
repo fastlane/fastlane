@@ -49,19 +49,19 @@ module Fastlane
         return if Helper.test?
 
         response = client.upload_build(options[:ipa], options)
-          case response.status
-          when 200...300
-            url = response.body['public_url']
+        case response.status
+        when 200...300
+          url = response.body['public_url']
 
-            Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
-            Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
+          Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
+          Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
 
-            Helper.log.info "Public Download URL: #{url}" if url
-            Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
-          else
-            Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
-            fail 'Error when trying to upload ipa to HockeyApp'.red
-          end
+          Helper.log.info "Public Download URL: #{url}" if url
+          Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
+        else
+          Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
+          fail 'Error when trying to upload ipa to HockeyApp'.red
+        end
       end
     end
   end
