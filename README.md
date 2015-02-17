@@ -26,6 +26,18 @@ All shared code of the fastlane tools is stored in this repository.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
+# Features
+
+This gem contains all shared classes and code:
+
+- Setting up a headless JavaScript browser using [poltergeist](https://github.com/teampoltergeist/poltergeist)
+- Login and basic navigation on iTunes Connect
+- Login and basic navigation on the Apple Developer Portal
+- Checking for updates for a specific gem and showing an update message
+- All output of all tools with different logging levels
+- Finding of the current Xcode and iTunes Transporter path
+- A list of available languages of iTunes Connect
+
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
