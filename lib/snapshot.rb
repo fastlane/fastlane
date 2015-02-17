@@ -1,4 +1,3 @@
-require 'json'
 require 'snapshot/version'
 require 'snapshot/snapshot_config'
 require 'snapshot/runner'
@@ -11,9 +10,6 @@ require 'snapshot/simulators'
 require 'snapshot/dependency_checker'
 
 require 'fastlane_core'
-
-# Third Party code
-require 'colored'
 
 module Snapshot
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
