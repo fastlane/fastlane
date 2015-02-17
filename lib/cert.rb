@@ -6,9 +6,13 @@ require 'cert/cert_checker'
 require 'cert/signing_request'
 require 'cert/keychain_importer'
 
-module Cert
-  TMP_FOLDER = "/tmp/cert/"
+require 'fastlane_core'
 
-  Cert::UpdateChecker.verify_latest_version
+module Cert
+  TMP_FOLDER = "/tmp/sigh/"
+
+  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+
+  FastlaneCore::UpdateChecker.verify_latest_version('cert', Cert::VERSION)
   DependencyChecker.check_dependencies
 end
