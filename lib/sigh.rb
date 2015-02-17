@@ -5,10 +5,6 @@ require 'sigh/resign'
 
 require 'fastlane_core'
 
-# Third Party code
-require 'colored'
-require 'phantomjs/poltergeist'
-
 module Sigh
   TMP_FOLDER = "/tmp/sigh/"
 
