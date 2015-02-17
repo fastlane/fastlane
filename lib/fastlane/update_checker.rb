@@ -25,7 +25,7 @@ module Fastlane
         if latest && Gem::Version.new(latest) > Gem::Version.new(current_version)
           return true
         end
-      rescue => ex
+      rescue
         Helper.log.error("Could not check if 'fastlane' is up to date.")
       end
 

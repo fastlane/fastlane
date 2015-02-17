@@ -91,7 +91,6 @@ module Fastlane
         file_name = File.basename(file).gsub('.rb', '')
 
         class_name = file_name.classify + 'Action'
-        class_ref = nil
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
 
@@ -102,7 +101,7 @@ module Fastlane
             Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
             fail "Plugin '#{file_name}' is damaged!"
           end
-        rescue NameError => ex
+        rescue NameError
           # Action not found
           Helper.log.error "Could not find '#{class_name}' class defined.".red
           Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'

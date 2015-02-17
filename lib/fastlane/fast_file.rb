@@ -67,7 +67,7 @@ module Fastlane
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError => ex
+      rescue NameError
         # Action not found
         raise "Could not find method '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
