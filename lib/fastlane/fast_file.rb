@@ -5,7 +5,7 @@ module Fastlane
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       return unless (path || '').length > 0
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+      fail "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
       @path = path
       content = File.read(path)
 
@@ -48,7 +48,7 @@ module Fastlane
     end
 
     def actions_path(path)
-      raise "Path '#{path}' not found!".red unless File.directory?(path)
+      fail "Path '#{path}' not found!".red unless File.directory?(path)
 
       Actions.load_external_actions(path)
     end
@@ -81,7 +81,7 @@ module Fastlane
           end
         end
       else
-        raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
+        fail "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
       end
     end
   end

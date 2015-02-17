@@ -18,11 +18,11 @@ module Fastlane
 
         unless api_token
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
-          raise 'No HIPCHAT_API_TOKEN given.'.red
+          fail 'No HIPCHAT_API_TOKEN given.'.red
         end
         if api_version.nil? || ![1, 2].include?(api_version[0].to_i)
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
-          raise 'No HIPCHAT_API_VERSION given.'.red
+          fail 'No HIPCHAT_API_VERSION given.'.red
         end
 
         channel = options[:channel]
@@ -32,7 +32,7 @@ module Fastlane
         if api_version.to_i == 1
           ########## running on V1 ##########
           if user?(channel)
-            raise 'HipChat private message not working with API V1 please use API V2 instead'.red
+            fail 'HipChat private message not working with API V1 please use API V2 instead'.red
           else
             uri = URI.parse('https://api.hipchat.com/v1/rooms/message')
             response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
@@ -80,11 +80,11 @@ module Fastlane
           when 200, 204
             true
           when 404
-            raise "Unknown #{channel}".red
+            fail "Unknown #{channel}".red
           when 401
-            raise "Access denied #{channel}".red
+            fail "Access denied #{channel}".red
           else
-            raise "Unexpected #{response.code} for `#{channel}'".red
+            fail "Unexpected #{response.code} for `#{channel}'".red
         end
       end
     end

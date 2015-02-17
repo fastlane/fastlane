@@ -11,7 +11,7 @@ module Fastlane
         Helper.log.fatal '# Install the latest version of Xcode from the AppStore'
         Helper.log.fatal '# Run xcode-select --install to install the developer tools'
         Helper.log.fatal '#############################################################'
-        raise "Run 'xcode-select --install' and start fastlane again"
+        fail "Run 'xcode-select --install' and start fastlane again"
       end
     end
   end

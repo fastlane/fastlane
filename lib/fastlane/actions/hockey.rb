@@ -24,9 +24,9 @@ module Fastlane
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
-        raise "No API Token for Hockey given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
-        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
+        fail "No API Token for Hockey given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
+        fail "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
+        fail "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
 
         if options[:dsym]
           options[:dsym_filename] = options[:dsym]
@@ -39,7 +39,7 @@ module Fastlane
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] &&
+        fail "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] &&
                                                                                                 !File.exist?(options[:dsym_filename]))
 
         Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
@@ -60,7 +60,7 @@ module Fastlane
             Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
           else
             Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
-            raise 'Error when trying to upload ipa to HockeyApp'.red
+            fail 'Error when trying to upload ipa to HockeyApp'.red
           end
       end
     end

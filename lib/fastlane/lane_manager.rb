@@ -1,11 +1,11 @@
 module Fastlane
   class LaneManager
     def self.cruise_lanes(lanes)
-      raise 'lanes must be an array' unless lanes.is_a?(Array)
+      fail 'lanes must be an array' unless lanes.is_a?(Array)
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
       if lanes.count == 0
-        raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
+        fail "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
       end
 
       start = Time.now
@@ -36,7 +36,7 @@ module Fastlane
         end
       else
         Helper.log.fatal 'fastlane finished with errors'.red
-        raise e
+        fail e
       end
     end
   end
