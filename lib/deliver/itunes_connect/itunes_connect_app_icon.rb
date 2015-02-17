@@ -14,7 +14,7 @@ module Deliver
       # Remove alpha channel
       Helper.log.info "Removing alpha channel from provided App Icon (iTunes Connect requirement)".green
       
-      `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null because there is warning because of the extension
+      `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null since there is warning because of the extension
       `sips -s format png '#{path}'`
 
       begin

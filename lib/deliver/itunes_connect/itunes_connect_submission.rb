@@ -1,6 +1,7 @@
 module Deliver  
   # Everything related to submitting the app
   class ItunesConnect
+    BUTTON_ADD_NEW_BUILD = 'Click + to add a build before you submit your app.'
     
     # This will put the latest uploaded build as a new beta build
     def put_build_into_beta_testing!(app, version_number)
