@@ -40,11 +40,14 @@
             <% screens.each do |screen_path| %>
               <% next if screen_path.include?"_framed.png" %>
               <td>
-                <% screen_size = FastImage.size(screen_path) %>
+                <% screen_size = FastImage.size(File.join(SnapshotConfig.shared_instance.screenshots_path, screen_path)) %>
+                <% width = ((screen_size[0] / divide_size_by).round rescue 0) %>
+                <% width = [width, max_width].min %>
+                <% style = (width > 0 ? "width: #{width}px;" : '') %>
                 <a href="<%= screen_path %>" target="_blank">
                   <img class="screenshot" 
                          src="<%= screen_path %>",
-                       style="width: <%= [(screen_size[0] / divide_size_by).round, max_width].min %>px;" />
+                       style="<%= style %>" />
                 </a>
               </td>
             <% end %>
