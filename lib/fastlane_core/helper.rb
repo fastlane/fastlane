@@ -27,7 +27,6 @@ module FastlaneCore
           string = string.red.bold
         end
 
-
         [string, second].join("")
       end
 
@@ -35,8 +34,13 @@ module FastlaneCore
     end
 
     # @return true if the currently running program is a unit test
-    def self.is_test?
+    def self.test?
       defined?SpecHelper
+    end
+
+    # Use Helper.test? instead
+    def self.is_test?
+      self.test?
     end
 
     # @return the full path to the Xcode developer tools of the currently
