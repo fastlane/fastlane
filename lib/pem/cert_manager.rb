@@ -7,7 +7,7 @@ module PEM
 
       Helper.log.info "Refreshing push notification profiles for app '#{app_identifier}'"
 
-      dev = PEM::DeveloperCenter.new
+      dev = FastlaneCore::DeveloperCenter.new
 
       cert_file = dev.fetch_cer_file(app_identifier, production)
       rsa_file = File.join(TMP_FOLDER, 'private_key.key')

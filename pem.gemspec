@@ -22,17 +22,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
-  spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
-
-  spec.add_dependency 'credentials_manager' # fastlane password manager
-
-  # Frontend Scripting
-  spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
-  spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
-  spec.add_dependency 'poltergeist', '~> 1.5.1' # headless Javascript browser for controlling iTC
+  spec.add_dependency 'fastlane_core' # all shared code and dependencies
 
   # Development only
   spec.add_development_dependency 'bundler'

@@ -1,11 +1,10 @@
-require 'json'
 require 'pem/version'
-require 'pem/helper'
 require 'pem/dependency_checker'
 require 'pem/developer_center'
-require 'pem/update_checker'
 require 'pem/cert_manager'
 require 'pem/signing_request'
+
+require 'fastlane_core'
 
 # Third Party code
 require 'phantomjs/poltergeist'
@@ -14,6 +13,8 @@ require 'colored'
 module PEM
   TMP_FOLDER = "/tmp/PEM/"
 
-  PEM::UpdateChecker.verify_latest_version
+  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+
+  FastlaneCore::UpdateChecker.verify_latest_version('pem', PEM::VERSION)
   DependencyChecker.check_dependencies
 end
