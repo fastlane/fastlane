@@ -9,7 +9,7 @@ require 'cert/keychain_importer'
 require 'fastlane_core'
 
 module Cert
-  TMP_FOLDER = "/tmp/sigh/"
+  TMP_FOLDER = "/tmp/cert/"
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
