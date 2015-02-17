@@ -31,6 +31,8 @@ class CertApplication
       c.action do |args, options|
         username(options)
         
+        ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
+
         Cert::CertRunner.run
 
         installed = Cert::CertChecker.is_installed?ENV["CER_FILE_PATH"]
