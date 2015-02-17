@@ -23,6 +23,7 @@ module FastlaneCore
     include Capybara::DSL
 
     DEVELOPER_CENTER_URL = "https://developer.apple.com/devcenter/ios/index.action"
+    PROFILES_URL = "https://developer.apple.com/account/ios/profile/profileList.action?type=production"
     TMP_FOLDER = "/tmp/fastlane_core/"
 
     def initialize
