@@ -11,37 +11,11 @@
 
   <body>
 
-    <div class="site-wrapper">
-
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-         <div class="masthead clearfix">
-            <div class="inner">
-              <h3 class="masthead-brand"><%= title %></h3>
-            </div>
-          </div>
-
-          <div class="inner cover">
-            <h1 class="cover-heading"></h1>
-            <p class="lead"></p>
-            <p class="lead">
-              <a href="itms-services://?action=download-manifest&url=itms-services://?action=download-manifest&url=<%= url %>" id="text" class="btn btn-lg btn-default">Install <%= title %> <%= bundle_version %></a>
-            </p>
-          </div>
-
-          <div class="mastfoot">
-            <div class="inner">
-              <p></p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
+    <h1 class="masthead-brand"><%= title %></h3>
+ 
+    <p>
+      <a href="itms-services://?action=download-manifest&url=itms-services://?action=download-manifest&url=<%= url %>" id="text" class="btn btn-lg btn-default">Install <%= title %> <%= bundle_version %></a>
+    </p>
     
   </body>
 </html>

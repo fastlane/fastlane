@@ -6,8 +6,10 @@ module Fastlane
   module Actions
 
     module SharedValues
-      IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
-      DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
+      S3_IPA_OUTPUT_PATH = :S3_IPA_OUTPUT_PATH
+      S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
+      S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
+      S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
     end
 
     # -f, --file FILE      .ipa file for the build 
@@ -22,12 +24,12 @@ module Fastlane
     # -P, --path PATH      S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  
     #              eg. "/path/to/folder/{CFBundleVersion}/" could be evaluated as "/path/to/folder/1.0.0/" 
 
-    ARGS_MAP = {
+    S3_ARGS_MAP = {
       file: '-f',
       dsym: '-d',
       access_key: '-a',
       secret_access_key: '-s',
-      bucket: '--b',
+      bucket: '-b',
       acl: '--acl',
       source: '--source-dir',
       path: '-P',
@@ -42,6 +44,11 @@ module Fastlane
 
         # Other things that we need
         params = params.first
+
+        # Maps nice developer build parameters to Shenzhen args
+        build_args = params_to_build_args(params)
+
+        # Pulling parameters for other uses
         s3_access_key = params[:access_key]
         s3_secret_access_key = params[:secret_access_key]
         s3_bucket = params[:bucket]
@@ -50,12 +57,7 @@ module Fastlane
 
         plist_template_path = params[:plist_template_path]
         html_template_path = params[:html_template_path]
-
-        # Maps nice developer build parameters to Shenzhen args
-        build_args = params_to_build_args(params)
-
-        # If no dest directory given, default to current directory
-        absolute_dest_directory ||= Dir.pwd
+        html_file_name = params[:html_file_name]
 
         if Helper.is_test?
           # Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.ipa")
@@ -76,45 +78,37 @@ module Fastlane
         #
         #####################################
 
-        # Gets values for plist
+        # Gets info used for the plist
+        bundle_id, bundle_version, title = get_ipa_info( ipa_file )
+
+        # Gets URL for IPA file
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
-        url = "https://s3.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file}"
+        ipa_url = "https://s3.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file}"
 
-        bundle_id, bundle_version, title = nil
-        Dir.mktmpdir do |dir|
+        plist_file_name = "#{url_part}#{title}.plist"
+        plist_url = "https://s3.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
 
-          system "unzip -q #{ipa_file} -d #{dir} 2> /dev/null"
-          plist = Dir["#{dir}/**/*.app/Info.plist"].last
+        html_file_name ||= "index.html"
+        html_url = "https://s3.amazonaws.com/#{s3_bucket}/#{html_file_name}"
 
-          bundle_id = Shenzhen::PlistBuddy.print(plist, 'CFBundleIdentifier')
-          bundle_version = Shenzhen::PlistBuddy.print(plist, 'CFBundleShortVersionString')
-          title = Shenzhen::PlistBuddy.print(plist, 'CFBundleName')
-
-        end
-
+        # Creates plist from template
         plist_template_path ||= "#{Helper.gem_path}/lib/assets/s3_plist_template.erb"
         plist_template = File.read(plist_template_path)
 
         et = ErbalT.new({
-          url: url,
+          url: ipa_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
           })
         plist_render = et.render(plist_template)
 
-        
-        #####################################
-        #
-        # Does html stuff
-        #
-        #####################################
-
+        # Creates html from template
         html_template_path ||= "#{Helper.gem_path}/lib/assets/s3_html_template.erb"
         html_template = File.read(html_template_path)
 
         et = ErbalT.new({
-          url: url,
+          url: plist_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
@@ -127,15 +121,15 @@ module Fastlane
         #
         #####################################
 
-        s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key
-        )
-        bucket = s3_client.buckets[s3_bucket]
-        plist_file_name = "#{url_part}#{title}.plist"
-        bucket.objects.create(plist_file_name, plist_render.to_s, :acl => :public_read)
-
-        bucket.objects.create("index.html", html_render.to_s, :acl => :public_read)
+        upload_plist_and_html_to_s3(
+          s3_access_key,
+          s3_secret_access_key,
+          s3_bucket,
+          plist_file_name,
+          plist_render,
+          html_file_name,
+          html_render
+          )        
 
         return true
 
@@ -148,13 +142,33 @@ module Fastlane
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k,v|
           v ||= ''
-          if args = ARGS_MAP[k]
+          if args = S3_ARGS_MAP[k]
             value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
-            "#{ARGS_MAP[k]} #{value}".strip
+            "#{S3_ARGS_MAP[k]} #{value}".strip
           end
         end.compact
       end
 
+      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render)
+        s3_client = AWS::S3.new(
+            access_key_id: s3_access_key,
+            secret_access_key: s3_secret_access_key
+        )
+        bucket = s3_client.buckets[s3_bucket]
+
+        bucket.objects.create(plist_file_name, plist_render.to_s, :acl => :public_read)
+        bucket.objects.create(html_file_name, html_render.to_s, :acl => :public_read)
+      end
+
+      #
+      # NOT a fan of this as this was taken straight from Shenzhen
+      # https://github.com/nomad/shenzhen/blob/986792db5d4d16a80c865a2748ee96ba63644821/lib/shenzhen/plugins/s3.rb#L32
+      # 
+      # Need to find a way to not use this copied method
+      #
+      # AGAIN, I am not happy about this right now.
+      # Using this for prototype reasons.
+      #
       def self.expand_path_with_substitutions_from_ipa_plist(ipa, path)
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
@@ -173,6 +187,21 @@ module Fastlane
         end
 
         return path
+      end
+
+      def self.get_ipa_info(ipa_file)
+        bundle_id, bundle_version, title = nil
+        Dir.mktmpdir do |dir|
+
+          system "unzip -q #{ipa_file} -d #{dir} 2> /dev/null"
+          plist = Dir["#{dir}/**/*.app/Info.plist"].last
+
+          bundle_id = Shenzhen::PlistBuddy.print(plist, 'CFBundleIdentifier')
+          bundle_version = Shenzhen::PlistBuddy.print(plist, 'CFBundleShortVersionString')
+          title = Shenzhen::PlistBuddy.print(plist, 'CFBundleName')
+
+        end
+        return bundle_id, bundle_version, title
       end
 
     end
