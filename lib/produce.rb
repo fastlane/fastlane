@@ -10,8 +10,6 @@ require 'produce/update_checker'
 require 'produce/available_default_languages'
 
 module Produce
-  TMP_FOLDER = "/tmp/produce/"
-
   # Produce::UpdateChecker.verify_latest_version
   DependencyChecker.check_dependencies
 end
