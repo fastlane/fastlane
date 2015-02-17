@@ -6,6 +6,7 @@ module Snapshot
 
       raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use Snapshot.".red if File.exists?(snapfile_path)
 
+      gem_path = Helper.gem_path("snapshot")
       File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))
       File.write([path, 'snapshot.js'].join('/'), File.read("#{gem_path}/lib/assets/snapshot.js"))
       File.write([path, 'snapshot-iPad.js'].join('/'), File.read("#{gem_path}/lib/assets/snapshot.js"))
@@ -16,14 +17,5 @@ module Snapshot
       puts "Successfully created new UI Automation JS file for iPad at '#{[path, 'snapshot-iPad.js'].join('/')}'".green
       puts "Successfully created new Snapfile at '#{snapfile_path}'".green
     end
-
-     private
-      def self.gem_path
-        if not Helper.is_test? and Gem::Specification::find_all_by_name('snapshot').any?
-          return Gem::Specification.find_by_name('snapshot').gem_dir
-        else
-          return './'
-        end
-      end
   end
 end
