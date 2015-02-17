@@ -1,6 +1,5 @@
 require 'json'
 require 'deliver/version'
-require 'deliver/helper'
 require 'deliver/app'
 require 'deliver/app_metadata'
 require 'deliver/metadata_item'
@@ -16,14 +15,17 @@ require 'deliver/languages'
 require 'deliver/pdf_generator'
 require 'deliver/deliver_process'
 require 'deliver/dependency_checker'
-require 'deliver/update_checker'
 require 'deliver/ipa_file_analyser'
 require 'deliver/testflight'
+
+require 'fastlane_core'
 
 # Third Party code
 require 'colored'
 
 module Deliver
-  Deliver::UpdateChecker.verify_latest_version
+  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+
+  FastlaneCore::UpdateChecker.verify_latest_version('deliver', Deliver::VERSION)
   Deliver::DependencyChecker.check_dependencies
 end
