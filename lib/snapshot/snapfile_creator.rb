@@ -1,5 +1,3 @@
-require 'snapshot/helper'
-
 module Snapshot
   class SnapfileCreator
     # This method will take care of creating a Snapfile
