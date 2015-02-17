@@ -6,10 +6,6 @@ require 'pem/signing_request'
 
 require 'fastlane_core'
 
-# Third Party code
-require 'phantomjs/poltergeist'
-require 'colored'
-
 module PEM
   TMP_FOLDER = "/tmp/PEM/"
 
