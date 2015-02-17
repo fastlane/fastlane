@@ -1,3 +1,4 @@
+require 'deliver'
 require 'fastimage'
 
 module Frameit

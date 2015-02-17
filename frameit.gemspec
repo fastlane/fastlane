@@ -21,10 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
-  spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
+  spec.add_dependency 'fastlane_core' # all shared code and dependencies
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'mini_magick', '~> 4.0.2' # To open, edit and export PSD files
   spec.add_dependency 'deliver', '> 0.3' # To determine the device type based on a screenshot file
