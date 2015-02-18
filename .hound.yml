@@ -1,0 +1,4 @@
+# Custom config file for houndci (https://houndci.com/)
+
+ruby:
+  config_file: .rubocop.yml
