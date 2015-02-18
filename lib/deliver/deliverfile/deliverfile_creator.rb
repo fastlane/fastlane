@@ -40,6 +40,7 @@ module Deliver
     # @param path (String) The exact path (including the file name) in which the Deliverfile should be created
     # @param project_name (String) The default name of the project, which is used in the generated Deliverfile
     def self.create_example_deliver_file(path, project_name)
+      gem_path = Helper.gem_path('deliver')
       example = File.read("#{gem_path}/lib/assets/DeliverfileExample")
       example.gsub!("[[APP_NAME]]", project_name)
       File.write(path, example)
@@ -66,14 +67,6 @@ module Deliver
     end
 
     private
-      def self.gem_path
-        if not Helper.is_test? and Gem::Specification::find_all_by_name('deliver').any?
-          return Gem::Specification.find_by_name('deliver').gem_dir
-        else
-          return './'
-        end
-      end
-
       # This method takes care of creating a new 'deliver' folder, containg the app metadata 
       # and screenshots folders
       def self.generate_deliver_file(app, path, project_name)
@@ -89,6 +82,8 @@ module Deliver
         meta_path = "#{metadata_path}metadata.json"
         File.write(meta_path, JSON.pretty_generate(json))
         puts "Successfully created new metadata JSON file at '#{meta_path}'".green
+
+        gem_path = Helper.gem_path('deliver')
 
         # Add a README to the screenshots folder
         File.write("#{metadata_path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))
