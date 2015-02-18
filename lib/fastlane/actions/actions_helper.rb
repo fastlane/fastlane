@@ -56,7 +56,7 @@ module Fastlane
       result = ''
       unless Helper.test?
         exit_status = nil
-        status = IO.popen(command) do |io|
+        status = IO.popen(command, err: [:child, :out]) do |io|
           io.each do |line|
             Helper.log.info ['[SHELL OUTPUT]', line.strip].join(': ')
             result << line
