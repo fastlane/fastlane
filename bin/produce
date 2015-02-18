@@ -31,8 +31,6 @@ class FastlaneApplication
       c.action do |args, options|
         set_username(options.username)
 
-        ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
-
         puts Produce::Manager.start_producing
       end
     end

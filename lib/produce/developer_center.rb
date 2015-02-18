@@ -24,12 +24,17 @@ module FastlaneCore
         wait_for_elements("*[name='explicitIdentifier']").first.set @config[:bundle_identifier]
         click_next
 
-        sleep 3 # sometimes this takes a while and we don't want to timeout
+        sleep 5 # sometimes this takes a while and we don't want to timeout
+
+        if all(".form-error").count > 0
+          error = all(".form-error").collect { |a| a.text }.join("\n")
+          raise error.red
+        end
 
         wait_for_elements("form[name='bundleSubmit']") # this will show the summary of the given information
         click_next
 
-        sleep 3 # sometimes this takes a while and we don't want to timeout
+        sleep 5 # sometimes this takes a while and we don't want to timeout
 
         wait_for_elements(".ios.bundles.confirmForm.complete")
         click_on "Done"
