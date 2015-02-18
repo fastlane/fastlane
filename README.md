@@ -331,7 +331,7 @@ This block will get executed when an error occurs, in any of the blocks (*before
 ```ruby
 error do |lane, exception|
   slack({
-    message: "Successfully deployed new App Update for [AppName](http://link.com).",
+    message: "Something went wrong with the deployment.",
     success: false
   })
 end
