@@ -5,7 +5,8 @@ module FastlaneCore
     APPS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
     CREATE_APP_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleCreate.action"
 
-    def run
+    def run(config)
+      @config = config
       create_new_app
     rescue => ex
       error_occured(ex)

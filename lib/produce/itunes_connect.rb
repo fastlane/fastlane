@@ -4,13 +4,13 @@ module FastlaneCore
   # Every method you call here, might take a time
   class ItunesConnect
     
-
-    ITUNESCONNECT_URL = "https://itunesconnect.apple.com/"
     APPS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app"
 
     NEW_APP_CLASS = ".new-button.ng-isolate-scope"
 
-    def run
+    def run(config)
+      @config = config
+
       if ENV["CREATED_NEW_APP_ID"].to_i > 0
         # We just created this App ID, this takes about 3 minutes to show up on iTunes Connect
         Helper.log.info "Waiting for 3 minutes to make sure, the App ID is synced to iTunes Connect".yellow
@@ -109,7 +109,7 @@ module FastlaneCore
 
       def open_new_app_popup
         visit APPS_URL
-        sleep 5 # this usually takes some time 
+        sleep 8 # this usually takes some time 
 
         wait_for_elements(NEW_APP_CLASS).first.click
         wait_for_elements('#new-menu > * > a').first.click # Create a new App
