@@ -39,9 +39,9 @@ module FastlaneCore
       end
 
       def snap
-        path = "Error#{Time.now.to_i}.png"
+        path = File.expand_path("Error#{Time.now.to_i}.png")
         save_screenshot(path, :full => true)
-        system("open '#{path}'")
+        system("open '#{path}'") unless ENV['SIGH_DISABLE_OPEN_ERROR']
       end
 
       # Since Apple takes for ages, after the upload is properly processed, we have to wait here

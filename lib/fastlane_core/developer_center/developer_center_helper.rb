@@ -33,7 +33,7 @@ module FastlaneCore
     end
 
     def snap
-      path = "Error#{Time.now.to_i}.png"
+      path = File.expand_path("Error#{Time.now.to_i}.png")
       save_screenshot(path, :full => true)
       system("open '#{path}'") unless ENV['SIGH_DISABLE_OPEN_ERROR']
     end
