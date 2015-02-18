@@ -10,6 +10,8 @@ before_all do
 
   # sh "./customShellScript.sh"
 
+  cocoapods
+
   # increment_build_number
 
   ipa({
@@ -17,8 +19,6 @@ before_all do
     configuration: "Debug",
     scheme: "MyApp",
   })
-
-  cocoapods
 
   xctool
 end

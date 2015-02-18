@@ -21,15 +21,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'json' # Because sometimes it's just not installed
-  spec.add_dependency 'highline', '~> 1.6.21' # user inputs (e.g. passwords)
-  spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '~> 4.2.0' # CLI parser
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
   spec.add_dependency 'shenzhen', '~> 0.11.0' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
 
-  spec.add_dependency 'credentials_manager'
+  spec.add_dependency 'fastlane_core' # all shared code and dependencies
+  
   spec.add_dependency 'deliver', '>= 0.5.0'
   spec.add_dependency 'snapshot', '>= 0.4.0'
   spec.add_dependency 'frameit', '>= 0.2.0'
