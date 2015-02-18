@@ -9,16 +9,16 @@ module Fastlane
         require 'sigh'
         require 'credentials_manager/appfile_config'
 
-        type = Sigh::DeveloperCenter::APPSTORE
-        type = Sigh::DeveloperCenter::ADHOC if params.include? :adhoc
-        type = Sigh::DeveloperCenter::DEVELOPMENT if params.include? :development
+        type = FastlaneCore::DeveloperCenter::APPSTORE
+        type = FastlaneCore::DeveloperCenter::ADHOC if params.include? :adhoc
+        type = FastlaneCore::DeveloperCenter::DEVELOPMENT if params.include? :development
 
         return type if Helper.test?
 
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
         raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
-        path = Sigh::DeveloperCenter.new.run(app, type)
+        path = FastlaneCore::DeveloperCenter.new.run(app, type)
         output_path = File.expand_path(File.join('.', File.basename(path)))
         FileUtils.mv(path, output_path)
         Helper.log.info "Exported provisioning profile to '#{output_path}'".green
