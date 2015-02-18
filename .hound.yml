@@ -2,3 +2,6 @@
 
 ruby:
   config_file: .rubocop.yml
+
+StringLiterals:
+  EnforcedStyle: single_quotes
