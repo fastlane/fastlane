@@ -13,6 +13,8 @@ module Cert
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
+
   FastlaneCore::UpdateChecker.verify_latest_version('cert', Cert::VERSION)
   DependencyChecker.check_dependencies
 end
