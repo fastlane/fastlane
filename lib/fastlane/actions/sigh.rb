@@ -18,6 +18,7 @@ module Fastlane
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
         raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
+        CredentialsManager::PasswordManager.shared_manager(ENV['SIGH_USERNAME']) if ENV['SIGH_USERNAME']
         path = FastlaneCore::DeveloperCenter.new.run(app, type)
         output_path = File.expand_path(File.join('.', File.basename(path)))
         FileUtils.mv(path, output_path)
