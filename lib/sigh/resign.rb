@@ -23,7 +23,7 @@ module Sigh
     end
 
     def get_inputs(options, args)
-      @resign_path = File.join(Helper.gem_path, 'lib', 'assets', 'resign.sh')
+      @resign_path = File.join(Helper.gem_path('sigh'), 'lib', 'assets', 'resign.sh')
       raise "Could not find resign.sh file. Please try re-installing the gem.".red unless File.exists?@resign_path
 
       @ipa = args.first || find_ipa || ask("Path to ipa file: ")
