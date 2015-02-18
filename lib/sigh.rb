@@ -8,6 +8,8 @@ require 'fastlane_core'
 module Sigh
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["SIGH_TEAM_ID"]
+
   FastlaneCore::UpdateChecker.verify_latest_version('sigh', Sigh::VERSION)
   DependencyChecker.check_dependencies
 end
