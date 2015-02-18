@@ -1,4 +1,4 @@
-require 'json'
+require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/version'
 require 'fastlane/fast_file'
 require 'fastlane/dependency_checker'
@@ -24,12 +24,5 @@ module Fastlane
   if Fastlane::FastlaneFolder.path
     actions_path = File.join(Fastlane::FastlaneFolder.path, 'actions')
     Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
-  end
-end
-
-
-class String
-  def classify
-    split('_').collect!(&:capitalize).join
   end
 end
