@@ -9,6 +9,8 @@ require 'fastlane_core'
 module PEM
   TMP_FOLDER = "/tmp/PEM/"
 
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["PEM_TEAM_ID"]
+
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   FastlaneCore::UpdateChecker.verify_latest_version('pem', PEM::VERSION)
