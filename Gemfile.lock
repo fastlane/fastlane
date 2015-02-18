@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.1.9)
+    fastlane (0.1.10)
       deliver (>= 0.5.0)
       fastlane_core
       frameit (>= 0.2.0)
@@ -62,10 +62,10 @@ GEM
       faraday (>= 0.7.4, < 0.10)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane_core (0.1.0)
+    fastlane_core (0.1.2)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.3.0)
+      commander (>= 4.1.0)
       credentials_manager
       highline (~> 1.6.21)
       json
