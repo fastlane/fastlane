@@ -6,6 +6,7 @@ module FastlaneCore
     CREATE_CERT_URL = "https://developer.apple.com/account/ios/certificate/certificateCreate.action"
 
     # This will check if there is at least one of the certificates already installed on the local machine
+    # This will store the resulting file name in ENV 'CER_FILE_PATH' and the Cert ID in 'CER_CERTIFICATE_ID'
     def run
       file = find_existing_cert
       if file
@@ -32,6 +33,7 @@ module FastlaneCore
         download_url(url, output)
         if Cert::CertChecker.is_installed?output
           # We'll use this one, since it's installed on the local machine
+          ENV["CER_CERTIFICATE_ID"] = display_id
           Helper.log.info "Found the certificate #{display_id}-#{type_id} which is installed on the local machine. Using this one.".green
           return output
         end
@@ -88,10 +90,13 @@ module FastlaneCore
       path = File.join(TMP_FOLDER, "certificate.cer")
       download_url(url, path)
       
+      certificate_id = url.match(/.*displayId=(.*)&type.*/)[1]
+      
       ENV["CER_FILE_PATH"] = path
-      Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green
+      ENV["CER_CERTIFICATE_ID"] = certificate_id
+      Helper.log.info "Successfully downloaded latest .cer file to '#{path}' (#{certificate_id})".green
 
-      KeychainImporter::import_file(path)
+      Cert::KeychainImporter::import_file(path)
     rescue => ex
       error_occured(ex)
     end
