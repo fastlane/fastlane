@@ -59,11 +59,9 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     cert
 
-This does the following:
+This will check if any of the available signing certificates is installed.  
 
-Check if any of the available signing certificates is installed.  
-
-Only if a new certificate needs to be created:
+Only if a new certificate needs to be created, `cert` will
 
 - Create a new private key
 - Create a new signing request
@@ -71,9 +69,10 @@ Only if a new certificate needs to be created:
 - Import all the generated files into your Keychain
 
 
-```cert``` will never revoke your existing certificates. 
+```cert``` will never revoke your existing certificates. If you can't create any more certificates, `cert` will raise an exception, which means, you have to revoke one of the existing certificates to make room for a new one.
 
-You can pass parameters like this:
+
+You can pass your Apple ID:
 
     cert -u cert@krausefx.com
 
@@ -83,7 +82,24 @@ In case you prefer environment variables:
 
 - ```CERT_USERNAME```
 - ```CERT_TEAM_ID```
-- ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain in case you don't want to use the default one
+- ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain if you don't want to use the default one
+
+## Use with [`sigh`](https://github.com/KrauseFx/sigh)
+
+`cert` is becomes really interesting when it's used in [`fastlane`](https://github.com/KrauseFx/fastlane) in combination with [`sigh`](https://github.com/KrauseFx/sigh).
+
+Update your `Fastfile` to contain the following code:
+
+```ruby
+lane :beta do
+  cert
+  sigh :force
+end
+```
+
+`:force` will make sure to re-generate the provisioning profile on each run.
+This will result in `sigh` always using the correct signing certificate, which is installed on the local machine.
+
 
 # How does it work?
 
