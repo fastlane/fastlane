@@ -7,7 +7,6 @@ require 'phantomjs/poltergeist'
 
 require 'fastlane_core/developer_center/developer_center_login'
 require 'fastlane_core/developer_center/developer_center_helper'
-require 'fastlane_core/developer_center/developer_center_signing_certificates'
 
 module FastlaneCore
   class DeveloperCenter
