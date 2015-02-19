@@ -27,7 +27,7 @@ cert - Create new iOS signing certificates
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/cert/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
 
-###### Create new iOS code signing certificates from the command line. 
+###### Automatically create and maintain iOS code signing certificates.
 
 ##### This tool was sponsored by [AppInstitute](http://appinstitute.co.uk/).
 
@@ -58,11 +58,13 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Why?
 
-Please check out [this guide](https://github.com/KrauseFx/deliver/blob/master/ManualSteps.md) to get started with a signing certificate and a provisioning profile.
+Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md) to get started with a signing certificate and a provisioning profile.
 
-**After** checking out the [guide](https://github.com/KrauseFx/deliver/blob/master/ManualSteps.md), take a look at this lovely gif:
+**After** checking out the [guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md), take a look at this lovely gif:
 
 ![assets/cert.gif](assets/cert.gif) 
+
+In the gif I used `cert && sigh`, which will first create an iOS code signing certificate and then a provisioning profile for your app if `cert` succeeded.
 
 # Usage
 
@@ -134,7 +136,6 @@ This will result in `sigh` always using the correct signing certificate, which i
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the ```cert``` files like this: 
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 
