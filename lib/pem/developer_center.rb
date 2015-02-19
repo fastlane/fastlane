@@ -44,7 +44,7 @@ module FastlaneCore
           apps = all(:xpath, "//td[@title='#{app_identifier}']")
           if apps.count == 1
             apps.first.click
-            sleep 1
+            sleep 2
 
             return true
           else
@@ -56,6 +56,7 @@ module FastlaneCore
       end
 
       def create_push_for_app(app_identifier, production)
+
         element_name = (production ? '.button.small.navLink.distribution.enabled' : '.button.small.navLink.development.enabled')
         begin
           wait_for_elements(element_name).first.click # Create Certificate button
