@@ -460,6 +460,10 @@ before_all do
   increment_build_number
   cocoapods
   xctool :test
+  
+  ipa({
+    workspace: "MyApp.xcworkspace"
+  })
 end
 
 lane :beta do
