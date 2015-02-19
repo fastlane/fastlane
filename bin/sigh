@@ -48,8 +48,9 @@ class SighApplication
         type = FastlaneCore::DeveloperCenter::DEVELOPMENT if options.development
 
         ENV['SIGH_CERTIFICATE'] = options.cert_owner if options.cert_owner
+        ENV['SIGH_CERTIFICATE_EXPIRE_DATE'] = options.cert_date if options.cert_date
 
-        path = FastlaneCore::DeveloperCenter.new.run(app, type, options.cert_name, options.force, options.cert_date)
+        path = FastlaneCore::DeveloperCenter.new.run(app, type, options.cert_name, options.force)
 
         if path
           file_name = options.filename || File.basename(path)

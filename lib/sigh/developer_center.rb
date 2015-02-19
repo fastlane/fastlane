@@ -1,4 +1,5 @@
 require 'fastlane_core/developer_center/developer_center'
+require 'sigh/developer_center_signing'
 
 module FastlaneCore
   class DeveloperCenter
@@ -10,8 +11,8 @@ module FastlaneCore
     PROFILES_URL_DEV = "https://developer.apple.com/account/ios/profile/profileList.action?type=limited"
 
     
-    def run(app_identifier, type, cert_name = nil, force = false, cert_date = nil)
-      cert = maintain_app_certificate(app_identifier, type, force, cert_date)
+    def run(app_identifier, type, cert_name = nil, force = false)
+      cert = maintain_app_certificate(app_identifier, type, force)
       
       type_name = type
       type_name = "Distribution" if type == APPSTORE # both enterprise and App Store
@@ -24,7 +25,7 @@ module FastlaneCore
       return output_path
     end
 
-    def maintain_app_certificate(app_identifier, type, force, cert_date)
+    def maintain_app_certificate(app_identifier, type, force)
       begin
         if type == DEVELOPMENT 
           visit PROFILES_URL_DEV
@@ -55,13 +56,13 @@ module FastlaneCore
             # We found the correct certificate
             if force && type != DEVELOPMENT
               provisioningProfileId = current_cert['provisioningProfileId']
-              renew_profile(provisioningProfileId, type, cert_date) # This one needs to be forcefully renewed
-              return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
+              renew_profile(provisioningProfileId, type) # This one needs to be forcefully renewed
+              return maintain_app_certificate(app_identifier, type, false) # recursive
             elsif current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif ['Expired', 'Invalid'].include? current_cert['status']
-              renew_profile(current_cert['provisioningProfileId'], type, cert_date) # This one needs to be renewed
-              return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
+              renew_profile(current_cert['provisioningProfileId'], type) # This one needs to be renewed
+              return maintain_app_certificate(app_identifier, type, false) # recursive
             end
 
             break
@@ -70,18 +71,18 @@ module FastlaneCore
 
         Helper.log.info "Could not find existing profile. Trying to create a new one."
         # Certificate does not exist yet, we need to create a new one
-        create_profile(app_identifier, type, cert_date)
+        create_profile(app_identifier, type)
         # After creating the profile, we need to download it
-        return maintain_app_certificate(app_identifier, type, false, cert_date) # recursive
+        return maintain_app_certificate(app_identifier, type, false) # recursive
 
       rescue => ex
         error_occured(ex)
       end
     end
 
-    def create_profile(app_identifier, type, cert_date)
+    def create_profile(app_identifier, type)
       Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificates = code_signing_certificates(type, cert_date)
+      certificates = code_signing_certificates(type)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
@@ -164,8 +165,8 @@ module FastlaneCore
       wait_for_elements('.row-details')
     end
 
-    def renew_profile(profile_id, type, cert_date)
-      certificate = code_signing_certificates(type, cert_date).first
+    def renew_profile(profile_id, type)
+      certificate = code_signing_certificates(type).first
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
