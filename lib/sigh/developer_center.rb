@@ -178,6 +178,14 @@ module FastlaneCore
       certs = all(:xpath, "//input[@type='radio' and @value='#{certificate["certificateId"]}']")
       if certs.count == 1
         certs.first.click
+
+        if type != APPSTORE
+          # Add all devices
+          wait_for_elements('.selectAll.column')
+          sleep 3
+          first(:xpath, "//div[@class='selectAll column']/input").click # select all the devices
+        end
+
         click_next
 
         wait_for_elements('.row-details')
