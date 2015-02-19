@@ -70,7 +70,7 @@ In the gif I used `cert && sigh`, which will first create an iOS code signing ce
 
     cert
 
-This will check if any of the available signing certificates is installed.  
+This will check if any of the available signing certificates is installed on your local machine.
 
 Only if a new certificate needs to be created, `cert` will
 
