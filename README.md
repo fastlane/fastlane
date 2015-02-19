@@ -117,9 +117,9 @@ To save the provisioning profile under a specific name, use the -f option:
 
     sigh -a com.krausefx.app -u username -f "myProfile.mobileprovision"
 
-If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime:
+If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime. `--force` will also add all available devices to this profile.
 
-    sigh --force -a com.krausefx.app -u username
+    sigh --force
 
 By default, ```sigh``` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
