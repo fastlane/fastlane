@@ -144,15 +144,30 @@ snapshot
 To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
 
 #### [sigh](https://github.com/KrauseFx/sigh)
-This will generate and download your App Store provisioning profile. ```sigh``` will store the generated profile in the ```./fastlane``` folder.
+This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the `./fastlane` folder.
+
 ```ruby
 sigh
 ```
 
 To use the Ad Hoc profile instead
+
 ```ruby
 sigh :adhoc
 ```
+
+To always re-generate the provisioning profile, use `sigh :force`.
+
+#### [cert](https://github.com/KrauseFx/cert)
+
+The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/KrauseFx/cert).
+
+```ruby
+cert
+sigh :force
+```
+
+`fastlane` will automatically pass the signing certificate to use to `sigh`.
 
 #### [produce](https://github.com/KrauseFx/produce)
 
