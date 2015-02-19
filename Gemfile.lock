@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sigh (0.3.3)
+    sigh (0.3.4)
       fastlane_core
 
 GEM
@@ -23,16 +23,16 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    credentials_manager (0.1.2)
+    credentials_manager (0.1.3)
       colored
-      highline (~> 1.6.21)
-      security (~> 0.1.3)
+      highline
+      security
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastlane_core (0.1.0)
+    fastlane_core (0.1.3)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.3.0)
+      commander (>= 4.1.0)
       credentials_manager
       highline (~> 1.6.21)
       json
