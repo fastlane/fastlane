@@ -3,8 +3,8 @@ PATH
   specs:
     credentials_manager (0.1.2)
       colored
-      highline (~> 1.6.21)
-      security (~> 0.1.3)
+      highline
+      security
 
 GEM
   remote: https://rubygems.org/

@@ -16,8 +16,6 @@ module CredentialsManager
       nil
     end
 
-
-
     def initialize(path = nil)
       path ||= self.class.default_path      
 
@@ -33,6 +31,8 @@ module CredentialsManager
       @data ||= {}
     end
 
+    # Setters
+
     def app_identifier(value)
       value ||= yield if block_given?
       data[:app_identifier] = value if value
@@ -41,6 +41,16 @@ module CredentialsManager
     def apple_id(value)
       value ||= yield if block_given?
       data[:apple_id] = value if value
+    end
+
+    def team_id(value)
+      value ||= yield if block_given?
+      data[:team_id] = value if value
+    end
+
+    def team_name(value)
+      value ||= yield if block_given?
+      data[:team_name] = value if value
     end
   end
 end
