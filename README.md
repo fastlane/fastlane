@@ -11,7 +11,8 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a>
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
+  <a href="https://github.com/KrauseFx/cert">cert</a> 
 </p>
 -------
 
@@ -303,6 +304,7 @@ clear_previous_screenshots
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
