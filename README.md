@@ -11,7 +11,8 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <b>sigh</b> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a>
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
+  <a href="https://github.com/KrauseFx/cert">cert</a> 
 </p>
 -------
 
@@ -167,6 +168,7 @@ In case you prefer environment variables:
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
