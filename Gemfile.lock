@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pem (0.3.4)
+    pem (0.3.5)
       fastlane_core
 
 GEM
@@ -29,10 +29,10 @@ GEM
       security (~> 0.1.3)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastlane_core (0.1.0)
+    fastlane_core (0.1.2)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.3.0)
+      commander (>= 4.1.0)
       credentials_manager
       highline (~> 1.6.21)
       json
