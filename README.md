@@ -36,6 +36,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 -------
 <p align="center">
     <a href="#installation">Installation</a> &bull; 
+    <a href="#why">Why?</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
     <a href="#how-does-it-work">How does it work?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
@@ -54,6 +55,14 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 Make sure, you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
+
+# Why?
+
+Please check out [this guide](https://github.com/KrauseFx/deliver/blob/master/ManualSteps.md) to get started with a signing certificate and a provisioning profile.
+
+**After** checking out the [guide](https://github.com/KrauseFx/deliver/blob/master/ManualSteps.md), take a look at this lovely gif:
+
+![assets/cert.gif](assets/cert.gif) 
 
 # Usage
 
