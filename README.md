@@ -134,10 +134,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 
 ## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
-
-![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
-
+Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.
 
 # Need help?
 - If there is a technical problem with ```cert```, submit an issue.
