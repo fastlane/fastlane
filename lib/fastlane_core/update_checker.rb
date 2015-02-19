@@ -11,7 +11,7 @@ module FastlaneCore
       puts '#######################################################################'.green
       puts "# #{gem_name} #{v} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
-      puts "# Update using 'sudo gem update #{gem_name}'.".green
+      puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
       puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green
       puts '#######################################################################'.green
       false
