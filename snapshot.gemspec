@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency 'fastimage'
   spec.add_dependency 'fastlane_core' # all shared code and dependencies
   
 
