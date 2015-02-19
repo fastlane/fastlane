@@ -58,9 +58,9 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Why?
 
-Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md) to get started with a signing certificate and a provisioning profile.
+Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md) which shows how to manually create an iOS code signing profile and a provisioning profile using the Apple Developer Portal.
 
-**After** checking out the [guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md), take a look at this lovely gif:
+**After** checking out the [guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md), take a look how `cert` and [`sigh`](https://github.com/KrauseFx/sigh) do all that for you.
 
 ![assets/cert.gif](assets/cert.gif) 
 
