@@ -145,11 +145,18 @@ You can pass more information using the command line:
 ## Environment Variables
 In case you prefer environment variables:
 
-- ```SIGH_USERNAME```
-- ```SIGH_APP_IDENTIFIER```
-- ```SIGH_CERTIFICATE``` (The name of the certificate to use)
-- ```SIGH_TEAM_ID``` (The Team ID, e.g. `Q2CBPK58CA`)
+- `SIGH_USERNAME`
+- `SIGH_APP_IDENTIFIER`
+- `SIGH_TEAM_ID` (The Team ID, e.g. `Q2CBPK58CA`)
 - `SIGH_DISABLE_OPEN_ERROR` - in case of error, `sigh` won't open Preview with a screenshot of the error when this variable is set.
+
+Choose signing certificate to use:
+
+- `SIGH_CERTIFICATE` (The name of the certificate to use)
+- `SIGH_CERTIFICATE_ID` (The ID of the certificate)
+- `SIGH_CERTIFICATE_EXPIRE_DATE` (The expire date of the certificate)
+
+If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fastlane](https://github.com/KrauseFx/fastlane) the signing certificate will automatically be selected for you.
 
 # How does it work?
 
