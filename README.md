@@ -11,7 +11,8 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a>
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
+  <a href="https://github.com/KrauseFx/cert">cert</a>
 </p>
 -------
 
