@@ -7,6 +7,8 @@ require 'produce/developer_center'
 require 'produce/itunes_connect'
 require 'produce/available_default_languages'
 
+require 'fastlane_core'
+
 module Produce
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
