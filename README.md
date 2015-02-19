@@ -11,6 +11,7 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
+  <a href="https://github.com/KrauseFx/cert">cert</a> 
   <b>produce</b>
 </p>
 -------
@@ -126,6 +127,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 
 # Need help?
 - If there is a technical problem with `produce`, submit an issue.
