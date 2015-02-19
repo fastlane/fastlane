@@ -158,7 +158,8 @@ module FastlaneCore
 
       # 5) Choose a profile name
       wait_for_elements('.distributionType')
-      profile_name = [app_identifier, type].join(' ')
+      profile_name = ENV["SIGH_PROVISIONING_PROFILE_NAME"]
+      profile_name ||= [app_identifier, type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
       click_next
       wait_for_elements('.row-details')
