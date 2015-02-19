@@ -238,7 +238,7 @@ More information about the available options can be found in the [HockeyApp Docs
 #### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
 crashlytics({
-  crashlytics_path: './path', # path to your 'Crashlytics.framework'
+  crashlytics_path: './Crashlytics.framework', # path to your 'Crashlytics.framework'
   api_token: '...',
   build_secret: '...',
   ipa_path: './app.ipa'
