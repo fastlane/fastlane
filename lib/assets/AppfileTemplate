@@ -1,2 +1,7 @@
 app_identifier "[[APP_IDENTIFIER]]"
 apple_id "[[APPLE_ID]]"
+
+# You can uncomment the lines below and add your own 
+# team selection in case you're in multiple teams
+# team_name "Felix Krause"
+# team_id "Q2CBPJ58CA"
