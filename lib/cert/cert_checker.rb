@@ -6,9 +6,6 @@ module Cert
 
       ids = installed_identies
       finger_print = sha1_fingerprint(path)
-      
-      puts ids
-      puts finger_print.green
 
       return ids.include?finger_print
     end
