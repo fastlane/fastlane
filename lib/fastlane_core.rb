@@ -7,6 +7,7 @@ require 'fastlane_core/core_ext/string'
 
 # Third Party code
 require 'colored'
+require 'babosa'
 
 module FastlaneCore
 
