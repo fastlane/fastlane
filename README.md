@@ -475,13 +475,19 @@ error do |lane, exception|
 end
 ```
 
-#### Set Team ID for all tools
+#### Set Team ID/Name for all tools
 
 To set a team ID for `sigh`, `PEM` and the other tools, add this code to your `before_all` block:
 
 ```ruby
 team_id "Q2CBPK58CA"
+
+# or
+
+team_name "Felix Krause"
 ```
+
+Alternatively you can add this information to your `fastlane/Appfile`.
 
 #### Snapshot
 To skip cleaning the project on every build:
