@@ -12,6 +12,7 @@ module Fastlane
         type = FastlaneCore::DeveloperCenter::APPSTORE
         type = FastlaneCore::DeveloperCenter::ADHOC if params.include? :adhoc
         type = FastlaneCore::DeveloperCenter::DEVELOPMENT if params.include? :development
+        force = params.include? :force
 
         return type if Helper.test?
 
@@ -19,7 +20,7 @@ module Fastlane
         raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
         CredentialsManager::PasswordManager.shared_manager(ENV['SIGH_USERNAME']) if ENV['SIGH_USERNAME']
-        path = FastlaneCore::DeveloperCenter.new.run(app, type)
+        path = FastlaneCore::DeveloperCenter.new.run(app, type, nil, force)
         output_path = File.expand_path(File.join('.', File.basename(path)))
         FileUtils.mv(path, output_path)
         Helper.log.info "Exported provisioning profile to '#{output_path}'".green
