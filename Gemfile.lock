@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     fastlane_core (0.1.3)
+      babosa
       capybara (~> 2.4.3)
       colored
       commander (>= 4.1.0)
