@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     fastlane_core (0.1.3)
+      babosa
       capybara (~> 2.4.3)
       colored
       commander (>= 4.1.0)
@@ -16,6 +17,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.7)
+    babosa (1.0.2)
     capybara (2.4.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -82,9 +84,9 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.5.1)
+    websocket-driver (0.5.2)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.1)
+    websocket-extensions (0.1.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.6)
