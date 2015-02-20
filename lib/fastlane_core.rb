@@ -6,7 +6,6 @@ require 'fastlane_core/languages'
 
 # Third Party code
 require 'colored'
-require 'babosa'
 
 module FastlaneCore
 

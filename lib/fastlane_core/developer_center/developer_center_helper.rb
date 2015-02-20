@@ -1,3 +1,5 @@
+require 'babosa'
+
 module FastlaneCore
   class DeveloperCenter
     # Download a file from the dev center, by using a HTTP client. This will return the content of the file
