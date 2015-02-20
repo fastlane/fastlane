@@ -123,7 +123,7 @@ Here a few links to get started:
 # Quick Start
 
 - Run ```snapshot init``` in your project folder
-- Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
+- Profile your app in Xcode (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
 - This will get you started. Copy the generated code into ```./snapshot.js```. Make sure, you leave the import statement on the top.
 - To take a screenshot, use ```captureLocalizedScreenshot('0-name')```
 
