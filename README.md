@@ -472,7 +472,7 @@ lane :beta do
   deliver :beta
   hockey({
     api_token: '...',
-    ipa: './app.ipa'
+    ipa: './app.ipa' # optional
   })
 end
 
