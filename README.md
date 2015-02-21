@@ -156,7 +156,9 @@ Choose signing certificate to use:
 - `SIGH_CERTIFICATE_ID` (The ID of the certificate)
 - `SIGH_CERTIFICATE_EXPIRE_DATE` (The expire date of the certificate)
 
-If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fastlane](https://github.com/KrauseFx/fastlane) the signing certificate will automatically be selected for you.
+If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fastlane](https://github.com/KrauseFx/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
+
+`sigh` will store the `UDID` of the generated provisioning profile in the environment: `SIGH_UDID`.
 
 # How does it work?
 

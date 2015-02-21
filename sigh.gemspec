@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core' # all shared code and dependencies
+  spec.add_dependency 'plist', '~> 3.1.0' # for reading the provisioning profile
 
   # Development only
   spec.add_development_dependency 'bundler'

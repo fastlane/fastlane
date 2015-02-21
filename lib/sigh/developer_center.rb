@@ -22,7 +22,15 @@ module FastlaneCore
       output_path = File.join(TMP_FOLDER, cert_name)
       File.write(output_path, cert)
 
+      store_provisioning_id_in_environment(output_path) unless ENV["SIGH_SKIP_ANALYSER"]
+
       return output_path
+    end
+
+    def store_provisioning_id_in_environment(path)
+      require 'sigh/profile_analyser'
+      udid = Sigh::ProfileAnalyser.run(path)
+      ENV["SIGH_UDID"] = udid if udid
     end
 
     def maintain_app_certificate(app_identifier, type, force)
