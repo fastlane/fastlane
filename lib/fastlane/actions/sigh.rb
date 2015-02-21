@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       SIGH_PROFILE_PATH = :SIGH_PROFILE_PATH
+      SIGH_UDID = :SIGH_UDID
     end
 
     class SighAction
@@ -26,7 +27,8 @@ module Fastlane
         Helper.log.info "Exported provisioning profile to '#{output_path}'".green
         Actions.sh "open '#{output_path}'" unless params.include? :skip_install
 
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = output_path # absolute URL
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = output_path # absolute path
+        Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
       end
     end
   end
