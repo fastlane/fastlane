@@ -12,7 +12,8 @@
   <a href="https://github.com/KrauseFx/pem">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <b>cert</b>
+  <b>cert</b> &bull;
+  <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
 -------
 
@@ -66,7 +67,7 @@ Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/Manua
 
 In the gif I used `cert && sigh`, which will first create an iOS code signing certificate and then a provisioning profile for your app if `cert` succeeded.
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Usage
 
@@ -134,8 +135,9 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.
