@@ -66,6 +66,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 To automate iOS Push profiles you can use [PEM](https://github.com/KrauseFx/PEM).
 
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+
 ### Why not let Xcode do the work?
 
 - ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
@@ -178,6 +180,8 @@ If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fa
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
