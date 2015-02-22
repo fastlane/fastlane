@@ -3,7 +3,7 @@ PATH
   specs:
     deliver (0.7.10)
       fastimage (~> 1.6.3)
-      fastlane_core
+      fastlane_core (>= 0.1.4)
       nokogiri (~> 1.6.5)
       plist (~> 3.1.0)
       prawn
@@ -28,18 +28,18 @@ GEM
       highline (~> 1.6.11)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    credentials_manager (0.1.2)
+    credentials_manager (0.1.3)
       colored
-      highline (~> 1.6.21)
-      security (~> 0.1.3)
+      highline
+      security
     diff-lcs (1.2.5)
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane_core (0.1.0)
+    fastlane_core (0.1.4)
       capybara (~> 2.4.3)
       colored
-      commander (~> 4.3.0)
+      commander (>= 4.1.0)
       credentials_manager
       highline (~> 1.6.21)
       json
@@ -98,9 +98,9 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.5.1)
+    websocket-driver (0.5.2)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.1)
+    websocket-extensions (0.1.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.6)

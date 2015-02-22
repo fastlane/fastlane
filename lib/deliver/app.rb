@@ -37,12 +37,12 @@ module Deliver
       
       if apple_id and not app_identifier
         # Fetch the app identifier based on the given Apple ID
-        self.app_identifier = Deliver::ItunesSearchApi.fetch_bundle_identifier(apple_id)
+        self.app_identifier = FastlaneCore::ItunesSearchApi.fetch_bundle_identifier(apple_id)
       elsif app_identifier and not apple_id
         # Fetch the Apple ID based on the given app identifier
         begin
-          self.apple_id = Deliver::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
-        rescue
+          self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+        rescue Exception
           unless Helper.is_test?
             Helper.log.info "Could not find Apple ID based on the app identifier in the US App Store. Maybe the app is not yet in the store?".yellow
             Helper.log.info "You can provide the Apple ID of your app using `apple_id '974739333'` in your `Deliverfile`".green

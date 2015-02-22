@@ -288,7 +288,7 @@ app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
 app.itc.submit_for_review!(app)
 
-Deliver::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches public metadata
+FastlaneCore::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches public metadata
 ```
 This project is well documented, check it out on [Rubydoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
 
