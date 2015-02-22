@@ -55,6 +55,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - **Create** new apps on both iTunes Connect and the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+
 # Installation
     sudo gem install produce
 
@@ -128,6 +130,8 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
 
 # Need help?
 - If there is a technical problem with `produce`, submit an issue.
