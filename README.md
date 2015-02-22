@@ -12,7 +12,8 @@
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> 
+  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
+  <a href="https://github.com/KrauseFx/codes">codes</a> 
 </p>
 -------
 
@@ -55,7 +56,7 @@ Put a gorgeous device frame around your iOS screenshots just by running one simp
 - Portrait and Landscape
 - Black and Silver devices
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 Here is a nice gif, that shows ```frameit``` in action:
 
@@ -113,8 +114,9 @@ To run the setup process again to add new frames use:
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Generate screenshots
 Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
