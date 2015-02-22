@@ -35,6 +35,8 @@ module Fastlane
         require 'slack-notifier'
 
         color = (options[:success] ? 'good' : 'danger')
+        options[:message] = options[:message].to_s
+        
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
         url = ENV['SLACK_URL']

@@ -73,7 +73,10 @@ module Fastlane
       end
 
       if class_ref && class_ref.respond_to?(:run)
-        Helper.log.info "Step: #{method_sym.to_s}".green
+        line = "----------" + ("-" * method_sym.to_s.length) + "----"
+        Helper.log.info line.green
+        Helper.log.info "--- Step: #{method_sym.to_s} ---".green
+        Helper.log.info line.green
 
         Dir.chdir('..') do # go up from the fastlane folder, to the project folder
           Actions.execute_action(method_sym) do
