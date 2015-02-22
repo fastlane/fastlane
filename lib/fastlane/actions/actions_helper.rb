@@ -55,19 +55,19 @@ module Fastlane
 
       result = ''
       unless Helper.test?
-
-        PTY.spawn(command) do |stdin, _stdout, pid|
-          stdin.each do |line|
+        exit_status = nil
+        status = IO.popen(command, err: [:child, :out]) do |io|
+          io.each do |line|
             Helper.log.info ['[SHELL OUTPUT]', line.strip].join(': ')
             result << line
           end
-
-          Process.wait(pid)
+          io.close
+          exit_status = $?.to_i
         end
 
-        if $CHILD_STATUS.exitstatus.to_i != 0
+        if exit_status != 0
           # this will also append the output to the exception (for the Jenkins reports)
-          fail "Exit status of command '#{command}' was #{$CHILD_STATUS.exitstatus.to_s} instead of 0. \n#{result}"
+          fail "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
         end
       else
         result << command # only for the tests

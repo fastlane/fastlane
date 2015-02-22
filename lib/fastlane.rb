@@ -1,23 +1,23 @@
-require 'json'
+require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/version'
 require 'fastlane/fast_file'
-require 'fastlane/helper'
 require 'fastlane/dependency_checker'
 require 'fastlane/runner'
 require 'fastlane/setup'
 require 'fastlane/fastlane_folder'
-require 'fastlane/update_checker'
 require 'fastlane/junit_generator'
 require 'fastlane/lane_manager'
 require 'fastlane/actions/actions_helper'
+
+require 'fastlane_core'
 
 # Third Party code
 require 'colored'
 
 module Fastlane
-  TMP_FOLDER = '/tmp/fastlane/'
+  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
-  UpdateChecker.verify_latest_version
+  FastlaneCore::UpdateChecker.verify_latest_version('fastlane', Fastlane::VERSION)
 
   Fastlane::Actions.load_default_actions
 
