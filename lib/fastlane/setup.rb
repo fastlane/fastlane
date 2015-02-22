@@ -37,7 +37,7 @@ module Fastlane
     end
 
     def files_to_copy
-      ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'SnapshotHelper.js', 'screenshots']
+      ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'snapshot-iPad.js', 'SnapshotHelper.js', 'screenshots']
     end
 
     def copy_existing_files
