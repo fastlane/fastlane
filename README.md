@@ -92,6 +92,8 @@ This gem automatically switches the language and device type and runs the automa
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
 - You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script.
 - You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
+- Easy verification that localizations fit into labels on all screen dimensions
+- Easy verification for translators (without an iDevice) that translations do make sense in real App context
 
 ###Why use ```snapshot``` instead of....
 
