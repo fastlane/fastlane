@@ -12,7 +12,8 @@
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
-  <a href="https://github.com/KrauseFx/cert">cert</a> 
+  <a href="https://github.com/KrauseFx/cert">cert</a> &bull; 
+  <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
 -------
 
@@ -61,7 +62,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
 - Upload new builds to the new Apple TestFlight
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Installation
 
@@ -324,8 +325,9 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Available language codes
 ```ruby
