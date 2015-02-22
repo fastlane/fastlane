@@ -61,7 +61,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
 - Upload new builds to the new Apple TestFlight
 
-##### [Get informed about new tools and features](https://tinyletter.com/krausefx).
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
 
 # Installation
 
