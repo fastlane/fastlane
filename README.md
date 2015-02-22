@@ -76,8 +76,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - ```snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
-After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
 
+After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
 
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
@@ -305,6 +306,8 @@ clear_previous_screenshots
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+
+##### [Get informed about new tools and features](https://tinyletter.com/krausefx)
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
