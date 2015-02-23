@@ -8,7 +8,8 @@
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
-  <a href="https://github.com/KrauseFx/cert">cert</a> 
+  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
+  <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
 -------
 
@@ -55,6 +56,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
 
 ##### Take a look at the [fastlane website](http://fastlane.tools) for more information about why and when to use `fastlane`.
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Installation
 
@@ -198,7 +201,10 @@ ipa({
 })
 ```
 
+The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood. 
+
 The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To also use it in `deliver` update your `Deliverfile`:
+
 
 ```ruby
 ipa ENV["IPA_OUTPUT_PATH"]
@@ -431,6 +437,9 @@ Save and run. The result should look like this:
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Advanced
 #### Lane Context
