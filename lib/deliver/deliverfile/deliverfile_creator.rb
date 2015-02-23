@@ -1,5 +1,6 @@
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
+require 'deliver/itunes_connect/itunes_connect'
 
 module Deliver
   # Helps new user quickly adopt Deliver
@@ -45,8 +46,6 @@ module Deliver
       example.gsub!("[[APP_NAME]]", project_name)
       File.write(path, example)
 
-      FileUtils.mkdir_p './screenshots/'
-
       puts "Successfully created new Deliverfile at '#{path}'".green
     end
 
@@ -62,6 +61,9 @@ module Deliver
       file_path = [deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
       json = generate_deliver_file(app, deliver_path, project_name)
       File.write(file_path, json)
+
+      FileUtils.mkdir_p './screenshots/'
+      ItunesConnect.new.download_existing_screenshots(app)
       
       puts "Successfully created new Deliverfile at '#{file_path}'".green
     end
