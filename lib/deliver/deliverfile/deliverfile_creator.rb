@@ -63,7 +63,11 @@ module Deliver
       File.write(file_path, json)
 
       FileUtils.mkdir_p './screenshots/'
-      ItunesConnect.new.download_existing_screenshots(app)
+      begin
+        ItunesConnect.new.download_existing_screenshots(app)
+      rescue
+        Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
+      end
       
       puts "Successfully created new Deliverfile at '#{file_path}'".green
     end
