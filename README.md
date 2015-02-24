@@ -30,13 +30,9 @@ sigh
 
 ###### Because you would rather spend your time building stuff than fighting provisioning
 
-Tired of manually creating, renewing and downloading your iOS provisioning profiles?
-
-```sigh``` handles all that for you. Just run ```sigh``` and it will do the rest.
+`sigh` can create, renew, download and repair provisioning profiles (with one command). It supports App Store, Ad Hoc, Development and Enterprise profiles and supports nice features, like auto-adding all test devices.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
-
-
 
 -------
 <p align="center">
