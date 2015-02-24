@@ -3,7 +3,7 @@ require 'open-uri'
 module FastlaneCore  
   # For all the information reading (e.g. version number)
   class ItunesConnect
-    ALL_INFORMATION_URL = "https://itunesconnect.apple.com//WebObjects/iTunesConnect.woa/ra/apps/version/"
+    ALL_INFORMATION_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/"
 
     # This method will download all existing app screenshots
     # @param app (Deliver::App) the app you want this information from
@@ -11,6 +11,8 @@ module FastlaneCore
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
     def download_existing_screenshots(app)
+      languages = JSON.parse(File.read(File.join(Helper.gem_path('deliver'), "lib", "assets", "DeliverLanguageMapping.json")))
+
       begin
         verify_app(app)
 
@@ -24,21 +26,25 @@ module FastlaneCore
         raise "Could not fetch previously uploaded screenshots" unless response
 
         data = JSON.parse(response)
+        screenshots = data['data']['details']['value'].each do |language_values|
+          language_code = languages.find { |a| a['name'] == language_values['language'] }
+          unless language_code
+            Helper.log.error "Could not find language information for language #{language_values['language']}".red
+            next
+          end
+          language_code = language_code['locale']
 
-        # TODO: instead of .first, it should iterate through all langauges!
-        screenshots = data['data']['details']['value'].first['screenshots']['value']
+          language_values['screenshots']['value'].each do |type, value|
+            value['value'].each do |screenshot|
+              url = screenshot['value']['url']
+              file_name = [screenshot['value']['sortOrder'], type, screenshot['value']['originalFileName']].join("_")
+              Helper.log.info "Downloading existing screenshot '#{file_name}' of device type: '#{type}'"
 
-        screenshots.each do |type, value|
-          value['value'].each do |screenshot|
-            url = screenshot['value']['url']
-            file_name = [screenshot['value']['sortOrder'], type, screenshot['value']['originalFileName']].join("_")
-            Helper.log.info "Downloading screenshot '#{file_name}' of device type: '#{type}'"
-            language = "en-US" # TODO 
-
-            containing_folder = File.join(".", "screenshots", language)
-            FileUtils.mkdir_p containing_folder
-            path = File.join(containing_folder, file_name)
-            File.write(path, open(url).read)
+              containing_folder = File.join(".", "screenshots", language_code)
+              FileUtils.mkdir_p containing_folder rescue nil # if it's already there
+              path = File.join(containing_folder, file_name)
+              File.write(path, open(url).read)
+            end
           end
         end
       rescue Exception => ex

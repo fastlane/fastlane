@@ -62,12 +62,7 @@ describe Deliver do
       correct.gsub!("[[APPLE_ID]]", apple_id.to_s)
       expect(File.read("/tmp/Deliverfile")).to eq(correct)
 
-      expect(File.directory?([deliver_path, "screenshots"].join("/"))).to eq(true)
-      expect(File.directory?([deliver_path, "screenshots", "de-DE"].join("/"))).to eq(true)
-      expect(File.directory?([deliver_path, "screenshots", "en-US"].join("/"))).to eq(true)
-      expect(File.directory?([deliver_path, "screenshots", "en-AU"].join("/"))).to eq(false)
-
-      expect(File.read("/tmp/deliver/screenshots/README.txt")).to eq(File.read("./lib/assets/ScreenshotsHelp"))
+      expect(File.read("/tmp/screenshots/README.txt")).to eq(File.read("./lib/assets/ScreenshotsHelp"))
     end
   end
 end

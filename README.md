@@ -129,8 +129,6 @@ The guide will create all the necessary files for you, using the existing app me
  - Enjoy a good drink, while the computer does all the work for you
 - When it's a new app: ```n```
 
-Copy your screenshots into the ```deliver/screenshots/[language]``` folders (see [Available language codes](#available-language-codes))
-
 From now on, you can run ```deliver``` to deploy a new update, or just upload new app metadata and screenshots.
 
 ### Customize the ```Deliverfile```
