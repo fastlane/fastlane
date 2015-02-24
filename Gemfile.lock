@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.7.10)
+    deliver (0.7.11)
       fastimage (~> 1.6.3)
       fastlane_core (>= 0.1.4)
       nokogiri (~> 1.6.5)
@@ -13,6 +13,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.7)
+    babosa (1.0.2)
     capybara (2.4.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -37,6 +38,7 @@ GEM
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
     fastlane_core (0.1.4)
+      babosa
       capybara (~> 2.4.3)
       colored
       commander (>= 4.1.0)
