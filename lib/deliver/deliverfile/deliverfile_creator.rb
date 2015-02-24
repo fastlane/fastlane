@@ -1,5 +1,6 @@
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
+require 'deliver/itunes_connect/itunes_connect'
 
 module Deliver
   # Helps new user quickly adopt Deliver
@@ -45,8 +46,6 @@ module Deliver
       example.gsub!("[[APP_NAME]]", project_name)
       File.write(path, example)
 
-      FileUtils.mkdir_p './screenshots/'
-
       puts "Successfully created new Deliverfile at '#{path}'".green
     end
 
@@ -62,16 +61,28 @@ module Deliver
       file_path = [deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
       json = generate_deliver_file(app, deliver_path, project_name)
       File.write(file_path, json)
+
+      FileUtils.mkdir_p './screenshots/'
+      begin
+        Helper.log.info "Downloading all previously used app screenshots.".green
+        ItunesConnect.new.download_existing_screenshots(app)
+      rescue
+        Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
+      end
+
+      # Add a README to the screenshots folder
+      FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
+      File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
       
-      puts "Successfully created new Deliverfile at '#{file_path}'".green
+      Helper.log.info "Successfully created new Deliverfile at '#{file_path}'".green
     end
 
     private
       # This method takes care of creating a new 'deliver' folder, containg the app metadata 
       # and screenshots folders
       def self.generate_deliver_file(app, path, project_name)
-        metadata_path = "#{path}/deliver/"
-        FileUtils.mkdir_p metadata_path
+        metadata_path = File.join(path, 'deliver')
+        FileUtils.mkdir_p metadata_path rescue nil # never mind if it's already there
 
         json = create_json_based_on_xml(app, metadata_path)
 
@@ -79,14 +90,11 @@ module Deliver
           json[key].delete(:version_whats_new)
         end
         
-        meta_path = "#{metadata_path}metadata.json"
+        meta_path = File.join(metadata_path, "metadata.json")
         File.write(meta_path, JSON.pretty_generate(json))
         puts "Successfully created new metadata JSON file at '#{meta_path}'".green
 
         gem_path = Helper.gem_path('deliver')
-
-        # Add a README to the screenshots folder
-        File.write("#{metadata_path}screenshots/README.txt", File.read("#{gem_path}/lib/assets/ScreenshotsHelp"))
 
         # Generate the final Deliverfile here
         deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
@@ -112,9 +120,6 @@ module Deliver
           end
 
           json[locale] = current
-
-          # Create an empty folder for the screenshots too
-          FileUtils.mkdir_p "#{path}screenshots/#{locale}/"
         end
 
         return json
