@@ -232,9 +232,13 @@ ios_version "9.0"
 ```
 
 ### Custom Args for the build command
-
+Use the ```custom_args``` directive to prepend custom statements to the build command.
 ```ruby
 custom_args "GCC_PREPROCESSOR_DEFINITIONS='SCREENSHOTS'"
+```
+Add a ```custom_build_args``` line to your ```Snapfile``` to add custom arguments to the build command.
+```ruby
+custom_build_args "-configuration release"
 ```
 
 ### Custom Build Command
@@ -247,8 +251,8 @@ build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROO
 ```
 
 ### Custom callbacks to prepare your app
-Run your own script when ```snapshot``` switches the simulator type or the language. 
-This can be used to 
+Run your own script when ```snapshot``` switches the simulator type or the language.
+This can be used to
 - Logout the user
 - Reset all user defaults
 - Pre-fill the database

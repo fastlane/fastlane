@@ -59,6 +59,8 @@ module Snapshot
         proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
 
         pre_command = SnapshotConfig.shared_instance.custom_args || ENV["SNAPSHOT_CUSTOM_ARGS"] || ''
+        custom_build_args = SnapshotConfig.shared_instance.custom_build_args || ENV["SNAPSHOT_CUSTOM_BUILD_ARGS"] || ''
+        
         build_command = pre_command + ' ' + (DependencyChecker.xctool_installed? ? 'xctool' : 'xcodebuild')
 
         actions = []
@@ -74,6 +76,7 @@ module Snapshot
           "DSTROOT='#{BUILD_DIR}'",
           "OBJROOT='#{BUILD_DIR}'",
           "SYMROOT='#{BUILD_DIR}'",
+          custom_build_args,
           actions.join(' ')
         ].join(' ')
       end

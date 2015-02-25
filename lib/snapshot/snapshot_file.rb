@@ -47,6 +47,9 @@ module Snapshot
         when :custom_args
           raise "custom_args has to be an String".red unless value.kind_of?String
           @config.custom_args = value
+        when :custom_build_args
+          raise "custom_build_args has to be an String".red unless value.kind_of?String
+          @config.custom_build_args = value
         when :skip_alpha_removal
           @config.skip_alpha_removal = true
         when :clear_previous_screenshots
