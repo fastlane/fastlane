@@ -36,6 +36,9 @@ module Snapshot
 
     # @return (String) This will be prepended before the actual build command
     attr_accessor :custom_args
+    
+    # @return (String) This will be appended to the actual build command
+    attr_accessor :custom_build_args
 
     # @return (Hash) All the blocks, which are called on specific actions
     attr_accessor :blocks
