@@ -27,20 +27,22 @@ module Deliver
 
         counter = 0
         deliverer.app.metadata.information.each do |language, content|
+          modified_color = '0000AA'
+          standard_color = '000000'
+          
           title = content[:title][:value] rescue ''
 
           Helper.log.info("[PDF] Exporting locale '#{language}' for app with title '#{title}'")
 
           font_size 20
-          text "#{language}: #{title}", :fallback_fonts => pdf_fallback_fonts
+          color = (content[:title][:modified] ? modified_color : standard_color rescue standard_color)
+          text "#{language}: #{title}", :fallback_fonts => pdf_fallback_fonts, color: color
           stroke_horizontal_rule
           font_size 14
 
           move_down 30
 
           col1 = 200
-          modified_color = '0000AA'
-          standard_color = '000000'
 
           prev_cursor = cursor.to_f
           # Description on right side
