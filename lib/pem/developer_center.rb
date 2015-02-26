@@ -21,6 +21,7 @@ module FastlaneCore
         else
           Helper.log.warn "Push for app '#{app_identifier}' is disabled. This has to change."
           first(:css, '#pushEnabled').click
+          sleep 3 # this takes some time
         end
 
         Helper.log.warn "Creating push certificate for app '#{app_identifier}'."
@@ -69,6 +70,7 @@ module FastlaneCore
         click_next # "Continue"
 
         sleep 1
+
         wait_for_elements(".file-input.validate")
         wait_for_elements(".button.small.center.back")
 
