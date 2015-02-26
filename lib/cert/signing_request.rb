@@ -1,3 +1,5 @@
+require 'openssl'
+
 module Cert
   class SigningRequest
     def self.get_path
