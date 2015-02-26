@@ -311,6 +311,19 @@ Send a message to **room** (by default) or a direct message to **@username** wit
   })
 ```
 
+#### [Typetalk](https://typetalk.in/)
+Send a message to **topic** with success (:smile:) or failure (:rage:) status.
+[Using Bot's Typetalk Token](https://developer.nulab-inc.com/docs/typetalk/auth#tttoken)
+
+```ruby
+  typetalk({
+    message: "App successfully released!",
+    topicId: 1,
+    success: true,
+    typetalkToken: 'Your Typetalk Token'
+  })
+```
+
 #### [Testmunk](http://testmunk.com)
 Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
 ```ruby
