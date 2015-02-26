@@ -12,7 +12,8 @@
   <b>PEM</b> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> 
+  <a href="https://github.com/KrauseFx/cert">cert</a>  &bull;
+  <a href="https://github.com/KrauseFx/codes">codes</a> 
 </p>
 -------
 
@@ -80,7 +81,6 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-
 ```PEM``` will never revoke your existing certificates. 
 
 You can pass parameters like this:
@@ -90,6 +90,8 @@ You can pass parameters like this:
 If you want to generate a development certificate instead:
 
     pem --development
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Environment Variables
 In case you prefer environment variables:
@@ -120,6 +122,9 @@ There are 2 actions involved:
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
