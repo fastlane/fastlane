@@ -74,12 +74,15 @@ module Deliver
       dir += "/#{app.apple_id}.itmsp"
 
       Helper.log.info "Going to upload updated app to iTunesConnect"
+      Helper.log.info "This might take a few minutes, please don't interrupt the script".green
 
       command = build_upload_command(@user, @password, dir)
       result = execute_transporter(command)
 
       if result
-        Helper.log.info "Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.".green
+        Helper.log.info(("-" * 102).green)
+        Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.".green)
+        Helper.log.info(("-" * 102).green)
 
         FileUtils.rm_rf(dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
       end
@@ -183,6 +186,8 @@ module Deliver
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-f '#{source}'",
+          "-t 'Signiant'",
+          "-k 100000",
           ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
         ].join(' ')
       end
