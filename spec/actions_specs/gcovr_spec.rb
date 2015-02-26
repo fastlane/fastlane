@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Gcovr Integration" do
-
       it "works with all parameters" do
         result = Fastlane::FastFile.new.parse("lane :test do
           gcovr({
