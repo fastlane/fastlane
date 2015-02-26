@@ -12,7 +12,8 @@
   <a href="https://github.com/KrauseFx/pem">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <b>cert</b>
+  <b>cert</b> &bull;
+  <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
 -------
 
@@ -20,7 +21,7 @@
     <img src="assets/cert.png">
 </p>
 
-cert - Create new iOS signing certificates
+cert
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -65,6 +66,8 @@ Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/Manua
 ![assets/cert.gif](assets/cert.gif) 
 
 In the gif I used `cert && sigh`, which will first create an iOS code signing certificate and then a provisioning profile for your app if `cert` succeeded.
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Usage
 
@@ -132,6 +135,9 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.
