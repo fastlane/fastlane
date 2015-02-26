@@ -1,3 +1,5 @@
+require 'openssl'
+
 module PEM
   class SigningRequest
     def self.get_path
