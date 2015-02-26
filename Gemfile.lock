@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    deliver (0.7.11)
+    deliver (0.7.12)
       fastimage (~> 1.6.3)
       fastlane_core (>= 0.1.4)
       nokogiri (~> 1.6.5)
