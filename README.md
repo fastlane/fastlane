@@ -12,7 +12,8 @@
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
-  <a href="https://github.com/KrauseFx/cert">cert</a> 
+  <a href="https://github.com/KrauseFx/cert">cert</a> &bull; 
+  <a href="https://github.com/KrauseFx/codes">codes</a> 
 </p>
 -------
 
@@ -76,8 +77,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - ```snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
-After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
+After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
 
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
@@ -90,6 +92,8 @@ This gem automatically switches the language and device type and runs the automa
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
 - You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script.
 - You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
+- Easy verification that localizations fit into labels on all screen dimensions
+- Easy verification for translators (without an iDevice) that translations do make sense in real App context
 
 ###Why use ```snapshot``` instead of....
 
@@ -123,7 +127,7 @@ Here a few links to get started:
 # Quick Start
 
 - Run ```snapshot init``` in your project folder
-- Profile your app (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
+- Profile your app in Xcode (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
 - This will get you started. Copy the generated code into ```./snapshot.js```. Make sure, you leave the import statement on the top.
 - To take a screenshot, use ```captureLocalizedScreenshot('0-name')```
 
@@ -228,9 +232,13 @@ ios_version "9.0"
 ```
 
 ### Custom Args for the build command
-
+Use the ```custom_args``` directive to prepend custom statements to the build command.
 ```ruby
 custom_args "GCC_PREPROCESSOR_DEFINITIONS='SCREENSHOTS'"
+```
+Add a ```custom_build_args``` line to your ```Snapfile``` to add custom arguments to the build command.
+```ruby
+custom_build_args "-configuration release"
 ```
 
 ### Custom Build Command
@@ -243,8 +251,8 @@ build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROO
 ```
 
 ### Custom callbacks to prepare your app
-Run your own script when ```snapshot``` switches the simulator type or the language. 
-This can be used to 
+Run your own script when ```snapshot``` switches the simulator type or the language.
+This can be used to
 - Logout the user
 - Reset all user defaults
 - Pre-fill the database
@@ -305,6 +313,9 @@ clear_previous_screenshots
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
