@@ -19,10 +19,9 @@ module FastlaneCore
 
       rows = wait_for_elements(".defaultTable.ratingsTable > tbody > tr.ng-scope") # .ng-scope, since there is one empty row
 
-      if rows.count != config.count
+      if rows.count != (config.count - 1) # -1 the kids
         raise "The number of options passed in the config file does not match the number of options available on iTC!".red
       end
-
 
 
       # Setting all the values based on config file
@@ -36,6 +35,25 @@ module FastlaneCore
         radio_value = "ITC.apps.ratings.level.#{level}"
 
         row.first("td > div[radio-value='#{radio_value}']").click
+      end
+
+
+      # Apple, doing some extra thingy for the kids section
+      val = config.last['level'].to_i
+      Helper.log.info "Setting kids mode to #{val}".green
+      currently_enabled = (all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > input").last.value != "")
+      if val > 0
+        if not currently_enabled
+          all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
+        end
+
+        # Kids is enabled, check mode
+        first("select[ng-model='tempRatings.ageBand'] > option[value='#{val - 1}']").select_option # -1 since 0 is no kids mode
+      else
+        if currently_enabled
+          # disable kids mode
+          all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
+        end
       end
 
       # Check if there is a warning or error message because of this rating

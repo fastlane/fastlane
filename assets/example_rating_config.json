@@ -52,5 +52,9 @@
     "type": "boolean",
     "comment": "Gambling and Contests",
     "level": 0
+  },
+  {
+    "comment": "Made for Kids; 1 = Age < 5; 2 = Ages 6-8; 3 = Ages 9 - 11",
+    "level": 0
   }
 ]
