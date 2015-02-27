@@ -12,7 +12,7 @@ module FastlaneCore
       
       page.driver.cookies.each do |key, cookie|
         cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
-      end 
+      end
       
       data = open(url, {'Cookie' => cookieString}).read
 

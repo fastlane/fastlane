@@ -42,7 +42,8 @@ module FastlaneCore
           phantomjs: Phantomjs.path,
           phantomjs_options: conf,
           phantomjs_logger: File.open("#{TMP_FOLDER}/poltergeist_log.txt", "a"),
-          js_errors: false
+          js_errors: false,
+          timeout: 90
         })
       end
 
