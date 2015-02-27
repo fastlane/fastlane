@@ -18,7 +18,7 @@ module Fastlane
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
     def self.execute_action(step_name)
-      raise 'No block given'.red unless block_given?
+      fail 'No block given'.red unless block_given?
 
       start = Time.now
       error = nil
@@ -40,7 +40,7 @@ module Fastlane
         time: duration
         # output: captured_output
       }
-      raise exc if exc
+      fail exc if exc
     end
 
     # Execute a shell command
@@ -67,7 +67,7 @@ module Fastlane
 
         if exit_status != 0
           # this will also append the output to the exception (for the Jenkins reports)
-          raise "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
+          fail "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
         end
       else
         result << command # only for the tests
@@ -83,7 +83,7 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise 'You need to pass a valid path' unless File.exist?(path)
+      fail 'You need to pass a valid path' unless File.exist?(path)
 
       Dir[File.expand_path '*.rb', path].each do |file|
         require file
@@ -91,7 +91,6 @@ module Fastlane
         file_name = File.basename(file).gsub('.rb', '')
 
         class_name = file_name.classify + 'Action'
-        class_ref = nil
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
 
@@ -100,9 +99,9 @@ module Fastlane
           else
             Helper.log.error "Could not find method 'run' in class #{class_name}.".red
             Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
-            raise "Plugin '#{file_name}' is damaged!"
+            fail "Plugin '#{file_name}' is damaged!"
           end
-        rescue NameError => ex
+        rescue NameError
           # Action not found
           Helper.log.error "Could not find '#{class_name}' class defined.".red
           Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'

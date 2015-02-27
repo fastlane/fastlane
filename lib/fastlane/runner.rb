@@ -15,7 +15,7 @@ module Fastlane
         if blocks[key]
           return_val = blocks[key].call
         else
-          raise "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
+          fail "Could not find lane for type '#{key}'. Available lanes: #{available_lanes.join(', ')}".red
         end
 
         @after_all.call(key) if @after_all # this is only called if no exception was raised before
@@ -45,7 +45,7 @@ module Fastlane
     end
 
     def set_block(key, block)
-      raise "Lane '#{key}' was defined multiple times!".red if blocks[key]
+      fail "Lane '#{key}' was defined multiple times!".red if blocks[key]
       blocks[key] = block
     end
 

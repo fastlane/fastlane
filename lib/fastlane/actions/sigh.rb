@@ -18,7 +18,7 @@ module Fastlane
         return type if Helper.test?
 
         app = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-        raise 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
+        fail 'No app_identifier definied in `./fastlane/Appfile`'.red unless app
 
         CredentialsManager::PasswordManager.shared_manager(ENV['SIGH_USERNAME']) if ENV['SIGH_USERNAME']
         path = FastlaneCore::DeveloperCenter.new.run(app, type, nil, force)

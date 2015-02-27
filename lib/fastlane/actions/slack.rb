@@ -42,7 +42,7 @@ module Fastlane
         url = ENV['SLACK_URL']
         unless url
           Helper.log.fatal "Please add 'ENV[\"SLACK_URL\"] = \"https://hooks.slack.com/services/...\"' to your Fastfile's `before_all` section.".red
-          raise 'No SLACK_URL given.'.red
+          fail 'No SLACK_URL given.'.red
         end
 
         notifier = Slack::Notifier.new url
@@ -105,7 +105,7 @@ module Fastlane
 
         unless result.code.to_i == 200
           Helper.log.debug result
-          raise 'Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.'.red
+          fail 'Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.'.red
         else
           Helper.log.info 'Successfully sent Slack notification'.green
         end

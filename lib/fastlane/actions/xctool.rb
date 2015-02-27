@@ -3,7 +3,7 @@ module Fastlane
     class XctoolAction
       def self.run(params)
         unless Helper.test?
-          raise 'xctool not installed, please install using `brew install xctool`'.red if `which xctool`.length == 0
+          fail 'xctool not installed, please install using `brew install xctool`'.red if `which xctool`.length == 0
         end
 
         Actions.sh('xctool ' + params.join(' '))

@@ -36,15 +36,15 @@ module Fastlane
           Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
           Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green
         else
-          raise 'Error when trying to upload ipa to DeployGate'.red
+          fail 'Error when trying to upload ipa to DeployGate'.red
         end
       end
 
       def self.assert_options!(options)
-        raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
-        raise "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
-        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
+        fail "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
+        fail "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
+        fail "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
+        fail "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
       end
       private_class_method :assert_options!
 
@@ -72,14 +72,14 @@ module Fastlane
 
       def self.help_message(response)
         message =
-          case response.body['message']
+            case response.body['message']
             when 'you are not authenticated'
               'Invalid API Token specified.'
             when 'application create error: permit'
               'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
             when 'application create error: limit'
               'Plan limit: You have reached to the limit of current plan or your plan was expired.'
-          end
+            end
         Helper.log.error message.red if message
       end
       private_class_method :help_message
