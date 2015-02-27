@@ -20,7 +20,7 @@ module FastlaneCore
       rows = wait_for_elements(".defaultTable.ratingsTable > tbody > tr.ng-scope") # .ng-scope, since there is one empty row
 
       if rows.count != (config.count - 1) # -1 the kids
-        raise "The number of options passed in the config file does not match the number of options available on iTC!".red
+        raise "The number of options passed in the config file does not match the number of options available on iTC! Make sure to use the latest template from https://github.com/KrauseFx/deliver/blob/master/assets/example_rating_config.json".red
       end
 
 
