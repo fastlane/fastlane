@@ -6,30 +6,30 @@ module Fastlane
             message: nil,
             success: true,
             topicId: nil,
-            typetalkToken: nil,
+            typetalk_token: nil,
         }.merge(params.first || {})
 
-        [:message, :topicId, :typetalkToken].each { |key|
+        [:message, :topicId, :typetalk_token].each { |key|
           raise "No #{key} given.".red unless options[key]
         }
 
         emoticon = (options[:success] ? ':smile:' : ':rage:')
         message = "#{emoticon} #{options[:message].to_s}"
         topicId = options[:topicId]
-        typetalkToken = options[:typetalkToken]
+        typetalk_token = options[:typetalk_token]
 
-        self.post_to_typetalk(message, topicId, typetalkToken)
+        self.post_to_typetalk(message, topicId, typetalk_token)
 
         Helper.log.info 'Successfully sent Typetalk notification'.green
       end
 
-      def self.post_to_typetalk(message, topicId, typetalkToken)
+      def self.post_to_typetalk(message, topicId, typetalk_token)
         require 'net/http'
         require 'uri'
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topicId}")
         response = Net::HTTP.post_form(uri, {'message' => message,
-                                             'typetalkToken' => typetalkToken})
+                                             'typetalk_token' => typetalk_token})
 
         self.check_response(response)
       end

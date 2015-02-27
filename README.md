@@ -320,7 +320,7 @@ Send a message to **topic** with success (:smile:) or failure (:rage:) status.
     message: "App successfully released!",
     topicId: 1,
     success: true,
-    typetalkToken: 'Your Typetalk Token'
+    typetalk_token: 'Your Typetalk Token'
   })
 ```
 
