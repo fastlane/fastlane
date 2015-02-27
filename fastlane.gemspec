@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'shenzhen', '~> 0.11.0' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
 
-  spec.add_dependency 'fastlane_core' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '~> 0.2.0' # all shared code and dependencies
   
   spec.add_dependency 'deliver', '>= 0.5.0'
   spec.add_dependency 'snapshot', '>= 0.4.0'
