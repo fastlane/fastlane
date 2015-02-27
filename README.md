@@ -2,11 +2,11 @@
   <img src="assets/fastlane_text.png" alt="fastlane Logo" />
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull;
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
+  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a>
@@ -28,13 +28,13 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#customise-the-fastfile">Customise</a> &bull; 
-    <a href="#extensions">Extensions</a> &bull; 
-    <a href="#jenkins-integration">Jenkins</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#quick-start">Quick Start</a> &bull;
+    <a href="#customise-the-fastfile">Customise</a> &bull;
+    <a href="#extensions">Extensions</a> &bull;
+    <a href="#jenkins-integration">Jenkins</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -126,7 +126,7 @@ When one command fails, the execution will be aborted.
 There are some predefined actions you can use. If you have ideas for more, please let me know.
 
 #### [CocoaPods](http://cocoapods.org)
-Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app. 
+Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
 ```ruby
 cocoapods # this will run pod install
 ```
@@ -319,6 +319,17 @@ ENV['TESTMUNK_EMAIL'] = 'email@email.com'
 testmunk
 ```
 
+#### [gcovr](http://gcovr.com/)
+Generate summarized code coverage reports.
+
+```ruby
+gcovr({
+  html: true,
+  html_details: true,
+  output: "./code-coverage/report.html"
+})
+```
+
 #### Custom Shell Scripts
 ```ruby
 sh "./your_bash_script.sh"
@@ -349,7 +360,7 @@ end
 ```
 
 ### *error* block
-This block will get executed when an error occurs, in any of the blocks (*before_all*, the lane itself or *after_all*). 
+This block will get executed when an error occurs, in any of the blocks (*before_all*, the lane itself or *after_all*).
 ```ruby
 error do |lane, exception|
   slack({
@@ -372,7 +383,7 @@ If you think your extension can be used by other developers as well, let me know
 
 # Jenkins Integration
 
-`fastlane` automatically generates a JUnit report for you. This allows Continuous Integration systems, like `Jenkins`, access the results of your deployment. 
+`fastlane` automatically generates a JUnit report for you. This allows Continuous Integration systems, like `Jenkins`, access the results of your deployment.
 
 ## Installation
 The recommended way to install [Jenkins](http://jenkins-ci.org/) is through [homebrew](http://brew.sh/):
@@ -388,7 +399,7 @@ To store the password in the Keychain of your remote machine, I recommend runnin
 
 ## Deploy Strategy
 
-You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update. 
+You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update.
 
 You can set up your own ```Release``` job, which is only triggered manually.
 
@@ -422,7 +433,7 @@ To show the **generated screenhots** right in `Jenkins`
 - *HTML directory to archive*: `fastlane/screenshots`
 - *Index page*: `screenshots.html`
 
-Save and run. The result should look like this: 
+Save and run. The result should look like this:
 
 ![JenkinsIntegration](assets/JenkinsIntegration.png)
 
@@ -443,7 +454,7 @@ Save and run. The result should look like this:
 
 ## Advanced
 #### Lane Context
-The different actions can *communicate* with each other using a shared hash. 
+The different actions can *communicate* with each other using a shared hash.
 Access them in your scrips using:
 ```ruby
 Actions.lane_context[Actions::SharedValues::LANE_NAME] # the name of the current lane
@@ -539,7 +550,7 @@ fastlane test inhouse appstore
 Keep in mind the ```before_all``` and ```after_all``` block will be executed for each of the ```lanes```.
 
 #### Hide the `fastlane` folder
-Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder. 
+Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder.
 
 #### Select  Xcode version (e.g. Beta Version)
 If you want to use a Beta Xcode installation, you can add this to your `before_all` block.
