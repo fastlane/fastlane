@@ -7,6 +7,7 @@ require 'fastlane_core/itunes_search_api'
 
 # Third Party code
 require 'colored'
+require 'commander'
 
 module FastlaneCore
 
