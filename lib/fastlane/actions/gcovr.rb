@@ -57,8 +57,15 @@ module Fastlane
 
         # Allows for a whole variety of configurations
         if params.first.is_a? Hash
+          params_hash = params.first
+
+          # Check if an output path was given
+          if params_hash.has_key? :output
+            create_output_dir_if_not_exists(params_hash[:output])
+          end
+
           # Maps parameter hash to CLI args
-          gcovr_args = params_hash_to_cli_args(params.first)
+          gcovr_args = params_hash_to_cli_args(params_hash)
         else
           gcovr_args = params
         end
@@ -67,9 +74,18 @@ module Fastlane
         gcovr_args = gcovr_args.join(" ")
 
         command = "gcovr #{gcovr_args}"
-        Helper.log.debug command
         Helper.log.info "Generating code coverage.".green
+        Helper.log.debug command
         Actions.sh command
+      end
+
+      def self.create_output_dir_if_not_exists(output_path)
+        output_dir = File.dirname(output_path)
+
+        # If the output directory doesn't exist, create it
+        unless Dir.exists? output_dir
+          FileUtils.mkpath output_dir
+        end
       end
 
       def self.params_hash_to_cli_args(params)
