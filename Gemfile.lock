@@ -1,14 +1,15 @@
 PATH
   remote: .
   specs:
-    snapshot (0.4.10)
-      fastimage
-      fastlane_core
+    snapshot (0.4.11)
+      fastimage (~> 1.6.3)
+      fastlane_core (~> 0.2.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.7)
+    babosa (1.0.2)
     capybara (2.4.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -22,15 +23,16 @@ GEM
     colored (1.2)
     commander (4.3.0)
       highline (~> 1.6.11)
-    credentials_manager (0.1.2)
+    credentials_manager (0.1.3)
       colored
-      highline (~> 1.6.21)
-      security (~> 0.1.3)
+      highline
+      security
     diff-lcs (1.2.5)
     docile (1.1.5)
     fastimage (1.6.6)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane_core (0.1.2)
+    fastlane_core (0.2.0)
+      babosa
       capybara (~> 2.4.3)
       colored
       commander (>= 4.1.0)
@@ -81,9 +83,9 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    websocket-driver (0.5.1)
+    websocket-driver (0.5.2)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.1)
+    websocket-extensions (0.1.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.6)
