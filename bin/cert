@@ -23,6 +23,7 @@ class CertApplication
     always_trace!
 
     global_option '-u', '--username STRING', 'Your Apple ID username'
+    global_option '--development', 'Create a development certificate instead of a distribution one.'
 
     command :create do |c|
       c.syntax = 'cert create'
@@ -31,7 +32,10 @@ class CertApplication
       c.action do |args, options|
         username(options)
 
-        Cert::CertRunner.run
+        type = FastlaneCore::DeveloperCenter::DISTRIBUTION
+        type = FastlaneCore::DeveloperCenter::DEVELOPMENT if options.development
+
+        Cert::CertRunner.run(type)
 
         installed = Cert::CertChecker.is_installed?ENV["CER_FILE_PATH"]
         raise "Could not find the newly generated certificate installed" unless installed

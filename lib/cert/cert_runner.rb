@@ -1,7 +1,7 @@
 module Cert
   class CertRunner
-    def self.run
-      FastlaneCore::DeveloperCenter.new.run
+    def self.run(type)
+      FastlaneCore::DeveloperCenter.new.run(type)
     end
   end
 end
