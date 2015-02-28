@@ -301,6 +301,14 @@ If you add this line in your `Snapfile`, the previously generated screenshots wi
 clear_previous_screenshots
 ```
 
+### Completely reset all simulators
+
+    snapshot reset_simulators
+
+**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird `Instruments` problems when running `snapshot`. 
+
+You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
+
 
 # Tips
 
