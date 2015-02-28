@@ -121,6 +121,20 @@ fastlane appstore
 
 When one command fails, the execution will be aborted.
 
+### Environment Variables
+You can define environment variables in a `.env` or `.env.default` file in the same directory as your `Fastfile`. Environment variables are loading used [dotenv](https://github.com/bkeepers/dotenv)
+
+#### Example using `dotenv`
+**Filename:** .env
+```
+WORKSPACE=YourApp.xcworkspace
+HOCKEYAPP_API_TOKEN=your-hockey-api-token
+```
+
+#### Environment specific `dotenv` variables
+`fastlane` also has a `--env` option that allows loading of environment specific `dotenv` files. `.env` and `.env.default` will be loaded before environment specific `dotenv` files are loaded. The naming convention for environment specific `dotenv` files is `.env.<environment>`
+
+**Example:** `fastlane <lane-name> --env development` will load `.env`, `.env.default`, and `.env.development`
 
 ### Actions
 There are some predefined actions you can use. If you have ideas for more, please let me know.
