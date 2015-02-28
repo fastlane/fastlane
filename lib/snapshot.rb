@@ -8,6 +8,7 @@ require 'snapshot/screenshot_flatten'
 require 'snapshot/screenshot_rotate'
 require 'snapshot/simulators'
 require 'snapshot/dependency_checker'
+require 'snapshot/latest_ios_version'
 
 require 'fastlane_core'
 
