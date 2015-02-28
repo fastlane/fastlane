@@ -74,14 +74,16 @@ module FastlaneCore
         raise "Could not open Developer Center" unless result['status'] == 'success'
 
         # Already logged in
-        return true if page.has_content? "Member Center"
+        select_team if current_url.include?"selectTeam.action"
+        return true if (page.has_content? "Member Center" and not current_url.include?"selectTeam.action")
 
         (wait_for_elements(".button.blue").first.click rescue nil) # maybe already logged in
 
         (wait_for_elements('#accountpassword') rescue nil) # when the user is already logged in, this will raise an exception
 
         # Already logged in
-        return true if page.has_content? "Member Center"
+        select_team if current_url.include?"selectTeam.action"
+        return true if (page.has_content? "Member Center" and not current_url.include?"selectTeam.action")
 
         fill_in "accountname", with: user
         fill_in "accountpassword", with: password
@@ -90,7 +92,7 @@ module FastlaneCore
 
         begin
           # If the user is not on multiple teams
-          select_team if page.has_content? "Select Team"
+          select_team if current_url.include?"selectTeam.action"
         rescue => ex
           Helper.log.debug ex
           raise DeveloperCenterLoginError.new("Error loggin in user #{user}. User is on multiple teams and we were unable to correctly retrieve them.")
