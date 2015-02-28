@@ -132,7 +132,7 @@ module Deliver
     end
 
     def verify_app_on_itunesconnect
-      if @ipa and is_release_build?
+      if (@ipa and is_release_build?) or !@ipa
         # This is a real release, which should also upload the ipa file onto production
         @app.create_new_version!(@app_version) unless Helper.is_test?
         @app.metadata.verify_version(@app_version)
