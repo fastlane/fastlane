@@ -16,6 +16,8 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
+      # Mac
+      MAC = "Mac"
     end
 
     # @return [Deliver::ScreenSize] the screen size (device type)
@@ -98,6 +100,12 @@ module Deliver
           [768, 1024],
           [1536, 2008],
           [1536, 2048]
+        ],
+        ScreenSize::MAC => [
+          [1280, 800],
+          [1440, 900],
+          [2880, 1800],
+          [2560, 1600]
         ]
       }
 
@@ -110,8 +118,7 @@ module Deliver
         end
       end
 
-      error = "Unsupported screen size #{size} for path '#{path}'"
-      raise error
+      raise "Unsupported screen size #{size} for path '#{path}'".red
     end
   end
 
