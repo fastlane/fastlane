@@ -38,8 +38,9 @@ module Fastlane
     class S3Action
       def self.run(params)
         
-        unless params.first.is_a? Hash
-          return
+        params[0] ||= {}
+        unless params.first.is_a?Hash
+          raise "Please pass the required information to the s3 action." 
         end
 
         # Other things that we need
