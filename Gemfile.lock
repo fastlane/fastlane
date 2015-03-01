@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     fastlane (0.1.14)
+      aws-sdk (~> 1.0)
       cert (>= 0.1.0)
       deliver (>= 0.5.0)
       fastlane_core (~> 0.2.0)
@@ -34,7 +35,7 @@ GEM
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
     cert (0.1.0)
-      fastlane_core
+      fastlane_core (~> 0.2.0)
     cliver (0.3.2)
     codeclimate-test-reporter (0.4.7)
       simplecov (>= 0.7.1, < 1.0.0)
@@ -64,9 +65,9 @@ GEM
       multipart-post (~> 1.2.0)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
-    fastimage (1.6.6)
+    fastimage (1.6.7)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane_core (0.2.0)
+    fastlane_core (0.2.1)
       babosa
       capybara (~> 2.4.3)
       colored
@@ -166,7 +167,7 @@ GEM
     simplecov-html (0.9.0)
     slack-notifier (1.1.0)
     slop (3.6.0)
-    snapshot (0.4.11)
+    snapshot (0.4.12)
       fastimage (~> 1.6.3)
       fastlane_core (~> 0.2.0)
     terminal-table (1.4.5)
