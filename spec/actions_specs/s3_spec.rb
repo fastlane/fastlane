@@ -2,10 +2,13 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "S3 Integration" do
 
-# raise "No S3 access key given, pass using `access_key: 'key'`".red unless s3_access_key.to_s.length > 0
-# raise "No S3 secret access key given, pass using `secret_access_key: 'secret key'`".red unless s3_secret_access_key.to_s.length > 0
-# raise "No S3 bucket given, pass using `bucket: 'bucket'`".red unless s3_bucket.to_s.length > 0
-# raise "No IPA file path given, pass using `ipa: 'ipa path'`".red unless ipa_file.to_s.length > 0
+      before(:each) do
+        ENV['S3_ACCESS_KEY'] = nil
+        ENV['S3_SECRET_ACCESS_KEY'] = nil
+        ENV['S3_BUCKET'] = nil
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
+      end
 
       it "raise an error if no S3 access key was given" do
         expect {
