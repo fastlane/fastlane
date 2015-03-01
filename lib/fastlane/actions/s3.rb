@@ -189,6 +189,8 @@ module Fastlane
 
         Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH] = html_obj.public_url.to_s
         ENV[SharedValues::S3_HTML_OUTPUT_PATH.to_s] = html_obj.public_url.to_s
+
+        Helper.log.info "Successfully uploaded ipa file to '#{html_obj.public_url.to_s}'".green
       end
 
       #
