@@ -92,7 +92,7 @@ module Fastlane
         html_url = "https://s3.amazonaws.com/#{s3_bucket}/#{html_file_name}"
 
         # Creates plist from template
-        plist_template_path ||= "#{Helper.gem_path}/lib/assets/s3_plist_template.erb"
+        plist_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_plist_template.erb"
         plist_template = File.read(plist_template_path)
 
         et = ErbalT.new({
@@ -104,7 +104,7 @@ module Fastlane
         plist_render = et.render(plist_template)
 
         # Creates html from template
-        html_template_path ||= "#{Helper.gem_path}/lib/assets/s3_html_template.erb"
+        html_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_html_template.erb"
         html_template = File.read(html_template_path)
 
         et = ErbalT.new({
