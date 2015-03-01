@@ -30,6 +30,7 @@ module Fastlane
       access_key: '-a',
       secret_access_key: '-s',
       bucket: '-b',
+      region: '-r',
       acl: '--acl',
       source: '--source-dir',
       path: '-P',
@@ -49,6 +50,7 @@ module Fastlane
         params[:access_key] ||= ENV['S3_ACCESS_KEY'] || ENV['AWS_ACCESS_KEY_ID']
         params[:secret_access_key] ||= ENV['S3_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY']
         params[:bucket] ||= ENV['S3_BUCKET'] || ENV['AWS_BUCKET_NAME']
+        params[:region] ||= ENV['S3_REGION'] || ENV['AWS_REGION']
         params[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         params[:dsym] ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
         params[:path] ||= 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'
@@ -57,6 +59,7 @@ module Fastlane
         build_args = params_to_build_args(params)
 
         # Pulling parameters for other uses
+        s3_subdomain = params[:region] ? "s3-#{params[:region]}" : "s3"
         s3_access_key = params[:access_key]
         s3_secret_access_key = params[:secret_access_key]
         s3_bucket = params[:bucket]
@@ -95,8 +98,9 @@ module Fastlane
 
         # Gets URL for IPA file
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
-        ipa_url = "https://s3.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file}"
-        dsym_url = "https://s3.amazonaws.com/#{s3_bucket}/#{url_part}#{dsym_file}" if dsym_file
+        ipa_file_name = File.basename(ipa_file)
+        ipa_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file_name}"
+        dsym_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{dsym_file}" if dsym_file
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH] = ipa_url
@@ -109,10 +113,10 @@ module Fastlane
 
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title}.plist"
-        plist_url = "https://s3.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
+        plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
 
         html_file_name ||= "index.html"
-        html_url = "https://s3.amazonaws.com/#{s3_bucket}/#{html_file_name}"
+        html_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{html_file_name}"
 
         # Creates plist from template
         plist_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_plist_template.erb"

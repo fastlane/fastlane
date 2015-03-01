@@ -35,7 +35,7 @@ GEM
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
     cert (0.1.0)
-      fastlane_core (~> 0.2.0)
+      fastlane_core
     cliver (0.3.2)
     codeclimate-test-reporter (0.4.7)
       simplecov (>= 0.7.1, < 1.0.0)
