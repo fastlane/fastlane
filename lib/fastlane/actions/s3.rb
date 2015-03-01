@@ -46,9 +46,9 @@ module Fastlane
         # Other things that we need
         params = params.first
 
-        params[:access_key] ||= ENV['S3_ACCESS_KEY']
-        params[:secret_access_key] ||= ENV['S3_SECRET_ACCESS_KEY']
-        params[:bucket] ||= ENV['S3_BUCKET']
+        params[:access_key] ||= ENV['S3_ACCESS_KEY'] || ENV['AWS_ACCESS_KEY_ID']
+        params[:secret_access_key] ||= ENV['S3_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY']
+        params[:bucket] ||= ENV['S3_BUCKET'] || ENV['AWS_BUCKET_NAME']
         params[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         params[:dsym] ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
         params[:path] ||= 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'
