@@ -29,7 +29,7 @@ class FastlaneApplication
 
       c.action do |args, _options|
         if Fastlane::FastlaneFolder.path
-          Fastlane::LaneManager.cruise_lanes(args, options.env)
+          Fastlane::LaneManager.cruise_lanes(args, _options.env)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
           Fastlane::Setup.new.run if create
