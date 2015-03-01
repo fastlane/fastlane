@@ -1,0 +1,133 @@
+describe Fastlane do
+  describe Fastlane::FastFile do
+    describe "S3 Integration" do
+
+# raise "No S3 access key given, pass using `access_key: 'key'`".red unless s3_access_key.to_s.length > 0
+# raise "No S3 secret access key given, pass using `secret_access_key: 'secret key'`".red unless s3_secret_access_key.to_s.length > 0
+# raise "No S3 bucket given, pass using `bucket: 'bucket'`".red unless s3_bucket.to_s.length > 0
+# raise "No IPA file path given, pass using `ipa: 'ipa path'`".red unless ipa_file.to_s.length > 0
+
+      it "raise an error if no S3 access key was given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+            s3({})
+          end").runner.execute(:test)
+        }.to raise_error("No S3 access key given, pass using `access_key: 'key'`".red)
+      end
+
+      it "raise an error if no S3 secret access key was given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+            s3({
+              access_key: 'access_key'
+              })
+          end").runner.execute(:test)
+        }.to raise_error("No S3 secret access key given, pass using `secret_access_key: 'secret key'`".red)
+      end
+
+      it "raise an error if no S3 bucket was given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+            s3({
+              access_key: 'access_key',
+              secret_access_key: 'secret_access_key'
+              })
+          end").runner.execute(:test)
+        }.to raise_error("No S3 bucket given, pass using `bucket: 'bucket'`".red)
+      end
+
+      it "raise an error if no IPA was given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+            s3({
+              access_key: 'access_key',
+              secret_access_key: 'secret_access_key',
+              bucket: 'bucket'
+              })
+          end").runner.execute(:test)
+        }.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`".red)
+      end
+
+      it "raise an error if no IPA was given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do 
+            s3({
+              access_key: 'access_key',
+              secret_access_key: 'secret_access_key',
+              bucket: 'bucket'
+              })
+          end").runner.execute(:test)
+        }.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`".red)
+      end
+
+      it "works with required arguments" do
+
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          s3({
+              access_key: 'access_key',
+              secret_access_key: 'secret_access_key',
+              bucket: 'bucket',
+              ipa: 'ipa'
+              })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq(5) # 5 because path is defaulted
+        expect(result).to include('-a "access_key"')
+        expect(result).to include('-s "secret_access_key"')
+        expect(result).to include('-b "bucket"')
+        expect(result).to include('-f "ipa"')
+        expect(result).to include('-P "v{CFBundleShortVersionString}_b{CFBundleVersion}/"')
+
+      end
+
+      it "works with required arguments and dsym and path" do
+
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          s3({
+              access_key: 'access_key',
+              secret_access_key: 'secret_access_key',
+              bucket: 'bucket',
+              ipa: 'ipa',
+              dsym: 'dsym',
+              path: './'
+              })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq(6) # 6 because path is defaulted
+        expect(result).to include('-a "access_key"')
+        expect(result).to include('-s "secret_access_key"')
+        expect(result).to include('-b "bucket"')
+        expect(result).to include('-f "ipa"')
+        expect(result).to include('-d "dsym"')
+        expect(result).to include('-P "./"')
+
+      end
+
+      it "works with no arguments (magic variables)" do
+
+        # Environment variables
+        ENV['S3_ACCESS_KEY'] = 'access_key'
+        ENV['S3_SECRET_ACCESS_KEY'] = 'secret_access_key'
+        ENV['S3_BUCKET'] = 'bucket'
+
+        # IPA Action
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = 'ipa'
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = 'dsym'
+
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          s3({})
+        end").runner.execute(:test)
+
+        expect(result.size).to eq(6) # 6 because path is defaulted
+        expect(result).to include('-a "access_key"')
+        expect(result).to include('-s "secret_access_key"')
+        expect(result).to include('-b "bucket"')
+        expect(result).to include('-f "ipa"')
+        expect(result).to include('-d "dsym"')
+        expect(result).to include('-P "v{CFBundleShortVersionString}_b{CFBundleVersion}/"')
+
+      end
+
+    end
+  end
+end
