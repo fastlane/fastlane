@@ -30,7 +30,8 @@ module Fastlane
       embed: '-m',
       identity: '-i',
       sdk: '--sdk',
-      ipa: '--ipa'
+      ipa: '--ipa',
+      verbose: '--verbose'
     }
 
     class IpaAction
@@ -84,8 +85,8 @@ module Fastlane
       end
 
       def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive
-        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
+        # Remove nil value params unless :clean or :archive or :verbose
+        params = params.delete_if { |k, v| (k != :clean && k != :archive && k != :verbose) && v.nil? }
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
