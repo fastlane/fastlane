@@ -55,16 +55,8 @@ module FastlaneCore
 
     # @return true if building in a known CI environment
     def self.is_ci?
-      # Check for Jenkins environment variable
-      if ENV["JENKINS_URL"]
-        return true
-      end
-
-      if ENV["TRAVIS"]
-        return true
-      end
-
-      return false
+      # Check for Jenkins or Travis CI environment variables
+      ENV.has_key?("JENKINS_URL") || ENV.has_key?("TRAVIS")
     end
 
     # @return the full path to the Xcode developer tools of the currently
