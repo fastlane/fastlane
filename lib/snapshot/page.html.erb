@@ -1,5 +1,8 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <title>KrauseFx/snapshot</title>
+    <meta charset="UTF-8">
     <style type="text/css">
       * {
         font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
@@ -28,14 +31,16 @@
 
     <% @data.each do |language, content| %>
       <h1 class="language"><%= language %></h1>
-      <hr />
+      <hr>
       <table>
         <% content.each do |device_name, screens| %>
-          <th colspan="<%= screens.count %>">
-            <h2 class="deviceName">
-              <%= device_name %>
-            </h2>
-          </th>
+          <tr>
+            <th colspan="<%= screens.count %>">
+              <h2 class="deviceName">
+                <%= device_name %>
+              </h2>
+            </th>
+          </tr>
           <tr>
             <% screens.each do |screen_path| %>
               <% next if screen_path.include?"_framed.png" %>
@@ -46,7 +51,7 @@
                 <% style = (width > 0 ? "width: #{width}px;" : '') %>
                 <a href="<%= screen_path %>" target="_blank">
                   <img class="screenshot" 
-                         src="<%= screen_path %>",
+                         src="<%= screen_path %>"
                        style="<%= style %>" />
                 </a>
               </td>
@@ -56,4 +61,4 @@
       </table>
     <% end %>
   </body>
-</head>
+</html>
