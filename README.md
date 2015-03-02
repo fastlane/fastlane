@@ -358,12 +358,9 @@ gcovr({
 ```
 
 #### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
-Sets the active developer directory used by xcrun, xcodebuild, cc, and other Xcode
-and BSD development tools. This is very useful if you need to support multiple
-versions of Xcode in your build environment.
+Use this command if you are supporting multiple versions of Xcode
 
 ```ruby
-# Select the desired Xcode version
 xcode_select "/Applications/Xcode6.1.app"
 ```
 
@@ -588,12 +585,6 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 
 #### Hide the `fastlane` folder
 Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder.
-
-#### Select  Xcode version (e.g. Beta Version)
-If you want to use a Beta Xcode installation, you can add this to your `before_all` block.
-```
-ENV['DEVELOPER_DIR'] = '/Applications/Xcode-Beta6.3.app/Contents/Developer'
-```
 
 #### Load own actions from external folder
 Add this to the top of your `Fastfile` (*.* is the `fastlane` folder)
