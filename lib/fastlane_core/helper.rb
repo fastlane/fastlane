@@ -53,6 +53,20 @@ module FastlaneCore
       self.test?
     end
 
+    # @return true if building in a known CI environment
+    def self.is_ci?
+      # Check for Jenkins environment variable
+      if ENV["JENKINS_URL"]
+        return true
+      end
+
+      if ENV["TRAVIS"]
+        return true
+      end
+
+      return false
+    end
+
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
