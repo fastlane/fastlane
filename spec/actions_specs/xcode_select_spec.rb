@@ -22,7 +22,6 @@ describe Fastlane do
       end
 
       it "throws an exception if the Xcode path is not a valid directory" do
-
         expect {
           Fastlane::FastFile.new.parse("lane :test do
             xcode_select \"#{invalid_path}\"
@@ -31,7 +30,6 @@ describe Fastlane do
       end
 
       it "sets the DEVELOPER_DIR environment variable" do
-
         Fastlane::FastFile.new.parse("lane :test do
           xcode_select \"#{valid_path}\"
         end").runner.execute(:test)
