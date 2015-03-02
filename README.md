@@ -303,6 +303,8 @@ clear_previous_screenshots
 
 ### Completely reset all simulators
 
+You can run this command in the terminal to delete and re-create all iOS simulators:
+
     snapshot reset_simulators
 
 **Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird `Instruments` problems when running `snapshot`. 
