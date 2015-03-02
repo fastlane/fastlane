@@ -5,15 +5,17 @@
     <meta charset="UTF-8">
     <style type="text/css">
       * {
-        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
         font-weight: 300;
       }
       .language {
-        
+
       }
       .deviceName {
-        padding-top: 20px;
+        display: block;
         font-size: 30px;
+        padding-bottom: 24px;
+        padding-top: 45px;
       }
       .screenshot {
         cursor: pointer;
@@ -36,9 +38,7 @@
         <% content.each do |device_name, screens| %>
           <tr>
             <th colspan="<%= screens.count %>">
-              <h2 class="deviceName">
-                <%= device_name %>
-              </h2>
+              <span class="deviceName"><%= device_name %></span>
             </th>
           </tr>
           <tr>
@@ -50,9 +50,10 @@
                 <% width = [width, max_width].min %>
                 <% style = (width > 0 ? "width: #{width}px;" : '') %>
                 <a href="<%= screen_path %>" target="_blank">
-                  <img class="screenshot" 
+                  <img class="screenshot"
                          src="<%= screen_path %>"
-                       style="<%= style %>" />
+                       style="<%= style %>"
+                         alt="<%= language %> <%= device_name %>" />
                 </a>
               </td>
             <% end %>
