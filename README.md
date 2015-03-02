@@ -7,7 +7,7 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
@@ -215,7 +215,7 @@ ipa({
 })
 ```
 
-The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood. 
+The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
 The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To also use it in `deliver` update your `Deliverfile`:
 
@@ -355,6 +355,16 @@ gcovr({
   html_details: true,
   output: "./code-coverage/report.html"
 })
+```
+
+#### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
+Sets the active developer directory used by xcrun, xcodebuild, cc, and other Xcode
+and BSD development tools. This is very useful if you need to support multiple
+versions of Xcode in your build environment.
+
+```ruby
+# Select the desired Xcode version
+xcode_select "/Applications/Xcode6.1.app"
 ```
 
 #### Custom Shell Scripts
@@ -508,7 +518,7 @@ before_all do |lane|
   increment_build_number
   cocoapods
   xctool :test
-  
+
   ipa({
     workspace: "MyApp.xcworkspace"
   })
