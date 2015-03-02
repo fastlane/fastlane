@@ -186,9 +186,9 @@ module Deliver
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-f '#{source}'",
+          ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
           "-t 'Signiant'",
-          "-k 100000",
-          ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
+          "-k 100000"
         ].join(' ')
       end
 

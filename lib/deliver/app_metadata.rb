@@ -111,7 +111,7 @@ module Deliver
       title.content = default_title
       new_locale << title
 
-      Helper.log.info("Successfully created the new locale '#{language}'. The default title '#{default_title}' was set, since it's required by iTunesConnect.")
+      Helper.log.info("Successfully created the new locale '#{language}'. The default title '#{default_title}' was set.")
       Helper.log.info("You can update the title using 'app.metadata.update_title'")
 
       information[language] ||= {}

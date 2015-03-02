@@ -66,7 +66,7 @@ describe Deliver do
         it "will raise an error if the size is invalid" do
           expect {
             Deliver::AppScreenshot.calculate_screen_size('./spec/fixtures/screenshots/invalidImage.png')
-          }.to raise_error("Unsupported screen size [20, 36] for path './spec/fixtures/screenshots/invalidImage.png'")
+          }.to raise_error("Unsupported screen size [20, 36] for path './spec/fixtures/screenshots/invalidImage.png'".red)
         end
 
         it "it will return the size for a given png file" do
