@@ -280,7 +280,7 @@ crashlytics({
   ipa_path: './app.ipa'
 })
 ```
-Additionally you can specify `notes_path`, `emails` and `groups`.
+Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
 
 #### [DeployGate](https://deploygate.com/)
 
