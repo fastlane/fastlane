@@ -7,7 +7,7 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
@@ -215,7 +215,7 @@ ipa({
 })
 ```
 
-The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood. 
+The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
 The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To also use it in `deliver` update your `Deliverfile`:
 
@@ -355,6 +355,13 @@ gcovr({
   html_details: true,
   output: "./code-coverage/report.html"
 })
+```
+
+#### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
+Use this command if you are supporting multiple versions of Xcode
+
+```ruby
+xcode_select "/Applications/Xcode6.1.app"
 ```
 
 #### Custom Shell Scripts
@@ -509,7 +516,7 @@ before_all do |lane|
   increment_build_number
   cocoapods
   xctool :test
-  
+
   ipa({
     workspace: "MyApp.xcworkspace"
   })
@@ -579,12 +586,6 @@ Keep in mind the ```before_all``` and ```after_all``` block will be executed for
 
 #### Hide the `fastlane` folder
 Just rename the folder to `.fastlane` in case you don't want it to be visible in the Finder.
-
-#### Select  Xcode version (e.g. Beta Version)
-If you want to use a Beta Xcode installation, you can add this to your `before_all` block.
-```
-ENV['DEVELOPER_DIR'] = '/Applications/Xcode-Beta6.3.app/Contents/Developer'
-```
 
 #### Load own actions from external folder
 Add this to the top of your `Fastfile` (*.* is the `fastlane` folder)
