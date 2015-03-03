@@ -18,9 +18,10 @@ module FastlaneCore
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
-        Helper.log.info "Creating new app '#{@config[:app_name]}' on the Apple Dev Center".green
+        app_name = valid_name_for(@config[:app_name])
+        Helper.log.info "Creating new app '#{app_name}' on the Apple Dev Center".green
         visit CREATE_APP_URL
-        wait_for_elements("*[name='appIdName']").first.set @config[:app_name]
+        wait_for_elements("*[name='appIdName']").first.set app_name
         wait_for_elements("*[name='explicitIdentifier']").first.set @config[:bundle_identifier]
         click_next
 
@@ -43,7 +44,7 @@ module FastlaneCore
 
         ENV["CREATED_NEW_APP_ID"] = Time.now.to_s
 
-        Helper.log.info "Finished creating new app '#{@config[:app_name]}' on the Dev Center".green
+        Helper.log.info "Finished creating new app '#{app_name}' on the Dev Center".green
       end
 
       return true
