@@ -5,7 +5,7 @@ PATH
       aws-sdk (~> 1.0)
       cert (>= 0.1.0)
       deliver (>= 0.5.0)
-      fastlane_core (~> 0.2.0)
+      fastlane_core (>= 0.2.1)
       frameit (>= 0.2.0)
       nokogiri (~> 1.6.5)
       pem (>= 0.3.0)

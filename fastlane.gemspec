@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
   spec.add_dependency "aws-sdk", "~> 1.0" # Upload ipa files to S3
 
-  spec.add_dependency 'fastlane_core', '~> 0.2.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.2.1' # all shared code and dependencies
   
   spec.add_dependency 'deliver', '>= 0.5.0'
   spec.add_dependency 'snapshot', '>= 0.4.0'
