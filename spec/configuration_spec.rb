@@ -20,10 +20,20 @@ describe FastlaneCore do
         }.to raise_error "available_options parameter must be an array of ConfigItems".red
       end
 
+
       it "raises an error if the option of a given value is not available" do
         expect {
           FastlaneCore::Configuration.create([], {cert_name: "value"})
-        }.to raise_error "Could not find available option 'cert_name' in the list of available options ([])".red
+        }.to raise_error "Could not find available option 'cert_name' in the list of available options []".red
+      end
+
+      it "raises an error if a description ends with a ." do
+        expect {
+          FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
+                                         key: :cert_name, 
+                                    env_name: "asdf",
+                                 description: "Set the profile name.")], {})
+        }.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well".red
       end
 
       describe "Use a valid Configuration Manager" do
@@ -75,7 +85,7 @@ describe FastlaneCore do
           it "throws an error if the key doesn't exist" do
             expect {
               @config.set(:non_existing, "value")
-            }.to raise_error("Could not find available option 'non_existing' in the list of !available options ([:cert_name, :output])".red)
+            }.to raise_error("Could not find available option 'non_existing' in the list of !available options [:cert_name, :output]".red)
           end
 
           it "throws an error if it's invalid" do
