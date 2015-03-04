@@ -39,8 +39,8 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: Proc.new do |value|
-                                  raise "Please pass a path as String" unless value.kind_of?String
-                                  raise "Could not find output directory '#{value}'" unless File.exists?(value)
+                                  raise "Please pass a path as String".red unless value.kind_of?String
+                                  raise "Could not find output directory '#{value}'".red unless File.exists?(value)
                                 end)
           ]
           @values = {
@@ -81,7 +81,7 @@ describe FastlaneCore do
           it "throws an error if it's invalid" do
             expect {
               @config.set(:output, 132)
-            }.to raise_error("Invalid value '132' for option 'output: Directory in which the profile should be stored'".red)
+            }.to raise_error("Please pass a path as String".red)
           end
 
           it "allows valid updates" do
