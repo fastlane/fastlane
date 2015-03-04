@@ -282,6 +282,29 @@ crashlytics({
 ```
 Additionally you can specify `notes_path`, `emails` and `groups`.
 
+#### AWS S3 Distribution
+
+Add the `s3` action after the `ipa` step:
+
+```ruby
+s3
+```
+
+You can also customize a lot of options:
+```ruby
+s3({
+  # All of these are used to make Shenzhen's `ipa distribute:s3` command
+  access_key: ENV['S3_ACCESS_KEY'], # Required from user
+  secret_access_key: ENV['S3_SECRET_ACCESS_KEY'], # Required from user
+  bucket: ENV['S3_BUCKET'], # Required from user
+  file: 'AppName.ipa', # This would come from IpaAction
+  dsym: 'AppName.app.dSYM.zip', # This would come from IpaAction
+  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/' # This is actually the default
+})
+```
+
+It is recommended to **not** store the AWS access keys in the `Fastfile`.
+
 #### [DeployGate](https://deploygate.com/)
 
 You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).
