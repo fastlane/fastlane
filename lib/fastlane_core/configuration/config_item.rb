@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block
+    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :is_string
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -8,9 +8,11 @@ module FastlaneCore
     # @param description (String) A description shown to the user
     # @param short_option (String) A string of length 1 which is used for the command parameters (e.g. -f)
     # @param default_value the value which is used if there was no given values and no environment values
-    # @param verify_block an optional block which is called when a new value is set. Return true/false depending on if the
-    #   value is valid. This could be type checks or if a folder/file exists
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil)
+    # @param verify_block an optional block which is called when a new value is set. 
+    #   Check value is valid. This could be type checks or if a folder/file exists
+    #   You have to raise a specific exception if something goes wrong. Append .red after the string
+    # @param is_string (String) is that parameter a string?
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true)
       raise "key must be a symbol" unless key.kind_of?Symbol
       raise "env_name must be a String" unless env_name.kind_of?String
       if short_option
@@ -23,6 +25,7 @@ module FastlaneCore
       @short_option = short_option
       @default_value = default_value
       @verify_block = verify_block
+      @is_string = is_string
     end
 
 
@@ -36,7 +39,7 @@ module FastlaneCore
     # Returns false if that's not the case
     def is_valid?(value)
       if @verify_block
-        return @verify_block.call(value)
+        @verify_block.call(value)
       end
 
       true

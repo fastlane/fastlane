@@ -4,25 +4,25 @@ describe FastlaneCore do
 
       it "raises an error if no hash is given" do
         expect {
-          FastlaneCore::Configuration.create_manager([], "string")
+          FastlaneCore::Configuration.create([], "string")
         }.to raise_error "values parameter must be a hash".red
       end
 
       it "raises an error if no array is given" do
         expect {
-          FastlaneCore::Configuration.create_manager("string", {})
+          FastlaneCore::Configuration.create("string", {})
         }.to raise_error "available_options parameter must be an array of ConfigItems".red
       end
 
       it "raises an error if array contains invalid elements" do
         expect {
-          FastlaneCore::Configuration.create_manager(["string"], {})
+          FastlaneCore::Configuration.create(["string"], {})
         }.to raise_error "available_options parameter must be an array of ConfigItems".red
       end
 
       it "raises an error if the option of a given value is not available" do
         expect {
-          FastlaneCore::Configuration.create_manager([], {cert_name: "value"})
+          FastlaneCore::Configuration.create([], {cert_name: "value"})
         }.to raise_error "Could not find available option 'cert_name' in the list of available options ([])".red
       end
 
@@ -39,14 +39,15 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: Proc.new do |value|
-                                  (value.kind_of?String and File.exists?(value))
+                                  raise "Please pass a path as String" unless value.kind_of?String
+                                  raise "Could not find output directory '#{value}'" unless File.exists?(value)
                                 end)
           ]
           @values = {
             cert_name: "asdf",
             output: ".."
           }
-          @config = FastlaneCore::Configuration.create_manager(@options, @values)
+          @config = FastlaneCore::Configuration.create(@options, @values)
         end
 
         describe "fetch" do

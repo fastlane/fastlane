@@ -2,7 +2,7 @@ require 'fastlane_core/configuration/config_item'
 
 module FastlaneCore
   class Configuration
-    def self.create_manager(available_options, values)
+    def self.create(available_options, values)
       Configuration.new(available_options, values)
     end
 
