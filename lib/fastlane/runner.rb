@@ -8,7 +8,8 @@ module Fastlane
 
       return_val = nil
 
-      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # the file is located in the fastlane folder
+      path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      Dir.chdir(path_to_use) do # the file is located in the fastlane folder
         @before_all.call(key) if @before_all
         
         return_val = nil
@@ -24,7 +25,9 @@ module Fastlane
 
       return return_val
     rescue => ex
-      @error.call(key, ex) if @error # notify the block
+      Dir.chdir(path_to_use) do
+        @error.call(key, ex) if @error # notify the block
+      end
       raise ex
     end
 
