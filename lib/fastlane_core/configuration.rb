@@ -24,7 +24,7 @@ module FastlaneCore
           # Call the verify block for it too
           option.verify!(value)
         else
-          raise "Could not find available option '#{key}' in the list of available options (#{@available_options.collect { |a| a.key }})".red
+          raise "Could not find available option '#{key}' in the list of available options #{@available_options.collect { |a| a.key }}".red
         end
       end
     end
@@ -33,11 +33,13 @@ module FastlaneCore
     def fetch(key)
       raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?Symbol
 
+      option = option_for_key(key)
+
       value ||= @values[key]
       # TODO: configuration files
       value ||= ENV[key.to_s]
-      value ||= option_for_key(key).default_value
-      # TODO: add more sources here
+      value ||= option.default_value
+      value ||= ask("#{option.description}: ")
 
       value
     end
@@ -48,7 +50,7 @@ module FastlaneCore
       option = option_for_key(key)
       
       unless option
-        raise "Could not find available option '#{key}' in the list of !available options (#{@available_options.collect { |a| a.key }})".red
+        raise "Could not find available option '#{key}' in the list of !available options #{@available_options.collect { |a| a.key }}".red
       end
 
       option.verify!(value)
