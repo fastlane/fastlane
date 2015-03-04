@@ -3,9 +3,9 @@ describe Fastlane do
     describe "S3 Integration" do
 
       before(:each) do
-        ENV['S3_ACCESS_KEY'] = nil
-        ENV['S3_SECRET_ACCESS_KEY'] = nil
-        ENV['S3_BUCKET'] = nil
+        ['S3_ACCESS_KEY', 'S3_SECRET_ACCESS_KEY', 'S3_BUCKET', 'S3_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_BUCKET_NAME', 'AWS_REGION'].each do |key|
+          ENV[key] = nil
+        end
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
       end
