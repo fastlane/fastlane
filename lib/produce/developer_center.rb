@@ -1,7 +1,7 @@
 require 'fastlane_core/developer_center/developer_center'
 
-module FastlaneCore
-  class DeveloperCenter
+module Produce
+  class DeveloperCenter < FastlaneCore::DeveloperCenter
     APPS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
     CREATE_APP_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleCreate.action"
 
