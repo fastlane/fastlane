@@ -27,7 +27,6 @@ module Snapshot
         puts "Creating #{device_type} for iOS version #{ios_version}"
         command = "xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{ios_version}"
         command_output = `#{command}`
-        sleep 0.5
       end
     end
   end
