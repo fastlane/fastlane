@@ -43,6 +43,11 @@ module FastlaneCore
       @available_options.each do |current|
         count = @available_options.select { |option| option.key == current.key }.count
         raise "Multiple entries for configuration key '#{current.key}' found!".red if count > 1
+
+        unless current.short_option.to_s.empty?
+          count = @available_options.select { |option| option.short_option == current.short_option }.count
+          raise "Multiple entries for short_option '#{current.short_option}' found!".red if count > 1
+        end
       end
     end
 
