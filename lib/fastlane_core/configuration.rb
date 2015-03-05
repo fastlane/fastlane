@@ -58,6 +58,7 @@ module FastlaneCore
       raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?Symbol
 
       option = option_for_key(key)
+      raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect { |a| a.key }}".red unless option
 
       value ||= @values[key]
       # TODO: configuration files

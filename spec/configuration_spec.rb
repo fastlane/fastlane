@@ -77,6 +77,12 @@ describe FastlaneCore do
             }.to raise_error "Key '123' must be a symbol. Example :app_id.".red
           end
 
+          it "raises an error if this option does not exist" do
+            expect {
+              @config[:asdfasdf]
+            }.to raise_error "Could not find option for key :asdfasdf. Available keys: [:cert_name, :output]".red
+          end
+
           it "returns the value for the given key if given" do
             expect(@config.fetch(:cert_name)).to eq(@values[:cert_name])
           end
