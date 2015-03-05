@@ -1,5 +1,5 @@
-module FastlaneCore
-  class DeveloperCenter
+module Sigh
+  class DeveloperCenter < FastlaneCore::DeveloperCenter
     # Returns a array of hashes, that contains information about the iOS certificate
     # @example
       # [{"certRequestId"=>"B23Q2P396B",

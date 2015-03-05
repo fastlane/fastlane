@@ -1,8 +1,8 @@
 require 'fastlane_core/developer_center/developer_center'
 require 'sigh/developer_center_signing'
 
-module FastlaneCore
-  class DeveloperCenter
+module Sigh
+  class DeveloperCenter < FastlaneCore::DeveloperCenter
     # Types of certificates
     APPSTORE = "AppStore"
     ADHOC = "AdHoc"
