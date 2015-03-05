@@ -36,6 +36,17 @@ describe FastlaneCore do
         }.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well".red
       end
 
+      it "raises an error if a a key was used twice" do
+        expect {
+          FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
+                                         key: :cert_name, 
+                                    env_name: "asdf"), 
+                                            FastlaneCore::ConfigItem.new(
+                                         key: :cert_name, 
+                                    env_name: "asdf")], {})
+        }.to raise_error "Multiple entries for configuration key 'cert_name' found!".red
+      end
+
       describe "Use a valid Configuration Manager" do
         before do
           @options = [

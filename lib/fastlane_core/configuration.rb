@@ -7,28 +7,46 @@ module FastlaneCore
       Configuration.new(available_options, values)
     end
 
+    # Setting up
+
     def initialize(available_options, values)
       @available_options = available_options
       @values = values
 
-      raise "available_options parameter must be an array of ConfigItems".red unless available_options.kind_of?Array
-      available_options.each do |item|
+      verify_input_types      
+      verify_value_exists
+      verify_no_duplicates
+    end
+
+    def verify_input_types
+      raise "available_options parameter must be an array of ConfigItems".red unless @available_options.kind_of?Array
+      @available_options.each do |item|
         raise "available_options parameter must be an array of ConfigItems".red unless item.kind_of?ConfigItem
       end
+      raise "values parameter must be a hash".red unless @values.kind_of?Hash
+    end
 
-      raise "values parameter must be a hash".red unless values.kind_of?Hash
-
-      # Make sure they exist
-      values.each do |key, value|
+    def verify_value_exists
+      # Make sure the given value keys exist
+      @values.each do |key, value|
         option = option_for_key(key)
         if option
-          # Call the verify block for it too
-          option.verify!(value)
+          option.verify!(value) # Call the verify block for it too
         else
           raise "Could not find available option '#{key}' in the list of available options #{@available_options.collect { |a| a.key }}".red
         end
       end
     end
+
+    def verify_no_duplicates
+      # Make sure a key was not used multiple times
+      @available_options.each do |current|
+        count = @available_options.select { |option| option.key == current.key }.count
+        raise "Multiple entries for configuration key '#{current.key}' found!".red if count > 1
+      end
+    end
+
+    # Using the class
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     def fetch(key)
