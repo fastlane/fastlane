@@ -22,10 +22,7 @@ module PEM
       content = File.read(pem_temp) + File.read(rsa_file)
       File.write(pem_file, content)
       
-
-      File.delete(rsa_file)
-
-      return pem_file
+      return pem_file, rsa_file
     end
 
     private

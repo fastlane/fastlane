@@ -34,7 +34,7 @@ class PemApplication
         app = app_identifier(options)
         username(options)
 
-        path = PEM::CertManager.new.run(app, !options.development)
+        path, rsa_file = PEM::CertManager.new.run(app, !options.development)
 
         if path
           file_name = File.basename(path)
@@ -42,6 +42,16 @@ class PemApplication
           FileUtils.mv(path, output)
           puts output.green
         end
+        
+        if ENV["PEM_SAVE_PRIVATEKEY"]
+          file_name = File.basename(rsa_file)
+          output = "./#{file_name}"
+          FileUtils.mv(rsa_file, output)
+          puts output.green          
+        else
+          File.delete(rsa_file)
+        end
+        
       end
     end
 
