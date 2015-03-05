@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["fastlanecore@krausefx.com"]
   spec.summary       = %q{Contains all shared code/dependencies of the fastlane.tools}
   spec.description   = %q{Contains all shared code/dependencies of the fastlane.tools}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
