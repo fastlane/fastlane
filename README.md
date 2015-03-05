@@ -287,6 +287,27 @@ A sanity check to make sure you are working in a repo that is clean. Especially 
 ensure_git_status_clean
 ```
 
+#### [commit_version_bump]
+This action will create a "Version Bump" commit in your repo. Useful in conjunction with `increment_build_number`.
+
+It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:
+- All .plist files
+- The `.xcodeproj/project.pbxproj` file
+
+Then commits those files to the repo.
+
+Customise the message with the `:message` option, defaults to "Version Bump"
+
+If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the `ipa` and or `sigh` actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action.
+
+```ruby
+commit_version_bump
+
+commit_version_bump(
+  message: 'New version yo!', # create a commit with a custom message
+)
+```
+
 #### [add_git_tag]
 This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where: 
 - `grouping` is just to keep your tags organised under one "folder", defaults to 'builds'
