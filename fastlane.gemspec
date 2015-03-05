@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'shenzhen', '~> 0.11.0' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
   spec.add_dependency "aws-sdk", "~> 1.0" # Upload ipa files to S3
+  spec.add_dependency 'rugged', '~> 0.21'
 
   spec.add_dependency 'fastlane_core', '>= 0.2.1' # all shared code and dependencies
   
