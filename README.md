@@ -287,6 +287,21 @@ A sanity check to make sure you are working in a repo that is clean. Especially 
 ensure_git_status_clean
 ```
 
+#### [reset_git_repo]
+This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
+
+It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:
+
+- You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.
+- You call it with the `:force` option, in which case "you have been warned".
+
+Also useful for putting in your `error` block, to bring things back to a pristine state (again with the caveat that you have called `ensure_git_status_clean` before)
+
+```ruby
+reset_git_repo
+reset_git_repo :force # if you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+```
+
 #### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
