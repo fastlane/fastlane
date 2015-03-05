@@ -1,7 +1,7 @@
 require 'fastlane_core/developer_center/developer_center'
 
-module FastlaneCore
-  class DeveloperCenter
+module PEM
+  class DeveloperCenter < FastlaneCore::DeveloperCenter
     APP_IDS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
 
     
@@ -49,7 +49,7 @@ module FastlaneCore
 
             return true
           else
-            raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page.")
+            raise DeveloperCenterGeneralError.new("Could not find app with identifier '#{app_identifier}' on apps page. The identifier is case sensitive.")
           end
         rescue => ex
           error_occured(ex)
