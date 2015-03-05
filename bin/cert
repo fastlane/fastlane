@@ -32,8 +32,8 @@ class CertApplication
       c.action do |args, options|
         username(options)
 
-        type = FastlaneCore::DeveloperCenter::DISTRIBUTION
-        type = FastlaneCore::DeveloperCenter::DEVELOPMENT if options.development
+        type = Cert::DeveloperCenter::DISTRIBUTION
+        type = Cert::DeveloperCenter::DEVELOPMENT if options.development
 
         Cert::CertRunner.run(type)
 

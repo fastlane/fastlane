@@ -1,7 +1,7 @@
 require 'fastlane_core/developer_center/developer_center'
 
-module FastlaneCore
-  class DeveloperCenter
+module Cert
+  class DeveloperCenter < FastlaneCore::DeveloperCenter
     DISTRIBUTION = "Distribution"
     DEVELOPMENT = "Development"
 
