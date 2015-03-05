@@ -99,7 +99,7 @@ In case you prefer environment variables:
 - ```PEM_USERNAME```
 - ```PEM_APP_IDENTIFIER```
 - ```PEM_TEAM_ID```
-- ```PEM_SAVE_PRIVATEKEY``` - save the private RSA key
+- ```PEM_SAVE_PRIVATEKEY``` - Set to "1" to save the private RSA key
 
 # How does it work?
 There are 2 actions involved:
