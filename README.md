@@ -258,6 +258,19 @@ increment_build_number # automatically increment by one
 increment_build_number '75' # set a specific number
 ```
 
+#### [resign]
+This will resign an ipa with another signing identity and provisioning profile.
+
+If you have used the `ipa` and `sigh` actions, then this action automatically gets the `ipa` and `provisioning_profile` values respectively from those actions and you don't need to manually set them (althout you can always override them).
+
+```ruby
+resign(
+  ipa: 'path/to/ipa', # can omit if using the `ipa` action
+  signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
+  provisioning_profile: 'path/to/profile', # can omit if using the `sigh` action
+)
+```
+
 #### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
