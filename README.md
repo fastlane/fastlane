@@ -620,8 +620,12 @@ before_all do |lane|
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   team_id "Q2CBPK58CA"
 
+  ensure_git_status_clean
+
   increment_build_number
+
   cocoapods
+
   xctool :test
 
   ipa({
@@ -630,8 +634,12 @@ before_all do |lane|
 end
 
 lane :beta do
+  cert
+
   sigh :adhoc
+
   deliver :beta
+
   hockey({
     api_token: '...',
     ipa: './app.ipa' # optional
@@ -639,13 +647,24 @@ lane :beta do
 end
 
 lane :deploy do
+  cert
+
   sigh
+
   snapshot
+
   deliver :force
+  
   frameit
 end
 
 after_all do |lane|
+  clean_build_artifacts
+
+  commit_version_bump
+
+  add_git_tag
+
   slack({
     message: "Successfully deployed a new version."
   })
@@ -653,6 +672,8 @@ after_all do |lane|
 end
 
 error do |lane, exception|
+  reset_git_repo
+
   slack({
     message: "An error occured"
   })
