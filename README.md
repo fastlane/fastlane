@@ -271,6 +271,15 @@ resign(
 )
 ```
 
+#### [clean_build_artifacts]
+This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
+
+Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
+
+```ruby
+clean_build_artifacts
+```
+
 #### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
