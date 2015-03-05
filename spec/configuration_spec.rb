@@ -49,7 +49,6 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: Proc.new do |value|
-                                  raise "Please pass a path as String".red unless value.kind_of?String
                                   raise "Could not find output directory '#{value}'".red unless File.exists?(value)
                                 end)
           ]

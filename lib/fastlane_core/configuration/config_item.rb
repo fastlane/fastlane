@@ -16,7 +16,7 @@ module FastlaneCore
       raise "key must be a symbol" unless key.kind_of?Symbol
       raise "env_name must be a String" unless env_name.kind_of?String
       if short_option
-        raise "short_option must be a String of length 1" unless (short_option.kind_of?String and short_option.length == 1)
+        raise "short_option must be a String of length 1" unless (short_option.kind_of?String and short_option.gsub('-', '').length == 1)
       end
       if description
         raise "Do not let descriptions end with a '.', since it's used for user inputs as well".red if (description[-1] == '.')
@@ -41,8 +41,20 @@ module FastlaneCore
     # Make sure, the value is valid (based on the verify block)
     # Returns false if that's not the case
     def is_valid?(value)
-      if @verify_block
-        @verify_block.call(value)
+      # we also allow nil values, which do not have to be verified. 
+      if value
+        if @is_string
+          raise "Please pass a path as String".red unless value.kind_of?String
+        end
+        
+        if @verify_block
+          begin
+            @verify_block.call(value)
+          rescue Exception => ex
+            Helper.log.fatal "Error setting value '#{value}' for option '#{@key}'".red
+            raise ex
+          end
+        end
       end
 
       true
