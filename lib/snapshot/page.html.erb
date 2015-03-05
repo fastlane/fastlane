@@ -195,7 +195,9 @@
           case 37:
           case 52:
           case 100:
-            // TODO
+            e.preventDefault();
+            document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
+            break;
          }
       };
       </script>
