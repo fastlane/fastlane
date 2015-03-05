@@ -1,7 +1,7 @@
 require 'json'
 
-module FastlaneCore  
-  class ItunesConnect
+module Deliver
+  class ItunesConnect < FastlaneCore::ItunesConnect
     # Setting the app's age restrictions
 
     def set_app_rating!(app, path_to_json)

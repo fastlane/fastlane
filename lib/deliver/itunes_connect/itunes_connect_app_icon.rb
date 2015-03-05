@@ -1,7 +1,7 @@
 require 'fastimage'
 
-module FastlaneCore  
-  class ItunesConnect
+module Deliver
+  class ItunesConnect < FastlaneCore::ItunesConnect
     # Uploading a new full size app icon
 
     def upload_app_icon!(app, path)

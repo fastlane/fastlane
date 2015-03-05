@@ -1,6 +1,6 @@
-module FastlaneCore  
+module Deliver
   # For all the information reading (e.g. version number)
-  class ItunesConnect
+  class ItunesConnect < FastlaneCore::ItunesConnect
     # This method will fetch the current status ({Deliver::App::AppStatus})
     # of your app and return it. This method uses a headless browser
     # under the hood, so it might take some time until you get the result

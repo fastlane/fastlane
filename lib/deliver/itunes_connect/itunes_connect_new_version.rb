@@ -1,5 +1,5 @@
-module FastlaneCore  
-  class ItunesConnect
+module Deliver
+  class ItunesConnect < FastlaneCore::ItunesConnect
     # This method creates a new version of your app using the
     # iTunesConnect frontend. This will happen directly after calling
     # this method. 

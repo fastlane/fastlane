@@ -1,5 +1,5 @@
-module FastlaneCore  
-  class ItunesConnect
+module Deliver
+  class ItunesConnect < FastlaneCore::ItunesConnect
     # This file sets additional information like copyright and age rating
 
     def set_copyright!(app, text)

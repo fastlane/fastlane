@@ -1,8 +1,8 @@
 require 'open-uri'
 
-module FastlaneCore  
+module Deliver
   # For all the information reading (e.g. version number)
-  class ItunesConnect
+  class ItunesConnect < FastlaneCore::ItunesConnect
     ALL_INFORMATION_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/"
 
     # This method will download all existing app screenshots
