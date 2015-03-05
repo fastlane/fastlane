@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane_core (0.2.1)
+    fastlane_core (0.3.0)
       babosa
       capybara (~> 2.4.3)
       colored
@@ -84,7 +84,7 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.5.2)
+    websocket-driver (0.5.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     xpath (2.0.0)
