@@ -1,8 +1,8 @@
 require 'fastlane_core/itunes_connect/itunes_connect'
 
-module FastlaneCore
+module Produce
   # Every method you call here, might take a time
-  class ItunesConnect
+  class ItunesConnect < FastlaneCore::ItunesConnect
     
     APPS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app"
 
