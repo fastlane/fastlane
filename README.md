@@ -280,6 +280,13 @@ Useful if you quickly want to send out a test build by dropping down to the comm
 clean_build_artifacts
 ```
 
+#### [ensure_git_status_clean]
+A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
+
+```ruby
+ensure_git_status_clean
+```
+
 #### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
