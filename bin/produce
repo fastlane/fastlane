@@ -16,7 +16,7 @@ class FastlaneApplication
     program :version, Produce::VERSION
     program :description, 'CLI for \'produce\''
     program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
-    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/produce'
     program :help_formatter, :compact
 

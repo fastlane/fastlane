@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["produce@krausefx.com"]
   spec.summary       = %q{Create new iOS apps on iTunes Connect and Dev Portal using the command line}
   spec.description   = %q{Create new iOS apps on iTunes Connect and Dev Portal using the command line}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
