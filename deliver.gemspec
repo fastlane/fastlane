@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '~> 0.2.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.2.0' # all shared code and dependencies
   spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
