@@ -31,7 +31,7 @@ module Sigh
                              description: "Your Apple ID Username",
                            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
                             verify_block: Proc.new do |value|
-                              # CredentialsManager::PasswordManager.shared_manager(value)
+                              CredentialsManager::PasswordManager.shared_manager(value)
                             end),
         FastlaneCore::ConfigItem.new(key: :provisioning_file_name, 
                             short_option: "-n",

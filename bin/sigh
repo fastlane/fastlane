@@ -32,8 +32,6 @@ class SighApplication
       c.action do |args, options|
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
 
-        username(options)
-
         path = Sigh::DeveloperCenter.new.run
 
         if path
