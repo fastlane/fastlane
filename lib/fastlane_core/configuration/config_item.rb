@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :is_string
+    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :is_string, :optional
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -12,7 +12,8 @@ module FastlaneCore
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string (String) is that parameter a string?
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true)
+    # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, optional: false)
       raise "key must be a symbol" unless key.kind_of?Symbol
       raise "env_name must be a String" unless env_name.kind_of?String
       if short_option
@@ -29,6 +30,7 @@ module FastlaneCore
       @default_value = default_value
       @verify_block = verify_block
       @is_string = is_string
+      @optional = optional
     end
 
 
