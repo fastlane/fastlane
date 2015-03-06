@@ -16,7 +16,7 @@ class PemApplication
     program :version, PEM::VERSION
     program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
     program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
-    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/PEM'
     program :help_formatter, :compact
 
