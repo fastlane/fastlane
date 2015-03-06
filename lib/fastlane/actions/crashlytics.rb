@@ -20,6 +20,7 @@ module Fastlane
         notes_path       = params[:notes_path]
         emails           = params[:emails]
         groups           = params[:groups]
+        notifications    = params[:notifications]
 
         assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
 
@@ -29,7 +30,7 @@ module Fastlane
 
         client = Shenzhen::Plugins::Crashlytics::Client.new(crashlytics_path, api_token, build_secret)
 
-        response = client.upload_build(ipa_path, file: ipa_path, notes: notes_path, emails: emails, groups: groups)
+        response = client.upload_build(ipa_path, file: ipa_path, notes: notes_path, emails: emails, groups: groups, notifications: notifications)
 
         if response
           Helper.log.info 'Build successfully uploaded to Crashlytics'.green
