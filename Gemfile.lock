@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     sigh (0.3.5)
-      fastlane_core (~> 0.2.0)
+      fastlane_core (~> 0.3.0)
       plist (~> 3.1.0)
 
 GEM
@@ -31,7 +31,7 @@ GEM
       security
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastlane_core (0.2.0)
+    fastlane_core (0.3.0)
       babosa
       capybara (~> 2.4.3)
       colored
@@ -88,7 +88,7 @@ GEM
     webmock (1.19.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-    websocket-driver (0.5.2)
+    websocket-driver (0.5.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     xpath (2.0.0)
