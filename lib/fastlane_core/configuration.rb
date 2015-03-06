@@ -60,11 +60,24 @@ module FastlaneCore
       option = option_for_key(key)
       raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect { |a| a.key }}".red unless option
 
+      # `if value == nil` instead of ||= because false is also a valid value
+
       value ||= @values[key]
       # TODO: configuration files
-      value ||= ENV[key.to_s]
-      value ||= option.default_value
-      value ||= ask("#{option.description}: ")
+      value = ENV[key.to_s] if value == nil
+      value = option.default_value if value == nil
+      value = false if (value == nil and not option.is_string) # by default boolean flags are false
+
+      while value == nil and !option.optional
+        value = ask("#{option.description}: ")
+        # Also store this value to use it from now on
+        begin
+          set(key, value)
+        rescue Exception => ex
+          puts ex
+          value = nil
+        end
+      end
 
       value
     end
