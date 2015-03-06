@@ -11,7 +11,7 @@ module FastlaneCore
 
     def initialize(available_options, values)
       @available_options = available_options
-      @values = values
+      @values = values || {}
 
       verify_input_types      
       verify_value_exists
