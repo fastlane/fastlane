@@ -1,5 +1,5 @@
 describe FastlaneCore do
-  describe FastlaneCore::Configuration, now: true do
+  describe FastlaneCore::Configuration do
     describe "Create a new Configuration Manager" do
 
       it "raises an error if no hash is given" do
