@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    snapshot (0.4.12)
+    snapshot (0.4.13)
       fastimage (~> 1.6.3)
-      fastlane_core (~> 0.2.0)
+      fastlane_core (>= 0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -29,9 +29,9 @@ GEM
       security
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastimage (1.6.6)
+    fastimage (1.6.8)
       addressable (~> 2.3, >= 2.3.5)
-    fastlane_core (0.2.0)
+    fastlane_core (0.3.0)
       babosa
       capybara (~> 2.4.3)
       colored
@@ -83,7 +83,7 @@ GEM
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     slop (3.6.0)
-    websocket-driver (0.5.2)
+    websocket-driver (0.5.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     xpath (2.0.0)
