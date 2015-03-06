@@ -17,7 +17,7 @@ class SnapshotApplication
     program :version, Snapshot::VERSION
     program :description, 'CLI for \'Snapshot\' - Automate taking localized screenshots of your iOS app on every device'
     program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
-    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/snapshot'
     program :help_formatter, :compact
 
