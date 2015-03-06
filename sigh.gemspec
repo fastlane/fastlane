@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["sigh@krausefx.com"]
   spec.summary       = %q{Because you would rather spend your time building stuff than fighting provisioning}
   spec.description   = %q{Because you would rather spend your time building stuff than fighting provisioning}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '~> 0.2.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '~> 0.3.0' # all shared code and dependencies
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the provisioning profile
 
   # Development only

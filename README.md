@@ -47,7 +47,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
-<h5 align="center"><code>sigh</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>sigh</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 
 # Features
@@ -169,9 +169,9 @@ If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fa
 ```sigh``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
 
 # Tips
-## [`fastlane`](http://fastlane.tools) Toolchain
+## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
