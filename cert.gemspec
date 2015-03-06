@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["cert@krausefx.com"]
   spec.summary       = %q{Create new iOS code signing certificates}
   spec.description   = %q{Create new iOS code signing certificates}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
 
   spec.license       = "MIT"
 

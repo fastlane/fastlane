@@ -16,7 +16,7 @@ class CertApplication
     program :version, Cert::VERSION
     program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
     program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
-    program :help, 'Website', 'http://fastlane.tools'
+    program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/cert'
     program :help_formatter, :compact
 
