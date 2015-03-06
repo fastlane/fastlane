@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["deliver@krausefx.com"]
   spec.summary       = %q{Upload screenshots, metadata and your app to the App Store using a single command}
   spec.description   = %q{Upload screenshots, metadata and your app to the App Store using a single command}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'

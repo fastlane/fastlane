@@ -50,7 +50,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
-<h5 align="center"><code>deliver</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>deliver</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 # Features
 - Upload hundreds of screenshots with different languages from different devices
@@ -314,9 +314,9 @@ Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF
 
 # Tips
 
-## [`fastlane`](http://fastlane.tools) Toolchain
+## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
