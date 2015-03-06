@@ -55,7 +55,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Very flexible configuration using a fully customizable `Fastfile`
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
 
-##### Take a look at the [fastlane website](http://fastlane.tools) for more information about why and when to use `fastlane`.
+##### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -496,7 +496,7 @@ Save and run. The result should look like this:
 
 # Tips
 
-## [`fastlane`](http://fastlane.tools) Toolchain
+## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
