@@ -37,9 +37,9 @@ module Sigh
       ret_certs = []
 
       # Select certificate
-      certificate_name = ENV['SIGH_CERTIFICATE']
-      cert_date = ENV['SIGH_CERTIFICATE_EXPIRE_DATE']
-      cert_id = ENV['SIGH_CERTIFICATE_ID']
+      certificate_name = Sigh.config[:cert_owner_name]
+      cert_date = Sigh.config[:cert_date]
+      cert_id = Sigh.config[:cert_id]
 
       # The other profiles are push profiles
       certificate_type = type == DEVELOPMENT ? 'iOS Development' : 'iOS Distribution'

@@ -6,6 +6,7 @@ require 'sigh'
 require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
+require 'sigh/options'
 
 HighLine.track_eof = false
 
@@ -22,45 +23,27 @@ class SighApplication
 
     always_trace!
 
-    global_option '--adhoc', 'By default, sigh will create and renew App Store profiles. Setting this flag will generate Adhoc profiles instead.'
-    global_option '--skip_install', 'By default, the certificate will be added on your local machine. Setting this flag will skip this action.'
-    global_option '--development', 'Renew the development certificate instead of the production one.'
-    global_option '--force', 'Renew non-development provisioning profiles regardless of state.'
-
-    global_option '-a', '--identifier STRING', String, 'The bundle identifier of your app.'
-    global_option '-u', '--username STRING', String, 'Your Apple ID username.'
-    global_option '-n', '--cert_name STRING', String, 'The name of the generated certificate file.'
-    global_option '-o', '--output STRING', String, 'The folder in which the file should be generated.'
-    global_option '-d', '--cert_date STRING', String, 'The certificate with the given expiry date used to renew. (e.g. "Nov 11, 2017")'
-    global_option '-c', '--cert_owner STRING', String, 'The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")'
-    global_option '-f', '--filename STRING', String, 'Filename to use for the provisioning profile'
+    FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
 
     command :renew do |c|
       c.syntax = 'sigh renew'
       c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
 
       c.action do |args, options|
-        app = app_identifier(options)
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
+
         username(options)
 
-        type = Sigh::DeveloperCenter::APPSTORE
-        type = Sigh::DeveloperCenter::ADHOC if options.adhoc 
-        type = Sigh::DeveloperCenter::DEVELOPMENT if options.development
-
-        ENV['SIGH_CERTIFICATE'] = options.cert_owner if options.cert_owner
-        ENV['SIGH_CERTIFICATE_EXPIRE_DATE'] = options.cert_date if options.cert_date
-
-        path = Sigh::DeveloperCenter.new.run(app, type, options.cert_name, options.force)
+        path = Sigh::DeveloperCenter.new.run
 
         if path
-          file_name = options.filename || File.basename(path)
-          if options.filename == nil
+          if Sigh.config[:filename] == nil
             file_name = File.basename(path)
           else
-            file_name = options.filename
+            file_name = Sigh.config[:filename]
           end
-          output_path = options.output || '.'
-          output = File.join(output_path.gsub("~", ENV["HOME"]), file_name)
+          
+          output = File.join(Sigh.config[:output_path].gsub("~", ENV["HOME"]), file_name)
           FileUtils.mv(path, output)
           system("open -g '#{output}'") unless options.skip_install
           puts output.green
@@ -84,21 +67,6 @@ class SighApplication
     run!
   end
 
-  def username(options)
-    user = options.username
-    user ||= ENV["SIGH_USERNAME"]
-    user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-    
-    CredentialsManager::PasswordManager.shared_manager(user) if user
-  end
-
-  def app_identifier(options)
-    value = options.identifier
-    value ||= ENV["SIGH_APP_IDENTIFIER"]
-    value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-    value ||= ask("App Identifier (Bundle ID, e.g. com.krausefx.app): ")
-    return value
-  end
 end
 
 SighApplication.new.run

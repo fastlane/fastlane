@@ -9,20 +9,22 @@ module Sigh
     DEVELOPMENT = "Development"
 
     PROFILES_URL_DEV = "https://developer.apple.com/account/ios/profile/profileList.action?type=limited"
-
     
-    def run(app_identifier, type, cert_name = nil, force = false)
-      cert = maintain_app_certificate(app_identifier, type, force)
+    def run
+      @type = Sigh::DeveloperCenter::APPSTORE
+      @type = Sigh::DeveloperCenter::ADHOC if Sigh.config[:adhoc]
+      @type = Sigh::DeveloperCenter::DEVELOPMENT if Sigh.config[:development]
+
+      cert = maintain_app_certificate # create/download the certificate
       
-      type_name = type
-      type_name = "Distribution" if type == APPSTORE # both enterprise and App Store
-      cert_name ||= "#{type_name}_#{app_identifier}.mobileprovision" # default name
+      type_name = "Distribution" if @type == APPSTORE # both enterprise and App Store
+      cert_name ||= "#{type_name}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
 
       output_path = File.join(TMP_FOLDER, cert_name)
       File.write(output_path, cert)
 
-      store_provisioning_id_in_environment(output_path) unless ENV["SIGH_SKIP_ANALYSER"]
+      store_provisioning_id_in_environment(output_path)
 
       return output_path
     end
@@ -33,9 +35,10 @@ module Sigh
       ENV["SIGH_UDID"] = udid if udid
     end
 
-    def maintain_app_certificate(app_identifier, type, force)
+    def maintain_app_certificate(force = nil)
+      force = Sigh.config[:force] if (force == nil)
       begin
-        if type == DEVELOPMENT 
+        if @type == DEVELOPMENT 
           visit PROFILES_URL_DEV
         else
           visit PROFILES_URL
@@ -48,29 +51,29 @@ module Sigh
         certs = post_ajax(@list_certs_url)
 
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
-        required_cert_types = type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution']
+        required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
         certs['provisioningProfiles'].each do |current_cert|
           next unless required_cert_types.include?(current_cert['type'])
           
           details = profile_details(current_cert['provisioningProfileId'])
 
-          if details['provisioningProfile']['appId']['identifier'] == app_identifier
+          if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
             # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-            next if type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
+            next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
 
             # that's an App Store profile ... skipping it
-            next if type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
+            next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
 
             # We found the correct certificate
-            if force && type != DEVELOPMENT
+            if force && @type != DEVELOPMENT
               provisioningProfileId = current_cert['provisioningProfileId']
-              renew_profile(provisioningProfileId, type) # This one needs to be forcefully renewed
-              return maintain_app_certificate(app_identifier, type, false) # recursive
+              renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
+              return maintain_app_certificate(false) # recursive
             elsif current_cert['status'] == 'Active'
               return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
             elsif ['Expired', 'Invalid'].include? current_cert['status']
-              renew_profile(current_cert['provisioningProfileId'], type) # This one needs to be renewed
-              return maintain_app_certificate(app_identifier, type, false) # recursive
+              renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
+              return maintain_app_certificate(false) # recursive
             end
 
             break
@@ -79,18 +82,19 @@ module Sigh
 
         Helper.log.info "Could not find existing profile. Trying to create a new one."
         # Certificate does not exist yet, we need to create a new one
-        create_profile(app_identifier, type)
+        create_profile
         # After creating the profile, we need to download it
-        return maintain_app_certificate(app_identifier, type, false) # recursive
+        return maintain_app_certificate(false) # recursive
 
       rescue => ex
         error_occured(ex)
       end
     end
 
-    def create_profile(app_identifier, type)
-      Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{type}'.".yellow
-      certificates = code_signing_certificates(type)
+    def create_profile
+      app_identifier = Sigh.config[:app_identifier]
+      Helper.log.info "Creating new profile for app '#{app_identifier}' for type '#{@type}'.".yellow
+      certificates = code_signing_certificates(@type)
 
       create_url = "https://developer.apple.com/account/ios/profile/profileCreate.action"
       visit create_url
@@ -106,8 +110,8 @@ module Sigh
       end
 
       value = enterprise ? 'inhouse' : 'store'
-      value = 'limited' if type == DEVELOPMENT
-      value = 'adhoc' if type == ADHOC
+      value = 'limited' if @type == DEVELOPMENT
+      value = 'adhoc' if @type == ADHOC
 
       first(:xpath, "//input[@type='radio' and @value='#{value}']").click
       click_next
@@ -137,7 +141,7 @@ module Sigh
       clicked = false
       certificates.each do |cert|
         cert_id = cert['certificateId']
-        input = if type == DEVELOPMENT
+        input = if @type == DEVELOPMENT
           # development uses a checkbox and has no [] around the value
           first(:xpath, "//input[@type='checkbox' and @value='#{cert_id}']")
         else
@@ -156,7 +160,7 @@ module Sigh
       end
       click_next
 
-      if type != APPSTORE
+      if @type != APPSTORE
         # 4) Devices selection
         wait_for_elements('.selectAll.column')
         sleep 3
@@ -167,15 +171,15 @@ module Sigh
 
       # 5) Choose a profile name
       wait_for_elements('.distributionType')
-      profile_name = ENV["SIGH_PROVISIONING_PROFILE_NAME"]
-      profile_name ||= [app_identifier, type].join(' ')
+      profile_name = Sigh.config[:provisioning_file_name]
+      profile_name ||= [app_identifier, @type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
       click_next
       wait_for_elements('.row-details')
     end
 
-    def renew_profile(profile_id, type)
-      certificate = code_signing_certificates(type).first
+    def renew_profile(profile_id)
+      certificate = code_signing_certificates(@type).first
 
       details_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?type=&provisioningProfileId=#{profile_id}"
       Helper.log.info "Renewing provisioning profile '#{profile_id}' using URL '#{details_url}'"
@@ -188,7 +192,7 @@ module Sigh
       if certs.count == 1
         certs.first.click
 
-        if type != APPSTORE
+        if @type != APPSTORE
           # Add all devices
           wait_for_elements('.selectAll.column')
           sleep 3
