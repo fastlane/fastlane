@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    produce (0.1.5)
-      fastlane_core (~> 0.2.0)
+    produce (0.1.6)
+      fastlane_core (>= 0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -30,7 +30,7 @@ GEM
       security
     diff-lcs (1.2.5)
     docile (1.1.5)
-    fastlane_core (0.2.1)
+    fastlane_core (0.3.0)
       babosa
       capybara (~> 2.4.3)
       colored
