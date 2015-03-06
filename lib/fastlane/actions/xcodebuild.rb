@@ -54,6 +54,7 @@ module Fastlane
         build_path = ENV["BUILD_PATH"]
         scheme     = ENV["SCHEME"]
         workspace  = ENV["WORKSPACE"]
+        project    = ENV["PROJECT"]
 
         # Append slash to build path, if needed
         unless build_path.end_with? "/"
@@ -64,7 +65,7 @@ module Fastlane
           # Operation bools
           archiving = params.key? :archive
           exporting = params.key? :export_archive
-          testing = params.key? :test
+          testing   = params.key? :test
 
           if exporting
             # If not passed, retrieve path from previous xcodebuild call
@@ -79,9 +80,10 @@ module Fastlane
             # Store IPA path for later deploy steps (i.e. Crashlytics)
             Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + params[:export_format].downcase
           else
-            # If not passed, check for archive scheme & workspace env vars
+            # If not passed, check for archive scheme & workspace/project env vars
             params[:scheme] ||= scheme
             params[:workspace] ||= workspace
+            params[:project] ||= project
 
             # If not passed, construct archive path from env vars
             params[:archive_path] ||= "#{build_path}#{params[:scheme]}.xcarchive"
@@ -93,9 +95,7 @@ module Fastlane
           end
 
           # Maps parameter hash to CLI args
-          hash_args = hash_to_cli_args(params)
-
-          if (hash_args)
+          if hash_args = hash_to_cli_args(params)
             cli_args += hash_args
           end
         end
@@ -109,6 +109,9 @@ module Fastlane
       end
 
       def self.hash_to_cli_args(hash)
+        # Remove nil value params
+        hash = hash.delete_if { |_, v| v.nil? }
+
         # Maps nice developer param names to CLI arguments
         hash.map do |k, v|
           v ||= ""
