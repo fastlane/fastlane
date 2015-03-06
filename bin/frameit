@@ -12,7 +12,7 @@ HighLine.track_eof = false
 program :version, Frameit::VERSION
 program :description, 'Quickly put your screenshots into the right device frames'
 program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
-program :help, 'Website', 'http://fastlane.tools'
+program :help, 'Website', 'https://fastlane.tools'
 program :help, 'GitHub', 'https://github.com/krausefx/frameit'
 program :help_formatter, :compact
 

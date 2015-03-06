@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["frameit@krausefx.com"]
   spec.summary       = %q{Quickly put your screenshots into the right device frames}
   spec.description   = %q{Quickly put your screenshots into the right device frames}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'

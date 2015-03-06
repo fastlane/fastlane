@@ -45,7 +45,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 </p>
 
 -------
-<h5 align="center"><code>frameit</code> is part of <a href="http://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 
 
@@ -105,9 +105,9 @@ To run the setup process again to add new frames use:
 
 # Tips
 
-## [`fastlane`](http://fastlane.tools) Toolchain
+## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](http://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
