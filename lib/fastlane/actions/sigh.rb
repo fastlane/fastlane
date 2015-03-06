@@ -28,6 +28,7 @@ module Fastlane
           (FileUtils.mv(path, output) rescue nil) # in case it already exists
           system("open -g '#{output}'") unless Sigh.config[:skip_install]
           puts output.green
+          path = output
         end
 
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
