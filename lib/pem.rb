@@ -7,6 +7,11 @@ require 'pem/signing_request'
 require 'fastlane_core'
 
 module PEM
+  # Use this to just setup the configuration attribute and set it later somewhere else
+  class << self
+    attr_accessor :config
+  end
+  
   TMP_FOLDER = "/tmp/PEM/"
   FileUtils.mkdir_p TMP_FOLDER
 
