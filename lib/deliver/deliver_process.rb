@@ -227,7 +227,13 @@ module Deliver
 
           system("open '#{pdf_path}'")
           okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
-          raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow unless okay
+
+          unless okay
+            dir ||= app.get_metadata_directory
+            dir += "/#{app.apple_id}.itmsp"
+            FileUtils.rm_rf(dir) unless Helper.is_test?
+            raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow
+          end
         end
       end
     end
