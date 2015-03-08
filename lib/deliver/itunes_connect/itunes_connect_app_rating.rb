@@ -39,21 +39,25 @@ module Deliver
 
 
       # Apple, doing some extra thingy for the kids section
-      val = config.last['level'].to_i
-      Helper.log.info "Setting kids mode to #{val}".green
-      currently_enabled = (all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > input").last.value != "")
-      if val > 0
-        if not currently_enabled
-          all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
-        end
+      begin
+        val = config.last['level'].to_i
+        currently_enabled = (all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > input").last.value != "")
+        Helper.log.info "Setting kids mode to #{val}".green
+        if val > 0
+          if not currently_enabled
+            all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
+          end
 
-        # Kids is enabled, check mode
-        first("select[ng-model='tempRatings.ageBand'] > option[value='#{val - 1}']").select_option # -1 since 0 is no kids mode
-      else
-        if currently_enabled
-          # disable kids mode
-          all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
+          # Kids is enabled, check mode
+          first("select[ng-model='tempRatings.ageBand'] > option[value='#{val - 1}']").select_option # -1 since 0 is no kids mode
+        else
+          if currently_enabled
+            # disable kids mode
+            all("div[itc-checkbox='tempPageContent.ratingDialog.madeForKidsChecked'] > * > a").last.click
+          end
         end
+      rescue 
+        Helper.log.warn "Couldn't set kids mode because of other options."
       end
 
       # Check if there is a warning or error message because of this rating
