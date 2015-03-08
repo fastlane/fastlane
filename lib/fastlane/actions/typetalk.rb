@@ -4,6 +4,7 @@ module Fastlane
       def self.run(params)
         options = {
             message: nil,
+            note_path: nil,
             success: true,
             topicId: nil,
             typetalk_token: nil,
@@ -15,6 +16,13 @@ module Fastlane
 
         emoticon = (options[:success] ? ':smile:' : ':rage:')
         message = "#{emoticon} #{options[:message].to_s}"
+
+        note_path = options[:note_path]
+        if File.exist?(File.expand_path(note_path))
+          contents = File.read(note_path)
+          message += "\n\n```\n#{contents}\n```"
+        end
+
         topicId = options[:topicId]
         typetalk_token = options[:typetalk_token]
 
