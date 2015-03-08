@@ -90,6 +90,9 @@ You can pass your Apple ID:
 
     cert -u cert@krausefx.com
 
+For a list of available commands run
+
+    cert --help
 
 ## Environment Variables
 In case you prefer environment variables:
