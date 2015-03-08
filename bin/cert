@@ -6,6 +6,7 @@ require 'cert'
 require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
+require 'cert/options'
 
 HighLine.track_eof = false
 
@@ -22,32 +23,16 @@ class CertApplication
 
     always_trace!
 
-    global_option '-u', '--username STRING', 'Your Apple ID username'
-    global_option '--development', 'Create a development certificate instead of a distribution one.'
+    FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
 
     command :create do |c|
       c.syntax = 'cert create'
       c.description = 'Create new iOS code signing certificates'
 
       c.action do |args, options|
-        username(options)
-
-        type = Cert::DeveloperCenter::DISTRIBUTION
-        type = Cert::DeveloperCenter::DEVELOPMENT if options.development
-
-        Cert::CertRunner.run(type)
-
-        installed = Cert::CertChecker.is_installed?ENV["CER_FILE_PATH"]
-        raise "Could not find the newly generated certificate installed" unless installed
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+        Cert::CertRunner.run
       end
-    end
-
-    def username(options)
-      user = options.username
-      user ||= ENV["CERT_USERNAME"]
-      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-      
-      CredentialsManager::PasswordManager.shared_manager(user) if user
     end
 
     default_command :create
