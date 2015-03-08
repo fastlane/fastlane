@@ -29,7 +29,15 @@ module PEM
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
                                      verify_block: Proc.new do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-t",
+                                     env_name: "PEM_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
       ]
     end
   end
