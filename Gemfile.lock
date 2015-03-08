@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     pem (0.3.7)
-      fastlane_core (>= 0.2.0)
+      fastlane_core (>= 0.3.0)
 
 GEM
   remote: https://rubygems.org/
