@@ -7,6 +7,7 @@ require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 require 'sigh/options'
+require 'sigh/manager'
 
 HighLine.track_eof = false
 
@@ -31,21 +32,7 @@ class SighApplication
 
       c.action do |args, options|
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-
-        path = Sigh::DeveloperCenter.new.run
-
-        if path
-          if Sigh.config[:filename]
-            file_name = Sigh.config[:filename]
-          else
-            file_name = File.basename(path)
-          end
-          
-          output = File.join(Sigh.config[:output_path].gsub("~", ENV["HOME"]), file_name)
-          (FileUtils.mv(path, output) rescue nil) # in case it already exists
-          system("open -g '#{output}'") unless Sigh.config[:skip_install]
-          puts output.green
-        end
+        Sigh::Manager.start
       end
     end
 
