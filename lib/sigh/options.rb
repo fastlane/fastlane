@@ -33,6 +33,14 @@ module Sigh
                                      verify_block: Proc.new do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-t",
+                                     env_name: "SIGH_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :provisioning_file_name,
                                      short_option: "-n",
                                      env_name: "SIGH_PROVISIONING_PROFILE_NAME",
