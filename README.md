@@ -105,6 +105,10 @@ If you want to generate a **Development** profile:
 To generate the profile in a specific directory: 
 
     sigh -o "~/Certificates/"
+
+For a list of available commands run
+
+    sigh --help
     
 ### Advanced
 
