@@ -257,6 +257,90 @@ increment_build_number # automatically increment by one
 increment_build_number '75' # set a specific number
 ```
 
+#### [resign]
+This will resign an ipa with another signing identity and provisioning profile.
+
+If you have used the `ipa` and `sigh` actions, then this action automatically gets the `ipa` and `provisioning_profile` values respectively from those actions and you don't need to manually set them (althout you can always override them).
+
+```ruby
+resign(
+  ipa: 'path/to/ipa', # can omit if using the `ipa` action
+  signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
+  provisioning_profile: 'path/to/profile', # can omit if using the `sigh` action
+)
+```
+
+#### [clean_build_artifacts]
+This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
+
+Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
+
+```ruby
+clean_build_artifacts
+```
+
+#### [ensure_git_status_clean]
+A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
+
+```ruby
+ensure_git_status_clean
+```
+
+#### [commit_version_bump]
+This action will create a "Version Bump" commit in your repo. Useful in conjunction with `increment_build_number`.
+
+It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:
+- All .plist files
+- The `.xcodeproj/project.pbxproj` file
+
+Then commits those files to the repo.
+
+Customise the message with the `:message` option, defaults to "Version Bump"
+
+If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the `ipa` and or `sigh` actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action.
+
+```ruby
+commit_version_bump
+
+commit_version_bump(
+  message: 'New version yo!', # create a commit with a custom message
+)
+```
+
+#### [add_git_tag]
+This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where: 
+- `grouping` is just to keep your tags organised under one "folder", defaults to 'builds'
+- `lane` is the name of the current fastlane lane
+- `prefix` is anything you want to stick in front of the version number, e.g. "v"
+- `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action
+
+For example for build 1234 in the "appstore" lane it will tag the commit with `builds/appstore/1234`
+
+```ruby
+add_git_tag # simple tag with default values
+
+add_git_tag(
+  grouping: 'fastlane-builds',
+  prefix: 'v',
+  build_number: 123
+)
+```
+
+#### [reset_git_repo]
+This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
+
+It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:
+
+- You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.
+- You call it with the `:force` option, in which case "you have been warned".
+
+Also useful for putting in your `error` block, to bring things back to a pristine state (again with the caveat that you have called `ensure_git_status_clean` before)
+
+```ruby
+reset_git_repo
+reset_git_repo :force # if you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+```
+
 #### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
@@ -536,8 +620,12 @@ before_all do |lane|
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   team_id "Q2CBPK58CA"
 
+  ensure_git_status_clean
+
   increment_build_number
+
   cocoapods
+
   xctool :test
 
   ipa({
@@ -546,8 +634,12 @@ before_all do |lane|
 end
 
 lane :beta do
+  cert
+
   sigh :adhoc
+
   deliver :beta
+
   hockey({
     api_token: '...',
     ipa: './app.ipa' # optional
@@ -555,13 +647,24 @@ lane :beta do
 end
 
 lane :deploy do
+  cert
+
   sigh
+
   snapshot
+
   deliver :force
+  
   frameit
 end
 
 after_all do |lane|
+  clean_build_artifacts
+
+  commit_version_bump
+
+  add_git_tag
+
   slack({
     message: "Successfully deployed a new version."
   })
@@ -569,6 +672,8 @@ after_all do |lane|
 end
 
 error do |lane, exception|
+  reset_git_repo
+
   slack({
     message: "An error occured"
   })
