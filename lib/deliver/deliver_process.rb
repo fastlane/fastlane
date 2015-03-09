@@ -105,6 +105,7 @@ module Deliver
         end
         if skip_deployment?
           upload_strategy = Deliver::IPA_UPLOAD_STRATEGY_JUST_UPLOAD
+          Helper.log.info "Skipping submission of app update"
         end
 
         @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_strategy)
