@@ -17,8 +17,8 @@ module Fastlane
         emoticon = (options[:success] ? ':smile:' : ':rage:')
         message = "#{emoticon} #{options[:message].to_s}"
 
-        note_path = options[:note_path]
-        if File.exist?(File.expand_path(note_path))
+        note_path = File.expand_path(options[:note_path]) if options[:note_path]
+        if note_path and File.exist?(note_path)
           contents = File.read(note_path)
           message += "\n\n```\n#{contents}\n```"
         end
