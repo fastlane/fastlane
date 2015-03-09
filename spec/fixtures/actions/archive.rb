@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      ARCHIVE_DIR = :ARCHIVE_DIR
+      ARCHIVE = :ARCHIVE
     end
 
     class ArchiveAction
@@ -16,7 +16,7 @@ module Fastlane
 
         raise "No ipa file found in #{ipa_file}".red unless File.exist?(ipa_file)
 
-        Actions.lane_context[SharedValues::ARCHIVE_DIR] = ipa_file
+        Actions.lane_context[SharedValues::ARCHIVE] = ipa_file
       end
     end
   end

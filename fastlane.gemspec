@@ -29,13 +29,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
   spec.add_dependency 'fastlane_core', '>= 0.2.1' # all shared code and dependencies
 
-  spec.add_dependency 'deliver', '>= 0.5.0'
+  spec.add_dependency 'deliver', '>= 0.7.13'
   spec.add_dependency 'snapshot', '>= 0.4.0'
-  spec.add_dependency 'frameit', '>= 0.2.0'
-  spec.add_dependency 'pem', '>= 0.3.0'
-  spec.add_dependency 'sigh', '>= 0.2.0'
-  spec.add_dependency 'produce', '>= 0.1.0'
-  spec.add_dependency 'cert', '>= 0.1.0'
+  spec.add_dependency 'frameit', '>= 0.2.3'
+  spec.add_dependency 'pem', '>= 0.3.8'
+  spec.add_dependency 'sigh', '>= 0.4.5'
+  spec.add_dependency 'produce', '>= 0.1.6'
+  spec.add_dependency 'cert', '>= 0.1.3'
+
+  spec.add_dependency 'terminal-notifier', '~> 1.6.2'
 
   # Development only
   spec.add_development_dependency 'bundler'
