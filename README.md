@@ -124,47 +124,49 @@ When one command fails, the execution will be aborted.
 ## Available fastlane actions
 
 ### Project
-- [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods)
-- [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number)
+- [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods): Setup your CocoaPods project
+- [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number): Increment the Xcode build number before building the app
 
 ### Testing
-- [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot)
-- [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool)
-- [Testmunk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#testmunk)
+- [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot): Automate taking localized screenshots of your iOS app on every device
+- [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool): Run tests of your app
+- [Testmunk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#testmunk): Run integration tests on real devices
 
 ### Certificates
-- [cert](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cert)
-- [sigh](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#sigh)
-- [resign](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#resign)
+- [cert](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cert): Automatically create and maintain iOS code signing certificates
+- [sigh](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#sigh): Create and maintain your provisioning profiles
+- [resign](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#resign): Re-Sign an existing ipa file
 
 ### Building
-- [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool)
-- [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa)
+- [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section
 
 ### Uploading
-- [deliver](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deliver)
-- [HockeyApp](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#hockeyapp)
-- [Crashlytics Beta](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#crashlytics-beta)
-- [DeployGate](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deploygate)
+- [deliver](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deliver): Upload screenshots, metadata and your app to the App Store
+- [HockeyApp](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#hockeyapp): Upload beta builds to Hockey App
+- [Crashlytics Beta](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#crashlytics-beta): Upload beta builds to Crashlytics Beta
+- [DeployGate](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deploygate): Upload beta builds to DeployGate
 
 ### Git
-- [ensure_git_status_clean](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ensure_git_status_clean)
-- [commit_version_bump](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#commit_version_bump)
-- [add_git_tag](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#add_git_tag)
-- [reset_git_repo](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#reset_git_repo)
+- [ensure_git_status_clean](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ensure_git_status_clean): Makes sure, the git repository is in a clean state before running `fastlane`
+- [commit_version_bump](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#commit_version_bump): Commit the version bump of your project
+- [add_git_tag](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#add_git_tag): Automatically tag your git repository
+- [reset_git_repo](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#reset_git_repo): Reset the git repository after the `fastlane` run
 
 ### Notifications
+
+Send success and error messages:
+
 - [Slack](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#slack)
 - [HipChat](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#hipchat)
 - [Typetalk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#typetalk)
 
 ### Misc
-- [frameit](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#frameit)
-- [produce](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#produce)
-- [clean_build_artifacts](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#clean_build_artifacts)
-- [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr)
-- [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select)
-- [team_id](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#team_id)
+- [frameit](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#frameit): Put your screenshots into the right device frames
+- [produce](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#produce): Create new iOS apps on iTunes Connect and Developer Portal
+- [clean_build_artifacts](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#clean_build_artifacts): Cleans up temporary files created by `sigh` and the other tools
+- [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr): Generate summarized code coverage reports
+- [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select): Set a path to a custom Xcode installation
+- [team_id](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#team_id): Select a team ID for the Apple Developer Portal if you are in multiple teams
 
 
 ### *before_all* block
@@ -301,7 +303,7 @@ error do |lane, exception|
 end
 ```
 
-### More advanced settings and tips can be found in [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/Advanced.md)
+##### More advanced settings and tips can be found in [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/Advanced.md)
 
 # Credentials
 A detailed description about your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
