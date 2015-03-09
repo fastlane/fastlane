@@ -48,16 +48,16 @@ module Fastlane
         end
 
         # The args we will build with
-        cli_args = Array[]
+        xcodebuild_args = Array[]
 
         # Supported ENV vars
-        build_path = ENV["BUILD_PATH"] || ""
+        build_path = ENV["BUILD_PATH"] || nil
         scheme     = ENV["SCHEME"]
         workspace  = ENV["WORKSPACE"]
         project    = ENV["PROJECT"]
 
         # Append slash to build path, if needed
-        unless build_path.end_with? "/"
+        if build_path && !build_path.end_with?("/")
           build_path += "/"
         end
 
@@ -95,20 +95,53 @@ module Fastlane
           end
 
           # Maps parameter hash to CLI args
-          if hash_args = hash_to_cli_args(params)
-            cli_args += hash_args
+          if hash_args = hash_to_args(params)
+            xcodebuild_args += hash_args
           end
         end
 
         # Joins args into space delimited string
-        cli_args = cli_args.join(" ")
+        xcodebuild_args = xcodebuild_args.join(" ")
 
-        output_format = testing && !archiving ? "--test" : "--simple"
+        # Default args
+        xcpretty_args = [ "--color" ]
 
-        Actions.sh "xcodebuild #{cli_args} | xcpretty #{output_format} --color"
+        # Stdout format
+        if testing && !archiving
+          xcpretty_args.push "--test"
+        else
+          xcpretty_args.push "--simple"
+        end
+
+        if testing
+          # Test report file format
+          if params[:report_formats]
+            report_formats = params[:report_formats].map do |format|
+              "--report #{format}"
+            end.sort().join(" ")
+
+            xcpretty_args.push report_formats
+
+            # Test report file path
+            if params[:report_path]
+              xcpretty_args.push "--output \"#{params[:report_path]}\""
+            elsif build_path
+              xcpretty_args.push "--output \"#{build_path}report\""
+            end
+
+            # Save screenshots flag
+            if params[:report_formats].include?("html") && params[:report_screenshots]
+              xcpretty_args.push "--screenshots"
+            end
+          end
+        end
+
+        xcpretty_args = xcpretty_args.sort.join(" ")
+
+        Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
       end
 
-      def self.hash_to_cli_args(hash)
+      def self.hash_to_args(hash)
         # Remove nil value params
         hash = hash.delete_if { |_, v| v.nil? }
 

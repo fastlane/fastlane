@@ -42,7 +42,8 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-alltargets " \
           + "-arch \"architecture\" " \
           + "-archivePath \"./build/MyApp.xcarchive\" " \
@@ -71,7 +72,7 @@ describe Fastlane do
           + "install " \
           + "installsrc " \
           + "test " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
       )
     end
 
@@ -104,12 +105,13 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
     end
 
@@ -146,12 +148,13 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "archive " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
       end
 
@@ -164,12 +167,13 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
       end
     end
@@ -185,12 +189,13 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "archive " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
       end
     end
@@ -205,11 +210,12 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
       end
     end
@@ -221,7 +227,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild clean | xcpretty --simple --color"
+          "set -o pipefail && xcodebuild clean | xcpretty --color --simple"
         )
       end
     end
@@ -236,12 +242,13 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --simple --color"
+          + "| xcpretty --color --simple"
         )
       end
     end
@@ -257,12 +264,95 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "xcodebuild " \
+          "set -o pipefail && " \
+          + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \
-          + "| xcpretty --test --color"
+          + "| xcpretty --color --test"
+        )
+      end
+    end
+
+    describe "test reporting" do
+      it "should work with xcpretty report params" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            report_formats: ['junit'],
+            report_path: './build-dir/test-report'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "test " \
+          + "| xcpretty --color " \
+          + "--output \"./build-dir/test-report\" " \
+          + "--report junit " \
+          + "--test"
+        )
+      end
+
+      it "should save reports to BUILD_PATH + \"/report\" by default" do
+        ENV["BUILD_PATH"] = "./build"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            report_formats: ['html'],
+            report_screenshots: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "test " \
+          + "| xcpretty --color " \
+          + "--output \"./build/report\" " \
+          + "--report html " \
+          + "--screenshots " \
+          + "--test"
+        )
+
+        ENV.delete("BUILD_PATH")
+      end
+
+      it "should support multiple output formats" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            report_formats: [ 'html', 'junit', 'json-compilation-database' ]
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "test " \
+          + "| xcpretty --color " \
+          + "--report html " \
+          + "--report json-compilation-database " \
+          + "--report junit " \
+          + "--test"
         )
       end
     end
