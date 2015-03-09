@@ -13,7 +13,8 @@ module Fastlane
         require 'credentials_manager/appfile_config'
 
         values = params.first
-        if values.kind_of?Array
+
+        unless values.kind_of?Hash
           # Old syntax
           values = {}
           params.each do |val|
