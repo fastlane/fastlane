@@ -24,10 +24,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
   spec.add_dependency 'shenzhen', '~> 0.12.1' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
-  spec.add_dependency 'shenzhen', '>= 0.12.1' # to upload to Hockey and Crashlytics
   spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
+  spec.add_dependency 'xcodeproj', '~> 0.22'
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
-
   spec.add_dependency 'fastlane_core', '>= 0.2.1' # all shared code and dependencies
 
   spec.add_dependency 'deliver', '>= 0.5.0'
