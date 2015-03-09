@@ -196,7 +196,9 @@ module Sigh
           # Add all devices
           wait_for_elements('.selectAll.column')
           sleep 3
-          first(:xpath, "//div[@class='selectAll column']/input").click # select all the devices
+          unless first(:xpath, "//div[@class='selectAll column']/input")["checked"]
+            first(:xpath, "//div[@class='selectAll column']/input").click # select all the devices
+          end
         end
 
         click_next
