@@ -147,7 +147,7 @@ When one command fails, the execution will be aborted.
 - [DeployGate](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deploygate): Upload beta builds to DeployGate
 
 ### Git
-- [ensure_git_status_clean](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ensure_git_status_clean): Makes sure, the git repository is in a clean state before running `fastlane`
+- [ensure_git_status_clean](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ensure_git_status_clean): Makes sure, the git repository is in a clean state
 - [commit_version_bump](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#commit_version_bump): Commit the version bump of your project
 - [add_git_tag](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#add_git_tag): Automatically tag your git repository
 - [reset_git_repo](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#reset_git_repo): Reset the git repository after the `fastlane` run
