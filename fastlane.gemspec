@@ -37,6 +37,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'produce', '>= 0.1.6'
   spec.add_dependency 'cert', '>= 0.1.3'
 
+  spec.add_dependency 'terminal-notifier', '~> 1.6.2'
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
