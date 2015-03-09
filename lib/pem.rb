@@ -16,6 +16,7 @@ module PEM
   FileUtils.mkdir_p TMP_FOLDER
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PEM_TEAM_ID"]
+  ENV['DELIVER_USER'] ||= ENV["PEM_USERNAME"]
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
