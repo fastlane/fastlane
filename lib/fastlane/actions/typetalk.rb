@@ -37,7 +37,7 @@ module Fastlane
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topicId}")
         response = Net::HTTP.post_form(uri, {'message' => message,
-                                             'typetalk_token' => typetalk_token})
+                                             'typetalkToken' => typetalk_token})
 
         self.check_response(response)
       end
