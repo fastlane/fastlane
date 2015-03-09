@@ -159,6 +159,7 @@ Send success and error messages:
 - [Slack](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#slack)
 - [HipChat](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#hipchat)
 - [Typetalk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#typetalk)
+- [Notify](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#notify)
 
 ### Misc
 - [frameit](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#frameit): Put your screenshots into the right device frames
