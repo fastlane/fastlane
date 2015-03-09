@@ -91,6 +91,11 @@ If you want to generate a development certificate instead:
 
     pem --development
 
+To get a list of available options run:
+
+    pem --help
+    
+
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Environment Variables
