@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sigh (0.4.3)
+    sigh (0.4.4)
       fastlane_core (>= 0.3.0)
       plist (~> 3.1.0)
 
