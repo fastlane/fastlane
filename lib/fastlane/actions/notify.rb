@@ -5,9 +5,7 @@ module Fastlane
         require 'terminal-notifier'
 
         text = params.join(' ')
-        TerminalNotifier.notify(text,
-                                :title => 'Fastlane',
-                               )
+        TerminalNotifier.notify(text, title: 'fastlane')
       end
     end
   end
