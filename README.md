@@ -355,6 +355,7 @@ Send a message to **topic** with success (:smile:) or failure (:rage:) status.
 ```ruby
   typetalk({
     message: "App successfully released!",
+    note_path: 'ChangeLog.md',
     topicId: 1,
     success: true,
     typetalk_token: 'Your Typetalk Token'

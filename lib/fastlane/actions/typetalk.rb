@@ -4,6 +4,7 @@ module Fastlane
       def self.run(params)
         options = {
             message: nil,
+            note_path: nil,
             success: true,
             topicId: nil,
             typetalk_token: nil,
@@ -15,6 +16,13 @@ module Fastlane
 
         emoticon = (options[:success] ? ':smile:' : ':rage:')
         message = "#{emoticon} #{options[:message].to_s}"
+
+        note_path = File.expand_path(options[:note_path]) if options[:note_path]
+        if note_path and File.exist?(note_path)
+          contents = File.read(note_path)
+          message += "\n\n```\n#{contents}\n```"
+        end
+
         topicId = options[:topicId]
         typetalk_token = options[:typetalk_token]
 
@@ -29,7 +37,7 @@ module Fastlane
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topicId}")
         response = Net::HTTP.post_form(uri, {'message' => message,
-                                             'typetalk_token' => typetalk_token})
+                                             'typetalkToken' => typetalk_token})
 
         self.check_response(response)
       end
