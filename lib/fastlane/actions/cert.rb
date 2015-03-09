@@ -16,7 +16,7 @@ module Fastlane
           # This should be executed in the fastlane folder
 
           values = params.first
-          if params.kind_of?Array
+          if values.kind_of?Array
             # Old syntax
             values = {}
             params.each do |val|
