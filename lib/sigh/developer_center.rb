@@ -50,6 +50,8 @@ module Sigh
 
         certs = post_ajax(@list_certs_url)
 
+        profile_name = Sigh.config[:provisioning_file_name]
+
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
         required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
         certs['provisioningProfiles'].each do |current_cert|
@@ -58,6 +60,9 @@ module Sigh
           details = profile_details(current_cert['provisioningProfileId'])
 
           if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
+
+            next if profile_name != nil && details['provisioningProfile']['name'] != profile_name
+
             # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
             next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
 
