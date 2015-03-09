@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.2.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.3.1' # all shared code and dependencies
 
   # Development only
   spec.add_development_dependency 'bundler'
