@@ -90,6 +90,9 @@ You can pass your Apple ID:
 
     cert -u cert@krausefx.com
 
+For a list of available commands run
+
+    cert --help
 
 ## Environment Variables
 In case you prefer environment variables:
@@ -97,6 +100,7 @@ In case you prefer environment variables:
 - ```CERT_USERNAME```
 - ```CERT_TEAM_ID```
 - ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain if you don't want to use the default one
+- ```FASTLANE_TEAM_NAME``` (the Team Name, e.g. `Felix Krause`)
 
 ## Use with [`sigh`](https://github.com/KrauseFx/sigh)
 

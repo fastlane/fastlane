@@ -9,6 +9,11 @@ require 'cert/keychain_importer'
 require 'fastlane_core'
 
 module Cert
+  # Use this to just setup the configuration attribute and set it later somewhere else
+  class << self
+    attr_accessor :config
+  end
+  
   TMP_FOLDER = "/tmp/cert/"
   FileUtils.mkdir_p TMP_FOLDER
 

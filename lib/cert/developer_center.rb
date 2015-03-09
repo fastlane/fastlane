@@ -11,27 +11,28 @@ module Cert
 
     # This will check if there is at least one of the certificates already installed on the local machine
     # This will store the resulting file name in ENV 'CER_FILE_PATH' and the Cert ID in 'CER_CERTIFICATE_ID'
-    def run(type)
-      file = find_existing_cert(type)
+    def run
+      @type = (Cert.config[:development] ? DEVELOPMENT : DISTRIBUTION)
+      file = find_existing_cert
       if file
         # We don't need to do anything :)
         ENV["CER_FILE_PATH"] = file
       else
-        create_certificate(type)
+        create_certificate
       end
     rescue => ex
       error_occured(ex)
     end
 
-    def find_existing_cert(type)
-      if type == DEVELOPMENT
+    def find_existing_cert
+      if @type == DEVELOPMENT
         visit CERTS_URL_DEV
       else
         visit CERTS_URL
       end
 
       # Download all available certs to check if they are installed using the SHA1 hash
-      certs = code_signing_certificate(type)
+      certs = code_signing_certificate
       certs.each do |current|
         display_id = current['certificateId']
         type_id = current['certificateTypeDisplayId']
@@ -54,7 +55,7 @@ module Cert
     end
 
     # This will actually create a new certificate
-    def create_certificate(type)
+    def create_certificate
       visit CREATE_CERT_URL
       wait_for_elements("form[name='certificateSave']")
 
@@ -62,7 +63,7 @@ module Cert
 
       # select certificate type
       toggle_value = 'type-iosNoOCSP'
-      toggle_value = 'type-development' if type == DEVELOPMENT
+      toggle_value = 'type-development' if @type == DEVELOPMENT
       app_store_toggle = first("input##{toggle_value}")
       if !!app_store_toggle['disabled']
         # Limit of certificates already reached
@@ -150,8 +151,8 @@ module Cert
         # "certificateTypeDisplayId"=>"...",
         # "serialNum"=>"....",
         # "typeString"=>"iOS Distribution"},
-      def code_signing_certificate(type)
-        if type == DEVELOPMENT
+      def code_signing_certificate
+        if @type == DEVELOPMENT
           visit CERTS_URL_DEV
         else
           visit CERTS_URL
@@ -168,7 +169,7 @@ module Cert
         available = []
 
         certTypeName = 'iOS Distribution'
-        certTypeName = 'iOS Development' if type == DEVELOPMENT
+        certTypeName = 'iOS Development' if @type == DEVELOPMENT
         certs = post_ajax(url)['certRequests']
         certs.each do |current_cert|
           if current_cert['typeString'] == certTypeName
