@@ -19,8 +19,8 @@ module Fastlane
         test: "test",
 
         # parameters
-        arch: "-arch",
         alltargets: "-alltargets",
+        arch: "-arch",
         archive_path: "-archivePath",
         configuration: "-configuration",
         derivedDataPath: "-derivedDataPath",
@@ -51,7 +51,7 @@ module Fastlane
         cli_args = Array[]
 
         # Supported ENV vars
-        build_path = ENV["BUILD_PATH"]
+        build_path = ENV["BUILD_PATH"] || ""
         scheme     = ENV["SCHEME"]
         workspace  = ENV["WORKSPACE"]
         project    = ENV["PROJECT"]
@@ -84,12 +84,12 @@ module Fastlane
             params[:scheme] ||= scheme
             params[:workspace] ||= workspace
             params[:project] ||= project
-
-            # If not passed, construct archive path from env vars
-            params[:archive_path] ||= "#{build_path}#{params[:scheme]}.xcarchive"
           end
 
           if archiving
+            # If not passed, construct archive path from env vars
+            params[:archive_path] ||= "#{build_path}#{params[:scheme]}.xcarchive"
+
             # Cache path for later xcodebuild calls
             Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = params[:archive_path]
           end
@@ -122,7 +122,39 @@ module Fastlane
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
           end
-        end.compact
+        end.compact.sort
+      end
+    end
+
+    class XcarchiveAction
+      def self.run(params)
+        params_hash = params.first || {}
+        params_hash[:archive] = true
+        XcodebuildAction.run([params_hash])
+      end
+    end
+
+    class XcbuildAction
+      def self.run(params)
+        params_hash = params.first || {}
+        params_hash[:build] = true
+        XcodebuildAction.run([params_hash])
+      end
+    end
+
+    class XccleanAction
+      def self.run(params)
+        params_hash = params.first || {}
+        params_hash[:clean] = true
+        XcodebuildAction.run([params_hash])
+      end
+    end
+
+    class XctestAction
+      def self.run(params)
+        params_hash = params.first || {}
+        params_hash[:test] = true
+        XcodebuildAction.run([params_hash])
       end
     end
   end

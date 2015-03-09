@@ -43,15 +43,8 @@ describe Fastlane do
 
         expect(result).to eq(
           "xcodebuild " \
-          + "analyze " \
-          + "archive " \
-          + "build " \
-          + "clean " \
-          + "install " \
-          + "installsrc " \
-          + "test " \
-          + "-arch \"architecture\" " \
           + "-alltargets " \
+          + "-arch \"architecture\" " \
           + "-archivePath \"./build/MyApp.xcarchive\" " \
           + "-configuration \"Debug\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
@@ -62,7 +55,6 @@ describe Fastlane do
           + "-exportProvisioningProfile \"MyApp Distribution\" " \
           + "-exportSigningIdentity \"Distribution: MyCompany, LLC\" " \
           + "-exportWithOriginalSigningIdentity " \
-          + "OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" " \
           + "-project \"MyApp.xcodeproj\" " \
           + "-resultBundlePath \"/result/bundle/path\" " \
           + "-scheme \"MyApp\" " \
@@ -71,6 +63,14 @@ describe Fastlane do
           + "-target \"MyAppTarget\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "-xcconfig \"my.xcconfig\" " \
+          + "OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" " \
+          + "analyze " \
+          + "archive " \
+          + "build " \
+          + "clean " \
+          + "install " \
+          + "installsrc " \
+          + "test " \
           + "| xcpretty --simple --color"
       )
     end
@@ -105,10 +105,10 @@ describe Fastlane do
 
         expect(result).to eq(
           "xcodebuild " \
-          + "-exportArchive " \
-          + "-exportPath \"./build-dir/MyApp\" " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
+          + "-exportPath \"./build-dir/MyApp\" " \
           + "| xcpretty --simple --color"
         )
     end
@@ -147,10 +147,10 @@ describe Fastlane do
 
         expect(result).to eq(
           "xcodebuild " \
-          + "archive " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "archive " \
           + "| xcpretty --simple --color"
         )
       end
@@ -170,6 +170,79 @@ describe Fastlane do
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
           + "| xcpretty --simple --color"
+        )
+      end
+    end
+
+    describe "xcarchive" do
+      it "is equivalent to 'xcodebuild archive'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcarchive(
+            archive_path: './build-dir/MyApp.xcarchive',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "xcodebuild " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "archive " \
+          + "| xcpretty --simple --color"
+        )
+      end
+    end
+
+    describe "xcbuild" do
+      it "is equivalent to 'xcodebuild build'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "| xcpretty --simple --color"
+        )
+      end
+    end
+
+    describe "xcclean" do
+      it "is equivalent to 'xcodebuild clean'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcclean
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "xcodebuild clean | xcpretty --simple --color"
+        )
+      end
+    end
+
+    describe "xctest" do
+      it "is equivalent to 'xcodebuild test'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "test " \
+          + "| xcpretty --test --color"
         )
       end
     end
