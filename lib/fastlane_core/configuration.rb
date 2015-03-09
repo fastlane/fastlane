@@ -64,7 +64,12 @@ module FastlaneCore
 
       value ||= @values[key]
       # TODO: configuration files
-      value = ENV[key.to_s] if value == nil
+
+      if value == nil
+        value = ENV[option.env_name]
+        option.verify!(value) if value
+      end
+
       value = option.default_value if value == nil
       value = false if (value == nil and not option.is_string) # by default boolean flags are false
 
