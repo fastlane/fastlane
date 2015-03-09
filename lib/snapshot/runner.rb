@@ -189,7 +189,7 @@ module Snapshot
         "-w '#{device}'",
         "-D '#{TRACE_DIR}/trace'",
         "-t 'Automation'",
-        "'#{@app_path.shellescape}'",
+        "#{@app_path.shellescape}",
         "-e UIARESULTSPATH '#{TRACE_DIR}'",
         "-e UIASCRIPT '#{script_path}'",
         "-AppleLanguages '(#{language})'",
