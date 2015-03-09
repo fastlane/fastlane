@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.1.17)
+    fastlane (0.1.18)
       aws-sdk (~> 1.0)
       cert (>= 0.1.0)
       deliver (>= 0.5.0)
@@ -34,7 +34,7 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    cert (0.1.1)
+    cert (0.1.2)
       fastlane_core (>= 0.2.0)
     cliver (0.3.2)
     codeclimate-test-reporter (0.4.7)
