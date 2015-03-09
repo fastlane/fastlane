@@ -152,7 +152,6 @@ When one command fails, the execution will be aborted.
 - [add_git_tag](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#add_git_tag): Automatically add a git tag
 - [push_to_git_remote](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#push_to_git_remote): Push local commits to a git remote
 - [reset_git_repo](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#reset_git_repo): Reset the git repository after the `fastlane` run
-- [push_to_git_repo](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#push_to_git_repo): Push the coommits and tags to the remote server
 
 ### Notifications
 
