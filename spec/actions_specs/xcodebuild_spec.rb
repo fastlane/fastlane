@@ -226,6 +226,26 @@ describe Fastlane do
       end
     end
 
+    describe "xcexport" do
+      it "is equivalent to 'xcodebuild -exportArchive'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcexport(
+            archive_path: './build-dir/MyApp.xcarchive',
+            export_path: './build-dir/MyApp',
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "xcodebuild " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "-exportArchive " \
+          + "-exportFormat \"ipa\" " \
+          + "-exportPath \"./build-dir/MyApp\" " \
+          + "| xcpretty --simple --color"
+        )
+      end
+    end
+
     describe "xctest" do
       it "is equivalent to 'xcodebuild test'" do
         result = Fastlane::FastFile.new.parse("lane :test do

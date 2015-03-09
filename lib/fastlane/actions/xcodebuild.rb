@@ -150,6 +150,14 @@ module Fastlane
       end
     end
 
+    class XcexportAction
+      def self.run(params)
+        params_hash = params.first || {}
+        params_hash[:export_archive] = true
+        XcodebuildAction.run([params_hash])
+      end
+    end
+
     class XctestAction
       def self.run(params)
         params_hash = params.first || {}
