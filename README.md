@@ -141,6 +141,7 @@ When one command fails, the execution will be aborted.
 ### Building
 - [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section
 - [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select): Set a path to a custom Xcode installation
+- [xcodebuild](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcodebuild): Archive, build, clean, test or export your app.
 
 ### Uploading
 - [deliver](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deliver): Upload screenshots, metadata and your app to the App Store
@@ -279,7 +280,7 @@ lane :deploy do
   snapshot
 
   deliver :force
-  
+
   frameit
 end
 
