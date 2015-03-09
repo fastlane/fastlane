@@ -1,4 +1,4 @@
-# `fastlane` Actions
+# fastlane Actions
 
 There are some predefined actions you can use. If you have ideas for more, please let me know.
 
@@ -41,13 +41,15 @@ This will generate and download your App Store provisioning profile. `sigh` will
 sigh
 ```
 
-To use the Ad Hoc profile instead
+You can pass all options listed in `sigh --help` in `fastlane`:
 
 ```ruby
-sigh :adhoc
+sigh({
+  adhoc: true,
+  force: true,
+  filename: "myFile.mobileprovision"
+})
 ```
-
-To always re-generate the provisioning profile, use `sigh :force`.
 
 #### [cert](https://github.com/KrauseFx/cert)
 
@@ -58,6 +60,15 @@ cert
 ```
 
 `fastlane` will automatically pass the signing certificate to use to `sigh`.
+
+You can pass all options listed in `sigh --help` in `fastlane`:
+
+```ruby
+cert({
+  development: true,
+  username: "user@email.com"
+})
+```
 
 #### [produce](https://github.com/KrauseFx/produce)
 
@@ -176,7 +187,7 @@ If you have other uncommitted changes in your repo, this action will fail. If yo
 commit_version_bump
 
 commit_version_bump(
-  message: 'New version yo!', # create a commit with a custom message
+  message: 'Version Bump', # create a commit with a custom message
 )
 ```
 
