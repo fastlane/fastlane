@@ -210,6 +210,22 @@ add_git_tag(
 )
 ```
 
+#### push_to_git_repo
+Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your caninical/main repo.
+
+Tags will be pushed as well.
+
+```ruby
+push_to_git_repo # simple version. pushes 'master' branch to 'origin' remote
+
+push_to_git_repo(
+  remote: 'origin',         # optional, default: 'origin'
+  local_branch: 'develop',  # optional, default: 'master'
+  remote_branch: 'develop', # optional, default is set to local_branch
+  force: true,              # optional, default: false
+)
+```
+
 #### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
 
