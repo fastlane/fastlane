@@ -182,7 +182,6 @@ The `cert` action can be used to make sure to have the latest signing certificat
 
 ```ruby
 cert
-sigh :force
 ```
 
 `fastlane` will automatically pass the signing certificate to use to `sigh`.

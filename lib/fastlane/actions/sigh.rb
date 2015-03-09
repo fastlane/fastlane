@@ -12,7 +12,16 @@ module Fastlane
         require 'sigh/manager'
         require 'credentials_manager/appfile_config'
 
-        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (params.first || {}))
+        values = params.first
+        if params.kind_of?Array
+          # Old syntax
+          values = {}
+          params.each do |val|
+            values[val] = true
+          end
+        end
+
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (values || {}))
         
         path = Sigh::Manager.start
 
