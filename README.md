@@ -131,6 +131,7 @@ When one command fails, the execution will be aborted.
 - [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot): Automate taking localized screenshots of your iOS app on every device
 - [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool): Run tests of your app
 - [Testmunk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#testmunk): Run integration tests on real devices
+- [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr): Generate summarized code coverage reports
 
 ### Certificates
 - [cert](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cert): Automatically create and maintain iOS code signing certificates
@@ -139,6 +140,7 @@ When one command fails, the execution will be aborted.
 
 ### Building
 - [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section
+- [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select): Set a path to a custom Xcode installation
 
 ### Uploading
 - [deliver](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deliver): Upload screenshots, metadata and your app to the App Store
@@ -166,8 +168,6 @@ Send success and error messages:
 - [frameit](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#frameit): Put your screenshots into the right device frames
 - [produce](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#produce): Create new iOS apps on iTunes Connect and Developer Portal
 - [clean_build_artifacts](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#clean_build_artifacts): Cleans up temporary files created by `sigh` and the other tools
-- [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr): Generate summarized code coverage reports
-- [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select): Set a path to a custom Xcode installation
 - [team_id](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#team_id): Select a team ID for the Apple Developer Portal if you are in multiple teams
 
 
