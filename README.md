@@ -49,7 +49,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
 - Easy setup, which helps you getting up and running very fast
-- Shared context, which is used to let the different deployment steps communicate with each other
+- [Shared context](https://github.com/KrauseFx/fastlane/blob/master/Advanced.md#lane-context), which is used to let the different deployment steps communicate with each other
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
 - Very flexible configuration using a fully customizable `Fastfile`
