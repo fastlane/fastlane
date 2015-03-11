@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'commander', '>= 4.1.0' # CLI parser
   spec.add_dependency 'babosa' # transliterate strings
 
-  spec.add_dependency 'credentials_manager' # fastlane password manager
+  spec.add_dependency 'credentials_manager', '>= 0.1.3' # fastlane password manager
 
   # Frontend Scripting
   spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
