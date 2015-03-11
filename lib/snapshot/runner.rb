@@ -1,4 +1,5 @@
 require 'pty'
+require 'shellwords'
 
 module Snapshot
   class Runner
@@ -86,7 +87,7 @@ module Snapshot
       com("xcrun simctl boot '#{udid}'")
       com("xcrun simctl uninstall booted '#{app_identifier}'")
       sleep 3
-      com("xcrun simctl install booted '#{@app_path}'")
+      com("xcrun simctl install booted '#{@app_path.shellescape}'")
       com("xcrun simctl shutdown booted")
     end
 
@@ -188,7 +189,7 @@ module Snapshot
         "-w '#{device}'",
         "-D '#{TRACE_DIR}/trace'",
         "-t 'Automation'",
-        "'#{@app_path}'",
+        "#{@app_path.shellescape}",
         "-e UIARESULTSPATH '#{TRACE_DIR}'",
         "-e UIASCRIPT '#{script_path}'",
         "-AppleLanguages '(#{language})'",
