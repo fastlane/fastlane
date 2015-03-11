@@ -304,7 +304,7 @@ A detailed description about your credentials is available on a [seperate repo](
 
 `deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
 
-Before actually uploading anything to iTunes, ```Deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
+Before actually uploading anything to iTunes, ```deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
 ```deliver``` uses the following techniques under the hood:
 
