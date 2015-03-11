@@ -44,9 +44,6 @@ keywords({
 ##### screenshots_path
 A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution.
 
-##### config_json_folder
-Path to a folder containing a configuration file and including screenshots - this will be generated for you when runing `deliver init`.
-
 ##### skip_pdf
 If set to `true`, no PDF report will be generated before the actual deployment. You can also pass `--force` when calling `deliver`.
 

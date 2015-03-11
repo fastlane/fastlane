@@ -39,7 +39,8 @@ module Deliver
         unless is_beta_build?
           # App Metdata will not be updated for beta builds
 
-          load_metadata_from_config_json_folder # the json file generated from the quick start
+          load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
+          load_metadata_folder # this is the new way of defining app metadata
           set_app_metadata
           set_screenshots
 
@@ -140,10 +141,8 @@ module Deliver
       end
     end
 
-    def load_metadata_from_config_json_folder
-      return unless @deploy_information[Deliverer::ValKey::CONFIG_JSON_FOLDER]
-
-      matching = {
+    def options_mapping
+      {
         'title' => Deliverer::ValKey::TITLE,
         'description' => Deliverer::ValKey::DESCRIPTION,
         'version_whats_new' => Deliverer::ValKey::CHANGELOG,
@@ -152,6 +151,10 @@ module Deliver
         'software_url' => Deliverer::ValKey::MARKETING_URL,
         'support_url' => Deliverer::ValKey::SUPPORT_URL
       }
+    end
+
+    def load_metadata_from_config_json_folder
+      return unless @deploy_information[Deliverer::ValKey::CONFIG_JSON_FOLDER]
 
       file_path = @deploy_information[:config_json_folder]
       unless file_path.split("/").last.include?"metadata.json"
@@ -163,11 +166,31 @@ module Deliver
       content = JSON.parse(File.read(file_path))
       content.each do |language, current|
 
-        matching.each do |key, value|
+        options_mapping.each do |key, value|
           if current[key]
             @deploy_information[value] ||= {}
             @deploy_information[value][language] ||= current[key]
           end
+        end
+      end
+    end
+
+    def load_metadata_folder
+      # Fetch the inforamtion from the ./metadata folder if it exists
+      metadata_folder = './metadata'
+      return unless File.exists?metadata_folder
+
+      Dir[File.join(metadata_folder, '*')].each do |language_folder|
+        language = File.basename(language_folder)
+
+        options_mapping.each do |key, value|
+          content = File.read(File.join(language_folder, "#{key}.txt")) rescue nil
+          next unless content
+          content = content.split("\n") if key == 'keywords'
+          @deploy_information[value] ||= {}
+          @deploy_information[value][language] ||= content
+
+          Helper.log.info "Successfully loaded content from '#{key}.txt' for language #{language_folder}"
         end
       end
     end
