@@ -81,7 +81,7 @@ module Produce
       all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
       wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
 
-      if @config[:bundle_identifier_suffix] != nil
+      if wildcard_bundle?
         wait_for_elements("input[ng-model='createAppDetails.newApp.bundleIdSuffix.value']").first.set @config[:bundle_identifier_suffix]
       end
 
