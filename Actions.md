@@ -398,10 +398,10 @@ the most common `xcodebuild` operations: `xcarchive`, `xcbuild`, `xcclean`, `xct
 Environment variables may be added to a .env file in place of some parameters:
 
 ```
-PROJECT="./MyApp.xcodeproj"
-WORKSPACE="./MyApp.xcworkspace"
-SCHEME="MyApp"
-BUILD_PATH="./build"
+XCODE_PROJECT="./MyApp.xcodeproj"
+XCODE_WORKSPACE="./MyApp.xcworkspace"
+XCODE_SCHEME="MyApp"
+XCODE_BUILD_PATH="./build"
 ```
 
 More usage examples (assumes the above .env setup is being used):
