@@ -55,6 +55,7 @@ module Produce
     def env_options
       hash = {
         bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
+        bundle_identifier_suffix: ENV['PRODUCE_APP_IDENTIFIER_SUFFIX'],
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],

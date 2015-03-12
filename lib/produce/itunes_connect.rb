@@ -10,12 +10,19 @@ module Produce
 
     def run(config)
       @config = config
+      @wildcard_bundle = config[:bundle_identifier].end_with?("*")
+
+      if @wildcard_bundle && @config[:bundle_identifier_suffix].nil? 
+        raise "Bundle id has wildcard in it. You must specify a valid bundle_identifier_suffix".red
+      end
+
+      @full_bundle_identifier = config[:bundle_identifier].gsub('*', config[:bundle_identifier_suffix].to_s)
 
       if ENV["CREATED_NEW_APP_ID"].to_i > 0
         # We just created this App ID, this takes about 3 minutes to show up on iTunes Connect
         Helper.log.info "Waiting for 3 minutes to make sure, the App ID is synced to iTunes Connect".yellow
         sleep 180
-        unless app_exists?
+        unless bundle_exist?
           Helper.log.info "Couldn't find new app yet, we're waiting for another 2 minutes.".yellow
           sleep 120
         end
@@ -27,7 +34,7 @@ module Produce
     end
 
     def create_new_app
-      if app_exists?
+      if bundle_exist?
         Helper.log.info "App '#{@config[:app_name]}' exists already, nothing to do on iTunes Connect".green
         # Nothing to do here
       else
@@ -37,7 +44,9 @@ module Produce
 
         initial_pricing
 
-        raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
+        if !@wildcard_bundle
+          raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
+        end
 
         Helper.log.info "Finished creating new app '#{@config[:app_name]}' on iTunes Connect".green
       end
@@ -47,12 +56,13 @@ module Produce
 
     def fetch_apple_id
       # First try it using the Apple API
-      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{@config[:bundle_identifier]}").read)
+      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{@full_bundle_identifier}").read)
 
       if data['resultCount'] == 0 or true
-        visit current_url
+        visit APPS_URL
         sleep 10
-        first("input[ng-model='searchModel']").set @config[:bundle_identifier]
+
+        first("input[ng-model='searchModel']").set @full_bundle_identifier
 
         if all("div[bo-bind='app.name']").count == 2
           raise "There were multiple results when looking for the new app. This might be due to having same app identifiers included in each other (see generated screenshots)".red
@@ -75,11 +85,16 @@ module Produce
       wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set @config[:app_name]
       wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
       wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
-      
-      wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
+
       all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
+      wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
+
+      if @config[:bundle_identifier_suffix] != nil
+        wait_for_elements("input[ng-model='createAppDetails.newApp.bundleIdSuffix.value']").first.set @config[:bundle_identifier_suffix]
+      end
 
       click_on "Create"
+
       sleep 5 # this usually takes some time
 
       if all("p[ng-repeat='error in errorText']").count == 1
@@ -92,19 +107,30 @@ module Produce
     end
 
     def initial_pricing
+      # It's not important here which is the price set. It will be updated by deliver
       sleep 3
       click_on "Pricing"
-      first('#pricingPopup > option[value="3"]').select_option
+      first('#pricingPopup > option[value="0"]').select_option
       first('.saveChangesActionButton').click
     end
 
     private
+      def bundle_exist?
+        if @wildcard_bundle
+          return false # We should always create the app from scratch.
+        else
+          open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
+          sleep 4
+
+          return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
+        end
+      end
+
       def app_exists?
         open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
-
         sleep 4
 
-        return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
+        return (all("option[value='#{@full_bundle_identifier}']").count == 0)
       end
 
       def open_new_app_popup
