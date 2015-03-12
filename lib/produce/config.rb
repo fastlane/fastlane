@@ -59,8 +59,8 @@ module Produce
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
-        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
-        skip_devcenter: skip_devcenter?(ENV['PRODUCE_SKIP_DEVCENTER']),
+        skip_itc: is_truthy?(ENV['PRODUCE_SKIP_ITC']),
+        skip_devcenter: is_truthy?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
         team_name: ENV['PRODUCE_TEAM_NAME']
       }
@@ -83,12 +83,10 @@ module Produce
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
-    def skip_itc? value
+    # TODO: this could be moved inside fastlane_core
+    def is_truthy? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
 
-    def skip_devcenter? value
-      %w( true t 1 yes y ).include? value.to_s.downcase
-    end
   end
 end
