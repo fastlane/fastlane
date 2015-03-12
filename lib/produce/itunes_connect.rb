@@ -10,12 +10,6 @@ module Produce
 
     def run(config)
       @config = config
-      @wildcard_bundle = config[:bundle_identifier].end_with?("*")
-
-      if @wildcard_bundle && @config[:bundle_identifier_suffix].nil? 
-        raise "Bundle id has wildcard in it. You must specify a valid bundle_identifier_suffix".red
-      end
-
       @full_bundle_identifier = config[:bundle_identifier].gsub('*', config[:bundle_identifier_suffix].to_s)
 
       if ENV["CREATED_NEW_APP_ID"].to_i > 0
@@ -34,7 +28,7 @@ module Produce
     end
 
     def create_new_app
-      if bundle_exist?
+      if app_exists?
         Helper.log.info "App '#{@config[:app_name]}' exists already, nothing to do on iTunes Connect".green
         # Nothing to do here
       else
@@ -44,9 +38,7 @@ module Produce
 
         initial_pricing
 
-        if !@wildcard_bundle
-          raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
-        end
+        raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
 
         Helper.log.info "Finished creating new app '#{@config[:app_name]}' on iTunes Connect".green
       end
@@ -116,21 +108,23 @@ module Produce
 
     private
       def bundle_exist?
-        if @wildcard_bundle
-          return false # We should always create the app from scratch.
-        else
-          open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
-          sleep 4
-
-          return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
-        end
-      end
-
-      def app_exists?
         open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
         sleep 4
 
-        return (all("option[value='#{@full_bundle_identifier}']").count == 0)
+        return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
+      end
+
+      def app_exists?
+        visit APPS_URL
+        sleep 10
+
+        first("input[ng-model='searchModel']").set @full_bundle_identifier
+
+        return (all("div[bo-bind='app.name']").count == 1)
+      end
+
+      def wildcard_bundle?
+        return @config[:bundle_identifier].end_with?("*")
       end
 
       def open_new_app_popup

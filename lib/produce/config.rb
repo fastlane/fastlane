@@ -2,6 +2,7 @@ module Produce
   class Config
     ASK_MESSAGES = {
       bundle_identifier: "App Identifier (Bundle ID, e.g. com.krausefx.app): ",
+      bundle_identifier_suffix: "App Identifier Suffix (Ignored if App Identifier does not ends with .*): ",
       app_name: "App Name: ",
       version: "Initial version number (e.g. '1.0'): ",
       sku: "SKU Number (e.g. '1234'): ",
