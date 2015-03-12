@@ -41,10 +41,10 @@ module Sigh
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
                                      end),
-        FastlaneCore::ConfigItem.new(key: :provisioning_file_name,
+        FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
                                      env_name: "SIGH_PROVISIONING_PROFILE_NAME",
-                                     description: "The name of the generated certificate file",
+                                     description: "The name of the profile that is used on the Apple Developer Portal",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",

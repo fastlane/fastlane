@@ -172,7 +172,7 @@ module Sigh
 
       # 5) Choose a profile name
       wait_for_elements('.distributionType')
-      profile_name = Sigh.config[:provisioning_file_name]
+      profile_name = Sigh.config[:provisioning_name]
       profile_name ||= [app_identifier, @type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
       click_next
