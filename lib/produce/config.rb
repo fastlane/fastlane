@@ -59,6 +59,7 @@ module Produce
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
         skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
+        skip_devcenter: skip_devcenter?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
         team_name: ENV['PRODUCE_TEAM_NAME']
       }
@@ -82,6 +83,10 @@ module Produce
     end
 
     def skip_itc? value
+      %w( true t 1 yes y ).include? value.to_s.downcase
+    end
+
+    def skip_devcenter? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
   end

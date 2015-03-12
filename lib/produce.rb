@@ -9,6 +9,10 @@ require 'produce/available_default_languages'
 
 require 'fastlane_core'
 
+# DEBUG
+require 'pry'
+# /DEBUG
+
 module Produce
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
@@ -16,4 +20,8 @@ module Produce
 
   FastlaneCore::UpdateChecker.verify_latest_version('produce', Produce::VERSION)
   DependencyChecker.check_dependencies
+
+  # DEBUG
+  binding.pry
+  # /DEBUG
 end
