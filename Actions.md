@@ -426,6 +426,17 @@ More usage examples (assumes the above .env setup is being used):
   xcexport
 ```
 
+When running tests, coverage reports can be generated via [xcpretty](https://github.com/supermarin/xcpretty) reporters:
+```ruby
+  # Run tests in given simulator
+  xctest(
+    destination: "name=iPhone 5s,OS=8.1",
+    report_formats: [ "html", "junit" ],
+    report_path: "./build-dir/reports", # will use XCODE_BUILD_PATH/reports, if not provided
+    report_screenshots: true
+  )
+```
+
 #### Custom Shell Scripts
 ```ruby
 sh "./your_bash_script.sh"
