@@ -51,10 +51,10 @@ module Fastlane
         cli_args = Array[]
 
         # Supported ENV vars
-        build_path = ENV["BUILD_PATH"] || ""
-        scheme     = ENV["SCHEME"]
-        workspace  = ENV["WORKSPACE"]
-        project    = ENV["PROJECT"]
+        build_path = ENV["XCODE_BUILD_PATH"] || ""
+        scheme     = ENV["XCODE_SCHEME"]
+        workspace  = ENV["XCODE_WORKSPACE"]
+        project    = ENV["XCODE_PROJECT"]
 
         # Append slash to build path, if needed
         unless build_path.end_with? "/"

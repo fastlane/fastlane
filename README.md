@@ -54,10 +54,24 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
 - Very flexible configuration using a fully customizable `Fastfile`
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
+- Over 30 built-in integrations available
 
 ##### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+
+# Special Thanks
+
+Thanks to all sponsors and contributors for extending and improving the `fastlane` suite:
+- [Detroit Labs](http://www.detroitlabs.com/)
+- Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
+- Dan Trenz ([@dtrenz](https://twitter.com/dtrenz))
+- Lukas Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
+- Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
+- Manuel Wallner ([@milch](https://github.com/milch))
+- Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
+
+Check out the project pages of the other tools for more sponsors and contributors.
 
 # Installation
 
