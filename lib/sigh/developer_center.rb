@@ -61,7 +61,7 @@ module Sigh
 
           if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
 
-            next if profile_name != nil && details['provisioningProfile']['name'] != profile_name
+            next if profile_name && details['provisioningProfile']['name'] != profile_name
 
             # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
             next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
