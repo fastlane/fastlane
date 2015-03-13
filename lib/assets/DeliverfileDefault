@@ -1,4 +1,4 @@
-# For more information about each property, visit the GitHub documentation: https://github.com/krausefx/deliver
+# For more information visit the GitHub documentation: https://github.com/krausefx/deliver
 # Everything next to a # is a comment and will be ignored
 
 # hide_transporter_output # remove the '#' in the beginning of the line, to hide the output while uploading
@@ -14,6 +14,13 @@
 # https://github.com/KrauseFx/deliver#upload-screenshots-to-itunes-connect
 screenshots_path "./screenshots/"
 
+
+# More information about all available options: https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md
+
+# Both lines are optional if you want to remove them:
+app_identifier "[[APP_IDENTIFIER]]"
+apple_id "[[APPLE_ID]]" # This is NOT your Apple login ID, but the App ID of your app
+email "[[EMAIL]]" # the login email address
 
 # version '1.2' # you can pass this if you want to verify the version number with the ipa file
 
@@ -52,3 +59,5 @@ end
 success do
   # system("say 'Successfully deployed a new version.'")
 end
+
+# More information about all available options: https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md
