@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
   spec.add_dependency 'xcodeproj', '~> 0.20' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
-  spec.add_dependency 'fastlane_core', '>= 0.2.1' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.3.1' # all shared code and dependencies
 
   spec.add_dependency 'deliver', '>= 0.7.13'
   spec.add_dependency 'snapshot', '>= 0.4.0'

@@ -73,10 +73,9 @@ module Fastlane
       end
 
       if class_ref && class_ref.respond_to?(:run)
-        line = "----------" + ("-" * method_sym.to_s.length) + "----"
-        Helper.log.info line.green
-        Helper.log.info "--- Step: #{method_sym.to_s} ---".green
-        Helper.log.info line.green
+        step_name = class_ref.step_text rescue nil
+        step_name = method_sym.to_s unless step_name
+        Helper.log_alert("Step: " + step_name)
 
         Dir.chdir('..') do # go up from the fastlane folder, to the project folder
           Actions.execute_action(method_sym) do
