@@ -18,6 +18,7 @@ module Sigh
       cert = maintain_app_certificate # create/download the certificate
       
       type_name = "Distribution" if @type == APPSTORE # both enterprise and App Store
+      type_name = "Development" unless @type == APPSTORE
       cert_name ||= "#{type_name}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
 
@@ -176,7 +177,7 @@ module Sigh
 
       # 5) Choose a profile name
       wait_for_elements('.distributionType')
-      profile_name = Sigh.config[:provisioning_file_name]
+      profile_name = Sigh.config[:provisioning_name]
       profile_name ||= [app_identifier, @type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
       click_next
