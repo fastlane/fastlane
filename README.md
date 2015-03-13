@@ -49,15 +49,29 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools
 - Never remember any difficult commands, just ```fastlane```
 - Easy setup, which helps you getting up and running very fast
-- Shared context, which is used to let the different deployment steps communicate with each other
+- [Shared context](https://github.com/KrauseFx/fastlane/blob/master/Advanced.md#lane-context), which is used to let the different deployment steps communicate with each other
 - Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update
 - Very flexible configuration using a fully customizable `Fastfile`
 - Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
+- Over 30 built-in integrations available
 
 ##### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+
+# Special Thanks
+
+Thanks to all sponsors and contributors for extending and improving the `fastlane` suite:
+- [Detroit Labs](http://www.detroitlabs.com/)
+- Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
+- Dan Trenz ([@dtrenz](https://twitter.com/dtrenz))
+- Lukas Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
+- Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
+- Manuel Wallner ([@milch](https://github.com/milch))
+- Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
+
+Check out the project pages of the other tools for more sponsors and contributors.
 
 # Installation
 
@@ -141,6 +155,7 @@ When one command fails, the execution will be aborted.
 ### Building
 - [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section
 - [xcode_select](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcode_select): Set a path to a custom Xcode installation
+- [xcodebuild](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcodebuild): Archive, build, clean, test or export your app.
 
 ### Uploading
 - [deliver](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#deliver): Upload screenshots, metadata and your app to the App Store
@@ -279,7 +294,7 @@ lane :deploy do
   snapshot
 
   deliver :force
-  
+
   frameit
 end
 

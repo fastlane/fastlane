@@ -129,15 +129,15 @@ describe Fastlane do
 
     context "when using environment variables"
       before :each do
-        ENV["BUILD_PATH"] = "./build-dir/"
-        ENV["SCHEME"] = "MyApp"
-        ENV["WORKSPACE"] = "MyApp.xcworkspace"
+        ENV["XCODE_BUILD_PATH"] = "./build-dir/"
+        ENV["XCODE_SCHEME"] = "MyApp"
+        ENV["XCODE_WORKSPACE"] = "MyApp.xcworkspace"
       end
 
       after :each do
-        ENV.delete("BUILD_PATH")
-        ENV.delete("SCHEME")
-        ENV.delete("WORKSPACE")
+        ENV.delete("XCODE_BUILD_PATH")
+        ENV.delete("XCODE_SCHEME")
+        ENV.delete("XCODE_WORKSPACE")
       end
 
       it "can archive" do

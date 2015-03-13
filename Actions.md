@@ -192,7 +192,7 @@ commit_version_bump(
 ```
 
 #### add_git_tag
-This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where: 
+This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
 - `grouping` is just to keep your tags organised under one "folder", defaults to 'builds'
 - `lane` is the name of the current fastlane lane
 - `prefix` is anything you want to stick in front of the version number, e.g. "v"
@@ -264,6 +264,8 @@ crashlytics({
 })
 ```
 Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
+
+The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
 #### AWS S3 Distribution
 
@@ -376,6 +378,52 @@ Use this command if you are supporting multiple versions of Xcode
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
+```
+
+#### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
+Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
+such as; archive, build, clean, test, export & more.
+
+```ruby
+  # Create an archive. (./build-dir/MyApp.xcarchive)
+  xcodebuild(
+    archive: true,
+    archive_path: './build-dir/MyApp.xcarchive',
+    scheme: 'MyApp',
+    workspace: 'MyApp.xcworkspace'
+  )
+```
+
+To keep your Fastfile lightweight, there are also alias actions available for
+the most common `xcodebuild` operations: `xcarchive`, `xcbuild`, `xcclean`, `xctest` & `xcexport`.
+
+Environment variables may be added to a .env file in place of some parameters:
+
+```
+XCODE_PROJECT="./MyApp.xcodeproj"
+XCODE_WORKSPACE="./MyApp.xcworkspace"
+XCODE_SCHEME="MyApp"
+XCODE_BUILD_PATH="./build"
+```
+
+More usage examples (assumes the above .env setup is being used):
+```ruby
+  # Clean the project
+  xcclean
+
+  # Build the project
+  xcbuild
+
+  # Run tests in given simulator
+  xctest(
+    destination: "name=iPhone 5s,OS=8.1"
+  )
+
+  # Create an archive (./build-dir/MyApp.xcarchive)
+  xcarchive
+
+  # Export a signed binary (./build-dir/MyApp.ipa)
+  xcexport
 ```
 
 #### Custom Shell Scripts

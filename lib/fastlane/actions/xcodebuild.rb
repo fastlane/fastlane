@@ -51,10 +51,10 @@ module Fastlane
         xcodebuild_args = Array[]
 
         # Supported ENV vars
-        build_path = ENV["BUILD_PATH"] || nil
-        scheme     = ENV["SCHEME"]
-        workspace  = ENV["WORKSPACE"]
-        project    = ENV["PROJECT"]
+        build_path = ENV["XCODE_BUILD_PATH"] || nil
+        scheme     = ENV["XCODE_SCHEME"]
+        workspace  = ENV["XCODE_WORKSPACE"]
+        project    = ENV["XCODE_PROJECT"]
 
         # Append slash to build path, if needed
         if build_path && !build_path.end_with?("/")
