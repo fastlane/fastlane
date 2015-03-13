@@ -7,7 +7,7 @@ module Deliver
   class DeliverfileCreator
 
     # This method will ask the user what he wants to do
-    # @param deliver_path (String) The path in which the Deliverfile should be created
+    # @param deliver_path (String) The path in which the Deliverfile should be created (this automatically takes care if it's in the fastlane folder)
     # @param project_name (String) The default name of the project, which is used in the generated Deliverfile
     def self.create(deliver_path, project_name = nil)
       deliver_file_path = File.join(deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME)
@@ -81,18 +81,22 @@ module Deliver
       # This method takes care of creating a new 'deliver' folder, containg the app metadata 
       # and screenshots folders
       def self.generate_deliver_file(app, path, project_name)
-        metadata_path = File.join(path, 'deliver')
-        FileUtils.mkdir_p metadata_path rescue nil # never mind if it's already there
+        FileUtils.mkdir_p path rescue nil # never mind if it's already there
 
-        json = create_json_based_on_xml(app, metadata_path)
+        json = create_json_based_on_xml(app, path)
 
-        json.each do |key, value|
-          json[key].delete(:version_whats_new)
+        json.each do |language, value|
+          folder = File.join(path, "metadata", language)
+          FileUtils.mkdir_p(folder)
+          value.each do |key, content|
+            next if key == :version_whats_new
+            content = content.join("\n") if key == :keywords
+            File.write(File.join(folder, "#{key}.txt"), content)
+          end
+          Helper.log.info "Successfully downloaded existing metadata for language #{language}"
         end
         
-        meta_path = File.join(metadata_path, "metadata.json")
-        File.write(meta_path, JSON.pretty_generate(json))
-        puts "Successfully created new metadata JSON file at '#{meta_path}'".green
+        puts "Successfully created new configuration files at '#{File.join(path, 'metadata')}'".green
 
         gem_path = Helper.gem_path('deliver')
 
