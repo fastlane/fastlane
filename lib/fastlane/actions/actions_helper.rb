@@ -91,7 +91,7 @@ module Fastlane
 
         file_name = File.basename(file).gsub('.rb', '')
 
-        class_name = file_name.classify + 'Action'
+        class_name = file_name.fastlane_class + 'Action'
         class_ref = nil
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
