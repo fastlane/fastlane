@@ -13,9 +13,9 @@ module Fastlane
 
         params = params.first
 
-        crashlytics_path = params[:crashlytics_path]
-        api_token        = params[:api_token]
-        build_secret     = params[:build_secret]
+        crashlytics_path = params[:crashlytics_path] || ENV["CRASHLYTICS_FRAMEWORK_PATH"]
+        api_token        = params[:api_token] || ENV["CRASHLYTICS_API_TOKEN"]
+        build_secret     = params[:build_secret] || ENV["CRASHLYTICS_BUILD_SECRET"]
         ipa_path         = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         notes_path       = params[:notes_path]
         emails           = params[:emails]

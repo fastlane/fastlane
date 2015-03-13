@@ -1,6 +1,13 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Crashlytics Integration" do
+
+      before :each do
+        ENV.delete "CRASHLYTICS_API_TOKEN"
+        ENV.delete "CRASHLYTICS_BUILD_SECRET"
+        ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
+      end
+
       it "raises an error if no parameters were given" do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
@@ -84,11 +91,23 @@ describe Fastlane do
       end
 
       it "works with valid parameters" do
-        Fastlane::FastFile.new.parse("lane :test do 
+        Fastlane::FastFile.new.parse("lane :test do
           crashlytics({
             crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
             api_token: 'wadus',
             build_secret: 'wadus',
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+          })
+        end").runner.execute(:test)
+      end
+
+      it "works when using environment variables in place of parameters" do
+        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
+        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+
+        Fastlane::FastFile.new.parse("lane :test do
+          crashlytics({
             ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
           })
         end").runner.execute(:test)
