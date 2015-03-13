@@ -302,7 +302,7 @@ describe Fastlane do
       end
 
       it "should save reports to BUILD_PATH + \"/report\" by default" do
-        ENV["BUILD_PATH"] = "./build"
+        ENV["XCODE_BUILD_PATH"] = "./build"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           xctest(
@@ -328,7 +328,7 @@ describe Fastlane do
           + "--test"
         )
 
-        ENV.delete("BUILD_PATH")
+        ENV.delete("XCODE_BUILD_PATH")
       end
 
       it "should support multiple output formats" do
