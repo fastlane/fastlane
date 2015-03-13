@@ -46,13 +46,13 @@ describe Deliver do
       # Check if all the files were correctly created at /tmp
 
       # Check metadata.json
-      metadata = JSON.parse(File.read("#{deliver_path}/metadata.json"))
-      expect(metadata['en-US']['title']).to eq('Default English Title')
-      expect(metadata['de-DE']['title']).to eq('Example App Title')
-      expect(metadata['de-DE']['description']).to include('3D GPS Birdiebuch')
-      expect(metadata['de-DE']['software_url']).to eq('http://sunapps.net')
-      expect(metadata['de-DE']['support_url']).to eq('http://www.sunapps.net/')
-      expect(metadata['de-DE']['keywords']).to eq(%w|personal sunapps sun sunapps felix krause|)
+      path = "/tmp/metadata"
+      expect(File.read(File.join(path, "en-US", "title.txt"))).to eq('Default English Title')
+      expect(File.read(File.join(path, "de-DE", "title.txt"))).to eq('Example App Title')
+      expect(File.read(File.join(path, "de-DE", "description.txt"))).to include('3D GPS Birdiebuch')
+      expect(File.read(File.join(path, "de-DE", "software_url.txt"))).to eq('http://sunapps.net')
+      expect(File.read(File.join(path, "de-DE", "support_url.txt"))).to eq('http://www.sunapps.net/')
+      expect(File.read(File.join(path, "de-DE", "keywords.txt"))).to eq(%w|personal sunapps sun sunapps felix krause|.join("\n"))
 
       # Check Deliverfile
       correct = File.read("./lib/assets/DeliverfileDefault")
