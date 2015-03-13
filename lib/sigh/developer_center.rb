@@ -51,7 +51,7 @@ module Sigh
 
         certs = post_ajax(@list_certs_url)
 
-        profile_name = Sigh.config[:provisioning_file_name]
+        profile_name = Sigh.config[:provisioning_name]
 
         Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
         required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
