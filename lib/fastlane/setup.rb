@@ -112,6 +112,7 @@ module Fastlane
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
       template.gsub!('xctool', '# xctool') unless @tools[:xctool]
       template.gsub!('cocoapods', '# cocoapods') unless @tools[:cocoapods]
+      template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
       @tools.each do |key, value|
         Helper.log.info "'#{key}' enabled.".magenta if value
