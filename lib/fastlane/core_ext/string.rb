@@ -1,5 +1,5 @@
 class String
-  def classify
+  def fastlane_class
     split('_').collect!(&:capitalize).join
   end
 end
