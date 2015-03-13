@@ -69,6 +69,7 @@ Thanks to all sponsors and contributors for extending and improving the `fastlan
 - Lukas Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
 - Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
 - Manuel Wallner ([@milch](https://github.com/milch))
+- Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
 
 Check out the project pages of the other tools for more sponsors and contributors.
 
