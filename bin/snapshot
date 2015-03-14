@@ -56,7 +56,7 @@ class SnapshotApplication
       c.option '-i', '--ios String', String, 'The iOS Version you want to use'
 
       c.action do |args, options|
-        version = options.ios || ENV["SNAPSHOT_IOS_VERSION"] || Snapshot::LatestIosVersion::VERSION
+        version = options.ios || Snapshot::LatestIosVersion.version
         require 'snapshot/reset_simulators'
 
         Snapshot::ResetSimulators.clear_everything!(version)

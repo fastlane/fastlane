@@ -73,7 +73,7 @@ module Snapshot
     end
 
     def set_defaults
-      self.ios_version = Snapshot::LatestIosVersion::VERSION
+      self.ios_version = Snapshot::LatestIosVersion.version
 
       self.languages = [
         'de-DE',
