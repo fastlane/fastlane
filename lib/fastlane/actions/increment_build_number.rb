@@ -27,10 +27,14 @@ module Fastlane
             folder = first_param[:xcodeproj] ? File.join('.', first_param[:xcodeproj], '..') : '.'
           end
             
-          command = [
+          command_prefix = [
             'cd',
             File.expand_path(folder).shellescape,
-            '&&',
+            '&&'
+          ].join(' ')
+
+          command = [
+            command_prefix,
             'agvtool',
             custom_number ? "new-version -all #{custom_number}" : 'next-version -all'
           ].join(' ')
@@ -42,10 +46,9 @@ module Fastlane
             Actions.sh command
 
             # Store the new number in the shared hash
-            build_number = `agvtool what-version`.split("\n").last.to_i
+            build_number = `#{command_prefix} agvtool what-version`.split("\n").last.to_i
 
             Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
-
           end
         rescue => ex
           Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
