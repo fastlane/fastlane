@@ -5,20 +5,35 @@ module Fastlane
     end
 
     class IncrementBuildNumberAction
+      require 'shellwords'
+
       def self.run(params)
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
         begin
-          custom_number = (params.first rescue nil)
+          first_param = (params.first rescue nil)
 
-          command = nil
-          if custom_number
-            command = "agvtool new-version -all #{custom_number}"
-          else
-            command = 'agvtool next-version -all'
+          case first_param
+          when NilClass
+            custom_number = nil
+            folder = '.'
+          when Fixnum
+            custom_number = first_param
+            folder = '.'
+          when Hash
+            custom_number = first_param[:build_number]
+            folder = first_param[:xcodeproj] ? File.join('.', first_param[:xcodeproj], '..') : '.'
           end
+            
+          command = [
+            'cd',
+            File.expand_path(folder).shellescape,
+            '&&',
+            'agvtool',
+            custom_number ? "new-version -all #{custom_number}" : 'next-version -all'
+          ].join(' ')
 
           if Helper.test?
             Actions.lane_context[SharedValues::BUILD_NUMBER] = command
