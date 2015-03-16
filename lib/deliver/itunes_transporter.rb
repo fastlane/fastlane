@@ -18,7 +18,9 @@ module Deliver
     OUTPUT_REGEX = />\s+(.+)/
     RETURN_VALUE_REGEX = />\sDBG-X:\sReturning\s+(\d+)/
 
-    private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX
+    SKIP_ERRORS = [ "ERROR: An exception has occurred: Scheduling automatic restart in 1 minute" ]
+
+    private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
@@ -131,7 +133,12 @@ module Deliver
         # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
 
         output_done = false
-        if line =~ ERROR_REGEX
+
+        re = Regexp.union(SKIP_ERRORS)
+        if line.match(re)
+          # Those lines will not be handle like errors or warnings
+
+        elsif line =~ ERROR_REGEX
           @errors << $1
           Helper.log.error "[Transporter Error Output]: #{$1}".red
 
