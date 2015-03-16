@@ -24,7 +24,8 @@ module Snapshot
       if Simulators.available_devices.count < 1
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to add new simulators using Xcode"
-        Helper.log.fatal "# Xcode => Window => Devices"
+        Helper.log.fatal "# You can let snapshot create new simulators: 'snapshot reset_simulators'"
+        Helper.log.fatal "# Manually: Xcode => Window => Devices"
         Helper.log.fatal "# Please run `instruments -s` to verify your xcode path"
         Helper.log.fatal '#############################################################'
         raise "Create the new simulators and run this script again"
