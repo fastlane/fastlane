@@ -19,8 +19,17 @@ module Fastlane
         ipa_path         = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
         notes_path       = params[:notes_path]
         emails           = params[:emails]
-        groups           = params[:groups]
         notifications    = params[:notifications]
+
+        # can pass groups param either as an Array or a String
+        case params[:groups]
+        when NilClass
+          groups = nil
+        when Array
+          groups = params[:groups].join(',')
+        when String
+          groups = params[:groups]
+        end
 
         assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
 
