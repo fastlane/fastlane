@@ -11,25 +11,39 @@ module Fastlane
         params = params.first
 
         commit_message = (params && params[:message]) || 'Version Bump'
+        xcodeproj_path = (params && params[:xcodeproj]) ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
         # find the repo root path
         repo_path = `git rev-parse --show-toplevel`.strip
+        repo_pathname = Pathname.new(repo_path)
 
-        # find an xcodeproj (ignoreing the Cocoapods one)
-        xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /.*Pods.xcodeproj/ =~ path }
+        if xcodeproj_path
+          # ensure that the xcodeproj passed in was OK
+          raise "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
+        else
+          # find an xcodeproj (ignoring the Cocoapods one)
+          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /.*Pods.xcodeproj/ =~ path }
 
-        raise 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
-        raise 'Found multiple .xcodeproj projects in the current repository\'s working directory. This tool only support project folders with a single .xcodeproj.'.red if xcodeproj_paths.count > 1
-        xcodeproj_path = xcodeproj_paths.first
+          # no projects found: error
+          raise 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
+
+          # too many projects found: error
+          if xcodeproj_paths.count > 1
+            relative_projects = xcodeproj_paths.map { |e| Pathname.new(e).relative_path_from(repo_pathname).to_s }.join("\n")
+            raise "Found multiple .xcodeproj projects in the current repository's working directory. Please specify your app's main project: \n#{relative_projects}".red
+          end
+
+          # one project found: great
+          xcodeproj_path = xcodeproj_paths.first
+        end
 
         # find the pbxproj path, relative to git directory
-        git_pathname = Pathname.new(repo_path)
         pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
-        pbxproj_path = pbxproj_pathname.relative_path_from(git_pathname).to_s
+        pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
         project = Xcodeproj::Project.open(xcodeproj_path)
-        info_plist_files = project.objects.select { |object| object.isa == 'XCBuildConfiguration' }.map(&:to_hash).map { |object_hash| object_hash['buildSettings'] }.select { |build_settings| build_settings.has_key?('INFOPLIST_FILE') }.map { |build_settings| build_settings['INFOPLIST_FILE'] }.uniq
+        info_plist_files = project.objects.select { |object| object.isa == 'XCBuildConfiguration' }.map(&:to_hash).map { |object_hash| object_hash['buildSettings'] }.select { |build_settings| build_settings.key?('INFOPLIST_FILE') }.map { |build_settings| build_settings['INFOPLIST_FILE'] }.uniq.map { |info_plist_path| Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s }
 
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = []
@@ -48,7 +62,7 @@ module Fastlane
         raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running.".red unless changed_files_as_expected
 
         # get the absolute paths to the files
-        git_add_paths = expected_changed_files.map { |path| File.expand_path(File.join(git_pathname, path)) }
+        git_add_paths = expected_changed_files.map { |path| File.expand_path(File.join(repo_pathname, path)) }
 
         # then create a commit with a message
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
