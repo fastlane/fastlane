@@ -151,6 +151,9 @@ All available commands with a short description can be found in [Deliverfile.md]
 
 Here are a few examples:
 #### Upload screenshots to iTunes Connect
+
+Remove the rest, and use just this format for your ```Deliverfile```.
+
 ```ruby
 app_identifier "net.sunapps.1"
 version "1.1"
