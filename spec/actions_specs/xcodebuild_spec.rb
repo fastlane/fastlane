@@ -355,6 +355,23 @@ describe Fastlane do
           + "--test"
         )
       end
+
+      it "should detect and use the workspace, when a workspace is present" do
+        allow(Dir).to receive(:glob).with("*.xcworkspace").and_return([ "MyApp.xcworkspace" ])
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "| xcpretty --color " \
+          + "--simple"
+        )
+      end
     end
   end
 end
