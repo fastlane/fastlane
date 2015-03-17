@@ -309,14 +309,23 @@ More information about the available options can be found in the [DeployGate Pus
 
 
 #### [Slack](http://slack.com)
-Send a message to **#channel** (by default) or a direct message to **@username** with success (green) or failure (red) status.
+Send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
 
 ```ruby
-  slack({
-    message: "App successfully released!",
-    channel: "#channel",
-    success: true
-  })
+slack(
+  message: "App successfully released!"
+)
+
+slack(
+  message: "App successfully released!",
+  channel: "#channel",  # optional, by default will post to the default channel configured for the POST URL
+  success: true,        # optional, defaults to true
+  payload: {            # optional, lets you specify any number of your own Slack attachments
+    'Build Date' => Time.new.to_s,
+    'Built by' => 'Jenkins',
+  },
+  default_payloads: [:git_branch, :git_author] #optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`.
+)
 ```
 
 #### [HipChat](http://www.hipchat.com/)
@@ -424,6 +433,17 @@ More usage examples (assumes the above .env setup is being used):
 
   # Export a signed binary (./build-dir/MyApp.ipa)
   xcexport
+```
+
+When running tests, coverage reports can be generated via [xcpretty](https://github.com/supermarin/xcpretty) reporters:
+```ruby
+  # Run tests in given simulator
+  xctest(
+    destination: "name=iPhone 5s,OS=8.1",
+    report_formats: [ "html", "junit" ],
+    report_path: "./build-dir/reports", # will use XCODE_BUILD_PATH/reports, if not provided
+    report_screenshots: true
+  )
 ```
 
 #### Custom Shell Scripts

@@ -21,7 +21,7 @@ module Fastlane
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/custom_action_template.rb")
       template.gsub!('[[NAME]]', name)
       template.gsub!('[[NAME_UP]]', name.upcase)
-      template.gsub!('[[NAME_CLASS]]', name.classify + 'Action')
+      template.gsub!('[[NAME_CLASS]]', name.fastlane_class + 'Action')
 
       actions_path = File.join((FastlaneFolder.path || Dir.pwd), 'actions')
       FileUtils.mkdir_p(actions_path) unless File.directory?(actions_path)
