@@ -15,12 +15,16 @@ module Snapshot
       device_types_output = `xcrun simctl list devicetypes`
       device_types = device_types_output.scan /(.*) \((.*)\)/
        
-      devices_output = `xcrun simctl list devices`
-      devices = devices_output.scan /\s\s\s\s(.*) \(([^)]+)\) (.*)/
+      devices_output = `xcrun simctl list devices`.split("\n")
 
-      devices.each do |device|
-        puts "Removing device #{device[0]} (#{device[1]})"
-        `xcrun simctl delete #{device[1]}`
+      devices_output.each do |line|
+        device = line.match(/\s+([\w\s]+)\(([\w\-]+)\)/)
+        if device and device.length == 3
+          name = device[1].strip
+          id = device[2]
+          puts "Removing device #{name} (#{id})"
+          `xcrun simctl delete #{id}`
+        end
       end
 
       device_types.each do |device_type|
