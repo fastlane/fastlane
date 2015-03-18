@@ -187,7 +187,8 @@ If you have other uncommitted changes in your repo, this action will fail. If yo
 commit_version_bump
 
 commit_version_bump(
-  message: 'Version Bump', # create a commit with a custom message
+  message: 'Version Bump',                         # create a commit with a custom message
+  xcodeproj_path: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
 )
 ```
 
