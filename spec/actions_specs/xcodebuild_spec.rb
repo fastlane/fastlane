@@ -37,7 +37,7 @@ describe Fastlane do
             skip_unavailable_actions: true,
             target: 'MyAppTarget',
             workspace: 'MyApp.xcworkspace',
-            xcconfig: 'my.xcconfig'
+            xcconfig: 'my.xcconfig',
           )
         end").runner.execute(:test)
 
@@ -74,6 +74,22 @@ describe Fastlane do
           + "test " \
           + "| xcpretty --color --simple"
       )
+    end
+
+    it "works with build settings" do
+      result = Fastlane::FastFile.new.parse("lane :test do
+        xcodebuild(
+          build_settings: {
+            'CODE_SIGN_IDENTITY' => 'iPhone Developer: Josh',
+            'JOBS' => 16,
+            'PROVISIONING_PROFILE' => 'JoshIsCoolProfile'
+          }
+        )
+      end").runner.execute(:test)
+
+      expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
+      expect(result).to include('JOBS="16"')
+      expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
     end
 
     it "when archiving, should cache the archive path for a later export step" do

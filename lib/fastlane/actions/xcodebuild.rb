@@ -151,6 +151,8 @@ module Fastlane
           if arg = ARGS_MAP[k]
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
+          elsif k == :build_settings
+            v.map{|setting,value| "#{setting}=\"#{value}\""}.join(' ')
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
