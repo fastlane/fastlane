@@ -154,6 +154,37 @@ resign(
 )
 ```
 
+#### register_devices
+This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.
+
+This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered withing the member center is not passed to this action, it will be left alone in the member center and continue to work.
+
+If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from ENV['CUPERTINO_TEAM_ID'], or ENV['FASTLANE_TEAM_ID'], in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
+
+The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable ENV['CUPERTINO_USERNAME'].
+
+```ruby
+# Simply provide a list of devices as a Hash
+register_devices(
+  devices: { 
+    'Luka iPhone 6' => '1234567890123456789012345678901234567890',
+    'Felix iPad Air 2' => 'abcdefghijklmnopqrstvuwxyzabcdefghijklmn', 
+  }
+)
+
+# Alternatively provide a standard UDID export .txt file, see the Apple Sample (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)
+register_devices(
+  devices_file: './devices.txt'
+)
+
+# Advanced
+register_devices(
+  devices_file: './devices.txt', # you must pass in either `devices_file` or `devices`
+  team_id: 'XXXXXXXXXX',         # optional, if you're a member of multiple teams, then you need to pass the team ID here
+  username: 'luka@goonbee.com'   # optional, lets you override the Apple member center username
+)
+```
+
 #### clean_build_artifacts
 This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 

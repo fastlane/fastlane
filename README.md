@@ -151,6 +151,7 @@ When one command fails, the execution will be aborted.
 - [cert](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cert): Automatically create and maintain iOS code signing certificates
 - [sigh](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#sigh): Create and maintain your provisioning profiles
 - [resign](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#resign): Re-Sign an existing ipa file
+- [register_devices](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#register_devices): Register iOS device identifiers
 
 ### Building
 - [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section
