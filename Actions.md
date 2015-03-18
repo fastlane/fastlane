@@ -157,7 +157,7 @@ resign(
 #### register_devices
 This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.
 
-This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered withing the member center is not passed to this action, it will be left alone in the member center and continue to work.
+This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
 
 If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from ENV['CUPERTINO_TEAM_ID'], or ENV['FASTLANE_TEAM_ID'], in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
 
