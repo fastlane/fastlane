@@ -24,7 +24,7 @@ module Fastlane
             Cupertino::ProvisioningPortal::Device.new(k, v)
           end
         elsif devices_file
-          devices_file = CSV.read(File.expand_path(File.join('.', devices_file)), col_sep: "\t")
+          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
 
           raise 'Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless devices_file.first == ['Device ID', 'Device Name']
 
