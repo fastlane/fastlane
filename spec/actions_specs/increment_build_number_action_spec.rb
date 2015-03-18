@@ -8,7 +8,7 @@ describe Fastlane do
           increment_build_number
         end").runner.execute(:test)
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq("cd #{File.expand_path('.').shellescape} && agvtool next-version -all")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool next-version -all/)
       end
 
       it "pass a custom build number to the tool" do
@@ -16,7 +16,7 @@ describe Fastlane do
           increment_build_number 24
         end").runner.execute(:test)
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq("cd #{File.expand_path('.').shellescape} && agvtool new-version -all 24")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all 24/)
       end
     end
   end
