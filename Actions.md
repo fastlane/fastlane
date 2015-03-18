@@ -403,6 +403,18 @@ such as; archive, build, clean, test, export & more.
   )
 ```
 
+```ruby
+xcodebuild(
+  workspace: "...",
+  scheme: "...",
+  build_settings: {
+    "CODE_SIGN_IDENTITY" => "iPhone Developer: ...",
+    "PROVISIONING_PROFILE" => "...",
+    "JOBS" => 16
+  }
+)
+```
+
 To keep your Fastfile lightweight, there are also alias actions available for
 the most common `xcodebuild` operations: `xcarchive`, `xcbuild`, `xcclean`, `xctest` & `xcexport`.
 
