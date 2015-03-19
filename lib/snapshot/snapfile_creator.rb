@@ -12,9 +12,9 @@ module Snapshot
       File.write([path, 'snapshot-iPad.js'].join('/'), File.read("#{gem_path}/lib/assets/snapshot.js"))
       File.write([path, 'SnapshotHelper.js'].join('/'), File.read("#{gem_path}/lib/assets/SnapshotHelper.js"))
 
-      puts "Successfully created SnapshotHelper.js '#{[path, 'SnapshotHelper.js'].join('/')}'".green
-      puts "Successfully created new UI Automation JS file at '#{[path, 'snapshot.js'].join('/')}'".green
-      puts "Successfully created new UI Automation JS file for iPad at '#{[path, 'snapshot-iPad.js'].join('/')}'".green
+      puts "Successfully created SnapshotHelper.js '#{File.join(path, 'SnapshotHelper.js')}'".green
+      puts "Successfully created new UI Automation JS file at '#{File.join(path, 'snapshot.js')}'".green
+      puts "Successfully created new UI Automation JS file for iPad at '#{File.join(path, 'snapshot-iPad.js')}'".green
       puts "Successfully created new Snapfile at '#{snapfile_path}'".green
     end
   end
