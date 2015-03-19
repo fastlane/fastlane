@@ -28,34 +28,40 @@ module Frameit
     def run(path, color = Color::BLACK)
       @color = color
 
-      Dir.glob("#{path}/**/*.{png,PNG}").each do |screenshot|
-        next if screenshot.include?"_framed.png"
-        next if screenshot.include?".itmsp/" # a package file, we don't want to modify that
-        
-        begin
-          template_path = get_template(screenshot)
-          if template_path
-            template = MiniMagick::Image.open(template_path)
-            image = MiniMagick::Image.open(screenshot)
+      screenshots = Dir.glob("#{path}/**/*.{png,PNG}")
 
-            offset_information = image_offset(screenshot)
-            raise "Could not find offset_information for '#{screenshot}'" unless (offset_information and offset_information[:width])
-            width = offset_information[:width]
-            image.resize width
+      if screenshots.length > 0
+        screenshots.each do |screenshot|
+          next if screenshot.include?"_framed.png"
+          next if screenshot.include?".itmsp/" # a package file, we don't want to modify that
+          
+          begin
+            template_path = get_template(screenshot)
+            if template_path
+              template = MiniMagick::Image.open(template_path)
+              image = MiniMagick::Image.open(screenshot)
 
-            result = template.composite(image) do |c|
-              c.compose "Over"
-              c.geometry offset_information[:offset]
+              offset_information = image_offset(screenshot)
+              raise "Could not find offset_information for '#{screenshot}'" unless (offset_information and offset_information[:width])
+              width = offset_information[:width]
+              image.resize width
+
+              result = template.composite(image) do |c|
+                c.compose "Over"
+                c.geometry offset_information[:offset]
+              end
+
+              output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+              result.format "png"
+              result.write output_path
+              Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
             end
-
-            output_path = screenshot.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-            result.format "png"
-            result.write output_path
-            Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
+          rescue => ex
+            Helper.log.error ex
           end
-        rescue => ex
-          Helper.log.error ex
         end
+      else 
+        Helper.log.error "Could not find screenshots"
       end
     end
 
