@@ -34,6 +34,8 @@ sigh
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
+Special thanks to [Matthias Tretter](https://twitter.com/myell0w) for coming up with the name.
+
 -------
 <p align="center">
     <a href="#features">Features</a> &bull; 
