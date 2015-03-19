@@ -30,7 +30,7 @@ module Frameit
 
       screenshots = Dir.glob("#{path}/**/*.{png,PNG}")
 
-      if screenshots.length > 0
+      if screenshots.count > 0
         screenshots.each do |screenshot|
           next if screenshot.include?"_framed.png"
           next if screenshot.include?".itmsp/" # a package file, we don't want to modify that
