@@ -34,20 +34,12 @@ screenshots_path "./screenshots"
 
 # Custom Callbacks
 
-# setup_for_device_change do |device|
-#   puts "Preparing device: #{device}"
-# end
-
-# setup_for_language_change do |lang, device|
-#   puts "Running #{lang} on #{device}"
+# setup_for_device_change do |device, udid, language|
+#   puts "Running #{language} on #{device}"
 #   system("./popuplateDatabase.sh")
 # end
 
-# teardown_language do |lang, device|
-#   puts "Finished with #{lang} on #{device}"
-# end
-
-# teardown_device do |device|
-#   puts "Cleaning device #{device}"
+# teardown_device do |language, device|
+#   puts "Finished with #{language} on #{device}"
 #   system("./cleanup.sh")
 # end

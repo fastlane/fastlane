@@ -17,22 +17,20 @@ module Snapshot
       FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if SnapshotConfig.shared_instance.clear_previous_screenshots
 
       SnapshotConfig.shared_instance.devices.each do |device|
-        
-        SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device, udid_for_simulator(device))  # Callback
-
         SnapshotConfig.shared_instance.languages.each do |language|
-          SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # Callback
-
           reinstall_app(device, language) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
+
+          prepare_simulator(device, language)
+          
           begin
             errors.concat(run_tests(device, language))
             counter += copy_screenshots(language)
           rescue => ex
             Helper.log.error(ex)
           end
-          SnapshotConfig.shared_instance.blocks[:teardown_language].call(language, device) # Callback
+
+          teardown_simulator(device, language)
         end
-        SnapshotConfig.shared_instance.blocks[:teardown_device].call(device) # Callback
       end
 
       `killall "iOS Simulator"` # close the simulator after the script is finished
@@ -54,6 +52,16 @@ module Snapshot
     def clean_old_traces
       FileUtils.rm_rf(TRACE_DIR)
       FileUtils.mkdir_p(TRACE_DIR)
+    end
+
+    def prepare_simulator(device, language)
+      SnapshotConfig.shared_instance.blocks[:setup_for_device_change].call(device, udid_for_simulator(device), language)  # Callback
+      SnapshotConfig.shared_instance.blocks[:setup_for_language_change].call(language, device) # deprecated
+    end
+
+    def teardown_simulator(device, language)
+      SnapshotConfig.shared_instance.blocks[:teardown_language].call(language, device) # Callback
+      SnapshotConfig.shared_instance.blocks[:teardown_device].call(device, language) # deprecated
     end
 
     def udid_for_simulator(name) # fetches the UDID of the simulator type
