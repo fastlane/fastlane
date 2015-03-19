@@ -61,6 +61,7 @@ module Fastlane
           build_path += "/"
         end
 
+
         if params = params.first
           # Operation bools
           archiving = params.key? :archive
@@ -84,6 +85,12 @@ module Fastlane
             params[:scheme] ||= scheme
             params[:workspace] ||= workspace
             params[:project] ||= project
+
+            # If no project or workspace was passed in or set as an environment
+            # variable, attempt to autodetect the workspace.
+            if params[:project].to_s.empty? && params[:workspace].to_s.empty?
+              params[:workspace] = detect_workspace
+            end
           end
 
           if archiving
@@ -158,6 +165,22 @@ module Fastlane
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
           end
         end.compact.sort
+      end
+
+      def self.detect_workspace
+        workspace = nil
+        workspaces = Dir.glob("*.xcworkspace")
+
+        if workspaces.length > 1
+          Helper.log.warn "Multiple workspaces detected."
+        end
+
+        if !workspaces.empty?
+          workspace = workspaces.first
+          Helper.log.warn "Using workspace \"#{workspace}\""
+        end
+
+        return workspace
       end
     end
 
