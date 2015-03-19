@@ -9,7 +9,7 @@ module Snapshot
       SnapshotConfig.shared_instance.js_file # to verify the file can be found earlier
 
       Builder.new.build_app(clean: clean)
-      @app_path = Dir.glob("/tmp/snapshot/build/*.app").first
+      @app_path = determine_app_path
 
       counter = 0
       errors = []
@@ -66,12 +66,8 @@ module Snapshot
 
     def reinstall_app(device, language)
 
-      def app_identifier
-        @app_identifier ||= ENV["SNAPSHOT_APP_IDENTIFIER"] 
-        @app_identifier ||= `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/Info.plist`
-        @app_identifier ||= `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' /tmp/snapshot/build/*.app/*.plist`
-        @app_identifier.strip
-      end
+      app_identifier = ENV["SNAPSHOT_APP_IDENTIFIER"]
+      app_identifier ||= @app_identifier
 
       def com(cmd)
         puts cmd.magenta
@@ -145,6 +141,21 @@ module Snapshot
       end
 
       return errors
+    end
+
+    def determine_app_path
+      # Determine the path to the actual app and not the WatchKit app
+      Dir.glob("/tmp/snapshot/build/*.app/*.plist").each do |path|
+        watchkit_enabled = `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{path}'`.strip
+        next if watchkit_enabled == 'true' # we don't care about WatchKit Apps
+
+        app_identifier = `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' '#{path}'`.strip
+        if app_identifier and app_identifier.length > 0
+          # This seems to be the valid Info.plist
+          @app_identifier = app_identifier
+          return File.expand_path("..", path) # the app
+        end
+      end
     end
 
     def parse_test_line(line)
