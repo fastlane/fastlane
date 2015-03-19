@@ -139,6 +139,11 @@ This method will increment the **build number**, not the app version. Usually th
 ```ruby
 increment_build_number # automatically increment by one
 increment_build_number '75' # set a specific number
+
+increment_build_numer(
+  build_number: 75, # specify specific build number (optional, omitting it increments by one)
+  xcodeproj: './path/to/MyApp.xcodeproj' (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+)
 ```
 
 #### [resign](https://github.com/krausefx/sigh#resign)

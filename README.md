@@ -66,7 +66,7 @@ Thanks to all sponsors and contributors for extending and improving the `fastlan
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Dan Trenz ([@dtrenz](https://twitter.com/dtrenz))
-- Lukas Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
+- Luka Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
 - Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
 - Manuel Wallner ([@milch](https://github.com/milch))
 - Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
