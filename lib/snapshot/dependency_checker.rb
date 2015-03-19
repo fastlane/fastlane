@@ -2,7 +2,6 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       self.check_xcode_select
-      self.check_simulators
       self.check_xctool
       self.check_for_automation_subfolder
       self.check_simctl

@@ -51,6 +51,7 @@ module Snapshot
 
     # @param path (String) the path to the config file to use (including the file name)
     def initialize(path = nil)
+      DependencyChecker.check_simulators
       path ||= './Snapfile'
       set_defaults
 
