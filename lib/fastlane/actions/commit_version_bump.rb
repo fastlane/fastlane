@@ -16,7 +16,7 @@ module Fastlane
         repo_path = `git rev-parse --show-toplevel`.strip
 
         # find an xcodeproj (ignoreing the Cocoapods one)
-        xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /.*Pods.xcodeproj/ =~ path }
+        xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /Pods\/.*.xcodeproj/ =~ path }
 
         raise 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
         raise 'Found multiple .xcodeproj projects in the current repository\'s working directory. This tool only support project folders with a single .xcodeproj.'.red if xcodeproj_paths.count > 1
