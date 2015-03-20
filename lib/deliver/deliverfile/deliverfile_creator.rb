@@ -58,15 +58,16 @@ module Deliver
       app.set_metadata_directory("/tmp") # we don't want to pollute the current folder
       app.metadata # this will download the latest app metadata
       
-      file_path = [deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
+      file_path = File.join(deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME)
       json = generate_deliver_file(app, deliver_path, project_name)
       File.write(file_path, json)
 
-      FileUtils.mkdir_p './screenshots/'
+      FileUtils.mkdir_p File.join(deliver_path, 'screenshots')
       begin
         Helper.log.info "Downloading all previously used app screenshots.".green
-        ItunesConnect.new.download_existing_screenshots(app)
-      rescue
+        ItunesConnect.new.download_existing_screenshots(app, deliver_path)
+      rescue Exception => ex
+        Helper.log.error ex
         Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
       end
 

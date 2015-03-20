@@ -7,10 +7,11 @@ module Deliver
 
     # This method will download all existing app screenshots
     # @param app (Deliver::App) the app you want this information from
+    # @param folder_path (String) the path to store the screenshots in
     # @raise [ItunesConnectGeneralError] General error while executing 
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
-    def download_existing_screenshots(app)
+    def download_existing_screenshots(app, folder_path)
       languages = JSON.parse(File.read(File.join(Helper.gem_path('deliver'), "lib", "assets", "DeliverLanguageMapping.json")))
 
       begin
@@ -40,7 +41,7 @@ module Deliver
               file_name = [screenshot['value']['sortOrder'], type, screenshot['value']['originalFileName']].join("_")
               Helper.log.info "Downloading existing screenshot '#{file_name}' of device type: '#{type}'"
 
-              containing_folder = File.join(".", "screenshots", language_code)
+              containing_folder = File.join(folder_path, "screenshots", language_code)
               FileUtils.mkdir_p containing_folder rescue nil # if it's already there
               path = File.join(containing_folder, file_name)
               File.write(path, open(url).read)
