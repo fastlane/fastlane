@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane_core (0.3.1)
+    fastlane_core (0.3.2)
       babosa
       capybara (~> 2.4.3)
       colored
