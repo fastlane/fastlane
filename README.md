@@ -268,16 +268,17 @@ before_all do |lane|
   cocoapods
 
   xctool :test
+end
 
-  ipa({
-    workspace: "MyApp.xcworkspace"
-  })
+lane :test do
+  snapshot
 end
 
 lane :beta do
   cert
-
   sigh :adhoc
+  
+  ipa
 
   deliver :beta
 
@@ -289,8 +290,8 @@ end
 
 lane :deploy do
   cert
-
   sigh
+  ipa
 
   snapshot
 
@@ -316,7 +317,8 @@ error do |lane, exception|
   reset_git_repo
 
   slack({
-    message: "An error occured"
+    message: "An error occured",
+    success: false
   })
 end
 ```
