@@ -175,6 +175,8 @@ describe Fastlane do
       end
 
       it "can export" do
+        ENV.delete("XCODE_SCHEME")
+        ENV.delete("XCODE_WORKSPACE")
         result = Fastlane::FastFile.new.parse("lane :test do
           xcodebuild(
             archive_path: './build-dir/MyApp.xcarchive',
