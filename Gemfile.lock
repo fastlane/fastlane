@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (0.2.1)
+    fastlane (0.3.0)
       aws-sdk (~> 1.0)
       cert (>= 0.1.3)
       deliver (>= 0.7.13)
@@ -81,7 +81,7 @@ GEM
       capybara (~> 2.4.3)
       colored
       commander (>= 4.1.0)
-      credentials_manager
+      credentials_manager (>= 0.1.3)
       highline (~> 1.6.21)
       json
       multi_json
@@ -193,7 +193,7 @@ GEM
     websocket-driver (0.5.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
-    xcodeproj (0.22.0)
+    xcodeproj (0.23.0)
       activesupport (>= 3)
       colored (~> 1.2)
     xcpretty (0.1.8)

@@ -8,6 +8,12 @@ Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```
 cocoapods # this will run pod install
 ```
 
+#### [Carthage](https://github.com/Carthage/Carthage)
+This will execute `carthage bootstrap`
+```ruby
+carthage
+```
+
 
 #### [xctool](https://github.com/facebook/xctool)
 You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
@@ -139,6 +145,11 @@ This method will increment the **build number**, not the app version. Usually th
 ```ruby
 increment_build_number # automatically increment by one
 increment_build_number '75' # set a specific number
+
+increment_build_numer(
+  build_number: 75, # specify specific build number (optional, omitting it increments by one)
+  xcodeproj: './path/to/MyApp.xcodeproj' (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+)
 ```
 
 #### [resign](https://github.com/krausefx/sigh#resign)
@@ -310,14 +321,23 @@ More information about the available options can be found in the [DeployGate Pus
 
 
 #### [Slack](http://slack.com)
-Send a message to **#channel** (by default) or a direct message to **@username** with success (green) or failure (red) status.
+Send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
 
 ```ruby
-  slack({
-    message: "App successfully released!",
-    channel: "#channel",
-    success: true
-  })
+slack(
+  message: "App successfully released!"
+)
+
+slack(
+  message: "App successfully released!",
+  channel: "#channel",  # optional, by default will post to the default channel configured for the POST URL
+  success: true,        # optional, defaults to true
+  payload: {            # optional, lets you specify any number of your own Slack attachments
+    'Build Date' => Time.new.to_s,
+    'Built by' => 'Jenkins',
+  },
+  default_payloads: [:git_branch, :git_author] #optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`.
+)
 ```
 
 #### [HipChat](http://www.hipchat.com/)
@@ -393,6 +413,18 @@ such as; archive, build, clean, test, export & more.
     scheme: 'MyApp',
     workspace: 'MyApp.xcworkspace'
   )
+```
+
+```ruby
+xcodebuild(
+  workspace: "...",
+  scheme: "...",
+  build_settings: {
+    "CODE_SIGN_IDENTITY" => "iPhone Developer: ...",
+    "PROVISIONING_PROFILE" => "...",
+    "JOBS" => 16
+  }
+)
 ```
 
 To keep your Fastfile lightweight, there are also alias actions available for
