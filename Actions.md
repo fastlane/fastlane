@@ -8,6 +8,12 @@ Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```
 cocoapods # this will run pod install
 ```
 
+#### [Carthage](https://github.com/Carthage/Carthage)
+This will execute `carthage bootstrap`
+```ruby
+carthage
+```
+
 
 #### [xctool](https://github.com/facebook/xctool)
 You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
