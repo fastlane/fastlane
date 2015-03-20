@@ -139,7 +139,7 @@ When one command fails, the execution will be aborted.
 
 ### Project
 - [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods): Setup your CocoaPods project
-- [Carthage](https://github.com/Carthage/Carthage): Setup your Carthage project
+- [Carthage](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#carthage): Setup your Carthage project
 - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number): Increment the Xcode build number before building the app
 
 ### Testing
