@@ -113,13 +113,6 @@ module Fastlane
         # Default args
         xcpretty_args = [ "--color" ]
 
-        # Stdout format
-        if testing && !archiving
-          xcpretty_args.push "--test"
-        else
-          xcpretty_args.push "--simple"
-        end
-
         if testing
           # Test report file format
           if params[:report_formats]
@@ -129,21 +122,30 @@ module Fastlane
 
             xcpretty_args.push report_formats
 
+            # Save screenshots flag
+            if params[:report_formats].include?("html") && params[:report_screenshots]
+              xcpretty_args.push "--screenshots"
+            end
+
+            xcpretty_args.sort!
+
             # Test report file path
             if params[:report_path]
               xcpretty_args.push "--output \"#{params[:report_path]}\""
             elsif build_path
               xcpretty_args.push "--output \"#{build_path}report\""
             end
-
-            # Save screenshots flag
-            if params[:report_formats].include?("html") && params[:report_screenshots]
-              xcpretty_args.push "--screenshots"
-            end
           end
         end
 
-        xcpretty_args = xcpretty_args.sort.join(" ")
+        # Stdout format
+        if testing && !archiving
+          xcpretty_args.push "--test"
+        else
+          xcpretty_args.push "--simple"
+        end
+
+        xcpretty_args = xcpretty_args.join(" ")
 
         Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
       end

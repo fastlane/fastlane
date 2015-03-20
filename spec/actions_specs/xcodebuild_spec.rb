@@ -311,8 +311,8 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \
           + "| xcpretty --color " \
-          + "--output \"./build-dir/test-report\" " \
           + "--report junit " \
+          + "--output \"./build-dir/test-report\" " \
           + "--test"
         )
       end
@@ -338,9 +338,9 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \
           + "| xcpretty --color " \
-          + "--output \"./build/report\" " \
           + "--report html " \
           + "--screenshots " \
+          + "--output \"./build/report\" " \
           + "--test"
         )
 
