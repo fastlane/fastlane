@@ -47,6 +47,9 @@ ipa do
     # If you only want to upload app metadata, remove the complete ipa block.
 
     # system("ipa build --verbose") # build your project using Shenzhen
+
+    # ENV["IPA_OUTPUT_PATH"] # if you're using fastlane uncomment this and remove the line below
+
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
 
