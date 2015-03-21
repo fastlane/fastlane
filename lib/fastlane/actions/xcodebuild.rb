@@ -76,7 +76,10 @@ module Fastlane
             params[:export_format] ||= "ipa"
 
             # If not passed, construct export path from env vars
-            params[:export_path] ||= "#{build_path}#{scheme}"
+            if params[:export_path] == nil
+              ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
+              params[:export_path] = "#{build_path}#{ipa_filename}"
+            end
 
             # Store IPA path for later deploy steps (i.e. Crashlytics)
             Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + params[:export_format].downcase
