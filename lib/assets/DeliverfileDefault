@@ -22,7 +22,7 @@ app_identifier "[[APP_IDENTIFIER]]"
 apple_id "[[APPLE_ID]]" # This is NOT your Apple login ID, but the App ID of your app
 email "[[EMAIL]]" # the login email address
 
-# version '1.2' # you can pass this if you want to verify the version number with the ipa file
+# version "1.2" # you can pass this if you want to verify the version number with the ipa file
 
 # To update the app's description, changelog, etc. or to avoid updating it using deliver, edit the files in ./metadata/[language]
 
