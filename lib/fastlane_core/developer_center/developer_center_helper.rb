@@ -8,13 +8,13 @@ module FastlaneCore
       host = Capybara.current_session.current_host
       url = [host, url].join('')
 
-      cookieString = ""
+      cookie_string = ""
       
       page.driver.cookies.each do |key, cookie|
-        cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
+        cookie_string << "#{cookie.name}=#{cookie.value};" # append all known cookies
       end
       
-      data = open(url, {'Cookie' => cookieString}).read
+      data = open(url, {'Cookie' => cookie_string}).read
 
       raise "Something went wrong when downloading the file from the Dev Center" unless data
       Helper.log.info "Successfully downloaded provisioning profile"
