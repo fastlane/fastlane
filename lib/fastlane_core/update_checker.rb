@@ -3,6 +3,10 @@ require 'open-uri'
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
+
+    # This web service is fully open source: https://github.com/fastlane/refresher
+    UPDATE_URL = "https://refresher.fastlane.tools/"
+
     # This method will check if the latest version is installed and show a warning if that's not the case
     def self.verify_latest_version(gem_name, current_version)
       return true unless self.update_available?(gem_name, current_version)
@@ -32,7 +36,8 @@ module FastlaneCore
 
     private
       def self.fetch_latest(gem_name)
-        JSON.parse(open("http://rubygems.org/api/v1/gems/#{gem_name}.json").read)["version"]
+        url = UPDATE_URL + gem_name
+        JSON.parse(open(url).read)["version"]
       end
   end
 end
