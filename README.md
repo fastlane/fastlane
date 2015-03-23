@@ -104,7 +104,7 @@ In case you prefer environment variables:
 
 ## Use with [`sigh`](https://github.com/KrauseFx/sigh)
 
-`cert` is becomes really interesting when it's used in [`fastlane`](https://github.com/KrauseFx/fastlane) in combination with [`sigh`](https://github.com/KrauseFx/sigh).
+`cert` becomes really interesting when used in [`fastlane`](https://github.com/KrauseFx/fastlane) in combination with [`sigh`](https://github.com/KrauseFx/sigh).
 
 Update your `Fastfile` to contain the following code:
 
