@@ -42,6 +42,8 @@ module Fastlane
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
+        params[0] ||= {} # default to hash to fill in default values
+
         # Allows for a whole variety of configurations
         if params.first.is_a? Hash
 
@@ -88,6 +90,8 @@ module Fastlane
         # Remove nil value params unless :clean or :archive or :verbose
         params = params.delete_if { |k, v| (k != :clean && k != :archive && k != :verbose) && v.nil? }
 
+        params = fill_in_default_values(params)
+
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
           v ||= ''
@@ -96,6 +100,12 @@ module Fastlane
             "#{ARGS_MAP[k]} #{value}".strip
           end
         end.compact
+      end
+
+      def self.fill_in_default_values(params)
+        embed = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
+        params[:embed] ||= embed if embed
+        params
       end
 
       def self.find_ipa_file(dir)

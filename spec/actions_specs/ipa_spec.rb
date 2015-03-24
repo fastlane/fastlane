@@ -92,7 +92,8 @@ describe Fastlane do
         expect(result).to include('--verbose')
       end
 
-      it "works with object argument with all and extras" do
+      it "works with object argument with all and extras and auto-use sigh profile if not given" do
+        ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
         result = Fastlane::FastFile.new.parse("lane :test do 
           ipa ({
@@ -103,7 +104,6 @@ describe Fastlane do
             clean: nil,
             archive: nil,
             destination: 'Nowhere',
-            embed: 'Sure',
             identity: 'bourne',
             sdk: '10.0',
             ipa: 'JoshIsAwesome.ipa',
@@ -112,7 +112,10 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
+        expect(result).to include("-m \"#{ENV['SIGH_PROFILE_PATH']}\"")
         expect(result.size).to eq(12)
+
+        ENV["SIGH_PROFILE_PATH"] = nil
       end
 
     end
