@@ -26,7 +26,7 @@ module Sigh
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        "-p #{provisioning_profile.shellescape}",
+        "-r yes -p #{provisioning_profile.shellescape}",
         ipa.shellescape
       ].join(' ')
 
