@@ -106,13 +106,12 @@ ipa({
 
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. To also use it in `deliver` update your `Deliverfile`:
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. 
 
 
-```ruby
-ipa ENV["IPA_OUTPUT_PATH"]
-beta_ipa ENV["IPA_OUTPUT_PATH"]
-```
+**Important:**
+
+To also use it in `deliver` update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks:
 
 #### [deliver](https://github.com/KrauseFx/deliver)
 ```ruby
