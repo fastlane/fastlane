@@ -80,6 +80,8 @@ In case you want to pass more information to `produce`:
 - `PRODUCE_LANGUAGE` (the language you want your app to use, e.g. `English`, `German`)
 - `PRODUCE_VERSION` (the initial app version)
 - `PRODUCE_SKU` (the SKU you want to use, which must be a unique number)
+- `PRODUCE_SKIP_ITC` (should iTunes Connect app be created)
+- `PRODUCE_SKIP_DEVCENTER` (should Apple Developer Portal app be created)
 - `FASTLANE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
 - `FASTLANE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
 
