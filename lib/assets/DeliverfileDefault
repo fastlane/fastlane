@@ -30,8 +30,9 @@ email "[[EMAIL]]" # the login email address
 # Building and Testing
 ########################################
 
-# Dynamic generation of the ipa file
-# I'm using Shenzhen by Mattt, but you can use any build tool you want
+# For fastlane users:
+# you can remove all code below if you're using fastlane!
+
 # Remove the whole block if you do not want to upload an ipa file
 ipa do
     # Add any code you want, like incrementing the build 
@@ -41,8 +42,6 @@ ipa do
     # If you only want to upload app metadata, remove the complete ipa block.
 
     # system("ipa build --verbose") # build your project using Shenzhen
-
-    # ENV["IPA_OUTPUT_PATH"] # if you're using fastlane uncomment this and remove the line below
     
     "./[[APP_NAME]].ipa" # Tell 'Deliver' where it can find the finished ipa file
 end
