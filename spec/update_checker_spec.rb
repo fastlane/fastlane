@@ -2,7 +2,7 @@ require 'fastlane_core/update_checker'
 
 def mock_ruby_gems_response(version)
   # RubyGems API to verify the latest app version
-    stub_request(:get, "http://rubygems.org/api/v1/gems/deliver.json").
+    stub_request(:get, "https://refresher.fastlane.tools/deliver").
       with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
       to_return(:status => 200, :body => {version: version}.to_json, :headers => {})
 end
