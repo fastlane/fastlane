@@ -4,7 +4,7 @@ module CredentialsManager
 
     def self.try_fetch_value(key)
       if self.default_path
-        return self.new.data[key]
+        return (self.new.data[key] rescue nil)
       end
       nil
     end

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = %q{Password manager used in fastlane.tools}
   spec.description   = %q{Password manager used in fastlane.tools}
-  spec.homepage      = "http://fastlane.tools"
+  spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
