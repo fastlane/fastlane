@@ -9,7 +9,7 @@ describe Deliver do
 
     it "can create an example Deliverfile" do
       Deliver::DeliverfileCreator.create_example_deliver_file(@deliver_path, 'deliver')
-      expect(File.read(@deliver_path)).to include("Dynamic generation of the ipa file")
+      expect(File.read(@deliver_path)).to include("A list of available language codes can be found here")
 
       default = File.read("./lib/assets/DeliverfileExample")
       default.gsub!("[[APP_NAME]]", "deliver") # default name
