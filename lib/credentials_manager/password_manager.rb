@@ -82,11 +82,13 @@ module CredentialsManager
 
           # Now we store this information in the keychain
           # Example usage taken from https://github.com/nomad/cupertino/blob/master/lib/cupertino/provisioning_portal/commands/login.rb
-          if Security::InternetPassword.add(hostname, self.username, self.password)
-            return true
-          else
-            puts "Could not store password in keychain".red
-            return false
+          unless ENV["FASTLANE_DONT_STORE_PASSWORD"]
+            if Security::InternetPassword.add(hostname, self.username, self.password)
+              return true
+            else
+              puts "Could not store password in keychain".red
+              return false
+            end
           end
         end
       end
