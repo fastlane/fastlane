@@ -257,6 +257,8 @@ The `Jenkins` setup was moved to [Jenkins.md](https://github.com/KrauseFx/fastla
 
 #### Complex Fastfile Example
 ```ruby
+fastlane_version "0.4.1" 
+
 before_all do |lane|
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   team_id "Q2CBPK58CA"
