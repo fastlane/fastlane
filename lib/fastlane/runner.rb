@@ -26,7 +26,9 @@ module Fastlane
       return return_val
     rescue => ex
       Dir.chdir(path_to_use) do
-        @error.call(key, ex) if @error # notify the block
+        # Provide error block exception without colour code
+        error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
+        @error.call(key, error_ex) if @error # notify the block
       end
       raise ex
     end
