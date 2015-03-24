@@ -8,7 +8,7 @@ module Fastlane
           Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH],
         ].reject { |file| file.nil? || !File.exist?(file) }.each { |file| File.delete(file) }
 
-        Helper.log.info 'Cleaned up build artefacts 🐙'.green
+        Helper.log.info 'Cleaned up build artifacts 🐙'.green
       end
     end
   end
