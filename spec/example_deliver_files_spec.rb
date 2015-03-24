@@ -76,6 +76,20 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:title").first.content).to eq("Overwritten")
           end
 
+          it "uses the fastlane environment ipa path if given for empty Deliverfiles" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            ipa_path = "./spec/fixtures/ipas/Example1.ipa"
+            ENV["IPA_OUTPUT_PATH"] = ipa_path
+            
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileIpaFromEnv")
+
+            expect(ENV["DELIVER_IPA_PATH"]).to eq(ipa_path) # use this ipa
+
+            ENV["IPA_OUTPUT_PATH"] = nil
+          end
+
           it "Raises an exception when iTunes Transporter results in an error" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
             

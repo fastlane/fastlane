@@ -79,10 +79,12 @@ module Deliver
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
 
+      used_ipa_file = ENV["IPA_OUTPUT_PATH"]# if (ENV["IPA_OUTPUT_PATH"] and File.exists?(ENV["IPA_OUTPUT_PATH"]))
+
       if is_release_build?
-        used_ipa_file = @deploy_information[:ipa]
+        used_ipa_file = @deploy_information[:ipa] if @deploy_information[:ipa]
       elsif is_beta_build?
-        used_ipa_file = @deploy_information[:beta_ipa]
+        used_ipa_file = @deploy_information[:beta_ipa] if @deploy_information[:beta_ipa]
       end
 
       if used_ipa_file.kind_of?Proc
