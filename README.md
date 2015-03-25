@@ -299,7 +299,7 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 # Credentials
 
-A detailed description about your credentials is available on a [seperate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 
 
 # Can I trust `deliver`? 
