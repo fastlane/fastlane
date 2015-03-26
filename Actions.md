@@ -198,7 +198,7 @@ commit_version_bump
 
 commit_version_bump(
   message: 'Version Bump',                         # create a commit with a custom message
-  xcodeproj_path: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
+  xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
 )
 ```
 
@@ -231,7 +231,7 @@ push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
 
 push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
-  local_branch: 'develop',  # optional, default: 'master'
+  local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
   force: true,              # optional, default: false
 )
