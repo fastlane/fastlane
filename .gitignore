@@ -47,3 +47,4 @@ assets/fastlane_ultra_large.png
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
+Gemfile.lock
