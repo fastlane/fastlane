@@ -5,7 +5,7 @@ module FastlaneCore
   class UpdateChecker
 
     # This web service is fully open source: https://github.com/fastlane/refresher
-    UPDATE_URL = "https://refresher.fastlane.tools/"
+    UPDATE_URL = "https://fastlane-refresher.herokuapp.com/"
 
     # This method will check if the latest version is installed and show a warning if that's not the case
     def self.verify_latest_version(gem_name, current_version)
