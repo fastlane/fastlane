@@ -198,7 +198,7 @@ commit_version_bump
 
 commit_version_bump(
   message: 'Version Bump',                         # create a commit with a custom message
-  xcodeproj_path: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
+  xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
 )
 ```
 
