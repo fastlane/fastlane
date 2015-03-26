@@ -231,7 +231,7 @@ push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
 
 push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
-  local_branch: 'develop',  # optional, default: 'master'
+  local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
   force: true,              # optional, default: false
 )
