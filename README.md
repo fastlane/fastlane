@@ -91,11 +91,11 @@ If you want to take a look at a project, already using `fastlane`, check out the
 # Quick Start
 
 
-The setup assistent will create all the necessary files for you, using the existing app metadata from iTunes Connect.
+The setup assistant will create all the necessary files for you, using the existing app metadata from iTunes Connect.
 
 - ```cd [your_project_folder]```
 - ```fastlane init```
-- Follow the setup assistent, which will set up ```fastlane``` for you
+- Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` using the next section
 
 For a more detailed setup, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/GUIDE.md).
