@@ -11,6 +11,9 @@
 # you can set the path to your ipa file using:
 # ipa './app.ip'
 
+# to provide an ipa file for TestFlight distribution, use beta_ipa 
+# beta_ipa './app.ip'
+
 # The version of your app - remove this if you provide an ipa file
 version "[[APP_VERSION]]"
 
