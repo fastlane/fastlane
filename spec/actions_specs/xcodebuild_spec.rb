@@ -37,7 +37,7 @@ describe Fastlane do
             skip_unavailable_actions: true,
             target: 'MyAppTarget',
             workspace: 'MyApp.xcworkspace',
-            xcconfig: 'my.xcconfig'
+            xcconfig: 'my.xcconfig',
           )
         end").runner.execute(:test)
 
@@ -74,6 +74,22 @@ describe Fastlane do
           + "test " \
           + "| xcpretty --color --simple"
       )
+    end
+
+    it "works with build settings" do
+      result = Fastlane::FastFile.new.parse("lane :test do
+        xcodebuild(
+          build_settings: {
+            'CODE_SIGN_IDENTITY' => 'iPhone Developer: Josh',
+            'JOBS' => 16,
+            'PROVISIONING_PROFILE' => 'JoshIsCoolProfile'
+          }
+        )
+      end").runner.execute(:test)
+
+      expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
+      expect(result).to include('JOBS="16"')
+      expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
     end
 
     it "when archiving, should cache the archive path for a later export step" do
@@ -159,6 +175,8 @@ describe Fastlane do
       end
 
       it "can export" do
+        ENV.delete("XCODE_SCHEME")
+        ENV.delete("XCODE_WORKSPACE")
         result = Fastlane::FastFile.new.parse("lane :test do
           xcodebuild(
             archive_path: './build-dir/MyApp.xcarchive',
@@ -295,8 +313,8 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \
           + "| xcpretty --color " \
-          + "--output \"./build-dir/test-report\" " \
           + "--report junit " \
+          + "--output \"./build-dir/test-report\" " \
           + "--test"
         )
       end
@@ -322,9 +340,9 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \
           + "| xcpretty --color " \
-          + "--output \"./build/report\" " \
           + "--report html " \
           + "--screenshots " \
+          + "--output \"./build/report\" " \
           + "--test"
         )
 
@@ -353,6 +371,23 @@ describe Fastlane do
           + "--report json-compilation-database " \
           + "--report junit " \
           + "--test"
+        )
+      end
+
+      it "should detect and use the workspace, when a workspace is present" do
+        allow(Dir).to receive(:glob).with("*.xcworkspace").and_return([ "MyApp.xcworkspace" ])
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "| xcpretty --color " \
+          + "--simple"
         )
       end
     end

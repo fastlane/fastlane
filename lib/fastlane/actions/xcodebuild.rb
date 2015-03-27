@@ -61,6 +61,7 @@ module Fastlane
           build_path += "/"
         end
 
+
         if params = params.first
           # Operation bools
           archiving = params.key? :archive
@@ -75,7 +76,10 @@ module Fastlane
             params[:export_format] ||= "ipa"
 
             # If not passed, construct export path from env vars
-            params[:export_path] ||= "#{build_path}#{scheme}"
+            if params[:export_path] == nil
+              ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
+              params[:export_path] = "#{build_path}#{ipa_filename}"
+            end
 
             # Store IPA path for later deploy steps (i.e. Crashlytics)
             Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + params[:export_format].downcase
@@ -84,6 +88,12 @@ module Fastlane
             params[:scheme] ||= scheme
             params[:workspace] ||= workspace
             params[:project] ||= project
+
+            # If no project or workspace was passed in or set as an environment
+            # variable, attempt to autodetect the workspace.
+            if params[:project].to_s.empty? && params[:workspace].to_s.empty?
+              params[:workspace] = detect_workspace
+            end
           end
 
           if archiving
@@ -106,13 +116,6 @@ module Fastlane
         # Default args
         xcpretty_args = [ "--color" ]
 
-        # Stdout format
-        if testing && !archiving
-          xcpretty_args.push "--test"
-        else
-          xcpretty_args.push "--simple"
-        end
-
         if testing
           # Test report file format
           if params[:report_formats]
@@ -122,21 +125,30 @@ module Fastlane
 
             xcpretty_args.push report_formats
 
+            # Save screenshots flag
+            if params[:report_formats].include?("html") && params[:report_screenshots]
+              xcpretty_args.push "--screenshots"
+            end
+
+            xcpretty_args.sort!
+
             # Test report file path
             if params[:report_path]
               xcpretty_args.push "--output \"#{params[:report_path]}\""
             elsif build_path
               xcpretty_args.push "--output \"#{build_path}report\""
             end
-
-            # Save screenshots flag
-            if params[:report_formats].include?("html") && params[:report_screenshots]
-              xcpretty_args.push "--screenshots"
-            end
           end
         end
 
-        xcpretty_args = xcpretty_args.sort.join(" ")
+        # Stdout format
+        if testing && !archiving
+          xcpretty_args.push "--test"
+        else
+          xcpretty_args.push "--simple"
+        end
+
+        xcpretty_args = xcpretty_args.join(" ")
 
         Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
       end
@@ -151,11 +163,29 @@ module Fastlane
           if arg = ARGS_MAP[k]
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
+          elsif k == :build_settings
+            v.map{|setting,value| "#{setting}=\"#{value}\""}.join(' ')
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
           end
         end.compact.sort
+      end
+
+      def self.detect_workspace
+        workspace = nil
+        workspaces = Dir.glob("*.xcworkspace")
+
+        if workspaces.length > 1
+          Helper.log.warn "Multiple workspaces detected."
+        end
+
+        if !workspaces.empty?
+          workspace = workspaces.first
+          Helper.log.warn "Using workspace \"#{workspace}\""
+        end
+
+        return workspace
       end
     end
 

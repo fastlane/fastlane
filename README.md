@@ -66,7 +66,7 @@ Thanks to all sponsors and contributors for extending and improving the `fastlan
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Dan Trenz ([@dtrenz](https://twitter.com/dtrenz))
-- Lukas Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
+- Luka Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
 - Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
 - Manuel Wallner ([@milch](https://github.com/milch))
 - Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
@@ -139,6 +139,7 @@ When one command fails, the execution will be aborted.
 
 ### Project
 - [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods): Setup your CocoaPods project
+- [Carthage](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#carthage): Setup your Carthage project
 - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number): Increment the Xcode build number before building the app
 
 ### Testing
@@ -257,6 +258,8 @@ The `Jenkins` setup was moved to [Jenkins.md](https://github.com/KrauseFx/fastla
 
 #### Complex Fastfile Example
 ```ruby
+fastlane_version "0.4.1" 
+
 before_all do |lane|
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   team_id "Q2CBPK58CA"
@@ -268,16 +271,17 @@ before_all do |lane|
   cocoapods
 
   xctool :test
+end
 
-  ipa({
-    workspace: "MyApp.xcworkspace"
-  })
+lane :test do
+  snapshot
 end
 
 lane :beta do
   cert
-
   sigh :adhoc
+  
+  ipa
 
   deliver :beta
 
@@ -289,8 +293,8 @@ end
 
 lane :deploy do
   cert
-
   sigh
+  ipa
 
   snapshot
 
@@ -316,7 +320,8 @@ error do |lane, exception|
   reset_git_repo
 
   slack({
-    message: "An error occured"
+    message: "An error occured",
+    success: false
   })
 end
 ```
