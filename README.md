@@ -275,8 +275,9 @@ All available commands with a short description can be found in [Deliverfile.md]
 - Ask the script user for a changelog
 - Deploy a new version just by starting a Jenkins job
 - Post the deployment status on Slack
-- Upload the latest screenshots on your server
-- Many more things, be creative and let me know :)
+- Upload the latest screenshots to your server
+
+For further actions, check out [fastlane](https://github.com/KrauseFx/fastlane)
     
 #### Use the exposed Ruby classes
 Some examples:
