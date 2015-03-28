@@ -99,7 +99,6 @@ module Deliver
         # Distribute to beta testers
         Helper.log.info "Distributing the latest build to Beta Testers."
         if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
-          Helper.log.info "Successfully distributed a new beta build of your app.".green
           return true
         end
         return false
