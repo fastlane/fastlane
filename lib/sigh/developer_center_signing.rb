@@ -82,7 +82,7 @@ module Sigh
 
       predicates_str = " with #{predicates.join(', ')}"
 
-      raise "Could not find a Certificate#{predicates_str}. Please open #{current_url} and make sure you have a signing profile created, which mathces the given filters".red
+      raise "Could not find a Certificate#{predicates_str}. Please open #{current_url} and make sure you have a signing profile created, which matches the given filters".red
     end
   end
 end
