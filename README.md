@@ -144,6 +144,7 @@ When one command fails, the execution will be aborted.
 
 ### Testing
 - [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot): Automate taking localized screenshots of your iOS app on every device
+- [xctest](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcodebuild): Use the built in testing in combination with `xcodebuild`
 - [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool): Run tests of your app
 - [Testmunk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#testmunk): Run integration tests on real devices
 - [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr): Generate summarized code coverage reports
