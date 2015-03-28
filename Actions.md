@@ -41,7 +41,7 @@ snapshot :verbose
 ```
 
 #### [sigh](https://github.com/KrauseFx/sigh)
-This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the `./fastlane` folder.
+This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
 ```ruby
 sigh
