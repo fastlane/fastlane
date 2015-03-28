@@ -52,5 +52,16 @@ module CredentialsManager
       value ||= yield if block_given?
       data[:team_name] = value if value
     end
+
+    # Override Appfile configuration for a specific lane.
+    #
+    # lane_name  - String containing name for a lane.
+    # block - Block to execute to override configuration values.
+    #
+    # Discussion If received lane name does not match the lane name available as environment variable, this method
+    #             does nothing.
+    def for_lane(lane_name, &block)
+      block.call if lane_name == ENV["FASTLANE_LANE_NAME"] # If necessary, override the specified configurations.
+    end
   end
 end
