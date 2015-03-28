@@ -219,6 +219,8 @@ module Deliver
         Helper.log.warn "Overwriting screenshots path from config (#{screens_path}) with (#{ENV["DELIVER_SCREENSHOTS_PATH"]})".yellow
         screens_path = ENV["DELIVER_SCREENSHOTS_PATH"]
       end
+
+      screens_path ||= "./screenshots/" # default value
       
       if screens_path
         # Not using Snapfile. Not a good user.

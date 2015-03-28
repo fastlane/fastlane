@@ -9,7 +9,7 @@ describe Deliver do
 
     it "can create an example Deliverfile" do
       Deliver::DeliverfileCreator.create_example_deliver_file(@deliver_path, 'deliver')
-      expect(File.read(@deliver_path)).to include("A list of available language codes can be found here")
+      expect(File.read(@deliver_path)).to include("https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md")
 
       default = File.read("./lib/assets/DeliverfileExample")
       default.gsub!("[[APP_NAME]]", "deliver") # default name
@@ -60,6 +60,7 @@ describe Deliver do
       correct.gsub!("[[APP_NAME]]", project_name)
       correct.gsub!("[[EMAIL]]", ENV["DELIVER_USER"])
       correct.gsub!("[[APPLE_ID]]", apple_id.to_s)
+      correct.gsub!("[[APP_VERSION]]", "0.9.10")
       expect(File.read("/tmp/Deliverfile")).to eq(correct)
 
       expect(File.read("/tmp/screenshots/README.txt")).to eq(File.read("./lib/assets/ScreenshotsHelp"))

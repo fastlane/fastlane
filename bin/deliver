@@ -46,9 +46,12 @@ class FastlaneApplication
 
     command :init do |c|
       c.syntax = 'deliver init'
+      c.option '-u', '--username String', String, 'Your Apple ID'
       c.description = "Creates a new Deliverfile in the current directory"
 
       c.action do |args, options|
+        set_username(options.username)
+
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Deliver::DeliverfileCreator.create(path)
       end

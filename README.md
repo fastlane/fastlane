@@ -168,6 +168,10 @@ To let the computer create the screenshots for you, checkout [this section of th
 
 If you want to have the screenshots inside a device frame, with a background and a fancy label on top, you can use [Sketch to App Store](http://sketchtoappstore.com/).
 
+#### Update App description, keywords and more
+
+If you used `deliver init`, take a look at the `./metadata/` folder, which contains your app description, keywords and app title. If you change the content of the files, it will get updated when you run `deliver`.
+
 #### Upload a new ipa file with a changelog to the App Store
 This will submit a new update to Apple
 ```ruby
@@ -184,6 +188,8 @@ changelog({
 If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. This will upload the ipa file and app metadata, but will not submit the app for review.
 
 The changelog is only used for App Store submission, not for TestFlight builds.
+
+It is recommended to use `deliver` in combination with [fastlane](https://github.com/KrauseFx/fastlane) to build the app using `xcodebuild`.
 
 #### Upload a new ipa for TestFlight beta testers
 
@@ -216,24 +222,6 @@ error do |information|
     # custom exception handling here
     raise "Something went wrong: #{information['error']}"    
 end
-```
-
-
-#### Set a default language if you only maintain one language
-```ruby
-default_language "en-US"
-version "1.2"
-
-title "Only English Title"
-```
-If you do not pass an ipa file, you have to specify the app version you want to edit.
-
-#### Update the app's keywords
-```ruby
-default_language "de-DE"
-version "1.2"
-
-keywords ["keyword1", "something", "else"]
 ```
 
 #### Read content from somewhere external (file, web service, ...)
@@ -275,8 +263,9 @@ All available commands with a short description can be found in [Deliverfile.md]
 - Ask the script user for a changelog
 - Deploy a new version just by starting a Jenkins job
 - Post the deployment status on Slack
-- Upload the latest screenshots on your server
-- Many more things, be creative and let me know :)
+- Upload the latest screenshots to your server
+
+For further actions, check out [fastlane](https://github.com/KrauseFx/fastlane)
     
 #### Use the exposed Ruby classes
 Some examples:
