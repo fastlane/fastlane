@@ -25,6 +25,13 @@ module CredentialsManager
       Dir.chdir(File.expand_path('..', path)) do
         eval(File.read(full_path))
       end
+
+      # If necessary override per lane configuration
+      blocks[ENV["FASTLANE_LANE_NAME"].to_sym].call if (ENV["FASTLANE_LANE_NAME"] && blocks[ENV["FASTLANE_LANE_NAME"].to_sym])
+    end
+
+    def blocks
+      @blocks ||= {}
     end
 
     def data
@@ -51,6 +58,18 @@ module CredentialsManager
     def team_name(value)
       value ||= yield if block_given?
       data[:team_name] = value if value
+    end
+
+    # Override Appfile configuration for a specific lane.
+    #
+    # lane_name  - Symbol representing a lane name.
+    # block - Block to execute to override configuration values.
+    #
+    # Discussion If received lane name does not match the lane name available as environment variable, no changes will
+    #             be applied.
+    def for_lane(lane_name, &block)
+      raise "Configuration for lane '#{lane_name}' was defined multiple times!".red if blocks[lane_name]
+      blocks[lane_name] = block
     end
   end
 end
