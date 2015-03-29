@@ -76,7 +76,7 @@ If your project has different bundle identifiers per environment (i.e. beta, app
 
 The configuration described for a lane will be loaded __together__ with values defined outside the block. While driving a lane, the values inside the proper block will be used, otherwise the value outside.
 
-### Example using `for_lane`
+#### Example using `for_lane`
 
 ```ruby
 app_identifier "net.sunapps.1"
