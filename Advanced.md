@@ -51,3 +51,41 @@ Add this to the top of your `Fastfile` (*.* is the `fastlane` folder)
 ```ruby
 actions_path '../custom_actions_folder/'
 ```
+
+### `Appfile`
+
+Once initialized, the Fastlane platform will take care to create some useful resources for you like the `Appfile`.
+
+The `Appfile` stores useful information that are used across all Fastlane tools like your *Apple ID* or the application *Bundle Identifier*, to deploy your lanes faster and tailored on your project and needs. 
+
+#### Configure the `Appfile`
+
+By default an Appfile looks like:
+
+```ruby
+app_identifier "net.sunapps.1" # The bundle identifier of your app
+apple_id "felix@sunapps.net" # Your Apple email address
+
+# You can uncomment the lines below and add your own 
+# team selection in case you're in multiple teams
+# team_name "Felix Krause"
+# team_id "Q2CBPJ58CA"
+```
+
+If your project use different bundle identifiers per environment (beta, app store), here is a way to define that.
+
+```ruby
+app_identifier "net.sunapps.1"
+apple_id "felix@sunapps.net"
+team_id "Q2CBPJ58CC"
+
+for_lane :beta do
+  app_identifier "net.sunapps.1.beta"
+end
+
+for_lane :enterprise do
+  app_identifier "enterprise.com"
+end
+```
+
+The value inside the blocks will be used if given, otherwise the value outside.
