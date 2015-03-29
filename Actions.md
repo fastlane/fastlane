@@ -405,13 +405,13 @@ Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
 such as; archive, build, clean, test, export & more.
 
 ```ruby
-  # Create an archive. (./build-dir/MyApp.xcarchive)
-  xcodebuild(
-    archive: true,
-    archive_path: './build-dir/MyApp.xcarchive',
-    scheme: 'MyApp',
-    workspace: 'MyApp.xcworkspace'
-  )
+# Create an archive. (./build-dir/MyApp.xcarchive)
+xcodebuild(
+  archive: true,
+  archive_path: './build-dir/MyApp.xcarchive',
+  scheme: 'MyApp',
+  workspace: 'MyApp.xcworkspace'
+)
 ```
 
 ```ruby
