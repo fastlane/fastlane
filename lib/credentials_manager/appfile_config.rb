@@ -27,7 +27,7 @@ module CredentialsManager
       end
 
       # If necessary override per lane configuration
-      blocks[ENV["FASTLANE_LANE_NAME"].to_sym].call if blocks[ENV["FASTLANE_LANE_NAME"].to_sym]
+      blocks[ENV["FASTLANE_LANE_NAME"].to_sym].call if (ENV["FASTLANE_LANE_NAME"] && blocks[ENV["FASTLANE_LANE_NAME"].to_sym])
     end
 
     def blocks
