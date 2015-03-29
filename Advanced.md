@@ -56,7 +56,7 @@ actions_path '../custom_actions_folder/'
 
 Once initialized, the Fastlane platform will take care to create some useful resources for you like the `Appfile`.
 
-The `Appfile` stores useful information that are used across all Fastlane tools like your *Apple ID* or the application *Bundle Identifier*, to deploy your lanes faster and tailored on your project and needs. 
+The `Appfile` stores useful information that are used across all Fastlane tools like your *Apple ID* or the application *Bundle Identifier*, to deploy your lanes faster and tailored on your project needs. 
 
 #### Configure the `Appfile`
 
@@ -74,7 +74,7 @@ apple_id "felix@sunapps.net" # Your Apple email address
 
 If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_lane` block declaration.
 
-The configuration described for a lane will be loaded __together__ with values defined outside the block. If no block is found for current driven lane, the value inside the blocks will be used, otherwise the value outside.
+The configuration described for a lane will be loaded __together__ with values defined outside the block. While driving a lane, the values inside the proper block will be used, otherwise the value outside.
 
 ### Example using `for_lane`
 
