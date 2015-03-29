@@ -95,7 +95,7 @@ end
 Therefore, while driving the `:beta` lane, this configuration are loaded:
 
 ```ruby
-app_identifier "net.sunapps.1,beta"
+app_identifier "net.sunapps.1.beta"
 apple_id "felix@sunapps.net"
 team_id "Q2CBPJ58CC"
 ```
