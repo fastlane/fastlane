@@ -52,7 +52,7 @@ Add this to the top of your `Fastfile` (*.* is the `fastlane` folder)
 actions_path '../custom_actions_folder/'
 ```
 
-### `Appfile`
+### The `Appfile`
 
 Once initialized, the Fastlane platform will take care to create some useful resources for you like the `Appfile`.
 
