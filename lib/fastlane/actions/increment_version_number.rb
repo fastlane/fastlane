@@ -46,22 +46,18 @@ module Fastlane
               '&&'
           ].join(' ')
 
-          current_version= `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
-
-          if !current_version.match(/\d.\d.\d/) && !Helper.test?
-            raise 'Your current version does not respect the format A.B.C'
-
+          if Helper.test?
+            version_array = [1,0,0]
+          else
+            current_version= `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
+            raise 'Your current version does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
             #Check if CFBundleShortVersionString is the same for each occurrence
             allBundles = `#{command_prefix} agvtool what-marketing-version -terse`.split("\n")
             allBundles.each do |bundle|
               raise 'Ensure all you CFBundleShortVersionString are equals in your project ' unless bundle.end_with? "=#{current_version}"
             end
+            version_array = current_version.split(".").map(&:to_i)
           end
-
-          version_array = current_version.split(".").map(&:to_i)
-
-          # Define default test version number
-          version_array = [1,0,0] if Helper.test?
 
           case release_task
             when "patch"
@@ -84,7 +80,6 @@ module Fastlane
               command_prefix,
               "agvtool new-marketing-version #{next_version_number}"
           ].join(' ')
-          puts(command)
 
           if Helper.test?
             Actions.lane_context[SharedValues::VERSION_NUMBER] = command
