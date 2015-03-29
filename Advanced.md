@@ -74,7 +74,7 @@ apple_id "felix@sunapps.net" # Your Apple email address
 
 If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_lane` block declaration.
 
-The configuration described for a lane will be loaded __together__ with values defined outside the block. While driving a lane, the values inside the proper block will be used, otherwise the value outside.
+The configuration described for a lane are loaded __together__ with values defined outside the block, such that you can also apply small changes per lane. 
 
 #### Example using `for_lane`
 
@@ -90,4 +90,12 @@ end
 for_lane :enterprise do
   app_identifier "enterprise.com"
 end
+```
+
+Therefore, while driving the `:beta` lane, this configuration are loaded:
+
+```ruby
+app_identifier "net.sunapps.1,beta"
+apple_id "felix@sunapps.net"
+team_id "Q2CBPJ58CC"
 ```
