@@ -10,14 +10,15 @@ module Produce
 
     def run(config)
       @config = config
+      @full_bundle_identifier = config[:bundle_identifier].gsub('*', config[:bundle_identifier_suffix].to_s)
 
       if ENV["CREATED_NEW_APP_ID"].to_i > 0
         # We just created this App ID, this takes about 3 minutes to show up on iTunes Connect
         Helper.log.info "Waiting for 3 minutes to make sure, the App ID is synced to iTunes Connect".yellow
         sleep 180
+
         open_new_app_popup # for some reason, we have to refresh the page twice to get it working
-        
-        unless app_exists?
+        unless bundle_exist?
           Helper.log.info "Couldn't find new app yet, we're waiting for another 2 minutes.".yellow
           sleep 120
         end
@@ -49,12 +50,13 @@ module Produce
 
     def fetch_apple_id
       # First try it using the Apple API
-      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{@config[:bundle_identifier]}").read)
+      data = JSON.parse(open("https://itunes.apple.com/lookup?bundleId=#{@full_bundle_identifier}").read)
 
       if data['resultCount'] == 0 or true
-        visit current_url
+        visit APPS_URL
         sleep 10
-        first("input[ng-model='searchModel']").set @config[:bundle_identifier]
+
+        first("input[ng-model='searchModel']").set @full_bundle_identifier
 
         if all("div[bo-bind='app.name']").count == 2
           raise "There were multiple results when looking for the new app. This might be due to having same app identifiers included in each other (see generated screenshots)".red
@@ -77,11 +79,16 @@ module Produce
       wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set @config[:app_name]
       wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
       wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
-      
-      wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
+
       all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
+      wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
+
+      if wildcard_bundle?
+        wait_for_elements("input[ng-model='createAppDetails.newApp.bundleIdSuffix.value']").first.set @config[:bundle_identifier_suffix]
+      end
 
       click_on "Create"
+
       sleep 5 # this usually takes some time
 
       if all("p[ng-repeat='error in errorText']").count == 1
@@ -94,19 +101,32 @@ module Produce
     end
 
     def initial_pricing
+      # It's not important here which is the price set. It will be updated by deliver
       sleep 3
       click_on "Pricing"
-      first('#pricingPopup > option[value="3"]').select_option
+      first('#pricingPopup > option[value="0"]').select_option
       first('.saveChangesActionButton').click
     end
 
     private
-      def app_exists?
+      def bundle_exist?
         open_new_app_popup # to get the dropdown of available app identifier, if it's there, the app was not yet created
-
         sleep 4
 
         return (all("option[value='#{@config[:bundle_identifier]}']").count == 0)
+      end
+
+      def app_exists?
+        visit APPS_URL
+        sleep 10
+
+        first("input[ng-model='searchModel']").set @full_bundle_identifier
+
+        return (all("div[bo-bind='app.name']").count == 1)
+      end
+
+      def wildcard_bundle?
+        return @config[:bundle_identifier].end_with?("*")
       end
 
       def open_new_app_popup

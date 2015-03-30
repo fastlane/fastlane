@@ -2,6 +2,7 @@ module Produce
   class Config
     ASK_MESSAGES = {
       bundle_identifier: "App Identifier (Bundle ID, e.g. com.krausefx.app): ",
+      bundle_identifier_suffix: "App Identifier Suffix (Ignored if App Identifier does not ends with .*): ",
       app_name: "App Name: ",
       version: "Initial version number (e.g. '1.0'): ",
       sku: "SKU Number (e.g. '1234'): ",
@@ -55,10 +56,12 @@ module Produce
     def env_options
       hash = {
         bundle_identifier: ENV['PRODUCE_APP_IDENTIFIER'],
+        bundle_identifier_suffix: ENV['PRODUCE_APP_IDENTIFIER_SUFFIX'],
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
         sku: ENV['PRODUCE_SKU'],
-        skip_itc: skip_itc?(ENV['PRODUCE_SKIP_ITC']),
+        skip_itc: is_truthy?(ENV['PRODUCE_SKIP_ITC']),
+        skip_devcenter: is_truthy?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
         team_name: ENV['PRODUCE_TEAM_NAME']
       }
@@ -81,8 +84,10 @@ module Produce
       AvailableDefaultLanguages.all_langauges.include? language
     end
 
-    def skip_itc? value
+    # TODO: this could be moved inside fastlane_core
+    def is_truthy? value
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
+
   end
 end
