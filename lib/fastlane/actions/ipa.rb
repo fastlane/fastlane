@@ -31,7 +31,8 @@ module Fastlane
       identity: '-i',
       sdk: '--sdk',
       ipa: '--ipa',
-      verbose: '--verbose'
+      verbose: '--verbose',
+      xcargs: '--xcargs',
     }
 
     class IpaAction
