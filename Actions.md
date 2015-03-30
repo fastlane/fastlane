@@ -101,12 +101,22 @@ ipa({
   workspace: "MyApp.xcworkspace",
   configuration: "Debug",
   scheme: "MyApp",
+  # (optionals)
+  clean: nil,                      # this means 'Do Clean'. Clean project before building.
+  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+  identity: "MyIdentity",          # Identity to be used along with --embed
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  archive: nil,                    # this means 'Do Archive'. Archive project after building.
+  verbose: nil,                    # this means 'Do Verbose'.
 })
 ```
 
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. 
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
 
 
 **Important:**
@@ -192,9 +202,9 @@ The action will connect to the Apple Developer Portal using the username you spe
 ```ruby
 # Simply provide a list of devices as a Hash
 register_devices(
-  devices: { 
+  devices: {
     'Luka iPhone 6' => '1234567890123456789012345678901234567890',
-    'Felix iPad Air 2' => 'abcdefghijklmnopqrstvuwxyzabcdefghijklmn', 
+    'Felix iPad Air 2' => 'abcdefghijklmnopqrstvuwxyzabcdefghijklmn',
   }
 )
 
