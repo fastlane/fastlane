@@ -151,6 +151,22 @@ increment_build_numer(
 )
 ```
 
+#### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
+This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
+
+```ruby
+increment_version_number # automatically increment patch version number
+increment_version_number "patch" # automatically increment patch version number
+increment_version_number "minor" # automatically increment minor version number
+increment_version_number "major" # automatically increment major version number
+increment_version_number '2.1.1' # set a specific version number
+
+increment_version_number(
+  release_task: '2.1.1', # specify specific version number (optional, omitting it increments patch version number)
+  xcodeproj: './path/to/MyApp.xcodeproj' (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+)
+```
+
 #### [resign](https://github.com/krausefx/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
