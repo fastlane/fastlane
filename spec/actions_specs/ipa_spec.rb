@@ -73,11 +73,12 @@ describe Fastlane do
             identity: 'bourne',
             sdk: '10.0',
             ipa: 'JoshIsAwesome.ipa',
-            verbose: nil
+            verbose: nil,
+            xcargs: 'MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1',
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(12)
+        expect(result.size).to eq(13)
         expect(result).to include('-w "Test.xcworkspace"')
         expect(result).to include('-p "Test.xcproject"')
         expect(result).to include('-c "Release"')
@@ -90,6 +91,7 @@ describe Fastlane do
         expect(result).to include('--sdk "10.0"')
         expect(result).to include('--ipa "JoshIsAwesome.ipa"')
         expect(result).to include('--verbose')
+        expect(result).to include('--xcargs "MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1"')
       end
 
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
