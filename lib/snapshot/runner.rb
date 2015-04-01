@@ -5,10 +5,10 @@ module Snapshot
   class Runner
     TRACE_DIR = '/tmp/snapshot_traces'
 
-    def work(clean: true)
+    def work(clean: true, build: true)
       SnapshotConfig.shared_instance.js_file # to verify the file can be found earlier
 
-      Builder.new.build_app(clean: clean)
+      Builder.new.build_app(clean: clean) if build
       @app_path = determine_app_path
 
       counter = 0
