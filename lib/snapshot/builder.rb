@@ -31,14 +31,17 @@ module Snapshot
             raise ex
           end
         end
+        Process.wait(pid)
       end
+      # Exit status for build command, should be 0 if build succeeded
+      cmdstatus = $?.exitstatus
 
-      if all_lines.join('\n').include?'** BUILD SUCCEEDED **'
+      if cmdstatus == 0 || all_lines.join('\n').include?('** BUILD SUCCEEDED **')
         Helper.log.info "BUILD SUCCEEDED".green
         return true
       else
         Helper.log.info(all_lines.join(' '))
-        raise "Looks like the build was not successfull."
+        raise "Looks like the build was not successful."
       end
     end
 
