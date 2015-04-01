@@ -25,8 +25,11 @@ module Snapshot
     # @return (String) The path, in which the screenshots should be stored
     attr_accessor :screenshots_path
 
-    # @return (String) The build command, wich should build the app to '/tmp/snapshot'
+    # @return (String) The build command, wich should build the app to build_dir (/tmp/snapshot by default)
     attr_accessor :build_command
+
+    # @return (String) The build directory, defaults to '/tmp/snapshot'
+    attr_accessor :build_dir
 
     # @return (BOOL) Skip the removal of the alpha channel from the screenshots
     attr_accessor :skip_alpha_removal
@@ -138,7 +141,7 @@ module Snapshot
 
     # Returns the file name of the project
     def project_name
-      File.basename(self.project_path, ".*" )
+      File.basename(self.project_path, ".*" ) if self.project_path
     end
 
     # The JavaScript UIAutomation file
