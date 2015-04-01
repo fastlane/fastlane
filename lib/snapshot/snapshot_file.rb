@@ -44,6 +44,9 @@ module Snapshot
         when :build_command
           raise "build_command has to be an String".red unless value.kind_of?String
           @config.build_command = value
+        when :build_dir
+          raise "build_dir has to be an String".red unless value.kind_of?String
+          @config.build_dir = File.expand_path(value)
         when :custom_args
           raise "custom_args has to be an String".red unless value.kind_of?String
           @config.custom_args = value

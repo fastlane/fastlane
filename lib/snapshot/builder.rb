@@ -1,14 +1,12 @@
 module Snapshot
   class Builder
-    BUILD_DIR = '/tmp/snapshot'
-
 
     def initialize
-      
+      @build_dir = SnapshotConfig.shared_instance.build_dir || '/tmp/snapshot'
     end
 
     def build_app(clean: true)
-      FileUtils.rm_rf(BUILD_DIR) if clean
+      FileUtils.rm_rf(@build_dir) if clean
 
       command = SnapshotConfig.shared_instance.build_command
 
@@ -70,12 +68,12 @@ module Snapshot
         [
           build_command,
           "-sdk iphonesimulator",
-          "CONFIGURATION_BUILD_DIR='#{BUILD_DIR}/build'",
+          "CONFIGURATION_BUILD_DIR='#{@build_dir}/build'",
           "-#{proj_key} '#{proj_path}'",
           "-scheme '#{scheme}'",
-          "DSTROOT='#{BUILD_DIR}'",
-          "OBJROOT='#{BUILD_DIR}'",
-          "SYMROOT='#{BUILD_DIR}'",
+          "DSTROOT='#{@build_dir}'",
+          "OBJROOT='#{@build_dir}'",
+          "SYMROOT='#{@build_dir}'",
           custom_build_args,
           actions.join(' ')
         ].join(' ')
