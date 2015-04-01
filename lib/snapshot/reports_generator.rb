@@ -12,16 +12,18 @@ module Snapshot
         language = File.basename(language_path)
         Dir[File.join(language_path, '*')].sort.each do |screenshot|
 
-          available_devices.each do |key_name, output_name|
+          ["portrait", "landscape"].each do |orientation|
+            available_devices.each do |key_name, output_name|
+              if File.basename(screenshot).include?key_name and File.basename(screenshot).include?orientation
+                output_name += " (#{orientation.capitalize})"
+                # This screenshot it from this device
+                @data[language] ||= {}
+                @data[language][output_name] ||= []
 
-            if File.basename(screenshot).include?key_name
-              # This screenshot it from this device
-              @data[language] ||= {}
-              @data[language][output_name] ||= []
-
-              resulting_path = File.join('.', language, File.basename(screenshot))
-              @data[language][output_name] << resulting_path
-              break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
+                resulting_path = File.join('.', language, File.basename(screenshot))
+                @data[language][output_name] << resulting_path
+                break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
+              end
             end
           end
         end
