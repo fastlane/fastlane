@@ -68,7 +68,12 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      self.xcode_path + '../Applications/Application\ Loader.app/Contents/MacOS/itms/bin/iTMSTransporter'
+      itms_path = self.xcode_path + '../Applications/Application\ Loader.app/Contents/MacOS/itms/bin/iTMSTransporter'
+      if File.file?(itms_path)
+         return itms_path
+      else
+         return self.xcode_path + '../Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter'
+      end
     end
 
     def self.fastlane_enabled?
