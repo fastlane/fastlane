@@ -153,7 +153,8 @@ module Snapshot
 
     def determine_app_path
       # Determine the path to the actual app and not the WatchKit app
-      Dir.glob("/tmp/snapshot/build/*.app/*.plist").each do |path|
+      build_dir = SnapshotConfig.shared_instance.build_dir || '/tmp/snapshot'
+      Dir.glob("#{build_dir}/**/*.app/*.plist").each do |path|
         watchkit_enabled = `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{path}'`.strip
         next if watchkit_enabled == 'true' # we don't care about WatchKit Apps
 
