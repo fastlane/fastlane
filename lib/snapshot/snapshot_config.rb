@@ -141,7 +141,7 @@ module Snapshot
 
     # Returns the file name of the project
     def project_name
-      File.basename(self.project_path, ".*" )
+      File.basename(self.project_path, ".*" ) if self.project_path
     end
 
     # The JavaScript UIAutomation file
