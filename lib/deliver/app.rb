@@ -41,7 +41,13 @@ module Deliver
       elsif app_identifier and not apple_id
         # Fetch the Apple ID based on the given app identifier
         begin
-          self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+          begin
+            self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+          rescue
+            Helper.log.warn "App doesn't seem to be in the App Store yet or is not available in the US App Store. Using the iTC API instead."
+            # Use the iTunes Connect API instead: make that default in the future
+            self.apple_id = FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier)
+          end
         rescue
           unless Helper.is_test?
             Helper.log.info "Could not find Apple ID based on the app identifier in the US App Store. Maybe the app is not yet in the store?".yellow
