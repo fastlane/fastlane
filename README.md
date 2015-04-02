@@ -141,7 +141,7 @@ When one command fails, the execution will be aborted.
 - [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods): Setup your CocoaPods project
 - [Carthage](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#carthage): Setup your Carthage project
 - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number): Increment the Xcode build number before building the app
-- - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_version_number): Increment the Xcode version number before building the app
+- [increment_version_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_version_number): Increment the Xcode version number before building the app
 
 ### Testing
 - [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot): Automate taking localized screenshots of your iOS app on every device
