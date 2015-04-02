@@ -244,7 +244,7 @@ custom_build_args "-configuration release"
 ### Custom Build Command
 If for some reason, the default build command does not work for your project, you can pass your own build script. The script will be executed **once** before the tests are being run.
 
-**Make sure** you are setting the output path to ```/tmp/snapshot```.
+**Make sure** you are setting the output path to ```/tmp/snapshot``` or specify a custom ```build_dir``` on your ```Snapfile```.
 
 ```ruby
 build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROOT='/tmp/snapshot' ... "
@@ -348,6 +348,33 @@ Change syntax highlighting to *Ruby*.
 Unfortunately ```Instruments``` sometimes decides, to not respond to anything. Which means, neither the ```Instruments``` application, nor the ```instruments``` command line work. Killing the process doesn't help.
 
 The only way to fix this, is a restart of the Mac. 
+
+## Use a custom build system
+Using a build systems not based on Xcode –such as RubyMotion or Xamarin– is also possible.
+
+### RubyMotion
+
+Add to your ```Snapfile```:
+
+```ruby
+build_dir 'build/iPhoneSimulator-7.0-Development'
+build_command 'rake build:simulator'
+```
+
+### Xamarin
+
+Add to your ```Snapfile```:
+
+```ruby
+build_dir 'YourProject/bin/iPhoneSimulator'
+build_command '/Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool -v build "--configuration:Debug|iPhoneSimulator" YourProject.sln'
+```
+
+Unfortunately, Xamarin command line tool is only available for Business Edition licenses. For Indie licenses you can build the app using Xamarin Studio and use the ```--nobuild``` option.
+
+### Skip building
+
+If building via command-line doesn't work for your project or you don't want to build every time, you can run the tool with ```snapshot --nobuild``` to skip the build process and use a pre-built ```.app``` under your ```build_dir```.
 
 # Need help?
 - If there is a technical problem with ```snapshot```, submit an issue.
