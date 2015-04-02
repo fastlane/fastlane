@@ -39,3 +39,4 @@ build/
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
+Gemfile.lock
