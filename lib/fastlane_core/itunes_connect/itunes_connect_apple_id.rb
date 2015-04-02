@@ -9,7 +9,7 @@ module FastlaneCore
 
       return apps['summaries'].find { |v| v['bundleId'] == app_identifier }['adamId'].to_i
     rescue => ex
-      error_occured(ex)
+      # Do nothing right now...
     end
   end
 end
