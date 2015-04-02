@@ -47,6 +47,7 @@ module Deliver
             Helper.log.warn "App doesn't seem to be in the App Store yet or is not available in the US App Store. Using the iTC API instead."
             # Use the iTunes Connect API instead: make that default in the future
             self.apple_id = FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier)
+            raise "Couldn't find Apple ID" unless self.apple_id
           end
         rescue
           unless Helper.is_test?
