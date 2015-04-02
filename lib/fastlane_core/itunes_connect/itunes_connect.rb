@@ -6,6 +6,7 @@ require 'phantomjs/poltergeist' # this will download and store phantomjs
 
 require 'fastlane_core/itunes_connect/itunes_connect_helper.rb'
 require 'fastlane_core/itunes_connect/itunes_connect_login.rb'
+require 'fastlane_core/itunes_connect/itunes_connect_apple_id.rb'
 
 module FastlaneCore
   # Everything that can't be achived using the {FastlaneCore::ItunesTransporter}
