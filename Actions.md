@@ -102,7 +102,7 @@ ipa({
   configuration: "Debug",
   scheme: "MyApp",
   # (optionals)
-  clean: nil,                      # this means 'Do Clean'. Clean project before building.
+  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
   destination: "path/to/dir",      # Destination directory. Defaults to current directory.
   ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
   xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.

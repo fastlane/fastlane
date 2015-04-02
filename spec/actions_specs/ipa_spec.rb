@@ -45,7 +45,7 @@ describe Fastlane do
             project: nil,
             configuration: 'Release',
             scheme: 'TestScheme',
-            clean: nil,
+            clean: true,
             archive: nil,
             destination: nil,
             embed: nil,
@@ -66,7 +66,7 @@ describe Fastlane do
             project: 'Test.xcproject',
             configuration: 'Release',
             scheme: 'TestScheme',
-            clean: nil,
+            clean: true,
             archive: nil,
             destination: 'Nowhere',
             embed: 'Sure',
@@ -94,6 +94,26 @@ describe Fastlane do
         expect(result).to include('--xcargs "MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1"')
       end
 
+      it "respects the clean argument when true" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            clean: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--clean")
+      end
+
+      it "respects the clean argument when false" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            clean: false,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--no-clean")
+      end
+
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
         ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
@@ -103,7 +123,7 @@ describe Fastlane do
             project: 'Test.xcproject',
             configuration: 'Release',
             scheme: 'TestScheme',
-            clean: nil,
+            clean: true,
             archive: nil,
             destination: 'Nowhere',
             identity: 'bourne',
