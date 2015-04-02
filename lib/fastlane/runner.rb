@@ -5,6 +5,7 @@ module Fastlane
       key = key.to_sym
       Helper.log.info "Driving the lane '#{key}'".green
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = key
+      ENV["FASTLANE_LANE_NAME"] = key.to_s
 
       return_val = nil
 

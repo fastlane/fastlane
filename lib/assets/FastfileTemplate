@@ -5,9 +5,9 @@
 
 # All lines starting with a # are ignored when running `fastlane`
 
-# This is the minimum version number required. 
+# This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "[[FASTLANE_VERSION]]" 
+fastlane_version "[[FASTLANE_VERSION]]"
 
 before_all do
   # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."

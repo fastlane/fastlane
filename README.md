@@ -91,11 +91,11 @@ If you want to take a look at a project, already using `fastlane`, check out the
 # Quick Start
 
 
-The setup assistent will create all the necessary files for you, using the existing app metadata from iTunes Connect.
+The setup assistant will create all the necessary files for you, using the existing app metadata from iTunes Connect.
 
 - ```cd [your_project_folder]```
 - ```fastlane init```
-- Follow the setup assistent, which will set up ```fastlane``` for you
+- Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` using the next section
 
 For a more detailed setup, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/GUIDE.md).
@@ -141,9 +141,11 @@ When one command fails, the execution will be aborted.
 - [CocoaPods](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cocoapods): Setup your CocoaPods project
 - [Carthage](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#carthage): Setup your Carthage project
 - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_build_number): Increment the Xcode build number before building the app
+- - [increment_build_number](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#increment_version_number): Increment the Xcode version number before building the app
 
 ### Testing
 - [snapshot](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#snapshot): Automate taking localized screenshots of your iOS app on every device
+- [xctest](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xcodebuild): Use the built in testing in combination with `xcodebuild`
 - [xctool](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#xctool): Run tests of your app
 - [Testmunk](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#testmunk): Run integration tests on real devices
 - [gcovr](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#gcovr): Generate summarized code coverage reports
@@ -152,6 +154,7 @@ When one command fails, the execution will be aborted.
 - [cert](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#cert): Automatically create and maintain iOS code signing certificates
 - [sigh](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#sigh): Create and maintain your provisioning profiles
 - [resign](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#resign): Re-Sign an existing ipa file
+- [register_devices](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#register_devices): Register iOS device identifiers
 
 ### Building
 - [ipa](https://github.com/KrauseFx/fastlane/blob/master/Actions.md#ipa): Build your app for further use of the [uploading](#uploading) section

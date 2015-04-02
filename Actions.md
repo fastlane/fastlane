@@ -41,7 +41,7 @@ snapshot :verbose
 ```
 
 #### [sigh](https://github.com/KrauseFx/sigh)
-This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the `./fastlane` folder.
+This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
 ```ruby
 sigh
@@ -101,12 +101,22 @@ ipa({
   workspace: "MyApp.xcworkspace",
   configuration: "Debug",
   scheme: "MyApp",
+  # (optionals)
+  clean: nil,                      # this means 'Do Clean'. Clean project before building.
+  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+  identity: "MyIdentity",          # Identity to be used along with --embed
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  archive: nil,                    # this means 'Do Archive'. Archive project after building.
+  verbose: nil,                    # this means 'Do Verbose'.
 })
 ```
 
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`. 
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
 
 
 **Important:**
@@ -147,6 +157,22 @@ increment_build_number '75' # set a specific number
 
 increment_build_numer(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
+  xcodeproj: './path/to/MyApp.xcodeproj' # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+)
+```
+
+#### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
+This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
+
+```ruby
+increment_version_number # automatically increment patch version number
+increment_version_number "patch" # automatically increment patch version number
+increment_version_number "minor" # automatically increment minor version number
+increment_version_number "major" # automatically increment major version number
+increment_version_number '2.1.1' # set a specific version number
+
+increment_version_number(
+  release_task: '2.1.1', # specify specific version number (optional, omitting it increments patch version number)
   xcodeproj: './path/to/MyApp.xcodeproj' (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
@@ -161,6 +187,37 @@ resign(
   ipa: 'path/to/ipa', # can omit if using the `ipa` action
   signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
   provisioning_profile: 'path/to/profile', # can omit if using the `sigh` action
+)
+```
+
+#### register_devices
+This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.
+
+This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
+
+If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from ENV['CUPERTINO_TEAM_ID'], or ENV['FASTLANE_TEAM_ID'], in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
+
+The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable ENV['CUPERTINO_USERNAME'].
+
+```ruby
+# Simply provide a list of devices as a Hash
+register_devices(
+  devices: {
+    'Luka iPhone 6' => '1234567890123456789012345678901234567890',
+    'Felix iPad Air 2' => 'abcdefghijklmnopqrstvuwxyzabcdefghijklmn',
+  }
+)
+
+# Alternatively provide a standard UDID export .txt file, see the Apple Sample (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)
+register_devices(
+  devices_file: './devices.txt'
+)
+
+# Advanced
+register_devices(
+  devices_file: './devices.txt', # you must pass in either `devices_file` or `devices`
+  team_id: 'XXXXXXXXXX',         # optional, if you're a member of multiple teams, then you need to pass the team ID here
+  username: 'luka@goonbee.com'   # optional, lets you override the Apple member center username
 )
 ```
 
@@ -198,7 +255,7 @@ commit_version_bump
 
 commit_version_bump(
   message: 'Version Bump',                         # create a commit with a custom message
-  xcodeproj_path: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
+  xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project heremain project
 )
 ```
 
@@ -231,7 +288,7 @@ push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
 
 push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
-  local_branch: 'develop',  # optional, default: 'master'
+  local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
   force: true,              # optional, default: false
 )
