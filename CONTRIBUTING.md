@@ -1,5 +1,12 @@
 # Contributing to `fastlane`
 
+1. Create an issue to discuss about your idea.
+2. Fork it (https://github.com/KrauseFx/fastlane/fork).
+3. Create your feature branch (`git checkout -b my-new-feature`).
+4. Commit your changes (`git commit -am 'Add some feature'`).
+5. Push to the branch (`git push origin my-new-feature`).
+6. Create a new Pull Request.
+
 ## New Issues
 
 Before submitting a new issue, do the following:
@@ -15,13 +22,12 @@ When submitting a new issue, please provide the following information:
 - The command and parameters you used to launch it.
 - Your `Fastfile` and all other configuration files you are using. 
 
-### By providing this information it's much faster and easier to help you
-
+*By providing this information it's much faster and easier to help you*
 
 ## Pull Requests
 
-Pull requests are always welcome :) 
+Pull requests are always welcome :simple_smile:
 
-- Your code editor should use the tab spaces of 2
-- Make sure to test the changes yourself before submitting
-- Run the tests by executing `bundle install` and then `rspec`
+- Your code editor should use the tab spaces of 2.
+- Make sure to test the changes yourself before submitting.
+- Run the tests by executing `bundle install` and then `rspec`.
