@@ -74,8 +74,7 @@ module FastlaneCore
 
     def valid_name_for(input)
       latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub!(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
-      latinazed.squeeze # squeeze whitespaces
+      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
     end
   end
 end
