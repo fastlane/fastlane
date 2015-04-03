@@ -68,7 +68,14 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      File.join(self.xcode_path, '../Applications/Application\ Loader.app/Contents/MacOS/itms/bin/iTMSTransporter')
+      [
+        "../Applications/Application\ Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",
+        "../Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter"
+      ].each do |path|
+        result = File.join(self.xcode_path, path)
+        return result if File.exists?(result)
+      end
+      raise "Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.".red
     end
 
     def self.fastlane_enabled?
