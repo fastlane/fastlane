@@ -180,7 +180,7 @@ module Deliver
 
       def build_download_command(username, password, apple_id, destination = "/tmp")
         [
-          Helper.transporter_path,
+          '"' + Helper.transporter_path + '"',
           "-m lookupMetadata",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
@@ -191,7 +191,7 @@ module Deliver
 
       def build_upload_command(username, password, source = "/tmp")
         [
-          Helper.transporter_path,
+          '"' + Helper.transporter_path + '"',
           "-m upload",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
