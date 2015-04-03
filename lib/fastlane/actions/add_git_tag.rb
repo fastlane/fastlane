@@ -5,15 +5,17 @@ module Fastlane
       def self.run(params)
         params = params.first
 
+        specified_tag = (params && params[:tag])
         grouping      = (params && params[:grouping]) || 'builds'
         prefix        = (params && params[:prefix]) || ''
         build_number  = (params && params[:build_number]) || Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]
         
         lane_name     = Actions.lane_context[Actions::SharedValues::LANE_NAME]
 
-        Actions.sh("git tag #{grouping}/#{lane_name}/#{prefix}#{build_number}")
+        tag = specified_tag || "#{grouping}/#{lane_name}/#{prefix}#{build_number}"
 
-        Helper.log.info 'Added git tag 🎯.'
+        Helper.log.info 'Adding git tag "#{tag}" 🎯.'
+        Actions.sh("git tag #{tag}")
       end
     end
   end
