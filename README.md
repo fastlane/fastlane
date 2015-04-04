@@ -233,12 +233,13 @@ ios_version "9.0"
 
 ### Custom Args for the build command
 Use the ```custom_args``` directive to prepend custom statements to the build command.
-```ruby
-custom_args "GCC_PREPROCESSOR_DEFINITIONS='SCREENSHOTS'"
-```
+
 Add a ```custom_build_args``` line to your ```Snapfile``` to add custom arguments to the build command.
+
+Here is an example for adding a preprocessor macro `SNAPSHOT` and  a custom build setting `SNAPSHOT_ENABLE`.
+
 ```ruby
-custom_build_args "-configuration release"
+custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' SNAPSHOT_ENABLE = YES"
 ```
 
 ### Custom Build Command
