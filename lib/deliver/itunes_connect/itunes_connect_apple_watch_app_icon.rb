@@ -23,10 +23,11 @@ module Deliver
 
         Helper.log.info "Starting upload of new watch app icon".green
 
+        evaluate_script("$('.ico.icon-chevron-animate-open-close.close').click()") # delete button
         evaluate_script("$('.appversionicon.watchIcon > .ios7-style-icon').prev().click()") # delete button
-        evaluate_script("$('[style-class=\"appversionicon watchIcon rounded\"] [itc-launch-filechooser] + input').attr('id', 'deliverFileUploadInput')") # set div
+        evaluate_script("$('[style-class=\"appversionicon watchIcon rounded\"] [itc-launch-filechooser] + input').attr('id', 'deliverFileUploadInputWatch')") # set div
         evaluate_script("URL = webkitURL; URL.createObjectURL = function(){return 'blob:abc'}"); # shim URL
-        page.attach_file("deliverFileUploadInput", path) # add file
+        page.attach_file("deliverFileUploadInputWatch", path) # add file
 
         sleep 10
 
