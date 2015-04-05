@@ -1,5 +1,6 @@
 describe FastlaneCore do
   describe FastlaneCore::Helper do
+    
     describe "#is_ci?" do
       it "returns false when not building in a known CI environment" do
         stub_const('ENV', {})
@@ -16,5 +17,20 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
     end
+
+    # Mac OS only (to work on Linux)
+    if OS.mac?
+      describe "Xcode Paths" do
+        it "#xcode_path" do
+          expect(FastlaneCore::Helper.xcode_path[-1]).to eq('/')
+          expect(FastlaneCore::Helper.xcode_path).to eq("/Applications/Xcode.app/Contents/Developer/")
+        end
+
+        it "#transporter_path" do
+          expect(FastlaneCore::Helper.transporter_path).to eq("/Applications/Xcode.app/Contents/Developer/../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter")
+        end
+      end
+    end
+    
   end
 end
