@@ -312,6 +312,7 @@ describe Deliver do
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_55))
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_47))
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_55))
+            @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_APPLE_WATCH))
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
             @app.metadata.add_screenshot('de-DE', Deliver::AppScreenshot.new(path, Deliver::ScreenSize::IOS_IPAD))
@@ -324,7 +325,7 @@ describe Deliver do
             
 
             results = @app.metadata.fetch_value("//x:software_screenshot")
-            expect(results.count).to eq(10)
+            expect(results.count).to eq(11)
 
             expect(results[0]['position']).to eq('1')
             expect(results[1]['position']).to eq('1')
@@ -332,10 +333,11 @@ describe Deliver do
             expect(results[3]['position']).to eq('1')
             expect(results[4]['position']).to eq('3')
             expect(results[5]['position']).to eq('1')
-            expect(results[6]['position']).to eq('2')
-            expect(results[7]['position']).to eq('3')
-            expect(results[8]['position']).to eq('4')
-            expect(results[9]['position']).to eq('5')
+            expect(results[6]['position']).to eq('1')
+            expect(results[7]['position']).to eq('2')
+            expect(results[8]['position']).to eq('3')
+            expect(results[9]['position']).to eq('4')
+            expect(results[10]['position']).to eq('5')
           end
         end
       end
