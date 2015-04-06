@@ -1,5 +1,8 @@
 module PEM
   class CertManager
+
+    attr_accessor :rsa_file, :cert_file, :pem_file, :certificate_type, :passphrase
+
     # Download the cert, do all kinds of Keychain related things
     def run
       # Keychain (security) documentation: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/security.1.html
@@ -9,30 +12,38 @@ module PEM
 
       dev = PEM::DeveloperCenter.new
 
-      cert_file = dev.fetch_cer_file
-      rsa_file = File.join(TMP_FOLDER, 'private_key.key')
-      private_key = OpenSSL::PKey::RSA.new(rsa_file)
+      self.cert_file = dev.fetch_cer_file
+      self.rsa_file = File.join(TMP_FOLDER, 'private_key.key')
+      self.certificate_type = (PEM.config[:development] ? 'development' : 'production')
+      self.pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
+      self.passphrase = ''
 
-      certificate_type = (PEM.config[:development] ? 'development' : 'production')
-
-      pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
-
-      certificate = OpenSSL::X509::Certificate.new(File.read(cert_file))
-
-      File.open(pem_file, 'w') do |f|
-        f.write(certificate.to_pem)
-        f.write(private_key.to_pem)
-      end
+      File.write(pem_file, pem_certificate)
 
       # Generate p12 file as well
       if PEM.config[:generate_p12]
-        p12 = OpenSSL::PKCS12.create(passphrase, certificate_type, private_key, certificate)
         output = "#{certificate_type}.p12"
-        File.write(output, p12.to_der)
+        File.write(output, p12_certificate.to_der)
         puts output.green
       end
 
       return pem_file, rsa_file
+    end
+
+    def private_key
+      OpenSSL::PKey::RSA.new(File.read(rsa_file))
+    end
+
+    def x509_certificate
+      OpenSSL::X509::Certificate.new(File.read(cert_file))
+    end
+
+    def p12_certificate
+      OpenSSL::PKCS12.create(passphrase, certificate_type, private_key, x509_certificate)
+    end
+
+    def pem_certificate
+      x509_certificate.to_pem + private_key.to_pem
     end
   end
 end
