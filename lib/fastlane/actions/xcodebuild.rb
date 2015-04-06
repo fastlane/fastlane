@@ -42,6 +42,10 @@ module Fastlane
         xcconfig: "-xcconfig"
       }
 
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         unless Helper.test?
           raise "xcodebuild not installed".red if `which xcodebuild`.length == 0

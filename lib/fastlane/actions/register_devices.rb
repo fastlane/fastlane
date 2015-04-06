@@ -3,6 +3,10 @@ module Fastlane
     class RegisterDevicesAction
       UDID_REGEXP = /^\h{40}$/
 
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'cupertino/provisioning_portal'
         require 'credentials_manager'

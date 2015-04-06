@@ -15,6 +15,11 @@ module Fastlane
     end
 
     class TestmunkAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(_params)
         raise "Please pass your Testmunk email address using `ENV['TESTMUNK_EMAIL'] = 'value'`" unless ENV['TESTMUNK_EMAIL']
         raise "Please pass your Testmunk API Key using `ENV['TESTMUNK_API'] = 'value'`" unless ENV['TESTMUNK_API']

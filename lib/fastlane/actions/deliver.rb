@@ -4,6 +4,10 @@ module Fastlane
     end
 
     class DeliverAction
+      def self.is_supported?(type)
+        type == :ios
+      end
+      
       def self.run(params)
         require 'deliver'
 

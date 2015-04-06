@@ -60,6 +60,19 @@ module Fastlane
       end
     end
 
+    def verify_supported_os(name, class_ref)
+      if class_ref.respond_to?(:is_supported?)
+        systems = Actions.lane_context[Actions::SharedValues::FASTLANE_OPERATING_SYSTEMS]
+
+        if systems and systems.count > 0
+          unless systems.any? { |s| class_ref.is_supported?(s) }
+            raise "Action '#{name}' doesn't support required operating system '#{systems.join('\', \'')}'.".red 
+          end
+        end
+      end
+    end
+
+    # This method takes care of actually running the actions
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
@@ -75,6 +88,9 @@ module Fastlane
       if class_ref && class_ref.respond_to?(:run)
         step_name = class_ref.step_text rescue nil
         step_name = method_sym.to_s unless step_name
+
+        verify_supported_os(method_sym, class_ref)
+
         Helper.log_alert("Step: " + step_name)
 
         Dir.chdir('..') do # go up from the fastlane folder, to the project folder

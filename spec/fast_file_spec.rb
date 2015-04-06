@@ -14,7 +14,41 @@ describe Fastlane do
       end
     end
 
+    describe "#lane_name" do
+      before do
+        @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+      end
+
+      it "raises an error if name is missing" do
+        expect { @ff.lane }.to raise_exception "You have to pass a valid name for this lane".red
+      end
+
+      it "raises an error if block is missing" do
+        expect { 
+          @ff.lane("my_name") 
+        }.to raise_exception "You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.".red
+      end
+
+      it "takes the block and lane name" do
+        @ff.lane "my_name" do
+
+        end
+      end
+    end
+
     describe "Different Fastfiles" do
+      it "rejects unsupported operating systems" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileUnsupportedOS')
+        expect {
+          ff.runner.execute(:test)
+        }.to raise_exception("Action 'frameit' doesn't support required operating system 'android', 'dosphone'.".red)
+      end
+
+      it "works with valid operating systems" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSupportedOS')
+        ff.runner.execute(:test)
+      end
+
       it "execute different envs" do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
@@ -45,7 +79,7 @@ describe Fastlane do
 
         ff.runner.execute(:test)
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)
-       end
+      end
 
       it "raises an error if lane is not available" do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')

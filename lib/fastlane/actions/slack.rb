@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class SlackAction
+      
+      def self.is_supported?(type)
+        true
+      end
+
       def self.git_branch
         return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
         s = `git rev-parse --abbrev-ref HEAD`

@@ -10,6 +10,11 @@ module Fastlane
     end
 
     class HockeyAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
         options = {

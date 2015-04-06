@@ -6,6 +6,11 @@ module Fastlane
     end
 
     class SighAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'sigh'
         require 'sigh/options'

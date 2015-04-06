@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class FrameitAction
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         return if Helper.test?
 

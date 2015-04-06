@@ -2,6 +2,11 @@ module Fastlane
   module Actions
     # Does a hard reset and clean on the repo
     class ResetGitRepoAction
+      
+      def self.is_supported?(type)
+        true
+      end
+
       def self.run(params)
         if params.include?(:force) || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
           Actions.sh('git reset --hard HEAD')

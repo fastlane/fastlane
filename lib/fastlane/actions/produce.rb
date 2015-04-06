@@ -5,6 +5,11 @@ module Fastlane
     end
 
     class ProduceAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'produce'
 

@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class TeamNameAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         team = params.first
         raise "Please pass your Team Name (e.g. team_name 'Felix Krause')".red unless team.to_s.length > 0

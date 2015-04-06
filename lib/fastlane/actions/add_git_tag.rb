@@ -2,6 +2,11 @@ module Fastlane
   module Actions
     # Adds a git tag to the current commit
     class AddGitTagAction
+      
+      def self.is_supported?(type)
+        true
+      end
+
       def self.run(params)
         params = params.first
 

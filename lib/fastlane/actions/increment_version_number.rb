@@ -7,6 +7,10 @@ module Fastlane
     class IncrementVersionNumberAction
       require 'shellwords'
 
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html

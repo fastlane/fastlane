@@ -13,6 +13,10 @@ module Fastlane
     class DeploygateAction
       DEPLOYGATE_URL_BASE = 'https://deploygate.com'
 
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/deploygate'

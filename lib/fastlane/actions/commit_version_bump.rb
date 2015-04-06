@@ -2,6 +2,11 @@ module Fastlane
   module Actions
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'xcodeproj'
         require 'pathname'

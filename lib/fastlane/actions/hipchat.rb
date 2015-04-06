@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class HipchatAction
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         options = { message: '',
                     success: true,

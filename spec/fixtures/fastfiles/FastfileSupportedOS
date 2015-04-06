@@ -1,0 +1,5 @@
+supported_systems :android, :ios
+
+lane :test do 
+  frameit
+end

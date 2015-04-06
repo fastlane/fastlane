@@ -37,6 +37,11 @@ module Fastlane
     }
 
     class S3Action
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         
         params[0] ||= {}

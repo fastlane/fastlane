@@ -2,6 +2,11 @@ module Fastlane
   module Actions
     # Resigns the ipa
     class ResignAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'sigh'
 

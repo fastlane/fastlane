@@ -6,6 +6,11 @@ module Fastlane
     end
 
     class CertAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         require 'cert'
         require 'cert/options'

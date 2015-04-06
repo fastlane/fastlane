@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class UpdateProjectCodeSigningAction
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+      
       def self.run(params)
         path = params.first
         path = File.join(path, "project.pbxproj")

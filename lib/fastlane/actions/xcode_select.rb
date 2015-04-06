@@ -18,6 +18,11 @@ module Fastlane
     #   environment variable into the full Developer content path.
     #
     class XcodeSelectAction
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         xcode_path = params.first
 

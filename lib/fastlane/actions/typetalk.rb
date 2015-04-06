@@ -1,6 +1,11 @@
 module Fastlane
   module Actions
     class TypetalkAction
+
+      def self.is_supported?(type)
+        true
+      end
+
       def self.run(params)
         options = {
             message: nil,

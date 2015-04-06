@@ -4,6 +4,11 @@ module Fastlane
     end
 
     class TeamIdAction
+
+      def self.is_supported?(type)
+        type == :ios
+      end
+      
       def self.run(params)
         team = params.first
         raise "Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red unless team.to_s.length > 0

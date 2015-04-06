@@ -5,6 +5,11 @@ module Fastlane
     end
 
     class SnapshotAction
+      
+      def self.is_supported?(type)
+        type == :ios
+      end
+
       def self.run(params)
         clean = true
         clean = false if params.include?(:noclean)

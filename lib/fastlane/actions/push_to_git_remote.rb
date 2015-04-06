@@ -2,6 +2,11 @@ module Fastlane
   module Actions
     # Adds a git tag to the current commit
     class PushToGitRemoteAction
+
+      def self.is_supported?(type)
+        true
+      end
+
       def self.run(params)
         options = params.first
 

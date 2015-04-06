@@ -1,0 +1,5 @@
+supported_systems :android, :dosphone
+
+lane :test do 
+  frameit
+end

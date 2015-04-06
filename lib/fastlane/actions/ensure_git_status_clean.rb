@@ -6,6 +6,11 @@ module Fastlane
 
     # Raises an exception and stop the lane execution if the repo is not in a clean state
     class EnsureGitStatusCleanAction
+
+      def self.is_supported?(type)
+        true
+      end
+
       def self.run(_params)
         repo_clean = `git status --porcelain`.empty?
 
