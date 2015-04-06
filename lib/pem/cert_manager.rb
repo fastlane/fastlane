@@ -11,34 +11,29 @@ module PEM
 
       cert_file = dev.fetch_cer_file
       rsa_file = File.join(TMP_FOLDER, 'private_key.key')
-
-      pem_temp = File.join(TMP_FOLDER, 'pem_temp.pem')
+      private_key = OpenSSL::PKey::RSA.new(rsa_file)
 
       certificate_type = (PEM.config[:development] ? 'development' : 'production')
 
-
       pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
-      command("openssl x509 -inform der -in '#{cert_file}' -out #{pem_temp}")
-      content = File.read(pem_temp) + File.read(rsa_file)
-      File.write(pem_file, content)
+
+      certificate = OpenSSL::X509::Certificate.new(File.read(cert_file))
+
+      File.open(pem_file, 'w') do |f|
+        f.write(certificate.to_pem)
+        f.write(private_key.to_pem)
+      end
 
       # Generate p12 file as well
       if PEM.config[:generate_p12]
+        p12 = OpenSSL::PKCS12.create(passphrase, certificate_type, private_key, certificate)
         output = "#{certificate_type}.p12"
-        command("openssl pkcs12 -export -password pass:"" -in '#{pem_file}' -inkey '#{pem_file}' -out '#{output}'")
+        File.write(output, p12.to_der)
         puts output.green
       end
-      
+
       return pem_file, rsa_file
     end
-
-    private
-      # Output the command, execute it, return its result
-      def command(com)
-        puts com.yellow
-        result = `#{com}`
-        puts result if (result || '').length > 0
-        result
-      end
   end
 end
+
