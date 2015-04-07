@@ -42,7 +42,7 @@ keywords({
 ```
 
 ##### screenshots_path
-A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution.
+A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution. Also includes Watch Support.
 
 ##### skip_pdf
 If set to `true`, no PDF report will be generated before the actual deployment. You can also pass `--force` when calling `deliver`.
@@ -57,6 +57,12 @@ price_tier 0
 A path to a new app icon, which must be exactly 1024x1024px
 ```ruby
 app_icon './AppIcon.png'
+```
+
+##### apple_watch_app_icon
+A path to a new app icon for the Watch, which must be exactly 1024x1024px
+```ruby
+apple_watch_app_icon './AppleWatchAppIcon.png'
 ```
 
 ##### copyright
