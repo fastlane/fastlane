@@ -133,6 +133,12 @@ module Deliver
       itc.upload_app_icon!(self, path)
     end
 
+    # Uploads a new apple watch app icon to iTunesConnect. This uses a headless browser
+    # which makes this command quite slow.
+    # @param (path) a path to the new apple watch app icon. The image must have the resolution of 1024x1024
+    def upload_apple_watch_app_icon!(path)
+      itc.upload_apple_watch_app_icon!(self, path)
+    end
     #####################################################
     # @!group Destructive/Constructive methods
     #####################################################

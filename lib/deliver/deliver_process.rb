@@ -288,6 +288,9 @@ module Deliver
 
       # App Icon
       itc.upload_app_icon!(@app, @deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
+
+      # Apple Watch App Icon
+      itc.upload_apple_watch_app_icon!(@app, @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]) if @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]
     end
 
     def trigger_ipa_upload
