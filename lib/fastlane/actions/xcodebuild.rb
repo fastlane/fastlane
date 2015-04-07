@@ -117,8 +117,20 @@ module Fastlane
         xcpretty_args = [ "--color" ]
 
         if testing
-          # Test report file format
-          if params[:report_formats]
+          if params[:reports]
+            # New report options format
+            reports = params[:reports].map do |report|
+              unless report[:screenshots]
+                "--report #{report[:report]} --output #{report[:output]}"
+              else
+                "--report #{report[:report]} --output #{report[:output]} --screenshots"
+              end
+            end
+
+            xcpretty_args.push reports.join(" ")
+
+          elsif params[:report_formats]
+            # Test report file format
             report_formats = params[:report_formats].map do |format|
               "--report #{format}"
             end.sort().join(" ")
