@@ -116,6 +116,8 @@ You can pass the "What to Test" value using the environment variable `DELIVER_WH
 DELIVER_WHAT_TO_TEST="Try the brand new project button" deliver testflight
 ```
 
+Additional environment variables: `DELIVER_BETA_DESCRIPTION`, `DELIVER_BETA_FEEDBACK_EMAIL`.
+
 # Quick Start
 
 
