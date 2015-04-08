@@ -7,7 +7,7 @@ module Fastlane
 
         remote        = (options && options[:remote]) || 'origin'
         force         = (options && options[:force]) || false
-        local_branch  = (options && (options[:local_branch] || options[:branch])) || 'master'
+        local_branch  = (options && (options[:local_branch] || options[:branch])) || Actions.git_branch || 'master'
         remote_branch = (options && options[:remote_branch]) || local_branch
 
         # construct our command as an array of components

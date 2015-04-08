@@ -4,13 +4,6 @@ module Fastlane
     end
 
     class SlackAction
-      def self.git_branch
-        return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-        s = `git rev-parse --abbrev-ref HEAD`
-        return s if s.to_s.length > 0
-        nil
-      end
-
       def self.git_author
         s = `git log --name-status HEAD^..HEAD`
         s = s.match(/Author:.*<(.*)>/)[1]
@@ -91,10 +84,10 @@ module Fastlane
         end
 
         # git branch
-        if git_branch && should_add_payload[:git_branch]
+        if Actions.git_branch && should_add_payload[:git_branch]
           slack_attachment[:fields] << {
             title: 'Git Branch',
-            value: git_branch,
+            value: Actions.git_branch,
             short: true
           }
         end
