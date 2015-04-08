@@ -16,7 +16,7 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
-      # Watch
+      #  Watch
       IOS_APPLE_WATCH= "iOS-Apple-Watch"
       # Mac
       MAC = "Mac"
