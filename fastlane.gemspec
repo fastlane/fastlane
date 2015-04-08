@@ -28,8 +28,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcodeproj', '~> 0.20' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
   spec.add_dependency 'cupertino', '~> 1.3', '>= 1.3.1' # for registering iOS devices with the Apple Developer Center
-  spec.add_dependency 'fastlane_core', '>= 0.4.0' # all shared code and dependencies
+  spec.add_dependency 'xcpretty', '~> 0.1.8' # Beautiful Xcode output
 
+  spec.add_dependency 'fastlane_core', '>= 0.4.0' # all shared code and dependencies
   spec.add_dependency 'deliver', '>= 0.7.13'
   spec.add_dependency 'snapshot', '>= 0.5.0'
   spec.add_dependency 'frameit', '>= 0.2.3'
