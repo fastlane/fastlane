@@ -22,6 +22,7 @@ class SnapshotApplication
     program :help_formatter, :compact
 
     global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
+    global_option '--nobuild', 'Skips the build process when running snapshot.'
     global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
     global_option('--verbose', 'Shows all output printed by Instruments.') { $verbose = true }
 
@@ -36,7 +37,7 @@ class SnapshotApplication
         Dir.chdir(path) do # switch the context
           Snapshot::DependencyChecker.check_simulators
           Snapshot::SnapshotConfig.shared_instance(options.snapfile)
-          Snapshot::Runner.new.work(clean: !options.noclean)
+          Snapshot::Runner.new.work(clean: !options.noclean, build: !options.nobuild)
         end
       end
     end

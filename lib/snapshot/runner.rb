@@ -5,10 +5,10 @@ module Snapshot
   class Runner
     TRACE_DIR = '/tmp/snapshot_traces'
 
-    def work(clean: true)
+    def work(clean: true, build: true)
       SnapshotConfig.shared_instance.js_file # to verify the file can be found earlier
 
-      Builder.new.build_app(clean: clean)
+      Builder.new.build_app(clean: clean) if build
       @app_path = determine_app_path
 
       counter = 0
@@ -153,7 +153,8 @@ module Snapshot
 
     def determine_app_path
       # Determine the path to the actual app and not the WatchKit app
-      Dir.glob("/tmp/snapshot/build/*.app/*.plist").each do |path|
+      build_dir = SnapshotConfig.shared_instance.build_dir || '/tmp/snapshot'
+      Dir.glob("#{build_dir}/**/*.app/*.plist").each do |path|
         watchkit_enabled = `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{path}'`.strip
         next if watchkit_enabled == 'true' # we don't care about WatchKit Apps
 
