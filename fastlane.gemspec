@@ -21,14 +21,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'nokogiri', '~> 1.6.5' # generating JUnit reports for Jenkins
-  spec.add_dependency 'shenzhen', '~> 0.12.1' # to upload to Hockey and Crashlytics
+  spec.add_dependency 'nokogiri', '~> 1.6' # generating JUnit reports for Jenkins
+  spec.add_dependency 'shenzhen', '~> 0.12' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
   spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
   spec.add_dependency 'xcodeproj', '~> 0.20' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
   spec.add_dependency 'cupertino', '~> 1.3', '>= 1.3.1' # for registering iOS devices with the Apple Developer Center
-  spec.add_dependency 'xcpretty' # Beautiful Xcode output
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
 
   spec.add_dependency 'fastlane_core', '>= 0.4.3' # all shared code and dependencies
