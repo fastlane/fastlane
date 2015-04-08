@@ -40,7 +40,7 @@ module Deliver
             end
 
             # We got the most recent build, let's see if it's ready
-            if current_build['internalState'] == 'inactive' and current_build['readyToInstall'] == true
+            if current_build['readyToInstall'] == true
               Helper.log.info "Build is ready 3.2.1...".green
               break # Success! 
             end
