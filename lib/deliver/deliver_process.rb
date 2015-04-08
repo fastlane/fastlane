@@ -276,7 +276,7 @@ module Deliver
       itc = ItunesConnect.new
       itc.set_copyright!(@app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
       itc.set_app_review_information!(@app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
-      itc.set_release_after_approval!(@app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]
+      itc.set_release_after_approval!(@app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE] != nil
 
       # Categories
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
