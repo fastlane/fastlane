@@ -274,7 +274,7 @@ Some examples:
 ```ruby
 require 'deliver'
 
-app = Deliver::App.new(app_identifier: 'at.felixkrause.app')
+app = Deliver::App.new(app_identifier: 'com.krausefx.app')
 
 app.get_app_status # => Waiting for Review
 app.create_new_version!("1.4")

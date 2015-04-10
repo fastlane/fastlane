@@ -25,7 +25,7 @@ module Deliver
         if CredentialsManager::PasswordManager.shared_manager.username and CredentialsManager::PasswordManager.shared_manager.password
           identifier = ((CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue '') || '')
           while identifier.length < 3
-            identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
+            identifier = ask("\nApp Identifier of your app (e.g. com.krausefx.app_name): ")
           end
 
           self.create_based_on_identifier(deliver_path, identifier, project_name)
