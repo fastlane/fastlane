@@ -7,6 +7,40 @@ module FastlaneCore
     # This web service is fully open source: https://github.com/fastlane/refresher
     UPDATE_URL = "https://fastlane-refresher.herokuapp.com/"
 
+    def self.start_looking_for_update(gem_name)
+      Thread.new do
+        begin
+          server_results[gem_name] = fetch_latest(gem_name)
+        rescue
+        end
+      end
+    end
+
+    def self.show_update_status(gem_name, current_version)
+      latest = server_results[gem_name]
+      if latest and Gem::Version.new(latest) > Gem::Version.new(current_version)
+        show_update_message(gem_name, latest, current_version)
+      end
+    end
+
+    def self.show_update_message(gem_name, available, current_version)
+      v = fetch_latest(gem_name)
+      puts '#######################################################################'.green
+      puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
+      puts "# It is recommended to use the latest version.".green
+      puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
+      puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green
+      puts '#######################################################################'.green
+    end
+
+    def self.server_results
+      @@results ||= {}
+    end
+
+
+
+
+    # Old code
     # This method will check if the latest version is installed and show a warning if that's not the case
     def self.verify_latest_version(gem_name, current_version)
       return true unless self.update_available?(gem_name, current_version)
@@ -34,6 +68,9 @@ module FastlaneCore
       return false
     end
 
+
+
+    # Relevant code
     private
       def self.fetch_latest(gem_name)
         url = UPDATE_URL + gem_name
