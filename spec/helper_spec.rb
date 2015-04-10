@@ -27,7 +27,7 @@ describe FastlaneCore do
         end
 
         it "#transporter_path" do
-          expect(FastlaneCore::Helper.transporter_path).to eq("/Applications/Xcode.app/Contents/Developer/../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter")
+          expect(FastlaneCore::Helper.transporter_path).to eq("/Applications/Xcode.app/Contents/Developer/../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter")
         end
       end
     end

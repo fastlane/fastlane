@@ -68,7 +68,7 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return '' if Helper.is_test? # to work on Linux too
+      return '' unless OS.mac? # so tests work on Linx too
 
       [
         "../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",
