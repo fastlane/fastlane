@@ -1,5 +1,4 @@
 require 'plist'
-require 'fastlane_core'
 
 module Sigh
   class Manager
