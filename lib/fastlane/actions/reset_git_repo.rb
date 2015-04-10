@@ -5,7 +5,7 @@ module Fastlane
       def self.run(params)
         hash = params.first
         if params.include?(:force) || hash[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
-          paths = hash[:files]
+          paths = (hash[:files] rescue nil)
 
           if (paths || []).count == 0
             Actions.sh('git reset --hard HEAD')
