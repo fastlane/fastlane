@@ -28,6 +28,8 @@ class FastlaneApplication
       c.syntax = 'deliver'
       c.description = 'Run a deploy process using the Deliverfile in the current folder'
       c.action do |args, options|
+        FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
           if File.exists?(deliver_path)
@@ -41,6 +43,8 @@ class FastlaneApplication
             end
           end
         end
+
+        FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
       end
     end
 
@@ -64,11 +68,15 @@ class FastlaneApplication
       c.option '-u', '--username String', String, 'Your Apple ID'
 
       c.action do |args, options|
+        FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+
         ipa_path = (args.first || determine_ipa) + '' # unfreeze the string
 
         set_username(options.username)
 
         Deliver::Testflight.upload!(ipa_path, options.app_id, options.skip_deploy)
+
+        FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
       end
     end
 

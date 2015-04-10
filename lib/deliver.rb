@@ -21,6 +21,5 @@ require 'fastlane_core'
 module Deliver
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
-  FastlaneCore::UpdateChecker.verify_latest_version('deliver', Deliver::VERSION)
   Deliver::DependencyChecker.check_dependencies
 end
