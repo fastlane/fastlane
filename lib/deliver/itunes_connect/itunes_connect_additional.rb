@@ -42,8 +42,10 @@ module Deliver
 
       Helper.log.info "Setting automatic release to '#{automatic_release}'".green
 
+      radio_value = automatic_release ? "true" : "false"
+
       # Find the correct radio button
-      first("div[itc-radio='versionInfo.releaseOnApproval.value'][radio-value='#{automatic_release.to_s}'] > * > a").click
+      first("div[itc-radio='versionInfo.releaseOnApproval.value'][radio-value='#{radio_value}'] > * > a").click
 
       (click_on "Save" rescue nil) # if nothing has changed, there is no back button and we don't care
     rescue => ex
