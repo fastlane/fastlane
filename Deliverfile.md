@@ -120,6 +120,13 @@ submit_further_information({
 })
 ```
 
+##### More options for TestFlight Builds
+
+You can pass the "What to Test" value using the environment variable `DELIVER_WHAT_TO_TEST`:
+
+`DELIVER_WHAT_TO_TEST="Try the brand new project button" deliver`
+Additional environment variables: `DELIVER_BETA_DESCRIPTION`, `DELIVER_BETA_FEEDBACK_EMAIL`.
+
 The latest commands can always be found inside [deliverer.rb](https://github.com/KrauseFx/deliver/blob/master/lib/deliver/deliverer.rb) in the `ValKey` module.
 
 ## Example Deliverfile
