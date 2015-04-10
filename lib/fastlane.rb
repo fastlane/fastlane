@@ -17,8 +17,6 @@ require 'colored'
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
-  FastlaneCore::UpdateChecker.verify_latest_version('fastlane', Fastlane::VERSION)
-
   Fastlane::Actions.load_default_actions
 
   if Fastlane::FastlaneFolder.path
