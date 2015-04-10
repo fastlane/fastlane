@@ -7,6 +7,8 @@ module Fastlane
       def self.run(params)
         require 'deliver'
 
+        FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+
         ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
 
         force = params.include?(:force)
@@ -22,6 +24,8 @@ module Fastlane
 
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV['DELIVER_IPA_PATH']) # deliver will store it in the environment
         end
+
+        FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
       end
     end
   end
