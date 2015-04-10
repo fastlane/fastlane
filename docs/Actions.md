@@ -499,6 +499,13 @@ Also useful for putting in your `error` block, to bring things back to a pristin
 ```ruby
 reset_git_repo
 reset_git_repo :force # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+
+# You can also specify a list of files that should be resetted.
+reset_git_repo(
+  force: true,
+  files: [
+    "./file.txt"
+  ])
 ```
 
 ## Notifications
