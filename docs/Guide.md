@@ -31,7 +31,7 @@ Additionally, to an Xcode installation, you also need the Xcode command line too
 
 You don't have to use [homebrew](http://brew.sh/) to install the dependencies, but it is the easiest way to get started.
 
-If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/). The just make sure it's up to date.
+If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/). This just makes sure it's up to date.
 
     brew doctor && brew update
 
