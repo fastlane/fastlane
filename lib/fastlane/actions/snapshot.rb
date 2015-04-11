@@ -26,6 +26,17 @@ module Fastlane
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
         end
       end
+
+      def self.description
+        "Generate new localised screenshots on multiple devices"
+      end
+
+      def self.available_options
+        [
+          ['noclean', 'Skips the clean process when building the app'],
+          ['verbose', 'Print out the UI Automation output']
+        ]
+      end
     end
   end
 end
