@@ -6,6 +6,7 @@ require 'fastlane'
 require 'commander'
 require 'dotenv'
 require 'fastlane/new_action'
+require 'fastlane/actions_list'
 
 HighLine.track_eof = false
 
@@ -58,6 +59,15 @@ class FastlaneApplication
 
       c.action do |_args, _options|
         Fastlane::NewAction.run
+      end
+    end
+
+    command :actions do |c|
+      c.syntax = 'fastlane actions'
+      c.description = 'Lists all available fastlane actions'
+
+      c.action do |_args, _options|
+        Fastlane::ActionsList.run
       end
     end
 
