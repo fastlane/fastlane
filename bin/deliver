@@ -12,7 +12,7 @@ class FastlaneApplication
 
   def run
     program :version, Deliver::VERSION
-    program :description, 'CLI for \'Deliver\' - Upload screenshots, metadata and your app to the App Store using a single command'
+    program :description, 'CLI for \'deliver\' - Upload screenshots, metadata and your app to the App Store using a single command'
     program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/deliver'
