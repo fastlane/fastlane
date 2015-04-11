@@ -50,7 +50,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # Plans
 
-I thought about providing a 1:1 representation of everything that’s stored on the Apple Dev Portal.
+This project only uses a plain HTTP client - no web scraping or headless browser. It combines API calls from both the Apple Developer Portal and the calls that are used by Xcode.
+
+I thought about providing a 1:1 representation of everything that’s stored on the Apple Dev Portal and provide an *Active Record* like interface.
 
 Imagine things like this:
 
