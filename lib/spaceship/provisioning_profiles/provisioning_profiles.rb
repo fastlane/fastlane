@@ -97,7 +97,8 @@ module Spaceship
       profile = ProvisioningProfile.new
       profile.client = self
       profile.distribution_method = distribution_method
-      profile.name = (Sigh.config[:provisioning_name] || [bundle_identifier, distribution_method].join(' '))
+      # profile.name = (Sigh.config[:provisioning_name] || [bundle_identifier, distribution_method].join(' '))
+      profile.name = [bundle_identifier, distribution_method].join(' ') # TODO
       profile.app = fetch_app(bundle_identifier)
       profile.generate!
 

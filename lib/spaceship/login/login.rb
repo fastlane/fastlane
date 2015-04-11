@@ -1,4 +1,5 @@
 require 'spaceship/login/select_team'
+require 'credentials_manager'
 
 module Spaceship
   class Client
