@@ -52,7 +52,12 @@ module Spaceship
 
       url = URL_LIST_CERTIFICATES + "teamId=#{@team_id}&types=#{types}"
       response = JSON.parse(unzip(Excon.post(url, 
-                    headers: { 'Cookie' => "myacinfo=#{@myacinfo}" }
+                    headers: { 'Cookie' => "myacinfo=#{@myacinfo}" },
+                    body: URI.encode_www_form(
+                      pageSize: 5000,
+                      pageNumber: 1,
+                      sort: "name=asc"
+                    ),
                   )))
 
       return response['certRequests'].collect do |current|

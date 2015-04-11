@@ -34,7 +34,13 @@ module Spaceship
 
       response = JSON.parse(unzip(Excon.post(URL_APP_IDS, 
         headers: { 'Cookie' => "myacinfo=#{@myacinfo}" },
-        body: "teamId=#{@team_id}")))
+        body: URI.encode_www_form(
+          teamId: @team_id,
+          pageNumber: 1,
+          pageSize: 5000,
+          sort: "name=asc"
+        )
+      )))
 
       response['appIds'].collect do |app|
         App.create(app)
