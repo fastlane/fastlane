@@ -83,8 +83,7 @@ module Deliver
     end
 
     # Adds a new locale (language) to the given app
-    # @param language (FastlaneCore::Languages::ALL_LANGUAGES) the language you want to
-    #  this app
+    # @param language (FastlaneCore::Languages::ALL_LANGUAGES) the language you want to add
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     # @return (Bool) Is true, if the language was created. False, when the language alreade existed
     def add_new_locale(language)
