@@ -16,6 +16,16 @@ module Spaceship
 
       certificate ||= get_code_signing_identity(distribution_type)
 
+      body = {
+        appIdId: profile.app.app_id,
+        distributionType: distribution_type,
+        certificateIds: certificate.id,
+        provisioningProfileName: profile.name,
+        returnFullObjects: false # this would information about return the generated profile - we don't care
+      }
+
+      body[:deviceIds] = device_ids || all_devices_for_profile unless distribution_type == 'store'
+
       response = Excon.post(url, 
         headers: { 
           "Cookie" => "myacinfo=#{@myacinfo}",
@@ -23,14 +33,7 @@ module Spaceship
           csrf: csrf,
           csrf_ts: csrf_ts
         },
-        body: URI.encode_www_form(
-          appIdId: profile.app.app_id,
-          distributionType: distribution_type,
-          certificateIds: certificate.id,
-          deviceIds: device_ids || all_devices_for_profile,
-          provisioningProfileName: profile.name,
-          returnFullObjects: false # this would information about return the generated profile - we don't care
-        )
+        body: URI.encode_www_form(body)
       )
 
       handle_create_error(response) # some errors are returned in plain text
@@ -38,7 +41,8 @@ module Spaceship
       handle_create_error_json(result)
 
       if result['resultCode'] == 0
-        Helper.log.info "Successfully generated new provisioning profile: '#{profile.name}'"
+        binding.pry
+        Helper.log.info "Successfully generated new provisioning profile: '#{profile.name}'".green
         return true
       end
       return false
