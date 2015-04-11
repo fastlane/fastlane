@@ -1,3 +1,3 @@
 All the methods, available for the lanes should be created here.
 
-```fastlane``` will automatically detect the files in this folder
+`fastlane` will automatically detect the files in this folder
