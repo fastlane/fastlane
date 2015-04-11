@@ -55,9 +55,9 @@ I thought about providing a 1:1 representation of everything that’s stored on 
 Imagine things like this:
 
 ```ruby
-profile = Secret.provisioning.find_by_app_identifier(‘com.krausefx.app’)
+profile = Secret.provisioning.find_by_app_identifier('com.krausefx.app')
 profile.devices = all_devices
-profile.name = ‘new name’
+profile.name = 'new name'
 profile.push!
 ```
 
@@ -66,14 +66,20 @@ the same for App IDs, code signing identities and devices
 With `spaceship` we can also do stuff like:
 
 ```ruby
-signing_identity = Secret.identities.find_installed_ones.first
-profile = ProvisioningProfile.new
-profile.identity = signing_identity
+signing_identity = identities.find_installed_ones.first
+
+profile = signing_identity.profiles.new
 profile.type = :store
-profile.app = Apps.find(‘com.krausefx.app’)
+profile.app = Apps.find('com.krausefx.app')
 profile.push!
 
-puts “Created: #{profile.uuid} #{profile.status}"
+puts "Created: #{profile.uuid} #{profile.status}"
+
+# Or the other way around
+app = Apps.find('com.krausefx.app')
+
+profile = app.profiles.new
+# ...
 ```
 
 # Need help?
