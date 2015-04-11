@@ -37,6 +37,16 @@ module Fastlane
           ENV["SIGH_CERTIFICATE_ID"] = certificate_id
         end
       end
+
+      def self.description
+        "Fetch the latest available code signing identity and create one if it doesn't exist already"
+      end
+
+      def self.available_options
+        require 'cert'
+        require 'cert/options'
+        Cert::Options.available_options
+      end
     end
   end
 end

@@ -29,6 +29,16 @@ module Fastlane
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
         Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
       end
+
+      def self.description
+        "This generates and downloads your provisioning profile. sigh will store the generated profile in the current folder."
+      end
+
+      def self.available_options
+        require 'sigh'
+        require 'sigh/options'
+        Sigh::Options.available_options
+      end
     end
   end
 end

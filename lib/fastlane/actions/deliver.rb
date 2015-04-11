@@ -27,6 +27,18 @@ module Fastlane
 
         FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
       end
+
+      def self.description
+        "Uses deliver to upload new app metadata and builds to iTunes Connect"
+      end
+
+      def self.available_options
+        [
+          ['force', 'Set to true to skip PDF verification'],
+          ['beta', 'Upload a new version to TestFlight'],
+          ['skip_deploy', 'Skip the submission of the app - it will only be uploaded'],
+        ]
+      end
     end
   end
 end
