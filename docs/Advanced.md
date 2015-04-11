@@ -97,3 +97,7 @@ app_identifier "net.sunapps.1.beta"
 apple_id "felix@krausefx.com"
 team_id "Q2CBPJ58CC"
 ```
+
+## Skip update check when launching `fastlane`
+
+You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the update check.
