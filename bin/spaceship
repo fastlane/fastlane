@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+# TODO: To remove
+# ENV['https_proxy'] = "https://127.0.0.1:8888"
+# require 'excon'
+# Excon.ssl_verify_peer = false
+
+require 'spaceship'
+require 'commander'
+
+
+HighLine.track_eof = false
+
+class SpaceshipApplication
+  include Commander::Methods
+
+  def run
+    program :version, Spaceship::VERSION
+    program :description, 'Shouldn\'t code signing be as cool as the new spaceship?'
+    program :help, 'Author', 'Felix Krause <spaceship@krausefx.com>'
+    program :help, 'Website', 'https://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/fastlane/spaceship'
+    program :help_formatter, :compact
+
+    command :beam do |c|
+      c.syntax = 'spaceship beam'
+      c.description = 'Beams stuff'
+
+      c.action do |args, options|
+        spaceship = Spaceship::Client.new
+        puts spaceship.fetch_provisioning_profile('net.sunapps.4', 'store').download
+      end
+    end
+
+    default_command :beam
+
+    always_trace!
+
+    run!
+  end
+
+end
+
+SpaceshipApplication.new.run
