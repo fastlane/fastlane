@@ -48,6 +48,33 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
     sudo gem install spaceship
 
+# Plans
+
+I thought about providing a 1:1 representation of everything that’s stored on the Apple Dev Portal.
+
+Imagine things like this:
+
+```ruby
+profile = Secret.provisioning.find_by_app_identifier(‘com.krausefx.app’)
+profile.devices = all_devices
+profile.name = ‘new name’
+profile.push!
+```
+
+the same for App IDs, code signing identities and devices
+
+With `spaceship` we can also do stuff like:
+
+```ruby
+signing_identity = Secret.identities.find_installed_ones.first
+profile = ProvisioningProfile.new
+profile.identity = signing_identity
+profile.type = :store
+profile.app = Apps.find(‘com.krausefx.app’)
+profile.push!
+
+puts “Created: #{profile.uuid} #{profile.status}"
+```
 
 # Need help?
 - If there is a technical problem with `spaceship`, submit an issue.
