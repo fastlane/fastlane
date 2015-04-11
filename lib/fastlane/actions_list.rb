@@ -38,12 +38,16 @@ module Fastlane
 
         rows = parse_options(action.available_options) if action.available_options
 
-        table = Terminal::Table.new(
-          title: filter.green,
-          headings: ['Key', 'Description', 'Environment Variable'],
-          rows: rows
-        )
-        puts table
+        if rows
+          table = Terminal::Table.new(
+            title: filter.green,
+            headings: ['Key', 'Description', 'Environment Variable'],
+            rows: rows
+          )
+          puts table
+        else
+          puts "No available options"
+        end
 
         return
       end
