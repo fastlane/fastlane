@@ -8,6 +8,7 @@ module FastlaneCore
     UPDATE_URL = "https://fastlane-refresher.herokuapp.com/"
 
     def self.start_looking_for_update(gem_name)
+      return if Helper.is_test?
       Thread.new do
         begin
           server_results[gem_name] = fetch_latest(gem_name)
