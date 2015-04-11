@@ -28,9 +28,6 @@ spaceship
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/spaceship/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
 
-###### Insert quote here
-
-insert short description here
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -50,10 +47,6 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Installation
 
     sudo gem install spaceship
-
-Make sure, you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
 
 
 # Need help?
