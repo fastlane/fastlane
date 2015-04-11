@@ -4,7 +4,7 @@ module Fastlane
       SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
     end
 
-    class SnapshotAction
+    class SnapshotAction < Action
       def self.run(params)
         clean = true
         clean = false if params.include?(:noclean)

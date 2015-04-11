@@ -22,7 +22,7 @@ module Fastlane
     # -g, --use-gcov-files           Use preprocessed gcov files for analysis.
     # -s, --print-summary            Prints a small report to stdout with line & branch percentage coverage
 
-    class GcovrAction
+    class GcovrAction < Action
       ARGS_MAP = {
         object_directory: "--object-directory",
         output: "-o",

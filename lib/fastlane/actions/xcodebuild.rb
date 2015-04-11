@@ -7,7 +7,7 @@ module Fastlane
     # xcodebuild man page:
     # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html
 
-    class XcodebuildAction
+    class XcodebuildAction < Action
       ARGS_MAP = {
         # actions
         analyze: "analyze",
@@ -189,7 +189,7 @@ module Fastlane
       end
     end
 
-    class XcarchiveAction
+    class XcarchiveAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:archive] = true
@@ -197,7 +197,7 @@ module Fastlane
       end
     end
 
-    class XcbuildAction
+    class XcbuildAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:build] = true
@@ -205,7 +205,7 @@ module Fastlane
       end
     end
 
-    class XccleanAction
+    class XccleanAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:clean] = true
@@ -213,7 +213,7 @@ module Fastlane
       end
     end
 
-    class XcexportAction
+    class XcexportAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:export_archive] = true
@@ -221,7 +221,7 @@ module Fastlane
       end
     end
 
-    class XctestAction
+    class XctestAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:test] = true

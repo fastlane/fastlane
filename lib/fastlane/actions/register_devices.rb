@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class RegisterDevicesAction
+    class RegisterDevicesAction < Action
       UDID_REGEXP = /^\h{40}$/
 
       def self.run(params)

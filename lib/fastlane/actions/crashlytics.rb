@@ -4,7 +4,7 @@ end
 
 module Fastlane
   module Actions
-    class CrashlyticsAction
+    class CrashlyticsAction < Action
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'

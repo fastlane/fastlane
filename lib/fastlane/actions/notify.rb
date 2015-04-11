@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class NotifyAction
+    class NotifyAction < Action
       def self.run(params)
         require 'terminal-notifier'
 

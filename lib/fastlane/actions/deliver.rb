@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class DeliverAction
+    class DeliverAction < Action
       def self.run(params)
         require 'deliver'
 

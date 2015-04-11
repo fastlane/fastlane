@@ -4,7 +4,7 @@ module Fastlane
       PRODUCE_APPLE_ID = :PRODUCE_APPLE_ID
     end
 
-    class ProduceAction
+    class ProduceAction < Action
       def self.run(params)
         require 'produce'
 

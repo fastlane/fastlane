@@ -36,7 +36,7 @@ module Fastlane
       path: '-P',
     }
 
-    class S3Action
+    class S3Action < Action
       def self.run(params)
         
         params[0] ||= {}

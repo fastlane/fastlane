@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class TypetalkAction
+    class TypetalkAction < Action
       def self.run(params)
         options = {
             message: nil,

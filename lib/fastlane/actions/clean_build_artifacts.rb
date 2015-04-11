@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class CleanBuildArtifactsAction
+    class CleanBuildArtifactsAction < Action
       def self.run(_params)
         [
           Actions.lane_context[Actions::SharedValues::IPA_OUTPUT_PATH],

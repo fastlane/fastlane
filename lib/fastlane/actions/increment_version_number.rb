@@ -4,7 +4,7 @@ module Fastlane
       VERSION_NUMBER = :VERSION_NUMBER
     end
 
-    class IncrementVersionNumberAction
+    class IncrementVersionNumberAction < Action
       require 'shellwords'
 
       def self.run(params)

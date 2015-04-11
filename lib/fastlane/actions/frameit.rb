@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class FrameitAction
+    class FrameitAction < Action
       def self.run(params)
         return if Helper.test?
 

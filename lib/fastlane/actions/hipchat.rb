@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class HipchatAction
+    class HipchatAction < Action
       def self.run(params)
         options = { message: '',
                     success: true,

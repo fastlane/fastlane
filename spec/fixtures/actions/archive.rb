@@ -4,7 +4,7 @@ module Fastlane
       ARCHIVE = :ARCHIVE
     end
 
-    class ArchiveAction
+    class ArchiveAction < Action
       def self.run(params)
         raise "Workspace is not set".red unless ENV['WORKSPACE']
         raise "Scheme is not set".red unless ENV['SCHEME']

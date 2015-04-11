@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class TeamIdAction
+    class TeamIdAction < Action
       def self.run(params)
         team = params.first
         raise "Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red unless team.to_s.length > 0

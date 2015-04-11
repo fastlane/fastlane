@@ -7,6 +7,7 @@ require 'fastlane/setup'
 require 'fastlane/fastlane_folder'
 require 'fastlane/junit_generator'
 require 'fastlane/lane_manager'
+require 'fastlane/action'
 require 'fastlane/actions/actions_helper'
 
 require 'fastlane_core'

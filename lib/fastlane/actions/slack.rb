@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class SlackAction
+    class SlackAction < Action
       def self.git_author
         s = `git log --name-status HEAD^..HEAD`
         s = s.match(/Author:.*<(.*)>/)[1]

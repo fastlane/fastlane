@@ -4,7 +4,7 @@ module Fastlane
       
     end
 
-    class FastlaneVersionAction
+    class FastlaneVersionAction < Action
       def self.run(params)
         defined_version = ((Gem::Version.new(params.first) if params.first) rescue nil)
         raise "Please pass minimum fastlane version as parameter to fastlane_version".red unless defined_version

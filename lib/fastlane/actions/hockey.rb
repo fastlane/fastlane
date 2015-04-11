@@ -9,7 +9,7 @@ module Fastlane
       HOCKEY_BUILD_INFORMATION = :HOCKEY_BUILD_INFORMATION # contains all keys/values from the HockeyApp API, like :title, :bundle_identifier
     end
 
-    class HockeyAction
+    class HockeyAction < Action
       def self.run(params)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
         options = {

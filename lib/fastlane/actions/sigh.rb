@@ -5,7 +5,7 @@ module Fastlane
       SIGH_UDID = :SIGH_UDID
     end
 
-    class SighAction
+    class SighAction < Action
       def self.run(params)
         require 'sigh'
         require 'sigh/options'

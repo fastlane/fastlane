@@ -4,7 +4,7 @@ module Fastlane
       BUILD_NUMBER = :BUILD_NUMBER
     end
 
-    class IncrementBuildNumberAction
+    class IncrementBuildNumberAction < Action
       require 'shellwords'
 
       def self.run(params)

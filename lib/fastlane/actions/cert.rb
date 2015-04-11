@@ -5,7 +5,7 @@ module Fastlane
       CERT_CERTIFICATE_ID = :CERT_CERTIFICATE_ID
     end
 
-    class CertAction
+    class CertAction < Action
       def self.run(params)
         require 'cert'
         require 'cert/options'
