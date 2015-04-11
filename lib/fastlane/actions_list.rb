@@ -49,6 +49,8 @@ module Fastlane
           puts "No available options"
         end
 
+        puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
+
         return
       end
 
