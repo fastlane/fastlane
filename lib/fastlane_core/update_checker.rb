@@ -9,6 +9,8 @@ module FastlaneCore
 
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
+      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+      
       Thread.new do
         begin
           server_results[gem_name] = fetch_latest(gem_name)
