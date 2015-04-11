@@ -8,10 +8,6 @@ module Fastlane
       "No description provided."
     end
 
-    def self.reference
-      nil
-    end
-
     def self.available_options
       # Return an array of 2-3 element arrays, like:
       # [

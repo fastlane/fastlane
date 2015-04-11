@@ -67,7 +67,15 @@ class FastlaneApplication
       c.description = 'Lists all available fastlane actions'
 
       c.action do |_args, _options|
-        Fastlane::ActionsList.run
+        Fastlane::ActionsList.run(_args.first)
+      end
+    end
+
+    command :action do |c|
+      c.syntax = 'fastlane action [tool_name]'
+      c.description = 'Shows more information for a specific command'
+      c.action do |_args, _options|
+        Fastlane::ActionsList.run(_args.first)
       end
     end
 
