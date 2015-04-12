@@ -95,7 +95,7 @@ module Fastlane
         if options.kind_of?Array
           options.each do |current|
             if current.kind_of?FastlaneCore::ConfigItem
-              rows << [current.key.to_s.green, current.description, current.env_name]
+              rows << [current.key.to_s.yellow, current.description, current.env_name]
             elsif current.kind_of?Array
               raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
               rows << current
