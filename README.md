@@ -377,6 +377,15 @@ Unfortunately, Xamarin command line tool is only available for Business Edition 
 
 If building via command-line doesn't work for your project or you don't want to build every time, you can run the tool with ```snapshot --nobuild``` to skip the build process and use a pre-built ```.app``` under your ```build_dir```.
 
+## Determine language in UI Automation script
+
+To detect the currently used localization in your Javascript file, use the following code:
+
+```javascript
+var result = target.host().performTaskWithPathArgumentsTimeout("/usr/bin/printenv" , ["SNAPSHOT_LANGUAGE"], 5);
+var language = result.stdout.substring(0, result.stdout.length - 1);
+```
+
 # Need help?
 - If there is a technical problem with ```snapshot```, submit an issue.
 - I'm available for contract work - drop me an email: snapshot@krausefx.com
