@@ -49,7 +49,7 @@ module Sigh
         # list_certs_url will look like this: "https://developer.apple.com/services-account/..../account/ios/profile/listProvisioningProfiles.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=id&userLocale=en_US&teamId=xy&includeInactiveProfiles=true&onlyCountLists=true"
         Helper.log.info "Fetching all available provisioning profiles..."
 
-        certs = post_ajax(@list_certs_url)
+        certs = post_ajax(@list_certs_url, "{pageNumber: 1, pageSize: 500, sort: 'name%3dasc'}")
 
         profile_name = Sigh.config[:provisioning_name]
 
