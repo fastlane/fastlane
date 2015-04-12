@@ -15,6 +15,5 @@ require 'fastlane_core'
 module Snapshot
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
-  FastlaneCore::UpdateChecker.verify_latest_version('snapshot', Snapshot::VERSION)
   Snapshot::DependencyChecker.check_dependencies
 end
