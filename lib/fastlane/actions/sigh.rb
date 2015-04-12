@@ -37,7 +37,7 @@ module Fastlane
       end
 
       def self.description
-        "This generates and downloads your provisioning profile. sigh will store the generated profile in the current folder."
+        "Generates a provisioning profile. Stores the profile in the current folder"
       end
 
       def self.available_options

@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.description
-        "This will add a git tag to the current branch."
+        "This will add a git tag to the current branch"
       end
 
       def self.available_options

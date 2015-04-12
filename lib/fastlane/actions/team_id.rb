@@ -14,6 +14,14 @@ module Fastlane
           ENV[current.to_s] = team
         end
       end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.description
+        "Specify the Team ID you want to use for the Apple Developer Portal"
+      end
     end
   end
 end

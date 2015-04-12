@@ -45,13 +45,17 @@ module Fastlane
       end
 
       def self.description
-        "Fetch the latest available code signing identity and create one if it doesn't exist already"
+        "Fetch or generate the latest available code signing identity"
       end
 
       def self.available_options
         require 'cert'
         require 'cert/options'
         Cert::Options.available_options
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

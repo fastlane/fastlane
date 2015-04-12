@@ -10,6 +10,14 @@ module Fastlane
 
         Helper.log.info 'Cleaned up build artifacts 🐙'.green
       end
+
+      def self.description
+        "Deletes files created as result of running ipa or sigh"
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end

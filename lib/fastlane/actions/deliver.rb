@@ -41,6 +41,10 @@ module Fastlane
           ['skip_deploy', 'Skip the submission of the app - it will only be uploaded'],
         ]
       end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end
