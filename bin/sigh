@@ -11,8 +11,6 @@ require 'sigh/manager'
 
 HighLine.track_eof = false
 
-FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
-
 class SighApplication
   include Commander::Methods
 
@@ -57,6 +55,7 @@ class SighApplication
 end
 
 begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
   SighApplication.new.run
 ensure
   FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
