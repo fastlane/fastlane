@@ -17,5 +17,9 @@ module Fastlane
       # Take a look at sigh.rb if you're using the config manager of fastlane
       nil
     end
+
+    def self.author
+      "KrauseFx"
+    end
   end
 end
