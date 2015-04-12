@@ -151,6 +151,13 @@ module Fastlane
         ]
       end
 
+      def self.output
+        [
+          ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
+          ['DSYM_OUTPUT_PATH', 'The path to the dsym file']
+        ]
+      end
+
       def self.author
         "joshdholtz"
       end
