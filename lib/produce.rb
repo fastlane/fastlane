@@ -14,6 +14,5 @@ module Produce
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
 
-  FastlaneCore::UpdateChecker.verify_latest_version('produce', Produce::VERSION)
   DependencyChecker.check_dependencies
 end

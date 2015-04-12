@@ -9,7 +9,7 @@ require 'credentials_manager/appfile_config'
 
 HighLine.track_eof = false
 
-class FastlaneApplication
+class ProduceApplication
   include Commander::Methods
 
   def run
@@ -48,4 +48,9 @@ class FastlaneApplication
   end
 end
 
-FastlaneApplication.new.run
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('produce')
+  ProduceApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
+end
