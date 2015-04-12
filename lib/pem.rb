@@ -20,6 +20,5 @@ module PEM
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
-  FastlaneCore::UpdateChecker.verify_latest_version('pem', PEM::VERSION)
   DependencyChecker.check_dependencies
 end

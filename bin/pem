@@ -42,4 +42,9 @@ class PemApplication
   end
 end
 
-PemApplication.new.run
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('pem')
+  PemApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
+end
