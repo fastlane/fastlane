@@ -36,7 +36,6 @@ begin
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
           Sigh::Manager.start
-        
         end
       end
 
@@ -47,11 +46,7 @@ begin
         c.option '-p', '--provisioning_profile STRING', String, 'The path to the provisioning profile which should be used'
 
         c.action do |args, options|
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
-
           Sigh::Resign.new.run(options, args)
-
-          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
         end
       end
 
