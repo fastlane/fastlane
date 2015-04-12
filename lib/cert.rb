@@ -21,6 +21,5 @@ module Cert
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
 
-  FastlaneCore::UpdateChecker.verify_latest_version('cert', Cert::VERSION)
   DependencyChecker.check_dependencies
 end
