@@ -12,9 +12,6 @@ require 'fastlane/actions/actions_helper'
 
 require 'fastlane_core'
 
-# Third Party code
-require 'colored'
-
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
