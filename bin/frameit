@@ -3,50 +3,64 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'frameit'
-require 'commander/import'
+require 'commander'
 
 HighLine.track_eof = false
 
+class FrameItApplication
+  include Commander::Methods
 
-# Commander
-program :version, Frameit::VERSION
-program :description, 'Quickly put your screenshots into the right device frames'
-program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
-program :help, 'Website', 'https://fastlane.tools'
-program :help, 'GitHub', 'https://github.com/krausefx/frameit'
-program :help_formatter, :compact
+  def run
+    program :version, Frameit::VERSION
+    program :description, 'Quickly put your screenshots into the right device frames'
+    program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
+    program :help, 'Website', 'https://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/krausefx/frameit'
+    program :help_formatter, :compact
 
-always_trace!
-
-
-default_command :black
+    always_trace!
 
 
-command :black do |c|
-  c.syntax = 'frameit black'
-  c.description = "Adds a black frame around all screenshots."
+    default_command :black
 
-  c.action do |args, options|
-    Frameit::Editor.new.run('.', Frameit::Editor::Color::BLACK)
+
+    command :black do |c|
+      c.syntax = 'frameit black'
+      c.description = "Adds a black frame around all screenshots."
+
+      c.action do |args, options|
+        Frameit::Editor.new.run('.', Frameit::Editor::Color::BLACK)
+      end
+    end
+
+    command :silver do |c|
+      c.syntax = 'frameit silver'
+      c.description = "Adds a silver frame around all screenshots."
+      
+      c.action do |args, options|
+        Frameit::Editor.new.run('.', Frameit::Editor::Color::SILVER)
+      end
+    end
+
+    command :setup do |c|
+      c.syntax = 'frameit setup'
+      c.description = "Helps you adding new frames."
+      
+      c.action do |args, options|
+        Frameit::FrameConverter.new.run
+      end
+    end
+
+    alias_command :white, :silver
+
+    run!
   end
 end
 
-command :silver do |c|
-  c.syntax = 'frameit silver'
-  c.description = "Adds a silver frame around all screenshots."
-  
-  c.action do |args, options|
-    Frameit::Editor.new.run('.', Frameit::Editor::Color::SILVER)
-  end
-end
 
-command :setup do |c|
-  c.syntax = 'frameit setup'
-  c.description = "Helps you adding new frames."
-  
-  c.action do |args, options|
-    Frameit::FrameConverter.new.run
-  end
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('frameit')
+  FrameItApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
 end
-
-alias_command :white, :silver
