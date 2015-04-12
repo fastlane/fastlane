@@ -28,6 +28,7 @@ module FastlaneCore
 
     def self.show_update_message(gem_name, available, current_version)
       v = fetch_latest(gem_name)
+      puts ""
       puts '#######################################################################'.green
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
