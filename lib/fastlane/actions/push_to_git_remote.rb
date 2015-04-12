@@ -28,6 +28,23 @@ module Fastlane
 
         Helper.log.info 'Sucesfully pushed to remote.'
       end
+
+      def self.description
+        "Push local changes to the remote branch"
+      end
+
+      def self.available_options
+        [
+          ['remote', 'The remote to push to. Defaults to `origin`'],
+          ['branch', 'The local branch to push from. Defaults to the current branch'],
+          ['branch', 'The remote branch to push to. Defaults to the local branch'],
+          ['force', 'Force push to remote. Defaults to false']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end

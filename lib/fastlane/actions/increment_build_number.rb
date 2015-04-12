@@ -55,6 +55,27 @@ module Fastlane
           raise ex
         end
       end
+
+      def self.description
+        "Increment the build number of your project"
+      end
+
+      def self.available_options
+        [
+          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
+          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+        ]
+      end
+
+      def self.output
+        [
+          ['BUILD_NUMBER', 'The new build number']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end

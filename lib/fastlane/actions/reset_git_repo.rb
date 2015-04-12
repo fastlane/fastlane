@@ -22,6 +22,29 @@ module Fastlane
           raise 'This is a destructive and potentially dangerous action. To protect from data loss, please add the `ensure_git_status_clean` action to the beginning of your lane, or if you\'re absolutely sure of what you\'re doing then call this action with the :force option.'.red
         end
       end
+
+      def self.description
+        "Resets git repo to a clean state by discarding uncommited changes"
+      end
+
+      def self.details
+        [
+          "This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.",
+          "It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:",
+          "You have called the ensure_git_status_clean action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run."
+        ].join(' ')
+      end
+
+      def self.available_options
+        [
+          ['files', 'Array of files the changes should be discarded from. If not given, all files will be discarded'],
+          ['force', 'Skip verifying of previously clean state of repo. Only recommended in combination with `files` option']
+        ]
+      end
+
+      def self.author
+        'lmirosevic'
+      end
     end
   end
 end
