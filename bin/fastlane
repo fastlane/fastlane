@@ -6,7 +6,6 @@ require 'fastlane'
 require 'commander'
 require 'dotenv'
 require 'fastlane/new_action'
-require 'fastlane/actions_list'
 
 HighLine.track_eof = false
 
@@ -29,16 +28,12 @@ class FastlaneApplication
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, _options|
-        FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
-
         if Fastlane::FastlaneFolder.path
           Fastlane::LaneManager.cruise_lanes(args, _options.env)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
           Fastlane::Setup.new.run if create
         end
-
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
     end
 
@@ -47,9 +42,7 @@ class FastlaneApplication
       c.description = 'Helps you setting up fastlane based on your existing tools.'
 
       c.action do |_args, _options|
-        FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
         Fastlane::Setup.new.run
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
     end
 
@@ -67,6 +60,7 @@ class FastlaneApplication
       c.description = 'Lists all available fastlane actions'
 
       c.action do |_args, _options|
+        require 'fastlane/actions_list'
         Fastlane::ActionsList.run(_args.first)
       end
     end
@@ -75,6 +69,7 @@ class FastlaneApplication
       c.syntax = 'fastlane action [tool_name]'
       c.description = 'Shows more information for a specific command'
       c.action do |_args, _options|
+        require 'fastlane/actions_list'
         Fastlane::ActionsList.run(_args.first)
       end
     end
@@ -85,4 +80,9 @@ class FastlaneApplication
   end
 end
 
-FastlaneApplication.new.run
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+  FastlaneApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+end
