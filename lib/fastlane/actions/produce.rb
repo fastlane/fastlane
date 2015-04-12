@@ -17,16 +17,22 @@ module Fastlane
 
         return if Helper.test?
 
-        Dir.chdir(FastlaneFolder.path || Dir.pwd) do
-          # This should be executed in the fastlane folder
+        FastlaneCore::UpdateChecker.start_looking_for_update('produce')
 
-          CredentialsManager::PasswordManager.shared_manager(ENV['PRODUCE_USERNAME']) if ENV['PRODUCE_USERNAME']
-          Produce::Config.shared_config # to ask for missing information right in the beginning
+        begin
+          Dir.chdir(FastlaneFolder.path || Dir.pwd) do
+            # This should be executed in the fastlane folder
 
-          apple_id = Produce::Manager.start_producing.to_s
+            CredentialsManager::PasswordManager.shared_manager(ENV['PRODUCE_USERNAME']) if ENV['PRODUCE_USERNAME']
+            Produce::Config.shared_config # to ask for missing information right in the beginning
 
-          Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
-          ENV['PRODUCE_APPLE_ID'] = apple_id
+            apple_id = Produce::Manager.start_producing.to_s
+
+            Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
+            ENV['PRODUCE_APPLE_ID'] = apple_id
+          end
+        ensure
+          FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
         end
       end
     end
