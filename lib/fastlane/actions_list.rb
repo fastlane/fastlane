@@ -15,6 +15,10 @@ module Fastlane
         if action < Action
           current << action.description if action.description
           current << action.author.green if action.author
+
+          l = (action.description || '').length
+          raise "Provided description for #{name} is too long. It is #{l}, must be <= 80".red if l > 80
+          raise "Provided description for #{name} shouldn't end with a `.`".red if action.description.strip.end_with?'.'
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
           current << "Please update action file".red
