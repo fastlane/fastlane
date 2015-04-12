@@ -14,6 +14,14 @@ module Fastlane
           ENV[current.to_s] = team
         end
       end
+
+      def self.description
+        "Set a team to use by its name"
+      end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end

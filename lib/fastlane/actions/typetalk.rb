@@ -50,6 +50,24 @@ module Fastlane
             raise "Could not sent Typetalk notification".red
         end
       end
+
+      def self.description
+        "Post a message to Typetalk"
+      end
+
+      def self.available_options
+        [
+          ['message', 'The message to post'],
+          ['note_path', 'Path to a md file'],
+          ['topicId', ''],
+          ['success', 'Successful build?'],
+          ['typetalk_token', 'API token']
+        ]
+      end
+
+      def self.author
+        "dataich"
+      end
     end
   end
 end

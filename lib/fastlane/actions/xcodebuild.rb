@@ -187,6 +187,28 @@ module Fastlane
 
         return workspace
       end
+
+      def self.description
+        "Use the `xcodebuild` command to build and sign your app"
+      end
+
+      def self.available_options
+        [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
+      end
+
+      def self.details
+        "More infomration on GitHub: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#xcodebuild"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
     class XcarchiveAction < Action
@@ -194,6 +216,14 @@ module Fastlane
         params_hash = params.first || {}
         params_hash[:archive] = true
         XcodebuildAction.run([params_hash])
+      end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
       end
     end
 
@@ -203,6 +233,14 @@ module Fastlane
         params_hash[:build] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
     class XccleanAction < Action
@@ -210,6 +248,14 @@ module Fastlane
         params_hash = params.first || {}
         params_hash[:clean] = true
         XcodebuildAction.run([params_hash])
+      end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
       end
     end
 
@@ -219,6 +265,14 @@ module Fastlane
         params_hash[:export_archive] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
     class XctestAction < Action
@@ -226,6 +280,20 @@ module Fastlane
         params_hash = params.first || {}
         params_hash[:test] = true
         XcodebuildAction.run([params_hash])
+      end
+
+      def self.description
+        "Runs tests on the given simulator"
+      end
+
+      def available_options
+        [
+          ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
+        ]
+      end
+
+      def self.author
+        "dtrenz"
       end
     end
   end

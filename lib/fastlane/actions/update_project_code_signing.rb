@@ -19,6 +19,18 @@ module Fastlane
 
         Helper.log.info("Successfully updated project settings to use UDID '#{udid}'".green)
       end
+
+      def self.description
+        "Updated code signing settings from 'Automatic' to a specific profile"
+      end
+
+      def self.details
+        "This feature is not yet 100% finished"
+      end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end
