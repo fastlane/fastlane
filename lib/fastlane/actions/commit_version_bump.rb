@@ -74,6 +74,21 @@ module Fastlane
 
         Helper.log.info "Committed \"#{commit_message}\" 💾.".green
       end
+
+      def self.description
+        "Creates a 'Version Bump' commit. Run after `increment_build_number`"
+      end
+
+      def self.available_options
+        [
+          ['message', 'The commit message. Defaults to "Version Bump"'],
+          ['xcodeproj', 'The path to your project file (Not the workspace). If you have only one, this is optional']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end
