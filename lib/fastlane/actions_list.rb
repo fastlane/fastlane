@@ -47,6 +47,10 @@ module Fastlane
         rows = []
         rows << [action.description] if action.description
         rows << [' ']
+        if action.details
+          rows << [action.details]
+          rows << [' ']
+        end
         rows << ["Created by #{action.author.green}"] if action.author
 
         puts Terminal::Table.new(

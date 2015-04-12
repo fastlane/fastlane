@@ -8,6 +8,10 @@ module Fastlane
       "No description provided".red
     end
 
+    def self.details
+      nil # this is your change to provide a more detailed description of this action
+    end
+
     def self.available_options
       # Return an array of 2-3 element arrays, like:
       # [
