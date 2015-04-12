@@ -17,13 +17,19 @@ module Fastlane
 
         require 'snapshot'
 
-        Dir.chdir(FastlaneFolder.path) do
-          Snapshot::SnapshotConfig.shared_instance
-          Snapshot::Runner.new.work(clean: clean)
+        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
 
-          results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+        begin
+          Dir.chdir(FastlaneFolder.path) do
+            Snapshot::SnapshotConfig.shared_instance
+            Snapshot::Runner.new.work(clean: clean)
 
-          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
+            results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+
+            Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
+          end
+        ensure
+          FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
         end
       end
 
