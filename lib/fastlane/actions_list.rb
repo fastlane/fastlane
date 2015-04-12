@@ -11,8 +11,13 @@ module Fastlane
       all_actions do |action, name|
         output = []
         rows << [name.yellow]
-        if action.description
-          rows.last << action.description
+
+        if action < Action
+          if action.description
+            rows.last << action.description
+          end
+        else
+          Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
         end
       end
 
