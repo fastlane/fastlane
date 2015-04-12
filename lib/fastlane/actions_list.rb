@@ -9,21 +9,22 @@ module Fastlane
     def self.print_all
       rows = []
       all_actions do |action, name|
-        output = []
-        rows << [name.yellow]
+        current = []
+        current << name.yellow
 
         if action < Action
-          if action.description
-            rows.last << action.description
-          end
+          current << action.description if action.description
+          current << action.author.green if action.author
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
+          current << "Please update action file".red
         end
+        rows << current
       end
 
       table = Terminal::Table.new(
         title: "Available fastlane actions".green,
-        headings: ['Action', 'Description'],
+        headings: ['Action', 'Description', 'Author'],
         rows: rows
       )
       puts table
@@ -39,7 +40,17 @@ module Fastlane
       all_actions do |action, name|
         next unless name == filter.strip
         
-        puts action.description.yellow if action.description
+        rows = []
+        rows << [action.description] if action.description
+        rows << [' ']
+        rows << ["Created by #{action.author.green}"] if action.description
+
+        puts Terminal::Table.new(
+          title: filter.green,
+          rows: rows
+        )
+
+        puts "\n"
 
         rows = parse_options(action.available_options) if action.available_options
 
@@ -55,8 +66,9 @@ module Fastlane
         end
 
         puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
+        puts "\n"
 
-        return
+        return # our job is done here
       end
 
       puts "Couldn't find action for the given filter.".red
@@ -87,7 +99,7 @@ module Fastlane
             elsif current.kind_of?Array
               raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
               rows << current
-              rows.last[0] = rows.last.first.green # color it green :) 
+              rows.last[0] = rows.last.first.yellow # color it yellow :) 
               rows.last << nil if rows.last.count == 2 # to have a nice border in the table
             end
           end
