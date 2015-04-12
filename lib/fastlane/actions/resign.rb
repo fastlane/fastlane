@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     # Resigns the ipa
-    class ResignAction
+    class ResignAction < Action
       def self.run(params)
         require 'sigh'
 

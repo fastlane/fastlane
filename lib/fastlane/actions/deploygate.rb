@@ -10,7 +10,7 @@ module Fastlane
       DEPLOYGATE_APP_INFO = :DEPLOYGATE_APP_INFO # contains app revision, bundle identifier, etc.
     end
 
-    class DeploygateAction
+    class DeploygateAction < Action
       DEPLOYGATE_URL_BASE = 'https://deploygate.com'
 
       def self.run(params)

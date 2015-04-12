@@ -35,7 +35,7 @@ module Fastlane
       xcargs: '--xcargs',
     }
 
-    class IpaAction
+    class IpaAction < Action
       def self.run(params)
         # The args we will build with
         build_args = nil

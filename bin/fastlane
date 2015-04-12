@@ -55,10 +55,34 @@ class FastlaneApplication
       end
     end
 
+    command :actions do |c|
+      c.syntax = 'fastlane actions'
+      c.description = 'Lists all available fastlane actions'
+
+      c.action do |_args, _options|
+        require 'fastlane/actions_list'
+        Fastlane::ActionsList.run(_args.first)
+      end
+    end
+
+    command :action do |c|
+      c.syntax = 'fastlane action [tool_name]'
+      c.description = 'Shows more information for a specific command'
+      c.action do |_args, _options|
+        require 'fastlane/actions_list'
+        Fastlane::ActionsList.run(_args.first)
+      end
+    end
+
     default_command :run
 
     run!
   end
 end
 
-FastlaneApplication.new.run
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+  FastlaneApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+end

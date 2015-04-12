@@ -385,9 +385,9 @@ This will register iOS devices with the Developer Portal so that you can include
 
 This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
 
-If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from ENV['CUPERTINO_TEAM_ID'], or ENV['FASTLANE_TEAM_ID'], in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
+If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from `ENV['CUPERTINO_TEAM_ID']`, or `ENV['FASTLANE_TEAM_ID']`, in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
 
-The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable ENV['CUPERTINO_USERNAME'].
+The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['CUPERTINO_USERNAME']`.
 
 ```ruby
 # Simply provide a list of devices as a Hash
@@ -499,6 +499,13 @@ Also useful for putting in your `error` block, to bring things back to a pristin
 ```ruby
 reset_git_repo
 reset_git_repo :force # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+
+# You can also specify a list of files that should be resetted.
+reset_git_repo(
+  force: true,
+  files: [
+    "./file.txt"
+  ])
 ```
 
 ## Notifications

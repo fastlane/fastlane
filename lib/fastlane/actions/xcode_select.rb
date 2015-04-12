@@ -17,7 +17,7 @@ module Fastlane
     #   Xcode application directory -- the xcode-select provided  shims  will  automatically  convert  the
     #   environment variable into the full Developer content path.
     #
-    class XcodeSelectAction
+    class XcodeSelectAction < Action
       def self.run(params)
         xcode_path = params.first
 

@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class UpdateProjectCodeSigningAction
+    class UpdateProjectCodeSigningAction < Action
       def self.run(params)
         path = params.first
         path = File.join(path, "project.pbxproj")

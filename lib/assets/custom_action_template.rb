@@ -4,7 +4,7 @@ module Fastlane
       [[NAME_UP]]_CUSTOM_VALUE = :[[NAME_UP]]_CUSTOM_VALUE
     end
 
-    class [[NAME_CLASS]]
+    class [[NAME_CLASS]] < Action
       def self.run(params)
         puts "My Ruby Code!"
         # puts "Parameter: #{params.first}"
