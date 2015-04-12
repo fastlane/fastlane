@@ -62,13 +62,18 @@ module FastlaneCore
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? and not OS.mac?
+      return "" if self.is_test? and not self.is_mac?
       `xcode-select -p`.gsub("\n", '') + "/"
+    end
+
+    # Is the currently running computer a Mac?
+    def self.is_mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return '' unless OS.mac? # so tests work on Linx too
+      return '' unless self.is_mac? # so tests work on Linx too
 
       [
         "../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",

@@ -19,7 +19,7 @@ describe FastlaneCore do
     end
 
     # Mac OS only (to work on Linux)
-    if OS.mac?
+    if FastlaneCore::Helper.is_mac?
       describe "Xcode Paths" do
         it "#xcode_path" do
           expect(FastlaneCore::Helper.xcode_path[-1]).to eq('/')
