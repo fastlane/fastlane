@@ -22,7 +22,7 @@ module PEM
 
       # Generate p12 file as well
       if PEM.config[:generate_p12]
-        output = "#{certificate_type}.p12"
+        output = "#{certificate_type}_#{PEM.config[:app_identifier]}.p12"
         File.write(output, p12_certificate.to_der)
         puts output.green
       end
