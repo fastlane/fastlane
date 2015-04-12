@@ -17,8 +17,6 @@ module Fastlane
           current << action.author.green if action.author
 
           l = (action.description || '').length
-          raise "Provided description for #{name} is too long. It is #{l}, must be <= 80".red if l > 80
-          raise "Provided description for #{name} shouldn't end with a `.`".red if action.description.strip.end_with?'.'
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
           current << "Please update action file".red
@@ -98,17 +96,17 @@ module Fastlane
     end
 
 
-    private
-      # Iterates through all available actions and yields from there
-      def self.all_actions
-        all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
-        all_actions.each do |symbol|        
-          action = Fastlane::Actions.const_get(symbol)
-          name = symbol.to_s.gsub('Action', '').fastlane_underscore
-          yield action, name
-        end
+    # Iterates through all available actions and yields from there
+    def self.all_actions
+      all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
+      all_actions.each do |symbol|        
+        action = Fastlane::Actions.const_get(symbol)
+        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        yield action, name
       end
-
+    end
+    
+    private
       def self.parse_options(options, fill_three = true)
         rows = []
         rows << [options] if options.kind_of?String
