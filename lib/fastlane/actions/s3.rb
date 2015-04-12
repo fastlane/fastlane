@@ -241,8 +241,36 @@ module Fastlane
         return bundle_id, bundle_version, title
       end
 
-    end
+      def self.description
+        "Generates a plist file and uploads all to AWS S3"
+      end
 
+      def self.available_options
+        [
+          ['access_key', 'AWS S3 Access Key', 'S3_ACCESS_KEY'],
+          ['secret_access_key', 'AWS S3 Secret Key', 'S3_SECRET_ACCESS_KEY'],
+          ['bucket', 'The bucket to store the ipa and plist in', 'S3_BUCKET'],
+          ['region', 'The region of your S3 server', 'S3_REGION'],
+          ['file', 'Path the ipa file to upload'],
+          ['dsym', 'Path to your dsym file'],
+          ['path', 'The path how it\'s used on S3']
+          # TODO: there are more options
+        ]
+      end
+
+      def self.output
+        [
+          ['S3_IPA_OUTPUT_PATH', 'Direct HTTP link to the uploaded ipa file'],
+          ['S3_DSYM_OUTPUT_PATH', 'Direct HTTP link to the uploaded dsym file'],
+          ['S3_PLIST_OUTPUT_PATH', 'Direct HTTP link to the uploaded plist file'],
+          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file']
+        ]
+      end
+
+      def self.author
+        "joshdholtz"
+      end
+    end
   end
 end
 

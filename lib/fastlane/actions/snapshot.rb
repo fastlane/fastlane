@@ -43,6 +43,10 @@ module Fastlane
           ['verbose', 'Print out the UI Automation output']
         ]
       end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end
