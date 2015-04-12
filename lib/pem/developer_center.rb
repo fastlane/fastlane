@@ -99,13 +99,9 @@ module PEM
         url = [host, url].join('')
         Helper.log.info "Downloading URL: '#{url}'"
         
-        cookieString = ""
+        cookie_string = page.driver.cookies.collect { |key, cookie| "#{cookie.name}=#{cookie.value}" }.join(";")
         
-        page.driver.cookies.each do |key, cookie|
-          cookieString << "#{cookie.name}=#{cookie.value};" # append all known cookies
-        end  
-        
-        data = open(url, {'Cookie' => cookieString}).read
+        data = open(url, {'Cookie' => cookie_string}).read
 
         raise "Something went wrong when downloading the certificate" unless data
 
