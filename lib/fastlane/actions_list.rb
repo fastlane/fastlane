@@ -47,7 +47,7 @@ module Fastlane
         rows = []
         rows << [action.description] if action.description
         rows << [' ']
-        rows << ["Created by #{action.author.green}"] if action.description
+        rows << ["Created by #{action.author.green}"] if action.author
 
         puts Terminal::Table.new(
           title: filter.green,
@@ -61,7 +61,7 @@ module Fastlane
         if options
           puts Terminal::Table.new(
             title: filter.green,
-            headings: ['Key', 'Description', 'Environment Variable'],
+            headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
         else
@@ -69,7 +69,7 @@ module Fastlane
         end
         puts "\n"
 
-        output = parse_options(action.output) if action.output
+        output = parse_options(action.output, false) if action.output
         if output
           puts Terminal::Table.new(
             title: filter.green,
@@ -105,7 +105,7 @@ module Fastlane
         end
       end
 
-      def self.parse_options(options)
+      def self.parse_options(options, fill_three = true)
         rows = []
         rows << [options] if options.kind_of?String
 
@@ -117,7 +117,7 @@ module Fastlane
               raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
               rows << current
               rows.last[0] = rows.last.first.yellow # color it yellow :) 
-              rows.last << nil if rows.last.count == 2 # to have a nice border in the table
+              rows.last << nil if (fill_three and rows.last.count == 2) # to have a nice border in the table
             end
           end
         end

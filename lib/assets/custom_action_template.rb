@@ -43,7 +43,7 @@ module Fastlane
 
       def self.author
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        "[Your GitHub Name]"
+        '[Your GitHub Name]'
       end
     end
   end
