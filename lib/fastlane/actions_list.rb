@@ -71,7 +71,7 @@ module Fastlane
         all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
         all_actions.each do |symbol|        
           action = Fastlane::Actions.const_get(symbol)
-          name = symbol.to_s.gsub('Action', '').fastlane_uncapitalize
+          name = symbol.to_s.gsub('Action', '').fastlane_underscore
           yield action, name
         end
       end
