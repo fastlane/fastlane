@@ -21,8 +21,8 @@ module FastlaneCore
       return data
     end
 
-    def post_ajax(url)
-      JSON.parse(page.evaluate_script("$.ajax({type: 'POST', url: '#{url}', async: false})")['responseText'])
+    def post_ajax(url, data = nil)
+      JSON.parse(page.evaluate_script("$.ajax({type: 'POST', url: '#{url}', async: false#{data.nil? ? '' : ", data: #{data}"} })")['responseText'])
     end
 
     def click_next
