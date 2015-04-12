@@ -5,7 +5,7 @@ module Fastlane
     end
 
     def self.description
-      "No description provided."
+      "No description provided".red
     end
 
     def self.available_options
@@ -15,6 +15,14 @@ module Fastlane
       #   ['app_identifier', 'This value is responsible for X']
       # ]
       # Take a look at sigh.rb if you're using the config manager of fastlane
+      nil
+    end
+
+    def self.output
+      # Return the keys you provide on the shared area
+      # [
+      #   ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file']
+      # ]
       nil
     end
 

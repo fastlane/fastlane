@@ -52,18 +52,31 @@ module Fastlane
 
         puts "\n"
 
-        rows = parse_options(action.available_options) if action.available_options
+        options = parse_options(action.available_options) if action.available_options
 
-        if rows
-          table = Terminal::Table.new(
+        if options
+          puts Terminal::Table.new(
             title: filter.green,
             headings: ['Key', 'Description', 'Environment Variable'],
-            rows: rows
+            rows: options
           )
-          puts table
         else
-          puts "No available options"
+          puts "No available options".yellow
         end
+        puts "\n"
+
+        output = parse_options(action.output) if action.output
+        if output
+          puts Terminal::Table.new(
+            title: filter.green,
+            headings: ['Key', 'Description'],
+            rows: output
+          )
+          puts "Access the output values using `Actions.lane_context[VARIABLE_NAME]`"
+          puts ""
+        end
+
+        
 
         puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
         puts "\n"
