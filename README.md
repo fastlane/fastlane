@@ -149,20 +149,17 @@ You can pass more information using the command line:
 
 # Manage
 
-If you simply want to manage your provisioning profiles locally, you can use `sigh manage`:
-
+With `sigh manage` you can list all provisioning profiles installed locally.
 
     sigh manage
 
-`sigh` will find all installed provisioning profiles and list them in three categories: **active**, **expire within 30 days** and **expired**.
-
-To delete all expired provisioning profiles:
+Delete all expired provisioning profiles
 
     sigh manage -e
 
-Delete any non-wildcard `iOS Team Provisioning Profile`
+Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
-    sigh manage -p "iOS\ {0,1}Team Provisioning Profile: \w"
+    sigh manage -p "iOS\ {0,1}Team Provisioning Profile:"
 
 ## Environment Variables
 In case you prefer environment variables:
