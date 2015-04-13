@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.description
-        "Code sign an existing API"
+        "Code sign an existing ipa file"
       end
 
       def self.available_options
