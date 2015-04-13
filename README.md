@@ -84,6 +84,8 @@ profile = app.profiles.new
 # ...
 ```
 
+Most of those things are already implemented. The code already has a great test coverage, since all web requests can easily be stubbed.
+
 # Need help?
 - If there is a technical problem with `spaceship`, submit an issue.
 - I'm available for contract work - drop me an email: spaceship@krausefx.com
