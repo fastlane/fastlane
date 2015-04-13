@@ -160,7 +160,7 @@ module Cert
         certificateStatuses = wait_for_variable('certificateStatuses')
 
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
-        url += "&pageSize=50&pageNumber=1&sort=name=asc"
+        url += "&pageSize=5000&pageNumber=1&sort=name=asc"
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution&pageSize=50&pageNumber=1&sort=name=asc
 
