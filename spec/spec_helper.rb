@@ -5,10 +5,3 @@ require 'sigh'
 module SpecHelper
   
 end
-
-
-module OS
-  def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
-  end
-end
