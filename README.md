@@ -137,7 +137,7 @@ From now on, you can run ```deliver``` to deploy a new update, or just upload ne
 Open the ```Deliverfile``` using a text editor and customize it even further. Take a look at the following settings:
 
 - ```ipa```: You can either pass a static path to an ipa file, or add your custom build script.
-- ```unit_tests```: Uncomment the code to run tests. (e.g. using [xctool](https://github.com/facebook/xctool))
+- ```unit_tests```: Uncomment the code to run tests. (e.g. using [xctool](https://github.com/facebook/xctool)). It is recommended to use [fastlane](https://fastlane.tools) for running tests.
 
 # Usage
 
