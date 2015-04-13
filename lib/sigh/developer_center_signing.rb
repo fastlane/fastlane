@@ -32,7 +32,7 @@ module Sigh
 
       # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
 
-      certs = post_ajax(url)['certRequests']
+      certs = post_ajax(url, "{pageNumber: 1, pageSize: 500, sort: 'name%3dasc'}")['certRequests']
 
       ret_certs = []
 
