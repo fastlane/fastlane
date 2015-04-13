@@ -20,12 +20,6 @@ ENV["DELIVER_USER"] = "DELIVERUSER"
 ENV["DELIVER_PASSWORD"] = "DELIVERPASS"
 
 
-module OS
-  def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
-  end
-end
-
 
 RSpec.configure do |config|
   config.after(:each) do |test|
