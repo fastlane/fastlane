@@ -44,11 +44,11 @@ module FastlaneCore
         if page.has_content?"My Apps"
           # Everything looks good
         else
-          raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.")
+          raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.".red)
         end
       rescue => ex
         Helper.log.debug(ex)
-        raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+        raise ItunesConnectLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.".red)
       end
 
       Helper.log.info "Successfully logged into iTunesConnect"

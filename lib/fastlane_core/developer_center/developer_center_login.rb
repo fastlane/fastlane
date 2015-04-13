@@ -54,7 +54,7 @@ module FastlaneCore
           if page.has_content?"Getting Started"
             raise "There was no valid signing certificate found. Please log in and follow the 'Getting Started guide' on '#{current_url}'".red
           else
-            raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.")
+            raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.".red)
           end
         end
 
