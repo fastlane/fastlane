@@ -95,7 +95,7 @@ module Fastlane
       end
 
       def self.description
-        "Increment the build number of your project"
+        "Increment the version number of your project"
       end
 
       def self.details
