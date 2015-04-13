@@ -6,6 +6,8 @@ module Fastlane
 
     class [[NAME_CLASS]] < Action
       def self.run(params)
+        params = params.first
+        
         puts "My Ruby Code!"
         # puts "Parameter Path: #{params[:first]}"
         # sh "shellcommand ./path"
