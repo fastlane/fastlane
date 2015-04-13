@@ -126,11 +126,11 @@ module Fastlane
               if report[:output]
                 report_string << " --output \"#{report[:output]}\""
               elsif report[:report] == 'junit'
-                report_string << "--output \"#{build_path}report/report.xml\""
+                report_string << " --output \"#{build_path}report/report.xml\""
               elsif report[:report] == 'html'
-                report_string << "--output \"#{build_path}report/report.html\""
+                report_string << " --output \"#{build_path}report/report.html\""
               elsif report[:report] == 'json-compilation-database'
-                report_string << "--output \"#{build_path}report/report.json\""
+                report_string << " --output \"#{build_path}report/report.json\""
               end
 
               if report[:screenshots]
