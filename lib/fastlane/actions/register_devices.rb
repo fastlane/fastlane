@@ -58,6 +58,23 @@ module Fastlane
           Helper.log.info "Device list up to date, all #{device_objs.count} devices are already registered. Total devices registed: #{existing_devices.count}.".green
         end
       end
+
+      def self.description
+        "Registers new devices to the Apple Dev Portal"
+      end
+
+      def self.available_options
+        [
+          ['devices', 'A hash of devices, with the name as key and the UDID as value'],
+          ['device_file', 'Instead, you can proide a path containing all UDIDs'],
+          ['team_id', 'optional: Your team ID'],
+          ['username', 'optional: Your Apple ID']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end

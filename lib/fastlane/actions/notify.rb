@@ -11,6 +11,10 @@ module Fastlane
       def self.description
         "Shows a Mac OS X notification"
       end
+
+      def author
+        "champo"
+      end
     end
   end
 end

@@ -93,6 +93,35 @@ module Fastlane
           raise ex
         end
       end
+
+      def self.description
+        "Increment the version number of your project"
+      end
+
+      def self.details
+        [
+          "This action will increment the version number. ", 
+          "You first have to set up your Xcode project, if you haven't done it already:",
+          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
+        ].join(' ')
+      end
+
+      def self.available_options
+        [
+          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
+          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+        ]
+      end
+
+      def self.output
+        [
+          ['VERSION_NUMBER', 'The new version number']
+        ]
+      end
+
+      def self.author
+        "serluca"
+      end
     end
   end
 end

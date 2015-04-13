@@ -36,7 +36,20 @@ You can run any xctool action. This will require having [xctool](https://github.
 xctool :test
 ```
 
-It is recommended to have the `xctool` configuration stored in a [`xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
+If you prefer to have the build configuration stored in the `Fastfile`:
+
+```ruby
+xctool :test, [
+      "--workspace", "'AwesomeApp.xcworkspace'",
+      "--scheme", "'Schema Name'",
+      "--configuration", "Debug",
+      "--sdk", "iphonesimulator",
+      "--arch", "i386"
+    ].join(" ")
+```
+
 
 ### [snapshot](https://github.com/KrauseFx/snapshot)
 

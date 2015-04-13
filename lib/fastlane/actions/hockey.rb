@@ -63,6 +63,32 @@ module Fastlane
             raise 'Error when trying to upload ipa to HockeyApp'.red
           end
       end
+
+      def self.description
+        "Upload a new build to HockeyApp"
+      end
+
+      def self.available_options
+        [
+          ['api_token', 'API Token for Hockey Access'],
+          ['ipa', 'Path to the ipa file. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['notes', 'The changelog for this build'],
+          ['dsym', 'Path to the dsym file. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['status', 'No description'],
+          ['notify', 'Notify testers? 1 for yes'],
+        ]
+      end
+
+      def output
+        [
+          ['HOCKEY_DOWNLOAD_LINK', 'The newly generated download link for this build'],
+          ['HOCKEY_BUILD_INFORMATION', 'contains all keys/values from the HockeyApp API, like :title, :bundle_identifier']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end

@@ -17,8 +17,6 @@ module Fastlane
           current << action.author.green if action.author
 
           l = (action.description || '').length
-          raise "Provided description for #{name} is too long. It is #{l}, must be <= 80".red if l > 80
-          raise "Provided description for #{name} shouldn't end with a `.`".red if action.description.strip.end_with?'.'
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
           current << "Please update action file".red
@@ -47,7 +45,11 @@ module Fastlane
         rows = []
         rows << [action.description] if action.description
         rows << [' ']
-        rows << ["Created by #{action.author.green}"] if action.description
+        if action.details
+          rows << [action.details]
+          rows << [' ']
+        end
+        rows << ["Created by #{action.author.green}"] if action.author
 
         puts Terminal::Table.new(
           title: filter.green,
@@ -61,7 +63,7 @@ module Fastlane
         if options
           puts Terminal::Table.new(
             title: filter.green,
-            headings: ['Key', 'Description', 'Environment Variable'],
+            headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
         else
@@ -69,7 +71,7 @@ module Fastlane
         end
         puts "\n"
 
-        output = parse_options(action.output) if action.output
+        output = parse_options(action.output, false) if action.output
         if output
           puts Terminal::Table.new(
             title: filter.green,
@@ -94,18 +96,18 @@ module Fastlane
     end
 
 
-    private
-      # Iterates through all available actions and yields from there
-      def self.all_actions
-        all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
-        all_actions.each do |symbol|        
-          action = Fastlane::Actions.const_get(symbol)
-          name = symbol.to_s.gsub('Action', '').fastlane_underscore
-          yield action, name
-        end
+    # Iterates through all available actions and yields from there
+    def self.all_actions
+      all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
+      all_actions.each do |symbol|        
+        action = Fastlane::Actions.const_get(symbol)
+        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        yield action, name
       end
-
-      def self.parse_options(options)
+    end
+    
+    private
+      def self.parse_options(options, fill_three = true)
         rows = []
         rows << [options] if options.kind_of?String
 
@@ -117,7 +119,7 @@ module Fastlane
               raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
               rows << current
               rows.last[0] = rows.last.first.yellow # color it yellow :) 
-              rows.last << nil if rows.last.count == 2 # to have a nice border in the table
+              rows.last << nil if (fill_three and rows.last.count == 2) # to have a nice border in the table
             end
           end
         end

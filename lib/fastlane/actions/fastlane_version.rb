@@ -19,6 +19,14 @@ module Fastlane
       def self.step_text
         "Verifying required fastlane version"
       end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.description
+        "Verifies the minimum fastlane version required"
+      end
     end
   end
 end

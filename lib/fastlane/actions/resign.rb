@@ -24,6 +24,22 @@ module Fastlane
           raise 'Failed to re-sign .ipa'.red
         end
       end
+
+      def self.description
+        "Code sign an existing ipa file"
+      end
+
+      def self.available_options
+        [
+          ['ipa', 'Path to the ipa file to resign. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['signing_identity', 'Code signing identity to use. e.g. "iPhone Distribution: Luka Mirosevic (0123456789)"'],
+          ['provisioning_profile', 'Path to your provisioning_profile. Optional if you use `sigh`']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end

@@ -11,9 +11,6 @@
 
 module Fastlane
   module Actions
-    module SharedValues
-    end
-
     class TestmunkAction < Action
       def self.run(_params)
         raise "Please pass your Testmunk email address using `ENV['TESTMUNK_EMAIL'] = 'value'`" unless ENV['TESTMUNK_EMAIL']
@@ -35,6 +32,22 @@ module Fastlane
         else
           raise 'Something went wrong while uploading your app to Testmunk'.red
         end
+      end
+
+      def self.description
+        "Run tests on real devices using Testmunk"
+      end
+
+      def self.available_options
+        [
+          ['', 'Your email address', 'TESTMUNK_EMAIL'],
+          ['', 'Testmunk API Key', 'TESTMUNK_API'],
+          ['', 'Testmunk App Name', 'TESTMUNK_APP']
+        ]
+      end
+
+      def self.author
+        "mposchen"
       end
     end
   end

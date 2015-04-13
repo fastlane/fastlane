@@ -1,8 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
-
     class FrameitAction < Action
       def self.run(params)
         return if Helper.test?
@@ -23,6 +20,14 @@ module Fastlane
         ensure
           FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
         end
+      end
+
+      def self.description
+        "Adds device frames around the screenshots using frameit"
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

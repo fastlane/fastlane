@@ -1,8 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
-
     class SlackAction < Action
       def self.git_author
         s = `git log --name-status HEAD^..HEAD`
@@ -124,6 +121,24 @@ module Fastlane
         else
           Helper.log.info 'Successfully sent Slack notification'.green
         end
+      end
+
+      def self.description
+        "Send a success/error message to your Slack group"
+      end
+
+      def self.available_options
+        [
+          ['message', 'The message that should be displayed on Slack. This supports the standard Slack markup language'],
+          ['channel', '#channel or @username'],
+          ['success', 'Success or error?'],
+          ['payload', 'Add additional information to this post. payload must be a hash containg any key with any value'],
+          ['default_payloads', 'Remove some of the default payloads. More information about the available payloads GitHub']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end
