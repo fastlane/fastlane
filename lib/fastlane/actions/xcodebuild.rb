@@ -119,7 +119,7 @@ module Fastlane
         if testing
           if params[:reports]
             # New report options format
-            reports = params[:reports].map do |report|
+            reports = params[:reports].reduce("") do |arguments, report|
 
               report_string = "--report #{report[:report]}"
 
@@ -133,13 +133,18 @@ module Fastlane
                 report_string << "--output \"#{build_path}report/report.json\""
               end
 
-              # If I uncomment this then the rspec test fails!
-              # if report[:screenshots]
-              #   report_string << " --screenshots"
-              # end
+              if report[:screenshots]
+                report_string << " --screenshots"
+              end
+
+              unless arguments == ""
+                arguments << " "
+              end
+
+              arguments << report_string
             end
 
-            xcpretty_args.push reports.join(" ")
+            xcpretty_args.push reports
 
           elsif params[:report_formats]
             # Test report file format
