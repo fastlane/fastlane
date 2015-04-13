@@ -120,11 +120,23 @@ module Fastlane
           if params[:reports]
             # New report options format
             reports = params[:reports].map do |report|
-              unless report[:screenshots]
-                "--report #{report[:report]} --output #{report[:output]}"
-              else
-                "--report #{report[:report]} --output #{report[:output]} --screenshots"
+
+              report_string = "--report #{report[:report]}"
+
+              if report[:output]
+                report_string << " --output \"#{report[:output]}\""
+              elsif report[:report] == 'junit'
+                report_string << "--output \"#{build_path}report/report.xml\""
+              elsif report[:report] == 'html'
+                report_string << "--output \"#{build_path}report/report.html\""
+              elsif report[:report] == 'json-compilation-database'
+                report_string << "--output \"#{build_path}report/report.json\""
               end
+
+              # If I uncomment this then the rspec test fails!
+              # if report[:screenshots]
+              #   report_string << " --screenshots"
+              # end
             end
 
             xcpretty_args.push reports.join(" ")

@@ -401,10 +401,10 @@ describe Fastlane do
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
-          + "--output ./build-dir/test-report.html " \
+          + "--output \"./build-dir/test-report.html\" " \
           + "--screenshots " \
           + "--report junit " \
-          + "--output ./build-dir/test-report.xml " \
+          + "--output \"./build-dir/test-report.xml\" " \
           + "--test"
         )
       end
