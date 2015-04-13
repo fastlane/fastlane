@@ -16,6 +16,20 @@ module Fastlane
           raise 'Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.'.red
         end
       end
+
+      def self.description
+        "Raises an exception if there are uncommited git changes"
+      end
+
+      def self.output
+        [
+          ['GIT_REPO_WAS_CLEAN_ON_START', 'Stores the fact that the git repo was clean at some point']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
+      end
     end
   end
 end

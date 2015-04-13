@@ -87,6 +87,24 @@ module Fastlane
             raise "Unexpected #{response.code} for `#{channel}'".red
         end
       end
+
+      def self.description
+        "Send a error/success message to HipChat"
+      end
+
+      def self.available_options
+        [
+          ['', 'Hipchat API Token', 'HIPCHAT_API_TOKEN'],
+          ['', 'Version of the Hipchat API. Must be 1 or 2', 'HIPCHAT_API_VERSION'],
+          ['message', 'The message to post on HipChat'],
+          ['channel', 'The room or @username'],
+          ['success', 'Is this a success message?'],
+        ]
+      end
+
+      def self.author
+        "jingx23"
+      end
     end
   end
 end

@@ -136,7 +136,7 @@ A detailed description about how ```fastlane``` stores your credentials is avail
 
 ## Special Thanks
 
-Thanks to all sponsors and contributors for extending and improving the `fastlane` suite:
+Thanks to all contributors for extending and improving the `fastlane` suite:
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Ash Furrow ([@ashfurrow](https://twitter.com/ashfurrow))

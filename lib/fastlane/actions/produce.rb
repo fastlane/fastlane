@@ -35,6 +35,42 @@ module Fastlane
           FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
         end
       end
+
+      def self.description
+        "Makes sure the given app identifier is created on the Dev Portal"
+      end
+
+      def details
+        [
+          'For more information about produce, visit its GitHub page:',
+          'https://github.com/KrauseFx/produce'
+        ].join(' ')
+      end
+
+      def self.available_options
+        [
+          ['produce_app_identifier', 'The App Identifier of your app', 'PRODUCE_APP_IDENTIFIER'],
+          ['produce_app_name', 'The name of your app', 'PRODUCE_APP_NAME'],
+          ['produce_language', 'The app\'s default language', 'PRODUCE_LANGUAGE'],
+          ['produce_version', 'The initial version of your app', 'PRODUCE_VERSION'],
+          ['produce_sku', 'The SKU number of the app if it gets created', 'PRODUCE_SKU'],
+          ['produce_team_name', 'optional: the name of your team', 'PRODUCE_TEAM_NAME'],
+          ['produce_team_id', 'optional: the ID of your team', 'PRODUCE_TEAM_ID'],
+          ['produce_username', 'optional: your Apple ID', 'PRODUCE_USERNAME'],
+          ['skip_itc', 'Skip the creation on iTunes Connect', 'PRODUCE_SKIP_ITC'],
+          ['skip_devcenter', 'Skip the creation on the Apple Developer Portal', 'PRODUCE_SKIP_DEVCENTER']
+        ]
+      end
+
+      def self.output
+        [
+          ['PRODUCE_APPLE_ID', 'The Apple ID of the newly created app. You probably need it for `deliver`']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
+      end
     end
   end
 end

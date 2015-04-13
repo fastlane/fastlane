@@ -83,6 +83,31 @@ module Fastlane
         Helper.log.error message.red if message
       end
       private_class_method :help_message
+
+      def self.description
+        "Upload a new build to DeployGate"
+      end
+
+      def self.available_options
+        [
+          ['api_token', 'DeployGate API Token'],
+          ['user', 'Target username or organization name'],
+          ['ipa', 'Path to your IPA file. Defaults to output of xcodebuild and ipa'],
+          ['message', 'Text for the uploaded build']
+        ]
+      end
+
+      def self.output
+        [
+          ['DEPLOYGATE_URL', 'URL of the newly uploaded build'],
+          ['DEPLOYGATE_REVISION', 'auto incremented revision number'],
+          ['DEPLOYGATE_APP_INFO', 'Contains app revision, bundle identifier, etc.']
+        ]
+      end
+
+      def self.author
+        "tnj"
+      end
     end
   end
 end
