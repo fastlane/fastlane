@@ -119,15 +119,32 @@ module Fastlane
         if testing
           if params[:reports]
             # New report options format
-            reports = params[:reports].map do |report|
-              unless report[:screenshots]
-                "--report #{report[:report]} --output #{report[:output]}"
-              else
-                "--report #{report[:report]} --output #{report[:output]} --screenshots"
+            reports = params[:reports].reduce("") do |arguments, report|
+
+              report_string = "--report #{report[:report]}"
+
+              if report[:output]
+                report_string << " --output \"#{report[:output]}\""
+              elsif report[:report] == 'junit'
+                report_string << " --output \"#{build_path}report/report.xml\""
+              elsif report[:report] == 'html'
+                report_string << " --output \"#{build_path}report/report.html\""
+              elsif report[:report] == 'json-compilation-database'
+                report_string << " --output \"#{build_path}report/report.json\""
               end
+
+              if report[:screenshots]
+                report_string << " --screenshots"
+              end
+
+              unless arguments == ""
+                arguments << " "
+              end
+
+              arguments << report_string
             end
 
-            xcpretty_args.push reports.join(" ")
+            xcpretty_args.push reports
 
           elsif params[:report_formats]
             # Test report file format

@@ -209,9 +209,15 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
   # Run tests in given simulator
   xctest(
     destination: "name=iPhone 5s,OS=8.1",
-    report_formats: [ "html", "junit" ],
-    report_path: "./build-dir/reports", # will use XCODE_BUILD_PATH/reports, if not provided
-    report_screenshots: true
+    reports: [{
+      report: 'html',
+      output: './build-dir/test-report.html',  # will use XCODE_BUILD_PATH/report, if output is not provided
+      screenshots: 1
+    },
+    {
+      report: 'junit',
+      output: './build-dir/test-report.xml'
+    }]
   )
 ```
 
