@@ -8,8 +8,8 @@ module Fastlane
       def self.run(params)
         params = params.first
         
-        puts "My Ruby Code!"
-        # puts "Parameter Path: #{params[:first]}"
+        Helper.log.info "My Ruby Code!"
+        # Helper.log.info "Parameter Path: #{params[:first]}"
         # sh "shellcommand ./path"
 
         # Actions.lane_context[SharedValues::[[NAME_UP]]_CUSTOM_VALUE] = "my_val"
