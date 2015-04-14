@@ -28,7 +28,7 @@ module Sigh
       destination = profile_path + profile_filename
 
       # If the directory doesn't exist, make it first
-      if !File.directory?(profile_path)
+      unless File.directory?(profile_path)
         FileUtils.mkdir_p(profile_path)
       end
 
