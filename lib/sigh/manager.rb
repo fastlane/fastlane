@@ -27,6 +27,11 @@ module Sigh
       profile_filename = ENV["SIGH_UDID"] + ".mobileprovision"
       destination = profile_path + profile_filename
 
+      # If the directory doesn't exist, make it first
+      if !File.directory?(profile_path)
+        FileUtils.mkdir_p(profile_path)
+      end
+
       # copy to Xcode provisioning profile directory
       FileUtils.copy profile, destination
 
