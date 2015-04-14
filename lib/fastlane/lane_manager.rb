@@ -61,12 +61,12 @@ module Fastlane
       duration = ((Time.now - start) / 60.0).round
 
       unless e
+        thread.join # to wait for the request to be finished
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
-        thread.join # to wait for the request to be finished
       else
         thread.join # to wait for the request to be finished
         Helper.log.fatal 'fastlane finished with errors'.red
