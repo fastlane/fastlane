@@ -1,3 +1,5 @@
+require 'fastlane/actions/actions_helper'
+
 module Fastlane
   class Action
     def self.run(params)
@@ -32,6 +34,11 @@ module Fastlane
 
     def self.author
       "KrauseFx"
+    end
+
+    # to allow a simple `sh` in the custom actions
+    def self.sh(command)
+      Fastlane::Actions.sh(command)
     end
   end
 end
