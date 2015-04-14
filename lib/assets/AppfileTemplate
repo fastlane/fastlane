@@ -5,3 +5,7 @@ apple_id "[[APPLE_ID]]" # Your Apple email address
 # team selection in case you're in multiple teams
 # team_name "Felix Krause"
 # team_id "Q2CBPJ58CA"
+
+
+# you can even provide different app identifiers, Apple IDs and team names per lane:
+# https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#the-appfile
