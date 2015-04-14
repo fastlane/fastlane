@@ -12,6 +12,10 @@ module Fastlane
       parse(content)
     end
 
+    def collector
+      @collector ||= ActionCollector.new
+    end
+
     def parse(data)
       @runner = Runner.new
 
@@ -60,6 +64,11 @@ module Fastlane
       end
     end
 
+    # Fastfile was finished executing
+    def did_finish
+      collector.did_finish
+    end
+
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
@@ -73,14 +82,21 @@ module Fastlane
       end
 
       if class_ref && class_ref.respond_to?(:run)
+        collector.did_launch_action(method_sym)
+
         step_name = class_ref.step_text rescue nil
         step_name = method_sym.to_s unless step_name
         Helper.log_alert("Step: " + step_name)
 
-        Dir.chdir('..') do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(method_sym) do
-            class_ref.run(arguments)
+        begin
+          Dir.chdir('..') do # go up from the fastlane folder, to the project folder
+            Actions.execute_action(method_sym) do
+              class_ref.run(arguments)
+            end
           end
+        rescue => ex
+          collector.did_raise_error(method_sym)
+          raise ex
         end
       else
         raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red

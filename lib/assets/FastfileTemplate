@@ -2,8 +2,12 @@
 # https://github.com/krausefx/fastlane#customise-the-fastfile
 
 # Change the syntax highlighting to Ruby
-
 # All lines starting with a # are ignored when running `fastlane`
+
+# By default, fastlane will send which actions are used
+# No personal data is shared, more information on https://github.com/fastlane/enhancer
+# Uncomment the following line to opt out
+# opt_out_usage
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version

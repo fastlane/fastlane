@@ -53,6 +53,8 @@ module Fastlane
         e = ex
       end
 
+      thread = ff.did_finish
+
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
 
@@ -64,7 +66,9 @@ module Fastlane
         else
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
+        thread.join # to wait for the request to be finished
       else
+        thread.join # to wait for the request to be finished
         Helper.log.fatal 'fastlane finished with errors'.red
         raise e
       end
