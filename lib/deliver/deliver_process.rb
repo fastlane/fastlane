@@ -178,7 +178,7 @@ module Deliver
     end
 
     def load_metadata_folder
-      # Fetch the inforamtion from the ./metadata folder if it exists
+      # Fetch the information from the ./metadata folder if it exists
       metadata_folder = './metadata'
       return unless File.exists?metadata_folder
 
