@@ -55,6 +55,20 @@ class FastlaneApplication
       end
     end
 
+    command :lanes do |c|
+      c.syntax = 'fastlane lanes'
+      c.description = 'Lists all available lanes'
+
+      c.action do |_args, _options|
+        ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+        puts "\nAvailable lanes:".green
+        ff.runner.available_lanes.each do |lane|
+          puts "- #{lane}"
+        end
+        puts "\nExecute using `fastlane [lane_name]`".yellow
+      end
+    end
+
     command :actions do |c|
       c.syntax = 'fastlane actions'
       c.description = 'Lists all available fastlane actions'
@@ -81,7 +95,7 @@ class FastlaneApplication
 end
 
 begin
-  FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+  # FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
   FastlaneApplication.new.run
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
