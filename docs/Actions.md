@@ -530,7 +530,7 @@ reset_git_repo(
 ## Notifications
 
 ### [Slack](http://slack.com)
-Send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
+Create an Incoming WebHook and export this as `SLACK_URL`. Can send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
 
 ```ruby
 slack(
