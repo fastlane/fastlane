@@ -49,8 +49,8 @@ module Fastlane
           if Helper.test?
             version_array = [1,0,0]
           else
-            current_version= `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
-            raise 'Your current version does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
+            current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
+            raise 'Your current version (#{current_version}) does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
             #Check if CFBundleShortVersionString is the same for each occurrence
             allBundles = `#{command_prefix} agvtool what-marketing-version -terse`.split("\n")
             allBundles.each do |bundle|
