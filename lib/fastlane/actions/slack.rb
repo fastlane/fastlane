@@ -16,6 +16,16 @@ module Fastlane
         nil
       end
 
+      # As there is a text limit in the notifications, we are 
+      # usually interested in the last part of the message
+      # e.g. for tests
+      def self.trim_message(message)
+        # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
+        start_index = [message.length - 7000, 0].max
+        message = message[start_index..-1]
+        message
+      end
+
       def self.run(params)
         options = { message: '',
                     success: true,
@@ -26,7 +36,7 @@ module Fastlane
         require 'slack-notifier'
 
         color = (options[:success] ? 'good' : 'danger')
-        options[:message] = options[:message].to_s
+        options[:message] = self.trim_message(options[:message].to_s || '')
 
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
