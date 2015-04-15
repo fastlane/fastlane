@@ -19,7 +19,7 @@ describe Fastlane do
         expect(result).to eq(['-s TestScheme', '-w Test.xcworkspace'])
       end
 
-      it "works with object argument without clean and archive and verbose" do
+      it "works with object argument without clean and archive" do
 
         result = Fastlane::FastFile.new.parse("lane :test do 
           ipa ({
@@ -37,7 +37,7 @@ describe Fastlane do
         expect(result.size).to eq(4)
       end
 
-      it "works with object argument with clean and archive and verbose" do
+      it "works with object argument with clean and archive" do
 
         result = Fastlane::FastFile.new.parse("lane :test do 
           ipa ({
@@ -50,12 +50,11 @@ describe Fastlane do
             destination: nil,
             embed: nil,
             identity: nil,
-            ipa: 'JoshIsAwesome.ipa',
-            verbose: nil
+            ipa: 'JoshIsAwesome.ipa'
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(7)
+        expect(result.size).to eq(6)
       end
 
       it "works with object argument with all" do
@@ -73,12 +72,11 @@ describe Fastlane do
             identity: 'bourne',
             sdk: '10.0',
             ipa: 'JoshIsAwesome.ipa',
-            verbose: nil,
             xcargs: 'MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1',
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(13)
+        expect(result.size).to eq(12)
         expect(result).to include('-w "Test.xcworkspace"')
         expect(result).to include('-p "Test.xcproject"')
         expect(result).to include('-c "Release"')
@@ -90,7 +88,6 @@ describe Fastlane do
         expect(result).to include('-i "bourne"')
         expect(result).to include('--sdk "10.0"')
         expect(result).to include('--ipa "JoshIsAwesome.ipa"')
-        expect(result).to include('--verbose')
         expect(result).to include('--xcargs "MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1"')
       end
 
@@ -129,13 +126,12 @@ describe Fastlane do
             identity: 'bourne',
             sdk: '10.0',
             ipa: 'JoshIsAwesome.ipa',
-            verbose: nil,
             hehehe: 'hahah'
           })
         end").runner.execute(:test)
 
         expect(result).to include("-m \"#{ENV['SIGH_PROFILE_PATH']}\"")
-        expect(result.size).to eq(12)
+        expect(result.size).to eq(11)
 
         ENV["SIGH_PROFILE_PATH"] = nil
       end
