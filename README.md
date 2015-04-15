@@ -114,6 +114,19 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/KrauseFx/fastlane/blob/master/docs).
 
+## Available commands
+
+Usually you'll use fastlane by triggering individual lanes:
+
+    fastlane [lane_name]
+
+#### Other commands
+
+- `fastlane lanes`: Lists all available lanes
+- `fastlane actions`: List all available `fastlane` actions
+- `fastlane action [action_name]`: Shows a more detailed description of an action with its available parameters
+- `fastlane new_action`: Create a new action (integration) for fastlane  
+
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 `fastlane` is designed to make your life easier by bringing together the `fastlane` suite of tools under one roof. 
