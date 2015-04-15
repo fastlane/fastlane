@@ -1,8 +1,15 @@
 module Fastlane
   class DocsGenerator
     def self.run(output_path, ff)
-      output = "fastlane actions\n"
+      output = "fastlane documentation\n"
       output += "================\n"
+
+      output += "# Installation\n"
+      output += "```\n"
+      output += "sudo gem install fastlane\n"
+      output += "```\n\n"
+
+      output += "# Available Actions\n"
       
       ff.runner.description_blocks.each do |lane, description|
         output += "## #{lane}\n\n"
