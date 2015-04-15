@@ -31,7 +31,6 @@ module Fastlane
       identity: '-i',
       sdk: '--sdk',
       ipa: '--ipa',
-      verbose: '--verbose',
       xcargs: '--xcargs',
     }
 
@@ -72,7 +71,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "ipa build #{build_args}"
+        command = "set -o pipefail && ipa build #{build_args} --verbose | xcpretty"
         Helper.log.debug command
         Actions.sh command
 
@@ -88,8 +87,8 @@ module Fastlane
       end
 
       def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive or :verbose
-        params = params.delete_if { |k, v| (k != :clean && k != :archive && k != :verbose) && v.nil? }
+        # Remove nil value params unless :clean or :archive
+        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
 
         params = fill_in_default_values(params)
 
@@ -134,21 +133,20 @@ module Fastlane
       end
 
       def self.available_options
-        [
-          ['workspace', 'Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)'],
-          ['project', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory'],
-          ['configuration', 'Configuration used to build'],
-          ['scheme', 'Scheme used to build app'],
-          ['clean', 'use an extra XCCONFIG file to build the app'],
-          ['archive', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'],
-          ['destination', 'Clean project before building'],
-          ['embed', 'Archive project after building'],
-          ['identity', 'Destination. Defaults to current directory'],
-          ['sdk', 'Sign .ipa file with .mobileprovision'],
-          ['ipa', 'Identity to be used along with --embed'],
-          ['verbose', 'use SDK as the name or path of the base SDK when building the project'],
-          ['xcargs', 'specify the name of the .ipa file to generate (including file extension)']
-        ]
+        # [
+          # ['workspace', 'Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)'],
+          # ['project', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory'],
+          # ['configuration', 'Configuration used to build'],
+          # ['scheme', 'Scheme used to build app'],
+          # ['clean', 'use an extra XCCONFIG file to build the app'],
+          # ['archive', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'],
+          # ['destination', 'Clean project before building'],
+          # ['embed', 'Archive project after building'],
+          # ['identity', 'Destination. Defaults to current directory'],
+          # ['sdk', 'Sign .ipa file with .mobileprovision'],
+          # ['ipa', 'Identity to be used along with --embed'],
+          # ['xcargs', 'specify the name of the .ipa file to generate (including file extension)']
+        # ]
       end
 
       def self.output
