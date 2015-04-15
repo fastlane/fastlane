@@ -22,6 +22,9 @@ module Fastlane
           when Fixnum
             custom_number = first_param
             folder = '.'
+          when String
+            custom_number = first_param
+            folder = '.'
           when Hash
             custom_number = first_param[:build_number]
             folder = first_param[:xcodeproj] ? File.join('.', first_param[:xcodeproj], '..') : '.'
