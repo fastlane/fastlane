@@ -23,7 +23,9 @@ module Fastlane
                                    is_beta_ipa: beta,
                                    skip_deploy: skip_deploy)
 
-            Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV['DELIVER_IPA_PATH']) # deliver will store it in the environment
+            if ENV['DELIVER_IPA_PATH'] # since IPA upload is optional
+              Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV['DELIVER_IPA_PATH']) # deliver will store it in the environment
+            end
           end
         ensure
           FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
