@@ -69,6 +69,24 @@ class FastlaneApplication
       end
     end
 
+    command :docs do |c|
+      c.syntax = 'fastlane docs'
+      c.description = 'Generate a markdown based documentation based on the Fastfile'
+      c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
+
+      c.action do |_args, _options|
+        path = File.join(Fastlane::FastlaneFolder.path, 'README.md')
+        if File.exists?path and not _options.force
+          return unless agree('Found existing ./fastlane/README.md. Do you want to overwrite it? (y/n)', true)
+        end
+
+        ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+
+        require 'fastlane/docs_generator'
+        Fastlane::DocsGenerator.run(path, ff)
+      end
+    end
+
     command :actions do |c|
       c.syntax = 'fastlane actions'
       c.description = 'Lists all available fastlane actions'

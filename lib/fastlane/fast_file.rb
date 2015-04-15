@@ -16,6 +16,10 @@ module Fastlane
       @collector ||= ActionCollector.new
     end
 
+    def desc_collection
+      @desc_collection ||= []
+    end
+
     def parse(data)
       @runner = Runner.new
 
@@ -27,7 +31,9 @@ module Fastlane
     end
 
     def lane(key, &block)
-      @runner.set_block(key, block)
+      desc = desc_collection.join("\n\n")
+      @runner.set_block(key, block, desc)
+      @desc_collection = nil # reset again
     end
 
     def before_all(&block)
@@ -67,6 +73,10 @@ module Fastlane
     # Fastfile was finished executing
     def did_finish
       collector.did_finish
+    end
+
+    def desc(string)
+      desc_collection << string
     end
 
     def method_missing(method_sym, *arguments, &_block)

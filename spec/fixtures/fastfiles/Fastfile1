@@ -6,6 +6,8 @@ lane :test do
   File.write('/tmp/fastlane/test', '1')
 end
 
+desc "My Deploy"
+desc "description"
 lane :deploy do
   File.write('/tmp/fastlane/deploy', '1')
 end
