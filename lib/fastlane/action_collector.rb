@@ -19,6 +19,7 @@ module Fastlane
           
           unless did_show_message?
             Helper.log.debug("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
+            Helper.log.debug("No personal/sensitive data is sent. Only sharing the following:")
             Helper.log.debug(launches)
             Helper.log.debug(@error) if @error
             Helper.log.debug("This information is used to fix failing actions and improve integrations that are often used.")
