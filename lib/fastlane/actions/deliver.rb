@@ -41,6 +41,7 @@ module Fastlane
           ['force', 'Set to true to skip PDF verification'],
           ['beta', 'Upload a new version to TestFlight'],
           ['skip_deploy', 'Skip the submission of the app - it will only be uploaded'],
+          ['', 'Specify a path to the directory containing the Deliverfile', 'DELIVERFILE_PATH']
         ]
       end
 
