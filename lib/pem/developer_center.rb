@@ -26,7 +26,8 @@ module PEM
         end
 
         if has_actual_cert
-          Helper.log.info "You have valid certificate already. No need to create a new one."
+          Helper.log.info "You already have a push certificate, which is active for more than 2 more weeks. No need to create a new one"
+          Helper.log.info "If you still want to create a new one, use the --force option when running PEM."
           false
         else
           Helper.log.warn "Creating push certificate for app '#{@app_identifier}'."
