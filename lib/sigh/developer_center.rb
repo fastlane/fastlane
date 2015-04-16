@@ -58,9 +58,9 @@ module Sigh
 
           profile_name = Sigh.config[:provisioning_name]
 
-          certificate_count = certs['provisioningProfiles'].count
+          profile_count = certs['provisioningProfiles'].count
 
-          Helper.log.info "Checking if profile is available. (#{certificate_count} profiles found on page #{page_index})"
+          Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
           required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
           certs['provisioningProfiles'].each do |current_cert|
             next unless required_cert_types.include?(current_cert['type'])
@@ -92,7 +92,7 @@ module Sigh
               break
             end
 
-            if page_size == certificate_count
+            if page_size == profile_count
               page_index += 1
             elsif
               has_all_profiles = true
