@@ -4,7 +4,7 @@ module PEM
   class DeveloperCenter < FastlaneCore::DeveloperCenter
     APP_IDS_URL = "https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action"
 
-    
+
     # This method will enable push for the given app
     # and download the cer file in any case, no matter if it existed before or not
     # @return the path to the push file
@@ -25,13 +25,29 @@ module PEM
           sleep 3 # this takes some time
         end
 
-        Helper.log.warn "Creating push certificate for app '#{@app_identifier}'."
-        create_push_for_app
+        if has_actual_cert
+          Helper.log.info "You have valid certificate already. No need to create a new one."
+          false
+        else
+          Helper.log.warn "Creating push certificate for app '#{@app_identifier}'."
+          create_push_for_app
+        end
       rescue => ex
         error_occured(ex)
       end
     end
 
+    def has_actual_cert
+      apps = all(:xpath, "//div[@class = 'certificate']")
+      cert_type = PEM.config[:development] ?  'Development' : 'Production'
+      cert_section = apps.select { |c| c.text.include? cert_type }
+
+      unless cert_section.empty?
+        data_s = cert_section.last.all('dd').last.text
+        data = Date.parse(data_s)
+        data - Time.now.to_date > 14  # valid for more than 2 weeks
+      end
+    end
 
     private
       def open_app_page
@@ -98,20 +114,20 @@ module PEM
         url = download_button['href']
         url = [host, url].join('')
         Helper.log.info "Downloading URL: '#{url}'"
-        
+
         cookie_string = page.driver.cookies.collect { |key, cookie| "#{cookie.name}=#{cookie.value}" }.join(";")
-        
+
         data = open(url, {'Cookie' => cookie_string}).read
 
         raise "Something went wrong when downloading the certificate" unless data
 
         path = "#{TMP_FOLDER}aps_#{certificate_type}_#{@app_identifier}.cer"
         dataWritten = File.write(path, data)
-        
+
         if dataWritten == 0
           raise "Can't write to #{TMP_FOLDER}"
         end
-        
+
         Helper.log.info "Successfully downloaded latest .cer file to '#{path}'".green
         return path
       end
