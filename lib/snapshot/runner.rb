@@ -203,6 +203,7 @@ module Snapshot
     def generate_test_command(device, language)
       is_ipad = (device.downcase.include?'ipad')
       script_path = SnapshotConfig.shared_instance.js_file(is_ipad)
+      custom_run_args = SnapshotConfig.shared_instance.custom_run_args || ENV["SNAPSHOT_CUSTOM_RUN_ARGS"] || ''
 
       [
         "instruments",
@@ -213,7 +214,8 @@ module Snapshot
         "-e UIARESULTSPATH '#{TRACE_DIR}'",
         "-e UIASCRIPT '#{script_path}'",
         "-AppleLanguages '(#{language})'",
-        "-AppleLocale '#{language}'" 
+        "-AppleLocale '#{language}'",
+        custom_run_args,
       ].join(' ')
     end
   end
