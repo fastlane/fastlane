@@ -13,21 +13,23 @@ module PEM
       dev = PEM::DeveloperCenter.new
 
       self.cert_file = dev.fetch_cer_file
-      self.rsa_file = File.join(TMP_FOLDER, 'private_key.key')
-      self.certificate_type = (PEM.config[:development] ? 'development' : 'production')
-      self.pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
-      self.passphrase = ''
+      if self.cert_file
+        self.rsa_file = File.join(TMP_FOLDER, 'private_key.key')
+        self.certificate_type = (PEM.config[:development] ? 'development' : 'production')
+        self.pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
+        self.passphrase = ''
 
-      File.write(pem_file, pem_certificate)
+        File.write(pem_file, pem_certificate)
 
-      # Generate p12 file as well
-      if PEM.config[:generate_p12]
-        output = "#{certificate_type}_#{PEM.config[:app_identifier]}.p12"
-        File.write(output, p12_certificate.to_der)
-        puts output.green
+        # Generate p12 file as well
+        if PEM.config[:generate_p12]
+          output = "#{certificate_type}_#{PEM.config[:app_identifier]}.p12"
+          File.write(output, p12_certificate.to_der)
+          puts output.green
+        end
+
+        return pem_file, rsa_file
       end
-
-      return pem_file, rsa_file
     end
 
     def private_key
