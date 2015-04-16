@@ -364,6 +364,29 @@ sigh({
 })
 ```
 
+### [PEM](https://github.com/KrauseFx/PEM)
+
+This will generate a new push profile if necessary (the old one is about to expire).
+
+Use it like this:
+
+```ruby
+pem
+```
+
+```ruby
+pem(
+  force: true, # create a new profile, even if the old one is still valid
+  app_identifier: 'net.sunapps.9', # optional app identifier
+  new_profile: Proc.new do |profile_path| # this block gets called when a new profile was generated
+    puts profile_path # the absolute path to the new PEM file
+    # insert the code to upload the PEM file to the server
+  end
+)
+```
+
+Use the `fastlane action pem` command to view all available options.
+
 ### [cert](https://github.com/KrauseFx/cert)
 
 The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/KrauseFx/cert).
