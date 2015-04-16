@@ -159,7 +159,7 @@ Delete all expired provisioning profiles
 
 Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
-    sigh manage -p "iOS\ {0,1}Team Provisioning Profile:"
+    sigh manage -p "iOS\ ?Team Provisioning Profile:"
 
 ## Environment Variables
 In case you prefer environment variables:

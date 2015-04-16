@@ -54,7 +54,7 @@ class SighApplication
       c.option '-e', '--clean_expired', 'Remove all expired provisioning profiles.'
 
       c.option '-p', '--clean_pattern STRING', String, 'Remove any provisioning profiles that matches the regular expression.'
-      c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'sigh manage -p "iOS\ {0,1}Team Provisioning Profile"'
+      c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'sigh manage -p "iOS\ ?Team Provisioning Profile"'
 
       c.action do |args, options|
         Sigh::Manager.new.run(options, args)
