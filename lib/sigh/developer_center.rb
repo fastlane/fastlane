@@ -48,41 +48,55 @@ module Sigh
         @list_certs_url = wait_for_variable('profileDataURL')
         # list_certs_url will look like this: "https://developer.apple.com/services-account/..../account/ios/profile/listProvisioningProfiles.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=id&userLocale=en_US&teamId=xy&includeInactiveProfiles=true&onlyCountLists=true"
         Helper.log.info "Fetching all available provisioning profiles..."
+        
+        has_all_profiles = false
+        page_index = 1
+        page_size = 500
 
-        certs = post_ajax(@list_certs_url, "{pageNumber: 1, pageSize: 500, sort: 'name%3dasc'}")
+        until has_all_profiles do
+          certs = post_ajax(@list_certs_url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc'}")
 
-        profile_name = Sigh.config[:provisioning_name]
+          profile_name = Sigh.config[:provisioning_name]
 
-        Helper.log.info "Checking if profile is available. (#{certs['provisioningProfiles'].count} profiles found)"
-        required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
-        certs['provisioningProfiles'].each do |current_cert|
-          next unless required_cert_types.include?(current_cert['type'])
-          
-          details = profile_details(current_cert['provisioningProfileId'])
+          profile_count = certs['provisioningProfiles'].count
 
-          if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
+          Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
+          required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
+          certs['provisioningProfiles'].each do |current_cert|
+            next unless required_cert_types.include?(current_cert['type'])
+            
+            details = profile_details(current_cert['provisioningProfileId'])
 
-            next if profile_name && details['provisioningProfile']['name'] != profile_name
+            if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
 
-            # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-            next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
+              next if profile_name && details['provisioningProfile']['name'] != profile_name
 
-            # that's an App Store profile ... skipping it
-            next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
+              # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
+              next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
 
-            # We found the correct certificate
-            if force && @type != DEVELOPMENT
-              provisioningProfileId = current_cert['provisioningProfileId']
-              renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
-              return maintain_app_certificate(false) # recursive
-            elsif current_cert['status'] == 'Active'
-              return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
-            elsif ['Expired', 'Invalid'].include? current_cert['status']
-              renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
-              return maintain_app_certificate(false) # recursive
+              # that's an App Store profile ... skipping it
+              next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
+
+              # We found the correct certificate
+              if force && @type != DEVELOPMENT
+                provisioningProfileId = current_cert['provisioningProfileId']
+                renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
+                return maintain_app_certificate(false) # recursive
+              elsif current_cert['status'] == 'Active'
+                return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
+              elsif ['Expired', 'Invalid'].include? current_cert['status']
+                renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
+                return maintain_app_certificate(false) # recursive
+              end
+
+              break
             end
+          end
 
-            break
+          if page_size == profile_count
+            page_index += 1
+          else
+            has_all_profiles = true
           end
         end
 
