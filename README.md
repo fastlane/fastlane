@@ -242,6 +242,13 @@ Here is an example for adding a preprocessor macro `SNAPSHOT` and  a custom buil
 custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' SNAPSHOT_ENABLE = YES"
 ```
 
+### Custom Args for the run command
+Add a ```custom_run_args``` line to your ```Snapfile``` to add custom arguments to the run command (i.e. the invocation of `instruments`. You can use this to set the value of a specific `NSUserDefaults` key, for example
+
+```ruby
+custom_run_args "-DidViewOnboarding YES"
+```
+
 ### Custom Build Command
 If for some reason, the default build command does not work for your project, you can pass your own build script. The script will be executed **once** before the tests are being run.
 
