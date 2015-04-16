@@ -92,7 +92,6 @@ module Deliver
           folder = File.join(path, "metadata", language)
           FileUtils.mkdir_p(folder)
           value.each do |key, content|
-            next if key == :version_whats_new
             content = content.join("\n") if key == :keywords
             File.write(File.join(folder, "#{key}.txt"), content)
           end
