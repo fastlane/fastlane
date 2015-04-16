@@ -4,12 +4,7 @@ module Fastlane
       SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
     end
 
-    class SnapshotAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class SnapshotAction < Action
       def self.run(params)
         clean = true
         clean = false if params.include?(:noclean)
@@ -22,14 +17,35 @@ module Fastlane
 
         require 'snapshot'
 
-        Dir.chdir(FastlaneFolder.path) do
-          Snapshot::SnapshotConfig.shared_instance
-          Snapshot::Runner.new.work(clean: clean)
+        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
 
-          results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+        begin
+          Dir.chdir(FastlaneFolder.path) do
+            Snapshot::SnapshotConfig.shared_instance
+            Snapshot::Runner.new.work(clean: clean)
 
-          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
+            results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+
+            Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
+          end
+        ensure
+          FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
         end
+      end
+
+      def self.description
+        "Generate new localised screenshots on multiple devices"
+      end
+
+      def self.available_options
+        [
+          ['noclean', 'Skips the clean process when building the app'],
+          ['verbose', 'Print out the UI Automation output']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

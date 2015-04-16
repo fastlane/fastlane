@@ -4,7 +4,7 @@ module Fastlane
       VERSION_NUMBER = :VERSION_NUMBER
     end
 
-    class IncrementVersionNumberAction
+    class IncrementVersionNumberAction < Action
       require 'shellwords'
 
       def self.is_supported?(type)
@@ -53,8 +53,8 @@ module Fastlane
           if Helper.test?
             version_array = [1,0,0]
           else
-            current_version= `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
-            raise 'Your current version does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
+            current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
+            raise 'Your current version (#{current_version}) does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
             #Check if CFBundleShortVersionString is the same for each occurrence
             allBundles = `#{command_prefix} agvtool what-marketing-version -terse`.split("\n")
             allBundles.each do |bundle|
@@ -96,6 +96,35 @@ module Fastlane
           Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
           raise ex
         end
+      end
+
+      def self.description
+        "Increment the version number of your project"
+      end
+
+      def self.details
+        [
+          "This action will increment the version number. ", 
+          "You first have to set up your Xcode project, if you haven't done it already:",
+          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
+        ].join(' ')
+      end
+
+      def self.available_options
+        [
+          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
+          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+        ]
+      end
+
+      def self.output
+        [
+          ['VERSION_NUMBER', 'The new version number']
+        ]
+      end
+
+      def self.author
+        "serluca"
       end
     end
   end

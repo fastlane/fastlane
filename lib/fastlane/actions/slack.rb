@@ -1,21 +1,6 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
-
-    class SlackAction
-      
-      def self.is_supported?(type)
-        true
-      end
-
-      def self.git_branch
-        return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-        s = `git rev-parse --abbrev-ref HEAD`
-        return s if s.to_s.length > 0
-        nil
-      end
-
+    class SlackAction < Action
       def self.git_author
         s = `git log --name-status HEAD^..HEAD`
         s = s.match(/Author:.*<(.*)>/)[1]
@@ -31,6 +16,16 @@ module Fastlane
         nil
       end
 
+      # As there is a text limit in the notifications, we are 
+      # usually interested in the last part of the message
+      # e.g. for tests
+      def self.trim_message(message)
+        # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
+        start_index = [message.length - 7000, 0].max
+        message = message[start_index..-1]
+        message
+      end
+
       def self.run(params)
         options = { message: '',
                     success: true,
@@ -41,7 +36,7 @@ module Fastlane
         require 'slack-notifier'
 
         color = (options[:success] ? 'good' : 'danger')
-        options[:message] = options[:message].to_s
+        options[:message] = self.trim_message(options[:message].to_s || '')
 
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
@@ -96,10 +91,10 @@ module Fastlane
         end
 
         # git branch
-        if git_branch && should_add_payload[:git_branch]
+        if Actions.git_branch && should_add_payload[:git_branch]
           slack_attachment[:fields] << {
             title: 'Git Branch',
-            value: git_branch,
+            value: Actions.git_branch,
             short: true
           }
         end
@@ -136,6 +131,24 @@ module Fastlane
         else
           Helper.log.info 'Successfully sent Slack notification'.green
         end
+      end
+
+      def self.description
+        "Send a success/error message to your Slack group"
+      end
+
+      def self.available_options
+        [
+          ['message', 'The message that should be displayed on Slack. This supports the standard Slack markup language'],
+          ['channel', '#channel or @username'],
+          ['success', 'Success or error?'],
+          ['payload', 'Add additional information to this post. payload must be a hash containg any key with any value'],
+          ['default_payloads', 'Remove some of the default payloads. More information about the available payloads GitHub']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

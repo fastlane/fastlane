@@ -26,7 +26,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             xcode_select \"#{invalid_path}\"
           end").runner.execute(:test)
-        }.to raise_error("Nonexistent path provided".red)
+        }.to raise_error("Path '/path/to/nonexistent/dir' doesn't exist".red)
       end
 
       it "sets the DEVELOPER_DIR environment variable" do

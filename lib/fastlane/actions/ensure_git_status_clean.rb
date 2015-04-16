@@ -5,12 +5,7 @@ module Fastlane
     end
 
     # Raises an exception and stop the lane execution if the repo is not in a clean state
-    class EnsureGitStatusCleanAction
-
-      def self.is_supported?(type)
-        true
-      end
-
+    class EnsureGitStatusCleanAction < Action
       def self.run(_params)
         repo_clean = `git status --porcelain`.empty?
 
@@ -20,6 +15,20 @@ module Fastlane
         else
           raise 'Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.'.red
         end
+      end
+
+      def self.description
+        "Raises an exception if there are uncommited git changes"
+      end
+
+      def self.output
+        [
+          ['GIT_REPO_WAS_CLEAN_ON_START', 'Stores the fact that the git repo was clean at some point']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
       end
     end
   end

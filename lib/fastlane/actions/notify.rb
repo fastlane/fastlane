@@ -1,16 +1,19 @@
 module Fastlane
   module Actions
-    class NotifyAction
-      
-      def self.is_supported?(type)
-        true
-      end
-
+    class NotifyAction < Action
       def self.run(params)
         require 'terminal-notifier'
 
         text = params.join(' ')
         TerminalNotifier.notify(text, title: 'fastlane')
+      end
+
+      def self.description
+        "Shows a Mac OS X notification"
+      end
+
+      def author
+        "champo"
       end
     end
   end

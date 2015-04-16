@@ -4,7 +4,7 @@ module Fastlane
       BUILD_NUMBER = :BUILD_NUMBER
     end
 
-    class IncrementBuildNumberAction
+    class IncrementBuildNumberAction < Action
       require 'shellwords'
 
       def self.is_supported?(type)
@@ -24,6 +24,9 @@ module Fastlane
             custom_number = nil
             folder = '.'
           when Fixnum
+            custom_number = first_param
+            folder = '.'
+          when String
             custom_number = first_param
             folder = '.'
           when Hash
@@ -58,6 +61,27 @@ module Fastlane
           Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
           raise ex
         end
+      end
+
+      def self.description
+        "Increment the build number of your project"
+      end
+
+      def self.available_options
+        [
+          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
+          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+        ]
+      end
+
+      def self.output
+        [
+          ['BUILD_NUMBER', 'The new build number']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

@@ -5,19 +5,19 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    # -w, --workspace WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)
-    # -p, --project PROJECT Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)
+    # -w, --workspace                   WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)
+    # -p, --project PROJECT             Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)
     # -c, --configuration CONFIGURATION Configuration used to build
-    # -s, --scheme SCHEME  Scheme used to build app
-    # --xcconfig XCCONFIG  use an extra XCCONFIG file to build the app
-    # --xcargs XCARGS      pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.
-    # --[no-]clean         Clean project before building
-    # --[no-]archive       Archive project after building
-    # -d, --destination DESTINATION Destination. Defaults to current directory
-    # -m, --embed PROVISION Sign .ipa file with .mobileprovision
-    # -i, --identity IDENTITY Identity to be used along with --embed
-    # --sdk SDK            use SDK as the name or path of the base SDK when building the project
-    # --ipa IPA            specify the name of the .ipa file to generate (including file extension)
+    # -s, --scheme SCHEME               Scheme used to build app
+    # --xcconfig XCCONFIG               use an extra XCCONFIG file to build the app
+    # --xcargs XCARGS                   pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.
+    # --[no-]clean                      Clean project before building
+    # --[no-]archive                    Archive project after building
+    # -d, --destination DESTINATION     Destination. Defaults to current directory
+    # -m, --embed PROVISION             Sign .ipa file with .mobileprovision
+    # -i, --identity IDENTITY           Identity to be used along with --embed
+    # --sdk SDK                         use SDK as the name or path of the base SDK when building the project
+    # --ipa IPA                         specify the name of the .ipa file to generate (including file extension)
 
     ARGS_MAP = {
       workspace: '-w',
@@ -31,16 +31,10 @@ module Fastlane
       identity: '-i',
       sdk: '--sdk',
       ipa: '--ipa',
-      verbose: '--verbose',
       xcargs: '--xcargs',
     }
 
-    class IpaAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class IpaAction < Action
       def self.run(params)
         # The args we will build with
         build_args = nil
@@ -77,7 +71,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "ipa build #{build_args}"
+        command = "set -o pipefail && ipa build #{build_args} --verbose | xcpretty"
         Helper.log.debug command
         Actions.sh command
 
@@ -93,8 +87,8 @@ module Fastlane
       end
 
       def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive or :verbose
-        params = params.delete_if { |k, v| (k != :clean && k != :archive && k != :verbose) && v.nil? }
+        # Remove nil value params unless :clean or :archive
+        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
 
         params = fill_in_default_values(params)
 
@@ -126,6 +120,44 @@ module Fastlane
       def self.find_dsym_file(dir)
         # Finds last modified .dSYM.zip in the destination directory
         Dir[File.join(dir, '*.dSYM.zip')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+      end
+
+      def self.description
+        "Easily build and sign your app using shenzhen"
+      end
+
+      def self.details
+        [
+          "More information on the shenzhen project page: https://github.com/nomad/shenzhen"
+        ].join(' ')
+      end
+
+      def self.available_options
+        # [
+          # ['workspace', 'Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)'],
+          # ['project', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory'],
+          # ['configuration', 'Configuration used to build'],
+          # ['scheme', 'Scheme used to build app'],
+          # ['clean', 'use an extra XCCONFIG file to build the app'],
+          # ['archive', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'],
+          # ['destination', 'Clean project before building'],
+          # ['embed', 'Archive project after building'],
+          # ['identity', 'Destination. Defaults to current directory'],
+          # ['sdk', 'Sign .ipa file with .mobileprovision'],
+          # ['ipa', 'Identity to be used along with --embed'],
+          # ['xcargs', 'specify the name of the .ipa file to generate (including file extension)']
+        # ]
+      end
+
+      def self.output
+        [
+          ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
+          ['DSYM_OUTPUT_PATH', 'The path to the dsym file']
+        ]
+      end
+
+      def self.author
+        "joshdholtz"
       end
     end
   end

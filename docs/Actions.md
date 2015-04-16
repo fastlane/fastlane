@@ -36,7 +36,20 @@ You can run any xctool action. This will require having [xctool](https://github.
 xctool :test
 ```
 
-It is recommended to have the `xctool` configuration stored in a [`xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
+If you prefer to have the build configuration stored in the `Fastfile`:
+
+```ruby
+xctool :test, [
+      "--workspace", "'AwesomeApp.xcworkspace'",
+      "--scheme", "'Schema Name'",
+      "--configuration", "Debug",
+      "--sdk", "iphonesimulator",
+      "--arch", "i386"
+    ].join(" ")
+```
+
 
 ### [snapshot](https://github.com/KrauseFx/snapshot)
 
@@ -196,9 +209,15 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
   # Run tests in given simulator
   xctest(
     destination: "name=iPhone 5s,OS=8.1",
-    report_formats: [ "html", "junit" ],
-    report_path: "./build-dir/reports", # will use XCODE_BUILD_PATH/reports, if not provided
-    report_screenshots: true
+    reports: [{
+      report: 'html',
+      output: './build-dir/test-report.html',  # will use XCODE_BUILD_PATH/report, if output is not provided
+      screenshots: 1
+    },
+    {
+      report: 'junit',
+      output: './build-dir/test-report.xml'
+    }]
   )
 ```
 
@@ -345,6 +364,29 @@ sigh({
 })
 ```
 
+### [PEM](https://github.com/KrauseFx/PEM)
+
+This will generate a new push profile if necessary (the old one is about to expire).
+
+Use it like this:
+
+```ruby
+pem
+```
+
+```ruby
+pem(
+  force: true, # create a new profile, even if the old one is still valid
+  app_identifier: 'net.sunapps.9', # optional app identifier
+  new_profile: Proc.new do |profile_path| # this block gets called when a new profile was generated
+    puts profile_path # the absolute path to the new PEM file
+    # insert the code to upload the PEM file to the server
+  end
+)
+```
+
+Use the `fastlane action pem` command to view all available options.
+
 ### [cert](https://github.com/KrauseFx/cert)
 
 The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/KrauseFx/cert).
@@ -385,9 +427,9 @@ This will register iOS devices with the Developer Portal so that you can include
 
 This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
 
-If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from ENV['CUPERTINO_TEAM_ID'], or ENV['FASTLANE_TEAM_ID'], in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
+If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from `ENV['CUPERTINO_TEAM_ID']`, or `ENV['FASTLANE_TEAM_ID']`, in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
 
-The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable ENV['CUPERTINO_USERNAME'].
+The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['CUPERTINO_USERNAME']`.
 
 ```ruby
 # Simply provide a list of devices as a Hash
@@ -499,12 +541,19 @@ Also useful for putting in your `error` block, to bring things back to a pristin
 ```ruby
 reset_git_repo
 reset_git_repo :force # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+
+# You can also specify a list of files that should be resetted.
+reset_git_repo(
+  force: true,
+  files: [
+    "./file.txt"
+  ])
 ```
 
 ## Notifications
 
 ### [Slack](http://slack.com)
-Send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
+Create an Incoming WebHook and export this as `SLACK_URL`. Can send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
 
 ```ruby
 slack(

@@ -7,7 +7,7 @@ module Fastlane
     # xcodebuild man page:
     # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html
 
-    class XcodebuildAction
+    class XcodebuildAction < Action
       ARGS_MAP = {
         # actions
         analyze: "analyze",
@@ -121,8 +121,37 @@ module Fastlane
         xcpretty_args = [ "--color" ]
 
         if testing
-          # Test report file format
-          if params[:report_formats]
+          if params[:reports]
+            # New report options format
+            reports = params[:reports].reduce("") do |arguments, report|
+
+              report_string = "--report #{report[:report]}"
+
+              if report[:output]
+                report_string << " --output \"#{report[:output]}\""
+              elsif report[:report] == 'junit'
+                report_string << " --output \"#{build_path}report/report.xml\""
+              elsif report[:report] == 'html'
+                report_string << " --output \"#{build_path}report/report.html\""
+              elsif report[:report] == 'json-compilation-database'
+                report_string << " --output \"#{build_path}report/report.json\""
+              end
+
+              if report[:screenshots]
+                report_string << " --screenshots"
+              end
+
+              unless arguments == ""
+                arguments << " "
+              end
+
+              arguments << report_string
+            end
+
+            xcpretty_args.push reports
+
+          elsif params[:report_formats]
+            # Test report file format
             report_formats = params[:report_formats].map do |format|
               "--report #{format}"
             end.sort().join(" ")
@@ -191,45 +220,113 @@ module Fastlane
 
         return workspace
       end
+
+      def self.description
+        "Use the `xcodebuild` command to build and sign your app"
+      end
+
+      def self.available_options
+        [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
+      end
+
+      def self.details
+        "More infomration on GitHub: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#xcodebuild"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
-    class XcarchiveAction
+    class XcarchiveAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:archive] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
-    class XcbuildAction
+    class XcbuildAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:build] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
-    class XccleanAction
+    class XccleanAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:clean] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
-    class XcexportAction
+    class XcexportAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:export_archive] = true
         XcodebuildAction.run([params_hash])
       end
+
+      def self.description
+        "Builds the project using `xcodebuild`"
+      end
+
+      def self.author
+        "dtrenz"
+      end
     end
 
-    class XctestAction
+    class XctestAction < Action
       def self.run(params)
         params_hash = params.first || {}
         params_hash[:test] = true
         XcodebuildAction.run([params_hash])
+      end
+
+      def self.description
+        "Runs tests on the given simulator"
+      end
+
+      def available_options
+        [
+          ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
+        ]
+      end
+
+      def self.author
+        "dtrenz"
       end
     end
   end

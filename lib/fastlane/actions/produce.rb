@@ -4,12 +4,7 @@ module Fastlane
       PRODUCE_APPLE_ID = :PRODUCE_APPLE_ID
     end
 
-    class ProduceAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class ProduceAction < Action
       def self.run(params)
         require 'produce'
 
@@ -22,17 +17,59 @@ module Fastlane
 
         return if Helper.test?
 
-        Dir.chdir(FastlaneFolder.path || Dir.pwd) do
-          # This should be executed in the fastlane folder
+        FastlaneCore::UpdateChecker.start_looking_for_update('produce')
 
-          CredentialsManager::PasswordManager.shared_manager(ENV['PRODUCE_USERNAME']) if ENV['PRODUCE_USERNAME']
-          Produce::Config.shared_config # to ask for missing information right in the beginning
+        begin
+          Dir.chdir(FastlaneFolder.path || Dir.pwd) do
+            # This should be executed in the fastlane folder
 
-          apple_id = Produce::Manager.start_producing.to_s
+            CredentialsManager::PasswordManager.shared_manager(ENV['PRODUCE_USERNAME']) if ENV['PRODUCE_USERNAME']
+            Produce::Config.shared_config # to ask for missing information right in the beginning
 
-          Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
-          ENV['PRODUCE_APPLE_ID'] = apple_id
+            apple_id = Produce::Manager.start_producing.to_s
+
+            Actions.lane_context[SharedValues::PRODUCE_APPLE_ID] = apple_id
+            ENV['PRODUCE_APPLE_ID'] = apple_id
+          end
+        ensure
+          FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
         end
+      end
+
+      def self.description
+        "Makes sure the given app identifier is created on the Dev Portal"
+      end
+
+      def details
+        [
+          'For more information about produce, visit its GitHub page:',
+          'https://github.com/KrauseFx/produce'
+        ].join(' ')
+      end
+
+      def self.available_options
+        [
+          ['produce_app_identifier', 'The App Identifier of your app', 'PRODUCE_APP_IDENTIFIER'],
+          ['produce_app_name', 'The name of your app', 'PRODUCE_APP_NAME'],
+          ['produce_language', 'The app\'s default language', 'PRODUCE_LANGUAGE'],
+          ['produce_version', 'The initial version of your app', 'PRODUCE_VERSION'],
+          ['produce_sku', 'The SKU number of the app if it gets created', 'PRODUCE_SKU'],
+          ['produce_team_name', 'optional: the name of your team', 'PRODUCE_TEAM_NAME'],
+          ['produce_team_id', 'optional: the ID of your team', 'PRODUCE_TEAM_ID'],
+          ['produce_username', 'optional: your Apple ID', 'PRODUCE_USERNAME'],
+          ['skip_itc', 'Skip the creation on iTunes Connect', 'PRODUCE_SKIP_ITC'],
+          ['skip_devcenter', 'Skip the creation on the Apple Developer Portal', 'PRODUCE_SKIP_DEVCENTER']
+        ]
+      end
+
+      def self.output
+        [
+          ['PRODUCE_APPLE_ID', 'The Apple ID of the newly created app. You probably need it for `deliver`']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

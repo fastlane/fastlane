@@ -3,12 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class UpdateProjectCodeSigningAction
-
-      def self.is_supported?(type)
-        type == :ios
-      end
-      
+    class UpdateProjectCodeSigningAction < Action
       def self.run(params)
         path = params.first
         path = File.join(path, "project.pbxproj")
@@ -23,6 +18,18 @@ module Fastlane
         File.write(path, p.gsub(/PROVISIONING_PROFILE = ".*";/, "PROVISIONING_PROFILE = \"#{udid}\";"))
 
         Helper.log.info("Successfully updated project settings to use UDID '#{udid}'".green)
+      end
+
+      def self.description
+        "Updated code signing settings from 'Automatic' to a specific profile"
+      end
+
+      def self.details
+        "This feature is not yet 100% finished"
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

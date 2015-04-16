@@ -17,12 +17,7 @@ module Fastlane
     #   Xcode application directory -- the xcode-select provided  shims  will  automatically  convert  the
     #   environment variable into the full Developer content path.
     #
-    class XcodeSelectAction
-
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class XcodeSelectAction < Action
       def self.run(params)
         xcode_path = params.first
 
@@ -30,11 +25,19 @@ module Fastlane
         raise "Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red unless xcode_path.to_s.length > 0
 
         # Verify that a path to a directory was passed in
-        raise "Nonexistent path provided".red unless Dir.exists? xcode_path
+        raise "Path '#{xcode_path}' doesn't exist".red unless Dir.exists?(xcode_path)
 
         Helper.log.info "Setting Xcode version to #{xcode_path} for all build steps"
 
         ENV["DEVELOPER_DIR"] = xcode_path + "/Contents/Developer"
+      end
+
+      def self.description
+        "Change the xcode-path to use. Useful for beta versions of Xcode"
+      end
+
+      def self.author
+        "dtrenz"
       end
     end
   end

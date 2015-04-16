@@ -5,12 +5,7 @@ module Fastlane
       SIGH_UDID = :SIGH_UDID
     end
 
-    class SighAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class SighAction < Action
       def self.run(params)
         require 'sigh'
         require 'sigh/options'
@@ -27,12 +22,28 @@ module Fastlane
           end
         end
 
-        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (values || {}))
-        
-        path = Sigh::Manager.start
+        begin
+          FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
 
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
-        Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (values || {}))
+          
+          path = Sigh::Manager.start
+
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
+          Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
+        ensure
+          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
+        end
+      end
+
+      def self.description
+        "Generates a provisioning profile. Stores the profile in the current folder"
+      end
+
+      def self.available_options
+        require 'sigh'
+        require 'sigh/options'
+        Sigh::Options.available_options
       end
     end
   end

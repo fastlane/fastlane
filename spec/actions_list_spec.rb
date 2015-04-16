@@ -1,0 +1,32 @@
+require 'fastlane/actions_list'
+
+describe Fastlane do
+  describe "Action List" do
+    it "doesn't throw an exception" do
+      Fastlane::ActionsList.run nil
+    end
+
+    describe "Actions provide a complete documenation" do
+      Fastlane::ActionsList.all_actions do |action, name|
+        it "Valid return values for fastlane action #{name}" do
+          expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
+          expect(action.description.length).to be > 5, "Provided description for '#{name}'-action is too short"
+          expect(action.description.strip.end_with?'.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
+          expect(action.author.length).to be > 1, "Action '#{name}' must have an author"
+
+          if action.available_options
+            expect(action.available_options).to be_instance_of(Array), "'available_options' for action '#{name}' must be an array"
+          end
+
+          if action.output
+            expect(action.output).to be_instance_of(Array), "'output' for action '#{name}' must be an array"
+          end
+
+          if action.details
+            expect(action.details).to be_instance_of(String), "'details' for action '#{name}' must be a String"
+          end
+        end
+      end
+    end
+  end
+end

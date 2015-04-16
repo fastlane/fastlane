@@ -1,12 +1,7 @@
 module Fastlane
   module Actions
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
-    class CommitVersionBumpAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class CommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
         require 'pathname'
@@ -64,7 +59,11 @@ module Fastlane
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         changed_files_as_expected = (Set.new(git_dirty_files) == Set.new(expected_changed_files))
-        raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running.".red unless changed_files_as_expected
+        unless changed_files_as_expected
+          unless params[:force]
+            raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force to not care about this.".red
+          end
+        end
 
         # get the absolute paths to the files
         git_add_paths = expected_changed_files.map { |path| File.expand_path(File.join(repo_pathname, path)) }
@@ -74,6 +73,21 @@ module Fastlane
         Actions.sh("git commit -m '#{commit_message}'")
 
         Helper.log.info "Committed \"#{commit_message}\" 💾.".green
+      end
+
+      def self.description
+        "Creates a 'Version Bump' commit. Run after `increment_build_number`"
+      end
+
+      def self.available_options
+        [
+          ['message', 'The commit message. Defaults to "Version Bump"'],
+          ['xcodeproj', 'The path to your project file (Not the workspace). If you have only one, this is optional']
+        ]
+      end
+
+      def self.author
+        "lmirosevic"
       end
     end
   end

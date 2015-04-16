@@ -65,6 +65,12 @@ describe Fastlane do
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)
       end
 
+      it "collects the lane description for documentation" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        ff.runner.execute(:deploy)
+        expect(ff.runner.description_blocks[:deploy]).to eq("My Deploy\n\ndescription")
+      end
+
       it "execute different envs with lane in before block" do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')

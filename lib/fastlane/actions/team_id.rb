@@ -3,12 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class TeamIdAction
-
-      def self.is_supported?(type)
-        type == :ios
-      end
-      
+    class TeamIdAction < Action
       def self.run(params)
         team = params.first
         raise "Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red unless team.to_s.length > 0
@@ -18,6 +13,14 @@ module Fastlane
         [:CERT_TEAM_ID, :SIGH_TEAM_ID, :PEM_TEAM_ID, :PRODUCE_TEAM_ID, :SIGH_TEAM_ID, :CUPERTINO_TEAM_ID, :FASTLANE_TEAM_ID].each do |current|
           ENV[current.to_s] = team
         end
+      end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.description
+        "Specify the Team ID you want to use for the Apple Developer Portal"
       end
     end
   end

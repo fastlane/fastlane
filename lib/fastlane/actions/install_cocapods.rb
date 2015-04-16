@@ -1,13 +1,12 @@
 module Fastlane
   module Actions
-    class CocoapodsAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class CocoapodsAction < Action
       def self.run(_params)
         Actions.sh('pod install')
+      end
+
+      def self.description
+        "Runs `pod install` for the project"
       end
     end
   end

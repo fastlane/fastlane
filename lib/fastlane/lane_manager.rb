@@ -7,7 +7,23 @@ module Fastlane
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
       if lanes.count == 0
-        raise "Please pass the name of the lane you want to drive. Available lanes: #{ff.runner.available_lanes.join(', ')}".red
+        loop do
+          Helper.log.error "You must provide a lane to drive. Available lanes:"
+          available = ff.runner.available_lanes
+
+          available.each_with_index do |lane, index|
+            puts "#{index + 1}) #{lane}"
+          end
+
+          i = gets.strip.to_i - 1
+          if i >= 0 and (available[i] rescue nil)
+            lanes = [available[i]]
+            Helper.log.info "Driving the lane #{lanes.first}. Next time launch fastlane using `fastlane #{lanes.first}`".green
+            break # yeah
+          end
+
+          Helper.log.error "Invalid input. Please enter the number of the lane you want to use".red
+        end
       end
 
       # Making sure the default '.env' and '.env.default' get loaded
@@ -37,18 +53,22 @@ module Fastlane
         e = ex
       end
 
+      thread = ff.did_finish
+
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
 
       duration = ((Time.now - start) / 60.0).round
 
       unless e
+        thread.join # to wait for the request to be finished
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
       else
+        thread.join # to wait for the request to be finished
         Helper.log.fatal 'fastlane finished with errors'.red
         raise e
       end

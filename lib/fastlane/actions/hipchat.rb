@@ -3,12 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class HipchatAction
-
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class HipchatAction < Action
       def self.run(params)
         options = { message: '',
                     success: true,
@@ -91,6 +86,24 @@ module Fastlane
           else
             raise "Unexpected #{response.code} for `#{channel}'".red
         end
+      end
+
+      def self.description
+        "Send a error/success message to HipChat"
+      end
+
+      def self.available_options
+        [
+          ['', 'Hipchat API Token', 'HIPCHAT_API_TOKEN'],
+          ['', 'Version of the Hipchat API. Must be 1 or 2', 'HIPCHAT_API_VERSION'],
+          ['message', 'The message to post on HipChat'],
+          ['channel', 'The room or @username'],
+          ['success', 'Is this a success message?'],
+        ]
+      end
+
+      def self.author
+        "jingx23"
       end
     end
   end

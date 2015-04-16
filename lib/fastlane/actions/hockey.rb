@@ -9,12 +9,7 @@ module Fastlane
       HOCKEY_BUILD_INFORMATION = :HOCKEY_BUILD_INFORMATION # contains all keys/values from the HockeyApp API, like :title, :bundle_identifier
     end
 
-    class HockeyAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class HockeyAction < Action
       def self.run(params)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
         options = {
@@ -29,7 +24,7 @@ module Fastlane
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
-        raise "No API Token for Hockey given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
+        raise "No API Token for Hockey given, pass using `api_token: 'token'`. Open https://rink.hockeyapp.net/manage/auth_tokens to get one".red unless options[:api_token].to_s.length > 0
         raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
         raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
 
@@ -67,6 +62,32 @@ module Fastlane
             Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
             raise 'Error when trying to upload ipa to HockeyApp'.red
           end
+      end
+
+      def self.description
+        "Upload a new build to HockeyApp"
+      end
+
+      def self.available_options
+        [
+          ['api_token', 'API Token for Hockey Access'],
+          ['ipa', 'Path to the ipa file. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['notes', 'The changelog for this build'],
+          ['dsym', 'Path to the dsym file. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['status', 'Download status: 1 = No user can download; 2 = Available for download'],
+          ['notify', 'Notify testers? 1 for yes'],
+        ]
+      end
+
+      def self.output
+        [
+          ['HOCKEY_DOWNLOAD_LINK', 'The newly generated download link for this build'],
+          ['HOCKEY_BUILD_INFORMATION', 'contains all keys/values from the HockeyApp API, like :title, :bundle_identifier']
+        ]
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

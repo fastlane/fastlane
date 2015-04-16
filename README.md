@@ -114,6 +114,20 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/KrauseFx/fastlane/blob/master/docs).
 
+## Available commands
+
+Usually you'll use fastlane by triggering individual lanes:
+
+    fastlane [lane_name]
+
+#### Other commands
+
+- `fastlane lanes`: Lists all available lanes
+- `fastlane docs`: Generates a markdown based documentation of all your lanes
+- `fastlane actions`: List all available `fastlane` actions
+- `fastlane action [action_name]`: Shows a more detailed description of an action
+- `fastlane new_action`: Create a new action (integration) for fastlane  
+
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 `fastlane` is designed to make your life easier by bringing together the `fastlane` suite of tools under one roof. 
@@ -136,7 +150,9 @@ A detailed description about how ```fastlane``` stores your credentials is avail
 
 ## Special Thanks
 
-Thanks to all sponsors and contributors for extending and improving the `fastlane` suite:
+Thanks to all contributors for extending and improving the `fastlane` suite:
+
+- [Product Hunt](http://producthunt.com)
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Ash Furrow ([@ashfurrow](https://twitter.com/ashfurrow))

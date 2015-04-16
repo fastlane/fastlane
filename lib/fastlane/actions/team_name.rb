@@ -3,12 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class TeamNameAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class TeamNameAction < Action
       def self.run(params)
         team = params.first
         raise "Please pass your Team Name (e.g. team_name 'Felix Krause')".red unless team.to_s.length > 0
@@ -18,6 +13,14 @@ module Fastlane
         [:FASTLANE_TEAM_NAME, :PRODUCE_TEAM_NAME].each do |current|
           ENV[current.to_s] = team
         end
+      end
+
+      def self.description
+        "Set a team to use by its name"
+      end
+
+      def self.author
+        "KrauseFx"
       end
     end
   end

@@ -4,12 +4,7 @@ end
 
 module Fastlane
   module Actions
-    class CrashlyticsAction
-      
-      def self.is_supported?(type)
-        type == :ios
-      end
-
+    class CrashlyticsAction < Action
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'
@@ -86,6 +81,26 @@ module Fastlane
       def self.assert_valid_ipa_path!(ipa_path)
         return if ipa_path && File.exist?(ipa_path)
         raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red
+      end
+
+      def self.description
+        "Upload a new build to Crashlytics Beta"
+      end
+
+      def self.available_options
+        [
+          ['crashlytics_path', 'Path to your Crashlytics bundle', 'CRASHLYTICS_FRAMEWORK_PATH'],
+          ['api_token', 'Crashlytics Beta API Token', 'CRASHLYTICS_API_TOKEN'],
+          ['build_secret', 'Crashlytics Build Secret', 'CRASHLYTICS_BUILD_SECRET'],
+          ['ipa_path', 'Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action'],
+          ['notes_path', 'Release Notes'],
+          ['emails', 'Pass email address'],
+          ['notifications', 'Crashlytics notification option']
+        ]
+      end
+
+      def self.author
+        "pedrogimenez"
       end
 
       private_class_method :assert_params_given!,

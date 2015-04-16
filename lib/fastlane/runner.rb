@@ -51,15 +51,21 @@ module Fastlane
       @error = block
     end
 
-    def set_block(key, block)
+    # @param key: The name of the lane
+    # @param block: The block of the lane
+    # @param desc: Description of this action
+    def set_block(key, block, desc = nil)
       raise "Lane '#{key}' was defined multiple times!".red if blocks[key]
       blocks[key] = block
+      description_blocks[key] = desc
     end
-
-    private
 
     def blocks
       @blocks ||= {}
+    end
+
+    def description_blocks
+      @description_blocks ||= {}
     end
   end
 end
