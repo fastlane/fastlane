@@ -8,6 +8,7 @@ module PEM
         file_name = File.basename(path)
         output = "./#{file_name}"
         FileUtils.mv(path, output)
+        path = output
         puts output.green
       end
       
@@ -19,6 +20,8 @@ module PEM
       else
         File.delete(rsa_file) if rsa_file
       end
+
+      return path
     end
   end
 end

@@ -29,6 +29,8 @@ module PEM
         end
 
         return pem_file, rsa_file
+      else
+        return nil, nil
       end
     end
 
