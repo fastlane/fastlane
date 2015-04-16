@@ -91,15 +91,15 @@ module Sigh
 
               break
             end
+          end
 
-            if page_size == profile_count
-              page_index += 1
-            elsif
-              has_all_profiles = true
-            end
+          if page_size == profile_count
+            page_index += 1
+          else
+            has_all_profiles = true
           end
         end 
-        
+
         Helper.log.info "Could not find existing profile. Trying to create a new one."
         # Certificate does not exist yet, we need to create a new one
         create_profile
