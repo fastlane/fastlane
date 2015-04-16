@@ -132,7 +132,6 @@ The latest commands can always be found inside [deliverer.rb](https://github.com
 ## Example Deliverfile
 
 ```ruby
-config_json_folder './deliver'
 screenshots_path "./screenshots"
 
 title({
@@ -164,6 +163,7 @@ ratings_config_path "~/Downloads/config.json"
 
 price_tier 5
 
+# it is recommended to remove that part and use fastlane instead for building
 ipa do
     system("cd ..; ipa build") # build your project using Shenzhen
     "../fastlane.ipa" # Tell 'deliver' where it can find the finished ipa file
