@@ -17,7 +17,7 @@ module PEM
         FileUtils.mv(rsa_file, output)
         puts output.green          
       else
-        File.delete(rsa_file)
+        File.delete(rsa_file) if rsa_file
       end
     end
   end
