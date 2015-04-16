@@ -98,7 +98,7 @@ module Sigh
           else
             has_all_profiles = true
           end
-        end 
+        end
 
         Helper.log.info "Could not find existing profile. Trying to create a new one."
         # Certificate does not exist yet, we need to create a new one
