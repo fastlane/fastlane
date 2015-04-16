@@ -59,7 +59,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Easily implement a real Continuous Deployment process using [fastlane](https://github.com/KrauseFx/fastlane)
 - Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
 - Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1)
-- Automatically create new screenshots with [Snapshot](https://github.com/KrauseFx/snapshot)
+- Automatically create new screenshots with [snapshot](https://github.com/KrauseFx/snapshot)
 - Upload new builds to the new Apple TestFlight
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
