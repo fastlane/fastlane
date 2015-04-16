@@ -72,6 +72,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 # Usage
 
     pem
+
 Yes, that's the whole command!
 
 This does the following:
@@ -82,6 +83,10 @@ This does the following:
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
 ```PEM``` will never revoke your existing certificates. 
+
+If you already have a push certificate enabled, which is active for at least 2 more weeks, `PEM` will not create a new certificate. If you still want to create one, use the `force`:
+
+    pem --force
 
 You can pass parameters like this:
 
