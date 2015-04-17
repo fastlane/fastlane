@@ -116,18 +116,6 @@ describe Fastlane do
     end
 
     describe "Different Fastfiles" do
-      it "rejects unsupported operating systems" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileUnsupportedOS')
-        expect {
-          ff.runner.execute(:test)
-        }.to raise_exception("Action 'frameit' doesn't support required operating system 'android', 'dosphone'.".red)
-      end
-
-      it "works with valid operating systems" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSupportedOS')
-        ff.runner.execute(:test)
-      end
-
       it "execute different envs" do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')

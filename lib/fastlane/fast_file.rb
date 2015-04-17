@@ -141,13 +141,12 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        systems = Actions.lane_context[Actions::SharedValues::OPERATING_SYSTEMS] # is an array
-        systems ||= []
-        systems << Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
-        if systems.count > 0
-          unless systems.any? { |s| class_ref.is_supported?(s) }
-            raise "Action '#{name}' doesn't support required operating system '#{systems.join('\', \'')}'.".red 
+          unless class_ref.is_supported?(platform)
+            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red 
           end
         end
       end
