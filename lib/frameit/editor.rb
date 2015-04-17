@@ -46,7 +46,7 @@ module Frameit
               width = offset_information[:width]
               image.resize width
 
-              result = template.composite(image) do |c|
+              result = template.composite(image, "png") do |c|
                 c.compose "Over"
                 c.geometry offset_information[:offset]
               end
