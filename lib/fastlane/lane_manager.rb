@@ -8,6 +8,12 @@ module Fastlane
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
+      unless (ff.is_platform_block?lane rescue false) # rescue, because this raises an exception if it can't be found at all
+        # maybe the user specified a default platform
+        # We'll only do this, if the lane specified isn't a platform, as we want to list all platforms then
+        platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
+      end
+
       if not platform and lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
