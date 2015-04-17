@@ -23,8 +23,8 @@ module Fastlane
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
       Dir.chdir(path_to_use) do # the file is located in the fastlane folder
 
-        unless blocks[platform][lane]
-          raise "Could not find lane '#{lane}'. Available lanes: #{available_lanes.join(', ')}".red
+        unless (blocks[platform][lane] rescue nil)
+          raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red
         end
 
         # Call the platform specific before_all block and then the general one
