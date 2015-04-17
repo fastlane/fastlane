@@ -54,7 +54,9 @@ module Sigh
         page_size = 500
 
         until has_all_profiles do
-          certs = post_ajax(@list_certs_url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc'}")
+          bundle_id = Sigh.config[:app_identifier]
+
+          certs = post_ajax(@list_certs_url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc', search: 'name%3D#{bundle_id}%26type%3D#{bundle_id}%26status%3D#{bundle_id}%26appId%3D#{bundle_id}'}")
 
           profile_name = Sigh.config[:provisioning_name]
 
@@ -67,7 +69,7 @@ module Sigh
             
             details = profile_details(current_cert['provisioningProfileId'])
 
-            if details['provisioningProfile']['appId']['identifier'] == Sigh.config[:app_identifier]
+            if details['provisioningProfile']['appId']['identifier'] == bundle_id
 
               next if profile_name && details['provisioningProfile']['name'] != profile_name
 
