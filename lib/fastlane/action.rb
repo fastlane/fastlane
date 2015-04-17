@@ -6,6 +6,7 @@ module Fastlane
       
     end
 
+    # Implement in subclasses
     def self.description
       "No description provided".red
     end
@@ -35,6 +36,19 @@ module Fastlane
     def self.author
       "KrauseFx"
     end
+
+    def self.is_supported?(type)
+      # you do things like
+      #  true
+      # 
+      #  type == :ios
+      # 
+      #  [:ios, :android].include?type
+      # 
+      true
+    end
+
+
 
     # to allow a simple `sh` in the custom actions
     def self.sh(command)
