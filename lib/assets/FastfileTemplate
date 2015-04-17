@@ -1,5 +1,5 @@
 # Customise this file, documentation can be found here:
-# https://github.com/krausefx/fastlane#customise-the-fastfile
+# https://github.com/KrauseFx/fastlane/tree/master/docs
 
 # Change the syntax highlighting to Ruby
 # All lines starting with a # are ignored when running `fastlane`
