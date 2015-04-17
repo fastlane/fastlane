@@ -31,6 +31,7 @@ platform :android do
     File.write("/tmp/fastlane/before_all_android.txt", Time.now.to_s)
   end
 
+  desc "Upload something to Google"
   lane :beta do
     File.write("/tmp/fastlane/android_beta.txt", Time.now.to_s)
   end
