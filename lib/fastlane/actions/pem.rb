@@ -28,8 +28,6 @@ module Fastlane
           FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
         end
       rescue => ex
-        require 'pry'
-        binding.pry
         puts ex
       end
 
