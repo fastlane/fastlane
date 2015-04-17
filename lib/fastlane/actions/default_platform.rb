@@ -6,9 +6,13 @@ module Fastlane
 
     class DefaultPlatformAction < Action
       def self.run(params)
-        raise "You forgot to pass the default platform" if params.first.nil?
+        raise "You forgot to pass the default platform".red if params.first.nil?
 
-        Actions.lane_context[SharedValues::DEFAULT_PLATFORM] = params.first
+        platform = params.first.to_sym
+
+        SupportedPlatforms.verify!platform
+
+        Actions.lane_context[SharedValues::DEFAULT_PLATFORM] = platform
       end
 
       def self.description

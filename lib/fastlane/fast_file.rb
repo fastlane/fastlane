@@ -42,6 +42,8 @@ module Fastlane
     
     # User defines a platform block
     def platform(platform_name, &block)
+      SupportedPlatforms.verify!platform_name
+
       @current_platform = platform_name
 
       block.call

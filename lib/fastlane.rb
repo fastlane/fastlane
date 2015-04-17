@@ -10,6 +10,7 @@ require 'fastlane/lane_manager'
 require 'fastlane/action'
 require 'fastlane/actions/actions_helper'
 require 'fastlane/action_collector'
+require 'fastlane/supported_platforms'
 
 require 'fastlane_core'
 
