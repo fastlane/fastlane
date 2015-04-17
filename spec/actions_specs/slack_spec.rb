@@ -2,13 +2,19 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Slack Action" do
       before :each do
-        # Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER] = build_number
         ENV['SLACK_URL'] = 'http://127.0.0.1'
       end
 
       it "trims long messages to show the bottom of the messages" do
         long_text = "a" * 10000
         expect(Fastlane::Actions::SlackAction.trim_message(long_text).length).to eq(7000)
+      end
+
+      it "raises an error if no slack URL is given" do
+        ENV.delete 'SLACK_URL'
+        expect {
+          Fastlane::Actions::SlackAction.run([])
+        }.to raise_exception('No SLACK_URL given.'.red)
       end
 
       it "works so perfect, like Slack does" do
