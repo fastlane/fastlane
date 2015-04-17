@@ -27,27 +27,44 @@ module Fastlane
     # @!group DSL
     #####################################################
 
+
+    # User defines a new lane
     def lane(lane_name, &block)
       raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
-
+      
       desc = desc_collection.join("\n\n")
-      @runner.set_block(lane_name, block, desc)
-      @desc_collection = nil # reset again
+      platform = @current_platform
+
+      @runner.set_block(lane_name, platform, block, desc)
+
+      @desc_collection = nil # reset the collected description again for the next lane
+    end
+    
+    # User defines a platform block
+    def platform(platform_name, &block)
+      @current_platform = platform_name
+
+      block.call
+
+      @current_platform = nil
     end
 
-
+    # Is executed before each test run
     def before_all(&block)
-      @runner.set_before_all(block)
+      @runner.set_before_all(@current_platform, block)
     end
 
+    # Is executed after each test run
     def after_all(&block)
-      @runner.set_after_all(block)
+      @runner.set_after_all(@current_platform, block)
     end
 
+    # Is executed if an error occured during fastlane execution
     def error(&block)
-      @runner.set_error(block)
+      @runner.set_error(@current_platform, block)
     end
 
+    # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
@@ -99,6 +116,16 @@ module Fastlane
       end
     end
 
+    # Is the given key a platform block or a lane?
+    def is_platform_block?(key)
+      raise 'No key given'.red unless key
+
+      return false if self.runner.blocks[nil][key.to_sym]
+      return true if self.runner.blocks[key.to_sym].kind_of?Hash
+
+      raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
+    end
+
     def actions_path(path)
       raise "Path '#{path}' not found!".red unless File.directory?(path)
 
@@ -114,9 +141,11 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        systems = Actions.lane_context[Actions::SharedValues::OPERATING_SYSTEMS]
+        systems = Actions.lane_context[Actions::SharedValues::OPERATING_SYSTEMS] # is an array
+        systems ||= []
+        systems << Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
-        if systems and systems.count > 0
+        if systems.count > 0
           unless systems.any? { |s| class_ref.is_supported?(s) }
             raise "Action '#{name}' doesn't support required operating system '#{systems.join('\', \'')}'.".red 
           end

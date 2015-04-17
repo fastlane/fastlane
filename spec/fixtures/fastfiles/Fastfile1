@@ -23,3 +23,10 @@ end
 error do |lane, exception|
   File.write('/tmp/fastlane/error', lane)
 end
+
+platform :mac do
+  desc "look at my mac, my mac is amazing"
+  lane :specific do
+    puts 'hi'
+  end
+end
