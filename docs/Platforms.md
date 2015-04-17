@@ -55,3 +55,7 @@ Execute lanes just like this:
 When running `fastlane ios beta`, both `before_all` blocks will be called: the general one on the top and the platform specific one.
 
 The same is the case for the `after_all` and `error` block: Always both blocks are being executed, the **more specific one first**.
+
+### Future
+
+As you might have guessed, this doesn't only work for `ios` and `mac`, but also for `android`. This not only allows you to automate the deployment process of your Android app, but also enabled developers to maintain both platforms in a single configuration file. This is super useful if you're using cross platform technology like [Xamarin](http://xamarin.com/).
