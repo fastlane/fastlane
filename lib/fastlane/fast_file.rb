@@ -30,9 +30,11 @@ module Fastlane
       self
     end
 
-    def lane(key, &block)
+    def lane(lane_name, &block)
+      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+
       desc = desc_collection.join("\n\n")
-      @runner.set_block(key, block, desc)
+      @runner.set_block(lane_name, block, desc)
       @desc_collection = nil # reset again
     end
 
@@ -72,7 +74,7 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        systems = Actions.lane_context[Actions::SharedValues::FASTLANE_OPERATING_SYSTEMS]
+        systems = Actions.lane_context[Actions::SharedValues::OPERATING_SYSTEMS]
 
         if systems and systems.count > 0
           unless systems.any? { |s| class_ref.is_supported?(s) }

@@ -19,10 +19,6 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
       end
 
-      it "raises an error if name is missing" do
-        expect { @ff.lane }.to raise_exception "You have to pass a valid name for this lane".red
-      end
-
       it "raises an error if block is missing" do
         expect { 
           @ff.lane("my_name") 
