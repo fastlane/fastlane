@@ -1,5 +1,5 @@
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+require 'coveralls'
+Coveralls.wear!
 
 require 'fastlane'
 require 'webmock/rspec'
@@ -9,5 +9,5 @@ module SpecHelper
   
 end
 
-# WebMock.disable_net_connect!(:allow => 'codeclimate.com')
+WebMock.disable_net_connect!(:allow => 'coveralls.io')
 WebMock.allow_net_connect!
