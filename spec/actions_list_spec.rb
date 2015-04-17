@@ -10,6 +10,10 @@ describe Fastlane do
       Fastlane::ActionsList.run 'deliver'
     end
 
+    it "shows all available actions if action can't be found" do
+      Fastlane::ActionsList.run 'nonExistingHere'
+    end
+
     describe "Actions provide a complete documenation" do
       Fastlane::ActionsList.all_actions do |action, name|
         it "Valid return values for fastlane action '#{name}'" do

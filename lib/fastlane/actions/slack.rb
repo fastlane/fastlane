@@ -125,6 +125,8 @@ module Fastlane
           }
         end
 
+        return [notifier, slack_attachment] if Helper.is_test?
+
         result = notifier.ping '',
                                icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
                                attachments: [slack_attachment]
