@@ -3,7 +3,7 @@ module Fastlane
     # @param platform The name of the platform to execute
     # @param lane_name The name of the lane to execute
     def self.cruise_lane(platform, lane, env = nil)
-      raise 'lane must be a string' unless (lane.is_a?(String) or platform.nil?)
+      raise 'lane must be a string' unless (lane.is_a?(String) or lane.nil?)
       raise 'platform must be a string' unless (platform.is_a?(String) or platform.nil?)
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
@@ -43,6 +43,8 @@ module Fastlane
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)
+
+      return ff
     end
 
     # All the finishing up that needs to be done
@@ -98,6 +100,8 @@ module Fastlane
     end
 
     def self.load_dot_env(env)
+      require 'dotenv'
+
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env
 
       # Making sure the default '.env' and '.env.default' get loaded

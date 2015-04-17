@@ -1,0 +1,32 @@
+# Needs to have this name
+
+FileUtils.mkdir_p("/tmp/fastlane/")
+
+default_platform :ios
+
+lane :test do
+  File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
+end
+
+
+platform :ios do
+
+  lane :beta do
+    File.write("/tmp/fastlane/mac_beta.txt", Time.now.to_s)
+    frameit
+    team_id '123'
+    team_id '123'
+  end
+  
+end
+before_all do |lane|
+  File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
+end
+
+lane :anotherroot do
+  File.write("/tmp/fastlane/another_root.txt", Time.now.to_s)
+end
+
+error do
+  File.write("/tmp/fastlane/error.txt", Time.now.to_s)
+end

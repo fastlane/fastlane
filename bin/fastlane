@@ -4,7 +4,6 @@ $LOAD_PATH.push File.expand_path('../../lib', __FILE__)
 
 require 'fastlane'
 require 'commander'
-require 'dotenv'
 require 'fastlane/new_action'
 
 HighLine.track_eof = false
