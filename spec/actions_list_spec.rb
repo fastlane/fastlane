@@ -6,9 +6,13 @@ describe Fastlane do
       Fastlane::ActionsList.run nil
     end
 
+    it "doesn't throw an exception with filter" do
+      Fastlane::ActionsList.run 'deliver'
+    end
+
     describe "Actions provide a complete documenation" do
       Fastlane::ActionsList.all_actions do |action, name|
-        it "Valid return values for fastlane action #{name}" do
+        it "Valid return values for fastlane action '#{name}'" do
           expect(action.superclass).to eq(Fastlane::Action), "Please add `Action` as a superclass for action '#{name}'"
 
           expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
@@ -28,6 +32,14 @@ describe Fastlane do
           if action.details
             expect(action.details).to be_instance_of(String), "'details' for action '#{name}' must be a String"
           end
+        end
+      end
+    end
+
+    describe "Provide action details" do
+      Fastlane::ActionsList.all_actions do |action, name|
+        it "Shows the details for action '#{name}'" do
+          Fastlane::ActionsList.show_details(name)
         end
       end
     end
