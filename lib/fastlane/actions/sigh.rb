@@ -45,6 +45,10 @@ module Fastlane
         require 'sigh/options'
         Sigh::Options.available_options
       end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
     end
   end
 end

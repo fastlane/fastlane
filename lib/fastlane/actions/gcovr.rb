@@ -47,8 +47,8 @@ module Fastlane
         print_summary: "-s"
       }
 
-      def self.is_supported?(type)
-        type == :ios
+      def self.is_supported?(platform)
+        platform == :ios
       end
 
       def self.run(params)

@@ -37,15 +37,15 @@ module Fastlane
       "KrauseFx"
     end
 
-    def self.is_supported?(type)
+    def self.is_supported?(platform)
       # you do things like
       #  true
       # 
-      #  type == :ios
+      #  platform == :ios
       # 
-      #  [:ios, :android].include?type
+      #  [:ios, :android].include?platform
       # 
-      true
+      raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
     end
 
 

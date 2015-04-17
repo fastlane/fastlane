@@ -35,6 +35,12 @@ module Fastlane
     }
 
     class IpaAction < Action
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
+      
       def self.run(params)
         # The args we will build with
         build_args = nil

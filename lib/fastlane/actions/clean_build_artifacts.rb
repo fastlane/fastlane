@@ -18,6 +18,10 @@ module Fastlane
       def self.author
         "lmirosevic"
       end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
     end
   end
 end

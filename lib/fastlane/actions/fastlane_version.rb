@@ -27,6 +27,10 @@ module Fastlane
       def self.description
         "Verifies the minimum fastlane version required"
       end
+
+      def self.is_supported?(platform)
+        true
+      end
     end
   end
 end

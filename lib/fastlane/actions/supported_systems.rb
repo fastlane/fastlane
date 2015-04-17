@@ -6,7 +6,7 @@ module Fastlane
 
     class SupportedSystemsAction < Action
       
-      def self.is_supported?(type)
+      def self.is_supported?(platform)
         true
       end
 

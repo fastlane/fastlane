@@ -7,8 +7,8 @@ module Fastlane
     class IncrementBuildNumberAction < Action
       require 'shellwords'
 
-      def self.is_supported?(type)
-        type == :ios
+      def self.is_supported?(platform)
+        platform == :ios
       end
 
       def self.run(params)

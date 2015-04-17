@@ -16,6 +16,10 @@ module Fastlane
         nil
       end
 
+      def self.is_supported?(platform)
+        true
+      end
+
       # As there is a text limit in the notifications, we are 
       # usually interested in the last part of the message
       # e.g. for tests

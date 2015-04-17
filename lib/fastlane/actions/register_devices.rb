@@ -3,8 +3,8 @@ module Fastlane
     class RegisterDevicesAction < Action
       UDID_REGEXP = /^\h{40}$/
 
-      def self.is_supported?(type)
-        type == :ios
+      def self.is_supported?(platform)
+        platform == :ios
       end
 
       def self.run(params)
