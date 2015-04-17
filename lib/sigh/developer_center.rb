@@ -58,7 +58,7 @@ module Sigh
 
           certs = post_ajax(@list_certs_url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc', search: 'name%3D#{bundle_id}%26type%3D#{bundle_id}%26status%3D#{bundle_id}%26appId%3D#{bundle_id}'}")
 
-          unless certs
+          if certs
             profile_name = Sigh.config[:provisioning_name]
 
             profile_count = certs['provisioningProfiles'].count
