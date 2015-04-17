@@ -120,7 +120,7 @@ class FastlaneApplication
 end
 
 begin
-  # FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+  FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
   FastlaneApplication.new.run
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
