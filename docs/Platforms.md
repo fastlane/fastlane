@@ -1,6 +1,6 @@
 # Support for multiple platforms
 
-`fastlane` can handle multiple operating systems in one `Fastfile`. This is very useful for projects supporting both iPhone and Mac OS apps.
+`fastlane` can handle multiple operating systems in one `Fastfile`. This is super useful for projects supporting both iPhone and Mac OS apps.
 
 Watch this magic:
 
