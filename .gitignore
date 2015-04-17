@@ -48,3 +48,4 @@ assets/fastlane_ultra_large.png
 spec/fixtures/*.itmsp/*.png
 /integration
 Gemfile.lock
+spec/fixtures/fastfiles/report.xml
