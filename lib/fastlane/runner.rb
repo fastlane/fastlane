@@ -23,21 +23,18 @@ module Fastlane
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
       Dir.chdir(path_to_use) do # the file is located in the fastlane folder
 
+        unless blocks[platform][lane]
+          raise "Could not find lane '#{lane}'. Available lanes: #{available_lanes.join(', ')}".red
+        end
+
         # Call the platform specific before_all block and then the general one
         before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
         before_all_blocks[nil].call(lane) if before_all_blocks[nil]
         
-        return_val = nil
-
-        if blocks[platform][lane]
-          return_val = blocks[platform][lane].call
-        else
-          # This should never been shown when normally used
-          raise "Could not find lane '#{lane}'. Available lanes: #{available_lanes.join(', ')}".red
-        end
-
+        return_val = blocks[platform][lane].call
+        
+        
         # `after_all` is only called if no exception was raised before
-
         # Call the platform specific before_all block and then the general one
         after_all_blocks[platform].call(lane) if (after_all_blocks[platform] and platform != nil)
         after_all_blocks[nil].call(lane) if (after_all_blocks[nil])
