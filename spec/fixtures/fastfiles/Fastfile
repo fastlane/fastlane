@@ -17,6 +17,14 @@ platform :ios do
     team_id '123'
     team_id '123'
   end
+
+  lane :empty do
+    # nothing going on here
+  end
+
+  lane :crashy do
+    raise "my exception"
+  end
   
 end
 before_all do |lane|
