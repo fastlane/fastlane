@@ -58,47 +58,49 @@ module Sigh
 
           certs = post_ajax(@list_certs_url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc', search: 'name%3D#{bundle_id}%26type%3D#{bundle_id}%26status%3D#{bundle_id}%26appId%3D#{bundle_id}'}")
 
-          profile_name = Sigh.config[:provisioning_name]
+          unless certs
+            profile_name = Sigh.config[:provisioning_name]
 
-          profile_count = certs['provisioningProfiles'].count
+            profile_count = certs['provisioningProfiles'].count
 
-          Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
-          required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
-          certs['provisioningProfiles'].each do |current_cert|
-            next unless required_cert_types.include?(current_cert['type'])
-            
-            details = profile_details(current_cert['provisioningProfileId'])
+            Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
+            required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
+            certs['provisioningProfiles'].each do |current_cert|
+              next unless required_cert_types.include?(current_cert['type'])
+              
+              details = profile_details(current_cert['provisioningProfileId'])
 
-            if details['provisioningProfile']['appId']['identifier'] == bundle_id
+              if details['provisioningProfile']['appId']['identifier'] == bundle_id
 
-              next if profile_name && details['provisioningProfile']['name'] != profile_name
+                next if profile_name && details['provisioningProfile']['name'] != profile_name
 
-              # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
-              next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
+                # that's an Ad Hoc profile. I didn't find a better way to detect if it's one ... skipping it
+                next if @type == APPSTORE && details['provisioningProfile']['deviceCount'] > 0
 
-              # that's an App Store profile ... skipping it
-              next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
+                # that's an App Store profile ... skipping it
+                next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
 
-              # We found the correct certificate
-              if force && @type != DEVELOPMENT
-                provisioningProfileId = current_cert['provisioningProfileId']
-                renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
-                return maintain_app_certificate(false) # recursive
-              elsif current_cert['status'] == 'Active'
-                return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
-              elsif ['Expired', 'Invalid'].include? current_cert['status']
-                renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
-                return maintain_app_certificate(false) # recursive
+                # We found the correct certificate
+                if force && @type != DEVELOPMENT
+                  provisioningProfileId = current_cert['provisioningProfileId']
+                  renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
+                  return maintain_app_certificate(false) # recursive
+                elsif current_cert['status'] == 'Active'
+                  return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
+                elsif ['Expired', 'Invalid'].include? current_cert['status']
+                  renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
+                  return maintain_app_certificate(false) # recursive
+                end
+
+                break
               end
-
-              break
             end
-          end
 
-          if page_size <= profile_count
-            page_index += 1
-          else
-            has_all_profiles = true
+            if page_size <= profile_count
+              page_index += 1
+            else
+              has_all_profiles = true
+            end
           end
         end
 
