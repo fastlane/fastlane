@@ -17,8 +17,13 @@ module Sigh
 
       cert = maintain_app_certificate # create/download the certificate
       
-      type_name = "Distribution" if @type == APPSTORE # both enterprise and App Store
-      type_name = "Development" unless @type == APPSTORE
+      if @type == APPSTORE # both enterprise and App Store
+        type_name = "Distribution"
+      elsif @type == ADHOC
+        type_name = "AdHoc"
+      else
+        type_name = "Development"
+      end
       cert_name ||= "#{type_name}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
 
