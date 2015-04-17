@@ -95,7 +95,7 @@ module Sigh
             end
           end
 
-          if page_size == profile_count
+          if page_size <= profile_count
             page_index += 1
           else
             has_all_profiles = true
