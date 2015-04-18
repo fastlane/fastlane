@@ -94,9 +94,17 @@ module Fastlane
             Actions.execute_action(method_sym) do
               # arguments is an array by default, containing an hash with the actual parameters
               # Since we usually just need the passed hash, we'll just use the first object if there is only one
-              arguments = arguments.first if (arguments.count == 1 and arguments.first.kind_of?Hash)
-              arguments = {} if arguments.count == 0 # no value => should be an empty hash
-              
+              if arguments.count == 0 
+                ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hsh
+              elsif arguments.count == 1 and arguments.first.kind_of?Hash
+                arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
+              elsif not class_ref.available_options
+                # This action does not use the new action format
+                # Just passing the arguments to this method
+              else
+                raise "You have to pass the options for '#{method_sym}' as hash. Please check out the current documentation on GitHub!".red
+              end
+
               class_ref.run(arguments)
             end
           end
