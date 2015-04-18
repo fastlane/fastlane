@@ -12,11 +12,11 @@ describe Fastlane do
 
       it "works with array of arguments" do
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
-          ipa '-s TestScheme', '-w Test.xcworkspace'
-        end").runner.execute(:test)
-
-        expect(result).to eq(['-s TestScheme', '-w Test.xcworkspace'])
+        expect {
+          result = Fastlane::FastFile.new.parse("lane :test do 
+            ipa '-s TestScheme', '-w Test.xcworkspace'
+          end").runner.execute(:test)
+        }.to raise_error("`ipa` action parameter must be a hash".red)
       end
 
       it "works with object argument without clean and archive" do
@@ -72,11 +72,12 @@ describe Fastlane do
             identity: 'bourne',
             sdk: '10.0',
             ipa: 'JoshIsAwesome.ipa',
+            xcconfig: 'SomethingGoesHere',
             xcargs: 'MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1',
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(12)
+        expect(result.size).to eq(13)
         expect(result).to include('-w "Test.xcworkspace"')
         expect(result).to include('-p "Test.xcproject"')
         expect(result).to include('-c "Release"')
@@ -88,6 +89,7 @@ describe Fastlane do
         expect(result).to include('-i "bourne"')
         expect(result).to include('--sdk "10.0"')
         expect(result).to include('--ipa "JoshIsAwesome.ipa"')
+        expect(result).to include('--xcconfig "SomethingGoesHere"')
         expect(result).to include('--xcargs "MY_ADHOC_OPT1=0 MY_ADHOC_OPT2=1"')
       end
 
