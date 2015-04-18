@@ -36,7 +36,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
               api_token: 'thisistest',
-              user: 'deploygate',
+              user: 'deploygate'
             })
           end").runner.execute(:test)
         }.to raise_error
