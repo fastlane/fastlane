@@ -46,7 +46,7 @@ module FastlaneCore
       # we also allow nil values, which do not have to be verified. 
       if value
         if @is_string
-          raise "Please pass a path as String".red unless value.kind_of?String
+          raise "'#{self.key}' value must be a String!".red unless value.kind_of?String
         end
         
         if @verify_block
