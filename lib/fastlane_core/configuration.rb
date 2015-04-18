@@ -19,7 +19,7 @@ module FastlaneCore
     end
 
     def verify_input_types
-      raise "available_options parameter must be an array of ConfigItems".red unless @available_options.kind_of?Array
+      raise "available_options parameter must be an array of ConfigItems but is #{@available_options.class}".red unless @available_options.kind_of?Array
       @available_options.each do |item|
         raise "available_options parameter must be an array of ConfigItems".red unless item.kind_of?ConfigItem
       end
@@ -73,7 +73,19 @@ module FastlaneCore
       value = option.default_value if value == nil
       value = false if (value == nil and not option.is_string) # by default boolean flags are false
 
-      while value == nil and !option.optional
+      return value if value # we already have a value
+      return value if option.optional # as this value is not required, just return what we have
+      
+
+      if Helper.is_test?
+        # Since we don't want to be asked on tests, we'll just call the verify block with no value
+        # to raise the exception that is shown when the user passes an invalid value
+        set(key, '')
+        # If this didn't raise an exception, just raise a default one
+        raise "No value found for '#{key}'"
+      end
+
+      while value == nil
         Helper.log.info "To not be asked about this value, you can specify it using '#{option.key}'".yellow
         value = ask("#{option.description}: ")
         # Also store this value to use it from now on
