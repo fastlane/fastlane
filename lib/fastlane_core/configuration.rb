@@ -10,7 +10,7 @@ module FastlaneCore
     # Setting up
 
     def initialize(available_options, values)
-      @available_options = available_options
+      @available_options = available_options || []
       @values = values || {}
 
       verify_input_types      
@@ -21,7 +21,7 @@ module FastlaneCore
     def verify_input_types
       raise "available_options parameter must be an array of ConfigItems but is #{@available_options.class}".red unless @available_options.kind_of?Array
       @available_options.each do |item|
-        raise "available_options parameter must be an array of ConfigItems".red unless item.kind_of?ConfigItem
+        raise "available_options parameter must be an array of ConfigItems. Found #{item.class}.".red unless item.kind_of?ConfigItem
       end
       raise "values parameter must be a hash".red unless @values.kind_of?Hash
     end
