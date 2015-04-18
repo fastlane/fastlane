@@ -48,7 +48,7 @@ module Deliver
 
           Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
             "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
-            "You can always open the browser page yourself: '#{current_url}'\n" +
+            "You can always open the browser page yourself: '#{current_url}/pre/builds'\n" +
             "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
           sleep 60
         end
