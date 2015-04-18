@@ -107,7 +107,7 @@ module Fastlane
     end
     
     private
-      def self.parse_options(options, fill_three = true)
+      def self.parse_options(options, fill_all = true)
         rows = []
         rows << [options] if options.kind_of?String
 
@@ -119,7 +119,7 @@ module Fastlane
               raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
               rows << current
               rows.last[0] = rows.last.first.yellow # color it yellow :) 
-              rows.last << nil if (fill_three and rows.last.count == 2) # to have a nice border in the table
+              rows.last << nil while (fill_all and rows.last.count < 3) # to have a nice border in the table
             end
           end
         end
