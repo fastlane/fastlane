@@ -9,6 +9,10 @@ module FastlaneCore
 
     # Setting up
 
+    def values
+      @values
+    end
+
     def initialize(available_options, values)
       @available_options = available_options || []
       @values = values || {}
