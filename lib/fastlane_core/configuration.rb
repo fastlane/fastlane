@@ -33,7 +33,7 @@ module FastlaneCore
         if option
           option.verify!(value) # Call the verify block for it too
         else
-          raise "Could not find available option '#{key}' in the list of available options #{@available_options.collect { |a| a.key }}".red
+          raise "Could not find available option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
         end
       end
     end
@@ -58,7 +58,7 @@ module FastlaneCore
       raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?Symbol
 
       option = option_for_key(key)
-      raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect { |a| a.key }}".red unless option
+      raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect { |a| a.key }.join(', ')}".red unless option
 
       # `if value == nil` instead of ||= because false is also a valid value
 
@@ -93,7 +93,7 @@ module FastlaneCore
       option = option_for_key(key)
       
       unless option
-        raise "Could not find available option '#{key}' in the list of !available options #{@available_options.collect { |a| a.key }}".red
+        raise "Could not find available option '#{key}' in the list of available options #{@available_options.collect { |a| a.key }.join(', ')}".red
       end
 
       option.verify!(value)
