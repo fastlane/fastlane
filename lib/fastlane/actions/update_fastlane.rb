@@ -1,6 +1,5 @@
 require 'rubygems/spec_fetcher'
 require 'rubygems/commands/update_command'
-require "open3"
 
 module Fastlane
   module Actions
