@@ -72,7 +72,7 @@ module Fastlane
                                        description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: Proc.new do |value|
-                                        raise "No IPA file given or found, pass using `value: 'path/app.ipa'`".red unless File.exists?(value)
+                                        raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red unless File.exists?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
@@ -94,17 +94,6 @@ module Fastlane
                                        description: "Crashlytics notification option (true/false)",
                                        optional: true)
         ]
-
-
-        # [
-        #   ['crashlytics_path', 'Path to your Crashlytics bundle', 'CRASHLYTICS_FRAMEWORK_PATH'],
-        #   ['api_token', 'Crashlytics Beta API Token', 'CRASHLYTICS_API_TOKEN'],
-        #   ['build_secret', 'Crashlytics Build Secret', 'CRASHLYTICS_BUILD_SECRET'],
-        #   ['ipa_path', 'Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action'],
-        #   ['notes_path', 'Release Notes'],
-        #   ['emails', 'Pass email address'],
-        #   ['notifications', 'Crashlytics notification option']
-        # ]
       end
 
       def self.author
