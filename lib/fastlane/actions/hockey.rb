@@ -58,12 +58,6 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :crashlytics_path,
-                                       env_name: "CRASHLYTICS_FRAMEWORK_PATH",
-                                       description: "Path to your Crashlytics bundle",
-                                       verify_block: Proc.new do |value|
-                                        raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exists?(value)
-                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",

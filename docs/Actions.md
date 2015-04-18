@@ -333,14 +333,22 @@ increment_build_numer(
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
 ```ruby
-increment_version_number         # Automatically increment patch version number.
-increment_version_number "patch" # Automatically increment patch version number.
-increment_version_number "minor" # Automatically increment minor version number.
-increment_version_number "major" # Automatically increment major version number.
-increment_version_number '2.1.1' # Set a specific version number.
+increment_version_number # Automatically increment patch version number.
+increment_version_number(
+  bump_type: "patch" # Automatically increment patch version number
+)
+increment_version_number(
+  bump_type: "minor" # Automatically increment minor version number
+)
+increment_version_number(
+  bump_type: "major" # Automatically increment major version number
+)
+increment_version_number(
+  version_number: '2.1.1' # Set a specific version number
+)
 
 increment_version_number(
-  release_task: '2.1.1',                  # specify specific version number (optional, omitting it increments patch version number)
+  version_number: '2.1.1',                # specify specific version number (optional, omitting it increments patch version number)
   xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```

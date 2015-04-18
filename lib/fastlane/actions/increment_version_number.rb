@@ -16,33 +16,7 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
         begin
-          first_param = (params.first rescue nil)
           folder = '.' #Current folder is the default folder
-
-          case first_param
-            when NilClass
-              release_task = 'patch' #Patch is the default action
-            when String
-              release_task = first_param
-            when Hash
-              release_task = first_param[:release_task] ? first_param[:release_task] : "patch"
-              folder = first_param[:xcodeproj] ? File.join('.', first_param[:xcodeproj], '..') : '.'
-          end
-
-          # Verify integrity
-          case release_task
-            when /\d.\d.\d/
-              specific_version_number = release_task
-              release_task = 'specific_version'
-            when "patch"
-              release_task = 'patch'
-            when "minor"
-              release_task = 'minor'
-            when "major"
-              release_task = "major"
-            else
-              raise 'Invalid parameter #{release_task}'
-          end
 
           command_prefix = [
               'cd',
@@ -55,7 +29,7 @@ module Fastlane
           else
             current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
             raise 'Your current version (#{current_version}) does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
-            #Check if CFBundleShortVersionString is the same for each occurrence
+            # Check if CFBundleShortVersionString is the same for each occurrence
             allBundles = `#{command_prefix} agvtool what-marketing-version -terse`.split("\n")
             allBundles.each do |bundle|
               raise 'Ensure all you CFBundleShortVersionString are equals in your project ' unless bundle.end_with? "=#{current_version}"
@@ -63,21 +37,26 @@ module Fastlane
             version_array = current_version.split(".").map(&:to_i)
           end
 
-          case release_task
-            when "patch"
-              version_array[2] = version_array[2]+1
-              next_version_number = version_array.join(".")
-            when "minor"
-              version_array[1] = version_array[1]+1
-              version_array[2] = version_array[2]=0
-              next_version_number = version_array.join(".")
-            when "major"
-              version_array[0] = version_array[0]+1
-              version_array[1] = version_array[1]=0
-              version_array[1] = version_array[2]=0
-              next_version_number = version_array.join(".")
-            when "specific_version"
-              next_version_number = specific_version_number
+          if params[:version_number]
+            # Specific version
+            next_version_number = params[:version_number]
+          else
+            case params[:bump_type]
+              when "patch"
+                version_array[2] = version_array[2] + 1
+                next_version_number = version_array.join(".")
+              when "minor"
+                version_array[1] = version_array[1] + 1
+                version_array[2] = version_array[2] = 0
+                next_version_number = version_array.join(".")
+              when "major"
+                version_array[0] = version_array[0] + 1
+                version_array[1] = version_array[1] = 0
+                version_array[1] = version_array[2] = 0
+                next_version_number = version_array.join(".")
+              when "specific_version"
+                next_version_number = specific_version_number
+            end
           end
 
           command = [
@@ -112,8 +91,28 @@ module Fastlane
 
       def self.available_options
         [
-          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
-          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+          FastlaneCore::ConfigItem.new(key: :bump_type,
+                                       env_name: "FL_VERSION_NUMBER_BUMP_TYPE",
+                                       description: "The type of this version bump. Available: patch, minor, major",
+                                       default_value: "patch",
+                                       verify_block: Proc.new do |value|
+                                        raise "Available values are 'patch', 'minor' and 'major'" unless ['patch', 'minor', 'major'].include?value
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :version_number,
+                                       env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
+                                       description: "Change to a specific version. This will replace the bump type value",
+                                       optional: true, 
+                                       verify_block: Proc.new do |value|
+                                        raise "Invalid version '#{value}' given. Must be x.y.z".red unless value.split(".").count == 3
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                       env_name: "FL_VERSION_NUMBER_PROJECT",
+                                       description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
+                                       default_value: "path",
+                                       verify_block: Proc.new do |value|
+                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
+                                        raise "Could not find Xcode project".red unless File.exists?(value)
+                                       end)
         ]
       end
 
