@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         require 'deliver'
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+        FastlaneCore::UpdateChecker.start_looking_for_update('deliver') unless Helper.is_test?
 
         begin
           ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
