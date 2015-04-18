@@ -17,7 +17,7 @@ module Fastlane
 
         return if Helper.test?
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('produce')
+        FastlaneCore::UpdateChecker.start_looking_for_update('produce') unless Helper.is_test?
 
         begin
           Dir.chdir(FastlaneFolder.path || Dir.pwd) do

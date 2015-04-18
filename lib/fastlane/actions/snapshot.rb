@@ -17,7 +17,7 @@ module Fastlane
 
         require 'snapshot'
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
+        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
 
         begin
           Dir.chdir(FastlaneFolder.path) do

@@ -23,7 +23,7 @@ module Fastlane
         end
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
+          FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
 
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (values || {}))
           
