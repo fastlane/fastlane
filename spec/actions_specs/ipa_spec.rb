@@ -7,7 +7,7 @@ describe Fastlane do
           ipa
         end").runner.execute(:test)
 
-        expect(result).to eq(['--no-clean'])
+        expect(result).to eq([])
       end
 
       it "works with object argument without clean and archive" do
@@ -25,7 +25,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(5)
+        expect(result.size).to eq(4)
       end
 
       it "works with object argument with clean and archive" do

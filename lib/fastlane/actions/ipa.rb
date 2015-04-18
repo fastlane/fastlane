@@ -75,20 +75,7 @@ module Fastlane
       end
 
       def self.params_to_build_args(config)
-        params = {}
-        params[:workspace] = config[:workspace]
-        params[:project] = config[:project]
-        params[:configuration] = config[:configuration]
-        params[:scheme] = config[:scheme]
-        params[:clean] = config[:clean]
-        params[:archive] = config[:archive]
-        params[:destination] = config[:destination]
-        params[:embed] = config[:embed]
-        params[:identity] = config[:identity]
-        params[:sdk] = config[:sdk]
-        params[:ipa] = config[:ipa]
-        params[:xcconfig] = config[:xcconfig]
-        params[:xcargs] = config[:xcargs]
+        params = config.values
 
         params = params.delete_if { |k, v| v.nil? }
         params = fill_in_default_values(params)
