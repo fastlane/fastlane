@@ -17,6 +17,13 @@ describe Fastlane do
           Fastlane::Actions::DefaultPlatformAction.run([])
         }.to raise_error("You forgot to pass the default platform".red)
       end
+
+      it "works as expected inside a Fastfile" do
+        Fastlane::FastFile.new.parse("lane :test do 
+          default_platform :ios
+        end").runner.execute(:test)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DEFAULT_PLATFORM]).to eq(:ios)
+      end
     end
   end
 end
