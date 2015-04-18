@@ -11,13 +11,13 @@ describe FastlaneCore do
       it "raises an error if no array is given" do
         expect {
           FastlaneCore::Configuration.create("string", {})
-        }.to raise_error "available_options parameter must be an array of ConfigItems".red
+        }.to raise_error "available_options parameter must be an array of ConfigItems but is String".red
       end
 
       it "raises an error if array contains invalid elements" do
         expect {
           FastlaneCore::Configuration.create(["string"], {})
-        }.to raise_error "available_options parameter must be an array of ConfigItems".red
+        }.to raise_error "available_options parameter must be an array of ConfigItems. Found String.".red
       end
 
 
