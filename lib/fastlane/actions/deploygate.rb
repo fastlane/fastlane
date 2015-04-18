@@ -17,25 +17,21 @@ module Fastlane
         platform == :ios
       end
 
-      def self.run(params)
+      def self.run(options)
         require 'shenzhen'
         require 'shenzhen/plugins/deploygate'
 
         # Available options: https://deploygate.com/docs/api
-        options = {
-          ipa: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        }.merge(params.first || {})
-        assert_options!(options)
-
         Helper.log.info 'Starting with ipa upload to DeployGate... this could take some time ⏳'.green
+
         client = Shenzhen::Plugins::DeployGate::Client.new(
-          options.delete(:api_token),
-          options.delete(:user)
+          options[:api_token],
+          options[:user]
         )
 
-        return if Helper.test?
+        return options[:ipa] if Helper.test?
 
-        response = client.upload_build(options.delete(:ipa), options)
+        response = client.upload_build(options[:ipa], options)
         if parse_response(response)
           Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
           Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green
@@ -43,14 +39,6 @@ module Fastlane
           raise 'Error when trying to upload ipa to DeployGate'.red
         end
       end
-
-      def self.assert_options!(options)
-        raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless options[:api_token].to_s.length > 0
-        raise "No User for app given, pass using `user: 'user'`".red unless options[:user].to_s.length > 0
-        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
-      end
-      private_class_method :assert_options!
 
       def self.parse_response(response)
         if response.body && response.body.key?('error')
@@ -94,10 +82,29 @@ module Fastlane
 
       def self.available_options
         [
-          ['api_token', 'DeployGate API Token'],
-          ['user', 'Target username or organization name'],
-          ['ipa', 'Path to your IPA file. Defaults to output of xcodebuild and ipa'],
-          ['message', 'Text for the uploaded build']
+          FastlaneCore::ConfigItem.new(key: :api_token,
+                                       env_name: "DEPLOYGATE_API_TOKEN",
+                                       description: "Deploygate API Token",
+                                       verify_block: Proc.new do |value|
+                                          raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless value.to_s.length > 0
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :user,
+                                       env_name: "DEPLOYGATE_USER",
+                                       description: "Target username or organization name", 
+                                       verify_block: Proc.new do |value|
+                                        raise "No User for app given, pass using `user: 'user'`".red unless value.to_s.length > 0
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "DEPLOYGATE_IPA_PATH",
+                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       verify_block: Proc.new do |value|
+                                        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "DEPLOYGATE_MESSAGE",
+                                       description: "Release Notes",
+                                       default_value: "No changelog provided")
         ]
       end
 
