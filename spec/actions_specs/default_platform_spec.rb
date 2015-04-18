@@ -11,6 +11,12 @@ describe Fastlane do
           Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
         }.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android]".red)
       end
+
+      it "raises an error if no platform is given" do
+        expect {
+          Fastlane::Actions::DefaultPlatformAction.run([])
+        }.to raise_error("You forgot to pass the default platform".red)
+      end
     end
   end
 end
