@@ -127,8 +127,7 @@ describe Fastlane do
             destination: 'Nowhere',
             identity: 'bourne',
             sdk: '10.0',
-            ipa: 'JoshIsAwesome.ipa',
-            hehehe: 'hahah'
+            ipa: 'JoshIsAwesome.ipa'
           })
         end").runner.execute(:test)
 

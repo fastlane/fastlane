@@ -35,24 +35,15 @@ module Fastlane
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
-        params[0] ||= {} # default to hash to fill in default values
-
-        # Allows for a whole variety of configurations
-        if params.first.is_a? Hash
-
-          # Used to get the final path of the IPA and dSYM
-          if dest = params.first[:destination]
-            absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
-          end
-
-          # Maps nice developer build parameters to Shenzhen args
-          build_args = params_to_build_args(params.first)
-
-        else
-          raise "`ipa` action parameter must be a hash".red
+        # Used to get the final path of the IPA and dSYM
+        if dest = params[:destination]
+          absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
         end
 
-        unless (params.first[:scheme] rescue nil)
+        # Maps nice developer build parameters to Shenzhen args
+        build_args = params_to_build_args(params)
+
+        unless (params[:scheme] rescue nil)
           Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any outupt, please pass a `scheme`"
         end
 
@@ -150,28 +141,29 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "IPA_CLEAN",
                                        description: "Clean project before building",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :archive,
                                        env_name: "IPA_ARCHIVE",
                                        description: "Archive project after building",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :DESTINATION,
+          FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "IPA_DESTINATION",
-                                       description: "Destination. Defaults to current directory",
+                                       description: "Build destination. Defaults to current directory",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :EMBED,
+          FastlaneCore::ConfigItem.new(key: :embed,
                                        env_name: "IPA_EMBED",
                                        description: "Sign .ipa file with .mobileprovision",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :IDENTITY,
+          FastlaneCore::ConfigItem.new(key: :identity,
                                        env_name: "IPA_IDENTITY",
                                        description: "Identity to be used along with --embed",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :SDK,
+          FastlaneCore::ConfigItem.new(key: :sdk,
                                        env_name: "IPA_SDK",
                                        description: "Use SDK as the name or path of the base SDK when building the project",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :IPA,
+          FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "IPA_IPA",
                                        description: "Specify the name of the .ipa file to generate (including file extension)",
                                        optional: true),
