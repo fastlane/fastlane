@@ -5,7 +5,7 @@ module Fastlane
       def self.run(options)
         lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].gsub(' ', '') # no spaces allowed
 
-        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
+        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number].to_s}"
 
         Helper.log.info "Adding git tag '#{tag}' 🎯."
         Actions.sh("git tag #{tag}")
@@ -32,7 +32,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        env_name: "FL_GIT_TAG_BUILD_NUMBER",
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
-                                       default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER])
+                                       default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
+                                       is_string: false)
         ]
       end
 
