@@ -74,10 +74,23 @@ module Fastlane
         ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
       end
 
-      def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive
-        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
+      def self.params_to_build_args(config)
+        params = {}
+        params[:workspace] = config[:workspace]
+        params[:project] = config[:project]
+        params[:configuration] = config[:configuration]
+        params[:scheme] = config[:scheme]
+        params[:clean] = config[:clean]
+        params[:archive] = config[:archive]
+        params[:destination] = config[:destination]
+        params[:embed] = config[:embed]
+        params[:identity] = config[:identity]
+        params[:sdk] = config[:sdk]
+        params[:ipa] = config[:ipa]
+        params[:xcconfig] = config[:xcconfig]
+        params[:xcargs] = config[:xcargs]
 
+        params = params.delete_if { |k, v| v.nil? }
         params = fill_in_default_values(params)
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
@@ -86,6 +99,8 @@ module Fastlane
           if args = ARGS_MAP[k]
             if k == :clean
               v == true ? '--clean' : '--no-clean'
+            elsif k == :archive
+              v == true ? '--archive' : nil
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip
@@ -146,7 +161,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :archive,
                                        env_name: "IPA_ARCHIVE",
                                        description: "Archive project after building",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "IPA_DESTINATION",
                                        description: "Build destination. Defaults to current directory",
