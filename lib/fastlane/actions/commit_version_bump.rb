@@ -8,10 +8,7 @@ module Fastlane
         require 'set'
         require 'shellwords'
 
-        params = params.first
-
-        commit_message = (params && params[:message]) || 'Version Bump'
-        xcodeproj_path = (params && params[:xcodeproj]) ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
+        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
         # find the repo root path
         repo_path = `git rev-parse --show-toplevel`.strip
@@ -70,9 +67,9 @@ module Fastlane
 
         # then create a commit with a message
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
-        Actions.sh("git commit -m '#{commit_message}'")
+        Actions.sh("git commit -m '#{params[:message]}'")
 
-        Helper.log.info "Committed \"#{commit_message}\" 💾.".green
+        Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
       end
 
       def self.description
@@ -81,8 +78,18 @@ module Fastlane
 
       def self.available_options
         [
-          ['message', 'The commit message. Defaults to "Version Bump"'],
-          ['xcodeproj', 'The path to your project file (Not the workspace). If you have only one, this is optional']
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_COMMIT_BUMP_MESSAGE",
+                                       description: "The commit message when committing the version bump",
+                                       default_value: "Version Bump"),
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                       env_name: "FL_BUILD_NUMBER_PROJECT",
+                                       description: "The path to your project file (Not the workspace). If you have only one, this is optional",
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
+                                        raise "Could not find Xcode project".red unless File.exists?(value)
+                                       end)
         ]
       end
 
