@@ -62,7 +62,7 @@ module FastlaneCore
 
       # `if value == nil` instead of ||= because false is also a valid value
 
-      value ||= @values[key]
+      value = @values[key]
       # TODO: configuration files
 
       if value == nil
@@ -74,6 +74,7 @@ module FastlaneCore
       value = false if (value == nil and not option.is_string) # by default boolean flags are false
 
       while value == nil and !option.optional
+        Helper.log.info "To not be asked about this value, you can specify it using '#{option.key}'".yellow
         value = ask("#{option.description}: ")
         # Also store this value to use it from now on
         begin
