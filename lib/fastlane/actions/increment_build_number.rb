@@ -17,22 +17,7 @@ module Fastlane
         # Attention: This is NOT the version number - but the build number
 
         begin
-          first_param = (params.first rescue nil)
-
-          case first_param
-          when NilClass
-            custom_number = nil
-            folder = '.'
-          when Fixnum
-            custom_number = first_param
-            folder = '.'
-          when String
-            custom_number = first_param
-            folder = '.'
-          when Hash
-            custom_number = first_param[:build_number]
-            folder = first_param[:xcodeproj] ? File.join('.', first_param[:xcodeproj], '..') : '.'
-          end
+          folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
             
           command_prefix = [
             'cd',
@@ -43,7 +28,7 @@ module Fastlane
           command = [
             command_prefix,
             'agvtool',
-            custom_number ? "new-version -all #{custom_number}" : 'next-version -all'
+            params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all'
           ].join(' ')
 
           if Helper.test?
@@ -69,8 +54,19 @@ module Fastlane
 
       def self.available_options
         [
-          ['build_number', 'specify specific build number (optional, omitting it increments by one)'],
-          ['xcodeproj', 'optional, you must specify the path to your main Xcode project if it is not in the project root directory']
+          FastlaneCore::ConfigItem.new(key: :build_number,
+                                       env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
+                                       description: "Change to a specific version",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                       env_name: "FL_BUILD_NUMBER_PROJECT",
+                                       description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
+                                       default_value: "path",
+                                       verify_block: Proc.new do |value|
+                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
+                                        raise "Could not find Xcode project".red unless File.exists?(value)
+                                       end)
         ]
       end
 

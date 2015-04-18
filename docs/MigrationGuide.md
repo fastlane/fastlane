@@ -30,3 +30,13 @@ increment_version_number(
   xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
+
+### increment_build_number
+
+You now have to specify the key `build_number` New syntax:
+
+```ruby
+increment_build_number(
+  build_number: '75' # set a specific number
+)
+```

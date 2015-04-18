@@ -321,7 +321,9 @@ This method will increment the **build number**, not the app version. Usually th
 
 ```ruby
 increment_build_number # automatically increment by one
-increment_build_number '75' # set a specific number
+increment_build_number(
+  build_number: '75' # set a specific number
+)
 
 increment_build_numer(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
