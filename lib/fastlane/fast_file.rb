@@ -92,6 +92,11 @@ module Fastlane
         begin
           Dir.chdir('..') do # go up from the fastlane folder, to the project folder
             Actions.execute_action(method_sym) do
+              # arguments is an array by default, containing an hash with the actual parameters
+              # Since we usually just need the passed hash, we'll just use the first object if there is only one
+              arguments = arguments.first if (arguments.count == 1 and arguments.first.kind_of?Hash)
+              arguments = {} if arguments.count == 0 # no value => should be an empty hash
+              
               class_ref.run(arguments)
             end
           end

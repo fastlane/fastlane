@@ -3,19 +3,14 @@ module Fastlane
     # Adds a git tag to the current commit
     class AddGitTagAction < Action
       def self.run(params)
-        params = params.first
-
-        specified_tag = (params && params[:tag])
-        grouping      = (params && params[:grouping]) || 'builds'
-        prefix        = (params && params[:prefix]) || ''
-        build_number  = (params && params[:build_number]) || Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]
+        options = ConfigurationHelper.parse(self, params)
         
-        lane_name     = Actions.lane_context[Actions::SharedValues::LANE_NAME]
+        lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].gsub(' ', '') # no spaces allowed
 
-        tag = specified_tag || "#{grouping}/#{lane_name}/#{prefix}#{build_number}"
+        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
 
-        Helper.log.info 'Adding git tag "#{tag}" 🎯.'
-        Actions.sh("git tag #{tag}")
+        Helper.log.info "Adding git tag '#{tag}' 🎯."
+        # Actions.sh("git tag #{tag}")
       end
 
       def self.description
@@ -24,10 +19,22 @@ module Fastlane
 
       def self.available_options
         [
-          ['tag', 'Define your own tag text. This will replace all other parameters.'],
-          ['grouping', 'Is used to keep your tags organised under one "folder". Defaults to "builds"'],
-          ['prefix', 'Anything you want to put in front of the version number (e.g. "v").'],
-          ['build_number', 'The build number. Defaults to the result of increment_build_number if you\'re using it']
+          FastlaneCore::ConfigItem.new(key: :tag,
+                                       env_name: "FL_GIT_TAG_TAG",
+                                       description: "Define your own tag text. This will replace all other parameters",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :grouping,
+                                       env_name: "FL_GIT_TAG_GROUPING",
+                                       description: "Is used to keep your tags organised under one 'folder'. Defaults to 'builds'",
+                                       default_value: 'builds'),
+          FastlaneCore::ConfigItem.new(key: :prefix,
+                                       env_name: "FL_GIT_TAG_PREFIX",
+                                       description: "Anything you want to put in front of the version number (e.g. 'v')",
+                                       default_value: ''),
+          FastlaneCore::ConfigItem.new(key: :build_number,
+                                       env_name: "FL_GIT_TAG_BUILD_NUMBER",
+                                       description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
+                                       default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER])
         ]
       end
 
