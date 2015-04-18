@@ -102,7 +102,11 @@ module Fastlane
                 # This action does not use the new action format
                 # Just passing the arguments to this method
               else
-                raise "You have to pass the options for '#{method_sym}' as hash. Please check out the current documentation on GitHub!".red
+                Helper.log.fatal "------------------------------------------------------------------------------------".red
+                Helper.log.fatal "If you've been an existing fastlane user, please check out the MigrationGuide to 1.0".yellow
+                Helper.log.fatal "https://github.com/KrauseFx/fastlane/blob/master/docs/MigrationGuide.md".yellow
+                Helper.log.fatal "------------------------------------------------------------------------------------".red
+                raise "You have to pass the options for '#{method_sym}' in a different way. Please check out the current documentation on GitHub!".red
               end
 
               class_ref.run(arguments)
