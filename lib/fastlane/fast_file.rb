@@ -95,7 +95,7 @@ module Fastlane
               # arguments is an array by default, containing an hash with the actual parameters
               # Since we usually just need the passed hash, we'll just use the first object if there is only one
               if arguments.count == 0 
-                ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hsh
+                arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hsh
               elsif arguments.count == 1 and arguments.first.kind_of?Hash
                 arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
               elsif not class_ref.available_options

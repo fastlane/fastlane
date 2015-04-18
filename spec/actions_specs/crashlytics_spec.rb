@@ -13,7 +13,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             crashlytics()
           end").runner.execute(:test)
-        }.to raise_error("You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red)
+        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
       end
 
       it "raises an error if no crashlytics path was given" do
@@ -74,7 +74,7 @@ describe Fastlane do
               build_secret: 'wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
+        }.to raise_error("No IPA file given or found, pass using `value: 'path/app.ipa'`".red)
       end
 
       it "raises an error if the given ipa path was not found" do
@@ -87,7 +87,7 @@ describe Fastlane do
               ipa_path: './fastlane/wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
+        }.to raise_error("No IPA file given or found, pass using `value: 'path/app.ipa'`".red)
       end
 
       it "works with valid parameters" do

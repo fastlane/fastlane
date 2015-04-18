@@ -13,19 +13,7 @@ module Fastlane
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'
-
-        assert_params_given!(params)
-
-        params = params.first
-
-        crashlytics_path = params[:crashlytics_path] || ENV["CRASHLYTICS_FRAMEWORK_PATH"]
-        api_token        = params[:api_token] || ENV["CRASHLYTICS_API_TOKEN"]
-        build_secret     = params[:build_secret] || ENV["CRASHLYTICS_BUILD_SECRET"]
-        ipa_path         = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        notes_path       = params[:notes_path]
-        emails           = params[:emails]
-        notifications    = params[:notifications]
-
+        
         # can pass groups param either as an Array or a String
         case params[:groups]
         when NilClass
@@ -36,15 +24,16 @@ module Fastlane
           groups = params[:groups]
         end
 
-        assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
-
         Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
 
-        return if Helper.test?
+        if Helper.test?
+          # Access all values, to do the verify
+          return params[:crashlytics_path], params[:api_token], params[:build_secret], params[:ipa_path], params[:build_secret], params[:ipa_path], params[:notes_path], params[:emails], params[:groups], params[:notifications]
+        end
 
-        client = Shenzhen::Plugins::Crashlytics::Client.new(crashlytics_path, api_token, build_secret)
+        client = Shenzhen::Plugins::Crashlytics::Client.new(params[:crashlytics_path], params[:api_token], params[:build_secret])
 
-        response = client.upload_build(ipa_path, file: ipa_path, notes: notes_path, emails: emails, groups: groups, notifications: notifications)
+        response = client.upload_build(ipa_path, file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: params[:notifications])
 
         if response
           Helper.log.info 'Build successfully uploaded to Crashlytics'.green
@@ -54,66 +43,73 @@ module Fastlane
         end
       end
 
-      private
-
-      def self.assert_params_given!(params)
-        return unless params.empty?
-        raise 'You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics'.red
-      end
-
-      def self.assert_valid_params!(crashlytics_path, api_token, build_secret, ipa_path)
-        assert_valid_crashlytics_path!(crashlytics_path)
-        assert_valid_api_token!(api_token)
-        assert_valid_build_secret!(build_secret)
-        assert_valid_ipa_path!(ipa_path)
-      end
-
-      def self.assert_valid_crashlytics_path!(crashlytics_path)
-        return if crashlytics_path && File.exist?(crashlytics_path)
-        raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red
-      end
-
-      def self.assert_valid_api_token!(token)
-        return unless token.nil? || token.empty?
-        raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red
-      end
-
-      def self.assert_valid_build_secret!(build_secret)
-        return unless build_secret.nil? || build_secret.empty?
-        raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red
-      end
-
-      def self.assert_valid_ipa_path!(ipa_path)
-        return if ipa_path && File.exist?(ipa_path)
-        raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red
-      end
-
       def self.description
         "Upload a new build to Crashlytics Beta"
       end
 
       def self.available_options
         [
-          ['crashlytics_path', 'Path to your Crashlytics bundle', 'CRASHLYTICS_FRAMEWORK_PATH'],
-          ['api_token', 'Crashlytics Beta API Token', 'CRASHLYTICS_API_TOKEN'],
-          ['build_secret', 'Crashlytics Build Secret', 'CRASHLYTICS_BUILD_SECRET'],
-          ['ipa_path', 'Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action'],
-          ['notes_path', 'Release Notes'],
-          ['emails', 'Pass email address'],
-          ['notifications', 'Crashlytics notification option']
+          FastlaneCore::ConfigItem.new(key: :crashlytics_path,
+                                       env_name: "CRASHLYTICS_FRAMEWORK_PATH",
+                                       description: "Path to your Crashlytics bundle",
+                                       verify_block: Proc.new do |value|
+                                        raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_token,
+                                       env_name: "CRASHLYTICS_API_TOKEN",
+                                       description: "Crashlytics Beta API Token",
+                                       verify_block: Proc.new do |value|
+                                          raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless (value and not value.empty?)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :build_secret,
+                                       env_name: "CRASHLYTICS_BUILD_SECRET",
+                                       description: "Crashlytics Build Secret",
+                                       verify_block: Proc.new do |value|
+                                        raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless (value and not value.empty?)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :ipa_path,
+                                       env_name: "CRASHLYTICS_IPA_PATH",
+                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       verify_block: Proc.new do |value|
+                                        raise "No IPA file given or found, pass using `value: 'path/app.ipa'`".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :notes_path,
+                                       env_name: "CRASHLYTICS_NOTES_PATH",
+                                       description: "Path to the release notes",
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        raise "Path '#{value}' not found".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :groups,
+                                       env_name: "CRASHLYTICS_GROUPS",
+                                       description: "The groups used for distribution",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :emails,
+                                       env_name: "CRASHLYTICS_EMAILS",
+                                       description: "Pass email addresses, separated by commas",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :notifications,
+                                       env_name: "CRASHLYTICS_NOTIFICATIONS",
+                                       description: "Crashlytics notification option (true/false)",
+                                       optional: true)
         ]
+
+
+        # [
+        #   ['crashlytics_path', 'Path to your Crashlytics bundle', 'CRASHLYTICS_FRAMEWORK_PATH'],
+        #   ['api_token', 'Crashlytics Beta API Token', 'CRASHLYTICS_API_TOKEN'],
+        #   ['build_secret', 'Crashlytics Build Secret', 'CRASHLYTICS_BUILD_SECRET'],
+        #   ['ipa_path', 'Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action'],
+        #   ['notes_path', 'Release Notes'],
+        #   ['emails', 'Pass email address'],
+        #   ['notifications', 'Crashlytics notification option']
+        # ]
       end
 
       def self.author
         "pedrogimenez"
       end
-
-      private_class_method :assert_params_given!,
-                           :assert_valid_params!,
-                           :assert_valid_crashlytics_path!,
-                           :assert_valid_api_token!,
-                           :assert_valid_build_secret!,
-                           :assert_valid_ipa_path!
     end
   end
 end
