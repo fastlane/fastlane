@@ -8,7 +8,7 @@ module Fastlane
             success: true,
             topicId: nil,
             typetalk_token: nil,
-        }.merge(params.first || {})
+        }.merge(params || {})
 
         [:message, :topicId, :typetalk_token].each { |key|
           raise "No #{key} given.".red unless options[key]
