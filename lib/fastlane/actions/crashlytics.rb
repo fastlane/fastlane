@@ -5,6 +5,11 @@ end
 module Fastlane
   module Actions
     class CrashlyticsAction < Action
+      
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'

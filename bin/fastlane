@@ -4,7 +4,6 @@ $LOAD_PATH.push File.expand_path('../../lib', __FILE__)
 
 require 'fastlane'
 require 'commander'
-require 'dotenv'
 require 'fastlane/new_action'
 
 HighLine.track_eof = false
@@ -24,12 +23,20 @@ class FastlaneApplication
 
     command :run do |c|
       c.syntax = 'fastlane run [lane]'
-      c.description = 'Drive the fastlane for a specific environment.'
+      c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, _options|
         if Fastlane::FastlaneFolder.path
-          Fastlane::LaneManager.cruise_lanes(args, _options.env)
+          platform = nil
+          lane = args[1]
+          if lane
+            platform = args[0]
+          else
+            lane = args[0]
+          end
+
+          Fastlane::LaneManager.cruise_lane(platform, lane, _options.env)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
           Fastlane::Setup.new.run if create

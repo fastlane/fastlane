@@ -1,0 +1,68 @@
+FileUtils.mkdir_p("/tmp/fastlane/")
+
+default_platform :ios
+
+lane :test do
+  File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
+end
+
+
+platform :mac do
+
+  lane :beta do
+    File.write("/tmp/fastlane/mac_beta.txt", Time.now.to_s)
+  end
+  
+end
+
+platform :ios do
+
+  lane :beta do
+    File.write("/tmp/fastlane/ios_beta.txt", Time.now.to_s)
+  end
+
+  lane :release do
+    File.write("/tmp/fastlane/ios_release.txt", Time.now.to_s)
+  end
+
+end
+
+platform :android do
+
+  before_all do
+    File.write("/tmp/fastlane/before_all_android.txt", Time.now.to_s)
+  end
+
+  desc "Upload something to Google"
+  lane :beta do
+    File.write("/tmp/fastlane/android_beta.txt", Time.now.to_s)
+  end
+
+  lane :witherror do
+    raise 'my exception'
+  end
+
+  lane :unsupported_action do
+    frameit
+  end
+
+  after_all do
+    File.write("/tmp/fastlane/after_all_android.txt", Time.now.to_s)
+  end
+
+  error do
+    File.write("/tmp/fastlane/android_error.txt", Time.now.to_s)
+  end
+end
+
+before_all do |lane|
+  File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
+end
+
+lane :anotherroot do
+  File.write("/tmp/fastlane/another_root.txt", Time.now.to_s)
+end
+
+error do
+  File.write("/tmp/fastlane/error.txt", Time.now.to_s)
+end

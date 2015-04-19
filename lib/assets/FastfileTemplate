@@ -1,5 +1,5 @@
 # Customise this file, documentation can be found here:
-# https://github.com/krausefx/fastlane#customise-the-fastfile
+# https://github.com/KrauseFx/fastlane/tree/master/docs
 
 # Change the syntax highlighting to Ruby
 # All lines starting with a # are ignored when running `fastlane`
@@ -13,62 +13,68 @@
 # Update this, if you use features of a newer version
 fastlane_version "[[FASTLANE_VERSION]]"
 
-before_all do
-  # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
+default_platform :ios
 
-  # sh "./customShellScript.sh"
 
-  cocoapods
+platform :ios do
 
-  # increment_build_number
+  before_all do
+    # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
 
-  ipa
+    cocoapods
 
-  xctool
+    # increment_build_number
+
+    ipa
+
+    xctool
+  end
+
+  desc "Runs all the tests"
+  lane :test do
+    snapshot
+  end
+
+  desc "Submit a new Beta Build to Apple TestFlight"
+  desc "This will also make sure the profile is up to date"
+  lane :beta do
+    snapshot
+    sigh
+    deliver :skip_deploy, :beta
+
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  desc "Deploy a new version to the App Store"
+  desc "** Full Markdown** Support: `code`"
+  lane :deploy do
+    snapshot
+    sigh
+    deliver :skip_deploy, :force
+    # frameit
+  end
+
+  # You can define as many lanes as you want
+
+  after_all do |lane|
+    # This block is called, only if the executed lane was successful
+    
+    # slack({
+    #   message: "Successfully deployed new App Update."
+    # })
+  end
+
+
+  error do |lane, exception|
+    # slack({
+    #   message: exception.message
+    #   success: false
+    # })
+  end
+
 end
 
-desc "Runs all the tests"
-lane :test do
-  snapshot
-end
 
-desc "Submit a new Beta Build to Apple TestFlight"
-desc "This will also make sure the profile is up to date"
-lane :beta do
-  snapshot
-  sigh
-  deliver :skip_deploy, :beta
-  # sh "your_script.sh"
-  # You can use other beta testing services here
-end
-
-desc "Deploy a new version to the App Store"
-desc "** Full Markdown** Support: `code`"
-lane :deploy do
-  snapshot
-  sigh
-  deliver :skip_deploy, :force
-  # frameit
-end
-
-desc "In House Beta Enterprise Distribution"
-lane :inhouse do
-  # insert your code here
-end
-
-# You can define as many lanes as you want
-
-after_all do |lane|
-  # This block is called, only if the executed lane was successful
-  
-  # slack({
-  #   message: "Successfully deployed new App Update for [App](http://link.com).",
-  #   success: true,
-  #   channel: 'development'
-  # })
-end
-
-
-error do |lane, exception|
-  # Something bad happened
-end
+# More information about multiple platforms in fastlane: 
+# https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md

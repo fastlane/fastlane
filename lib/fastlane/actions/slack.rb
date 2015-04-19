@@ -16,6 +16,10 @@ module Fastlane
         nil
       end
 
+      def self.is_supported?(platform)
+        true
+      end
+
       # As there is a text limit in the notifications, we are 
       # usually interested in the last part of the message
       # e.g. for tests
@@ -35,7 +39,6 @@ module Fastlane
 
         require 'slack-notifier'
 
-        color = (options[:success] ? 'good' : 'danger')
         options[:message] = self.trim_message(options[:message].to_s || '')
 
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
@@ -54,72 +57,9 @@ module Fastlane
           notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
         end
 
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+        slack_attachment = generate_slack_attachments(options)
 
-        slack_attachment = {
-          fallback: options[:message],
-          text: options[:message],
-          color: color,
-          fields: []
-        }
-
-        # custom user payloads
-        slack_attachment[:fields] += options[:payload].map do |k, v|
-          {
-            title: k.to_s,
-            value: v.to_s,
-            short: false
-          }
-        end
-
-        # lane
-        if should_add_payload[:lane]
-          slack_attachment[:fields] << {
-            title: 'Lane',
-            value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
-            short: true
-          }
-        end
-
-        # test_result
-        if should_add_payload[:test_result]
-          slack_attachment[:fields] << {
-            title: 'Test Result',
-            value: (options[:success] ? 'Success' : 'Error'),
-            short: true
-          }
-        end
-
-        # git branch
-        if Actions.git_branch && should_add_payload[:git_branch]
-          slack_attachment[:fields] << {
-            title: 'Git Branch',
-            value: Actions.git_branch,
-            short: true
-          }
-        end
-
-        # git_author
-        if git_author && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
-            # We only show the git author if the build failed
-          else
-            slack_attachment[:fields] << {
-              title: 'Git Author',
-              value: git_author,
-              short: true
-            }
-          end
-        end
-
-        # last_git_commit
-        if last_git_commit && should_add_payload[:last_git_commit]
-          slack_attachment[:fields] << {
-            title: 'Git Commit',
-            value: last_git_commit,
-            short: false
-          }
-        end
+        return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
         result = notifier.ping '',
                                icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
@@ -150,6 +90,79 @@ module Fastlane
       def self.author
         "KrauseFx"
       end
+
+      private
+        def self.generate_slack_attachments(options)
+          color = (options[:success] ? 'good' : 'danger')
+          should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+
+          slack_attachment = {
+            fallback: options[:message],
+            text: options[:message],
+            color: color,
+            fields: []
+          }
+
+          # custom user payloads
+          slack_attachment[:fields] += options[:payload].map do |k, v|
+            {
+              title: k.to_s,
+              value: v.to_s,
+              short: false
+            }
+          end
+
+          # lane
+          if should_add_payload[:lane]
+            slack_attachment[:fields] << {
+              title: 'Lane',
+              value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
+              short: true
+            }
+          end
+
+          # test_result
+          if should_add_payload[:test_result]
+            slack_attachment[:fields] << {
+              title: 'Test Result',
+              value: (options[:success] ? 'Success' : 'Error'),
+              short: true
+            }
+          end
+
+          # git branch
+          if Actions.git_branch && should_add_payload[:git_branch]
+            slack_attachment[:fields] << {
+              title: 'Git Branch',
+              value: Actions.git_branch,
+              short: true
+            }
+          end
+
+          # git_author
+          if git_author && should_add_payload[:git_author]
+            if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+              # We only show the git author if the build failed
+            else
+              slack_attachment[:fields] << {
+                title: 'Git Author',
+                value: git_author,
+                short: true
+              }
+            end
+          end
+
+          # last_git_commit
+          if last_git_commit && should_add_payload[:last_git_commit]
+            slack_attachment[:fields] << {
+              title: 'Git Commit',
+              value: last_git_commit,
+              short: false
+            }
+          end
+
+          slack_attachment
+        end
     end
   end
 end

@@ -12,14 +12,6 @@ module Fastlane
       parse(content)
     end
 
-    def collector
-      @collector ||= ActionCollector.new
-    end
-
-    def desc_collection
-      @desc_collection ||= []
-    end
-
     def parse(data)
       @runner = Runner.new
 
@@ -30,55 +22,51 @@ module Fastlane
       self
     end
 
-    def lane(key, &block)
+
+    #####################################################
+    # @!group DSL
+    #####################################################
+
+
+    # User defines a new lane
+    def lane(lane_name, &block)
+      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+      
       desc = desc_collection.join("\n\n")
-      @runner.set_block(key, block, desc)
-      @desc_collection = nil # reset again
+      platform = @current_platform
+
+      @runner.set_block(lane_name, platform, block, desc)
+
+      @desc_collection = nil # reset the collected description again for the next lane
+    end
+    
+    # User defines a platform block
+    def platform(platform_name, &block)
+      SupportedPlatforms.verify!platform_name
+
+      @current_platform = platform_name
+
+      block.call
+
+      @current_platform = nil
     end
 
+    # Is executed before each test run
     def before_all(&block)
-      @runner.set_before_all(block)
+      @runner.set_before_all(@current_platform, block)
     end
 
+    # Is executed after each test run
     def after_all(&block)
-      @runner.set_after_all(block)
+      @runner.set_after_all(@current_platform, block)
     end
 
+    # Is executed if an error occured during fastlane execution
     def error(&block)
-      @runner.set_error(block)
+      @runner.set_error(@current_platform, block)
     end
 
-    # Speak out loud
-    def say(value)
-      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
-      value ||= yield
-      Actions.execute_action('say') do
-        Fastlane::Actions::SayAction.run([value])
-      end
-    end
-
-    def actions_path(path)
-      raise "Path '#{path}' not found!".red unless File.directory?(path)
-
-      Actions.load_external_actions(path)
-    end
-
-    # Execute shell command
-    def sh(command)
-      Actions.execute_action(command) do
-        Actions.sh_no_action(command)
-      end
-    end
-
-    # Fastfile was finished executing
-    def did_finish
-      collector.did_finish
-    end
-
-    def desc(string)
-      desc_collection << string
-    end
-
+    # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
@@ -96,6 +84,9 @@ module Fastlane
 
         step_name = class_ref.step_text rescue nil
         step_name = method_sym.to_s unless step_name
+
+        verify_supported_os(method_sym, class_ref)
+
         Helper.log_alert("Step: " + step_name)
 
         begin
@@ -111,6 +102,73 @@ module Fastlane
       else
         raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
       end
+    end
+
+
+    #####################################################
+    # @!group Other things
+    #####################################################
+
+    # Speak out loud
+    def say(value)
+      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
+      value ||= yield
+      Actions.execute_action('say') do
+        Fastlane::Actions::SayAction.run([value])
+      end
+    end
+
+    # Is the given key a platform block or a lane?
+    def is_platform_block?(key)
+      raise 'No key given'.red unless key
+
+      return false if self.runner.blocks[nil][key.to_sym]
+      return true if self.runner.blocks[key.to_sym].kind_of?Hash
+
+      raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
+    end
+
+    def actions_path(path)
+      raise "Path '#{path}' not found!".red unless File.directory?(path)
+
+      Actions.load_external_actions(path)
+    end
+
+    # Execute shell command
+    def sh(command)
+      Actions.execute_action(command) do
+        Actions.sh_no_action(command)
+      end
+    end
+
+    def verify_supported_os(name, class_ref)
+      if class_ref.respond_to?(:is_supported?)
+        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+
+          unless class_ref.is_supported?(platform)
+            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red 
+          end
+        end
+      end
+    end
+
+    # Fastfile was finished executing
+    def did_finish
+      collector.did_finish
+    end
+
+    def desc(string)
+      desc_collection << string
+    end
+
+    def collector
+      @collector ||= ActionCollector.new
+    end
+
+    def desc_collection
+      @desc_collection ||= []
     end
   end
 end

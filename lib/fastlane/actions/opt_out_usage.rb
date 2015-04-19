@@ -22,6 +22,10 @@ module Fastlane
       def self.author
         "KrauseFx"
       end
+
+      def self.is_supported?(platform)
+        true
+      end
     end
   end
 end

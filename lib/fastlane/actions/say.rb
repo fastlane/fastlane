@@ -9,6 +9,10 @@ module Fastlane
       def self.description
         "This action speaks out loud the given text"
       end
+
+      def self.is_supported?(platform)
+        true
+      end
     end
   end
 end

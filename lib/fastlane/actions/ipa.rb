@@ -35,6 +35,12 @@ module Fastlane
     }
 
     class IpaAction < Action
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
+      
       def self.run(params)
         # The args we will build with
         build_args = nil
@@ -57,6 +63,10 @@ module Fastlane
 
         else
           build_args = params
+        end
+
+        unless (params.first[:scheme] rescue nil)
+          Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any outupt, please pass a `scheme`"
         end
 
         # If no dest directory given, default to current directory

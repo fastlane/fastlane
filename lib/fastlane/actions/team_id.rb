@@ -22,6 +22,10 @@ module Fastlane
       def self.description
         "Specify the Team ID you want to use for the Apple Developer Portal"
       end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
     end
   end
 end

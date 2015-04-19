@@ -4,6 +4,7 @@ module Fastlane
   module Actions
     module SharedValues
       LANE_NAME = :LANE_NAME
+      PLATFORM_NAME = :PLATFORM_NAME
       ENVIRONMENT = :ENVIRONMENT
     end
 

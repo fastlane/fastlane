@@ -8,6 +8,8 @@ More advanced settings and tips can be found in [Advanced.md](https://github.com
 
 `Jenkins` setup is in [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
 
+For more information about multi platform support check out [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md).
+
 ## Fastfile
 
 The Fastfile is used to configure `fastlane`. Open it in your favourite text editor, using Ruby syntax highlighting.

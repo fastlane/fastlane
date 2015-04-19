@@ -42,6 +42,10 @@ module Fastlane
         xcconfig: "-xcconfig"
       }
 
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
       def self.run(params)
         unless Helper.test?
           raise "xcodebuild not installed".red if `which xcodebuild`.length == 0
@@ -254,6 +258,10 @@ module Fastlane
       def self.author
         "dtrenz"
       end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
     end
 
     class XcbuildAction < Action
@@ -269,6 +277,10 @@ module Fastlane
 
       def self.author
         "dtrenz"
+      end
+
+      def self.is_supported?(platform)
+        platform == :ios
       end
     end
 
@@ -286,6 +298,10 @@ module Fastlane
       def self.author
         "dtrenz"
       end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
     end
 
     class XcexportAction < Action
@@ -301,6 +317,10 @@ module Fastlane
 
       def self.author
         "dtrenz"
+      end
+
+      def self.is_supported?(platform)
+        platform == :ios
       end
     end
 
@@ -319,6 +339,10 @@ module Fastlane
         [
           ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
         ]
+      end
+
+      def self.is_supported?(platform)
+        platform == :ios
       end
 
       def self.author

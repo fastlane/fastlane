@@ -47,6 +47,10 @@ module Fastlane
         print_summary: "-s"
       }
 
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
       def self.run(params)
         unless Helper.test?
           raise "gcovr not installed".red if `which gcovr`.length == 0

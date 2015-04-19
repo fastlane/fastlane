@@ -28,8 +28,6 @@ module Fastlane
           FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
         end
       rescue => ex
-        require 'pry'
-        binding.pry
         puts ex
       end
 
@@ -54,6 +52,10 @@ module Fastlane
         require 'pem'
         require 'pem/options'
         PEM::Options.available_options
+      end
+
+      def self.is_supported?(platform)
+        platform == :ios
       end
     end
   end
