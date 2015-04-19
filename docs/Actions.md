@@ -239,14 +239,20 @@ gcovr({
 deliver
 ```
 
-To upload a new build to TestFlight use ```deliver :beta```.
+To upload a new build to TestFlight use ```deliver(beta: true)```.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver :force`
+If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
 
 Other options
 
-- ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
-- ```deliver :force, :skip_deploy```: Combine options using ```,```
+```ruby
+deliver(
+  force: true,# Set to true to skip PDF verification
+  beta: true, # Upload a new version to TestFlight
+  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
+  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+)
+```
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
