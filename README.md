@@ -195,6 +195,16 @@ languages([
 ])
 ```
 
+If you want to use a specific locale, you can also use 
+
+```ruby
+languages([
+  "en-US",
+  "de-DE",
+  ["cmn-Hans", "cmn-Hans_CN"]
+])
+```
+
 ### JavaScript file
 Usually ```snapshot``` automatically finds your JavaScript file. If that's not the case, you can pass the path 
 to your test file.
