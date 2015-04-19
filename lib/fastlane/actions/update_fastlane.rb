@@ -25,39 +25,58 @@ module Fastlane
           return
         end
 
-        tools_to_update = options[:tools]
+        tools_to_update = options[:tools].split ',' unless options[:tools].nil?
         tools_to_update ||= all_installed_tools
 
-        updater = Gem::Commands::UpdateCommand.new
+        if tools_to_update.count == 0
+          Helper.log.error "No tools specified or couldn't find any installed fastlane.tools".red
+          return
+        end
 
-        puts Fastlane::VERSION
+        updater = Gem::Commands::UpdateCommand.new
 
         sudo_needed = !File.writable?(Gem.dir)
 
         if sudo_needed
-          # TODO: Think up how to do this properly
-          #Helper.log.info "Fastlane needs your password to update the fastlane-tools."
-          #Action.sh "sudo gem update " + tools_to_update.join(" ")
-        else
-          highest_versions = updater.highest_installed_gems
+          Helper.log.warn "It seems that your Gem directory is not writable by your current User."
+          Helper.log.warn "Fastlane would need sudo rights to update itself, however, running 'sudo fastlane' is not recommended."
+          Helper.log.warn "If you still want to use this action, please read the Actions.md documentation on a guide how to set this up."
+          return
+        end
 
-          #suppress updater output - very noisy
-          Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+        highest_versions = updater.highest_installed_gems.keep_if {|key| tools_to_update.include? key }
+        update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
-          tools_to_update.each do |tool| 
-            updater.update_gem tool
-          end
+        if update_needed.count == 0
+          Helper.log.info "Nothing to update! 😮".yellow
+          return
+        end
 
-          any_updates = updater.updated.any? do |updated_tool|
-            updated_tool.version > highest_versions[updated_tool.name].version
-          end
+        #suppress updater output - very noisy
+        Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
 
-          if any_updates
-            Helper.log.info "fastlane.tools succesfully updated! I will now restart myself... 😴"
-            exec "fastlane #{ARGV.join ' '}"
-          else 
-            Helper.log.info "All fastlane tools are up-to-date!"
-          end
+        update_needed.each do |tool_info| 
+          tool = tool_info[0]
+          local_version = Gem::Version.new(highest_versions[tool].version)
+          Helper.log.info "Updating #{tool} @ #{local_version}..."
+
+          # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
+          updater.update_gem tool, Gem::Requirement.new(local_version.approximate_recommendation)
+          
+          Helper.log.info "Finished updating #{tool}"
+        end
+
+        any_updates = updater.installer.installed_gems.any? do |updated_tool|
+          updated_tool.version > highest_versions[updated_tool.name].version
+        end
+
+        if any_updates
+          Helper.log.info "fastlane.tools succesfully updated! I will now restart myself... 😴"
+          
+          # Set no_update to true so we don't try to update again
+          exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
+        else 
+          Helper.log.info "All fastlane tools are up-to-date!"
         end
       end
 
