@@ -70,8 +70,13 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :tools,
                                        env_name: "FL_TOOLS_TO_UPDATE",
-                                       description: "An array of the fastlane-tools to update. If not specified, all installed fastlane-tools will be updated",
+                                       description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh). If not specified, all currently installed fastlane-tools will be updated",
                                        optional: true),
+         FastlaneCore::ConfigItem.new(key: :no_update,
+                                      env_name: "FL_NO_UPDATE",
+                                      description: "Don't update during this run. Defaults to false",
+                                      is_string: false,
+                                      default_value: false),
         ]
       end
 
