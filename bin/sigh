@@ -8,6 +8,7 @@ require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 require 'sigh/options'
 require 'sigh/manager'
+require 'sigh/local_manage'
 
 HighLine.track_eof = false
 
@@ -57,7 +58,7 @@ class SighApplication
       c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'sigh manage -p "iOS\ ?Team Provisioning Profile"'
 
       c.action do |args, options|
-        Sigh::Manager.new.run(options, args)
+        Sigh::LocalManage.start(options, args)
       end
     end
 
