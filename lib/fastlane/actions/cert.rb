@@ -18,16 +18,7 @@ module Fastlane
           Dir.chdir(FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
 
-            values = params.first
-            unless values.kind_of?Hash
-              # Old syntax
-              values = {}
-              params.each do |val|
-                values[val] = true
-              end
-            end
-
-            Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, (values || {}))
+            Cert.config = params # we alread have the finished config
 
             Cert::CertRunner.run
             cert_file_path = ENV["CER_FILE_PATH"]

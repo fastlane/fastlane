@@ -6,26 +6,16 @@ module Fastlane
     end
 
     class SighAction < Action
-      def self.run(params)
+      def self.run(values)
         require 'sigh'
         require 'sigh/options'
         require 'sigh/manager'
         require 'credentials_manager/appfile_config'
 
-        values = params.first
-
-        unless values.kind_of?Hash
-          # Old syntax
-          values = {}
-          params.each do |val|
-            values[val] = true
-          end
-        end
-
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
 
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, (values || {}))
+          Sigh.config = values # we alread have the finished config
           
           path = Sigh::Manager.start
 

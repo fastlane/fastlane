@@ -1,34 +1,25 @@
 module Fastlane
   module Actions
-    module SharedValues
-      
-    end
-
     class PemAction < Action
       def self.run(params)
         require 'pem'
         require 'pem/options'
         require 'pem/manager'
 
-        values = params.first
-
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('pem') unless Helper.is_test?
 
-          success_block = values[:new_profile]
-          values.delete(:new_profile) # as it's not in the configs
+          success_block = params[:new_profile]
 
-          PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, (values || {}))
+          PEM.config = params
           profile_path = PEM::Manager.start
 
           if profile_path
-            success_block.call(File.expand_path(profile_path))
+            success_block.call(File.expand_path(profile_path)) if success_block
           end
         ensure
           FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
         end
-      rescue => ex
-        puts ex
       end
 
       def self.description
@@ -51,7 +42,15 @@ module Fastlane
       def self.available_options
         require 'pem'
         require 'pem/options'
-        PEM::Options.available_options
+
+        unless @options
+          @options = PEM::Options.available_options
+          @options << FastlaneCore::ConfigItem.new(key: :new_profile,
+                                       env_name: "",
+                                       description: "Block that is called if there is a new profile", 
+                                       optional: true)
+        end
+        @options
       end
 
       def self.is_supported?(platform)

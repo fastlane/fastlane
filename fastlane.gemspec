@@ -34,13 +34,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastlane_core', '>= 0.6.0' # all shared code and dependencies
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 0.9.1'
+  spec.add_dependency 'deliver', '>= 0.9.2'
   spec.add_dependency 'snapshot', '>= 0.6.1'
   spec.add_dependency 'frameit', '>= 1.0.0'
-  spec.add_dependency 'pem', '>= 0.5.3'
+  spec.add_dependency 'pem', '>= 0.5.4'
   spec.add_dependency 'sigh', '>= 0.4.9'
   spec.add_dependency 'produce', '>= 0.2.0'
-  spec.add_dependency 'cert', '>= 0.1.6'
+  spec.add_dependency 'cert', '>= 0.1.7'
 
   # Development only
   spec.add_development_dependency 'bundler'
