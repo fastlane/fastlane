@@ -16,7 +16,8 @@ module Fastlane
         "sigh",
         "produce",
         "cert",
-        "codes"
+        "codes",
+        "credentials_manager"
       ]
 
       def self.run(params)
