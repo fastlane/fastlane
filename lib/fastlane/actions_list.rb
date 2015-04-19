@@ -49,7 +49,7 @@ module Fastlane
           rows << [action.details]
           rows << [' ']
         end
-        rows << ["Originally created by #{action.author.green}"] if action.author
+        rows << ["Created by #{action.author.green}"] if action.author
 
         puts Terminal::Table.new(
           title: filter.green,

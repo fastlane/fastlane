@@ -13,7 +13,7 @@ describe Fastlane do
 
       it "works with :noclean" do
         result = Fastlane::FastFile.new.parse("lane :test do 
-          snapshot :noclean
+          snapshot(noclean: true)
         end").runner.execute(:test)
         expect(result).to eq(false)
 

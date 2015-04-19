@@ -6,6 +6,16 @@ With `fastlane` `1.0.0` it was necessary to do some breaking changes:
 
 ## Changed Integrations:
 
+### increment_build_number
+
+You now have to specify the key `build_number` New syntax:
+
+```ruby
+increment_build_number(
+  build_number: '75' # set a specific number
+)
+```
+
 ### increment_version_number
 
 You now have to specify the key `bump_type` to make this integration work. New syntax:
@@ -31,12 +41,14 @@ increment_version_number(
 )
 ```
 
-### increment_build_number
 
-You now have to specify the key `build_number` New syntax:
+### snapshot
+
+For `verbose` and `noclean` update your code to this:
 
 ```ruby
-increment_build_number(
-  build_number: '75' # set a specific number
+snapshot(
+  verbose: true, 
+  noclean: true
 )
 ```
