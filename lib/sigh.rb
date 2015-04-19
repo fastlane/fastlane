@@ -2,6 +2,7 @@ require 'sigh/version'
 require 'sigh/dependency_checker'
 require 'sigh/developer_center'
 require 'sigh/resign'
+require 'sigh/manager'
 
 require 'fastlane_core'
 

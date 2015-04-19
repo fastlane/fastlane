@@ -147,6 +147,20 @@ You can pass more information using the command line:
 
     sigh resign ./path/app.ipa -i "iPhone Distribution: Felix Krause" -p "my.mobileprovision"
 
+# Manage
+
+With `sigh manage` you can list all provisioning profiles installed locally.
+
+    sigh manage
+
+Delete all expired provisioning profiles
+
+    sigh manage -e
+
+Or delete all `iOS Team Provisioning Profile` by using a regular expression
+
+    sigh manage -p "iOS\ ?Team Provisioning Profile:"
+
 ## Environment Variables
 In case you prefer environment variables:
 
