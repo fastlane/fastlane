@@ -93,8 +93,13 @@ module Sigh
                 elsif current_cert['status'] == 'Active'
                   return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
                 elsif ['Expired', 'Invalid'].include? current_cert['status']
-                  renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
-                  return maintain_app_certificate(false) # recursive
+                  # Broken profile
+                  begin
+                    renew_profile(current_cert['provisioningProfileId']) # This one needs to be renewed
+                    return maintain_app_certificate(false) # recursive
+                  rescue
+                    # Something went wrong, just create a new one instead
+                  end
                 end
 
                 break
