@@ -3,8 +3,7 @@ module Fastlane
     def self.all
       [
         :ios,
-        :mac,
-        :android
+        :mac
       ]
     end
 
