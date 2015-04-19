@@ -37,8 +37,17 @@ module Fastlane
 
       def self.available_options
         [
-          ['files', 'Array of files the changes should be discarded from. If not given, all files will be discarded'],
-          ['force', 'Skip verifying of previously clean state of repo. Only recommended in combination with `files` option']
+          FastlaneCore::ConfigItem.new(key: :files,
+                                       env_name: "FL_RESET_GIT_FILES",
+                                       description: "Array of files the changes should be discarded from. If not given, all files will be discarded",
+                                       verify_block: Proc.new do |value|
+                                        raise "Please pass an array only" unless value.kind_of?Array
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :force,
+                                       env_name: "FL_RESET_GIT_FORCE",
+                                       description: "Skip verifying of previously clean state of repo. Only recommended in combination with `files` option",
+                                       is_string: false,
+                                       default_value: false),
         ]
       end
 
