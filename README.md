@@ -191,7 +191,8 @@ devices([
 languages([
   "en-US",
   "de-DE",
-  "es-ES"
+  "es-ES",
+  ["cmn-Hans", "cmn-Hans_CN"] # you can specify a locale if needed
 ])
 ```
 
