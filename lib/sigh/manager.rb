@@ -1,7 +1,7 @@
 require 'plist'
 
 module Sigh
-  class Manage
+  class Manager
     def self.start
       path = Sigh::DeveloperCenter.new.run
 
