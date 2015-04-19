@@ -6,6 +6,25 @@ With `fastlane` `1.0.0` it was necessary to do some breaking changes:
 
 ## Changed Integrations:
 
+### deliver
+
+If you want to pass options to `deliver`, you have to upgrade to the new syntax:
+
+```ruby
+deliver(
+  beta: true
+)
+```
+
+All available options:
+```ruby
+deliver(
+  force: true,# Set to true to skip PDF verification
+  beta: true, # Upload a new version to TestFlight
+  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
+  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+)
+
 ### increment_build_number
 
 You now have to specify the key `build_number` New syntax:
@@ -14,6 +33,8 @@ You now have to specify the key `build_number` New syntax:
 increment_build_number(
   build_number: '75' # set a specific number
 )
+
+
 ```
 
 ### increment_version_number
