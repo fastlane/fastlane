@@ -41,7 +41,7 @@ module PEM
                                      optional: true,
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
-                                     end),
+                                     end)
       ]
     end
   end

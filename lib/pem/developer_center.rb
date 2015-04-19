@@ -46,7 +46,7 @@ module PEM
       unless cert_section.empty?
         data_s = cert_section.last.all('dd').last.text
         data = Date.parse(data_s)
-        data - Time.now.to_date > 14  # valid for more than 2 weeks
+        data - Time.now.to_date > 30  # valid for more than 30 days (Apple email)
       end
     end
 
