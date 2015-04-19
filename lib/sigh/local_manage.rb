@@ -46,25 +46,31 @@ module Sigh
       now = DateTime.now
       soon = (Date.today + 30).to_datetime
 
-      Helper.log.info "Provisioning profiles installed"
-      Helper.log.info "Valid:"
       profiles_valid = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] > soon }
-      profiles_valid.each do |profile|
-        Helper.log.info profile["Name"].green
+      if profiles_valid.count > 0
+        Helper.log.info "Provisioning profiles installed"
+        Helper.log.info "Valid:"
+        profiles_valid.each do |profile|
+          Helper.log.info profile["Name"].green
+        end
       end
 
-      Helper.log.info ""
-      Helper.log.info "Expiring within 30 day:"
       profiles_soon = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] < soon }
-      profiles_soon.each do |profile|
-        Helper.log.info profile["Name"].yellow
-      end      
+      if profiles_soon.count > 0
+        Helper.log.info ""
+        Helper.log.info "Expiring within 30 day:"
+        profiles_soon.each do |profile|
+          Helper.log.info profile["Name"].yellow
+        end
+      end
       
-      Helper.log.info ""
-      Helper.log.info "Expired:"
       profiles_expired = profiles.select { |profile| profile["ExpirationDate"] < now }
-      profiles_expired.each do |profile|
-        Helper.log.info profile["Name"].red
+      if profiles_expired.count > 0
+        Helper.log.info ""
+        Helper.log.info "Expired:"
+        profiles_expired.each do |profile|
+          Helper.log.info profile["Name"].red
+        end
       end
       
       Helper.log.info ""
