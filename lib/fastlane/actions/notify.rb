@@ -12,7 +12,7 @@ module Fastlane
         "Shows a Mac OS X notification"
       end
 
-      def author
+      def self.author
         "champo"
       end
 

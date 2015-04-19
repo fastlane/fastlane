@@ -19,7 +19,7 @@ module Fastlane
     #
     class XcodeSelectAction < Action
       def self.run(params)
-        xcode_path = params.first
+        xcode_path = (params.first rescue nil)
 
         # Verify that a param was passed in
         raise "Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red unless xcode_path.to_s.length > 0

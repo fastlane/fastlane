@@ -15,9 +15,9 @@ module Fastlane
       File.exist?(path)
     end
 
-    def self.create_folder!
-      path = "./#{FOLDER_NAME}"
-      FileUtils.mkdir_p path
+    def self.create_folder!(path = nil)
+      path = File.join(path || '.', FOLDER_NAME)
+      FileUtils.mkdir_p(path)
       Helper.log.info "Created new folder '#{path}'.".green
     end
   end

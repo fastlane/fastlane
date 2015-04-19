@@ -17,6 +17,11 @@ module Fastlane
       @lane_context ||= {}
     end
 
+    # Used in tests to get a clear lane before every test
+    def self.clear_lane_context
+      @lane_context = nil
+    end
+
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
     def self.execute_action(step_name)

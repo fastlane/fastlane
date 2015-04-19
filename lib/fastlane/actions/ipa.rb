@@ -5,20 +5,6 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    # -w, --workspace                   WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)
-    # -p, --project PROJECT             Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)
-    # -c, --configuration CONFIGURATION Configuration used to build
-    # -s, --scheme SCHEME               Scheme used to build app
-    # --xcconfig XCCONFIG               use an extra XCCONFIG file to build the app
-    # --xcargs XCARGS                   pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.
-    # --[no-]clean                      Clean project before building
-    # --[no-]archive                    Archive project after building
-    # -d, --destination DESTINATION     Destination. Defaults to current directory
-    # -m, --embed PROVISION             Sign .ipa file with .mobileprovision
-    # -i, --identity IDENTITY           Identity to be used along with --embed
-    # --sdk SDK                         use SDK as the name or path of the base SDK when building the project
-    # --ipa IPA                         specify the name of the .ipa file to generate (including file extension)
-
     ARGS_MAP = {
       workspace: '-w',
       project: '-p',
@@ -31,6 +17,7 @@ module Fastlane
       identity: '-i',
       sdk: '--sdk',
       ipa: '--ipa',
+      xcconfig: '--xcconfig',
       xcargs: '--xcargs',
     }
 
@@ -48,24 +35,15 @@ module Fastlane
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
-        params[0] ||= {} # default to hash to fill in default values
-
-        # Allows for a whole variety of configurations
-        if params.first.is_a? Hash
-
-          # Used to get the final path of the IPA and dSYM
-          if dest = params.first[:destination]
-            absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
-          end
-
-          # Maps nice developer build parameters to Shenzhen args
-          build_args = params_to_build_args(params.first)
-
-        else
-          build_args = params
+        # Used to get the final path of the IPA and dSYM
+        if dest = params[:destination]
+          absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
         end
 
-        unless (params.first[:scheme] rescue nil)
+        # Maps nice developer build parameters to Shenzhen args
+        build_args = params_to_build_args(params)
+
+        unless (params[:scheme] rescue nil)
           Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any outupt, please pass a `scheme`"
         end
 
@@ -96,10 +74,10 @@ module Fastlane
         ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
       end
 
-      def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive
-        params = params.delete_if { |k, v| (k != :clean && k != :archive) && v.nil? }
+      def self.params_to_build_args(config)
+        params = config.values
 
+        params = params.delete_if { |k, v| v.nil? }
         params = fill_in_default_values(params)
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
@@ -108,6 +86,8 @@ module Fastlane
           if args = ARGS_MAP[k]
             if k == :clean
               v == true ? '--clean' : '--no-clean'
+            elsif k == :archive
+              v == true ? '--archive' : nil
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip
@@ -143,20 +123,62 @@ module Fastlane
       end
 
       def self.available_options
-        # [
-          # ['workspace', 'Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)'],
-          # ['project', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory'],
-          # ['configuration', 'Configuration used to build'],
-          # ['scheme', 'Scheme used to build app'],
-          # ['clean', 'use an extra XCCONFIG file to build the app'],
-          # ['archive', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'],
-          # ['destination', 'Clean project before building'],
-          # ['embed', 'Archive project after building'],
-          # ['identity', 'Destination. Defaults to current directory'],
-          # ['sdk', 'Sign .ipa file with .mobileprovision'],
-          # ['ipa', 'Identity to be used along with --embed'],
-          # ['xcargs', 'specify the name of the .ipa file to generate (including file extension)']
-        # ]
+        [
+          FastlaneCore::ConfigItem.new(key: :workspace,
+                                       env_name: "IPA_WORKSPACE",
+                                       description: "WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project,
+                                       env_name: "IPA_PROJECT",
+                                       description: "Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "IPA_CONFIGURATION",
+                                       description: "Configuration used to build",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :scheme,
+                                       env_name: "IPA_SCHEME",
+                                       description: "Scheme used to build app",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :clean,
+                                       env_name: "IPA_CLEAN",
+                                       description: "Clean project before building",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :archive,
+                                       env_name: "IPA_ARCHIVE",
+                                       description: "Archive project after building",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :destination,
+                                       env_name: "IPA_DESTINATION",
+                                       description: "Build destination. Defaults to current directory",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :embed,
+                                       env_name: "IPA_EMBED",
+                                       description: "Sign .ipa file with .mobileprovision",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :identity,
+                                       env_name: "IPA_IDENTITY",
+                                       description: "Identity to be used along with --embed",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sdk,
+                                       env_name: "IPA_SDK",
+                                       description: "Use SDK as the name or path of the base SDK when building the project",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "IPA_IPA",
+                                       description: "Specify the name of the .ipa file to generate (including file extension)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :xcconfig,
+                                       env_name: "IPA_XCCONFIG",
+                                       description: "Use an extra XCCONFIG file to build the app",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :xcargs,
+                                       env_name: "IPA_XCARGS",
+                                       description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
+                                       optional: true),
+        ]
       end
 
       def self.output

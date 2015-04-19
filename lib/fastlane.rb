@@ -11,6 +11,7 @@ require 'fastlane/action'
 require 'fastlane/actions/actions_helper'
 require 'fastlane/action_collector'
 require 'fastlane/supported_platforms'
+require 'fastlane/configuration_helper'
 
 require 'fastlane_core'
 

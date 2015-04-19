@@ -6,9 +6,8 @@ module Fastlane
 
     class SnapshotAction < Action
       def self.run(params)
-        clean = true
-        clean = false if params.include?(:noclean)
-        $verbose = true if params.include?(:verbose)
+        $verbose = true if params[:verbose]
+        clean = !params[:noclean]
 
         if Helper.test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
@@ -17,7 +16,7 @@ module Fastlane
 
         require 'snapshot'
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
+        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
 
         begin
           Dir.chdir(FastlaneFolder.path) do
@@ -39,8 +38,16 @@ module Fastlane
 
       def self.available_options
         [
-          ['noclean', 'Skips the clean process when building the app'],
-          ['verbose', 'Print out the UI Automation output']
+          FastlaneCore::ConfigItem.new(key: :noclean,
+                                       env_name: "FL_SNAPSHOT_NO_CLEAN",
+                                       description: "Skips the clean process when building the app",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_SNAPSHOT_VERBOSE",
+                                       description: "Print out the UI Automation output",
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

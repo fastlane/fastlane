@@ -1,3 +1,5 @@
+require 'credentials_manager'
+
 module Fastlane
   module Actions
     class RegisterDevicesAction < Action
@@ -9,17 +11,12 @@ module Fastlane
 
       def self.run(params)
         require 'cupertino/provisioning_portal'
-        require 'credentials_manager'
         require 'csv'
-
-        params = params.first
-
-        raise 'You must pass valid params to the register_devices action. Please check the readme.'.red if (params.nil? || params.empty?)
 
         devices       = params[:devices]
         devices_file  = params[:devices_file]
-        team_id       = params[:team_id] || ENV['CUPERTINO_TEAM_ID'] || ENV['FASTLANE_TEAM_ID']
-        username      = params[:username] || ENV['CUPERTINO_USERNAME']
+        team_id       = params[:team_id]
+        username      = params[:username]
 
         if devices
           device_objs = devices.map do |k, v|
@@ -69,10 +66,25 @@ module Fastlane
 
       def self.available_options
         [
-          ['devices', 'A hash of devices, with the name as key and the UDID as value'],
-          ['device_file', 'Instead, you can proide a path containing all UDIDs'],
-          ['team_id', 'optional: Your team ID'],
-          ['username', 'optional: Your Apple ID']
+          FastlaneCore::ConfigItem.new(key: :devices,
+                                       env_name: "FL_REGISTER_DEVICES_DEVICES",
+                                       description: "A hash of devices, with the name as key and the UDID as value",
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :devices_file,
+                                       env_name: "FL_REGISTER_DEVICES_FILE",
+                                       description: "Provide a path to the devices to register",
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        raise "Could not find file '#{value}'".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :team_id,
+                                       env_name: "FASTLANE_TEAM_ID",
+                                       description: "optional: Your team ",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :username,
+                                       env_name: "CUPERTINO_USERNAME",
+                                       description: "optional: Your Apple ID ",
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
         ]
       end
 

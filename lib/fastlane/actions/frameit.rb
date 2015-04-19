@@ -7,9 +7,9 @@ module Fastlane
         require 'frameit'
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('frameit')
+          FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
           color = Frameit::Editor::Color::BLACK
-          color = Frameit::Editor::Color::SILVER if [:silver, :white].include?(params.first)
+          color = Frameit::Editor::Color::SILVER if [:silver, :white].include?(params)
 
           screenshots_folder = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
           screenshots_folder ||= FastlaneFolder.path

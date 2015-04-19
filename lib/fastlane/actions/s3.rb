@@ -12,18 +12,6 @@ module Fastlane
       S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
     end
 
-    # -f, --file FILE      .ipa file for the build 
-    # -d, --dsym FILE      zipped .dsym package for the build 
-    # -a, --access-key-id ACCESS_KEY_ID AWS Access Key ID 
-    # -s, --secret-access-key SECRET_ACCESS_KEY AWS Secret Access Key 
-    # -b, --bucket BUCKET  S3 bucket 
-    # --[no-]create        Create bucket if it doesn't already exist 
-    # -r, --region REGION  Optional AWS region (for bucket creation) 
-    # --acl ACL            Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read 
-    # --source-dir SOURCE  Optional source directory e.g. ./build 
-    # -P, --path PATH      S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  
-    #              eg. "/path/to/folder/{CFBundleVersion}/" could be evaluated as "/path/to/folder/1.0.0/" 
-
     S3_ARGS_MAP = {
       ipa: '-f',
       dsym: '-d',
@@ -37,23 +25,19 @@ module Fastlane
     }
 
     class S3Action < Action
-      def self.run(params)
-        
-        params[0] ||= {}
-        unless params.first.is_a?Hash
-          raise "Please pass the required information to the s3 action." 
-        end
+      def self.run(config)
 
-        # Other things that we need
-        params = params.first
-
-        params[:access_key] ||= ENV['S3_ACCESS_KEY'] || ENV['AWS_ACCESS_KEY_ID']
-        params[:secret_access_key] ||= ENV['S3_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY']
-        params[:bucket] ||= ENV['S3_BUCKET'] || ENV['AWS_BUCKET_NAME']
-        params[:region] ||= ENV['S3_REGION'] || ENV['AWS_REGION']
-        params[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        params[:dsym] ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
-        params[:path] ||= 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'
+        # Calling fetch on config so that default values will be used
+        params = {}
+        params[:ipa] = config[:ipa]
+        params[:dsym] = config[:dsym]
+        params[:access_key] = config[:access_key]
+        params[:secret_access_key] = config[:secret_access_key]
+        params[:bucket] = config[:bucket]
+        params[:region] = config[:region]
+        params[:acl] = config[:acl]
+        params[:source] = config[:source]
+        params[:path] = config[:path]
 
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
@@ -247,14 +231,49 @@ module Fastlane
 
       def self.available_options
         [
-          ['access_key', 'AWS S3 Access Key', 'S3_ACCESS_KEY'],
-          ['secret_access_key', 'AWS S3 Secret Key', 'S3_SECRET_ACCESS_KEY'],
-          ['bucket', 'The bucket to store the ipa and plist in', 'S3_BUCKET'],
-          ['region', 'The region of your S3 server', 'S3_REGION'],
-          ['file', 'Path the ipa file to upload'],
-          ['dsym', 'Path to your dsym file'],
-          ['path', 'The path how it\'s used on S3']
-          # TODO: there are more options
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "",
+                                       description: ".ipa file for the build ",
+                                       optional: true,
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]),
+          FastlaneCore::ConfigItem.new(key: :dsym,
+                                       env_name: "",
+                                       description: "zipped .dsym package for the build ",
+                                       optional: true,
+                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
+          FastlaneCore::ConfigItem.new(key: :access_key,
+                                       env_name: "S3_ACCESS_KEY",
+                                       description: "AWS Access Key ID ",
+                                       optional: true,
+                                       default_value: ENV['AWS_ACCESS_KEY_ID']),
+          FastlaneCore::ConfigItem.new(key: :secret_access_key,
+                                       env_name: "S3_SECRET_ACCESS_KEY",
+                                       description: "AWS Secret Access Key ",
+                                       optional: true,
+                                       default_value: ENV['AWS_SECRET_ACCESS_KEY']),
+          FastlaneCore::ConfigItem.new(key: :bucket,
+                                       env_name: "S3_BUCKET",
+                                       description: "AWS bucket name",
+                                       optional: true,
+                                       default_value: ENV['AWS_BUCKET_NAME']),
+          FastlaneCore::ConfigItem.new(key: :region,
+                                       env_name: "S3_REGION",
+                                       description: "AWS region (for bucket creation) ",
+                                       optional: true,
+                                       default_value: ENV['AWS_REGION']),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: "S3_PATH",
+                                       description: "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  ",
+                                       optional: true,
+                                       default_value: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'),
+          FastlaneCore::ConfigItem.new(key: :source,
+                                       env_name: "S3_SOURCE",
+                                       description: "Optional source directory e.g. ./build ",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :acl,
+                                       env_name: "S3_ACL",
+                                       description: "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read ",
+                                       optional: true,),
         ]
       end
 

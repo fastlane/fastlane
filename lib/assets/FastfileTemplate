@@ -9,6 +9,9 @@
 # Uncomment the following line to opt out
 # opt_out_usage
 
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
 fastlane_version "[[FASTLANE_VERSION]]"

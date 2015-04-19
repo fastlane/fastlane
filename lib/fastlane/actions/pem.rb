@@ -13,7 +13,7 @@ module Fastlane
         values = params.first
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pem')
+          FastlaneCore::UpdateChecker.start_looking_for_update('pem') unless Helper.is_test?
 
           success_block = values[:new_profile]
           values.delete(:new_profile) # as it's not in the configs

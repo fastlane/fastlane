@@ -30,17 +30,10 @@ module Fastlane
         message
       end
 
-      def self.run(params)
-        options = { message: '',
-                    success: true,
-                    channel: nil,
-                    payload: {}
-                  }.merge(params.first || {})
-
+      def self.run(options)
         require 'slack-notifier'
 
         options[:message] = self.trim_message(options[:message].to_s || '')
-
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
         url = ENV['SLACK_URL']
@@ -79,11 +72,36 @@ module Fastlane
 
       def self.available_options
         [
-          ['message', 'The message that should be displayed on Slack. This supports the standard Slack markup language'],
-          ['channel', '#channel or @username'],
-          ['success', 'Success or error?'],
-          ['payload', 'Add additional information to this post. payload must be a hash containg any key with any value'],
-          ['default_payloads', 'Remove some of the default payloads. More information about the available payloads GitHub']
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_SLACK_MESSAGE",
+                                       description: "The message that should be displayed on Slack. This supports the standard Slack markup language",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :channel,
+                                       env_name: "FL_SLACK_CHANNEL",
+                                       description: "#channel or @username",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :slack_url,
+                                       env_name: "SLACK_URL",
+                                       description: "Create an Incoming WebHook for your Slack group",
+                                       verify_block: Proc.new do |value|
+                                        raise "Invalid URL, must start with https://" unless value.start_with?"https://"
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :payload,
+                                       env_name: "FL_SLACK_PAYLOAD",
+                                       description: "Add additional information to this post. payload must be a hash containg any key with any value",
+                                       default_value: {},
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :default_payloads,
+                                       env_name: "FL_SLACK_DEFAULT_PAYLOADS",
+                                       description: "Remove some of the default payloads. More information about the available payloads on GitHub",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :success,
+                                       env_name: "FL_SLACK_SUCCESS",
+                                       description: "Was this build successful? (true/false)",
+                                       optional: true,
+                                       default_value: true,
+                                       is_string: false),
         ]
       end
 

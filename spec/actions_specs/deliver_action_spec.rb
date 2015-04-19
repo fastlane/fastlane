@@ -31,6 +31,28 @@ describe Fastlane do
         end
       end
 
+      it "works with custom setting" do
+        test_val = "test_val"
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
+
+        Dir.chdir(test_path) do
+          expect {
+            
+            Fastlane::FastFile.new.parse("lane :test do 
+              deliver(
+                force: true,
+                beta: true,
+                skip_deploy: true,
+                deliver_file_path: '../example'
+              )
+            end").runner.execute(:test)
+
+          }.to raise_error("Couldn't find folder '../example'. Make sure to pass the path to the directory not the file!".red)
+
+          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
+        end
+      end
+
       after do
         File.delete(@app_file)
         File.delete(@deliver_file)

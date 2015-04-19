@@ -33,7 +33,9 @@ module Fastlane
                   error: @error
                 )
 
-          Excon.post(url)
+          unless Helper.is_test? # don't send test data
+            Excon.post(url)
+          end
         end
       end
     end

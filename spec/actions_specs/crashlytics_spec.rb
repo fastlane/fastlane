@@ -13,7 +13,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             crashlytics()
           end").runner.execute(:test)
-        }.to raise_error("You have to pass Crashlytics parameters to the Crashlytics action, take a look at https://github.com/KrauseFx/fastlane#crashlytics".red)
+        }.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
       end
 
       it "raises an error if no crashlytics path was given" do

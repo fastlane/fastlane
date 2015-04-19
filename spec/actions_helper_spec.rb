@@ -32,6 +32,8 @@ describe Fastlane do
       it "can load custom paths" do
         Fastlane::Actions.load_external_actions("spec/fixtures/actions")
         Fastlane::Actions::ExampleActionAction.run(nil)
+        Fastlane::Actions::ExampleActionSecondAction.run(nil)
+        Fastlane::Actions::ArchiveAction.run(nil)
       end
 
       it "can throws an error if plugin is damaged" do

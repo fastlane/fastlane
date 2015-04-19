@@ -13,7 +13,9 @@ describe Fastlane do
       it "raises an error if no slack URL is given" do
         ENV.delete 'SLACK_URL'
         expect {
-          Fastlane::Actions::SlackAction.run([])
+          Fastlane::FastFile.new.parse("lane :test do 
+            slack
+          end").runner.execute(:test)
         }.to raise_exception('No SLACK_URL given.'.red)
       end
 
@@ -24,11 +26,20 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run([{
+        require 'fastlane/actions/slack'
+        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
           message: message,
           success: false,
-          channel: channel
-        }])
+          channel: channel,
+          payload: {
+            'Build Date' => Time.new.to_s,
+            'Built by' => 'Jenkins',
+          },
+          default_payloads: [:lane, :test_result, :git_branch, :git_author]
+        })
+
+
+        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
 
         expect(notifier.default_payload[:username]).to eq('fastlane')
         expect(notifier.default_payload[:channel]).to eq(channel)
@@ -37,11 +48,14 @@ describe Fastlane do
         expect(attachments[:text]).to eq(message)
 
         fields = attachments[:fields]
-        expect(fields[0][:title]).to eq('Lane')
-        expect(fields[0][:value]).to eq(lane_name)
+        expect(fields[1][:title]).to eq('Built by')
+        expect(fields[1][:value]).to eq('Jenkins')
 
-        expect(fields[1][:title]).to eq('Test Result')
-        expect(fields[1][:value]).to eq('Error')
+        expect(fields[2][:title]).to eq('Lane')
+        expect(fields[2][:value]).to eq(lane_name)
+
+        expect(fields[3][:title]).to eq('Test Result')
+        expect(fields[3][:value]).to eq('Error')
       end
     end
   end

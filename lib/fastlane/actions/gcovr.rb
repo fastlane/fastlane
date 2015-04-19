@@ -60,8 +60,8 @@ module Fastlane
         gcovr_args = nil
 
         # Allows for a whole variety of configurations
-        if params.first.is_a? Hash
-          params_hash = params.first
+        if params.is_a? Hash
+          params_hash = params
 
           # Check if an output path was given
           if params_hash.has_key? :output
