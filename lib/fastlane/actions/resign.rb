@@ -5,20 +5,9 @@ module Fastlane
       def self.run(params)
         require 'sigh'
 
-        params = params.first
-
-        raise 'You must pass valid params to the resign action. Please check the README.md'.red if (params.nil? || params.empty?)
-
-        ipa                   = params[:ipa] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        signing_identity      = params[:signing_identity]
-        provisioning_profile  = params[:provisioning_profile] || Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
-
-        raise 'Please pass a valid ipa which should be a path to an ipa on disk'.red unless ipa
-        raise 'Please pass a valid signing_identity'.red unless signing_identity
-        raise 'Please pass a valid provisioning_profile which should be a path to a profile on disk.'.red unless provisioning_profile
 
         # try to resign the ipa
-        if Sigh::Resign.resign(ipa, signing_identity, provisioning_profile)
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile])
           Helper.log.info 'Successfully re-signed .ipa 🔏.'.green
         else
           raise 'Failed to re-sign .ipa'.red
@@ -26,14 +15,28 @@ module Fastlane
       end
 
       def self.description
-        "Code sign an existing ipa file"
+        "Codesign an existing ipa file"
       end
 
       def self.available_options
         [
-          ['ipa', 'Path to the ipa file to resign. Optional if you use the `ipa` or `xcodebuild` action'],
-          ['signing_identity', 'Code signing identity to use. e.g. "iPhone Distribution: Luka Mirosevic (0123456789)"'],
-          ['provisioning_profile', 'Path to your provisioning_profile. Optional if you use `sigh`']
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "FL_RESIGN_IPA",
+                                       description: "Path to the ipa file to resign. Optional if you use the `ipa` or `xcodebuild` action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       verify_block: Proc.new do |value|
+                                        raise "No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :signing_identity,
+                                       env_name: "FL_RESIGN_SIGNING_IDENTITY",
+                                       description: "Code signing identity to use. e.g. \"iPhone Distribution: Luka Mirosevic (0123456789)\""),
+          FastlaneCore::ConfigItem.new(key: :provisioning_profile,
+                                       env_name: "FL_RESIGN_PROVISIONING_PROFILE",
+                                       description: "Path to your provisioning_profile. Optional if you use `sigh`",
+                                       default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       verify_block: Proc.new do |value|
+                                        raise "No provisioning_profile file given or found, pass using `provisioning_profile: 'path/app.mobileprovision'`".red unless File.exists?(value)
+                                       end)
         ]
       end
 
