@@ -4,7 +4,7 @@ describe Fastlane do
       ff = nil
       begin
         ff = Fastlane::FastFile.new.parse("lane :test do 
-          snapshot :noclean
+          snapshot(noclean: true)
           snapshot
         end")
       rescue

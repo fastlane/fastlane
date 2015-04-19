@@ -3,13 +3,14 @@ module Fastlane
     def self.parse(action, params)
       begin
         first_element = (action.available_options.first rescue nil) # might also be nil
+        
         if first_element and first_element.kind_of?FastlaneCore::ConfigItem
           # default use case
           return FastlaneCore::Configuration.create(action.available_options, params)
 
         elsif first_element
           Helper.log.error "Action '#{action}' uses the old configuration format."
-          raise "Old configuration format".red if Helper.is_test? # only fail in tests - this might be removed in the future, once all actions are migrated
+          puts "Old configuration format for action '#{action}'".red if Helper.is_test?
           return params
         else
 
