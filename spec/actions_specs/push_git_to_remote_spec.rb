@@ -7,7 +7,8 @@ describe Fastlane do
           push_to_git_remote
         end").runner.execute(:test)
 
-        expect(result).to eq("git push origin HEAD:HEAD --tags")
+        expect(result).to include("git push origin")
+        expect(result).to include("--tags")
       end
 
       it "works with options specified" do

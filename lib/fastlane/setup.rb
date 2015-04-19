@@ -12,7 +12,7 @@ module Fastlane
       return unless response
 
       begin
-        FastlaneFolder.create_folder!
+        FastlaneFolder.create_folder! unless Helper.is_test?
         copy_existing_files
         generate_app_metadata
         detect_installed_tools # after copying the existing files
