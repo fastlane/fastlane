@@ -84,7 +84,7 @@ This does the following:
 
 ```PEM``` will never revoke your existing certificates. 
 
-If you already have a push certificate enabled, which is active for at least 2 more weeks, `PEM` will not create a new certificate. If you still want to create one, use the `force`:
+If you already have a push certificate enabled, which is active for at least 30 more days, `PEM` will not create a new certificate. If you still want to create one, use the `force`:
 
     pem --force
 

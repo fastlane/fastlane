@@ -26,7 +26,7 @@ module PEM
         end
 
         if has_actual_cert and not PEM.config[:force]
-          Helper.log.info "You already have a push certificate, which is active for more than 2 more weeks. No need to create a new one".green
+          Helper.log.info "You already have a push certificate, which is active for more than 30 more days. No need to create a new one".green
           Helper.log.info "If you still want to create a new one, use the --force option when running PEM.".green
           false
         else
