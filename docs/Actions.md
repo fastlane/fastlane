@@ -636,11 +636,11 @@ testmunk
 
 ### update_fastlane
 
-This action will look at all installed fastlane-tools and update them to the next available minor version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues. 
+This action will look at all installed fastlane tools and update them to the next available minor version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues. 
 
 If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without runnin in sudo mode. 
 
-The simplest possible fix for this is putting the following lines into your `.bashrc` or `.zshrc` file:
+The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:
 
 ```bash
   export GEM_HOME=~/.gems
@@ -649,7 +649,7 @@ The simplest possible fix for this is putting the following lines into your `.ba
 
 After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
 
-Recommended usage of the update_fastlane action is at the top of the before_all block, before running any other action:
+Recommended usage of the update_fastlane action is at the top of the `before_all` block, before running any other action:
 
 ```ruby
   before_all do
