@@ -39,7 +39,8 @@ module Fastlane
                                        default_value: ENV["SIGH_UDID"],
                                        verify_block: Proc.new do |value|
                                         raise "Path is invalid".red unless File.exists?(value)
-                                       end),
+                                       end)
+        ]
       end
 
       def self.author
