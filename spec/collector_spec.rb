@@ -1,6 +1,8 @@
 describe Fastlane do
   describe Fastlane::ActionCollector do
     it "works with :noclean" do
+      ENV.delete("FASTLANE_OPT_OUT_USAGE")
+      
       ff = nil
       begin
         ff = Fastlane::FastFile.new.parse("lane :test do 
