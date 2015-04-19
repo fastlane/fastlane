@@ -75,10 +75,12 @@ module Sigh
       
       Helper.log.info ""
       Helper.log.info "Summary"
-      Helper.log.info "#{profiles.length} installed profiles"
-      Helper.log.info "#{profiles_expired.length} are expired".red
-      Helper.log.info "#{profiles_soon.length} are valid but will expire within 30 days".yellow
-      Helper.log.info "#{profiles_valid.length} are valid".green
+      Helper.log.info "#{profiles.count} installed profiles"
+      Helper.log.info "#{profiles_expired.count} are expired".red
+      Helper.log.info "#{profiles_soon.count} are valid but will expire within 30 days".yellow
+      Helper.log.info "#{profiles_valid.count} are valid".green
+
+      Helper.log.info "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
     end
 
     def self.cleanup_profiles(expired = false, pattern = nil)
@@ -92,10 +94,10 @@ module Sigh
       end
 
       if agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
-        Helper.log.info "Deleting #{profiles.length} profiles"
         profiles.each do |profile|
           File.delete profile["Path"]
         end
+        Helper.log.info "\n\nDeleted #{profiles.length} profiles".green
       end
     end
 
