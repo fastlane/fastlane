@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
 
-  spec.add_dependency 'fastlane_core', '>= 0.5.2' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.6.0' # all shared code and dependencies
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 0.9.1'
