@@ -21,6 +21,9 @@ module Fastlane
       ]
 
       def self.run(options)
+        if options[:no_update]
+          return
+        end
 
         tools_to_update = options[:tools]
         tools_to_update ||= all_installed_tools
