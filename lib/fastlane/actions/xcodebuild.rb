@@ -66,7 +66,7 @@ module Fastlane
         end
 
 
-        if params = params.first
+        if params
           # Operation bools
           archiving = params.key? :archive
           exporting = params.key? :export_archive
@@ -246,9 +246,9 @@ module Fastlane
 
     class XcarchiveAction < Action
       def self.run(params)
-        params_hash = params.first || {}
+        params_hash = params || {}
         params_hash[:archive] = true
-        XcodebuildAction.run([params_hash])
+        XcodebuildAction.run(params_hash)
       end
 
       def self.description
@@ -261,14 +261,23 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.available_options
+        [
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
       end
     end
 
     class XcbuildAction < Action
       def self.run(params)
-        params_hash = params.first || {}
+        params_hash = params || {}
         params_hash[:build] = true
-        XcodebuildAction.run([params_hash])
+        XcodebuildAction.run(params_hash)
       end
 
       def self.description
@@ -281,14 +290,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.available_options
+        [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
       end
     end
 
     class XccleanAction < Action
       def self.run(params)
-        params_hash = params.first || {}
+        params_hash = params || {}
         params_hash[:clean] = true
-        XcodebuildAction.run([params_hash])
+        XcodebuildAction.run(params_hash)
       end
 
       def self.description
@@ -302,13 +321,23 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.available_options
+        [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
+      end
     end
 
     class XcexportAction < Action
       def self.run(params)
-        params_hash = params.first || {}
+        params_hash = params || {}
         params_hash[:export_archive] = true
-        XcodebuildAction.run([params_hash])
+        XcodebuildAction.run(params_hash)
       end
 
       def self.description
@@ -317,6 +346,16 @@ module Fastlane
 
       def self.author
         "dtrenz"
+      end
+
+      def self.available_options
+        [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information']
+        ]
       end
 
       def self.is_supported?(platform)
@@ -326,17 +365,22 @@ module Fastlane
 
     class XctestAction < Action
       def self.run(params)
-        params_hash = params.first || {}
+        params_hash = params || {}
         params_hash[:test] = true
-        XcodebuildAction.run([params_hash])
+        XcodebuildAction.run(params_hash)
       end
 
       def self.description
         "Runs tests on the given simulator"
       end
 
-      def available_options
+      def self.available_options
         [
+          ['archive', 'Set to true to build archive'],
+          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
+          ['workspace', 'The workspace to use'],
+          ['scheme', 'The scheme to build'],
+          ['build_settings', 'Hash of additional build information'],
           ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
         ]
       end
