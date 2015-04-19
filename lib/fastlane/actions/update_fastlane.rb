@@ -20,8 +20,7 @@ module Fastlane
         "credentials_manager"
       ]
 
-      def self.run(params)
-        options = ConfigurationHelper.parse(self, params)
+      def self.run(options)
 
         tools_to_update = options[:tools]
         tools_to_update ||= all_installed_tools
