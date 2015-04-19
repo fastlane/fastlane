@@ -3,7 +3,7 @@ module Fastlane
     # Adds a git tag to the current commit
     class PushToGitRemoteAction < Action
       def self.run(params)
-        local_branch  = params[:local_branch] || Actions.git_branch.gsub(/#{params[:remote]}\//, '') || 'master'
+        local_branch  = params[:local_branch] || (Actions.git_branch.gsub(/#{params[:remote]}\//, '') rescue nil) || 'master'
         remote_branch = params[:remote_branch] || local_branch
 
         # construct our command as an array of components
