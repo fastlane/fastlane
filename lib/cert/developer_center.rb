@@ -160,7 +160,6 @@ module Cert
         certificateStatuses = wait_for_variable('certificateStatuses')
 
         url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
-        url += "&pageSize=5000&pageNumber=1&sort=name=asc"
 
         # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution&pageSize=50&pageNumber=1&sort=name=asc
 
@@ -168,7 +167,9 @@ module Cert
 
         certTypeName = 'iOS Distribution'
         certTypeName = 'iOS Development' if @type == DEVELOPMENT
-        certs = post_ajax(url)['certRequests']
+        certs = post_ajax(url, "{pageNumber: 1, pageSize: 500, sort: 'name%3dasc'}")['certRequests']
+
+        raise "Something went wrong with request to #{url}" unless certs
         certs.each do |current_cert|
           if current_cert['typeString'] == certTypeName
             # The other profiles are push profiles
