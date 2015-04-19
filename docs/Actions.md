@@ -239,14 +239,20 @@ gcovr({
 deliver
 ```
 
-To upload a new build to TestFlight use ```deliver :beta```.
+To upload a new build to TestFlight use ```deliver(beta: true)```.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver :force`
+If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
 
 Other options
 
-- ```deliver :skip_deploy```: To don't submit the app for review (works with both App Store and beta builds)
-- ```deliver :force, :skip_deploy```: Combine options using ```,```
+```ruby
+deliver(
+  force: true,# Set to true to skip PDF verification
+  beta: true, # Upload a new version to TestFlight
+  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
+  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+)
+```
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
@@ -321,7 +327,9 @@ This method will increment the **build number**, not the app version. Usually th
 
 ```ruby
 increment_build_number # automatically increment by one
-increment_build_number '75' # set a specific number
+increment_build_number(
+  build_number: '75' # set a specific number
+)
 
 increment_build_numer(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
@@ -333,14 +341,22 @@ increment_build_numer(
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
 ```ruby
-increment_version_number         # Automatically increment patch version number.
-increment_version_number "patch" # Automatically increment patch version number.
-increment_version_number "minor" # Automatically increment minor version number.
-increment_version_number "major" # Automatically increment major version number.
-increment_version_number '2.1.1' # Set a specific version number.
+increment_version_number # Automatically increment patch version number.
+increment_version_number(
+  bump_type: "patch" # Automatically increment patch version number
+)
+increment_version_number(
+  bump_type: "minor" # Automatically increment minor version number
+)
+increment_version_number(
+  bump_type: "major" # Automatically increment major version number
+)
+increment_version_number(
+  version_number: '2.1.1' # Set a specific version number
+)
 
 increment_version_number(
-  release_task: '2.1.1',                  # specify specific version number (optional, omitting it increments patch version number)
+  version_number: '2.1.1',                # specify specific version number (optional, omitting it increments patch version number)
   xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
@@ -479,7 +495,7 @@ If you have other uncommitted changes in your repo, this action will fail. If yo
 commit_version_bump
 
 commit_version_bump(
-  message: 'Version Bump',                         # create a commit with a custom message
+  message: 'Version Bump',                    # create a commit with a custom message
   xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project here
 )
 ```

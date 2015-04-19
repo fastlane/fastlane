@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class CocoapodsAction < Action
-      def self.run(_params)
+      def self.run(params)
         Actions.sh('pod install')
       end
 

@@ -12,7 +12,7 @@ module Fastlane
 
         return if Helper.test?
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('cert')
+        FastlaneCore::UpdateChecker.start_looking_for_update('cert') unless Helper.is_test?
 
         begin
           Dir.chdir(FastlaneFolder.path || Dir.pwd) do
@@ -37,7 +37,7 @@ module Fastlane
 
             Helper.log.info("Use signing certificate '#{certificate_id}' from now on!".green)
 
-            ENV["SIGH_CERTIFICATE_ID"] = certificate_id
+            ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
           end
         ensure
           FastlaneCore::UpdateChecker.show_update_status('cert', Cert::VERSION)

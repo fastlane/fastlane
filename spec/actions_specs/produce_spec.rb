@@ -6,7 +6,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do 
               produce('text')
             end").runner.execute(:test)
-        }.to raise_error("Parameter of produce must be a hash".red)
+        }.to raise_error("You have to pass the options for 'produce' in a different way. Please check out the current documentation on GitHub!".red)
       end
 
       it "stores passed parameters in the environment" do

@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::LaneManager do
-    describe "#init", now: true do
+    describe "#init" do
       it "raises an error on invalid platform" do
         expect {
           Fastlane::LaneManager.cruise_lane(123, nil)

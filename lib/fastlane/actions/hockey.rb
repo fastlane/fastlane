@@ -10,37 +10,25 @@ module Fastlane
     end
 
     class HockeyAction < Action
-      def self.run(params)
+      def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
-        options = {
-          notes: 'No changelog given',
-          status: 2,
-          notify: 1
-        }.merge(params.first)
-
-        options[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        options[:dsym] ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
 
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
-        raise "No API Token for Hockey given, pass using `api_token: 'token'`. Open https://rink.hockeyapp.net/manage/auth_tokens to get one".red unless options[:api_token].to_s.length > 0
-        raise "No IPA file given or found, pass using `ipa: 'path.ipa'`".red unless options[:ipa]
-        raise "IPA file on path '#{File.expand_path(options[:ipa])}' not found".red unless File.exist?(options[:ipa])
-
         if options[:dsym]
-          options[:dsym_filename] = options[:dsym]
+          dsym_filename = options[:dsym]
         else
           dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
           if File.exist?(dsym_path)
-            options[:dsym_filename] = dsym_path
+            dsym_filename = dsym_path
           else
             Helper.log.info "Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly".yellow
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(options[:dsym_filename])}' not found".red if (options[:dsym_filename] &&
-                                                                                                !File.exist?(options[:dsym_filename]))
+        raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if (dsym_filename &&
+                                                                                                !File.exist?(dsym_filename))
 
         Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
 
@@ -70,12 +58,38 @@ module Fastlane
 
       def self.available_options
         [
-          ['api_token', 'API Token for Hockey Access'],
-          ['ipa', 'Path to the ipa file. Optional if you use the `ipa` or `xcodebuild` action'],
-          ['notes', 'The changelog for this build'],
-          ['dsym', 'Path to the dsym file. Optional if you use the `ipa` or `xcodebuild` action'],
-          ['status', 'Download status: 1 = No user can download; 2 = Available for download'],
-          ['notify', 'Notify testers? 1 for yes'],
+          FastlaneCore::ConfigItem.new(key: :api_token,
+                                       env_name: "FL_HOCKEY_API_TOKEN",
+                                       description: "API Token for Hockey Access",
+                                       verify_block: Proc.new do |value|
+                                          raise "No API token for Hockey given, pass using `api_token: 'token'`".red unless (value and not value.empty?)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "FL_HOCKEY_IPA",
+                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       verify_block: Proc.new do |value|
+                                        raise "No IPA file given or found, pass using `ipa: 'path/app.ipa'`".red unless File.exists?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :dsym,
+                                       env_name: "FL_HOCKEY_DSYM",
+                                       description: "Path to your DSYM file",
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        # validation is done in the action
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :notes,
+                                       env_name: "FL_HOCKEY_NOTES",
+                                       description: "Beta Notes",
+                                       default_value: "No changelog given"),
+          FastlaneCore::ConfigItem.new(key: :notify,
+                                       env_name: "FL_HOCKEY_NOTIFY",
+                                       description: "Notify testers? 1 for yes",
+                                       default_value: 1),
+          FastlaneCore::ConfigItem.new(key: :status,
+                                       env_name: "FL_HOCKEY_STATUS",
+                                       description: "Download status: 1 = No user can download; 2 = Available for download",
+                                       default_value: "2")
         ]
       end
 
