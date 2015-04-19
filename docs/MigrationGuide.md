@@ -2,7 +2,13 @@ fastlane 1.0 Migration Guide
 ============================
 
 
-With `fastlane` `1.0.0` it was necessary to do some breaking changes:
+With `fastlane` `1.0.0` it was necessary to do some breaking changes. More information in the [release notes](https://github.com/KrauseFx/fastlane/releases/tag/0.12.0).
+
+**Important**: When migrating the actions to the new format, don't forget to specify the `fastlane` version on the top of your `Fastfile`:
+
+```ruby
+fastlane_version "0.12.0"
+```
 
 ## Changed Integrations:
 
