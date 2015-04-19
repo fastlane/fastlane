@@ -19,7 +19,7 @@ module Snapshot
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language_item|
 
-          if language_item.instance_of? String
+          if language_item.instance_of?String
             language = language_item
             locale = language_item
           else

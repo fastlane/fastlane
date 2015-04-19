@@ -191,17 +191,8 @@ devices([
 languages([
   "en-US",
   "de-DE",
-  "es-ES"
-])
-```
-
-If you want to use a specific locale, you can also use 
-
-```ruby
-languages([
-  "en-US",
-  "de-DE",
-  ["cmn-Hans", "cmn-Hans_CN"]
+  "es-ES",
+  ["cmn-Hans", "cmn-Hans_CN"] # you can specify a locale if needed
 ])
 ```
 
