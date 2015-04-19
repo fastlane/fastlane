@@ -10,15 +10,6 @@ describe Fastlane do
         expect(result).to eq([])
       end
 
-      it "works with array of arguments" do
-
-        expect {
-          result = Fastlane::FastFile.new.parse("lane :test do 
-            ipa '-s TestScheme', '-w Test.xcworkspace'
-          end").runner.execute(:test)
-        }.to raise_error("`ipa` action parameter must be a hash".red)
-      end
-
       it "works with object argument without clean and archive" do
 
         result = Fastlane::FastFile.new.parse("lane :test do 
@@ -54,7 +45,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(6)
+        expect(result.size).to eq(5)
       end
 
       it "works with object argument with all" do
@@ -66,7 +57,7 @@ describe Fastlane do
             configuration: 'Release',
             scheme: 'TestScheme',
             clean: true,
-            archive: nil,
+            archive: true,
             destination: 'Nowhere',
             embed: 'Sure',
             identity: 'bourne',
@@ -123,7 +114,7 @@ describe Fastlane do
             configuration: 'Release',
             scheme: 'TestScheme',
             clean: true,
-            archive: nil,
+            archive: true,
             destination: 'Nowhere',
             identity: 'bourne',
             sdk: '10.0',
