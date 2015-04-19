@@ -4,7 +4,7 @@ module Fastlane
       [
         :ios,
         :mac,
-        :mac
+        :android
       ]
     end
 
