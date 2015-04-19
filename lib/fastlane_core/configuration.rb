@@ -77,7 +77,7 @@ module FastlaneCore
       value = option.default_value if value == nil
       value = nil if (value == nil and not option.is_string) # by default boolean flags are false
 
-      return value if value # we already have a value
+      return value unless value.nil? # we already have a value
       return value if option.optional # as this value is not required, just return what we have
       
 
@@ -106,7 +106,7 @@ module FastlaneCore
 
     # Overwrites or sets a new value for a given key
     def set(key, value)
-      raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?Symbol
+      raise "Key '#{key}' must be a symbol. Example :#{key}.".red unless key.kind_of?Symbol
       option = option_for_key(key)
       
       unless option
