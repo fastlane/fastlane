@@ -57,7 +57,7 @@ module Fastlane
                                        description: "Specify a path to the directory containing the Deliverfile",
                                        default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
                                        verify_block: Proc.new do |value|
-                                        raise "Couldn't find folder. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
+                                        raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
                                        end)
         ]
       end

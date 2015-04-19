@@ -8,10 +8,9 @@ module Fastlane
       def self.run(params)
         require 'produce'
 
-        hash = params.first || {}
-        raise 'Parameter of produce must be a hash'.red unless hash.is_a?(Hash)
+        raise 'Parameter of produce must be a hash'.red unless params.is_a?(Hash)
 
-        hash.each do |key, value|
+        params.each do |key, value|
           ENV[key.to_s.upcase] = value.to_s
         end
 

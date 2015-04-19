@@ -47,7 +47,7 @@ describe Fastlane do
               )
             end").runner.execute(:test)
 
-          }.to raise_error('Deliverfile not found at path \'/private/tmp/fastlane/tests/Deliverfile\''.red)
+          }.to raise_error("Couldn't find folder '../example'. Make sure to pass the path to the directory not the file!".red)
 
           expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
         end
