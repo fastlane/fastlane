@@ -3,13 +3,14 @@
 module Fastlane
   class Setup
     def run
-      raise "Fastlane already set up at path #{folder}".yellow if FastlaneFolder.setup?
+      raise "Fastlane already set up at path #{folder}".yellow if (FastlaneFolder.setup? and not Helper.is_test?)
 
       show_infos
       response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
       return unless response
       response = agree('Do you have everything commited in version control? If not please do so! (y/n)'.yellow, true)
       return unless response
+
       begin
         FastlaneFolder.create_folder!
         copy_existing_files
@@ -42,6 +43,7 @@ module Fastlane
 
     def copy_existing_files
       files_to_copy.each do |current|
+        current = File.join(File.expand_path('..', FastlaneFolder.path), current)
         next unless File.exist?(current)
         file_name = File.basename(current)
         to_path = File.join(folder, file_name)
@@ -67,8 +69,8 @@ module Fastlane
       @tools = {}
       @tools[:deliver] = File.exist?(File.join(folder, 'Deliverfile'))
       @tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
-      @tools[:xctool] = File.exist?('./.xctool-args')
-      @tools[:cocoapods] = File.exist?('./Podfile')
+      @tools[:xctool] = File.exist?(File.join(File.expand_path('..', folder), '.xctool-args'))
+      @tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
       @tools[:sigh] = false
     end
 
@@ -87,7 +89,7 @@ module Fastlane
         Helper.log.info 'Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building'.yellow
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
         Helper.log.info 'Please read the above carefully and click Enter to confirm.'.green
-        STDIN.gets
+        STDIN.gets unless Helper.is_test?
       end
 
       unless @tools[:snapshot]
@@ -126,6 +128,10 @@ module Fastlane
 
     def folder
       FastlaneFolder.path
+    end
+
+    def tools
+      @tools
     end
 
     def restore_previous_state
