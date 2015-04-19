@@ -70,6 +70,7 @@ module Sigh
 
             Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
             required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
+            require 'pry'; binding.pry
             certs['provisioningProfiles'].each do |current_cert|
               next unless required_cert_types.include?(current_cert['type'])
               
@@ -209,6 +210,12 @@ module Sigh
       profile_name ||= [app_identifier, @type].join(' ')
       fill_in "provisioningProfileName", with: profile_name
       click_next
+
+      if page.has_content?"Multiple profiles found with the name"
+        fill_in "provisioningProfileName", with: (profile_name + " sigh")
+        click_next
+      end
+
       wait_for_elements('.row-details')
     end
 
