@@ -74,7 +74,7 @@ describe Fastlane do
               build_secret: 'wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
+        }.to raise_error("Couldn't find ipa file at path ''".red)
       end
 
       it "raises an error if the given ipa path was not found" do
@@ -87,7 +87,7 @@ describe Fastlane do
               ipa_path: './fastlane/wadus'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa_path: 'path/app.ipa'`".red)
+        }.to raise_error("Couldn't find ipa file at path './fastlane/wadus'".red)
       end
 
       it "works with valid parameters" do

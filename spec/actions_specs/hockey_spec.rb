@@ -8,7 +8,7 @@ describe Fastlane do
               api_token: 'xxx'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa: 'path/app.ipa'`".red)
+        }.to raise_error("Couldn't find ipa file at path ''".red)
       end
 
       it "raises an error if given ipa file was not found" do
@@ -19,7 +19,7 @@ describe Fastlane do
               ipa: './notHere.ipa'
             })
           end").runner.execute(:test)
-        }.to raise_error("No IPA file given or found, pass using `ipa: 'path/app.ipa'`".red)
+        }.to raise_error("Couldn't find ipa file at path './notHere.ipa'".red)
       end
 
       it "raises an error if supplied dsym file was not found" do

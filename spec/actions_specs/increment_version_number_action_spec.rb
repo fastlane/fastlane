@@ -50,14 +50,6 @@ describe Fastlane do
           end").runner.execute(:test)
         }.to raise_error("Please pass the path to the project, not the workspace".red)
       end
-
-      it "raises an exception if given version number is invalid" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do
-            increment_version_number(version_number: '3')
-          end").runner.execute(:test)
-        }.to raise_error("Invalid version '3' given. Must be x.y.z".red)
-      end
     end
   end
 end
