@@ -62,9 +62,12 @@ module Cert
       Helper.log.info "Creating a new code signing certificate"
 
       # select certificate type
-      toggle_value = 'type-iosNoOCSP'
-      toggle_value = 'type-development' if @type == DEVELOPMENT
-      app_store_toggle = first("input##{toggle_value}")
+      if @type == DEVELOPMENT
+        app_store_toggle = first("input#type-development")
+      else
+        app_store_toggle = first("input#type-iosNoOCSP") || first("input#type-iosOCSP")
+      end
+      
       if !!app_store_toggle['disabled']
         # Limit of certificates already reached
         raise "Could not create another certificate, reached the maximum number of available certificates.".red
