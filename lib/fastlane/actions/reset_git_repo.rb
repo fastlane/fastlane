@@ -39,6 +39,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :files,
                                        env_name: "FL_RESET_GIT_FILES",
                                        description: "Array of files the changes should be discarded from. If not given, all files will be discarded",
+                                       optional: true,
                                        verify_block: Proc.new do |value|
                                         raise "Please pass an array only" unless value.kind_of?Array
                                        end),
