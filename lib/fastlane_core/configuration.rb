@@ -10,6 +10,10 @@ module FastlaneCore
     # Setting up
 
     def values
+      # As the user accesses all values, we need to iterate through them to receive all the values
+      @available_options.each do |option|
+        @values[option.key] = fetch(option.key) unless @values[option.key]
+      end
       @values
     end
 
