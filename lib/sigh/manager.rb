@@ -35,7 +35,7 @@ module Sigh
       end
 
       # copy to Xcode provisioning profile directory
-      FileUtils.copy profile, destination
+      (FileUtils.copy profile, destination rescue nil) # if the directory doesn't exist yet
 
       if File.exists? destination
         Helper.log.info "Profile installed at \"#{destination}\""
