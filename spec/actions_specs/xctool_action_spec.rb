@@ -1,6 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Deliver Integration" do
+    describe "xctool Integration" do
+
+      it "works with no parameters" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          xctool
+        end").runner.execute(:test)
+
+        expect(result).to eq("xctool ")
+      end
 
       it "works with default setting" do
         result = Fastlane::FastFile.new.parse("lane :test do 

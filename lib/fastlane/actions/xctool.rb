@@ -6,6 +6,8 @@ module Fastlane
           raise 'xctool not installed, please install using `brew install xctool`'.red if `which xctool`.length == 0
         end
 
+        params = [] if params.kind_of?FastlaneCore::Configuration
+
         Actions.sh('xctool ' + params.join(' '))
       end
 
