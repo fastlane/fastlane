@@ -18,8 +18,10 @@ module Fastlane
 
         end
       rescue => ex
-        Helper.log.fatal "You invalid parameters to '#{action.action_name}'.".red
-        Helper.log.fatal "Check out the error below and available options by running `fastlane action #{action.action_name}`".red
+        if action.respond_to?:action_name
+          Helper.log.fatal "You invalid parameters to '#{action.action_name}'.".red
+          Helper.log.fatal "Check out the error below and available options by running `fastlane action #{action.action_name}`".red
+        end
         raise ex
       end
     end
