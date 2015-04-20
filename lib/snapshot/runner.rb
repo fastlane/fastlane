@@ -14,7 +14,7 @@ module Snapshot
       counter = 0
       errors = []
 
-      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots
+      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if (SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots)
 
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language|
