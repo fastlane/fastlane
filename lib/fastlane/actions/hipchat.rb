@@ -107,7 +107,7 @@ module Fastlane
                                        env_name: "HIPCHAT_API_VERSION",
                                        description: "Version of the Hipchat API. Must be 1 or 2",
                                        verify_block: Proc.new do |value|
-                                        if api_version.nil? || ![1, 2].include?(api_version[0].to_i)
+                                        if value.nil? || ![1, 2].include?(value.to_i)
                                           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
                                           raise 'No HIPCHAT_API_VERSION given.'.red
                                         end
