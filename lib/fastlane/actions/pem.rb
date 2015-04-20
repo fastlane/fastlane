@@ -12,7 +12,12 @@ module Fastlane
           success_block = params[:new_profile]
 
           PEM.config = params
-          profile_path = PEM::Manager.start
+
+          if Helper.is_test?
+            profile_path = './test.pem'
+          else
+            profile_path = PEM::Manager.start
+          end
 
           if profile_path
             success_block.call(File.expand_path(profile_path)) if success_block
@@ -48,7 +53,8 @@ module Fastlane
           @options << FastlaneCore::ConfigItem.new(key: :new_profile,
                                        env_name: "",
                                        description: "Block that is called if there is a new profile", 
-                                       optional: true)
+                                       optional: true,
+                                       is_string: false)
         end
         @options
       end
