@@ -24,23 +24,21 @@ module Fastlane
               '&&'
           ].join(' ')
 
-          if Helper.test?
-            version_array = [1,0,0]
-          else
-            current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
-            raise 'Your current version (#{current_version}) does not respect the format A.B.C' unless current_version.match(/\d.\d.\d/)
-            # Check if CFBundleShortVersionString is the same for each occurrence
-            allBundles = `#{command_prefix} agvtool what-marketing-version -terse`.split("\n")
-            allBundles.each do |bundle|
-              raise 'Ensure all you CFBundleShortVersionString are equals in your project ' unless bundle.end_with? "=#{current_version}"
-            end
-            version_array = current_version.split(".").map(&:to_i)
-          end
+          current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last
 
           if params[:version_number]
+            Helper.log.debug "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
+
             # Specific version
             next_version_number = params[:version_number]
           else
+            if Helper.test?
+              version_array = [1,0,0]
+            else
+              raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
+              version_array = current_version.split(".").map(&:to_i)
+            end
+
             case params[:bump_type]
               when "patch"
                 version_array[2] = version_array[2] + 1
@@ -101,10 +99,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
                                        description: "Change to a specific version. This will replace the bump type value",
-                                       optional: true, 
-                                       verify_block: Proc.new do |value|
-                                        raise "Invalid version '#{value}' given. Must be x.y.z".red unless value.split(".").count == 3
-                                       end),
+                                       optional: true,
+                                       ),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_VERSION_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
