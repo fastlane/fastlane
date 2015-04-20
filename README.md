@@ -157,6 +157,12 @@ To skip cleaning the project:
 snapshot --noclean
 ```
 
+To only run tests (i.e. don't actually take any screenshots):
+```
+snapshot test
+```
+
+
 By default, `snapshot`, will re-install the app, to make sure it's in a clean state. In case you don't want this run
 
 ```

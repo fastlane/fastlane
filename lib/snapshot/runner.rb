@@ -5,7 +5,7 @@ module Snapshot
   class Runner
     TRACE_DIR = '/tmp/snapshot_traces'
 
-    def work(clean: true, build: true)
+    def work(clean: true, build: true, take_snapshots: true)
       SnapshotConfig.shared_instance.js_file # to verify the file can be found earlier
 
       Builder.new.build_app(clean: clean) if build
@@ -14,7 +14,7 @@ module Snapshot
       counter = 0
       errors = []
 
-      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if SnapshotConfig.shared_instance.clear_previous_screenshots
+      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots
 
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language|
@@ -24,7 +24,7 @@ module Snapshot
           
           begin
             errors.concat(run_tests(device, language))
-            counter += copy_screenshots(language)
+            counter += copy_screenshots(language) if take_snapshots
           rescue => ex
             Helper.log.error(ex)
           end
@@ -34,6 +34,8 @@ module Snapshot
       end
 
       `killall "iOS Simulator"` # close the simulator after the script is finished
+
+      return unless take_snapshots
 
       ReportsGenerator.new.generate
 
@@ -124,6 +126,10 @@ module Snapshot
                   retry_run = true
                 when :screenshot
                   Helper.log.info "Successfully took screenshot 📱"
+                when :pass
+                  Helper.log.info line.strip.gsub("Pass:", "✓").green
+                when :fail
+                  Helper.log.info line.strip.gsub("Fail:", "✗").red
                 when :need_permission
                   raise "Looks like you may need to grant permission for Instruments to analyze other processes.\nPlease Ctrc + C and run this command: \"#{command}\""
                 end
@@ -174,6 +180,10 @@ module Snapshot
         return :screenshot
       elsif line.include? "Instruments wants permission to analyze other processes"
         return :need_permission
+      elsif line.include? "Pass: "
+        return :pass
+      elsif line.include? "Fail: "
+        return :fail
       elsif line =~ /.*Error: (.*)/
         raise "UIAutomation Error: #{$1}"
       elsif line =~ /Instruments Usage Error :(.*)/

@@ -42,6 +42,20 @@ class SnapshotApplication
       end
     end
 
+    command :test do |c|
+      c.syntax = 'snapshot test'
+      c.description = 'Runs the automated tests.'
+
+      c.action do |args, options|
+        path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+        Dir.chdir(path) do # switch the context
+          Snapshot::DependencyChecker.check_simulators
+          Snapshot::SnapshotConfig.shared_instance(options.snapfile)
+          Snapshot::Runner.new.work(clean: !options.noclean, build: !options.nobuild, take_snapshots: false)
+        end
+      end
+    end
+
     command :init do |c|
       c.syntax = 'snapshot init'
       c.description = "Creates a new Snapfile in the current directory"
