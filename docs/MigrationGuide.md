@@ -25,9 +25,9 @@ deliver(
 All available options:
 ```ruby
 deliver(
-  force: true,# Set to true to skip PDF verification
+  force: true, # Set to true to skip PDF verification
   beta: true, # Upload a new version to TestFlight
-  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
+  skip_deploy: true, # Set true to not submit app for review (works with both App Store and beta builds)
   deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
 )
 
