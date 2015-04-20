@@ -75,10 +75,9 @@ module FastlaneCore
 
 
     # Relevant code
-    private
-      def self.fetch_latest(gem_name)
-        url = UPDATE_URL + gem_name
-        JSON.parse(open(url).read)["version"]
-      end
+    def self.fetch_latest(gem_name)
+      url = UPDATE_URL + gem_name
+      JSON.parse(open(url).read)["version"]
+    end
   end
 end
