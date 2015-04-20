@@ -56,8 +56,8 @@ module Fastlane
           ['produce_team_name', 'optional: the name of your team', 'PRODUCE_TEAM_NAME'],
           ['produce_team_id', 'optional: the ID of your team', 'PRODUCE_TEAM_ID'],
           ['produce_username', 'optional: your Apple ID', 'PRODUCE_USERNAME'],
-          ['skip_itc', 'Skip the creation on iTunes Connect', 'PRODUCE_SKIP_ITC'],
-          ['skip_devcenter', 'Skip the creation on the Apple Developer Portal', 'PRODUCE_SKIP_DEVCENTER']
+          ['produce_skip_itc', 'Skip the creation on iTunes Connect', 'PRODUCE_SKIP_ITC'],
+          ['produce_skip_devcenter', 'Skip the creation on the Apple Developer Portal', 'PRODUCE_SKIP_DEVCENTER']
         ]
       end
 
