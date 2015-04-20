@@ -70,6 +70,21 @@ describe FastlaneCore do
           @config = FastlaneCore::Configuration.create(@options, @values)
         end
 
+        describe "#values" do
+          it "returns the user values" do
+            values = @config.values
+            expect(values[:output]).to eq('..')
+            expect(values[:cert_name]).to eq('asdf')
+          end
+          
+          it "returns the default values" do
+            @config = FastlaneCore::Configuration.create(@options, {}) # no user inputs
+            values = @config.values
+            expect(values[:cert_name]).to eq('production_default')
+            expect(values[:output]).to eq('.')
+          end
+        end
+
         describe "fetch" do
           it "raises an error if a non symbol was given" do
             expect {
