@@ -27,16 +27,18 @@ module Fastlane
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if (dsym_filename &&
-                                                                                                !File.exist?(dsym_filename))
+        raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if (dsym_filename && !File.exist?(dsym_filename))
 
         Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
-        return options if Helper.test?
+        values = options.values
+        values[:dsym_filename] = dsym_path
 
-        response = client.upload_build(options[:ipa], options.values)
+        return values if Helper.test?
+
+        response = client.upload_build(options[:ipa], values)
         case response.status
           when 200...300
             url = response.body['public_url']
