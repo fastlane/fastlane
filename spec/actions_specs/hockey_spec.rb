@@ -42,6 +42,20 @@ describe Fastlane do
           })
         end").runner.execute(:test)
       end
+
+      it "has the correct default values" do
+        ff = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+          })
+        end").runner.execute(:test)
+
+        values = ff.values # they are passed like this to shenzhen
+        expect(values[:notify]).to eq(1.to_s)
+        expect(values[:status]).to eq(2.to_s)
+        expect(values[:notes]).to eq("No changelog given")
+      end
     end
   end
 end

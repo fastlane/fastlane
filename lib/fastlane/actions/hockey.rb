@@ -34,7 +34,7 @@ module Fastlane
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
-        return if Helper.test?
+        return options if Helper.test?
 
         response = client.upload_build(options[:ipa], options.values)
         case response.status
@@ -85,7 +85,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
                                        description: "Notify testers? 1 for yes",
-                                       default_value: 1),
+                                       default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
                                        description: "Download status: 1 = No user can download; 2 = Available for download",
