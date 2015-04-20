@@ -17,13 +17,21 @@ module Snapshot
       FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if (SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots)
 
       SnapshotConfig.shared_instance.devices.each do |device|
-        SnapshotConfig.shared_instance.languages.each do |language|
-          reinstall_app(device, language) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
+        SnapshotConfig.shared_instance.languages.each do |language_item|
+
+          if language_item.instance_of?String
+            language = language_item
+            locale = language_item
+          else
+            (language, locale) = language_item            
+          end
+
+          reinstall_app(device, language, locale) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
 
           prepare_simulator(device, language)
           
           begin
-            errors.concat(run_tests(device, language))
+            errors.concat(run_tests(device, language, locale))
             counter += copy_screenshots(language) if take_snapshots
           rescue => ex
             Helper.log.error(ex)
@@ -74,7 +82,7 @@ module Snapshot
       raise "Could not find simulator '#{name}' to install the app on."
     end
 
-    def reinstall_app(device, language)
+    def reinstall_app(device, language, locale)
 
       app_identifier = ENV["SNAPSHOT_APP_IDENTIFIER"]
       app_identifier ||= @app_identifier
@@ -97,13 +105,13 @@ module Snapshot
       com("xcrun simctl shutdown booted")
     end
 
-    def run_tests(device, language)
-      Helper.log.info "Running tests on #{device} in language #{language}".green
-
+    def run_tests(device, language, locale)
+      Helper.log.info "Running tests on #{device} in language #{language} (locale #{locale})".green
+      
       clean_old_traces
 
       ENV['SNAPSHOT_LANGUAGE'] = language
-      command = generate_test_command(device, language)
+      command = generate_test_command(device, language, locale)
       Helper.log.debug command.yellow
       
       retry_run = false
@@ -151,7 +159,7 @@ module Snapshot
       if retry_run
         Helper.log.error "Instruments tool failed again. Re-trying..."
         sleep 2 # We need enough sleep... that's an instruments bug
-        errors = run_tests(device, language)
+        errors = run_tests(device, language, locale)
       end
 
       return errors
@@ -210,7 +218,7 @@ module Snapshot
       return Dir.glob("#{TRACE_DIR}/**/*.png").count
     end
 
-    def generate_test_command(device, language)
+    def generate_test_command(device, language, locale)
       is_ipad = (device.downcase.include?'ipad')
       script_path = SnapshotConfig.shared_instance.js_file(is_ipad)
       custom_run_args = SnapshotConfig.shared_instance.custom_run_args || ENV["SNAPSHOT_CUSTOM_RUN_ARGS"] || ''
@@ -224,7 +232,7 @@ module Snapshot
         "-e UIARESULTSPATH '#{TRACE_DIR}'",
         "-e UIASCRIPT '#{script_path}'",
         "-AppleLanguages '(#{language})'",
-        "-AppleLocale '#{language}'",
+        "-AppleLocale '#{locale}'",
         custom_run_args,
       ].join(' ')
     end
