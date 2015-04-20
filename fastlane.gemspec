@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'snapshot', '>= 0.6.1'
   spec.add_dependency 'frameit', '>= 1.0.0'
   spec.add_dependency 'pem', '>= 0.5.4'
-  spec.add_dependency 'sigh', '>= 0.4.9'
+  spec.add_dependency 'sigh', '>= 0.4.10'
   spec.add_dependency 'produce', '>= 0.2.0'
   spec.add_dependency 'cert', '>= 0.1.7'
 
