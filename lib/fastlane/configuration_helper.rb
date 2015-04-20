@@ -19,8 +19,8 @@ module Fastlane
 
         end
       rescue => ex
-        Helper.log.fatal "You provided an option to action #{action.action_name} which is not supported.".red
-        Helper.log.fatal "Check out the available options below or run `fastlane action #{action.action_name}`".red
+        Helper.log.fatal "You invalid parameters to '#{action.action_name}'.".red
+        Helper.log.fatal "Check out the error below and available options by running `fastlane action #{action.action_name}`".red
         raise ex
       end
     end

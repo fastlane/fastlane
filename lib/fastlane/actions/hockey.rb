@@ -11,6 +11,7 @@ module Fastlane
 
     class HockeyAction < Action
       def self.run(options)
+        require 'pry'; binding.pry
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
 
         require 'shenzhen'
@@ -69,7 +70,7 @@ module Fastlane
                                        description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: Proc.new do |value|
-                                        raise "No IPA file given or found, pass using `ipa: 'path/app.ipa'`".red unless File.exists?(value)
+                                        raise "Couldn't find ipa file at path '#{value}'".red unless File.exists?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
