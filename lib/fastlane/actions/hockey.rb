@@ -11,7 +11,6 @@ module Fastlane
 
     class HockeyAction < Action
       def self.run(options)
-        require 'pry'; binding.pry
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
 
         require 'shenzhen'
