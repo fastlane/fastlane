@@ -30,12 +30,17 @@ deliver(
   skip_deploy: true, # Set true to not submit app for review (works with both App Store and beta builds)
   deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
 )
+```
 
 ### increment_build_number
 
 You now have to specify the key `build_number` New syntax:
 
 ```ruby
+increment_build_number # auto increment
+
+# or
+
 increment_build_number(
   build_number: '75' # set a specific number
 )
