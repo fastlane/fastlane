@@ -107,7 +107,7 @@ describe FastlaneCore do
           it "throws an error if it's invalid" do
             expect {
               @config.set(:output, 132)
-            }.to raise_error("'output' value must be a String!".red)
+            }.to raise_error("'output' value must be a String! Found Fixnum instead.".red)
           end
 
           it "allows valid updates" do
