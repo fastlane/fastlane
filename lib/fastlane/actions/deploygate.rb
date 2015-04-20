@@ -31,7 +31,7 @@ module Fastlane
 
         return options[:ipa] if Helper.test?
 
-        response = client.upload_build(options[:ipa], options)
+        response = client.upload_build(options[:ipa], options.values)
         if parse_response(response)
           Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
           Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green

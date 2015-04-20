@@ -36,7 +36,7 @@ module Fastlane
 
         return if Helper.test?
 
-        response = client.upload_build(options[:ipa], options)
+        response = client.upload_build(options[:ipa], options.values)
         case response.status
           when 200...300
             url = response.body['public_url']
