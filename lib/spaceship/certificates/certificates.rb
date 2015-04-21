@@ -21,7 +21,7 @@ module Spaceship
       [self.name, self.owner_type.capitalize, self.id].join(" - ")
     end
 
-    def download
+    def file
       client.download(id, type_id)
     end
 

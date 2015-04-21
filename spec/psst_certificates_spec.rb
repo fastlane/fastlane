@@ -60,11 +60,10 @@ describe Spaceship do
       expect(cert.is_push).to eq(false)
     end
 
-    describe '#download' do
+    describe '#file' do
       let(:cert) { @client.certificates.first }
       it 'downloads the associated .cer file' do
-        file = cert.download
-        x509 = OpenSSL::X509::Certificate.new(file)
+        x509 = OpenSSL::X509::Certificate.new(cert.file)
         expect(x509.issuer.to_s).to match('Apple Worldwide Developer Relations')
       end
     end
