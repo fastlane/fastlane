@@ -52,13 +52,13 @@ module Fastlane
       end
 
       def self.description
-        "Post a message to Typetalk. http://www.typetalk.in/"
+        "Post a message to Typetalk"
       end
 
       def self.available_options
         [
           ['message', 'The message to post'],
-          ['note_path', 'Path to a additional note'],
+          ['note_path', 'Path to an additional note'],
           ['topicId', 'Typetalk topic id'],
           ['success', 'Successful build?'],
           ['typetalk_token', 'typetalk token']
