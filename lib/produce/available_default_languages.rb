@@ -1,6 +1,6 @@
 module Produce
   class AvailableDefaultLanguages
-    def self.all_langauges
+    def self.all_languages
       [
          "Australian English",
          "Brazilian Portuguese",
