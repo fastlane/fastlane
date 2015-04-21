@@ -4,10 +4,10 @@ module Fastlane
       def self.run(params)
         return if Helper.test?
 
-        require 'frameit'
+        require "frameit"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("frameit") unless Helper.is_test?
           color = Frameit::Editor::Color::BLACK
           color = Frameit::Editor::Color::SILVER if [:silver, :white].include?(params)
 
@@ -15,10 +15,10 @@ module Fastlane
           screenshots_folder ||= FastlaneFolder.path
 
           Dir.chdir(screenshots_folder) do
-            Frameit::Editor.new.run('.', color)
+            Frameit::Editor.new.run(".", color)
           end
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("frameit", Frameit::VERSION)
         end
       end
 

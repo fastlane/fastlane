@@ -14,9 +14,9 @@ module Fastlane
           return clean
         end
 
-        require 'snapshot'
+        require "snapshot"
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
+        FastlaneCore::UpdateChecker.start_looking_for_update("snapshot") unless Helper.is_test?
 
         begin
           Dir.chdir(FastlaneFolder.path) do
@@ -28,7 +28,7 @@ module Fastlane
             Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
           end
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("snapshot", Snapshot::VERSION)
         end
       end
 

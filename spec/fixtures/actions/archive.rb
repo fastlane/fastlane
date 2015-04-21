@@ -5,8 +5,8 @@ module Fastlane
     end
 
     class ArchiveAction < Action
-      def self.run(params)
-        puts 'yes'
+      def self.run(_params)
+        puts "yes"
       end
     end
   end

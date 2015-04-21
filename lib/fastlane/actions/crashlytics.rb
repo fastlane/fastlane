@@ -5,26 +5,25 @@ end
 module Fastlane
   module Actions
     class CrashlyticsAction < Action
-      
       def self.is_supported?(platform)
         platform == :ios
       end
 
       def self.run(params)
-        require 'shenzhen'
-        require 'shenzhen/plugins/crashlytics'
-        
+        require "shenzhen"
+        require "shenzhen/plugins/crashlytics"
+
         # can pass groups param either as an Array or a String
         case params[:groups]
         when NilClass
           groups = nil
         when Array
-          groups = params[:groups].join(',')
+          groups = params[:groups].join(",")
         when String
           groups = params[:groups]
         end
 
-        Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
+        Helper.log.info "Uploading the IPA to Crashlytics. Go for a coffee ☕️.".green
 
         if Helper.test?
           # Access all values, to do the verify
@@ -36,10 +35,10 @@ module Fastlane
         response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: params[:notifications])
 
         if response
-          Helper.log.info 'Build successfully uploaded to Crashlytics'.green
+          Helper.log.info "Build successfully uploaded to Crashlytics".green
         else
-          Helper.log.fatal 'Error uploading to Crashlytics.'
-          raise 'Error when trying to upload ipa to Crashlytics'.red
+          Helper.log.fatal "Error uploading to Crashlytics."
+          fail "Error when trying to upload ipa to Crashlytics".red
         end
       end
 
@@ -52,34 +51,34 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
                                        description: "Path to your Crashlytics bundle",
-                                       verify_block: Proc.new do |value|
-                                        raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        description: "Crashlytics Beta API Token",
-                                       verify_block: Proc.new do |value|
-                                          raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless (value and not value.empty?)
+                                       verify_block: proc do |value|
+                                         fail "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
-                                       verify_block: Proc.new do |value|
-                                        raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless (value and not value.empty?)
+                                       verify_block: proc do |value|
+                                         fail "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find ipa file at path '#{value}'".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
                                        description: "Path to the release notes",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Path '#{value}' not found".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "Path '#{value}' not found".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :groups,
                                        env_name: "CRASHLYTICS_GROUPS",

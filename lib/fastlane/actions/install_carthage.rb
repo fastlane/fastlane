@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
     class CarthageAction < Action
-      def self.run(params)
-        Actions.sh('carthage bootstrap')
+      def self.run(_params)
+        Actions.sh("carthage bootstrap")
       end
 
       def self.description

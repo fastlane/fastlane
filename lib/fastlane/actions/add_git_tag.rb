@@ -3,9 +3,9 @@ module Fastlane
     # Adds a git tag to the current commit
     class AddGitTagAction < Action
       def self.run(options)
-        lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].gsub(' ', '') # no spaces allowed
+        lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].gsub(" ", "") # no spaces allowed
 
-        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number].to_s}"
+        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
 
         Helper.log.info "Adding git tag '#{tag}' 🎯."
         Actions.sh("git tag #{tag}")
@@ -24,11 +24,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :grouping,
                                        env_name: "FL_GIT_TAG_GROUPING",
                                        description: "Is used to keep your tags organised under one 'folder'. Defaults to 'builds'",
-                                       default_value: 'builds'),
+                                       default_value: "builds"),
           FastlaneCore::ConfigItem.new(key: :prefix,
                                        env_name: "FL_GIT_TAG_PREFIX",
                                        description: "Anything you want to put in front of the version number (e.g. 'v')",
-                                       default_value: ''),
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        env_name: "FL_GIT_TAG_BUILD_NUMBER",
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
@@ -41,7 +41,7 @@ module Fastlane
         "lmirosevic"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

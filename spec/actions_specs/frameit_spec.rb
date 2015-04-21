@@ -9,7 +9,7 @@ describe Fastlane do
 
       #   Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = @path
 
-      #   result = Fastlane::FastFile.new.parse("lane :test do 
+      #   result = Fastlane::FastFile.new.parse("lane :test do
       #     frameit
       #   end").runner.execute(:test)
 

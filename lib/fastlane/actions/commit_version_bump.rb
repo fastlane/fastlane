@@ -3,12 +3,12 @@ module Fastlane
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction < Action
       def self.run(params)
-        require 'xcodeproj'
-        require 'pathname'
-        require 'set'
-        require 'shellwords'
+        require "xcodeproj"
+        require "pathname"
+        require "set"
+        require "shellwords"
 
-        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
+        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join(".", params[:xcodeproj])) : nil
 
         # find the repo root path
         repo_path = `git rev-parse --show-toplevel`.strip
@@ -16,18 +16,18 @@ module Fastlane
 
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
-          raise "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
+          fail "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
         else
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /Pods\/.*.xcodeproj/ =~ path }
+          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, "**/*.xcodeproj"))].reject { |path| /Pods\/.*.xcodeproj/ =~ path }
 
           # no projects found: error
-          raise 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
+          fail 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
 
           # too many projects found: error
           if xcodeproj_paths.count > 1
             relative_projects = xcodeproj_paths.map { |e| Pathname.new(e).relative_path_from(repo_pathname).to_s }.join("\n")
-            raise "Found multiple .xcodeproj projects in the current repository's working directory. Please specify your app's main project: \n#{relative_projects}".red
+            fail "Found multiple .xcodeproj projects in the current repository's working directory. Please specify your app's main project: \n#{relative_projects}".red
           end
 
           # one project found: great
@@ -35,12 +35,12 @@ module Fastlane
         end
 
         # find the pbxproj path, relative to git directory
-        pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
+        pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, "project.pbxproj"))
         pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
         project = Xcodeproj::Project.open(xcodeproj_path)
-        info_plist_files = project.objects.select { |object| object.isa == 'XCBuildConfiguration' }.map(&:to_hash).map { |object_hash| object_hash['buildSettings'] }.select { |build_settings| build_settings.key?('INFOPLIST_FILE') }.map { |build_settings| build_settings['INFOPLIST_FILE'] }.uniq.map { |info_plist_path| Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s }
+        info_plist_files = project.objects.select { |object| object.isa == "XCBuildConfiguration" }.map(&:to_hash).map { |object_hash| object_hash["buildSettings"] }.select { |build_settings| build_settings.key?("INFOPLIST_FILE") }.map { |build_settings| build_settings["INFOPLIST_FILE"] }.uniq.map { |info_plist_path| Pathname.new(File.expand_path(File.join(xcodeproj_path, "..", info_plist_path))).relative_path_from(repo_pathname).to_s }
 
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = []
@@ -52,13 +52,13 @@ module Fastlane
         git_dirty_files = `git diff --name-only HEAD`.split("\n") + `git ls-files --other --exclude-standard`.split("\n")
 
         # little user hint
-        raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if git_dirty_files.empty?
+        fail "No file changes picked up. Make sure you run the `increment_build_number` action first.".red if git_dirty_files.empty?
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         changed_files_as_expected = (Set.new(git_dirty_files) == Set.new(expected_changed_files))
         unless changed_files_as_expected
           unless params[:force]
-            raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force to not care about this.".red
+            fail "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force to not care about this.".red
           end
         end
 
@@ -86,9 +86,9 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
-                                        raise "Could not find Xcode project".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         fail "Could not find Xcode project".red unless File.exist?(value)
                                        end)
         ]
       end

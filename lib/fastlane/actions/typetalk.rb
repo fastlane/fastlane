@@ -3,22 +3,22 @@ module Fastlane
     class TypetalkAction < Action
       def self.run(params)
         options = {
-            message: nil,
-            note_path: nil,
-            success: true,
-            topicId: nil,
-            typetalk_token: nil,
+          message: nil,
+          note_path: nil,
+          success: true,
+          topicId: nil,
+          typetalk_token: nil
         }.merge(params || {})
 
-        [:message, :topicId, :typetalk_token].each { |key|
-          raise "No #{key} given.".red unless options[key]
-        }
+        [:message, :topicId, :typetalk_token].each do |key|
+          fail "No #{key} given.".red unless options[key]
+        end
 
-        emoticon = (options[:success] ? ':smile:' : ':rage:')
-        message = "#{emoticon} #{options[:message].to_s}"
+        emoticon = (options[:success] ? ":smile:" : ":rage:")
+        message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
-        if note_path and File.exist?(note_path)
+        if note_path && File.exist?(note_path)
           contents = File.read(note_path)
           message += "\n\n```\n#{contents}\n```"
         end
@@ -26,20 +26,20 @@ module Fastlane
         topicId = options[:topicId]
         typetalk_token = options[:typetalk_token]
 
-        self.post_to_typetalk(message, topicId, typetalk_token)
+        post_to_typetalk(message, topicId, typetalk_token)
 
-        Helper.log.info 'Successfully sent Typetalk notification'.green
+        Helper.log.info "Successfully sent Typetalk notification".green
       end
 
       def self.post_to_typetalk(message, topicId, typetalk_token)
-        require 'net/http'
-        require 'uri'
+        require "net/http"
+        require "uri"
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topicId}")
-        response = Net::HTTP.post_form(uri, {'message' => message,
-                                             'typetalkToken' => typetalk_token})
+        response = Net::HTTP.post_form(uri, "message" => message,
+                                            "typetalkToken" => typetalk_token)
 
-        self.check_response(response)
+        check_response(response)
       end
 
       def self.check_response(response)
@@ -47,7 +47,7 @@ module Fastlane
           when 200, 204
             true
           else
-            raise "Could not sent Typetalk notification".red
+            fail "Could not sent Typetalk notification".red
         end
       end
 
@@ -57,11 +57,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['message', 'The message to post'],
-          ['note_path', 'Path to a md file'],
-          ['topicId', ''],
-          ['success', 'Successful build?'],
-          ['typetalk_token', 'API token']
+          ["message", "The message to post"],
+          ["note_path", "Path to a md file"],
+          ["topicId", ""],
+          ["success", "Successful build?"],
+          ["typetalk_token", "API token"]
         ]
       end
 
@@ -69,7 +69,7 @@ module Fastlane
         "dataich"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

@@ -19,15 +19,13 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
 
         Dir.chdir(test_path) do
-          expect {
-            
-            Fastlane::FastFile.new.parse("lane :test do 
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
               deliver
             end").runner.execute(:test)
+          end.to raise_error('You have to pass a valid version number using the Deliver file. (e.g. \'version "1.0"\')'.red)
 
-          }.to raise_error('You have to pass a valid version number using the Deliver file. (e.g. \'version "1.0"\')'.red)
-
-          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
+          expect(ENV["DELIVER_SCREENSHOTS_PATH"]).to eq(test_val)
         end
       end
 
@@ -36,9 +34,8 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
 
         Dir.chdir(test_path) do
-          expect {
-            
-            Fastlane::FastFile.new.parse("lane :test do 
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
               deliver(
                 force: true,
                 beta: true,
@@ -46,10 +43,9 @@ describe Fastlane do
                 deliver_file_path: '../example'
               )
             end").runner.execute(:test)
+          end.to raise_error("Couldn't find folder '../example'. Make sure to pass the path to the directory not the file!".red)
 
-          }.to raise_error("Couldn't find folder '../example'. Make sure to pass the path to the directory not the file!".red)
-
-          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
+          expect(ENV["DELIVER_SCREENSHOTS_PATH"]).to eq(test_val)
         end
       end
 
@@ -57,7 +53,6 @@ describe Fastlane do
         File.delete(@app_file)
         File.delete(@deliver_file)
       end
-
     end
   end
 end

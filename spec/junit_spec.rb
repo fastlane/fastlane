@@ -23,11 +23,11 @@ describe Fastlane do
         expect(path).to end_with("fastlane/report.xml")
 
         xml = Nokogiri::XML(File.open(path))
-        expect(xml.xpath('//testcase')[0]['name']).to eq("0: My Step Name")
-        expect(xml.xpath('//testcase')[0]['time']).to eq(time.to_s)
-        expect(xml.xpath('//testcase')[1]['name']).to eq("1: error step")
-        expect(xml.xpath('//testcase')[1]['time']).to eq(time.to_s)
-        expect(xml.xpath('//failure')[0]['message']).to eq("Some error text")
+        expect(xml.xpath("//testcase")[0]["name"]).to eq("0: My Step Name")
+        expect(xml.xpath("//testcase")[0]["time"]).to eq(time.to_s)
+        expect(xml.xpath("//testcase")[1]["name"]).to eq("1: error step")
+        expect(xml.xpath("//testcase")[1]["time"]).to eq(time.to_s)
+        expect(xml.xpath("//failure")[0]["message"]).to eq("Some error text")
 
         File.delete(path)
       end

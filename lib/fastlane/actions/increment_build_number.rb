@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class IncrementBuildNumberAction < Action
-      require 'shellwords'
+      require "shellwords"
 
       def self.is_supported?(platform)
         platform == :ios
@@ -16,36 +16,34 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
-        begin
-          folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
-            
-          command_prefix = [
-            'cd',
-            File.expand_path(folder).shellescape,
-            '&&'
-          ].join(' ')
+        folder = params[:xcodeproj] ? File.join(".", params[:xcodeproj], "..") : "."
 
-          command = [
-            command_prefix,
-            'agvtool',
-            params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all'
-          ].join(' ')
+        command_prefix = [
+          "cd",
+          File.expand_path(folder).shellescape,
+          "&&"
+        ].join(" ")
 
-          if Helper.test?
-            Actions.lane_context[SharedValues::BUILD_NUMBER] = command
-          else
+        command = [
+          command_prefix,
+          "agvtool",
+          params[:build_number] ? "new-version -all #{params[:build_number]}" : "next-version -all"
+        ].join(" ")
 
-            Actions.sh command
+        if Helper.test?
+          Actions.lane_context[SharedValues::BUILD_NUMBER] = command
+        else
 
-            # Store the new number in the shared hash
-            build_number = `#{command_prefix} agvtool what-version`.split("\n").last.to_i
+          Actions.sh command
 
-            Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
-          end
-        rescue => ex
-          Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
-          raise ex
+          # Store the new number in the shared hash
+          build_number = `#{command_prefix} agvtool what-version`.split("\n").last.to_i
+
+          Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
+      rescue => ex
+        Helper.log.error "Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html".yellow
+        raise ex
       end
 
       def self.description
@@ -63,16 +61,16 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
-                                        raise "Could not find Xcode project".red if (not File.exists?(value) and not Helper.is_test?)
+                                       verify_block: proc do |value|
+                                         fail "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         fail "Could not find Xcode project".red if !File.exist?(value) && !Helper.is_test?
                                        end)
         ]
       end
 
       def self.output
         [
-          ['BUILD_NUMBER', 'The new build number']
+          ["BUILD_NUMBER", "The new build number"]
         ]
       end
 

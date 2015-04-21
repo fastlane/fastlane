@@ -6,14 +6,14 @@ module Fastlane
 
     # Raises an exception and stop the lane execution if the repo is not in a clean state
     class EnsureGitStatusCleanAction < Action
-      def self.run(params)
+      def self.run(_params)
         repo_clean = `git status --porcelain`.empty?
 
         if repo_clean
-          Helper.log.info 'Git status is clean, all good! 💪'.green
+          Helper.log.info "Git status is clean, all good! 💪".green
           Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START] = true
         else
-          raise 'Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.'.red
+          fail "Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.".red
         end
       end
 
@@ -23,7 +23,7 @@ module Fastlane
 
       def self.output
         [
-          ['GIT_REPO_WAS_CLEAN_ON_START', 'Stores the fact that the git repo was clean at some point']
+          ["GIT_REPO_WAS_CLEAN_ON_START", "Stores the fact that the git repo was clean at some point"]
         ]
       end
 
@@ -31,7 +31,7 @@ module Fastlane
         "lmirosevic"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

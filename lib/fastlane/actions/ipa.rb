@@ -6,28 +6,26 @@ module Fastlane
     end
 
     ARGS_MAP = {
-      workspace: '-w',
-      project: '-p',
-      configuration: '-c',
-      scheme: '-s',
-      clean: '--clean',
-      archive: '--archive',
-      destination: '-d',
-      embed: '-m',
-      identity: '-i',
-      sdk: '--sdk',
-      ipa: '--ipa',
-      xcconfig: '--xcconfig',
-      xcargs: '--xcargs',
+      workspace: "-w",
+      project: "-p",
+      configuration: "-c",
+      scheme: "-s",
+      clean: "--clean",
+      archive: "--archive",
+      destination: "-d",
+      embed: "-m",
+      identity: "-i",
+      sdk: "--sdk",
+      ipa: "--ipa",
+      xcconfig: "--xcconfig",
+      xcargs: "--xcargs"
     }
 
     class IpaAction < Action
-
       def self.is_supported?(platform)
         platform == :ios
       end
 
-      
       def self.run(params)
         # The args we will build with
         build_args = nil
@@ -51,13 +49,13 @@ module Fastlane
         absolute_dest_directory ||= Dir.pwd
 
         if Helper.test?
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.ipa')
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.app.dSYM.zip')
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.ipa")
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, "test.app.dSYM.zip")
           return build_args
         end
 
         # Joins args into space delimited string
-        build_args = build_args.join(' ')
+        build_args = build_args.join(" ")
 
         command = "set -o pipefail && ipa build #{build_args} --verbose | xcpretty"
         Helper.log.debug command
@@ -77,19 +75,19 @@ module Fastlane
       def self.params_to_build_args(config)
         params = config.values
 
-        params = params.delete_if { |k, v| v.nil? }
+        params = params.delete_if { |_k, v| v.nil? }
         params = fill_in_default_values(params)
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
-          v ||= ''
+          v ||= ""
           if args = ARGS_MAP[k]
             if k == :clean
-              v == true ? '--clean' : '--no-clean'
+              v == true ? "--clean" : "--no-clean"
             elsif k == :archive
-              v == true ? '--archive' : nil
+              v == true ? "--archive" : nil
             else
-              value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
+              value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
               "#{ARGS_MAP[k]} #{value}".strip
             end
           end
@@ -104,12 +102,12 @@ module Fastlane
 
       def self.find_ipa_file(dir)
         # Finds last modified .ipa in the destination directory
-        Dir[File.join(dir, '*.ipa')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, "*.ipa")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
 
       def self.find_dsym_file(dir)
         # Finds last modified .dSYM.zip in the destination directory
-        Dir[File.join(dir, '*.dSYM.zip')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, "*.dSYM.zip")].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
       end
 
       def self.description
@@ -119,7 +117,7 @@ module Fastlane
       def self.details
         [
           "More information on the shenzhen project page: https://github.com/nomad/shenzhen"
-        ].join(' ')
+        ].join(" ")
       end
 
       def self.available_options
@@ -177,14 +175,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcargs,
                                        env_name: "IPA_XCARGS",
                                        description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
-                                       optional: true),
+                                       optional: true)
         ]
       end
 
       def self.output
         [
-          ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
-          ['DSYM_OUTPUT_PATH', 'The path to the dsym file']
+          ["IPA_OUTPUT_PATH", "The path to the newly generated ipa file"],
+          ["DSYM_OUTPUT_PATH", "The path to the dsym file"]
         ]
       end
 

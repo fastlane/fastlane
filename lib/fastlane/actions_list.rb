@@ -1,7 +1,7 @@
 module Fastlane
   class ActionsList
     def self.run(filter)
-      require 'terminal-table'
+      require "terminal-table"
       print_all unless filter
       show_details(filter) if filter
     end
@@ -16,7 +16,7 @@ module Fastlane
           current << action.description if action.description
           current << action.author.green if action.author
 
-          l = (action.description || '').length
+          l = (action.description || "").length
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
           current << "Please update action file".red
@@ -26,7 +26,7 @@ module Fastlane
 
       table = Terminal::Table.new(
         title: "Available fastlane actions".green,
-        headings: ['Action', 'Description', 'Author'],
+        headings: %w(Action Description Author),
         rows: rows
       )
       puts table
@@ -41,13 +41,13 @@ module Fastlane
 
       all_actions do |action, name|
         next unless name == filter.strip
-        
+
         rows = []
         rows << [action.description] if action.description
-        rows << [' ']
+        rows << [" "]
         if action.details
           rows << [action.details]
-          rows << [' ']
+          rows << [" "]
         end
         rows << ["Created by #{action.author.green}"] if action.author
 
@@ -63,7 +63,7 @@ module Fastlane
         if options
           puts Terminal::Table.new(
             title: filter.green,
-            headings: ['Key', 'Description', 'Env Var'],
+            headings: ["Key", "Description", "Env Var"],
             rows: options
           )
         else
@@ -75,14 +75,12 @@ module Fastlane
         if output
           puts Terminal::Table.new(
             title: filter.green,
-            headings: ['Key', 'Description'],
+            headings: %w(Key Description),
             rows: output
           )
           puts "Access the output values using `Actions.lane_context[VARIABLE_NAME]`"
           puts ""
         end
-
-        
 
         puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
         puts "\n"
@@ -95,36 +93,36 @@ module Fastlane
       print_all # show all available actions instead
     end
 
-
     # Iterates through all available actions and yields from there
     def self.all_actions
-      all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
-      all_actions.each do |symbol|        
+      all_actions = Fastlane::Actions.constants.select { |c| Class === Fastlane::Actions.const_get(c) }
+      all_actions.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
-        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        name = symbol.to_s.gsub("Action", "").fastlane_underscore
         yield action, name
       end
     end
-    
-    private
-      def self.parse_options(options, fill_all = true)
-        rows = []
-        rows << [options] if options.kind_of?String
 
-        if options.kind_of?Array
-          options.each do |current|
-            if current.kind_of?FastlaneCore::ConfigItem
-              rows << [current.key.to_s.yellow, current.description, current.env_name]
-            elsif current.kind_of?Array
-              raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless ([2, 3].include?current.count)
-              rows << current
-              rows.last[0] = rows.last.first.yellow # color it yellow :) 
-              rows.last << nil while (fill_all and rows.last.count < 3) # to have a nice border in the table
-            end
+    private
+
+    def self.parse_options(options, fill_all = true)
+      rows = []
+      rows << [options] if options.is_a? String
+
+      if options.is_a? Array
+        options.each do |current|
+          if current.is_a? FastlaneCore::ConfigItem
+            rows << [current.key.to_s.yellow, current.description, current.env_name]
+          elsif current.is_a? Array
+            fail "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless [2, 3].include? current.count
+            rows << current
+            rows.last[0] = rows.last.first.yellow # color it yellow :)
+            rows.last << nil while fill_all && rows.last.count < 3 # to have a nice border in the table
           end
         end
-
-        rows
       end
+
+      rows
+    end
   end
 end

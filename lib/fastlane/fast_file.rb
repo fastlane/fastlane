@@ -4,8 +4,8 @@ module Fastlane
 
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
-      return unless (path || '').length > 0
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+      return unless (path || "").length > 0
+      fail "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
       @path = path
       content = File.read(path)
 
@@ -22,16 +22,14 @@ module Fastlane
       self
     end
 
-
     #####################################################
     # @!group DSL
     #####################################################
 
-
     # User defines a new lane
     def lane(lane_name, &block)
-      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
-      
+      fail "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+
       desc = desc_collection.join("\n\n")
       platform = @current_platform
 
@@ -39,10 +37,10 @@ module Fastlane
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
-    
+
     # User defines a platform block
     def platform(platform_name, &block)
-      SupportedPlatforms.verify!platform_name
+      SupportedPlatforms.verify! platform_name
 
       @current_platform = platform_name
 
@@ -70,7 +68,7 @@ module Fastlane
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
 
-      class_name = method_sym.to_s.fastlane_class + 'Action'
+      class_name = method_sym.to_s.fastlane_class + "Action"
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
@@ -90,15 +88,15 @@ module Fastlane
         Helper.log_alert("Step: " + step_name)
 
         begin
-          Dir.chdir('..') do # go up from the fastlane folder, to the project folder
+          Dir.chdir("..") do # go up from the fastlane folder, to the project folder
             Actions.execute_action(method_sym) do
               # arguments is an array by default, containing an hash with the actual parameters
               # Since we usually just need the passed hash, we'll just use the first object if there is only one
-              if arguments.count == 0 
+              if arguments.count == 0
                 arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hsh
-              elsif arguments.count == 1 and arguments.first.kind_of?Hash
+              elsif arguments.count == 1 && arguments.first.is_a?(Hash)
                 arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
-              elsif not class_ref.available_options
+              elsif !class_ref.available_options
                 # This action does not use the new action format
                 # Just passing the arguments to this method
               else
@@ -106,7 +104,7 @@ module Fastlane
                 Helper.log.fatal "If you've been an existing fastlane user, please check out the MigrationGuide to 1.0".yellow
                 Helper.log.fatal "https://github.com/KrauseFx/fastlane/blob/master/docs/MigrationGuide.md".yellow
                 Helper.log.fatal "------------------------------------------------------------------------------------".red
-                raise "You have to pass the options for '#{method_sym}' in a different way. Please check out the current documentation on GitHub!".red
+                fail "You have to pass the options for '#{method_sym}' in a different way. Please check out the current documentation on GitHub!".red
               end
 
               class_ref.run(arguments)
@@ -117,10 +115,9 @@ module Fastlane
           raise ex
         end
       else
-        raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
+        fail "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
       end
     end
-
 
     #####################################################
     # @!group Other things
@@ -130,23 +127,23 @@ module Fastlane
     def say(value)
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
-      Actions.execute_action('say') do
+      Actions.execute_action("say") do
         Fastlane::Actions::SayAction.run([value])
       end
     end
 
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
-      raise 'No key given'.red unless key
+      fail "No key given".red unless key
 
-      return false if self.runner.blocks[nil][key.to_sym]
-      return true if self.runner.blocks[key.to_sym].kind_of?Hash
+      return false if runner.blocks[nil][key.to_sym]
+      return true if runner.blocks[key.to_sym].is_a? Hash
 
-      raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
+      fail "Could not find '#{key}'. Available lanes: #{runner.available_lanes.join(', ')}".red
     end
 
     def actions_path(path)
-      raise "Path '#{path}' not found!".red unless File.directory?(path)
+      fail "Path '#{path}' not found!".red unless File.directory?(path)
 
       Actions.load_external_actions(path)
     end
@@ -165,7 +162,7 @@ module Fastlane
           platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
           unless class_ref.is_supported?(platform)
-            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red 
+            fail "Action '#{name}' doesn't support required operating system '#{platform}'.".red
           end
         end
       end
