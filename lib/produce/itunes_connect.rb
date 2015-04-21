@@ -16,6 +16,8 @@ module Produce
         # We just created this App ID, this takes about 3 minutes to show up on iTunes Connect
         Helper.log.info "Waiting for 3 minutes to make sure, the App ID is synced to iTunes Connect".yellow
         sleep 180
+
+        open_new_app_popup # for some reason, we have to refresh the page twice to get it working
         unless bundle_exist?
           Helper.log.info "Couldn't find new app yet, we're waiting for another 2 minutes.".yellow
           sleep 120
