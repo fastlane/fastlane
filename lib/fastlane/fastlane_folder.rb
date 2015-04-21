@@ -6,7 +6,7 @@ module Fastlane
       return "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
       return "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
       return './' if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
-      return './' if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder and hidden
+      return './' if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
       nil
     end
 
