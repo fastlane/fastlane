@@ -9,7 +9,7 @@ def stub_login(fixtures)
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
          with(:body => {"accountPassword"=>"so_secret", "appIdKey"=>"2089349823abbababa98239839", "appleId"=>"spaceship@krausefx.com"},
               :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Host'=>'idmsa.apple.com:443'}).
-         to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"}) 
+         to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"})
   # List the teams
   stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action").
          with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developerservices2.apple.com:443'}).
@@ -59,6 +59,9 @@ def stub_certificates(fixtures)
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action?certificateStatus=0&teamId=5A997XSHAA&types=R58UK2EWSO").
          with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developer.apple.com:443'}).
          to_return(:status => 200, :body => File.read(File.join(fixtures, "list_certificates_filtered.json")), :headers => {})
+ stub_request(:get, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action?displayId=XC5PH8DAAA&type=R58UK2EAAA").
+         with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developer.apple.com:443'}).
+         to_return(:status => 200, :body => File.read(File.join(fixtures, 'aps_development.cer')))
 end
 
 def stub_apps(fixtures)

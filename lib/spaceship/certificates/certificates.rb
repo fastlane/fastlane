@@ -1,5 +1,5 @@
 module Spaceship
-  class Certificate < Struct.new(:client, :id, :name, :status, :created, :expires, :owner_type, :owner_name, :owner_id, :is_push)
+  class Certificate < Struct.new(:client, :id, :name, :status, :created, :expires, :owner_type, :owner_name, :owner_id, :is_push, :type_id)
     # Parse the server response
     def self.create(client, hash)
       Certificate.new(
@@ -12,12 +12,17 @@ module Spaceship
         hash['ownerType'],
         hash['ownerName'],
         hash['ownerId'],
-        hash['ownerType'] == 'bundle' # certificates have the type 'team' or 'teamMember'
+        hash['ownerType'] == 'bundle', # certificates have the type 'team' or 'teamMember'
+        hash['certificateTypeDisplayId']
       )
     end
 
     def to_s
       [self.name, self.owner_type.capitalize, self.id].join(" - ")
+    end
+
+    def download
+      client.download(id, type_id)
     end
 
     # Examples
@@ -51,18 +56,26 @@ module Spaceship
       types ||= ProfileTypes.all_profile_types.join(",")
 
       url = URL_LIST_CERTIFICATES + "teamId=#{@team_id}&types=#{types}"
-      response = JSON.parse(unzip(Excon.post(url, 
-                    headers: { 'Cookie' => "myacinfo=#{@myacinfo}" },
+
+      response = JSON.parse(request(url,
                     body: URI.encode_www_form(
                       pageSize: 5000,
                       pageNumber: 1,
                       sort: "name=asc"
-                    ),
-                  )))
+                    )
+                   ).with_auth.post.body)
 
       return response['certRequests'].collect do |current|
         Certificate.create(self, current)
       end
+    end
+
+    def download(id, type)
+      url = 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action'
+      request(url, query: {
+        displayId: id,
+        type: type
+      }).with_auth.get.body
     end
   end
 end
