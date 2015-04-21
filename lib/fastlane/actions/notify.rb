@@ -2,10 +2,10 @@ module Fastlane
   module Actions
     class NotifyAction < Action
       def self.run(params)
-        require 'terminal-notifier'
+        require "terminal-notifier"
 
-        text = params.join(' ')
-        TerminalNotifier.notify(text, title: 'fastlane')
+        text = params.join(" ")
+        TerminalNotifier.notify(text, title: "fastlane")
       end
 
       def self.description
@@ -16,7 +16,7 @@ module Fastlane
         "champo"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

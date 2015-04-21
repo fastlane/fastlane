@@ -10,8 +10,8 @@ module Fastlane
       output << "```"
 
       output << "# Available Actions"
-      
-      all_keys = ff.runner.description_blocks.keys.reject(&:nil?) 
+
+      all_keys = ff.runner.description_blocks.keys.reject(&:nil?)
       all_keys.unshift(nil) # because we want root elements on top.. always! They have key nil
 
       all_keys.each do |platform|
@@ -20,7 +20,7 @@ module Fastlane
         value = ff.runner.description_blocks[platform]
 
         value.each do |lane, description|
-          output << render(platform, lane, description)          
+          output << render(platform, lane, description)
         end
 
         output << "----"
@@ -35,16 +35,16 @@ module Fastlane
 
     private
 
-      def self.render(platform, lane, description)
-        full_name = [platform, lane].reject(&:nil?).join(' ')
+    def self.render(platform, lane, description)
+      full_name = [platform, lane].reject(&:nil?).join(" ")
 
-        output = []
-        output << "### #{full_name}"
-        output << "```"
-        output << "fastlane #{full_name}"
-        output << "```"
-        output << description
-        output
-      end
+      output = []
+      output << "### #{full_name}"
+      output << "```"
+      output << "fastlane #{full_name}"
+      output << "```"
+      output << description
+      output
+    end
   end
 end

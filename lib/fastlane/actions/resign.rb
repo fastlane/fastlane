@@ -3,14 +3,13 @@ module Fastlane
     # Resigns the ipa
     class ResignAction < Action
       def self.run(params)
-        require 'sigh'
-
+        require "sigh"
 
         # try to resign the ipa
         if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile])
-          Helper.log.info 'Successfully re-signed .ipa 🔏.'.green
+          Helper.log.info "Successfully re-signed .ipa 🔏.".green
         else
-          raise 'Failed to re-sign .ipa'.red
+          fail "Failed to re-sign .ipa".red
         end
       end
 
@@ -24,8 +23,8 @@ module Fastlane
                                        env_name: "FL_RESIGN_IPA",
                                        description: "Path to the ipa file to resign. Optional if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find ipa file at path '#{value}'".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :signing_identity,
                                        env_name: "FL_RESIGN_SIGNING_IDENTITY",
@@ -34,8 +33,8 @@ module Fastlane
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
                                        description: "Path to your provisioning_profile. Optional if you use `sigh`",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
-                                       verify_block: Proc.new do |value|
-                                        raise "No provisioning_profile file given or found, pass using `provisioning_profile: 'path/app.mobileprovision'`".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         fail "No provisioning_profile file given or found, pass using `provisioning_profile: 'path/app.mobileprovision'`".red unless File.exist?(value)
                                        end)
         ]
       end

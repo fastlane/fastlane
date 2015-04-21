@@ -1,31 +1,18 @@
-require 'rubygems/spec_fetcher'
-require 'rubygems/commands/update_command'
+require "rubygems/spec_fetcher"
+require "rubygems/commands/update_command"
 
 module Fastlane
   module Actions
-    # Makes sure fastlane tools are up-to-date when running fastlane 
+    # Makes sure fastlane tools are up-to-date when running fastlane
     class UpdateFastlaneAction < Action
-
-      ALL_TOOLS = [
-        "fastlane",
-        "fastlane_core",
-        "deliver",
-        "snapshot",
-        "frameit",
-        "pem",
-        "sigh",
-        "produce",
-        "cert",
-        "codes",
-        "credentials_manager"
-      ]
+      ALL_TOOLS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert codes credentials_manager)
 
       def self.run(options)
         if options[:no_update]
           return
         end
 
-        tools_to_update = options[:tools].split ',' unless options[:tools].nil?
+        tools_to_update = options[:tools].split "," unless options[:tools].nil?
         tools_to_update ||= all_installed_tools
 
         if tools_to_update.count == 0
@@ -44,7 +31,7 @@ module Fastlane
           return
         end
 
-        highest_versions = updater.highest_installed_gems.keep_if {|key| tools_to_update.include? key }
+        highest_versions = updater.highest_installed_gems.keep_if { |key| tools_to_update.include? key }
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
         if update_needed.count == 0
@@ -52,10 +39,10 @@ module Fastlane
           return
         end
 
-        #suppress updater output - very noisy
+        # suppress updater output - very noisy
         Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
 
-        update_needed.each do |tool_info| 
+        update_needed.each do |tool_info|
           tool = tool_info[0]
           local_version = Gem::Version.new(highest_versions[tool].version)
           latest_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
@@ -63,7 +50,7 @@ module Fastlane
 
           # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
           updater.update_gem tool, Gem::Requirement.new(local_version.approximate_recommendation)
-          
+
           Helper.log.info "Finished updating #{tool}"
         end
 
@@ -73,16 +60,16 @@ module Fastlane
 
         if any_updates
           Helper.log.info "fastlane.tools succesfully updated! I will now restart myself... 😴"
-          
+
           # Set no_update to true so we don't try to update again
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
-        else 
+        else
           Helper.log.info "All fastlane tools are up-to-date!"
         end
       end
 
       def self.all_installed_tools
-        Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map {|s| s.name}.uniq
+        Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq
       end
 
       def self.description
@@ -95,11 +82,11 @@ module Fastlane
                                        env_name: "FL_TOOLS_TO_UPDATE",
                                        description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh). If not specified, all currently installed fastlane-tools will be updated",
                                        optional: true),
-         FastlaneCore::ConfigItem.new(key: :no_update,
-                                      env_name: "FL_NO_UPDATE",
-                                      description: "Don't update during this run. Defaults to false",
-                                      is_string: false,
-                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :no_update,
+                                       env_name: "FL_NO_UPDATE",
+                                       description: "Don't update during this run. Defaults to false",
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 
@@ -107,7 +94,7 @@ module Fastlane
         "milch"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

@@ -5,3 +5,6 @@ Metrics/LineLength:
 
 Metrics/MethodLength:
   Max: 20
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes

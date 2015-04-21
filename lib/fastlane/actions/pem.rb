@@ -2,19 +2,19 @@ module Fastlane
   module Actions
     class PemAction < Action
       def self.run(params)
-        require 'pem'
-        require 'pem/options'
-        require 'pem/manager'
+        require "pem"
+        require "pem/options"
+        require "pem/manager"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pem') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("pem") unless Helper.is_test?
 
           success_block = params[:new_profile]
 
           PEM.config = params
 
           if Helper.is_test?
-            profile_path = './test.pem'
+            profile_path = "./test.pem"
           else
             profile_path = PEM::Manager.start
           end
@@ -23,7 +23,7 @@ module Fastlane
             success_block.call(File.expand_path(profile_path)) if success_block
           end
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("pem", PEM::VERSION)
         end
       end
 
@@ -45,16 +45,16 @@ module Fastlane
       end
 
       def self.available_options
-        require 'pem'
-        require 'pem/options'
+        require "pem"
+        require "pem/options"
 
         unless @options
           @options = PEM::Options.available_options
           @options << FastlaneCore::ConfigItem.new(key: :new_profile,
-                                       env_name: "",
-                                       description: "Block that is called if there is a new profile", 
-                                       optional: true,
-                                       is_string: false)
+                                                   env_name: "",
+                                                   description: "Block that is called if there is a new profile",
+                                                   optional: true,
+                                                   is_string: false)
         end
         @options
       end

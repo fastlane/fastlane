@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SayAction < Action
       def self.run(params)
-        text = params.join(' ')
+        text = params.join(" ")
         Actions.sh("say '#{text}'")
       end
 
@@ -10,7 +10,7 @@ module Fastlane
         "This action speaks out loud the given text"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

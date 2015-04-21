@@ -1,4 +1,4 @@
-require 'fastlane/actions_list'
+require "fastlane/actions_list"
 
 describe Fastlane do
   describe "Action List" do
@@ -7,11 +7,11 @@ describe Fastlane do
     end
 
     it "doesn't throw an exception with filter" do
-      Fastlane::ActionsList.run 'deliver'
+      Fastlane::ActionsList.run "deliver"
     end
 
     it "shows all available actions if action can't be found" do
-      Fastlane::ActionsList.run 'nonExistingHere'
+      Fastlane::ActionsList.run "nonExistingHere"
     end
 
     describe "Actions provide a complete documenation" do
@@ -21,7 +21,7 @@ describe Fastlane do
 
           expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
           expect(action.description.length).to be > 5, "Provided description for '#{name}'-action is too short"
-          expect(action.description.strip.end_with?'.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
+          expect(action.description.strip.end_with? ".").to eq(false), "The description of '#{name}' shouldn't end with a `.`"
           expect(action.author.length).to be > 1, "Action '#{name}' must have an author"
           action.is_supported?(nil) # this will raise an exception if the method is not implemented
 
@@ -41,7 +41,7 @@ describe Fastlane do
     end
 
     describe "Provide action details" do
-      Fastlane::ActionsList.all_actions do |action, name|
+      Fastlane::ActionsList.all_actions do |_action, name|
         it "Shows the details for action '#{name}'" do
           Fastlane::ActionsList.show_details(name)
         end

@@ -7,22 +7,22 @@ module Fastlane
 
     class SighAction < Action
       def self.run(values)
-        require 'sigh'
-        require 'sigh/options'
-        require 'sigh/manager'
-        require 'credentials_manager/appfile_config'
+        require "sigh"
+        require "sigh/options"
+        require "sigh/manager"
+        require "credentials_manager/appfile_config"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("sigh") unless Helper.is_test?
 
           Sigh.config = values # we alread have the finished config
-          
+
           path = Sigh::Manager.start
 
           Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
           Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("sigh", Sigh::VERSION)
         end
       end
 
@@ -31,8 +31,8 @@ module Fastlane
       end
 
       def self.available_options
-        require 'sigh'
-        require 'sigh/options'
+        require "sigh"
+        require "sigh/options"
         Sigh::Options.available_options
       end
 

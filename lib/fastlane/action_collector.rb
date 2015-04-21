@@ -16,7 +16,7 @@ module Fastlane
     def did_finish
       Thread.new do
         unless ENV["FASTLANE_OPT_OUT_USAGE"]
-          
+
           unless did_show_message?
             Helper.log.debug("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
             Helper.log.debug("No personal/sensitive data is sent. Only sharing the following:")
@@ -26,11 +26,11 @@ module Fastlane
             Helper.log.debug("You can disable this by adding `opt_out_usage` to your Fastfile")
           end
 
-          require 'excon'
-          url = HOST_URL + '/did_launch?'
+          require "excon"
+          url = HOST_URL + "/did_launch?"
           url += URI.encode_www_form(
-                  steps: launches.to_json,
-                  error: @error
+            steps: launches.to_json,
+            error: @error
                 )
 
           unless Helper.is_test? # don't send test data
@@ -45,10 +45,10 @@ module Fastlane
     end
 
     def did_show_message?
-      path = File.join(File.expand_path('~'), '.did_show_opt_info')
-      
-      did_show = File.exists?path
-      File.write(path, '1')
+      path = File.join(File.expand_path("~"), ".did_show_opt_info")
+
+      did_show = File.exist? path
+      File.write(path, "1")
       did_show
     end
   end

@@ -5,8 +5,8 @@ module Fastlane
     end
 
     class ExampleActionSecondAction
-      def self.run(params)
-        puts 'running'
+      def self.run(_params)
+        puts "running"
       end
     end
   end

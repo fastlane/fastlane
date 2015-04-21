@@ -1,9 +1,8 @@
-require 'fastlane/actions/actions_helper'
+require "fastlane/actions/actions_helper"
 
 module Fastlane
   class Action
-    def self.run(params)
-      
+    def self.run(_params)
     end
 
     # Implement in subclasses
@@ -37,18 +36,16 @@ module Fastlane
       "KrauseFx"
     end
 
-    def self.is_supported?(platform)
+    def self.is_supported?(_platform)
       # you do things like
       #  true
-      # 
+      #
       #  platform == :ios
-      # 
+      #
       #  [:ios, :android].include?platform
-      # 
-      raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
+      #
+      fail "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
     end
-
-
 
     # to allow a simple `sh` in the custom actions
     def self.sh(command)
@@ -57,7 +54,7 @@ module Fastlane
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user
     def self.action_name
-      self.name.split('::').last.gsub('Action', '').fastlane_underscore
+      name.split("::").last.gsub("Action", "").fastlane_underscore
     end
   end
 end

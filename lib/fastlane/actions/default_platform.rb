@@ -6,11 +6,11 @@ module Fastlane
 
     class DefaultPlatformAction < Action
       def self.run(params)
-        raise "You forgot to pass the default platform".red if params.first.nil?
+        fail "You forgot to pass the default platform".red if params.first.nil?
 
         platform = params.first.to_sym
 
-        SupportedPlatforms.verify!platform
+        SupportedPlatforms.verify! platform
 
         Actions.lane_context[SharedValues::DEFAULT_PLATFORM] = platform
       end
@@ -23,7 +23,7 @@ module Fastlane
         "KrauseFx"
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end

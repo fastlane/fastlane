@@ -48,7 +48,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          raise "xcodebuild not installed".red if `which xcodebuild`.length == 0
+          fail "xcodebuild not installed".red if `which xcodebuild`.length == 0
         end
 
         # The args we will build with
@@ -65,7 +65,6 @@ module Fastlane
           build_path += "/"
         end
 
-
         if params
           # Operation bools
           archiving = params.key? :archive
@@ -80,7 +79,7 @@ module Fastlane
             params[:export_format] ||= "ipa"
 
             # If not passed, construct export path from env vars
-            if params[:export_path] == nil
+            if params[:export_path].nil?
               ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
               params[:export_path] = "#{build_path}#{ipa_filename}"
             end
@@ -118,22 +117,21 @@ module Fastlane
         xcodebuild_args = xcodebuild_args.join(" ")
 
         # Default args
-        xcpretty_args = [ "--color" ]
+        xcpretty_args = ["--color"]
 
         if testing
           if params[:reports]
             # New report options format
             reports = params[:reports].reduce("") do |arguments, report|
-
               report_string = "--report #{report[:report]}"
 
               if report[:output]
                 report_string << " --output \"#{report[:output]}\""
-              elsif report[:report] == 'junit'
+              elsif report[:report] == "junit"
                 report_string << " --output \"#{build_path}report/report.xml\""
-              elsif report[:report] == 'html'
+              elsif report[:report] == "html"
                 report_string << " --output \"#{build_path}report/report.html\""
-              elsif report[:report] == 'json-compilation-database'
+              elsif report[:report] == "json-compilation-database"
                 report_string << " --output \"#{build_path}report/report.json\""
               end
 
@@ -154,7 +152,7 @@ module Fastlane
             # Test report file format
             report_formats = params[:report_formats].map do |format|
               "--report #{format}"
-            end.sort().join(" ")
+            end.sort.join(" ")
 
             xcpretty_args.push report_formats
 
@@ -197,7 +195,7 @@ module Fastlane
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
           elsif k == :build_settings
-            v.map{|setting,value| "#{setting}=\"#{value}\""}.join(' ')
+            v.map { |setting, value| "#{setting}=\"#{value}\"" }.join(" ")
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
@@ -213,12 +211,12 @@ module Fastlane
           Helper.log.warn "Multiple workspaces detected."
         end
 
-        if !workspaces.empty?
+        unless workspaces.empty?
           workspace = workspaces.first
           Helper.log.warn "Using workspace \"#{workspace}\""
         end
 
-        return workspace
+        workspace
       end
 
       def self.description
@@ -227,11 +225,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive', 'Set to true to build archive'],
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ["archive", "Set to true to build archive"],
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"]
         ]
       end
 
@@ -265,10 +263,10 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"]
         ]
       end
     end
@@ -294,11 +292,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive', 'Set to true to build archive'],
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ["archive", "Set to true to build archive"],
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"]
         ]
       end
     end
@@ -324,11 +322,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive', 'Set to true to build archive'],
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ["archive", "Set to true to build archive"],
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"]
         ]
       end
     end
@@ -350,11 +348,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive', 'Set to true to build archive'],
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ["archive", "Set to true to build archive"],
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"]
         ]
       end
 
@@ -376,12 +374,12 @@ module Fastlane
 
       def self.available_options
         [
-          ['archive', 'Set to true to build archive'],
-          ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
-          ['workspace', 'The workspace to use'],
-          ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information'],
-          ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
+          ["archive", "Set to true to build archive"],
+          ["archive_path", "The path to archive the to. Must contain `.xcarchive`"],
+          ["workspace", "The workspace to use"],
+          ["scheme", "The scheme to build"],
+          ["build_settings", "Hash of additional build information"],
+          ["destination", 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
         ]
       end
 

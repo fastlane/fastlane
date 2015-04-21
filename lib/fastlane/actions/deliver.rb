@@ -5,12 +5,12 @@ module Fastlane
 
     class DeliverAction < Action
       def self.run(config)
-        require 'deliver'
+        require "deliver"
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('deliver') unless Helper.is_test?
+        FastlaneCore::UpdateChecker.start_looking_for_update("deliver") unless Helper.is_test?
 
         begin
-          ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots if there
+          ENV["DELIVER_SCREENSHOTS_PATH"] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots if there
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
@@ -19,12 +19,12 @@ module Fastlane
                                    is_beta_ipa: config[:beta],
                                    skip_deploy: config[:skip_deploy])
 
-            if ENV['DELIVER_IPA_PATH'] # since IPA upload is optional
-              Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV['DELIVER_IPA_PATH']) # deliver will store it in the environment
+            if ENV["DELIVER_IPA_PATH"] # since IPA upload is optional
+              Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV["DELIVER_IPA_PATH"]) # deliver will store it in the environment
             end
           end
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("deliver", Deliver::VERSION)
         end
       end
 
@@ -56,8 +56,8 @@ module Fastlane
                                        env_name: "FL_DELIVER_CONFIG_PATH",
                                        description: "Specify a path to the directory containing the Deliverfile",
                                        default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
+                                       verify_block: proc do |value|
+                                         fail "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
                                        end)
         ]
       end

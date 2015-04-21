@@ -6,7 +6,7 @@ module Fastlane
     class TeamNameAction < Action
       def self.run(params)
         team = (params.first rescue nil)
-        raise "Please pass your Team Name (e.g. team_name 'Felix Krause')".red unless team.to_s.length > 0
+        fail "Please pass your Team Name (e.g. team_name 'Felix Krause')".red unless team.to_s.length > 0
 
         Helper.log.info "Setting Team Name to '#{team}' for all build steps"
 

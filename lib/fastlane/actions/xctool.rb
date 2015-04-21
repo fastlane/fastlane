@@ -3,12 +3,12 @@ module Fastlane
     class XctoolAction < Action
       def self.run(params)
         unless Helper.test?
-          raise 'xctool not installed, please install using `brew install xctool`'.red if `which xctool`.length == 0
+          fail "xctool not installed, please install using `brew install xctool`".red if `which xctool`.length == 0
         end
 
-        params = [] if params.kind_of?FastlaneCore::Configuration
+        params = [] if params.is_a? FastlaneCore::Configuration
 
-        Actions.sh('xctool ' + params.join(' '))
+        Actions.sh("xctool " + params.join(" "))
       end
 
       def self.description
@@ -19,7 +19,7 @@ module Fastlane
         [
           "It is recommended to store the build configuration in the `.xctool-args` file.",
           "More information available on GitHub: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#xctool"
-        ].join(' ')
+        ].join(" ")
       end
 
       def self.author
