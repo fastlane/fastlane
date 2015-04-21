@@ -58,15 +58,15 @@ module Fastlane
       def self.available_options
         [
           ['message', 'The message to post'],
-          ['note_path', 'Path to a md file'],
-          ['topicId', ''],
+          ['note_path', 'Path to an additional note'],
+          ['topicId', 'Typetalk topic id'],
           ['success', 'Successful build?'],
-          ['typetalk_token', 'API token']
+          ['typetalk_token', 'typetalk token']
         ]
       end
 
       def self.author
-        "dataich"
+        "Nulab Inc."
       end
 
       def self.is_supported?(platform)
