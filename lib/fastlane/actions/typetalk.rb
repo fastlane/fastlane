@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.description
-        "Post a message to Typetalk.\n\nhttp://www.typetalk.in/"
+        "Post a message to Typetalk. http://www.typetalk.in/"
       end
 
       def self.available_options
