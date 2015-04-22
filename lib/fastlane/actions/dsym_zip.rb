@@ -31,7 +31,7 @@ module Fastlane
       end
 
       def self.description
-        'Creates a zipped dSYM in the project root from the .xcarchive.'
+        'Creates a zipped dSYM in the project root from the .xcarchive'
       end
 
       def self.available_options
