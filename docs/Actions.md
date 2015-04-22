@@ -198,6 +198,22 @@ To use white (sorry, silver) device frames
 frameit :silver
 ```
 
+### dsym_zip
+
+Create a zipped dSYM file from your `.xcarchive`, useful if you use the `xcodebuild` action in combination with `crashlytics` or `hockey`.
+
+```ruby
+dsym_zip
+```
+
+You can manually specify the path to the xcarchive (not needed if you use `xcodebuild`/`xcarchive` to build your archive):
+
+```ruby
+dsym_zip(
+  archive_path: 'MyApp.xcarchive'
+)
+```
+
 ## Testing
 
 ### xctest
