@@ -70,7 +70,6 @@ module Sigh
 
             Helper.log.info "Checking if profile is available. (#{profile_count} profiles found on page #{page_index})"
             required_cert_types = (@type == DEVELOPMENT ? ['iOS Development'] : ['iOS Distribution', 'iOS UniversalDistribution'])
-            require 'pry'; binding.pry
             certs['provisioningProfiles'].each do |current_cert|
               next unless required_cert_types.include?(current_cert['type'])
               
