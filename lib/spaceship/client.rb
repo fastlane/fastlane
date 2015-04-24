@@ -4,23 +4,20 @@ require 'faraday_middleware/response_middleware'
 require 'nokogiri'
 require 'pry' # TODO: Remove
 
-require 'spaceship/urls'
-require 'spaceship/helper'
-require 'spaceship/profile_types'
-require 'spaceship/login/login'
-require 'spaceship/apps/apps'
-require 'spaceship/devices/devices'
-require 'spaceship/certificates/certificates'
-require 'spaceship/provisioning_profiles/provisioning_profiles'
 require 'singleton'
 
 module FaradayMiddleware
   class PlistMiddleware < ResponseMiddleware
+    dependency do
+      require 'plist' unless defined?(::Plist)
+    end
+
     define_parser do |body|
       Plist::parse_xml(body)
     end
   end
 end
+
 Faraday::Response.register_middleware(:plist => FaradayMiddleware::PlistMiddleware)
 
 module Spaceship
@@ -31,22 +28,32 @@ module Spaceship
   end
 
   class Client
+    PROTOCOL_VERSION = "QH65B2"
     include Singleton
 
+    attr_reader :client
     attr_accessor :cookie
 
+    def self.login(username, password)
+      instance.login(username, password)
+      instance
+    end
+
     def initialize
-      @client = Faraday.new do |c|
+      @client = Faraday.new("https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/") do |c|
         c.response :json, :content_type => /\bjson$/
         c.response :xml, :content_type => /\bxml$/
-        c.response :plist, :content_type => /\bx-plist$/
+        c.response :plist, :content_type => /\bplist$/
         c.request :url_encoded
         c.adapter Faraday.default_adapter #can be Excon
+        #for debugging:
+        #c.response :logger
+        #c.proxy "http://localhost:8080"
       end
     end
 
     def api_key
-      page = @client.get(URL_LOGIN_LANDING_PAGE).body
+      page = @client.get("https://developer.apple.com/devcenter/ios/index.action").body
       html = Nokogiri::HTML(page)
       link = html.css('a[href*=IDMSWebAuth]')[0]
       href = link['href']
@@ -55,19 +62,30 @@ module Spaceship
     end
 
     def login(username, password)
-      response = @client.post(URL_AUTHENTICATE,{
-          appleId: username,
-          accountPassword: password,
-          appIdKey: api_key
-        })
+      response = @client.post("https://idmsa.apple.com/IDMSWebAuth/authenticate", {
+        appleId: username,
+        accountPassword: password,
+        appIdKey: api_key
+      })
 
-      @cookie = response['Set-Cookie']
+      if response['Set-Cookie'] =~ /myacinfo=(\w+);/
+        @cookie = "myacinfo=#{$1};"
+      end
+    end
+
+    def cookie
+      return @cookie if @cookie
+
+      raise 'No session found. Please login with `Spaceship::Client.login(username, password)`'
+    end
+
+    def session?
+      !!@cookie
     end
 
     def teams
-      response = @client.post(URL_LIST_TEAMS, {}, {'Cookie' => cookie})
-      xml = Plist::parse_xml(response.body)
-      xml['teams']
+      response = request(:post, 'account/listTeams.action')
+      response.body['teams']
     end
 
     def team_id
@@ -79,13 +97,12 @@ module Spaceship
     end
 
     def apps
-      response = @client.post(URL_APP_IDS, {
+      response = request(:post, "account/ios/identifiers/listAppIds.action", {
         teamId: team_id,
         pageNumber: 1,
-        pageSize: 5000,
+        pageSize: 500,
         sort: "name=asc"
-      },
-      {'Cookie' => cookie})
+      })
       response.body['appIds']
     end
 
@@ -97,20 +114,33 @@ module Spaceship
     end
 
     def devices
-      response = @client.post(URL_LIST_DEVICES, {
-        teamId: team_id
-      }, {
-        Cookie: cookie
+      response = request(:post, 'account/ios/device/listDevices.action', {
+        teamId: team_id,
+        pageNumber: 1,
+        pageSize: 500,
+        sort: 'name=asc'
       })
       response.body['devices']
     end
 
     def certificates(types = nil)
+      response = request(:post, 'account/ios/certificate/listCertRequests.action', {
+        teamId: team_id,
+        types: '5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,3BQKVH9I2X,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,T44PTHVNID,DZQUP8189Y',
+        pageNumber: 1,
+        pageSize: 500,
+        sort: 'certRequestStatusCode=asc'
+      })
+      response.body['certRequests']
     end
 
     def download_certificate(certificate_id, type)
+      response = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
+        displayId: certificate_id,
+        type: type
+      })
     end
-
+=begin
     def revoke_certificate
     end
 
@@ -122,5 +152,15 @@ module Spaceship
 
     def generate_provisioning_profile(profile, distribution_method, device_ids, certificate)
     end
+=end
+    private
+      def request(method, url_or_path, params = {}, headers = {}, &block)
+        if session?
+          headers.merge!({'Cookie' => cookie})
+          @client.send(method, url_or_path, params, headers, &block)
+        else
+          @client.send(method, url_or_path, params, headers, &block)
+        end
+      end
   end
 end

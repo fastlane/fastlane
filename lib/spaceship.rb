@@ -1,6 +1,7 @@
 require 'spaceship/version'
 require 'fastlane_core'
 require 'spaceship/client'
+require 'spaceship/apps'
 
 module Spaceship
   # Use this to just setup the configuration attribute and set it later somewhere else
