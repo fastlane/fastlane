@@ -32,7 +32,7 @@ module Produce
           case key
           when :primary_language
             q.validate = lambda { |val| is_valid_language?(val) }
-            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_langauges}"
+            q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}"
           else
             q.validate = lambda { |val| !val.empty? }
             q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
@@ -67,13 +67,16 @@ module Produce
       }
       
       if ENV['PRODUCE_LANGUAGE']
-        language = ENV['PRODUCE_LANGUAGE'].split.map(&:capitalize).join(' ')
-        if is_valid_language?(language)
-          hash[:primary_language] = language
+        language = valid_language(ENV['PRODUCE_LANGUAGE'])
+
+        if language.nil?
+          unknown_language = ENV['PRODUCE_LANGUAGE']
+          Helper.log.error "PRODUCE_LANGUAGE is set to #{unknown_language} but it's not one of available languages. You'll be asked to set language again if needed."          
         else
-          Helper.log.error "PRODUCE_LANGUAGE is set to #{language} but it's not one of available languages. You'll be asked to set language again if needed."
+          hash[:primary_language] = language
         end
       end
+
       hash[:bundle_identifier] ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       hash.delete_if { |key, value| value.nil? }
       hash
@@ -81,7 +84,19 @@ module Produce
 
 
     def is_valid_language? language
-      AvailableDefaultLanguages.all_langauges.include? language
+      AvailableDefaultLanguages.all_languages.include? language
+    end
+
+    def valid_language language
+      AvailableDefaultLanguages.all_languages.each do |l| 
+
+        if l.casecmp(language) == 0
+          return l
+        end
+
+      end
+
+      return nil
     end
 
     # TODO: this could be moved inside fastlane_core
