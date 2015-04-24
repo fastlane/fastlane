@@ -4,15 +4,14 @@ require 'webmock/rspec'
 
 def stub_login(fixtures)
   stub_request(:get, "https://developer.apple.com/devcenter/ios/index.action").
-         with(:headers => {'Host'=>'developer.apple.com:443'}).
          to_return(:status => 200, :body => File.read(File.join(fixtures, "landing_page.html")), :headers => {})
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
          with(:body => {"accountPassword"=>"so_secret", "appIdKey"=>"2089349823abbababa98239839", "appleId"=>"spaceship@krausefx.com"},
-              :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Host'=>'idmsa.apple.com:443'}).
+              :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
          to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"})
   # List the teams
   stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action").
-         with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developerservices2.apple.com:443'}).
+         with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
          to_return(:status => 200, :body => File.read(File.join(fixtures, "list_teams.plist")), :headers => {})
 end
 
@@ -45,8 +44,8 @@ end
 def stub_devices(fixtures)
   stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listDevices.action").
          with(:body => "teamId=5A997XSHAA",
-              :headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developerservices2.apple.com:443'}).
-         to_return(:status => 200, :body => File.read(File.join(fixtures, "list_devices.plist")), :headers => {})
+              :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+         to_return(:status => 200, :body => File.read(File.join(fixtures, "list_devices.plist")), :headers => {'Content-type' => 'application/x-plist'})
 end
 
 def stub_certificates(fixtures)
@@ -66,9 +65,9 @@ end
 
 def stub_apps(fixtures)
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action").
-         with(:body => "teamId=5A997XSHAA&pageNumber=1&pageSize=5000&sort=name%3Dasc",
-              :headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developer.apple.com:443'}).
-         to_return(:status => 200, :body => File.read(File.join(fixtures, "list_apps.json")), :headers => {})
+         with(:body => {'teamId'=>'5A997XSHAA', 'pageNumber'=>'1', 'pageSize'=>'5000', 'sort'=>'name=asc'},
+              :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+         to_return(:status => 200, :body => File.read(File.join(fixtures, "list_apps.json")), :headers => {'Content-Type' => 'application/json'})
 end
 
 WebMock.disable_net_connect!
