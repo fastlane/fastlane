@@ -69,5 +69,13 @@ describe Spaceship::Client do
         expect(devices.first.keys).to eq(["deviceId", "name", "deviceNumber", "devicePlatform", "status"])
       end
     end
+
+    describe '#certificates' do
+      let(:certificates) { subject.certificates }
+      it 'returns a list of certificates hashes' do
+        expect(certificates).to be_instance_of(Array)
+        expect(certificates.first.keys).to eq(["certRequestId", "name", "statusString", "dateRequestedString", "dateRequested", "dateCreated", "expirationDate", "expirationDateString", "ownerType", "ownerName", "ownerId", "canDownload", "canRevoke", "certificateId", "certificateStatusCode", "certRequestStatusCode", "certificateTypeDisplayId", "serialNum", "typeString"])
+      end
+    end
   end
 end
