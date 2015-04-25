@@ -23,13 +23,13 @@ describe Spaceship::Client do
       let(:teams) { subject.teams }
       it 'returns the list of available teams' do
         expect(teams).to be_instance_of(Array)
-        expect(teams.first.keys).to eq(['status', 'name', 'teamId', 'type', 'extendedTeamAttributes', 'teamAgent', 'memberships', 'currentTeamMember'])
+        expect(teams.first.keys).to eq( ["status", "teamId", "type", "extendedTeamAttributes", "teamAgent", "memberships", "currentTeamMember", "name"])
       end
     end
 
     describe '#team_id' do
       it 'returns the default team_id' do
-        expect(subject.team_id).to eq('5A997XSHAA')
+        expect(subject.team_id).to eq('XXXXXXXXXX')
       end
     end
 
