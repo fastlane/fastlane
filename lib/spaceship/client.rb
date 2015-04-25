@@ -34,7 +34,10 @@ module Spaceship
     attr_reader :client
     attr_accessor :cookie
 
-    def self.login(username, password)
+    def self.login(username = nil, password = nil)
+      username ||= ENV['DELIVER_USER']
+      password ||= ENV['DELIVER_PASSWORD']
+
       instance.login(username, password)
       instance
     end
@@ -106,13 +109,6 @@ module Spaceship
       response.body['appIds']
     end
 
-    #this should probably be in the model.
-    def app(bundle_id)
-      apps.select do |app|
-        app['appIdId'] == bundle_id
-      end.first
-    end
-
     def devices
       response = request(:post, 'account/ios/device/listDevices.action', {
         teamId: team_id,
@@ -123,10 +119,10 @@ module Spaceship
       response.body['devices']
     end
 
-    def certificates(types = nil)
+    def certificates(types = [])
       response = request(:post, 'account/ios/certificate/listCertRequests.action', {
         teamId: team_id,
-        types: '5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,3BQKVH9I2X,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,T44PTHVNID,DZQUP8189Y',
+        types: types.join(','),
         pageNumber: 1,
         pageSize: 500,
         sort: 'certRequestStatusCode=asc'
@@ -139,6 +135,7 @@ module Spaceship
         displayId: certificate_id,
         type: type
       })
+      response.body
     end
 =begin
     def revoke_certificate
