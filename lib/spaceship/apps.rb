@@ -1,40 +1,28 @@
-
 module Spaceship
-  class App
+  class Apps
     include Spaceship::SharedClient
+    include Enumerable
 
-    attr_accessor :app_id, :name, :platform, :prefix, :identifier, :is_wildcard
+    def initialize
+      @apps = client.apps
+    end
 
-    def self.all
-      Spaceship::Client.instance.apps.map do |device|
-        App.new(
-          app_id: device['appIdId'],
-          name: device['name'],
-          platform: device['appIdPlatform'],
-          prefix: device['prefix'],
-          identifier: device['identifier'],
-          is_wildcard: device['isWildCard']
-        )
+    def each(&block)
+      @apps.each do |app|
+        block.call(app)
       end
     end
 
-    def initialize(attrs = {})
-      attrs.each do |attr, value|
-        send("#{attr}=", value)
+    def find(app_id)
+      each do |app|
+        return app if app['AppIdId'] == app_id
       end
     end
+    alias [] find
 
-    def to_s
-      [self.name, self.identifier].join(" - ")
+    def details(app_id)
+      client.app(app_id)
     end
-
-    #this should probably be in the model.
-    def app(bundle_id)
-      apps.select do |app|
-        app['appIdId'] == bundle_id
-      end.first
-    end
-
 
     # Example
     # app_id="572XTN75U2",
