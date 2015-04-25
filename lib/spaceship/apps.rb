@@ -28,6 +28,14 @@ module Spaceship
       [self.name, self.identifier].join(" - ")
     end
 
+    #this should probably be in the model.
+    def app(bundle_id)
+      apps.select do |app|
+        app['appIdId'] == bundle_id
+      end.first
+    end
+
+
     # Example
     # app_id="572XTN75U2",
     # name="App Name",
