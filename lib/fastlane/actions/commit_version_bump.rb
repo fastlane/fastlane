@@ -96,7 +96,7 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false
-                                       ),
+                                       )
         ]
       end
 
