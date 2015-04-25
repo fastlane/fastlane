@@ -89,7 +89,14 @@ module Fastlane
                                        verify_block: Proc.new do |value|
                                         raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
                                         raise "Could not find Xcode project".red unless File.exists?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :force,
+                                       env_name: "FL_FORCE_COMMIT",
+                                       description: "Forces the commit, even if other files than the ones containing the version number have been modified",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false
+                                       ),
         ]
       end
 
