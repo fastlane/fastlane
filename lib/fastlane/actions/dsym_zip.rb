@@ -47,7 +47,6 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        description: 'Path for generated dsym. Optional, default is your apps root directory',
-                                       default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
                                        optional: true,
                                        env_name: 'DSYM_ZIP_DSYM_PATH')
         ]
