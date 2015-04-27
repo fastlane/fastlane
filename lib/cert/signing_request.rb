@@ -3,6 +3,8 @@ require 'openssl'
 module Cert
   class SigningRequest
     def self.get_path
+      return ENV["CERT_SIGNING_REQUEST_PATH"] if ENV["CERT_SIGNING_REQUEST_PATH"]
+      
       self.generate
     end
 

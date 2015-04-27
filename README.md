@@ -100,6 +100,7 @@ In case you prefer environment variables:
 - ```CERT_USERNAME```
 - ```CERT_TEAM_ID```
 - ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain if you don't want to use the default one
+- ```CERT_SIGNING_REQUEST_PATH``` Path to your own signing request file
 - ```FASTLANE_TEAM_NAME``` (the Team Name, e.g. `Felix Krause`)
 
 ## Use with [`sigh`](https://github.com/KrauseFx/sigh)
