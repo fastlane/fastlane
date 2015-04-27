@@ -50,10 +50,10 @@ module FastlaneCore
           wait_for_elements('.ios.profiles.gridList')
           visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
         rescue => ex
-          Helper.log.debug ex
           if page.has_content?"Getting Started"
             visit PROFILES_URL # again, since after the login, the dev center loses the production GET value
           else
+            Helper.log.debug ex
             raise DeveloperCenterLoginError.new("Error logging in user #{user} with the given password. Make sure you entered them correctly.".red)
           end
         end
