@@ -86,9 +86,8 @@ module Sigh
                 next if @type != APPSTORE && details['provisioningProfile']['deviceCount'] == 0
 
                 # We found the correct certificate
-                if force && @type != DEVELOPMENT
-                  provisioningProfileId = current_cert['provisioningProfileId']
-                  renew_profile(provisioningProfileId) # This one needs to be forcefully renewed
+                if force
+                  renew_profile(current_cert['provisioningProfileId']) # This one needs to be forcefully renewed
                   return maintain_app_certificate(false) # recursive
                 elsif current_cert['status'] == 'Active'
                   return download_profile(details['provisioningProfile']['provisioningProfileId']) # this one is already finished. Just download it.
@@ -246,8 +245,21 @@ module Sigh
         wait_for_elements('.row-details')
         click_on "Done"
       else
-        Helper.log.info "Looking for certificate: #{certificate}."
-        raise "Could not find certificate in the list of available certificates."
+        if @type != APPSTORE
+          # Add all devices
+          wait_for_elements('.selectAll.column')
+          sleep 3
+          unless all(:xpath, "//div[@class='selectAll column']/input").last["checked"]
+            all(:xpath, "//div[@class='selectAll column']/input").last.click # select all the devices
+          end
+          click_next
+
+          wait_for_elements('.row-details')
+          click_on "Done"
+        else
+          Helper.log.info "Looking for certificate: #{certificate}."
+          raise "Could not find certificate in the list of available certificates."
+        end
       end
     end
 
