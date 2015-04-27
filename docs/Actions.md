@@ -275,6 +275,12 @@ deliver(
 )
 ```
 
+If you want to use a different Apple ID for iTunes Connect in `deliver`, just add this to your `Deliverfile`:
+
+```ruby
+email "itunes@connect.com"
+```
+
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey({
