@@ -14,6 +14,9 @@ module Fastlane
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
+
+            CredentialsManager::PasswordManager.shared_manager(config[:apple_id]) if config[:apple_id]
+            
             Deliver::Deliverer.new(nil,
                                    force: config[:force],
                                    is_beta_ipa: config[:beta],
@@ -52,6 +55,13 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :apple_id,
+                                       env_name: "FL_DELIVER_APPLE_ID",
+                                       description: "If you use a different email for iTunes Connect than for the rest",
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        raise "Invalid email address" unless value.include?"@"
+                                       end),
           FastlaneCore::ConfigItem.new(key: :deliver_file_path,
                                        env_name: "FL_DELIVER_CONFIG_PATH",
                                        description: "Specify a path to the directory containing the Deliverfile",
