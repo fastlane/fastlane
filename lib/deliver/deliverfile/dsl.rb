@@ -107,6 +107,7 @@ module Deliver
         # This will set the email address of the Apple ID to be used
         def email(value)
           value ||= yield if block_given?
+          CredentialsManager::PasswordManager.logout # if it was logged in already (with fastlane)
           CredentialsManager::PasswordManager.shared_manager(value)
         end
 
