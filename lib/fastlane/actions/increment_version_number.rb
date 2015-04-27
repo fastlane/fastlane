@@ -24,7 +24,7 @@ module Fastlane
               '&&'
           ].join(' ')
 
-          current_version = `#{command_prefix} asdf what-marketing-version -terse1`.split("\n").last || ''
+          current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
 
           if params[:version_number]
             Helper.log.debug "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
