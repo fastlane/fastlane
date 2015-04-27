@@ -96,7 +96,11 @@ module Deliver
       
       if (used_ipa_file || '').length == 0 and is_beta_build?
         # Beta Release but no ipa given
-        raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
+        used_ipa_file = Dir["*.ipa"].first
+        
+        unless used_ipa_file
+          raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
+        end
       end
 
       ENV["DELIVER_IPA_PATH"] = used_ipa_file
