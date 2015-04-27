@@ -118,7 +118,22 @@ module Fastlane
         xcodebuild_args = xcodebuild_args.join(" ")
 
         # Default args
-        xcpretty_args = [ "--color" ]
+        xcpretty_args = []
+
+        # Formatting style
+        if params && params[:output_style]
+          output_style = params[:output_style]
+          raise "Invalid output_style #{output_style}".red unless [:standard, :basic].include?(output_style)
+        else
+          output_style = :standard
+        end
+
+        case output_style
+        when :standard
+          xcpretty_args << '--color'
+        when :basic
+          xcpretty_args << '--no-utf'
+        end
 
         if testing
           if params[:reports]
@@ -231,7 +246,8 @@ module Fastlane
           ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ['build_settings', 'Hash of additional build information'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
 
@@ -268,7 +284,8 @@ module Fastlane
           ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ['build_settings', 'Hash of additional build information'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
     end
@@ -298,7 +315,8 @@ module Fastlane
           ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ['build_settings', 'Hash of additional build information'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
     end
@@ -328,7 +346,8 @@ module Fastlane
           ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ['build_settings', 'Hash of additional build information'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
     end
@@ -354,7 +373,8 @@ module Fastlane
           ['archive_path', 'The path to archive the to. Must contain `.xcarchive`'],
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
-          ['build_settings', 'Hash of additional build information']
+          ['build_settings', 'Hash of additional build information'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
 
@@ -381,7 +401,8 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"']
+          ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end
 
