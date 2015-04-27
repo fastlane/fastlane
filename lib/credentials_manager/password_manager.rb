@@ -19,6 +19,10 @@ module CredentialsManager
       @@instance ||= PasswordManager.new(id_to_use)
     end
 
+    def self.logout
+      @@instance = nil
+    end
+
     # A new instance of PasswordManager.
     # 
     # This already check the Keychain if there is a username and password stored.
