@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
   spec.add_dependency 'prawn' # generating PDF file for the applied changes
-  spec.add_dependency 'zip' # unzipping the ipa file
   spec.add_dependency 'excon' # HTTP client
 
   # Development only
