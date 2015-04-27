@@ -189,6 +189,7 @@ module Deliver
           content = File.read(File.join(language_folder, "#{key}.txt")) rescue nil
           next unless content
           content = content.split("\n") if key == 'keywords'
+          content = content.strip if key == 'privacy_url' || key == 'software_url' || key == 'support_url'
           @deploy_information[value] ||= {}
           @deploy_information[value][language] ||= content
 
