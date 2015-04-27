@@ -23,6 +23,9 @@ module Fastlane
             if ENV['DELIVER_IPA_PATH'] # since IPA upload is optional
               Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.expand_path(ENV['DELIVER_IPA_PATH']) # deliver will store it in the environment
             end
+
+            # The user might used a different account for deliver
+            CredentialsManager::PasswordManager.logout
           end
         ensure
           FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
