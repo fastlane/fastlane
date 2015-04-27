@@ -134,6 +134,10 @@ xcodebuild(
 )
 ```
 
+`build_settings` are variables which are exposed inside the build process as ENV variables, and can be used to override project settings, or dynamically set values inside a Plist.
+
+`output_style` sets the output format of the console output. Supported options are: 1) `:standard`, this is the default and will output pretty colored UTF8, and 2) `:basic`, which will output monochrome ASCII, useful for a CI environment like TeamCity that doesn't support color/UTF8.
+
 ```ruby
 xcodebuild(
   workspace: "...",
@@ -142,7 +146,8 @@ xcodebuild(
     "CODE_SIGN_IDENTITY" => "iPhone Developer: ...",
     "PROVISIONING_PROFILE" => "...",
     "JOBS" => 16
-  }
+  },
+  output_style: :basic
 )
 ```
 
