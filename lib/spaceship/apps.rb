@@ -2,27 +2,31 @@ module Spaceship
   class Apps
     include Spaceship::SharedClient
     include Enumerable
+    extend Forwardable
+
+    def_delegators :@apps, :each, :first, :last
+
+    App = Struct.new(:app_id, :name, :platform, :prefix, :identifier, :is_wildcard, :dev_push_enabled, :prod_push_enabled)
 
     def initialize
-      @apps = client.apps
-    end
-
-    def each(&block)
-      @apps.each do |app|
-        block.call(app)
+      @apps = client.apps.map do |app|
+        values = app.values_at('appIdId', 'name', 'appIdPlatform', 'prefix', 'identifier', 'isWildCard', 'isDevPushEnabled', 'isProdPushEnabled')
+        App.new(*values)
       end
     end
 
-    def find(app_id)
+    def find(identifier)
       each do |app|
-        return app if app['AppIdId'] == app_id
+        return app if app.identifier == identifier
       end
+      return nil
     end
     alias [] find
 
     def details(app_id)
       client.app(app_id)
     end
+
 
     # Example
     # app_id="572XTN75U2",
