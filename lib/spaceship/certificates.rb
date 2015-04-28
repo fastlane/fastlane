@@ -26,8 +26,8 @@ module Spaceship
     end
 
     def find(cert_id)
-      each do |cert|
-        return cert if cert.id == cert_id
+      @certificates.find do |cert|
+        cert.id == cert_id
       end
     end
     alias [] find

@@ -25,7 +25,7 @@ describe Spaceship::Certificates do
     end
 
     it "parses push certificates correctly" do
-      push = subject[1] # that's the push certificate
+      push = subject['32KPRBAAAA'] # that's the push certificate
 
       expect(push.id).to eq('32KPRBAAAA')
       expect(push.name).to eq('net.sunapps.54')
@@ -40,7 +40,7 @@ describe Spaceship::Certificates do
   end
 
   it "Correctly filters the listed certificates" do
-    certs = @client.certificates(Spaceship::Client::ProfileTypes::SigningCertificate.development)
+    certs = Spaceship::Certificates.new([Spaceship::Client::ProfileTypes::SigningCertificate.development])
     expect(certs.count).to eq(1)
 
     cert = certs.first
@@ -58,15 +58,15 @@ describe Spaceship::Certificates do
   describe '#file' do
     let(:cert) { subject.first }
     it 'downloads the associated .cer file' do
-      x509 = OpenSSL::X509::Certificate.new(subject.file(cert['certificateId']))
+      x509 = OpenSSL::X509::Certificate.new(subject.file(cert.id))
       expect(x509.issuer.to_s).to match('Apple Worldwide Developer Relations')
     end
   end
 
   describe '#revoke' do
-    let(:cert) { @client.certificates.first }
-    it 'revokes the identified certificate' do
-      cert.revoke
-    end
+    #let(:cert) { @client.certificates.first }
+    #it 'revokes the identified certificate' do
+    #  cert.revoke
+    #end
   end
 end

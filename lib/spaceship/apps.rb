@@ -16,10 +16,9 @@ module Spaceship
     end
 
     def find(identifier)
-      each do |app|
-        return app if app.identifier == identifier
+      @apps.find do |app|
+        app.identifier == identifier
       end
-      return nil
     end
     alias [] find
 
