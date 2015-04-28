@@ -2,9 +2,13 @@ require 'faraday' # HTTP Client
 require 'faraday_middleware'
 require 'faraday_middleware/response_middleware'
 require 'nokogiri'
-require 'pry' # TODO: Remove
 
 require 'singleton'
+
+if ENV['DEBUG']
+  require 'pry' # TODO: Remove
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
 
 module FaradayMiddleware
   class PlistMiddleware < ResponseMiddleware
@@ -49,9 +53,12 @@ module Spaceship
         c.response :plist, :content_type => /\bplist$/
         c.request :url_encoded
         c.adapter Faraday.default_adapter #can be Excon
-        #for debugging:
-        #c.response :logger
-        #c.proxy "http://localhost:8080"
+
+        if ENV['debug']
+          #for debugging:
+          c.response :logger
+          c.proxy "http://localhost:8080"
+        end
       end
     end
 
@@ -119,7 +126,7 @@ module Spaceship
       response.body['devices']
     end
 
-    def certificates(types = [])
+    def certificates(types)
       response = request(:post, 'account/ios/certificate/listCertRequests.action', {
         teamId: team_id,
         types: types.join(','),

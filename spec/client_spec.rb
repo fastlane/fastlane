@@ -71,7 +71,7 @@ describe Spaceship::Client do
     end
 
     describe '#certificates' do
-      let(:certificates) { subject.certificates }
+      let(:certificates) { subject.certificates(Client::ProfileTypes.all_profile_types) }
       it 'returns a list of certificates hashes' do
         expect(certificates).to be_instance_of(Array)
         expect(certificates.first.keys).to eq(["certRequestId", "name", "statusString", "dateRequestedString", "dateRequested", "dateCreated", "expirationDate", "expirationDateString", "ownerType", "ownerName", "ownerId", "canDownload", "canRevoke", "certificateId", "certificateStatusCode", "certRequestStatusCode", "certificateTypeDisplayId", "serialNum", "typeString"])
