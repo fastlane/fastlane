@@ -144,19 +144,43 @@ module Spaceship
       })
       response.body
     end
-=begin
-    def revoke_certificate
-    end
+
+    #def revoke_certificate
+    #end
 
     def provisioning_profiles
+      response = request(:post, 'account/ios/profile/listProvisioningProfiles.action', {
+        teamId: team_id,
+        includeInactiveProfiles: true,
+        onlyCountLists: true,
+        search: nil,
+        pageSize: 500,
+        pageNumber: 1,
+        sort: 'name=asc'
+      })
+      response.body['provisioningProfiles']
     end
 
-    def provisioning_profile(bundle_id, distribution_method)
+    def provisioning_profile(profile_id, distribution_method)
+      response = request(:post, 'account/ios/profile/getProvisioningProfile.action', {
+        teamId: team_id,
+        includeInactiveProfiles: true,
+        onlyCountLists: true,
+        provisioningProfileId: profile_id
+      })
+      response.body['provisioningProfile']
+    end
+
+    def download_provisioning_profile(profile_id)
+      response = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
+        displayId: profile_id
+      })
+      response.body
     end
 
     def generate_provisioning_profile(profile, distribution_method, device_ids, certificate)
     end
-=end
+
     private
       def request(method, url_or_path, params = {}, headers = {}, &block)
         if session?
