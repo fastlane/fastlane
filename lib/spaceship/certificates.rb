@@ -39,7 +39,7 @@ module Spaceship
     end
 
     def revoke(cert_id)
-      client.revoke(bundle_id)
+      client.revoke(cert_id)
     end
 
     #not sure how/when to do this:
