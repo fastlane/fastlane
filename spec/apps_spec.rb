@@ -68,4 +68,17 @@ describe Spaceship::Apps do
       expect(app.is_wildcard).to eq(false)
     end
   end
+
+  describe '#delete' do
+    it 'deletes the app by a given bundle_id' do
+      expect(client).to receive(:delete_app).with('B7JBD8LHAA')
+      app = subject.delete('net.sunapps.151')
+      expect(app.app_id).to eq('B7JBD8LHAA')
+    end
+
+    it 'returns nil if the given bundle_id is not a valid app' do
+      expect(client).to_not receive(:delete_app)
+      expect(subject.delete('net.sunapps.XXX')).to eq(nil)
+    end
+  end
 end

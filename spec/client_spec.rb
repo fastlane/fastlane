@@ -57,6 +57,12 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#delete_app' do
+      it 'should make a request to delete the app' do
+        subject.delete_app('LXD24VUE49')
+      end
+    end
+
     describe '#devices' do
       let(:devices) { subject.devices }
       it 'returns a list of device hashes' do

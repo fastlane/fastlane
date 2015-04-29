@@ -37,6 +37,13 @@ module Spaceship
       self.class.factory(new_app)
     end
 
+    def delete(bundle_id)
+      if app = find(bundle_id)
+        client.delete_app(app.app_id)
+        app
+      end
+    end
+
     def find(bundle_id)
       @apps.find do |app|
         app.bundle_id == bundle_id
