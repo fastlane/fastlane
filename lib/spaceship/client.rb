@@ -172,6 +172,16 @@ module Spaceship
       response.body['certRequests']
     end
 
+    def create_certificate(type, csr, app_id = nil)
+      response = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+        teamId: team_id,
+        type: type,
+        csrContent: csr,
+        appIdId: app_id  #optional
+      })
+      response.body['certRequest']
+    end
+
     def download_certificate(certificate_id, type)
       response = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
         displayId: certificate_id,

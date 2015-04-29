@@ -68,5 +68,19 @@ describe Spaceship::Certificates do
     #it 'revokes the identified certificate' do
     #  cert.revoke
     #end
+
+  describe '#create' do
+    it 'should create and return a new certificate' do
+      expect(client).to receive(:create_certificate).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
+        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+      }
+      certificate = nil
+
+      expect {
+        certificate = subject.create(Spaceship::Certificates::ProductionPush, 'net.sunapps.151')
+      }.to change(subject, :count).by(+1)
+
+      expect(certificate).to be_instance_of(Spaceship::Certificates::ProductionPush)
+    end
   end
 end

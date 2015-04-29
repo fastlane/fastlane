@@ -78,5 +78,13 @@ describe Spaceship::Client do
         expect(certificates.first.keys).to eq(["certRequestId", "name", "statusString", "dateRequestedString", "dateRequested", "dateCreated", "expirationDate", "expirationDateString", "ownerType", "ownerName", "ownerId", "canDownload", "canRevoke", "certificateId", "certificateStatusCode", "certRequestStatusCode", "certificateTypeDisplayId", "serialNum", "typeString"])
       end
     end
+
+    describe '#create_certificate' do
+      let(:csr) { read_fixture_file('certificateSigningRequest.certSigningRequest')}
+      it 'makes a request to create a certificate' do
+        response = subject.create_certificate('BKLRAVXMGM', csr, '2HNR359G63')
+        expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')
+      end
+    end
   end
 end

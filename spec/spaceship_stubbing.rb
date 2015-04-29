@@ -54,17 +54,24 @@ def stub_certificates
          :headers => {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listCertRequests.action.json'), :headers => {'Content-Type' => 'application/json'})
 
-  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action?certificateStatus=0&teamId=5A997XSHAA&types=5QPB9NHCEI").
-    with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
+    with(:body => {"pageNumber"=>"1", "pageSize"=>"500", "sort"=>"certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => '5QPB9NHCEI'},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {'Content-Type' => 'application/json'})
+=begin
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
+    with(:body => {'teamId' => '5A997XSHAA', 'types' => 'R58UK2EWSO'},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {})
-
-  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action?certificateStatus=0&teamId=5A997XSHAA&types=R58UK2EWSO").
-    with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
-    to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {})
-
-    stub_request(:get, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action").
-      with(:headers => {'Cookie'=>'myacinfo=abcdef;'}, :body => {"displayId"=>"XC5PH8DAAA", "type"=>"R58UK2EAAA"}).
-      to_return(:status => 200, :body => read_fixture_file('aps_development.cer'))
+=end
+  stub_request(:post, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action").
+    with(:body => {"displayId"=>"XC5PH8DAAA", "type"=>"R58UK2EAAA"},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('aps_development.cer'))
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
+     with(:body => {"appIdId"=>"2HNR359G63", "csrContent"=>read_fixture_file('certificateSigningRequest.certSigningRequest'), "type"=>"BKLRAVXMGM"},
+          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+     to_return(:status => 200, :body => read_fixture_file('submitCertificateRequest.action.json'), :headers => {'Content-Type' => 'application/json'})
 end
 
 def stub_apps
