@@ -54,7 +54,7 @@ module Spaceship
         c.request :url_encoded
         c.adapter Faraday.default_adapter #can be Excon
 
-        if ENV['debug']
+        if ENV['DEBUG']
           #for debugging:
           c.response :logger
           c.proxy "http://localhost:8080"
@@ -107,14 +107,55 @@ module Spaceship
     end
 
     def apps
-      response = request(:post, "account/ios/identifiers/listAppIds.action", {
+      response = request(:post, 'account/ios/identifiers/listAppIds.action', {
         teamId: team_id,
         pageNumber: 1,
         pageSize: 500,
-        sort: "name=asc"
+        sort: 'name=asc'
       })
       response.body['appIds']
     end
+
+    def create_app_csrf
+
+    end
+
+    def create_app(type, name, bundle_id)
+      ident_params = case type.to_sym
+      when :explicit
+        {
+          type: 'explicit',
+          explicitIdentifier: bundle_id,
+          appIdentifierString: bundle_id,
+          push: 'on',
+          inAppPurchase: 'on',
+          gameCenter: 'on'
+        }
+      when :wildcard
+        {
+          type: 'wildcard',
+          wildcardIdentifier: bundle_id,
+          appIdentifierString: bundle_id
+        }
+      else
+        raise "Unknown app id type: #{type}"
+      end
+
+      params = {
+        appIdName: name,
+        teamId: team_id
+      }
+
+      params.merge!(ident_params)
+
+      response = request(:post, 'account/ios/identifiers/addAppId.action', params)
+      response.body['appId']
+    end
+
+    #this might be nice to have
+    #def validate_app(same params as above)
+    #account/ios/identifiers/validateAppId.action
+    #end
 
     def devices
       response = request(:post, 'account/ios/device/listDevices.action', {
@@ -182,13 +223,25 @@ module Spaceship
     end
 
     private
+      ##
+      # memoize the last csrf tokens from responses
+      def csrf_tokens
+        return {} unless @last_response
+
+        tokens = @last_response.headers.select{|k,v| %w[csrf csrf_ts].include?(k) }
+        if tokens.empty? && @crsf_tokens && !@csrf_tokens.empty?
+          @csrf_tokens
+        else
+          @csrf_tokens = tokens
+        end
+      end
+
       def request(method, url_or_path, params = {}, headers = {}, &block)
         if session?
           headers.merge!({'Cookie' => cookie})
-          @client.send(method, url_or_path, params, headers, &block)
-        else
-          @client.send(method, url_or_path, params, headers, &block)
+          headers.merge!(csrf_tokens)
         end
+        @last_response = @client.send(method, url_or_path, params, headers, &block)
       end
   end
 end

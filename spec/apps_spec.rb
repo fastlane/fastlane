@@ -14,7 +14,7 @@ describe Spaceship::Apps do
       expect(app.name).to eq("The App Name")
       expect(app.platform).to eq("ios")
       expect(app.prefix).to eq("5A997XSHK2")
-      expect(app.identifier).to eq("net.sunapps.151")
+      expect(app.bundle_id).to eq("net.sunapps.151")
       expect(app.is_wildcard).to eq(false)
     end
 
@@ -25,7 +25,7 @@ describe Spaceship::Apps do
       expect(app.name).to eq("SunApps")
       expect(app.platform).to eq("ios")
       expect(app.prefix).to eq("5A997XSHK2")
-      expect(app.identifier).to eq("net.sunapps.*")
+      expect(app.bundle_id).to eq("net.sunapps.*")
       expect(app.is_wildcard).to eq(true)
     end
   end
@@ -47,6 +47,20 @@ describe Spaceship::Apps do
 
     it "returns nil app ID wasn't found" do
       expect(subject.find("asdfasdf")).to be_nil
+    end
+  end
+
+  describe '#create' do
+    it 'creates an app id with an explicit bundle_id' do
+      app = subject.create('tools.fastlane.spaceship.some-explicit-app', 'Production App')
+      expect(app.is_wildcard).to eq(false)
+      expect(app.name).to eq('Production App')
+    end
+
+    it 'creates an app id with a wildcard bundle_id' do
+      app = subject.create('tools.fastlane.spaceship.*', 'Development App')
+      expect(app.is_wildcard).to eq(true)
+      expect(app.name).to eq('Development App')
     end
   end
 end

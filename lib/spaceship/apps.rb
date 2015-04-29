@@ -6,18 +6,40 @@ module Spaceship
 
     def_delegators :@apps, :each, :first, :last
 
-    App = Struct.new(:app_id, :name, :platform, :prefix, :identifier, :is_wildcard, :dev_push_enabled, :prod_push_enabled)
-
-    def initialize
-      @apps = client.apps.map do |app|
-        values = app.values_at('appIdId', 'name', 'appIdPlatform', 'prefix', 'identifier', 'isWildCard', 'isDevPushEnabled', 'isProdPushEnabled')
-        App.new(*values)
-      end
+    class App < Struct.new(:app_id, :name, :platform, :prefix, :bundle_id, :is_wildcard, :dev_push_enabled, :prod_push_enabled)
     end
 
-    def find(identifier)
+    #class Passbook < App; end
+    #class WebsitePush < App; end
+    #class ICloudContainer < App; end
+    #class AppGroup < App; end
+    #class Merchant < App; end
+
+    def self.factory(response)
+      values = response.values_at('appIdId', 'name', 'appIdPlatform', 'prefix', 'identifier', 'isWildCard', 'isDevPushEnabled', 'isProdPushEnabled')
+      App.new(*values)
+    end
+
+    def initialize
+      @apps = client.apps.map {|app| self.class.factory(app) }
+    end
+
+    #if bundle_id ends with '*' then it is a wildcard id
+    #otherwise, it is an explicit id
+    def create(bundle_id, name)
+      if bundle_id.end_with?('*')
+        type = :wildcard
+      else
+        type = :explicit
+      end
+
+      new_app = client.create_app(type, name, bundle_id)
+      self.class.factory(new_app)
+    end
+
+    def find(bundle_id)
       @apps.find do |app|
-        app.identifier == identifier
+        app.bundle_id == bundle_id
       end
     end
     alias [] find
@@ -25,16 +47,5 @@ module Spaceship
     def details(app_id)
       client.app(app_id)
     end
-
-
-    # Example
-    # app_id="572XTN75U2",
-    # name="App Name",
-    # platform="ios",
-    # prefix="5A997XSHK2",
-    # identifier="net.sunapps.7",
-    # is_wildcard=false,
-    # dev_push_enabled=false,
-    # prod_push_enabled=false>,
   end
 end
