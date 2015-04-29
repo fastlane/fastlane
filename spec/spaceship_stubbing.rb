@@ -71,6 +71,16 @@ def stub_apps
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action').
     with(:body => {:teamId => 'XXXXXXXXXX', :pageSize => "500", :pageNumber => "1", :sort => 'name=asc'}, :headers => {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listApps.action.json'), :headers => {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
+    with(:body => {"appIdName"=>"Production App", "appIdentifierString"=>"tools.fastlane.spaceship.some-explicit-app", "explicitIdentifier"=>"tools.fastlane.spaceship.some-explicit-app", "gameCenter"=>"on", "inAppPurchase"=>"on", "push"=>"on", "teamId"=>"XXXXXXXXXX", "type"=>"explicit"},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('addAppId.action.explicit.json'), :headers => {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
+    with(:body => {"appIdName"=>"Development App", "appIdentifierString"=>"tools.fastlane.spaceship.*", "teamId"=>"XXXXXXXXXX", "type"=>"wildcard", "wildcardIdentifier"=>"tools.fastlane.spaceship.*"},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('addAppId.action.wildcard.json'), :headers => {'Content-Type' => 'application/json'})
 end
 
 WebMock.disable_net_connect!

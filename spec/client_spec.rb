@@ -41,24 +41,19 @@ describe Spaceship::Client do
       end
     end
 
-    describe '#app' do
-      it 'returns an app hash matching on the bundle_id' do
-        expect(subject.app('B7JBD8LHAA')).to eq({
-          "appIdId" => "B7JBD8LHAA",
-          "appIdPlatform" => "ios",
-          "associatedApplicationGroupsCount" => nil,
-          "associatedCloudContainersCount" => nil,
-          "associatedIdentifiersCount" => nil,
-          "enabledFeatures" => [],
-          "features" => {},
-          "identifier" => "net.sunapps.151",
-          "isDevPushEnabled" => nil,
-          "isDuplicate" => false,
-          "isProdPushEnabled" => nil,
-          "isWildCard" => false,
-          "name" => "The App Name",
-          "prefix" => "5A997XSHK2",
-        })
+    describe '#create_app' do
+      it 'should make a request create an explicit app id' do
+        response = subject.create_app(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app')
+        expect(response['isWildCard']).to eq(false)
+        expect(response['name']).to eq('Production App')
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
+      end
+
+      it 'should make a request create a wildcard app id' do
+        response = subject.create_app(:wildcard, 'Development App', 'tools.fastlane.spaceship.*')
+        expect(response['isWildCard']).to eq(true)
+        expect(response['name']).to eq('Development App')
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.*')
       end
     end
 
@@ -71,7 +66,7 @@ describe Spaceship::Client do
     end
 
     describe '#certificates' do
-      let(:certificates) { subject.certificates(Client::ProfileTypes.all_profile_types) }
+      let(:certificates) { subject.certificates(Spaceship::Client::ProfileTypes.all_profile_types) }
       it 'returns a list of certificates hashes' do
         expect(certificates).to be_instance_of(Array)
         expect(certificates.first.keys).to eq(["certRequestId", "name", "statusString", "dateRequestedString", "dateRequested", "dateCreated", "expirationDate", "expirationDateString", "ownerType", "ownerName", "ownerId", "canDownload", "canRevoke", "certificateId", "certificateStatusCode", "certRequestStatusCode", "certificateTypeDisplayId", "serialNum", "typeString"])

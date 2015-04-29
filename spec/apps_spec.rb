@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Spaceship::Apps do
+  let(:client) { Spaceship::Client.instance }
   before { Spaceship::Client.login }
   describe "successfully loads and parses all apps" do
     it "the number is correct" do
@@ -52,15 +53,19 @@ describe Spaceship::Apps do
 
   describe '#create' do
     it 'creates an app id with an explicit bundle_id' do
+      expect(client).to receive(:create_app).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app') {
+        {'isWildCard' => true}
+      }
       app = subject.create('tools.fastlane.spaceship.some-explicit-app', 'Production App')
-      expect(app.is_wildcard).to eq(false)
-      expect(app.name).to eq('Production App')
+      expect(app.is_wildcard).to eq(true)
     end
 
     it 'creates an app id with a wildcard bundle_id' do
+      expect(client).to receive(:create_app).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*') {
+        {'isWildCard' => false}
+      }
       app = subject.create('tools.fastlane.spaceship.*', 'Development App')
-      expect(app.is_wildcard).to eq(true)
-      expect(app.name).to eq('Development App')
+      expect(app.is_wildcard).to eq(false)
     end
   end
 end

@@ -116,10 +116,6 @@ module Spaceship
       response.body['appIds']
     end
 
-    def create_app_csrf
-
-    end
-
     def create_app(type, name, bundle_id)
       ident_params = case type.to_sym
       when :explicit
@@ -137,8 +133,6 @@ module Spaceship
           wildcardIdentifier: bundle_id,
           appIdentifierString: bundle_id
         }
-      else
-        raise "Unknown app id type: #{type}"
       end
 
       params = {
