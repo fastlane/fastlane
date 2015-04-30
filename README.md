@@ -163,10 +163,17 @@ snapshot test
 ```
 
 
-By default, `snapshot`, will re-install the app, to make sure it's in a clean state. In case you don't want this run
+By default, `snapshot` will re-install the app, to make sure it's in a clean state. In case you don't want this run
 
 ```
 SNAPSHOT_SKIP_UNINSTALL=1 snapshot
+```
+
+
+Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
+
+```
+SNAPSHOT_SKIP_OPEN_SUMMARY=1 snapshot
 ```
 
 ## Snapfile
