@@ -15,13 +15,18 @@ module Fastlane
         message = options[:message]
         picture = options[:picture]
 
+        body = {"title" => title,
+                "message" => message,
+                "picture" => picture}
+
         uri = URI.parse("https://hall.com/api/1/services/generic/#{group_api_token}")
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         req = Net::HTTP::Post.new(uri.path, initheader = {"Content-Type" =>"application/json",
                                                           "Accept" => "application/json"})
-        req.body = {"title" => title,
-                    "message" => message}.to_json
+        req.body = body.to_json
+
+        return [uri.to_s, body] if Helper.is_test? # tests will verify the url and body
 
         res = http.request(req)
         check_response_code(res)
