@@ -96,7 +96,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
                                       description: "Notes type for your :notes, 0 = Textile, 1 = Markdown (default)",
-                                      default_value: "1")
+                                      default_value: "1"),
+          FastlaneCore::ConfigItem.new(key: :release_type,
+                                      env_name: "FL_HOCKEY_RELEASE_TYPE",
+                                      description: "Release type of the app",
+                                      default_value: "0")
         ]
       end
 
