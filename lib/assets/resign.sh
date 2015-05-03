@@ -293,7 +293,7 @@ then
     echo "Resigning embedded frameworks using certificate: '$CERTIFICATE'" >&2
     for framework in "$FRAMEWORKS_DIR"/*
     do
-        if [[ "$framework" == *.framework ]]
+        if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
         then
             /usr/bin/codesign -f -s "$CERTIFICATE" "$framework"
             checkStatus
