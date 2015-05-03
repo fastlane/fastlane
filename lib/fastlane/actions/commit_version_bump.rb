@@ -63,7 +63,7 @@ module Fastlane
         end
 
         # get the absolute paths to the files
-        git_add_paths = expected_changed_files.map { |path| File.expand_path(File.join(repo_pathname, path)) }
+        git_add_paths = git_dirty_files.map { |path| File.expand_path(File.join(repo_pathname, path)) }
 
         # then create a commit with a message
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
