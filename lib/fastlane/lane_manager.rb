@@ -54,7 +54,13 @@ module Fastlane
 
 
       unless error
-        thread.join # to wait for the request to be finished
+        begin
+          thread.join # to wait for the request to be finished
+        rescue
+          # We don't care about errors here
+          # https://github.com/KrauseFx/fastlane/issues/240
+        end
+
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
