@@ -35,6 +35,7 @@ module Fastlane
 
         values = options.values
         values[:dsym_filename] = dsym_path
+        values[:notes_type] = options[:notes_type]
 
         return values if Helper.test?
 
@@ -91,7 +92,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
                                        description: "Download status: 1 = No user can download; 2 = Available for download",
-                                       default_value: "2")
+                                       default_value: "2"),
+          FastlaneCore::ConfigItem.new(key: :notes_type,
+                                      env_name: "FL_HOCKEY_NOTES_TYPE",
+                                      description: "Notes type for your :notes, 0 = Textile, 1 = Markdown (default)",
+                                      default_value: "1"),
+          FastlaneCore::ConfigItem.new(key: :release_type,
+                                      env_name: "FL_HOCKEY_RELEASE_TYPE",
+                                      description: "Release type of the app",
+                                      default_value: "0")
         ]
       end
 

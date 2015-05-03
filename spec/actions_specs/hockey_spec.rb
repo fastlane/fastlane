@@ -54,7 +54,44 @@ describe Fastlane do
         expect(values[:notify]).to eq(1.to_s)
         expect(values[:status]).to eq(2.to_s)
         expect(values[:notes]).to eq("No changelog given")
+        expect(values[:release_type]).to eq(0.to_s)
       end
+      
+      it "has the correct default notes_type value" do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+          })
+        end").runner.execute(:test)
+
+        expect(values[:notes_type]).to eq("1")
+      end
+      
+      it "can change the notes_type " do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            notes_type: '0'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:notes_type]).to eq("0")
+      end
+
+      it "can change the release_type " do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            release_type: '1'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:release_type]).to eq(1.to_s)
+      end
+      
     end
   end
 end

@@ -71,7 +71,7 @@ platform :ios do
 
   error do |lane, exception|
     # slack({
-    #   message: exception.message
+    #   message: exception.message,
     #   success: false
     # })
   end

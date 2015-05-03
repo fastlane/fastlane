@@ -30,4 +30,4 @@ Pull requests are always welcome :simple_smile:
 
 - Your code editor should use the tab spaces of 2.
 - Make sure to test the changes yourself before submitting.
-- Run the tests by executing `bundle install` and then `rspec`.
+- Run the tests by executing `bundle install` and then `bundle exec rspec`.
