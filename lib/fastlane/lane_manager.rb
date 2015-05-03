@@ -87,7 +87,7 @@ module Fastlane
         i = $stdin.gets.strip.to_i - 1
         if i >= 0 and (available[i] rescue nil)
           selection = available[i]
-          Helper.log.info "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`".green
+          Helper.log.info "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`".yellow
           platform = selection.split(' ')[0]
           lane_name = selection.split(' ')[1]
 
