@@ -139,7 +139,7 @@ module Fastlane
     def is_platform_block?(key)
       raise 'No key given'.red unless key
 
-      return false if self.runner.blocks[nil][key.to_sym]
+      return false if (self.runner.blocks[nil][key.to_sym] rescue false)
       return true if self.runner.blocks[key.to_sym].kind_of?Hash
 
       raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
