@@ -5,8 +5,8 @@ There are lots of predefined `fastlane` actions you can use. If you have ideas f
 To get the most up-to-date information from the command line on your current verion you can also run:
 
 ```sh
-   fastlane actions: List all available fastlane actions
-   fastlane action [action_name]:
+fastlane actions: List all available fastlane actions
+fastlane action [action_name]:
 ```
 
 - [Building](#building)
