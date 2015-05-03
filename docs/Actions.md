@@ -2,6 +2,13 @@
 
 There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/KrauseFx/fastlane/issues/new).
 
+To get the most up-to-date information from the command line on your current verion you can also run:
+
+```sh
+   fastlane actions: List all available fastlane actions
+   fastlane action [action_name]:
+```
+
 - [Building](#building)
 - [Testing](#testing)
 - [Deploying](#deploying)
