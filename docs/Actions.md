@@ -81,7 +81,7 @@ snapshot :verbose
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
 ```ruby
-ipa({
+ipa(
   workspace: "MyApp.xcworkspace",
   configuration: "Debug",
   scheme: "MyApp",
@@ -95,7 +95,7 @@ ipa({
   sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
   archive: nil,                    # this means 'Do Archive'. Archive project after building.
   verbose: nil,                    # this means 'Do Verbose'.
-})
+)
 ```
 
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
@@ -253,11 +253,11 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
 Generate summarized code coverage reports.
 
 ```ruby
-gcovr({
+gcovr(
   html: true,
   html_details: true,
   output: "./code-coverage/report.html"
-})
+)
 ```
 
 ## Deploying
@@ -290,11 +290,11 @@ email "itunes@connect.com"
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
-hockey({
+hockey(
   api_token: '...',
   ipa: './app.ipa',
   notes: "Changelog"
-})
+)
 ```
 
 Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.
@@ -303,12 +303,12 @@ More information about the available options can be found in the [HockeyApp Docs
 
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
-crashlytics({
+crashlytics(
   crashlytics_path: './Crashlytics.framework', # path to your 'Crashlytics.framework'
   api_token: '...',
   build_secret: '...',
   ipa_path: './app.ipa'
-})
+)
 ```
 Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
 
@@ -324,7 +324,7 @@ s3
 
 You can also customize a lot of options:
 ```ruby
-s3({
+s3(
   # All of these are used to make Shenzhen's `ipa distribute:s3` command
   access_key: ENV['S3_ACCESS_KEY'],               # Required from user.
   secret_access_key: ENV['S3_SECRET_ACCESS_KEY'], # Required from user.
@@ -332,7 +332,7 @@ s3({
   file: 'AppName.ipa',                            # This would come from IpaAction.
   dsym: 'AppName.app.dSYM.zip',                   # This would come from IpaAction.
   path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/' # This is actually the default.
-})
+)
 ```
 
 It is recommended to **not** store the AWS access keys in the `Fastfile`.
@@ -342,12 +342,12 @@ It is recommended to **not** store the AWS access keys in the `Fastfile`.
 You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).
 
 ```ruby
-deploygate({
+deploygate(
   api_token: '...',
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
   message: "Build #{Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]}",
-})
+)
 ```
 
 If you put `deploygate` after `ipa` action, you don't have to specify IPA file path, as it is extracted from the lane context automatically.
@@ -407,11 +407,11 @@ sigh
 You can pass all options listed in `sigh --help` in `fastlane`:
 
 ```ruby
-sigh({
+sigh(
   adhoc: true,
   force: true,
   filename: "myFile.mobileprovision"
-})
+)
 ```
 
 ### [PEM](https://github.com/KrauseFx/PEM)
@@ -450,10 +450,10 @@ cert
 You can pass all options listed in `sigh --help` in `fastlane`:
 
 ```ruby
-cert({
+cert(
   development: true,
   username: "user@email.com"
-})
+)
 ```
 
 ### [produce](https://github.com/KrauseFx/produce)
@@ -461,7 +461,7 @@ cert({
 Create new apps on iTunes Connect and Apple Developer Portal. If the app already exists, `produce` will not do anything.
 
 ```ruby
-produce({
+produce(
   produce_username: 'felix@krausefx.com',
   produce_app_identifier: 'com.krausefx.app',
   produce_app_name: 'MyApp',
@@ -469,7 +469,7 @@ produce({
   produce_version: '1.0',
   produce_sku: 123,
   produce_team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
-})
+)
 ```
 
 ### register_devices
@@ -629,11 +629,11 @@ Send a message to **room** (by default) or a direct message to **@username** wit
   ENV["HIPCHAT_API_TOKEN"] = "Your API token"
   ENV["HIPCHAT_API_VERSION"] = "1 for API version 1 or 2 for API version 2"
 
-  hipchat({
+  hipchat(
     message: "App successfully released!",
     channel: "Room or @username",
     success: true
-  })
+  )
 ```
 
 ### [Typetalk](https://typetalk.in/)
@@ -641,13 +641,13 @@ Send a message to **topic** with success (:smile:) or failure (:rage:) status.
 [Using Bot's Typetalk Token](https://developer.nulab-inc.com/docs/typetalk/auth#tttoken)
 
 ```ruby
-  typetalk({
+  typetalk(
     message: "App successfully released!",
     note_path: 'ChangeLog.md',
     topicId: 1,
     success: true,
     typetalk_token: 'Your Typetalk Token'
-  })
+  )
 ```
 
 ### [Hall](https://hall.com/)
@@ -656,24 +656,11 @@ Post a message to a **group**
 ```ruby
   ENV["HALL_GROUP_API_TOKEN"] = "Your Group API token" # Activate an Incoming Webhook integration to get your Group API token
 
-  hall({
+  hall(
     message: "App successfully released!",
-    # (optionals)
     title: "fastlane",
-    picture: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
-  })
-```
-
-You can also do this in your `error` block:
-
-```ruby
-  error do |lane, exception|
-
-    hall(
-      title: "#{lane}",
-      message: "Failed with exception: #{exception}"
-      )   
-  end
+    picture: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png"
+  )
 ```
 
 ### Notify

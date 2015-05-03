@@ -43,9 +43,9 @@ It will only be called, if the selected lane was executed **successfully**.
 ```ruby
 after_all do |lane|
   say "Successfully finished deployment (#{lane})!"
-  slack({
+  slack(
     message: "Successfully submitted new App Update"
-  })
+  )
   sh "./send_screenshots_to_team.sh" # Example
 end
 ```
@@ -56,10 +56,10 @@ This block will get executed when an error occurs, in any of the blocks (*before
 
 ```ruby
 error do |lane, exception|
-  slack({
+  slack(
     message: "Something went wrong with the deployment.",
     success: false
-  })
+  )
 end
 ```
 
