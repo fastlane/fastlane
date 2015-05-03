@@ -73,14 +73,16 @@ app_identifier "net.sunapps.1"
 apple_id "felix@krausefx.com"
 team_id "Q2CBPJ58CC"
 
-for_lane :beta do
+for_lane "ios beta" do
   app_identifier "net.sunapps.1.beta"
 end
 
-for_lane :enterprise do
+for_lane "ios enterprise" do
   app_identifier "enterprise.com"
 end
 ```
+
+You only have to prefix with `ios` if you're using `platform :ios do` in your `Fastfile`.
 
 `fastlane` will always use the lane specific value if given, otherwise fall back to the value on the top of the file. Therefore, while driving the `:beta` lane, this configuration is loaded:
 
