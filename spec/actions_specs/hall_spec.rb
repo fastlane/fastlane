@@ -33,7 +33,6 @@ describe Fastlane do
         url, body = Fastlane::Actions::HallAction.run(arguments)
 
         expect(url).to eq("https://hall.com/api/1/services/generic/#{group_api_token}")
-        puts body
         expect(body["title"]).to eq(title)
         expect(body["message"]).to eq(message)
         expect(body["picture"]).to eq(picture)
