@@ -163,10 +163,24 @@ snapshot test
 ```
 
 
-By default, `snapshot`, will re-install the app, to make sure it's in a clean state. In case you don't want this run
+If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and `snapshot` will continue with the next device or language. To stop the flow after the first error, run
+
+```
+SNAPSHOT_BREAK_ON_FIRST_ERROR=1 snapshot
+```
+
+
+By default, `snapshot` will re-install the app, to make sure it's in a clean state. In case you don't want this run
 
 ```
 SNAPSHOT_SKIP_UNINSTALL=1 snapshot
+```
+
+
+Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
+
+```
+SNAPSHOT_SKIP_OPEN_SUMMARY=1 snapshot
 ```
 
 ## Snapfile
