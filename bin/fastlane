@@ -13,11 +13,11 @@ class FastlaneApplication
 
   def run
     program :version, Fastlane::VERSION
-    program :description, 'CLI for \'fastlane\' - Connect all iOS deployment tools into one streamlined workflow'
+    program :description, "CLI for 'fastlane' - Connect all iOS deployment tools into one streamlined workflow.\n\nRun using fastlane [lane_name]"
     program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
-    program :help_formatter, :compact
+    # program :help_formatter, :compact # https://github.com/commander-rb/commander/issues/12
 
     always_trace!
 
