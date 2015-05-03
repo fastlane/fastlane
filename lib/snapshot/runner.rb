@@ -38,7 +38,11 @@ module Snapshot
           end
 
           teardown_simulator(device, language)
+
+          break if errors.any? && ENV["SNAPSHOT_BREAK_ON_FIRST_ERROR"]
         end
+
+        break if errors.any? && ENV["SNAPSHOT_BREAK_ON_FIRST_ERROR"]
       end
 
       `killall "iOS Simulator"` # close the simulator after the script is finished
