@@ -58,7 +58,7 @@ module Fastlane
         changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)) == Set.new(expected_changed_files.map(&:downcase)))
         unless changed_files_as_expected
           unless params[:force]
-            raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force to not care about this.".red
+            raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: #{expected_changed_files}. But found these actual changes: #{git_dirty_files}. Make sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to bypass this check, and always commit a version bump regardless of the state of the working directory.".red
           end
         end
 
