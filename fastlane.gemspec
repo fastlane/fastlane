@@ -31,14 +31,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
 
-  spec.add_dependency 'fastlane_core', '>= 0.6.2' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.7.1' # all shared code and dependencies
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 0.9.3'
-  spec.add_dependency 'snapshot', '>= 0.7.0'
+  spec.add_dependency 'deliver', '>= 0.9.4'
+  spec.add_dependency 'snapshot', '>= 0.8.0'
   spec.add_dependency 'frameit', '>= 1.0.0'
-  spec.add_dependency 'pem', '>= 0.5.4'
-  spec.add_dependency 'sigh', '>= 0.4.10'
+  spec.add_dependency 'pem', '>= 0.5.5'
+  spec.add_dependency 'sigh', '>= 0.5.0'
   spec.add_dependency 'produce', '>= 0.2.0'
   spec.add_dependency 'cert', '>= 0.1.7'
 
