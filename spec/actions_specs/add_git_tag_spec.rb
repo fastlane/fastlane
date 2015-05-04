@@ -14,7 +14,7 @@ describe Fastlane do
           add_git_tag
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag builds/test/1337")
+        expect(result).to eq("git tag \"builds/test/1337\"")
       end
 
       it "allows you to specify grouping and build number" do
@@ -28,7 +28,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag #{grouping}/test/#{specified_build_number}")
+        expect(result).to eq("git tag \"#{grouping}/test/#{specified_build_number}\"")
       end
 
       it "allows you to specify a prefix" do
@@ -40,7 +40,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag builds/test/#{prefix}#{build_number}")
+        expect(result).to eq("git tag \"builds/test/#{prefix}#{build_number}\"")
       end
 
       it "allows you to specify your own tag" do
@@ -52,7 +52,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag #{tag}")
+        expect(result).to eq("git tag \"#{tag}\"")
       end
 
       it "specified tag overrides generate tag" do
@@ -67,7 +67,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag #{tag}")
+        expect(result).to eq("git tag \"#{tag}\"")
       end      
     end
   end
