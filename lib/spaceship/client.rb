@@ -151,6 +151,14 @@ module Spaceship
     #account/ios/identifiers/validateAppId.action
     #end
 
+    def delete_app(app_id)
+      response = request(:post, 'account/ios/identifiers/deleteAppId.action', {
+        teamId: team_id,
+        appIdId: app_id
+      })
+      response.body
+    end
+
     def devices
       response = request(:post, 'account/ios/device/listDevices.action', {
         teamId: team_id,
