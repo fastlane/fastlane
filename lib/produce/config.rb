@@ -26,6 +26,14 @@ module Produce
     # Raises exception if given `key` is not Symbol or unknown.
     def val(key)
       raise "Please only pass symbols, no Strings to this method".red unless key.kind_of? Symbol
+      
+      # bundle_identifier_suffix can be set to empty string, if bundle_identifier is not a wildcard id
+      # (does not end with '*'). bundle_identifier_suffix is ignored on non wildcard bundle_identifiers
+      if key == :bundle_identifier_suffix
+        unless @config[:bundle_identifier].end_with?("*")
+          @config[key] = '' # set empty string, if no wildcard bundle_indentifiier
+        end
+      end
 
       unless @config.has_key? key
         @config[key] = ask(ASK_MESSAGES[key]) do |q|
