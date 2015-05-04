@@ -1,7 +1,6 @@
 require 'faraday' # HTTP Client
 require 'faraday_middleware'
 require 'faraday_middleware/response_middleware'
-require 'nokogiri'
 
 require 'singleton'
 
@@ -64,11 +63,9 @@ module Spaceship
 
     def api_key
       page = @client.get("https://developer.apple.com/devcenter/ios/index.action").body
-      html = Nokogiri::HTML(page)
-      link = html.css('a[href*=IDMSWebAuth]')[0]
-      href = link['href']
-      params = CGI.parse(href)['appIdKey']
-      params[0]
+      if page =~ %r{<a href="https://idmsa.apple.com/IDMSWebAuth/login\?.*appIdKey=(\h+)}
+        return $1
+      end
     end
 
     def login(username, password)

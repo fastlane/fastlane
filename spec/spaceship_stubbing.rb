@@ -7,7 +7,7 @@ end
 # Let the stubbing begin
 def stub_login
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
-    with(:body => {"accountPassword"=>"so_secret", "appIdKey"=>"2089349823abbababa98239839", "appleId"=>"spaceship@krausefx.com"},
+    with(:body => {"accountPassword"=>"so_secret", "appIdKey"=>"891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId"=>"spaceship@krausefx.com"},
          :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
     to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"})
 
