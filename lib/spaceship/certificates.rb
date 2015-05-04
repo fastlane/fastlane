@@ -108,7 +108,8 @@ module Spaceship
     end
 
     def revoke(cert_id)
-      client.revoke(cert_id)
+      cert = find(cert_id)
+      client.revoke_certificate(cert.id, cert.type_display_id)
     end
 
     #not sure how/when to do this:

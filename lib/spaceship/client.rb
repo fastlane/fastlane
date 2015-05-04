@@ -190,8 +190,14 @@ module Spaceship
       response.body
     end
 
-    #def revoke_certificate
-    #end
+    def revoke_certificate(certificate_id, type)
+      response = request(:post, 'account/ios/certificate/revokeCertificate.action', {
+        teamId: team_id,
+        certificateId: certificate_id,
+        type: type
+      })
+      response.body['certRequests']
+    end
 
     def provisioning_profiles
       response = request(:post, 'account/ios/profile/listProvisioningProfiles.action', {

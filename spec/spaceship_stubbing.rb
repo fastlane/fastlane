@@ -69,9 +69,14 @@ def stub_certificates
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('aps_development.cer'))
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
-     with(:body => {"appIdId"=>"2HNR359G63", "csrContent"=>read_fixture_file('certificateSigningRequest.certSigningRequest'), "type"=>"BKLRAVXMGM"},
+     with(:body => {"appIdId"=>"2HNR359G63", "csrContent"=>read_fixture_file('certificateSigningRequest.certSigningRequest'), "type"=>"BKLRAVXMGM", "teamId"=>"XXXXXXXXXX"},
           :headers => {'Cookie'=>'myacinfo=abcdef;'}).
      to_return(:status => 200, :body => read_fixture_file('submitCertificateRequest.action.json'), :headers => {'Content-Type' => 'application/json'})
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action").
+     with(:body => {"certificateId"=>"WHT3M5V55A", "teamId"=>"XXXXXXXXXX", "type"=>"3BQKVH9I2X"},
+          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+     to_return(:status => 200, :body => read_fixture_file('revokeCertificate.action.json'), :headers => {'Content-Type' => 'application/json'})
+
 end
 
 def stub_apps

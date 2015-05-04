@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Spaceship::Certificates do
-  before do
-    Spaceship::Client.login
-  end
+  let(:client) { Spaceship::Client.instance }
+  before { Spaceship::Client.login }
 
   describe "successfully loads and parses all certificates" do
     it "the number is correct" do
@@ -64,10 +63,12 @@ describe Spaceship::Certificates do
   end
 
   describe '#revoke' do
-    #let(:cert) { @client.certificates.first }
-    #it 'revokes the identified certificate' do
-    #  cert.revoke
-    #end
+    let(:cert) { subject.first }
+    it 'revokes certificate by the given cert id' do
+      expect(client).to receive(:revoke_certificate).with('XC5PH8DAAA', 'R58UK2EAAA')
+      subject.revoke(cert.id)
+    end
+  end
 
   describe '#create' do
     it 'should create and return a new certificate' do
