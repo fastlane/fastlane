@@ -696,7 +696,7 @@ The simplest possible fix for this is putting the following lines into your `~/.
 
 After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
 
-Recommended usage of the update_fastlane action is at the top of the `before_all` block, before running any other action:
+Recommended usage of the `update_fastlane` action is at the top of the `before_all` block, before running any other action:
 
 ```ruby
   before_all do
