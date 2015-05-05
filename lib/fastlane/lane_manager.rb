@@ -48,18 +48,13 @@ module Fastlane
     # All the finishing up that needs to be done
     def self.finish_fastlane(ff, duration, error)
       thread = ff.did_finish
+      thread.join 5 # https://github.com/KrauseFx/fastlane/issues/240
 
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
 
 
       unless error
-        begin
-          thread.join # to wait for the request to be finished
-        rescue
-          # We don't care about errors here
-          # https://github.com/KrauseFx/fastlane/issues/240
-        end
 
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
@@ -67,7 +62,6 @@ module Fastlane
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
       else
-        thread.join # to wait for the request to be finished
         Helper.log.fatal 'fastlane finished with errors'.red
         raise error
       end
