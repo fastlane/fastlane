@@ -42,5 +42,13 @@ describe Fastlane do
         }.to raise_error "Plugin 'broken_action' is damaged!"
       end
     end
+
+    describe "#get_all_official_actions" do
+      it "lists all built-in actions" do
+        [:sigh, :deliver, :snapshot, :slack, :hockey].each do |current|
+          expect(Fastlane::Actions.get_all_official_actions).to include(current)
+        end
+      end
+    end
   end
 end

@@ -89,7 +89,14 @@ module Fastlane
       s = `git rev-parse --abbrev-ref HEAD`
       return s.to_s.strip if s.to_s.length > 0
       nil
-    end 
+    end
+
+    # returns a list of official integrations
+    def self.get_all_official_actions
+      Dir[File.expand_path '*.rb', File.dirname(__FILE__)].collect do |file|
+        File.basename(file).gsub('.rb', '').to_sym
+      end
+    end
 
     def self.load_default_actions
       Dir[File.expand_path '*.rb', File.dirname(__FILE__)].each do |file|

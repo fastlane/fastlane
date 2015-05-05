@@ -3,12 +3,16 @@ module Fastlane
     HOST_URL = "https://fastlane-enhancer.herokuapp.com/"
 
     def did_launch_action(name)
-      launches[name] ||= 0
-      launches[name] += 1
+      if is_official(name)
+        launches[name] ||= 0
+        launches[name] += 1
+      end
     end
 
     def did_raise_error(name)
-      @error = name
+      if is_official(name)
+        @error = name
+      end
     end
 
     # Sends the used actions
@@ -45,6 +49,10 @@ module Fastlane
 
     def launches
       @launches ||= {}
+    end
+
+    def is_official(name)
+      Actions.get_all_official_actions.include?name
     end
 
     def did_show_message?
