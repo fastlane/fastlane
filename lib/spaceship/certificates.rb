@@ -71,9 +71,8 @@ module Spaceship
       end
     end
 
-    def create(klass, bundle_id = nil)
+    def create(klass, csr, bundle_id = nil)
       type = CERTIFICATE_TYPE_IDS.key(klass)
-      csr, private_key = self.class.certificate_signing_request
       app_id = nil
 
       #look up the app_id by the bundle_id
@@ -87,11 +86,6 @@ module Spaceship
       response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
       certificate = self.class.factory(response)
       @certificates << certificate
-
-      pkey_file = Tempfile.open(["pkey_#{bundle_id}", '.key']) do |f|
-        f.write(private_key.to_pem)
-      end
-
       certificate
     end
 

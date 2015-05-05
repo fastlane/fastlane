@@ -79,7 +79,7 @@ describe Spaceship::Certificates do
       certificate = nil
 
       expect {
-        certificate = subject.create(Spaceship::Certificates::ProductionPush, 'net.sunapps.151')
+        certificate = subject.create(Spaceship::Certificates::ProductionPush, Spaceship::Certificates.certificate_signing_request.first, 'net.sunapps.151')
       }.to change(subject, :count).by(+1)
 
       expect(certificate).to be_instance_of(Spaceship::Certificates::ProductionPush)
