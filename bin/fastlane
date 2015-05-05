@@ -17,7 +17,7 @@ class FastlaneApplication
     program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
-    program :help_formatter, :compact # https://github.com/commander-rb/commander/issues/12
+    program :help_formatter, :compact
 
     always_trace!
 
