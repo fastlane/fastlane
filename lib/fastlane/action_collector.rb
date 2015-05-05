@@ -37,7 +37,7 @@ module Fastlane
               Excon.post(url)
             end
           rescue
-            Helper.log.info("Failed sending usage data")
+            # We don't care about connection errors
           end
         end
       end

@@ -48,11 +48,11 @@ module Fastlane
     # All the finishing up that needs to be done
     def self.finish_fastlane(ff, duration, error)
       thread = ff.did_finish
-      thread.join 5 # https://github.com/KrauseFx/fastlane/issues/240
 
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
 
+      thread.join(5) # https://github.com/KrauseFx/fastlane/issues/240
 
       unless error
 
