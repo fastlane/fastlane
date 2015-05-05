@@ -12,6 +12,7 @@ describe Fastlane do
       expect(output).to include('sudo gem install fastlane')
       expect(output).to include('# Available Actions')
       expect(output).to include('### test')
+      expect(output).to include('# iOS')
       expect(output).to include('fastlane test')
       expect(output).to include('## mac')
       expect(output).to include('----')

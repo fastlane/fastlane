@@ -12,18 +12,20 @@ module Fastlane
       output << "# Available Actions"
       
       all_keys = ff.runner.description_blocks.keys.reject(&:nil?) 
-      all_keys.unshift(nil) # because we want root elements on top.. always! They have key nil
+      all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
-        output << "## #{platform}" if platform
+        output << "## #{formatted_platform(platform)}" if platform
 
         value = ff.runner.description_blocks[platform]
 
-        value.each do |lane, description|
-          output << render(platform, lane, description)          
-        end
+        if value
+          value.each do |lane, description|
+            output << render(platform, lane, description)          
+          end
 
-        output << "----"
+          output << "----"
+        end
       end
 
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
@@ -34,6 +36,14 @@ module Fastlane
     end
 
     private
+
+      def self.formatted_platform(pl)
+        pl = pl.to_s
+        return "iOS" if pl == 'ios'
+        return "Mac" if pl == 'mac'
+
+        return pl
+      end
 
       def self.render(platform, lane, description)
         full_name = [platform, lane].reject(&:nil?).join(' ')
