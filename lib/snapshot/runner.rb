@@ -183,6 +183,8 @@ module Snapshot
           return File.expand_path("..", path) # the app
         end
       end
+
+      raise "Could not find app in '#{build_dir}'. Make sure you're following the README and set the build directory to the correct path.".red
     end
 
     def parse_test_line(line)
