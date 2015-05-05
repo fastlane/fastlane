@@ -14,8 +14,14 @@ describe Spaceship::Client do
 
   describe '#login' do
     it 'returns the session cookie' do
-      cookie = subject.login(username, password)
-      expect(cookie).to eq('myacinfo=abcdef;')
+      subject.login(username, password)
+      expect(subject.cookie).to eq('myacinfo=abcdef;')
+    end
+
+    it 'raises an exception if authentication failed' do
+      expect {
+        subject.login('bad-username', 'bad-password')
+      }.to raise_exception(Spaceship::Client::NotAuthenticatedError)
     end
   end
 

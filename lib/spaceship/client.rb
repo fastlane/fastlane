@@ -28,6 +28,8 @@ module Spaceship
     attr_reader :client
     attr_accessor :cookie
 
+    class NotAuthenticatedError < StandardError; end
+
     def self.login(username, password)
       instance = self.new
       instance.login(username, password)
@@ -57,6 +59,11 @@ module Spaceship
       end
     end
 
+    ##
+    # perform login procedure. this sets a cookie that will be used in subsequent requests
+    # raises NotAuthenticatedError if authentication failed.
+    #
+    # returns Spaceship::Client
     def login(username, password)
       response = @client.post("https://idmsa.apple.com/IDMSWebAuth/authenticate", {
         appleId: username,
@@ -66,13 +73,10 @@ module Spaceship
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
+        return @client
       end
-    end
 
-    def cookie
-      return @cookie if @cookie
-
-      raise 'No session found. Please login with `Spaceship::Client.login(username, password)`'
+      raise NotAuthenticatedError.new(response)
     end
 
     def session?

@@ -11,6 +11,10 @@ def stub_login
          :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
     to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"})
 
+  stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
+    with(:body => {"accountPassword"=>"bad-password", "appIdKey"=>"891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId"=>"bad-username"}).
+    to_return(:status => 200, :body => "", :headers => {})
+
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
     with(:headers => {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listTeams.action.json'), :headers => {'Content-Type' => 'application/json'})
