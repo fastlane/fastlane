@@ -1,12 +1,12 @@
 ###################### App Metadata ######################
 # 
-# title({
+# title(
 #   "en-US" => "Your App Name"
-# })
+# )
 # 
-# changelog({
+# changelog(
 #   "en-US" => "iPhone 6 (Plus) Support" 
-# })
+# )
 # More options: https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md
 
 ###################### Screenshots ######################

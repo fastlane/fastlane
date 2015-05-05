@@ -182,10 +182,10 @@ ipa do
     "./name.ipa"
 end
 
-changelog({
+changelog(
     "en-US" => "This update adds cool new features",
     "de-DE" => "Dieses Update ist super"
-})
+)
 ```
 If you wish to skip automated submission to review you can provide `--skip-deploy` option when calling `deliver`. This will upload the ipa file and app metadata, but will not submit the app for review.
 
@@ -199,8 +199,8 @@ In order to upload an `.ipa` file for Apple TestFlight you need to specify `beta
 
 ```ruby
 beta_ipa do 
-    system("ipa build")
-    "./name.ipa"
+  system("ipa build")
+  "./name.ipa"
 end
 ```
 
@@ -228,10 +228,10 @@ end
 
 #### Read content from somewhere external (file, web service, ...)
 ```ruby
-description({
-    "en-US" => File.read("description-en.txt")
-    "de-DE" => open("http://example.com/app_description.txt").read
-})
+description(
+  "en-US" => File.read("description-en.txt")
+  "de-DE" => open("http://example.com/app_description.txt").read
+)
 ```
 
 #### Build and sign the app
@@ -278,7 +278,7 @@ app = Deliver::App.new(app_identifier: 'com.krausefx.app')
 
 app.get_app_status # => Waiting for Review
 app.create_new_version!("1.4")
-app.metadata.update_title({ "en-US" => "iPhone App Title" })
+app.metadata.update_title("en-US" => "iPhone App Title")
 app.metadata.set_all_screenshots_from_path("./screenshots")
 app.upload_metadata!
 app.itc.submit_for_review!(app)

@@ -36,9 +36,9 @@ These URLs are shown in the AppStore
 ##### keywords
 An array of keywords
 ```ruby
-keywords({
+keywords(
   "en-US" => ["Keyword1", "Keyword2"]
-})
+)
 ```
 
 ##### screenshots_path
@@ -85,7 +85,7 @@ Contact information for the app review team. Available options: `first_name`, `l
 
 
 ```ruby
-app_review_information({
+app_review_information(
   first_name: "Felix",
   last_name: "Krause",
   phone_number: "123123",
@@ -93,7 +93,7 @@ app_review_information({
   demo_user: "demoUser",
   demo_password: "demoPass",
   notes: "such notes, very text"
-})
+)
 ```
 
 ##### ratings_config_path
@@ -134,19 +134,19 @@ The latest commands can always be found inside [deliverer.rb](https://github.com
 ```ruby
 screenshots_path "./screenshots"
 
-title({
+title(
   "en-US" => "Your App Name"
-})
+)
 
-# changelog({
+# changelog(
 #   "en-US" => "iPhone 6 (Plus) Support" 
-# })
+# )
 
 copyright "#{Time.now.year} Felix Krause"
 
 automatic_release false
 
-app_review_information({
+app_review_information(
   first_name: "Felix",
   last_name: "Krause",
   phone_number: "123123",
@@ -154,7 +154,7 @@ app_review_information({
   demo_user: "demoUser",
   demo_password: "demoPass",
   notes: "such notes, very text"
-})
+)
 
 primary_category "Business"
 secondary_category "Books"
