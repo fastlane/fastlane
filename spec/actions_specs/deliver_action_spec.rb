@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Deliver Integration" do
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
       let (:app_identifier) { "net.sunapps.54" }
-      let (:apple_id) { "krausefx@gmail.com" }
+      let (:apple_id) { "deliver@krausefx.com" }
 
       before do
         @app_file = File.join(test_path, "Appfile")
