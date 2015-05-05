@@ -100,7 +100,19 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :release_type,
                                       env_name: "FL_HOCKEY_RELEASE_TYPE",
                                       description: "Release type of the app",
-                                      default_value: "0")
+                                      default_value: "0"),
+          FastlaneCore::ConfigItem.new(key: :mandatory,
+                                      env_name: "FL_HOCKEY_MANDATORY",
+                                      description: "Set to 1 to make this update mandatory",
+                                      default_value: "0"),
+          FastlaneCore::ConfigItem.new(key: :teams,
+                                      env_name: "FL_HOCKEY_TEAMS",
+                                      description: "Comma separated list of team ID numbers to which this build will be restricted",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :tags,
+                                      env_name: "FL_HOCKEY_TAGS",
+                                      description: "Comma separated list of tags which will receive access to the build",
+                                      optional: true)
         ]
       end
 

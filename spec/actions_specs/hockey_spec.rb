@@ -55,6 +55,10 @@ describe Fastlane do
         expect(values[:status]).to eq(2.to_s)
         expect(values[:notes]).to eq("No changelog given")
         expect(values[:release_type]).to eq(0.to_s)
+        expect(values[:tags]).to eq(nil)
+        expect(values[:teams]).to eq(nil)
+        expect(values[:mandatory]).to eq(0.to_s)
+        expect(values[:notes_type]).to eq(1.to_s)
       end
       
       it "has the correct default notes_type value" do
@@ -68,7 +72,7 @@ describe Fastlane do
         expect(values[:notes_type]).to eq("1")
       end
       
-      it "can change the notes_type " do
+      it "can change the notes_type" do
         values = Fastlane::FastFile.new.parse("lane :test do 
           hockey({
             api_token: 'xxx',
@@ -80,7 +84,7 @@ describe Fastlane do
         expect(values[:notes_type]).to eq("0")
       end
 
-      it "can change the release_type " do
+      it "can change the release_type" do
         values = Fastlane::FastFile.new.parse("lane :test do 
           hockey({
             api_token: 'xxx',
@@ -90,6 +94,42 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(values[:release_type]).to eq(1.to_s)
+      end
+
+      it "can change teams" do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            teams: '123,123'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:teams]).to eq('123,123')
+      end
+
+      it "can change mandatory" do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            mandatory: '1'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:mandatory]).to eq(1.to_s)
+      end
+
+      it "can change tags" do
+        values = Fastlane::FastFile.new.parse("lane :test do 
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            tags: '123,123'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:tags]).to eq('123,123')
       end
       
     end
