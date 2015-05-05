@@ -2,8 +2,6 @@ require 'faraday' # HTTP Client
 require 'faraday_middleware'
 require 'faraday_middleware/response_middleware'
 
-require 'singleton'
-
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -24,23 +22,14 @@ end
 Faraday::Response.register_middleware(:plist => FaradayMiddleware::PlistMiddleware)
 
 module Spaceship
-  module SharedClient
-    def client
-      Client.instance
-    end
-  end
-
   class Client
     PROTOCOL_VERSION = "QH65B2"
-    include Singleton
 
     attr_reader :client
     attr_accessor :cookie
 
-    def self.login(username = nil, password = nil)
-      username ||= ENV['DELIVER_USER']
-      password ||= ENV['DELIVER_PASSWORD']
-
+    def self.login(username, password)
+      instance = self.new
       instance.login(username, password)
       instance
     end

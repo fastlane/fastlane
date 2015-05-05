@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe Spaceship::Apps do
-  let(:client) { Spaceship::Client.instance }
-  before { Spaceship::Client.login }
+  subject { Spaceship.apps }
+  before { Spaceship.login }
+  let(:client) { subject.client }
+
   describe "successfully loads and parses all apps" do
     it "the number is correct" do
       expect(subject.count).to eq(5)

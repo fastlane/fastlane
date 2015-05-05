@@ -1,9 +1,9 @@
 module Spaceship
   class Apps
-    include Spaceship::SharedClient
     include Enumerable
     extend Forwardable
 
+    attr_reader :client
     def_delegators :@apps, :each, :first, :last
 
     class App < Struct.new(:app_id, :name, :platform, :prefix, :bundle_id, :is_wildcard, :dev_push_enabled, :prod_push_enabled)
@@ -20,7 +20,8 @@ module Spaceship
       App.new(*values)
     end
 
-    def initialize
+    def initialize(client)
+      @client = client
       @apps = client.apps.map {|app| self.class.factory(app) }
     end
 

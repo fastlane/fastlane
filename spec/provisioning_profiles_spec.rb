@@ -1,7 +1,8 @@
 require 'spec_helper'
 
-describe Spaceship::ProvisioningProfile do
-  before { Spaceship::Client.login }
+describe Spaceship::ProvisioningProfiles do
+  before { Spaceship.login }
+  subject { Spaceship.provisioning_profiles }
 
   it "downloads an existing provisioning profile" do
     path = @client.fetch_provisioning_profile('net.sunapps.9', 'store').download
@@ -14,10 +15,9 @@ describe Spaceship::ProvisioningProfile do
   end
 
   it "properly stores the provisioning profiles as structs" do
-    expect(@client.provisioning_profiles.count).to eq(33) # ignore the Xcode generated profiles
+    expect(subject.count).to eq(33) # ignore the Xcode generated profiles
 
-    profile = @client.provisioning_profiles.last
-    expect(profile.client).to eq(@client)
+    profile = subject.last
     expect(profile.name).to eq('net.sunapps.9 Development')
     expect(profile.type).to eq('iOS Development')
     expect(profile.app_id).to eq('572SH8263D')
@@ -29,7 +29,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   it "updates the distribution method to adhoc if devices are enabled" do
-    adhoc = @client.provisioning_profiles[2]
+    adhoc = subject[2]
 
     expect(adhoc.distribution_method).to eq('adhoc')
     expect(adhoc.devices.count).to eq(13)

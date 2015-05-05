@@ -2,10 +2,10 @@ require 'openssl'
 
 module Spaceship
   class Certificates
-    include Spaceship::SharedClient
     include Enumerable
     extend Forwardable
 
+    attr_reader :client
     def_delegators :@certificates, :each, :first, :last
 
     class Certificate < Struct.new(:id, :name, :status, :created, :expires, :owner_type, :owner_name, :owner_id, :type_display_id, :app)
@@ -63,7 +63,8 @@ module Spaceship
       return [csr, key]
     end
 
-    def initialize(types = nil)
+    def initialize(client, types = nil)
+      @client = client
       types ||= Client::ProfileTypes.all_profile_types
       @certificates = client.certificates(types).map do |cert|
         self.class.factory(cert)
@@ -77,7 +78,7 @@ module Spaceship
 
       #look up the app_id by the bundle_id
       if bundle_id
-        app_id = Spaceship::Apps.new.find(bundle_id).app_id
+        app_id = Spaceship::Apps.new(self.client).find(bundle_id).app_id
       end
 
       #if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux

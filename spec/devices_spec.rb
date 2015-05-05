@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Spaceship::Devices do
-  before { Spaceship::Client.login }
+  before { Spaceship.login }
+  subject { Spaceship.devices }
 
   it "successfully loads and parses all devices" do
     expect(subject.count).to eq(4)

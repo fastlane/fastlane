@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Spaceship::Certificates do
-  let(:client) { Spaceship::Client.instance }
-  before { Spaceship::Client.login }
+  before { Spaceship.login }
+  subject { Spaceship.certificates }
+  let(:client) { Spaceship.client }
 
   describe "successfully loads and parses all certificates" do
     it "the number is correct" do
@@ -39,7 +40,7 @@ describe Spaceship::Certificates do
   end
 
   it "Correctly filters the listed certificates" do
-    certs = Spaceship::Certificates.new([Spaceship::Client::ProfileTypes::SigningCertificate.development])
+    certs = Spaceship::Certificates.new(client, [Spaceship::Client::ProfileTypes::SigningCertificate.development])
     expect(certs.count).to eq(1)
 
     cert = certs.first
