@@ -1,7 +1,11 @@
 require 'mini_magick'
 require 'frameit/version'
 require 'frameit/frame_converter'
+require 'frameit/device_types'
 require 'frameit/editor'
+require 'frameit/screenshot'
+require 'frameit/offsets'
+require 'frameit/template_finder'
 require 'frameit/dependency_checker'
 
 require 'fastlane_core'
