@@ -43,7 +43,7 @@ module Fastlane
       }
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.run(params)
@@ -276,7 +276,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.available_options
@@ -306,7 +306,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.available_options
@@ -337,7 +337,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.available_options
@@ -379,7 +379,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
     end
 
@@ -407,7 +407,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.author
