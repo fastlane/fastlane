@@ -50,8 +50,7 @@ module Fastlane
             Helper.log.info "Public Download URL: #{url}" if url
             Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
           else
-            Helper.log.fatal "Error uploading to HockeyApp: #{response.body}"
-            raise 'Error when trying to upload ipa to HockeyApp'.red
+            raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
           end
       end
 
@@ -69,7 +68,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
+                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action. For Mac zip the .app",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: Proc.new do |value|
                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exists?(value)
@@ -132,7 +131,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
     end
   end
