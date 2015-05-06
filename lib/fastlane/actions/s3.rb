@@ -38,6 +38,9 @@ module Fastlane
         params[:acl] = config[:acl]
         params[:source] = config[:source]
         params[:path] = config[:path]
+        params[:plist_template_path] = config[:plist_template_path]
+        params[:html_template_path] = config[:html_template_path]
+        params[:html_file_name] = config[:html_file_name]
 
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
@@ -241,6 +244,18 @@ module Fastlane
                                        description: "zipped .dsym package for the build ",
                                        optional: true,
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
+          FastlaneCore::ConfigItem.new(key: :plist_template_path,
+                                       env_name: "",
+                                       description: "plist template path",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :html_template_path,
+                                       env_name: "",
+                                       description: "html erb template path",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :html_file_name,
+                                       env_name: "",
+                                       description: "uploaded html filename",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :access_key,
                                        env_name: "S3_ACCESS_KEY",
                                        description: "AWS Access Key ID ",
