@@ -5,6 +5,8 @@ module Frameit
     attr_accessor :size # size in px array of 2 elements: height and width
     attr_accessor :screen_size # deliver screen size type, is unique per device type, used in device_name
     attr_accessor :color # the color to use for the frame
+    attr_accessor :title_height # the height of the title added on top of the screenshot
+    attr_accessor :keyword_padding # padding between keyword and title
 
     # path: Path to screenshot
     # color: Color to use for the frame
@@ -14,6 +16,8 @@ module Frameit
       @path = path
       @size = FastImage.size(path)
       @screen_size = Deliver::AppScreenshot.calculate_screen_size(path) 
+      @title_height = 110
+      @keyword_padding = 30
     end
 
     # Device name for a given screen size. Used to use the correct template
@@ -41,7 +45,12 @@ module Frameit
       self.path
     end
 
-    # Add the device frame
+    def fetch_config
+      return @config if @config
+      @config = ConfigParser.new.parse("./spec/fixtures/Framefile").first # TODO: actually search
+    end
+
+    # Add the device frame, this will also call the method that adds the background + title
     def frame!
       template_path = TemplateFinder.get_template(self)
       if template_path
@@ -53,15 +62,80 @@ module Frameit
         width = offset_information[:width]
         image.resize width
 
-        result = template.composite(image, "png") do |c|
+        image = template.composite(image, "png") do |c|
           c.compose "Over"
           c.geometry offset_information[:offset]
         end
+        
+        if fetch_config['background'] and fetch_config['title'] and fetch_config['keyword']
+          image = add_title(image)
+        end
 
         output_path = self.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-        result.format "png"
-        result.write output_path
+        image.format "png"
+        image.write output_path
         Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
+      end
+    end
+
+    def add_title(image)
+      # If the user defined a background + title, here we go
+      if fetch_config['background']
+        background = MiniMagick::Image.open(fetch_config['background'])
+
+        left_space = (background.width / 2.0 - image.width / 2.0).round
+        top_space = 20
+        top_space += @title_height if fetch_config['title']
+
+        image = background.composite(image, "png") do |c|
+          c.compose "Over"
+          c.geometry "+#{left_space}+#{top_space}"
+        end
+
+        if fetch_config['title']
+          title_images = build_title_images(image.width)
+          keyword = title_images.first
+          title = title_images.last
+          sum_width = keyword.width + title.width + @keyword_padding
+          top_space = (@title_height / 2.0).round # centered
+          
+          left_space = (image.width / 2.0 - sum_width / 2.0).round
+          image = image.composite(keyword, "png") do |c|
+            c.compose "Over"
+            c.geometry "+#{left_space}+#{top_space}"
+          end
+
+          left_space += keyword.width + @keyword_padding
+          image = image.composite(title, "png") do |c|
+            c.compose "Over"
+            c.geometry "+#{left_space}+#{top_space}"
+          end
+        end
+      end
+      image
+    end
+
+    # This will assemble one image containing the 2 title parts
+    def build_title_images(max_width)
+      [:keyword, :title].collect do |key|
+
+        # Create empty background
+        title_image = MiniMagick::Image.open("./lib/assets/empty.png")
+        title_image.combine_options do |i|
+          i.resize "#{max_width}x#{@title_height}!" # `!` says it should ignore the ratio
+        end
+
+        # Add the actual title
+        title_image.combine_options do |i|
+          # i.font ""
+          i.gravity "Center"
+          i.pointsize (@title_height / 3.0).round
+          i.draw "text 0,0 '#{fetch_config[key.to_s]['text']}'"
+          i.fill fetch_config[key.to_s]['color']
+        end
+        title_image.trim # remove white space
+
+        title_image
       end
     end
   end
