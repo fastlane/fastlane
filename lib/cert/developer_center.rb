@@ -174,9 +174,9 @@ module Cert
 
         raise "Something went wrong with request to #{url}" unless certs
         certs.each do |current_cert|
-          if current_cert['typeString'] == certTypeName
-            # The other profiles are push profiles
-            # We only care about the distribution profile
+          if current_cert['typeString'] == certTypeName and current_cert['canDownload']
+            # The other profiles are push profiles or ones we are not allowed to download
+            # We only care about the distribution profile that we can download
             available << current_cert # mostly we only care about the 'certificateId'
           end
         end
