@@ -24,7 +24,9 @@ module Fastlane
             output << render(platform, lane, description)          
           end
 
+          output << ""
           output << "----"
+          output << ""
         end
       end
 
