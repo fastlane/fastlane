@@ -112,6 +112,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :tags,
                                       env_name: "FL_HOCKEY_TAGS",
                                       description: "Comma separated list of tags which will receive access to the build",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :public_identifier,
+                                      env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
+                                      description: "Public identifier of the app you are targeting, usually you won't need this value",
                                       optional: true)
         ]
       end
