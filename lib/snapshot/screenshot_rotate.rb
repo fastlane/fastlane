@@ -11,7 +11,7 @@ module Snapshot
 
     def rotate(path)
       Dir.glob([path, '/**/*.png'].join('/')).each do |file|
-        Helper.log.debug "Rotating '#{file}'"
+        Helper.log.debug "Rotating '#{file}'" if $verbose
 
         command = nil
         if file.end_with? "landscapeleft.png"
