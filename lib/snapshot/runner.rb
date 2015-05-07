@@ -33,10 +33,12 @@ module Snapshot
           
           begin
             errors.concat(run_tests(device, language, locale))
-            counter += copy_screenshots(language) if take_snapshots
           rescue => ex
             Helper.log.error(ex)
           end
+
+          # we also want to see the screenshots when something went wrong
+          counter += copy_screenshots(language) if take_snapshots 
 
           teardown_simulator(device, language)
 
