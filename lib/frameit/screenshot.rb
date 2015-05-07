@@ -105,7 +105,7 @@ module Frameit
           keyword = title_images.first
           title = title_images.last
           sum_width = keyword.width + title.width + @keyword_padding
-          top_space = (@title_height / 2.0).round # centered
+          top_space = (@title_height / 2.0 - actual_font_size / 4.0).round # centered
           
           left_space = (image.width / 2.0 - sum_width / 2.0).round
           image = image.composite(keyword, "png") do |c|
@@ -123,6 +123,10 @@ module Frameit
       image
     end
 
+    def actual_font_size
+      (@title_height / 3.0).round
+    end
+
     # This will assemble one image containing the 2 title parts
     def build_title_images(max_width)
       [:keyword, :title].collect do |key|
@@ -138,7 +142,7 @@ module Frameit
         title_image.combine_options do |i|
           i.font font if font
           i.gravity "Center"
-          i.pointsize (@title_height / 4.0).round
+          i.pointsize actual_font_size
           i.draw "text 0,0 '#{fetch_config[key.to_s]['text']}'"
           i.fill fetch_config[key.to_s]['color']
         end
