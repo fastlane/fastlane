@@ -62,7 +62,7 @@ module Snapshot
       set_defaults
 
       if File.exists?path
-        Helper.log.info "Using '#{path}'".green
+        Helper.log.info "Using '#{path}'".green if $verbose
         self.snapshot_file = SnapshotFile.new(path, self)
 
         self.verify_devices
@@ -178,10 +178,11 @@ module Snapshot
         project_key = 'project'
         project_key = 'workspace' if project_path.end_with?'.xcworkspace'
         command = "xcodebuild -#{project_key} '#{project_path}' -list"
-        Helper.log.debug command
+        Helper.log.debug command if $verbose
         
         schemes = `#{command}`.split("Schemes:").last.split("\n").each { |a| a.strip! }.delete_if { |a| a == '' }
-        Helper.log.debug "Found available schemes: #{schemes}"
+        
+        Helper.log.debug "Found available schemes: #{schemes}" if $verbose
 
         self.manual_scheme = schemes.first if schemes.count == 1
 

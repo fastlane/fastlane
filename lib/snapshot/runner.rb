@@ -29,6 +29,7 @@ module Snapshot
           reinstall_app(device, language, locale) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
 
           prepare_simulator(device, language)
+
           
           begin
             errors.concat(run_tests(device, language, locale))
@@ -92,9 +93,9 @@ module Snapshot
       app_identifier ||= @app_identifier
 
       def com(cmd)
-        puts cmd.magenta
-        result = `#{cmd}`
-        puts result if result.to_s.length > 0
+        puts cmd.magenta if $verbose
+        result = `#{cmd} 2>&1` # to now show errors
+        puts result if (result.to_s.length > 0 and $verbose)
       end
 
       udid = udid_for_simulator(device)
@@ -161,7 +162,7 @@ module Snapshot
       end
 
       if retry_run
-        Helper.log.error "Instruments tool failed again. Re-trying..."
+        Helper.log.error "Instruments tool failed again. Re-trying..." if $verbose
         sleep 2 # We need enough sleep... that's an instruments bug
         errors = run_tests(device, language, locale)
       end
@@ -173,10 +174,11 @@ module Snapshot
       # Determine the path to the actual app and not the WatchKit app
       build_dir = SnapshotConfig.shared_instance.build_dir || '/tmp/snapshot'
       Dir.glob("#{build_dir}/**/*.app/*.plist").each do |path|
-        watchkit_enabled = `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{path}'`.strip
+        # `2>&1` to hide the error if it's not there: http://stackoverflow.com/a/4783536/445598
+        watchkit_enabled = `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{path}' 2>&1`.strip
         next if watchkit_enabled == 'true' # we don't care about WatchKit Apps
 
-        app_identifier = `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' '#{path}'`.strip
+        app_identifier = `/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' '#{path}' 2>&1`.strip
         if app_identifier and app_identifier.length > 0
           # This seems to be the valid Info.plist
           @app_identifier = app_identifier

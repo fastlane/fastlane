@@ -19,7 +19,7 @@ module Snapshot
     end
 
     def self.check_simulators
-      Helper.log.debug "Found #{Simulators.available_devices.count} simulators."
+      Helper.log.debug "Found #{Simulators.available_devices.count} simulators." if $verbose
       if Simulators.available_devices.count < 1
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to add new simulators using Xcode"
