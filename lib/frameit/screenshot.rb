@@ -47,7 +47,11 @@ module Frameit
 
     def fetch_config
       return @config if @config
-      @config = ConfigParser.new.parse("./spec/fixtures/Framefile").first # TODO: actually search
+
+      config_path = File.join(File.expand_path("..", self.path), "Framefile.json")
+      config_path = File.join(File.expand_path("../..", self.path), "Framefile.json") unless File.exists?config_path
+      file = ConfigParser.new.load(config_path)
+      @config = file.fetch_value(self.path)
     end
 
     # Add the device frame, this will also call the method that adds the background + title
@@ -130,8 +134,9 @@ module Frameit
         end
 
         # Add the actual title
+        font = fetch_config[key.to_s]['font']
         title_image.combine_options do |i|
-          # i.font ""
+          i.font font if font
           i.gravity "Center"
           i.pointsize (@title_height / 4.0).round
           i.draw "text 0,0 '#{fetch_config[key.to_s]['text']}'"
