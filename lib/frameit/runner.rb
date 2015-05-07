@@ -2,7 +2,7 @@ require 'deliver'
 require 'fastimage'
 
 module Frameit
-  class Editor
+  class Runner
     def initialize
       converter = FrameConverter.new
       unless converter.frames_exist?

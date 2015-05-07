@@ -29,7 +29,7 @@ class FrameItApplication
       c.description = "Adds a black frame around all screenshots."
 
       c.action do |args, options|
-        Frameit::Editor.new.run('.', Frameit::Color::BLACK)
+        Frameit::Runner.new.run('.', Frameit::Color::BLACK)
       end
     end
 
@@ -38,7 +38,7 @@ class FrameItApplication
       c.description = "Adds a silver frame around all screenshots."
       
       c.action do |args, options|
-        Frameit::Editor.new.run('.', Frameit::Color::SILVER)
+        Frameit::Runner.new.run('.', Frameit::Color::SILVER)
       end
     end
 
