@@ -88,6 +88,7 @@ module Snapshot
     end
 
     def reinstall_app(device, language, locale)
+      Helper.log.info "Reinstalling app".yellow unless $verbose
 
       app_identifier = ENV["SNAPSHOT_APP_IDENTIFIER"]
       app_identifier ||= @app_identifier
