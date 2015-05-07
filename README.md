@@ -27,6 +27,7 @@ frameit
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/frameit/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
+[![Build Status](https://img.shields.io/travis/fastlane/frameit/master.svg?style=flat)](https://travis-ci.org/fastlane/frameit)
 
 ###### Quickly put your screenshots into the right device frames
 
