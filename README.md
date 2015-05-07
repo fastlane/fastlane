@@ -286,6 +286,8 @@ This can be used to
 - Reset all user defaults
 - Pre-fill the database
 
+The `setup_for_device_change` will be called **before** the app is installed on the simulator.
+
 To run a shell script, just use ```system('./script.sh')```.
 ```ruby
 setup_for_device_change do |device, udid, language|

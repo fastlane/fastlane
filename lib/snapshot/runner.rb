@@ -26,10 +26,10 @@ module Snapshot
             (language, locale) = language_item            
           end
 
-          reinstall_app(device, language, locale) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
 
           prepare_simulator(device, language)
 
+          reinstall_app(device, language, locale) unless ENV["SNAPSHOT_SKIP_UNINSTALL"]
           
           begin
             errors.concat(run_tests(device, language, locale))
