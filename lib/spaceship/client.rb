@@ -210,7 +210,7 @@ module Spaceship
       response.body['provisioningProfiles']
     end
 
-    def provisioning_profile(profile_id, distribution_method)
+    def provisioning_profile(profile_id)
       response = request(:post, 'account/ios/profile/getProvisioningProfile.action', {
         teamId: team_id,
         includeInactiveProfiles: true,
@@ -220,6 +220,20 @@ module Spaceship
       response.body['provisioningProfile']
     end
 
+    def create_provisioning_profile(profile, distribution_method, device_ids, certificate_ids)
+      response = request(:post, 'account/ios/profile/createProvisioningProfile.action', {
+        provisioningProfileName: '',
+        appIdId: '',
+        distributionType: distribution_method,
+        certificateIds: certificates_ids,
+        deviceIds: device_ids,
+      })
+      response.body['provisioningProfile']
+    end
+
+    def update_provisioning_profile
+    end
+
     def download_provisioning_profile(profile_id)
       response = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
         displayId: profile_id
@@ -227,7 +241,12 @@ module Spaceship
       response.body
     end
 
-    def generate_provisioning_profile(profile, distribution_method, device_ids, certificate)
+    def delete_provisioning_profile(profile_id)
+      response = request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
+        teamId: team_id,
+        provisioningProfileId: profile_id
+      })
+      response.body
     end
 
     private
