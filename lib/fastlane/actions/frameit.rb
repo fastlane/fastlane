@@ -8,14 +8,14 @@ module Fastlane
 
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
-          color = Frameit::Editor::Color::BLACK
-          color = Frameit::Editor::Color::SILVER if [:silver, :white].include?(params)
+          color = Frameit::Color::BLACK
+          color = Frameit::Color::SILVER if (params[:white] or params[:silver])
 
           screenshots_folder = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
           screenshots_folder ||= FastlaneFolder.path
 
           Dir.chdir(screenshots_folder) do
-            Frameit::Editor.new.run('.', color)
+            Frameit::Runner.new.run('.', color)
           end
         ensure
           FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
@@ -24,6 +24,21 @@ module Fastlane
 
       def self.description
         "Adds device frames around the screenshots using frameit"
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :white,
+                                         env_name: "",
+                                         description: "Use white device frames",
+                                         optional: true,
+                                         is_string: false),
+          FastlaneCore::ConfigItem.new(key: :silver,
+                                         env_name: "",
+                                         description: "Use white device frames. Alias for :white",
+                                         optional: true,
+                                         is_string: false)
+        ]
       end
 
       def self.author
