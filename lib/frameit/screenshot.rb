@@ -16,8 +16,8 @@ module Frameit
       @path = path
       @size = FastImage.size(path)
       @screen_size = Deliver::AppScreenshot.calculate_screen_size(path) 
-      @title_height = 110
-      @keyword_padding = 30
+      @title_height = 285
+      @keyword_padding = 50
     end
 
     # Device name for a given screen size. Used to use the correct template
@@ -83,6 +83,10 @@ module Frameit
       if fetch_config['background']
         background = MiniMagick::Image.open(fetch_config['background'])
 
+        # First off, change the size of `image` to match the background + padding
+        frame_width = background.width - fetch_config['padding'] * 2
+        image.resize "#{frame_width}x"
+
         left_space = (background.width / 2.0 - image.width / 2.0).round
         top_space = 20
         top_space += @title_height if fetch_config['title']
@@ -129,7 +133,7 @@ module Frameit
         title_image.combine_options do |i|
           # i.font ""
           i.gravity "Center"
-          i.pointsize (@title_height / 3.0).round
+          i.pointsize (@title_height / 4.0).round
           i.draw "text 0,0 '#{fetch_config[key.to_s]['text']}'"
           i.fill fetch_config[key.to_s]['color']
         end
