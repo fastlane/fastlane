@@ -14,6 +14,11 @@ function wait_for_loading_indicator_to_be_finished()
   } catch (e) {}
 }
 
+function isTablet()
+{
+  return !(UIATarget.localTarget().model().match(/iPhone/))
+}
+
 function captureLocalizedScreenshot(name) {
   wait_for_loading_indicator_to_be_finished();
 
