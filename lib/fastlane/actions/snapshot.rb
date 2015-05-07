@@ -18,6 +18,8 @@ module Fastlane
 
         FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
 
+        ENV['SNAPSHOT_SKIP_OPEN_SUMMARY'] = "1" # it doesn't make sense to show the HTML page here
+
         begin
           Dir.chdir(FastlaneFolder.path) do
             Snapshot::SnapshotConfig.shared_instance
