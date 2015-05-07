@@ -132,7 +132,8 @@ module Frameit
       [:keyword, :title].collect do |key|
 
         # Create empty background
-        title_image = MiniMagick::Image.open("./lib/assets/empty.png")
+        empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
+        title_image = MiniMagick::Image.open(empty_path)
         title_image.combine_options do |i|
           i.resize "#{max_width}x#{@title_height}!" # `!` says it should ignore the ratio
         end
