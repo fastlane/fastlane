@@ -15,7 +15,7 @@ module Snapshot
       errors = []
 
       if (SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots)
-        path_to_clear = (SnapshotConfig.shared_instance.screenshots_path + "/**/*.png")
+        path_to_clear = (SnapshotConfig.shared_instance.screenshots_path + "/*-*/*.png") # languages always contain a `-`
         Dir[path_to_clear].each { |a| File.delete(a) } # no idea why rm_rf doesn't work
       end
 
