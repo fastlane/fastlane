@@ -14,7 +14,10 @@ module Snapshot
       counter = 0
       errors = []
 
-      FileUtils.rm_rf SnapshotConfig.shared_instance.screenshots_path if (SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots)
+      if (SnapshotConfig.shared_instance.clear_previous_screenshots and take_snapshots)
+        path_to_clear = (SnapshotConfig.shared_instance.screenshots_path + "/**/*.png")
+        Dir[path_to_clear].each { |a| File.delete(a) } # no idea why rm_rf doesn't work
+      end
 
       SnapshotConfig.shared_instance.devices.each do |device|
         SnapshotConfig.shared_instance.languages.each do |language_item|
@@ -90,7 +93,7 @@ module Snapshot
     end
 
     def reinstall_app(device, language, locale)
-      Helper.log.info "Reinstalling app".yellow unless $verbose
+      Helper.log.info "Reinstalling app...".yellow unless $verbose
 
       app_identifier = ENV["SNAPSHOT_APP_IDENTIFIER"]
       app_identifier ||= @app_identifier
