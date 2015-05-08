@@ -361,15 +361,23 @@ else
                 PlistBuddy -c "Set :keychain-access-groups:0 ${APP_IDENTIFER_PREFIX}.${BUNDLE_IDENTIFIER}" "$TEMP_DIR/newEntitlements"
 #               checkStatus  -- if this fails it's likely because the keychain-access-groups key does not exist, so we have nothing to update
                 if [[ "$CERTIFICATE" == *Distribution* ]]; then
+                    IS_ENTERPRISE_PROFILE=`PlistBuddy -c "Print :ProvisionsAllDevices" "$TEMP_DIR/profile.plist" | tr -d '\n'`
+
                     echo "Assuming Distribution Identity"
                     if [ "$ADJUST_BETA_REPORTS_ACTIVE_FLAG" == "1" ]; then
-                        echo "Ensuring beta-reports-active is present and enabled"
-                        # new beta key is only used for Distribution; might not exist yet, if we were building Development
-                        PlistBuddy -c "Add :beta-reports-active bool true" "$TEMP_DIR/newEntitlements"
-                        if [ $? -ne 0 ]; then
-                            PlistBuddy -c "Set :beta-reports-active YES" "$TEMP_DIR/newEntitlements"
+                        if [ "$IS_ENTERPRISE_PROFILE" == "true" ]; then
+                            echo "Ensuring beta-reports-active is not included for Enterprise environment"
+                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements"
+                            checkStatus
+                        else
+                            echo "Ensuring beta-reports-active is present and enabled"
+                            # new beta key is only used for Distribution; might not exist yet, if we were building Development
+                            PlistBuddy -c "Add :beta-reports-active bool true" "$TEMP_DIR/newEntitlements"
+                            if [ $? -ne 0 ]; then
+                                PlistBuddy -c "Set :beta-reports-active YES" "$TEMP_DIR/newEntitlements"
+                            fi
+                            checkStatus
                         fi
-                        checkStatus
                     fi
                     echo "Setting get-task-allow entitlement to NO"
                     PlistBuddy -c "Set :get-task-allow NO" "$TEMP_DIR/newEntitlements"
