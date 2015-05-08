@@ -31,9 +31,29 @@ module Frameit
 
       values = default.fastlane_deep_merge(specific || {})
 
+      change_paths_to_absolutes!(values)
       validate_values(values)
 
       values
+    end
+
+    # Use absolute paths instead of relative
+    def change_paths_to_absolutes!(values)
+      values.each do |key, value|
+        if value.kind_of?Hash
+          change_paths_to_absolutes!(value) # recursive call
+        else
+          if ['font', 'background'].include?key
+            # Change the paths to relative ones
+            # `replace`: to change the content of the string, so it's actually stored
+
+            if @path # where is the config file. We don't have a config file in tests
+              containing_folder = File.expand_path('..', @path) 
+              value.replace File.join(containing_folder, value)
+            end
+          end
+        end
+      end
     end
 
     # Make sure the paths/colors are valid
