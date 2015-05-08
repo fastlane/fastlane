@@ -60,6 +60,7 @@ end
 
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('frameit')
+  Frameit::DependencyChecker.check_dependencies
   FrameItApplication.new.run
 ensure
   FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
