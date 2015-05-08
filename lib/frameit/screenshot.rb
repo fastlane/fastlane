@@ -102,18 +102,21 @@ module Frameit
 
         if fetch_config['title']
           title_images = build_title_images(image.width)
-          keyword = title_images.first
-          title = title_images.last
-          sum_width = keyword.width + title.width + @keyword_padding
+          keyword = title_images[:keyword]
+          title = title_images[:title]
+
+          sum_width = (keyword.width rescue 0) + title.width + @keyword_padding
           top_space = (@title_height / 2.0 - actual_font_size / 4.0).round # centered
           
           left_space = (image.width / 2.0 - sum_width / 2.0).round
-          image = image.composite(keyword, "png") do |c|
-            c.compose "Over"
-            c.geometry "+#{left_space}+#{top_space}"
+          if keyword
+            image = image.composite(keyword, "png") do |c|
+              c.compose "Over"
+              c.geometry "+#{left_space}+#{top_space}"
+            end
           end
 
-          left_space += keyword.width + @keyword_padding
+          left_space += (keyword.width rescue 0) + @keyword_padding
           image = image.composite(title, "png") do |c|
             c.compose "Over"
             c.geometry "+#{left_space}+#{top_space}"
@@ -129,8 +132,9 @@ module Frameit
 
     # This will assemble one image containing the 2 title parts
     def build_title_images(max_width)
-      [:keyword, :title].collect do |key|
-
+      words = [:keyword, :title].keep_if{ |a| fetch_config[a.to_s] and fetch_config[a.to_s]['text'] } # optional keyword/title
+      results = {}
+      words.each do |key|
         # Create empty background
         empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
@@ -149,8 +153,9 @@ module Frameit
         end
         title_image.trim # remove white space
 
-        title_image
+        results[key] = title_image
       end
+      results
     end
   end
 end
