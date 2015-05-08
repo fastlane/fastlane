@@ -1,33 +1,9 @@
 module Fastlane
   module Actions
     class MailgunAction < Action
-      def self.git_author
-        s = `git log --name-status HEAD^..HEAD`
-        s = s.match(/Author:.*<(.*)>/)[1]
-        return s if s.to_s.length > 0
-        return nil
-      rescue
-        return nil
-      end
-
-      def self.last_git_commit
-        s = `git log -1 --pretty=%B`.strip
-        return s if s.to_s.length > 0
-        nil
-      end
 
       def self.is_supported?(platform)
         true
-      end
-
-      # As there is a text limit in the notifications, we are
-      # usually interested in the last part of the message
-      # e.g. for tests
-      def self.trim_message(message)
-        # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
-        start_index = [message.length - 7000, 0].max
-        message = message[start_index..-1]
-        message
       end
 
       def self.run(options)
@@ -35,11 +11,9 @@ module Fastlane
 
         handle_exceptions(options)
 
-        options[:message] = self.trim_message(options[:message].to_s || '')
-
-        mailgunit(ENV['MAILGUN_APIKEY'],
-                  ENV['MAILGUN_SANDBOX_DOMAIN'],
-                  ENV['MAILGUN_SANDBOX_POSTMASTER'],
+        mailgunit(options[:mailgun_apikey],
+                  options[:mailgun_sandbox_domain],
+                  options[:mailgun_sandbox_postmaster],
                   options[:to],
                   options[:subject],
                   compose_mail(options[:message],options[:success]))
@@ -69,7 +43,10 @@ module Fastlane
                                        description: "Text of your mail"),
           FastlaneCore::ConfigItem.new(key: :subject,
                                        env_name: "MAILGUN_SUBJECT",
-                                       description: "Subject of your mail"),
+                                       description: "Subject of your mail",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: "Fastlane Build"),
           FastlaneCore::ConfigItem.new(key: :success,
                                       env_name: "MAILGUN_SUCCESS",
                                       description: "Was this build successful? (true/false)",
@@ -86,8 +63,8 @@ module Fastlane
 
       private
       def self.compose_mail(text,success)
-        text << "\n Git Author: #{git_author}"
-        text << "\n Last Commit: #{last_git_commit}"
+        text << "\n Git Author: #{Actions.git_author}"
+        text << "\n Last Commit: #{Actions.last_git_commit}"
         text << "\n Success: #{success}"
       end
 
@@ -115,11 +92,6 @@ module Fastlane
           unless (options[:message] rescue nil)
             Helper.log.fatal "Please provide a valid :message  = \"a_valid_mailgun_text\"".red
             raise 'No MAILGUN_MESSAGE given.'.red
-          end
-
-          unless (options[:subject] rescue nil)
-            Helper.log.fatal "Please provide a valid :subject  = \"a_valid_mailgun_subject\"".red
-            raise 'No MAILGUN_SUBJECT given.'.red
           end
       end
 

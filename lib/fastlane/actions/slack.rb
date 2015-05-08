@@ -1,26 +1,12 @@
 module Fastlane
   module Actions
     class SlackAction < Action
-      def self.git_author
-        s = `git log --name-status HEAD^..HEAD`
-        s = s.match(/Author:.*<(.*)>/)[1]
-        return s if s.to_s.length > 0
-        return nil
-      rescue
-        return nil
-      end
-
-      def self.last_git_commit
-        s = `git log -1 --pretty=%B`.strip
-        return s if s.to_s.length > 0
-        nil
-      end
 
       def self.is_supported?(platform)
         true
       end
 
-      # As there is a text limit in the notifications, we are 
+      # As there is a text limit in the notifications, we are
       # usually interested in the last part of the message
       # e.g. for tests
       def self.trim_message(message)
@@ -158,23 +144,23 @@ module Fastlane
           end
 
           # git_author
-          if git_author && should_add_payload[:git_author]
+          if Actions.git_author && should_add_payload[:git_author]
             if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
               # We only show the git author if the build failed
             else
               slack_attachment[:fields] << {
                 title: 'Git Author',
-                value: git_author,
+                value: Actions.git_author,
                 short: true
               }
             end
           end
 
           # last_git_commit
-          if last_git_commit && should_add_payload[:last_git_commit]
+          if Actions.last_git_commit && should_add_payload[:last_git_commit]
             slack_attachment[:fields] << {
               title: 'Git Commit',
-              value: last_git_commit,
+              value: Actions.last_git_commit,
               short: false
             }
           end

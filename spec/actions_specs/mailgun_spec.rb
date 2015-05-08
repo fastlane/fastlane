@@ -7,10 +7,6 @@ describe Fastlane do
         ENV['MAILGUN_APIKEY'] = 'key-73827fakeapikey2329'
       end
 
-      it "trims long messages to show the bottom of the messages" do
-        long_text = "a" * 10000
-        expect(Fastlane::Actions::MailgunAction.trim_message(long_text).length).to eq(7000)
-      end
 
       it "raises an error if no mailgun sandbox domain is given" do
         ENV.delete 'MAILGUN_SANDBOX_DOMAIN'
@@ -44,8 +40,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
             :to => 'valid@gmail.com',
-            :message => 'A valid email text',
-            :subject => 'A valid subject'
+            :message => 'A valid email text'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_APIKEY given.'.red)
@@ -55,8 +50,7 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :message => 'A valid email text',
-            :subject => 'A valid subject'
+            :message => 'A valid email text'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_TO given.'.red)
@@ -66,22 +60,10 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :to => 'valid@gmail.com',
-            :subject => 'A valid subject'
+            :to => 'valid@gmail.com'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_MESSAGE given.'.red)
-      end
-
-      it "raises an error if no mailgun subject is given" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do
-          mailgun({
-            :to => 'valid@gmail.com',
-            :message => 'A valid email text'
-            })
-          end").runner.execute(:test)
-        }.to raise_exception('No MAILGUN_SUBJECT given.'.red)
       end
 
     end
