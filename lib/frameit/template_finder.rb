@@ -17,11 +17,12 @@ module Frameit
       if templates.count == 0
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35
           Helper.log.warn "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'".yellow
+          Helper.log.debug "Looked for: '#{parts.join('_')}.png'".red
         else
           Helper.log.error "Could not find a valid template for screenshot '#{screenshot.path}'".red
           Helper.log.error "You can download new templates from '#{FrameConverter::DOWNLOAD_URL}'"
           Helper.log.error "and store them in '#{templates_path}'"
-          Helper.log.error "Missing file: '#{parts.join('_')}.psd'".red
+          Helper.log.error "Missing file: '#{parts.join('_')}.png'".red
         end
         return nil
       else
