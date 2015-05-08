@@ -30,6 +30,8 @@ module Frameit
           return 'iPhone_6'
         when sizes::IOS_40
           return 'iPhone_5s'
+        when sizes::IOS_35
+          return 'iPhone_4'
         when sizes::IOS_IPAD
           return 'iPad_mini'
       end
