@@ -40,13 +40,13 @@ module Fastlane
                                        description: "Destination of your mail"),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "MAILGUN_MESSAGE",
-                                       description: "Text of your mail"),
+                                       description: "Message of your mail"),
           FastlaneCore::ConfigItem.new(key: :subject,
                                        env_name: "MAILGUN_SUBJECT",
                                        description: "Subject of your mail",
                                        optional: true,
                                        is_string: true,
-                                       default_value: "Fastlane Build"),
+                                       default_value: "fastlane build"),
           FastlaneCore::ConfigItem.new(key: :success,
                                       env_name: "MAILGUN_SUCCESS",
                                       description: "Was this build successful? (true/false)",
@@ -69,17 +69,17 @@ module Fastlane
       end
 
       def self.handle_exceptions(options)
-          unless ENV['MAILGUN_APIKEY']
+          unless (options[:mailgun_apikey] rescue nil)
             Helper.log.fatal "Please add 'ENV[\"MAILGUN_APIKEY\"] = \"a_valid_mailgun_apikey\"' to your Fastfile's `before_all` section.".red
             raise 'No MAILGUN_APIKEY given.'.red
           end
 
-          unless ENV['MAILGUN_SANDBOX_DOMAIN']
+          unless (options[:mailgun_sandbox_domain] rescue nil)
             Helper.log.fatal "Please add 'ENV[\"MAILGUN_SANDBOX_DOMAIN\"] = \"a_valid_mailgun_sandbox_domain\"' to your Fastfile's `before_all` section.".red
             raise 'No MAILGUN_SANDBOX_DOMAIN given.'.red
           end
 
-          unless ENV['MAILGUN_SANDBOX_POSTMASTER']
+          unless (options[:mailgun_sandbox_postmaster] rescue nil)
             Helper.log.fatal "Please add 'ENV[\"MAILGUN_SANDBOX_POSTMASTER\"] = \"a_valid_mailgun_sandbox_postmaster\"' to your Fastfile's `before_all` section.".red
             raise 'No MAILGUN_SANDBOX_POSTMASTER given.'.red
           end
@@ -97,7 +97,7 @@ module Fastlane
 
       def self.mailgunit(api_key,sandbox_domain,sandbox_postmaster,to,subject,text)
         RestClient.post "https://api:#{api_key}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-        :from => "Mailgun Sandbox <#{sandbox_postmaster}>",
+        :from => "Mailgun Sandbox<#{sandbox_postmaster}>",
         :to => "#{to}",
         :subject => subject,
         :text => text
