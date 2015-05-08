@@ -12,6 +12,22 @@ module Fastlane
       @executed_actions ||= []
     end
 
+    def self.git_author
+      s = `git log --name-status HEAD^..HEAD`
+      s = s.match(/Author:.*<(.*)>/)[1]
+      return s if s.to_s.length > 0
+      return nil
+    rescue
+      return nil
+    end
+
+    def self.last_git_commit
+      s = `git log -1 --pretty=%B`.strip
+      return s if s.to_s.length > 0
+      nil
+    end
+
+
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
       @lane_context ||= {}

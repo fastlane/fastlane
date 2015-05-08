@@ -622,6 +622,32 @@ slack(
 )
 ```
 
+### [Mailgun](http://www.mailgun.com)
+Send email notifications from within your builds.No need to setup a mail server to send emails from fastlane.You only need to provide your mailgun **apikey** **sandbox_domain** and **sandbox_postmaster**, all this is avaible as soon as your signup on mailgun. Also you have to specify another two required params: **to** and **message** . Additional not required params like **success** and **subject** could be omitted for default values.
+
+```ruby
+ENV['MAILGUN_SANDBOX_DOMAIN'] = '{MY_SANDBOX_DOMAIN}'
+ENV['MAILGUN_SANDBOX_POSTMASTER'] = '{MY_POSTMASTER}'
+ENV['MAILGUN_APIKEY'] = '{MY_API_KEY}'
+
+mailgun({
+  :to => "{DESTINATION_EMAIL}",
+  :success => true,
+  :message => "mail from inside a lane with mailgun"
+})
+
+or
+
+mailgun({
+  :mailgun_sandbox_domain => '{MY_SANDBOX_DOMAIN}',
+  :mailgun_sandbox_postmaster => '{MY_POSTMASTER}',
+  :mailgun_apikey => '{MY_API_KEY}',
+  :to => "{DESTINATION_EMAIL}",
+  :success => true,
+  :message => "mail from inside a lane with mailgun"
+})
+```
+
 ### [HipChat](http://www.hipchat.com/)
 Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
 
@@ -683,9 +709,9 @@ testmunk
 
 ### update_fastlane
 
-This action will look at all installed fastlane tools and update them to the next available minor version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues. 
+This action will look at all installed fastlane tools and update them to the next available minor version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.
 
-If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode. 
+If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.
 
 The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:
 
@@ -707,4 +733,3 @@ Recommended usage of the `update_fastlane` action is at the top of the `before_a
     ...
   end
 ```
-
