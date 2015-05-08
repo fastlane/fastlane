@@ -97,10 +97,10 @@ module Fastlane
 
       def self.mailgunit(api_key,sandbox_domain,sandbox_postmaster,to,subject,text)
         RestClient.post "https://api:#{api_key}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-        :from => "Mailgun Sandbox<#{sandbox_postmaster}>",
-        :to => "#{to}",
-        :subject => subject,
-        :text => text
+            :from => "Mailgun Sandbox<#{sandbox_postmaster}>",
+            :to => "#{to}",
+            :subject => subject,
+            :text => text
       end
 
     end

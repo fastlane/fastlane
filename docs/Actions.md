@@ -623,29 +623,29 @@ slack(
 ```
 
 ### [Mailgun](http://www.mailgun.com)
-Send email notifications from within your builds.No need to setup a mail server to send emails from fastlane.You only need to provide your mailgun **apikey** **sandbox_domain** and **sandbox_postmaster**, all this is avaible as soon as your signup on mailgun. Also you have to specify another two required params: **to** and **message** . Additional not required params like **success** and **subject** could be omitted for default values.
+Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com). 
 
 ```ruby
-ENV['MAILGUN_SANDBOX_DOMAIN'] = '{MY_SANDBOX_DOMAIN}'
-ENV['MAILGUN_SANDBOX_POSTMASTER'] = '{MY_POSTMASTER}'
-ENV['MAILGUN_APIKEY'] = '{MY_API_KEY}'
+ENV['MAILGUN_SANDBOX_DOMAIN'] ||= "MY_SANDBOX_DOMAIN"
+ENV['MAILGUN_SANDBOX_POSTMASTER'] ||= "MY_POSTMASTER"
+ENV['MAILGUN_APIKEY'] = "MY_API_KEY"
 
-mailgun({
-  :to => "{DESTINATION_EMAIL}",
-  :success => true,
-  :message => "mail from inside a lane with mailgun"
-})
+mailgun(
+  to: "fastlane@krausefx.com",
+  success: true,
+  message: "This is the mail's content"
+)
 
 or
 
-mailgun({
-  :mailgun_sandbox_domain => '{MY_SANDBOX_DOMAIN}',
-  :mailgun_sandbox_postmaster => '{MY_POSTMASTER}',
-  :mailgun_apikey => '{MY_API_KEY}',
-  :to => "{DESTINATION_EMAIL}",
-  :success => true,
-  :message => "mail from inside a lane with mailgun"
-})
+mailgun(
+  mailgun_sandbox_domain: "SANDBOX_DOMAIN",
+  mailgun_sandbox_postmaster: "MY_POSTMASTER",
+  mailgun_apikey: "MY_API_KEY",
+  to: "DESTINATION_EMAIL",
+  success: true,
+  message: "Mail Body"
+)
 ```
 
 ### [HipChat](http://www.hipchat.com/)
