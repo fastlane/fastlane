@@ -49,6 +49,8 @@ module Snapshot
     # @return (Hash) All the blocks, which are called on specific actions
     attr_accessor :blocks
 
+    attr_accessor :html_title
+
 
     # A shared singleton
     def self.shared_instance(path = nil)
@@ -86,6 +88,8 @@ module Snapshot
         'de-DE',
         'en-US'
       ]
+
+      self.html_title = 'KrauseFx/snapshot'
 
       self.screenshots_path = './screenshots'
 

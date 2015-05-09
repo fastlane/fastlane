@@ -6,6 +6,7 @@ module Snapshot
     def generate
       screens_path = SnapshotConfig.shared_instance.screenshots_path
 
+      @title = SnapshotConfig.shared_instance.html_title
       @data = {}
 
       Dir["#{screens_path}/*"].sort.each do |language_path|

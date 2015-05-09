@@ -76,6 +76,9 @@ module Snapshot
           raise "#{method_sym} needs to have a block provided." unless block_given?
           Helper.log.warn("'setup_for_language_change' and 'teardown_language' are deprecated.".yellow) if [:setup_for_language_change, :teardown_language].include?method_sym
           @config.blocks[method_sym] = block
+        when :html_title 
+          raise "html_title has to be an String".red unless value.kind_of?String
+          @config.html_title = value
         else
           Helper.log.error "Unknown method #{method_sym}"
         end

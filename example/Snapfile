@@ -15,6 +15,8 @@ languages([
   'it-IT'
 ])
 
+html_title 'Example'
+
 # Where should the resulting screenshots be stored?
 screenshots_path "./screenshots"
 
