@@ -7,6 +7,7 @@ require 'frameit/screenshot'
 require 'frameit/config_parser'
 require 'frameit/offsets'
 require 'frameit/template_finder'
+require 'frameit/strings_parser'
 require 'frameit/dependency_checker'
 
 require 'fastlane_core'
