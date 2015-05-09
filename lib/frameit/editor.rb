@@ -61,7 +61,6 @@ module Frameit
         x = hash.split("+")[1].to_f * multiplicator
         y = hash.split("+")[2].to_f * multiplicator
         new_offset = "+#{x.round}+#{y.round}"
-        puts new_offset
         @offset_information[:offset] = new_offset
       end
 
@@ -151,7 +150,7 @@ module Frameit
         (actual_font_size / 2.0).round
       end
 
-      # This will assemble one image containing the 2 title parts
+      # This will build 2 individual images with the title, which will then be added to the real image
       def build_title_images(max_width)
         words = [:keyword, :title].keep_if{ |a| fetch_text(a) } # optional keyword/title
         results = {}
