@@ -252,6 +252,11 @@ I'll try to keep the script up to date. If you need to change the iOS version, y
 ios_version "9.0"
 ```
 
+### Html Title
+```ruby
+html_title 'Example'
+```
+
 ### Custom Args for the build command
 Use the ```custom_args``` directive to prepend custom statements to the build command.
 
