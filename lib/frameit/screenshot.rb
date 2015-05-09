@@ -47,6 +47,8 @@ module Frameit
       self.path
     end
 
+    # Loads the config (colors, background, texts, etc.)
+    # Don't use this method to access the actual text and use `fetch_texts` instead
     def fetch_config
       return @config if @config
 
@@ -55,6 +57,29 @@ module Frameit
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
       @config = file.fetch_value(self.path)
+    end
+
+    # Fetches the title + keyword for this particular screenshot
+    def fetch_text(type)
+      raise "Valid parameters :keyword, :title" unless [:keyword, :title].include?type
+
+      # Try to get it from a keyword.strings or title.strings file
+      strings_path = File.join(File.expand_path("..", @path), "#{type.to_s}.strings")
+      if File.exists?strings_path
+        parsed = StringsParser.parse(strings_path)
+        result = parsed.find { |k, v| @path.include?k }
+        return result.last if result
+      end
+
+      # No string files, fallback to Framefile config
+      result = fetch_config[type.to_s]['text']      
+
+      if !result and type == :title
+        # title is mandatory
+        raise "Could not get title for screenshot #{@path}. Please provide one in your Framefile.json".red
+      end
+
+      return result
     end
 
     # Add the device frame, this will also call the method that adds the background + title
@@ -135,7 +160,7 @@ module Frameit
 
     # This will assemble one image containing the 2 title parts
     def build_title_images(max_width)
-      words = [:keyword, :title].keep_if{ |a| fetch_config[a.to_s] and fetch_config[a.to_s]['text'] } # optional keyword/title
+      words = [:keyword, :title].keep_if{ |a| fetch_text(a) } # optional keyword/title
       results = {}
       words.each do |key|
         # Create empty background
@@ -151,7 +176,7 @@ module Frameit
           i.font font if font
           i.gravity "Center"
           i.pointsize actual_font_size
-          i.draw "text 0,0 '#{fetch_config[key.to_s]['text']}'"
+          i.draw "text 0,0 '#{fetch_text(key)}'"
           i.fill fetch_config[key.to_s]['color']
         end
         title_image.trim # remove white space
