@@ -5,8 +5,6 @@ module Frameit
     attr_accessor :size # size in px array of 2 elements: height and width
     attr_accessor :screen_size # deliver screen size type, is unique per device type, used in device_name
     attr_accessor :color # the color to use for the frame
-    attr_accessor :title_height # the height of the title added on top of the screenshot
-    attr_accessor :keyword_padding # padding between keyword and title
 
     # path: Path to screenshot
     # color: Color to use for the frame
@@ -16,8 +14,6 @@ module Frameit
       @path = path
       @size = FastImage.size(path)
       @screen_size = Deliver::AppScreenshot.calculate_screen_size(path) 
-      @title_height = 285
-      @keyword_padding = 50
     end
 
     # Device name for a given screen size. Used to use the correct template
@@ -114,18 +110,21 @@ module Frameit
       # If the user defined a background + title, here we go
       if fetch_config['background']
         background = MiniMagick::Image.open(fetch_config['background'])
+        if background.height != @size[1]
+          background.resize "#{@size[0]}x#{@size[1]}!" # `!` says it should ignore the ratio
+        end
 
         # First off, change the size of `image` to match the background + padding
         frame_width = background.width - fetch_config['padding'] * 2
         image.resize "#{frame_width}x"
 
         left_space = (background.width / 2.0 - image.width / 2.0).round
-        top_space = 20
-        top_space += @title_height if fetch_config['title']
+        bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
+        device_top = background.height - image.height - bottom_space
 
         image = background.composite(image, "png") do |c|
           c.compose "Over"
-          c.geometry "+#{left_space}+#{top_space}"
+          c.geometry "+#{left_space}+#{device_top}"
         end
 
         if fetch_config['title']
@@ -133,8 +132,8 @@ module Frameit
           keyword = title_images[:keyword]
           title = title_images[:title]
 
-          sum_width = (keyword.width rescue 0) + title.width + @keyword_padding
-          top_space = (@title_height / 2.0 - actual_font_size / 4.0).round # centered
+          sum_width = (keyword.width rescue 0) + title.width + keyword_padding
+          top_space = (device_top / 2.0 - actual_font_size / 2.0).round # centered
           
           left_space = (image.width / 2.0 - sum_width / 2.0).round
           if keyword
@@ -144,7 +143,7 @@ module Frameit
             end
           end
 
-          left_space += (keyword.width rescue 0) + @keyword_padding
+          left_space += (keyword.width rescue 0) + keyword_padding
           image = image.composite(title, "png") do |c|
             c.compose "Over"
             c.geometry "+#{left_space}+#{top_space}"
@@ -155,7 +154,11 @@ module Frameit
     end
 
     def actual_font_size
-      (@title_height / 3.0).round
+      (@size[0] / 20.0).round # depends on the width of the screenshot
+    end
+
+    def keyword_padding
+      (actual_font_size / 2.0).round
     end
 
     # This will assemble one image containing the 2 title parts
@@ -167,7 +170,7 @@ module Frameit
         empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
         title_image.combine_options do |i|
-          i.resize "#{max_width}x#{@title_height}!" # `!` says it should ignore the ratio
+          i.resize "#{max_width}x#{actual_font_size}!" # `!` says it should ignore the ratio
         end
 
         # Add the actual title
