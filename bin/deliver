@@ -101,6 +101,7 @@ end
 
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+  Deliver::DependencyChecker.check_dependencies
   FastlaneApplication.new.run
 ensure
   FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
