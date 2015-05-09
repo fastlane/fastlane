@@ -257,10 +257,18 @@ Use the ```custom_args``` directive to prepend custom statements to the build co
 
 Add a ```custom_build_args``` line to your ```Snapfile``` to add custom arguments to the build command.
 
-Here is an example for adding a preprocessor macro `SNAPSHOT` and  a custom build setting `SNAPSHOT_ENABLE`.
+Here is an example for adding a preprocessor macro `SNAPSHOT`:
 
 ```ruby
-custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' SNAPSHOT_ENABLE = YES"
+custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1'"
+```
+
+In your Objective-C code, use the following code to detect the `snapshot` mode:
+
+```objective-c
+#ifdef SNAPSHOT
+// Your Code here
+#endif
 ```
 
 ### Custom Args for the run command
