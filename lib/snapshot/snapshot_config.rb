@@ -89,8 +89,6 @@ module Snapshot
         'en-US'
       ]
 
-      self.html_title = 'KrauseFx/snapshot'
-
       self.screenshots_path = './screenshots'
 
       folders = ["./*.xcworkspace"] # we prefer workspaces
@@ -109,6 +107,10 @@ module Snapshot
         setup_for_language_change: empty,
         teardown_language: empty
       }
+
+      name = self.project_name
+      self.html_title = name ? name : 'KrauseFx/snapshot'
+
     end
 
     # This has to be done after parsing the Snapfile (iOS version)

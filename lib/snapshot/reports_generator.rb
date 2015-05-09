@@ -4,9 +4,11 @@ require 'fastimage'
 module Snapshot
   class ReportsGenerator
     def generate
-      screens_path = SnapshotConfig.shared_instance.screenshots_path
 
-      @title = SnapshotConfig.shared_instance.html_title
+      config = SnapshotConfig.shared_instance
+      screens_path = config.screenshots_path
+
+      @title = config.html_title    
       @data = {}
 
       Dir["#{screens_path}/*"].sort.each do |language_path|
