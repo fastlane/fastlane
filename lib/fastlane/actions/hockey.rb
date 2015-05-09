@@ -24,6 +24,7 @@ module Fastlane
             dsym_filename = dsym_path
           else
             Helper.log.info "Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly".yellow
+            dsym_filename = nil
           end
         end
 
