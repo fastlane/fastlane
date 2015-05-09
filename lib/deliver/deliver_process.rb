@@ -49,6 +49,8 @@ module Deliver
           additional_itc_information # e.g. copyright, age rating
 
           trigger_metadata_upload
+        else
+          Helper.log.info "Beta builds don't upload new metadata to iTunesConnet".yellow
         end
 
         # Always upload a new ipa (except if none was given)
