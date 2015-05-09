@@ -26,40 +26,85 @@ module Deliver
 
     def run
       begin
-        run_unit_tests
-        fetch_information_from_ipa_file
-
-        verify_ipa_file
+        unless metadata_only?
+          run_unit_tests
+          fetch_app_key_information
+          fetch_information_from_ipa_file
+          verify_ipa_file
+        else
+          fetch_app_key_information
+          @app_version ||= ask("Which version number should be updated? ")
+          @app_identifier ||= ask("App Identifier (e.g. com.krausefx.app): ")
+        end
+        create_app
 
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
-        create_app
-        verify_app_on_itunesconnect
+        verify_app_on_itunesconnect unless metadata_only?
 
-        unless is_beta_build?
-          # App Metdata will not be updated for beta builds
+        if ready_for_sale?
+          raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
+        end
 
-          load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
-          load_metadata_folder # this is the new way of defining app metadata
-          set_app_metadata
-          set_screenshots
-
-          verify_pdf_file
-
-          additional_itc_information # e.g. copyright, age rating
-
-          trigger_metadata_upload
-        else
+        if is_beta_build?
           Helper.log.info "Beta builds don't upload new metadata to iTunesConnet".yellow
+        else
+          upload_metadata
         end
 
         # Always upload a new ipa (except if none was given)
-        trigger_ipa_upload
+        trigger_ipa_upload unless metadata_only?
 
         call_success_block
       rescue => ex
         call_error_block(ex)
       end
+    end
+
+    def upload_metadata
+      load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
+      load_metadata_folder # this is the new way of defining app metadata
+      set_app_metadata
+      set_screenshots
+
+      verify_pdf_file
+
+      additional_itc_information # e.g. copyright, age rating
+
+      trigger_metadata_upload
+    end
+
+    #####################################################
+    # @!group What kind of release
+    #####################################################
+
+    # Deployment = Submission of the binary
+    def skip_deployment?
+      @deploy_information[Deliverer::ValKey::SKIP_DEPLOY]
+    end
+
+    # Release = App Store and not TestFlight
+    def is_release_build?
+      is_beta_build? == false
+    end
+
+    # TestFlight Buil
+    def is_beta_build?
+      @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
+    end
+
+    # Only upload metadata and no binary
+    def metadata_only?
+      ENV["DELIVER_SKIP_BINARY"]
+    end
+
+    # Is the app already ready for sale?
+    # if so, we can't update the app metadata: http://www.openradar.appspot.com/18263306
+    def ready_for_sale?
+      return @ready if @checked_for_ready
+
+      @checked_for_ready = true
+      @ready = (app.get_app_status == App::AppStatus::READY_FOR_SALE)
     end
 
     #####################################################
@@ -77,10 +122,14 @@ module Deliver
       end
     end
 
-    def fetch_information_from_ipa_file
+    # Tries to fetch app version and app identifier from Deliverfile
+    def fetch_app_key_information
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
+    end
 
+
+    def fetch_information_from_ipa_file
       used_ipa_file = ENV["IPA_OUTPUT_PATH"]# if (ENV["IPA_OUTPUT_PATH"] and File.exists?(ENV["IPA_OUTPUT_PATH"]))
 
       if is_release_build?
@@ -363,18 +412,6 @@ module Deliver
           app_version = @ipa.fetch_app_version
         end
         return app_version
-      end
-
-      def skip_deployment?
-        @deploy_information[Deliverer::ValKey::SKIP_DEPLOY]
-      end
-
-      def is_release_build?
-        is_beta_build? == false
-      end
-
-      def is_beta_build?
-        @deploy_information[Deliverer::ValKey::IS_BETA_IPA]
       end
   end
 end
