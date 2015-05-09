@@ -253,7 +253,7 @@ ios_version "9.0"
 ```
 
 ### Html Title
-By default, ```snapshot``` will try to set the html title with the project name. If you want to specify a title, you can do it like this:
+If you want to change the title of the generated HTML page, you can use:
 ```ruby
 html_title 'Example'
 ```

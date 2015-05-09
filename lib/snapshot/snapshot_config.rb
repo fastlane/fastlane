@@ -108,8 +108,7 @@ module Snapshot
         teardown_language: empty
       }
 
-      name = self.project_name
-      self.html_title = name ? name : 'KrauseFx/snapshot'
+      self.html_title = self.project_name || 'KrauseFx/snapshot'
 
     end
 
