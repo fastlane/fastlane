@@ -5,7 +5,8 @@ module PEM
       path, rsa_file = PEM::CertManager.new.run
 
       if path
-        file_name = File.basename(path)
+        file_name = PEM.config[:pem_name] || File.basename(path)
+        file_name =  file_name =~ /.pem/ ? file_name : "#{file_name}.pem"
         output = "./#{file_name}"
         FileUtils.mv(path, output)
         path = output
