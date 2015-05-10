@@ -11,7 +11,7 @@ module Deliver
       html_path = File.join(lib_path, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
-      export_path ||= '.'
+      export_path ||= ENV["DELIVER_HTML_EXPORT_PATH"] || '.' # DELIVER_HTML_EXPORT_PATH used in tests to use /tmp
       export_path = File.join(export_path, "Preview.html")
       File.write(export_path, html)
 

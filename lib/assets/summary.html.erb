@@ -115,7 +115,7 @@
 
     <%
       def modified?(val)
-        "modified" if (val[:modified] == true)
+        "modified" if (val and val[:modified] == true)
       end
     %>
     
