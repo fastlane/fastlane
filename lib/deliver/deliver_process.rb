@@ -251,21 +251,21 @@ module Deliver
       else
         # Everything is prepared for the upload
         # We may have to ask the user if that's okay
-        pdf_path = PdfGenerator.new.render(self)
+        html_path = HtmlGenerator.new.render(self)
         unless Helper.is_test?
           puts "----------------------------------------------------------------------------"
-          puts "Verifying the upload via the PDF file can be disabled by either adding"
+          puts "Verifying the upload via the HTML file can be disabled by either adding"
           puts "'skip_pdf true' to your Deliverfile or using the flag --force."
           puts "----------------------------------------------------------------------------"
 
-          system("open '#{pdf_path}'")
-          okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
+          system("open '#{html_path}'")
+          okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
 
           unless okay
             dir ||= app.get_metadata_directory
             dir += "/#{app.apple_id}.itmsp"
             FileUtils.rm_rf(dir) unless Helper.is_test?
-            raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow
+            raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
           end
         end
       end
