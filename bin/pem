@@ -30,8 +30,6 @@ class PemApplication
       c.syntax = 'pem renew'
       c.description = 'Renews the certificate (in case it expired) and shows the path to the generated pem file'
 
-      c.option '-n', '--pem_name STRING', String, 'The name of the generated .pem file.'
-
       c.action do |args, options|  
         PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options.__hash__)
         PEM::Manager.start
