@@ -96,6 +96,10 @@ If you want to generate a development certificate instead:
 
     pem --development
 
+You can specify a name for the output file:
+
+    pem -n myCustomName.pem
+
 To get a list of available options run:
 
     pem --help

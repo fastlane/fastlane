@@ -45,7 +45,13 @@ module PEM
                                      optional: true,
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :pem_name,
+                                     short_option: "-n",
+                                     env_name: "PEM_FILE_NAME",
+                                     description: "The name of the output file",
+                                     optional: true,
+                                     default_value: '')
       ]
     end
   end
