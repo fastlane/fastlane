@@ -221,22 +221,21 @@ module Spaceship
       return_response('provisioningProfile')
     end
 
-    def create_provisioning_profile(profile, distribution_method, device_ids, certificate_ids)
-      response = request(:post, 'account/ios/profile/createProvisioningProfile.action', {
-        provisioningProfileName: '',
-        appIdId: '',
+    def create_provisioning_profile(name, distribution_method, app_id, certificate_ids, device_ids)
+      request(:post, 'account/ios/profile/createProvisioningProfile.action', {
+        teamId: team_id,
+        provisioningProfileName: name,
+        appIdId: app_id,
         distributionType: distribution_method,
-        certificateIds: certificates_ids,
+        certificateIds: certificate_ids,
         deviceIds: device_ids,
       })
-      response.body['provisioningProfile']
-    end
-
-    def update_provisioning_profile
+      return_response('provisioningProfile')
     end
 
     def download_provisioning_profile(profile_id)
       response = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
+        teamId: team_id,
         displayId: profile_id
       })
       response.body
