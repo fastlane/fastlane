@@ -49,7 +49,7 @@ module PEM
         FastlaneCore::ConfigItem.new(key: :pem_name,
                                      short_option: "-n",
                                      env_name: "PEM_FILE_NAME",
-                                     description: "The name of the output file",
+                                     description: "The file name of the generated .pem file",
                                      optional: true,
                                      default_value: '')
       ]
