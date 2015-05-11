@@ -29,6 +29,7 @@ module Spaceship
     attr_accessor :cookie
 
     class NotAuthenticatedError < StandardError; end
+    class UnexpectedResponse < StandardError; end
 
     def self.login(username, password)
       instance = self.new
@@ -84,8 +85,8 @@ module Spaceship
     end
 
     def teams
-      response = request(:post, 'account/listTeams.action')
-      response.body['teams']
+      request(:post, 'account/listTeams.action')
+      return_response('teams')
     end
 
     def team_id
@@ -97,13 +98,13 @@ module Spaceship
     end
 
     def apps
-      response = request(:post, 'account/ios/identifiers/listAppIds.action', {
+      request(:post, 'account/ios/identifiers/listAppIds.action', {
         teamId: team_id,
         pageNumber: 1,
         pageSize: 500,
         sort: 'name=asc'
       })
-      response.body['appIds']
+      return_response('appIds')
     end
 
     def create_app(type, name, bundle_id)
@@ -132,8 +133,8 @@ module Spaceship
 
       params.merge!(ident_params)
 
-      response = request(:post, 'account/ios/identifiers/addAppId.action', params)
-      response.body['appId']
+      request(:post, 'account/ios/identifiers/addAppId.action', params)
+      return_response('appId')
     end
 
     #this might be nice to have
@@ -142,11 +143,11 @@ module Spaceship
     #end
 
     def delete_app(app_id)
-      response = request(:post, 'account/ios/identifiers/deleteAppId.action', {
+      request(:post, 'account/ios/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
       })
-      response.body
+      return_response
     end
 
     def devices
@@ -189,16 +190,16 @@ module Spaceship
     end
 
     def revoke_certificate(certificate_id, type)
-      response = request(:post, 'account/ios/certificate/revokeCertificate.action', {
+      request(:post, 'account/ios/certificate/revokeCertificate.action', {
         teamId: team_id,
         certificateId: certificate_id,
         type: type
       })
-      response.body['certRequests']
+      return_response('certRequests')
     end
 
     def provisioning_profiles
-      response = request(:post, 'account/ios/profile/listProvisioningProfiles.action', {
+      request(:post, 'account/ios/profile/listProvisioningProfiles.action', {
         teamId: team_id,
         includeInactiveProfiles: true,
         onlyCountLists: true,
@@ -207,17 +208,17 @@ module Spaceship
         pageNumber: 1,
         sort: 'name=asc'
       })
-      response.body['provisioningProfiles']
+      return_response('provisioningProfiles')
     end
 
     def provisioning_profile(profile_id)
-      response = request(:post, 'account/ios/profile/getProvisioningProfile.action', {
+      request(:post, 'account/ios/profile/getProvisioningProfile.action', {
         teamId: team_id,
         includeInactiveProfiles: true,
         onlyCountLists: true,
         provisioningProfileId: profile_id
       })
-      response.body['provisioningProfile']
+      return_response('provisioningProfile')
     end
 
     def create_provisioning_profile(profile, distribution_method, device_ids, certificate_ids)
@@ -269,6 +270,15 @@ module Spaceship
           headers.merge!(csrf_tokens)
         end
         @last_response = @client.send(method, url_or_path, params, headers, &block)
+      end
+
+      def return_response(expected_key)
+        content = @last_response.body[expected_key]
+        if content.nil?
+          raise UnexpectedResponse.new(@last_response.body)
+        else
+          content
+        end
       end
   end
 end
