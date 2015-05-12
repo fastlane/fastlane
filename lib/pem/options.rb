@@ -51,7 +51,7 @@ module PEM
                                      env_name: "PEM_FILE_NAME",
                                      description: "The file name of the generated .pem file",
                                      optional: true,
-                                     default_value: '')
+                                     default_value: nil)
       ]
     end
   end
