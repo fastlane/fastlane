@@ -108,6 +108,10 @@ module Fastlane
       def self.author
         'HeEAaD'
       end
+      
+      def self.is_supported?(platform)
+        true
+      end
     end
   end
 end
