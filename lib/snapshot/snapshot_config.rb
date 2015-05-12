@@ -49,6 +49,8 @@ module Snapshot
     # @return (Hash) All the blocks, which are called on specific actions
     attr_accessor :blocks
 
+    attr_accessor :html_title
+
 
     # A shared singleton
     def self.shared_instance(path = nil)
@@ -105,6 +107,9 @@ module Snapshot
         setup_for_language_change: empty,
         teardown_language: empty
       }
+
+      self.html_title = self.project_name || 'KrauseFx/snapshot'
+
     end
 
     # This has to be done after parsing the Snapfile (iOS version)
