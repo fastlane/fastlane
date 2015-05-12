@@ -419,6 +419,13 @@ Unfortunately, Xamarin command line tool is only available for Business Edition 
 
 If building via command-line doesn't work for your project or you don't want to build every time, you can run the tool with ```snapshot --nobuild``` to skip the build process and use a pre-built ```.app``` under your ```build_dir```.
 
+### Simulator doesn't launch the application
+
+When the app dies directly after the application is launched there might be 2 problems
+
+- The simulator is somehow in a broken state and you need to re-create it. You can use `snapshot reset_simulators` to reset all simulators (this will remove all installed apps)
+- You haven't enabled the correct architectures. Make sure you have the same architectures as in the example project of this repository. 
+
 ## Determine language in UI Automation script
 
 To detect the currently used localization in your Javascript file, use the following code:
