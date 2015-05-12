@@ -9,7 +9,10 @@ module Fastlane
 
         select_reqex = params[:select_reqex]
         
-        files = JSON.parse(File.read(params[:compile_commands])).map { |compile_command| compile_command['file'] }
+        compile_commands = params[:compile_commands]
+        raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exists?(compile_commands)
+        
+        files = JSON.parse(File.read(compile_commands)).map { |compile_command| compile_command['file'] }
         files.uniq!
         files.select! do |file|
           file_ruby = file.gsub('\ ', ' ')
