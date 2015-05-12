@@ -67,12 +67,22 @@ module Deliver
         build_url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/#{app.apple_id}/trains/#{current_build['trainVersion']}/builds/#{current_build['buildVersion']}/testInformation"
         build_info = JSON.parse(Excon.get(build_url, headers: { "Cookie" => cookie_string } ).body)['data']
 
+        Helper.log.info "Setting the following information for this build:".yellow
+        Helper.log.info "DELIVER_WHAT_TO_TEST: '#{ENV['DELIVER_WHAT_TO_TEST']}'"
+        Helper.log.info "DELIVER_BETA_DESCRIPTION: '#{ENV['DELIVER_BETA_DESCRIPTION']}'"
+        Helper.log.info "DELIVER_BETA_FEEDBACK_EMAIL: '#{ENV['DELIVER_BETA_FEEDBACK_EMAIL']}'"
+
         build_info['details'][0]['whatsNew']['value'] = ENV["DELIVER_WHAT_TO_TEST"]
         build_info['details'][0]['description']['value'] = ENV["DELIVER_BETA_DESCRIPTION"]
         build_info['details'][0]['feedbackEmail']['value'] = ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
-        Excon.post(build_url, body: build_info.to_json, headers: { "Cookie" => cookie_string } )
+        h = Excon.post(build_url, body: build_info.to_json, headers: { "Cookie" => cookie_string } )
 
-        Helper.log.info "Successfully distributed latest beta build 🚀".green
+        if h.status == 200
+          Helper.log.info "Successfully distributed latest beta build 🚀".green
+        else
+          Helper.log.info h.data
+          Helper.log.info "Some error occured marking the new builds as TestFlight build. Please do it manually on '#{current_url}'.".green
+        end
 
         return true
       rescue => ex
