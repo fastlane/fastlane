@@ -91,6 +91,9 @@ module Deliver
           return publish_production_build(submit_information)
         elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
+        else
+          Helper.log.info "deliver will **not** submit the app for Review or for TestFlight distribution".yellow
+          Helper.log.info "If you want to distribute the binary, don't define `skip_deploy` ".yellow
         end
         return true
       end
