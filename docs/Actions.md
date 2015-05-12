@@ -232,6 +232,21 @@ gcovr({
 })
 ```
 
+### [OCLint](http://oclint.org)
+Lints implementation files with OCLint
+
+```
+oclint({
+  compile_commands: 'commands.json', # The json compilation database, use xctool reporter 'json-compilation-database'
+  select_reqex: /ViewController.m/,  # Select all files matching this reqex
+  report_type: 'pmd',                # The type of the report (default: html)
+  max_priority_1: 10,                # The max allowed number of priority 1 violations
+  max_priority_2: 100,               # The max allowed number of priority 2 violations
+  max_priority_3: 1000,              # The max allowed number of priority 3 violations
+  rc: 'LONG_LINE=200'                # Override the default behavior of rules
+})  
+```
+
 ## Deploying
 
 ### [deliver](https://github.com/KrauseFx/deliver)
