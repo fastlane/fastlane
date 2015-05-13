@@ -83,10 +83,7 @@
             <% screens.each do |screen_path| %>
               <% next if screen_path.include?"_framed.png" %>
               <td>
-                <% screen_size = FastImage.size(File.join(SnapshotConfig.shared_instance.screenshots_path, screen_path)) %>
-                <% width = ((screen_size[0] / divide_size_by).round rescue 0) %>
-                <% width = [width, max_width].min %>
-                <% style = (width > 0 ? "width: #{width}px;" : '') %>
+                <% style = "width: 100%;" %>
                 <% image_counter += 1 %>
                 <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
                   <img class="screenshot"
@@ -136,7 +133,7 @@
             tmpImg.src = img.src;
             imageDisplay.style.height     = 'auto';
             imageDisplay.style.width     = 'auto';
-            imageDisplay.style.paddingTop   = '0px';
+            imageDisplay.style.paddingTop   = '20px';
             if (window.innerHeight < tmpImg.height) {
               imageDisplay.style.height = document.documentElement.clientHeight+'px';
             } else if (window.innerWidth < tmpImg.width) {
@@ -182,7 +179,6 @@
       document.onkeypress = function(e) {
         e = e || window.event;
         var charCode = e.keyCode || e.which;
-
         switch(charCode) {
           case 27: // Esc
             overlay.style.display = "none";
