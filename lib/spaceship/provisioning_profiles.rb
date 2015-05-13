@@ -68,7 +68,7 @@ module Spaceship
     # @param certificate [Spaceship::Certificates::Certificate] an instance of a certificate used for the provisioning profile. Either `Production` or `Development`
     #
     # @return [Spaceship::ProvisioningProfiles::Profile] the newly created provisioning profile
-    def create(klass, name, bundle_id, certificate, devices = nil)
+    def create(klass: nil, name: nil, bundle_id: nil, certificate: nil, devices: nil)
       app = Spaceship.apps.find(bundle_id)
       profile = client.create_provisioning_profile(name, klass.type, app.app_id, [certificate.id], devices)
       @profiles << self.class.factory(profile)

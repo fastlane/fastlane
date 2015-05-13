@@ -121,6 +121,17 @@ production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certific
 Spaceship.provisioning_profiles.create(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
 ```
 
+Named Parameters
+```ruby
+Spaceship.provisioning_profiles.create(
+    klass: Spaceship::ProvisioningProfiles::Development,
+    name: "Spaceship",
+    bundle_id: "net.sunapps.1",
+    certificate: Spaceship.certificates.all_of_type(Spaceship::Certificates::Development).first,
+    devices: [Spaceship.devices.first]
+)
+```
+
 download the .mobileprovision profile
 ```ruby
 file = Spaceship.provisioning_profiles.download('tools.fastlane.flappy-bird')
