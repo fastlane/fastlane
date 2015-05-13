@@ -21,7 +21,7 @@ describe Spaceship::Client do
     it 'raises an exception if authentication failed' do
       expect {
         subject.login('bad-username', 'bad-password')
-      }.to raise_exception(Spaceship::Client::NotAuthenticatedError)
+      }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
     end
   end
 

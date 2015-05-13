@@ -90,6 +90,12 @@ module Spaceship
       certificate
     end
 
+    def all_of_type(type)
+      @certificates.select do |c| 
+        c.kind_of?(type)
+      end
+    end
+
     def find(cert_id)
       @certificates.find do |cert|
         cert.id == cert_id
