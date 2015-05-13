@@ -266,8 +266,13 @@ module Spaceship
         @last_response = @client.send(method, url_or_path, params, headers, &block)
       end
 
-      def parse_response(expected_key)
-        content = @last_response.body[expected_key]
+      def parse_response(expected_key = nil)
+        if expected_key
+          content = @last_response.body[expected_key]
+        else
+          content = @last_response.body
+        end
+
         if content.nil?
           raise UnexpectedResponse.new(@last_response.body)
         else
