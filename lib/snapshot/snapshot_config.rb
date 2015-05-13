@@ -154,6 +154,8 @@ module Snapshot
 
     # The JavaScript UIAutomation file
     def js_file(ipad = false)
+      return ENV["SNAPSHOT_JS_FILE"] if ENV["SNAPSHOT_JS_FILE"]
+      
       result = manual_js_file
 
       unless result
