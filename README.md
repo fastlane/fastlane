@@ -66,6 +66,9 @@ Here is a nice gif, that shows ```frameit``` in action:
 ### Results
 
 ![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png)
+
+-------
+
 ![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png)
 
 # Installation
@@ -161,11 +164,11 @@ Use it to define the general information:
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
-The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots)
+The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
 
 #### `.strings` files
 
-To define the title and optionally the keyword, put 2 `.strings` files into the language folder (e.g. [en-US](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
+To define the title and optionally the keyword, put 2 `.strings` files into the language folder (e.g. [en-US in the example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
@@ -184,8 +187,12 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-## Generate screenshots
-Check out [```Snapshot```](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
+## Generate localized screenshots
+Check out [`snapshot`](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
+
+## White background of frames
+
+Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `frameit` again.
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
