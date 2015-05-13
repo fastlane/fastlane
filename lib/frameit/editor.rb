@@ -159,8 +159,9 @@ module Frameit
           # Create empty background
           empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
           title_image = MiniMagick::Image.open(empty_path)
+          image_height = actual_font_size * 2 # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
           title_image.combine_options do |i|
-            i.resize "#{max_width}x#{actual_font_size}!" # `!` says it should ignore the ratio
+            i.resize "#{max_width}x#{image_height}!" # `!` says it should ignore the ratio
           end
 
           # Add the actual title
