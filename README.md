@@ -63,8 +63,10 @@ Here is a nice gif, that shows ```frameit``` in action:
 
 ![assets/FrameitGit.gif](assets/FrameitGit.gif)
 
-Here is how the result can look like
-![assets/Overview.png](assets/Overview.png)
+### Results
+
+![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png)
+![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png)
 
 # Installation
 
@@ -103,6 +105,69 @@ To use the silver version of the frames:
 To run the setup process again to add new frames use:
 
     frameit setup
+
+# Titles and Background (optional)
+
+With `frameit` 2.0 you are now able to add a custom background, title and text colors to your screenshots.
+
+A working example can be found in the [fastlane examples](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) project.
+
+#### `Framefile.json`
+
+Use it to define the general information:
+
+```json
+{
+  "default": {
+    "keyword": {
+      "font": "./fonts/MyFont-Rg.otf"
+    },
+    "title": {
+      "font": "./fonts/MyFont-Th.otf",
+      "color": "#545454"
+    },
+    "background": "./background.jpg",
+    "padding": 50
+  },
+
+  "data": [
+    {
+      "filter": "Brainstorming",
+      "keyword": {
+        "color": "#d21559"
+      }
+    },
+    {
+      "filter": "Organizing",
+      "keyword": {
+        "color": "#feb909"
+      }
+    },
+    {
+      "filter": "Sharing",
+      "keyword": {
+        "color": "#aa4dbc"
+      }
+    },
+    {
+      "filter": "Styling",
+      "keyword": {
+        "color": "#31bb48"
+      }
+    }
+  ]
+}
+```
+
+The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
+
+The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots)
+
+#### `.strings` files
+
+To define the title and optionally the keyword, put 2 `.strings` files into the language folder (e.g. [en-US](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
+
+The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
 # Tips
 
