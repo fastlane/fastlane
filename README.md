@@ -6,14 +6,14 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull;
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
+  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a> 
+  <a href="https://github.com/KrauseFx/codes">codes</a>
 </p>
 -------
 
@@ -48,47 +48,89 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
     sudo gem install spaceship
 
-# Plans
+# Usage
 
-This project only uses a plain HTTP client - no web scraping or headless browser. It combines API calls from both the Apple Developer Portal and the calls that are used by Xcode.
+Spaceship is library designed to provide an interface to all of the functionality of Apple's Developer Portal via a simple HTTP client.
 
-I thought about providing a 1:1 representation of everything that’s stored on the Apple Dev Portal and provide an *Active Record* like interface.
 
-Imagine things like this:
+## Authoriation
 
-```ruby
-profile = Secret.provisioning.find_by_app_identifier('com.krausefx.app')
-profile.devices = all_devices
-profile.name = 'new name'
-profile.push!
-```
+In order to use the library you must login with you Apple ID credentials. This
+only needs to be done once during the lifetime of your app as the authenticated
+client is shared. Your credentials are not saved anywhere.
 
-the same for App IDs, code signing identities and devices
-
-With `spaceship` we can also do stuff like:
 
 ```ruby
-signing_identity = identities.find_installed_ones.first
-
-profile = signing_identity.profiles.new
-profile.type = :store
-profile.app = Apps.find('com.krausefx.app')
-profile.push!
-
-puts "Created: #{profile.uuid} #{profile.status}"
-
-# Or the other way around
-app = Apps.find('com.krausefx.app')
-
-profile = app.profiles.new
-# ...
+Spaceship.login(username, password)
 ```
 
-Most of those things are already implemented. The code already has a great test coverage, since all web requests can easily be stubbed.
+### App Ids
 
-# Need help?
-- If there is a technical problem with `spaceship`, submit an issue.
-- I'm available for contract work - drop me an email: spaceship@krausefx.com
+For instance, this is how you can list all of your app ids:
+```ruby
+Spaceship.apps.each do |app|
+  puts app
+end
+```
+
+Finding an app by it's bundle_id
+```ruby
+app = Spaceship.apps.find('tools.fastlane.test-app')
+```
+
+Creating an app:
+```ruby
+Spaceship.apps.create('com.company.appname', 'Next Big App')
+```
+
+### Certificates
+
+Download a certificate:
+
+```ruby
+certificates = Spaceship.certificates
+
+x509_cert = certificates.download('CERTID')
+File.write('/tmp/test', x509_cert.to_pem)
+```
+
+Filter by certificate types:
+```ruby
+push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certificates::PushCertificate) }
+#or
+prod_push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certificates::ProductionPush) }
+```
+
+Create a new certificate
+
+```ruby
+csr = Spaceship::Certificates.certificate_signing_request
+Spaceship.certificates.create(Spaceship::Certificates::ProductionPush, csr, 'tools.fastlane.test-app')
+```
+
+### Provisioning Profiles
+
+List provisioning profiles
+```ruby
+profiles = Spaceship.provisioning_profiles
+```
+
+create a distribution provisioning profile for an app
+```ruby
+production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certificates::Production)}.first
+Spaceship.provisioning_profiles.create(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
+```
+
+download the .mobileprovision profile
+```ruby
+file = Spaceship.provisioning_profiles.download('tools.fastlane.flappy-bird')
+```
+
+Check out the wiki for a full list of all supported actions.
+
+## Credit
+
+This project has been sponsored by [https://zeropush.com](ZeroPush).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
@@ -101,3 +143,4 @@ This project is licensed under the terms of the MIT license. See the LICENSE fil
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create a new Pull Request
+
