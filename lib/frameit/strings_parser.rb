@@ -8,7 +8,7 @@ module Frameit
       result = {}
 
       # A .strings file is UTF-16 encoded. We only want to deal with UTF-8
-      content = `iconv -f UTF-16 -t UTF-8 #{path}`
+      content = `iconv -f UTF-16 -t UTF-8 '#{path}'`
 
       content.split("\n").each do |line|
         begin
