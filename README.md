@@ -128,6 +128,22 @@ file = Spaceship.provisioning_profiles.download('tools.fastlane.flappy-bird')
 
 Check out the wiki for a full list of all supported actions.
 
+
+## Debugging
+
+In order to inspect traffic during development, it is useful to enable network debugging.
+A man-in-the-middle proxy such as Charles or mitmproxy on `localhost:8080` is required for this to work.
+
+### Example
+
+`$ brew install mitmproxy`
+`$ mitmproxy`
+in another terminal
+`$ DEBUG=1 bundle exec pry -rspaceship`
+`>> Spaceship.login('username', 'password')`
+
+You should see the requests and responses in mitmproxy
+
 ## Credit
 
 This project has been sponsored by [https://zeropush.com](ZeroPush).
