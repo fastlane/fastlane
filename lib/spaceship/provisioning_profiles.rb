@@ -13,15 +13,21 @@ module Spaceship
     end
 
     class Development < Profile
-      #limited
+      def self.type
+        'limited'
+      end
     end
 
     class AppStore < Profile
-      #store
+      def self.type
+        'store'
+      end
     end
 
     class AdHoc < Profile
-      #adhoc
+      def self.type
+        'adhoc'
+      end
     end
 
     def self.factory(attrs)
@@ -48,9 +54,9 @@ module Spaceship
       end
     end
 
-    def create(type, name, bundle_id, certificate, devices = nil)
+    def create(klass, name, bundle_id, certificate, devices = nil)
       app = Spaceship.apps.find(bundle_id)
-      profile = client.create_provisioning_profile(name, type, app.app_id, [certificate.id], devices)
+      profile = client.create_provisioning_profile(name, klass.type, app.app_id, [certificate.id], devices)
       @profiles << self.class.factory(profile)
     end
 
