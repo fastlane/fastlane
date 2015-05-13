@@ -14,17 +14,17 @@ module Spaceship
       end
 
       def is_push
-        #does display_type_id match push?
+        # does display_type_id match push?
         [Client::ProfileTypes::Push.development, Client::ProfileTypes::Push.production].include?(type_display_id)
       end
     end
 
-    #these certs are not associated with apps
+    # these certs are not associated with apps
     class Development < Certificate; end
     class Production < Certificate; end
 
-    #all these certs have apps.
-    class PushCertificate < Certificate; end  #abstract class
+    # all these certs have apps.
+    class PushCertificate < Certificate; end  # abstract class
     class DevelopmentPush < PushCertificate; end
     class ProductionPush < PushCertificate; end
     class WebsitePush < PushCertificate; end
@@ -76,14 +76,14 @@ module Spaceship
       type = CERTIFICATE_TYPE_IDS.key(klass)
       app_id = nil
 
-      #look up the app_id by the bundle_id
+      # look up the app_id by the bundle_id
       if bundle_id
         app_id = Spaceship::Apps.new(self.client).find(bundle_id).app_id
       end
 
-      #if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
+      # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
       response = client.create_certificate(type, csr.to_pem, app_id)
-      #munge the response to make it work for the factory
+      # munge the response to make it work for the factory
       response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
       certificate = self.class.factory(response)
       @certificates << certificate
@@ -107,10 +107,6 @@ module Spaceship
       cert = find(cert_id)
       client.revoke_certificate(cert.id, cert.type_display_id)
     end
-
-    #not sure how/when to do this:
-    #def activate(cert_id)
-    #end
   end
 end
 
