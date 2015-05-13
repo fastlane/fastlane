@@ -260,6 +260,21 @@ gcovr(
 )
 ```
 
+### [OCLint](http://oclint.org)
+Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
+
+```
+oclint({
+  compile_commands: 'commands.json', # The json compilation database, use xctool reporter 'json-compilation-database'
+  select_reqex: /ViewController.m/,  # Select all files matching this reqex
+  report_type: 'pmd',                # The type of the report (default: html)
+  max_priority_1: 10,                # The max allowed number of priority 1 violations
+  max_priority_2: 100,               # The max allowed number of priority 2 violations
+  max_priority_3: 1000,              # The max allowed number of priority 3 violations
+  rc: 'LONG_LINE=200'                # Override the default behavior of rules
+})  
+```
+
 ## Deploying
 
 ### [deliver](https://github.com/KrauseFx/deliver)
@@ -427,7 +442,8 @@ pem
 ```ruby
 pem(
   force: true, # create a new profile, even if the old one is still valid
-  app_identifier: 'net.sunapps.9', # optional app identifier
+  app_identifier: 'net.sunapps.9', # optional app identifier,
+  save_private_key: true,
   new_profile: Proc.new do |profile_path| # this block gets called when a new profile was generated
     puts profile_path # the absolute path to the new PEM file
     # insert the code to upload the PEM file to the server
