@@ -69,6 +69,10 @@ Here is a nice gif, that shows ```frameit``` in action:
 
 ![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
 
+-------
+
+![assets/MacExample.png](assets/MacExample.png?raw=1)
+
 # Installation
 
 Make sure, you have the commandline tools installed
