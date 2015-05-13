@@ -59,7 +59,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "set -o pipefail && ipa build #{build_args} --verbose | xcpretty"
+        command = "set -o pipefail && krausefx-ipa build #{build_args} --verbose | xcpretty"
         Helper.log.debug command
         Actions.sh command
 
