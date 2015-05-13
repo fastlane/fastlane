@@ -225,6 +225,8 @@ js_file './path/file.js'
 
 You can add a custom script for iPads: `./path/file-iPad.js` and it will automatically be used if found. Just append the `-iPad` to your existing file.
 
+If you want to overwrite the JS path using environment variables, use `SNAPSHOT_JS_FILE`.
+
 ### Scheme
 To not be asked which scheme to use, just set it like this:
 ```ruby
@@ -358,6 +360,10 @@ You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for 
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+
+## Frame the screenshots
+
+If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://github.com/fastlane/frameit).
 
 ## Run in Continuous Integration
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
