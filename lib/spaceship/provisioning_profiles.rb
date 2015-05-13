@@ -88,7 +88,7 @@ module Spaceship
     ##
     # Helper method to find a provisioning profile that matches a bundle_id of the associated app
     def find_by_bundle_id(bundle_id)
-      @profiles.find do |profile|
+      @profiles.find_all do |profile|
         if profile.app.nil?
           app_attrs = client.provisioning_profile(profile.id)['appId']
           profile.app = Spaceship::Apps.factory(app_attrs)
