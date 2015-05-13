@@ -13,7 +13,8 @@ module Frameit
       @color = color
       @path = path
       @size = FastImage.size(path)
-      @screen_size = Deliver::AppScreenshot.calculate_screen_size(path) 
+
+      @screen_size = ENV["FRAMEIT_FORCE_DEVICE_TYPE"] || Deliver::AppScreenshot.calculate_screen_size(path) 
     end
 
     # Device name for a given screen size. Used to use the correct template
@@ -30,7 +31,13 @@ module Frameit
           return 'iPhone_4'
         when sizes::IOS_IPAD
           return 'iPad_mini'
+        when sizes::MAC
+          return 'Mac'
       end
+    end
+
+    def is_mac?
+      return device_name == 'Mac'
     end
 
     # The name of the orientation of a screenshot. Used to find the correct template
@@ -49,7 +56,11 @@ module Frameit
 
     # Add the device frame, this will also call the method that adds the background + title
     def frame!
-      Editor.new.frame!(self)
+      if self.is_mac?
+        MacEditor.new.frame!(self)
+      else
+        Editor.new.frame!(self)
+      end
     end
   end
 end

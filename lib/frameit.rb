@@ -9,6 +9,7 @@ require 'frameit/offsets'
 require 'frameit/editor'
 require 'frameit/template_finder'
 require 'frameit/strings_parser'
+require 'frameit/mac_editor'
 require 'frameit/dependency_checker'
 
 require 'fastlane_core'
