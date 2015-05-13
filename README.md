@@ -53,7 +53,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 Spaceship is library designed to provide an interface to all of the functionality of Apple's Developer Portal via a simple HTTP client.
 
 
-## Authoriation
+## Authorization
 
 In order to use the library you must login with you Apple ID credentials. This
 only needs to be done once during the lifetime of your app as the authenticated
@@ -137,9 +137,13 @@ A man-in-the-middle proxy such as Charles or mitmproxy on `localhost:8080` is re
 ### Example
 
 `$ brew install mitmproxy`
+
 `$ mitmproxy`
+
 in another terminal
+
 `$ DEBUG=1 bundle exec pry -rspaceship`
+
 `>> Spaceship.login('username', 'password')`
 
 You should see the requests and responses in mitmproxy
