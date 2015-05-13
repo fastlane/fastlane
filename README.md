@@ -180,6 +180,40 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatic :rocket:
 
+### Mac
+
+With `frameit` 2.0 is possible to also frame Mac OS X Applications. You have to provide the following:
+
+- The `offset` information so `frameit` knows where to put your screenshots
+- A path to a `background`, which should contain both the background and the Mac
+- `titleHeight`: The height in px that should be used for the title
+
+##### Example
+```json
+{
+  "default": {
+    "title": {
+      "color": "#545454"
+    },
+    "background": "Mac.jpg",
+    "offset": {
+      "offset": "+676+479",
+      "titleHeight": 320
+    }
+  },
+  "data": [
+    {
+      "filter": "Brainstorming",
+      "keyword": {
+        "color": "#d21559"
+      }
+    }
+  ]
+}
+```
+
+Check out the [MindNode example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots)
+
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
