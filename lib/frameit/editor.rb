@@ -100,8 +100,9 @@ module Frameit
       def put_device_into_background(image, background)
         left_space = (background.width / 2.0 - image.width / 2.0).round
         bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
+        bottom_space -= 20 if screenshot.is_portrait? # even more for portrait mode
+
         self.top_space_above_device = background.height - image.height - bottom_space
-        # require 'pry'; binding.pry
 
         image = background.composite(image, "png") do |c|
           c.compose "Over"

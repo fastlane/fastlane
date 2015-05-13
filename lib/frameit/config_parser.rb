@@ -25,7 +25,6 @@ module Frameit
     # and fallback to a default value if nothing was found
     def fetch_value(path)
       specific = @data['data'].find { |a| path.include?a['filter'] }
-      Helper.log.info "Could not find specific value for path '#{path}'".yellow unless specific
       
       default = @data['default']
 

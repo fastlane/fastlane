@@ -39,6 +39,10 @@ module Frameit
       return Orientation::LANDSCAPE
     end
 
+    def is_portrait?
+      return (orientation_name == Orientation::PORTRAIT)
+    end
+
     def to_s
       self.path
     end
