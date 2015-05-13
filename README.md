@@ -31,8 +31,6 @@ frameit
 
 ###### Quickly put your screenshots into the right device frames
 
-This tool is not supposed to be used for App Store screenshots. Instead it should be used to prepare screenshots for websites, emails and prints.
-
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 
@@ -61,15 +59,15 @@ Put a gorgeous device frame around your iOS screenshots just by running one simp
 
 Here is a nice gif, that shows ```frameit``` in action:
 
-![assets/FrameitGit.gif](assets/FrameitGit.gif)
+![assets/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
 
 ### Results
 
-![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png)
+![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png?raw=1)
 
 -------
 
-![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png)
+![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
 
 # Installation
 
@@ -108,6 +106,8 @@ To use the silver version of the frames:
 To run the setup process again to add new frames use:
 
     frameit setup
+
+When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
 # Titles and Background (optional)
 
@@ -171,6 +171,10 @@ The `Framefile.json` should be in the `screenshots` folder, as seen in the [exam
 To define the title and optionally the keyword, put 2 `.strings` files into the language folder (e.g. [en-US in the example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
+
+#### Uploading screenshots to iTC
+
+Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatic :rocket:
 
 # Tips
 
