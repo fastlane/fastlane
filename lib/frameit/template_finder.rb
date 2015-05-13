@@ -12,7 +12,8 @@ module Frameit
       parts << "sRGB" if screenshot.device_name == 'iPad_mini'
 
       templates_path = [ENV['HOME'], FrameConverter::FRAME_PATH].join('/')
-      templates = Dir["#{templates_path}/**/#{parts.join('_')}*.png"]
+      templates = Dir["#{templates_path}/**/#{parts.join('_')}*.{png,jpg}"]
+      templates = templates + Dir["../**/#{parts.join('_')}*.{png,jpg}"] # local directory too
 
       if templates.count == 0
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35

@@ -45,7 +45,7 @@ module Frameit
     end
 
     def frames_exist?
-      Dir["#{templates_path}/**/*.psd"].count > 0
+      (Dir["#{templates_path}/**/*.psd"].count > 0 || Dir["../**/*sRGB.png"].count > 0)
     end
 
     def templates_path
