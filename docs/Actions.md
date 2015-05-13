@@ -410,6 +410,16 @@ increment_version_number(
 )
 ```
 
+### set_build_number_repository
+```ruby
+set_build_number_repository
+```
+
+This action will set the **build number** according to what the SCM HEAD reports.
+Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash).
+
+There are no options currently available for this action.
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
