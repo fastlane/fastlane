@@ -14,7 +14,7 @@ module Spaceship
     attr_reader :client
     attr_accessor :cookie
 
-    class NotAuthenticatedError < StandardError; end
+    class InvalidUserCredentialsError < StandardError; end
     class UnexpectedResponse < StandardError; end
 
     def self.login(username, password)
@@ -47,7 +47,7 @@ module Spaceship
 
     ##
     # perform login procedure. this sets a cookie that will be used in subsequent requests
-    # raises NotAuthenticatedError if authentication failed.
+    # raises InvalidUserCredentialsError if authentication failed.
     #
     # returns Spaceship::Client
     def login(username, password)
@@ -60,9 +60,10 @@ module Spaceship
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
         return @client
+      else
+        # User Credentials are wrong
+        raise InvalidUserCredentialsError.new(response)
       end
-
-      raise NotAuthenticatedError.new(response)
     end
 
     def session?
