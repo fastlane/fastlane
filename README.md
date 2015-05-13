@@ -73,6 +73,8 @@ Here is a nice gif, that shows ```frameit``` in action:
 
 ![assets/MacExample.png](assets/MacExample.png?raw=1)
 
+<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
+
 # Installation
 
 Make sure, you have the commandline tools installed
