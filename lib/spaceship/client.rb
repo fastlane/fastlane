@@ -86,7 +86,7 @@ module Spaceship
 
     def teams
       request(:post, 'account/listTeams.action')
-      return_response('teams')
+      parse_response('teams')
     end
 
     def team_id
@@ -104,7 +104,7 @@ module Spaceship
         pageSize: 500,
         sort: 'name=asc'
       })
-      return_response('appIds')
+      parse_response('appIds')
     end
 
     def create_app(type, name, bundle_id)
@@ -134,59 +134,54 @@ module Spaceship
       params.merge!(ident_params)
 
       request(:post, 'account/ios/identifiers/addAppId.action', params)
-      return_response('appId')
+      parse_response('appId')
     end
-
-    #this might be nice to have
-    #def validate_app(same params as above)
-    #account/ios/identifiers/validateAppId.action
-    #end
 
     def delete_app(app_id)
       request(:post, 'account/ios/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
       })
-      return_response
+      parse_response
     end
 
     def devices
-      response = request(:post, 'account/ios/device/listDevices.action', {
+      request(:post, 'account/ios/device/listDevices.action', {
         teamId: team_id,
         pageNumber: 1,
         pageSize: 500,
         sort: 'name=asc'
       })
-      response.body['devices']
+      parse_response('devices')
     end
 
     def certificates(types)
-      response = request(:post, 'account/ios/certificate/listCertRequests.action', {
+      request(:post, 'account/ios/certificate/listCertRequests.action', {
         teamId: team_id,
         types: types.join(','),
         pageNumber: 1,
         pageSize: 500,
         sort: 'certRequestStatusCode=asc'
       })
-      response.body['certRequests']
+      parse_response('certRequests')
     end
 
     def create_certificate(type, csr, app_id = nil)
-      response = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
         type: type,
         csrContent: csr,
         appIdId: app_id  #optional
       })
-      response.body['certRequest']
+      parse_response('certRequest')
     end
 
     def download_certificate(certificate_id, type)
-      response = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
+      request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
         displayId: certificate_id,
         type: type
       })
-      response.body
+      parse_response
     end
 
     def revoke_certificate(certificate_id, type)
@@ -195,7 +190,7 @@ module Spaceship
         certificateId: certificate_id,
         type: type
       })
-      return_response('certRequests')
+      parse_response('certRequests')
     end
 
     def provisioning_profiles
@@ -208,7 +203,7 @@ module Spaceship
         pageNumber: 1,
         sort: 'name=asc'
       })
-      return_response('provisioningProfiles')
+      parse_response('provisioningProfiles')
     end
 
     def provisioning_profile(profile_id)
@@ -218,7 +213,7 @@ module Spaceship
         onlyCountLists: true,
         provisioningProfileId: profile_id
       })
-      return_response('provisioningProfile')
+      parse_response('provisioningProfile')
     end
 
     def create_provisioning_profile(name, distribution_method, app_id, certificate_ids, device_ids)
@@ -230,23 +225,23 @@ module Spaceship
         certificateIds: certificate_ids,
         deviceIds: device_ids,
       })
-      return_response('provisioningProfile')
+      parse_response('provisioningProfile')
     end
 
     def download_provisioning_profile(profile_id)
-      response = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
+      request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
         teamId: team_id,
         displayId: profile_id
       })
-      response.body
+      parse_response
     end
 
     def delete_provisioning_profile(profile_id)
-      response = request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
+      request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id
       })
-      response.body
+      parse_response
     end
 
     private
@@ -271,7 +266,7 @@ module Spaceship
         @last_response = @client.send(method, url_or_path, params, headers, &block)
       end
 
-      def return_response(expected_key)
+      def parse_response(expected_key)
         content = @last_response.body[expected_key]
         if content.nil?
           raise UnexpectedResponse.new(@last_response.body)
