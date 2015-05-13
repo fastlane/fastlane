@@ -7,20 +7,6 @@ if ENV['DEBUG']
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
-module FaradayMiddleware
-  class PlistMiddleware < ResponseMiddleware
-    dependency do
-      require 'plist' unless defined?(::Plist)
-    end
-
-    define_parser do |body|
-      Plist::parse_xml(body)
-    end
-  end
-end
-
-Faraday::Response.register_middleware(:plist => FaradayMiddleware::PlistMiddleware)
-
 module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
@@ -41,7 +27,6 @@ module Spaceship
       @client = Faraday.new("https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/") do |c|
         c.response :json, :content_type => /\bjson$/
         c.response :xml, :content_type => /\bxml$/
-        c.response :plist, :content_type => /\bplist$/
         c.request :url_encoded
         c.adapter Faraday.default_adapter #can be Excon
 
