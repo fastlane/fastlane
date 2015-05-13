@@ -61,20 +61,6 @@ Here is a nice gif, that shows ```frameit``` in action:
 
 ![assets/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
 
-### Results
-
-![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png?raw=1)
-
--------
-
-![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
-
--------
-
-![assets/MacExample.png](assets/MacExample.png?raw=1)
-
-<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
-
 # Installation
 
 Make sure, you have the commandline tools installed
