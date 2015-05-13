@@ -8,7 +8,7 @@ module Fastlane
         platform == :ios
       end
 
-      def self.is_svn?()
+      def self.is_svn?
         begin
           Actions.sh 'svn info'
           return true
@@ -26,7 +26,7 @@ module Fastlane
         end
       end
 
-      def self.is_git_svn?()
+      def self.is_git_svn?
         begin
           Actions.sh 'git svn info'
           return true
