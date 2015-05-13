@@ -1,6 +1,8 @@
 module Frameit
   class DependencyChecker
     def self.check_dependencies
+      return if Helper.is_test?
+      
       self.check_image_magick
     end
 
