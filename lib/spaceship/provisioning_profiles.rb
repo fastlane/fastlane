@@ -54,7 +54,7 @@ module Spaceship
       @profiles << self.class.factory(profile)
     end
 
-    def file(bundle_id)
+    def download(bundle_id)
       profile = find_by_bundle_id(bundle_id)
       client.download_provisioning_profile(profile.id)
     end

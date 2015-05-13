@@ -21,19 +21,20 @@ module Spaceship
 
     #these certs are not associated with apps
     class Development < Certificate; end
-    class AppStore < Certificate; end
+    class Production < Certificate; end
 
     #all these certs have apps.
-    class DevelopmentPush < Certificate; end
-    class ProductionPush < Certificate; end
-    class WebsitePush < Certificate; end
-    class VoIPPush < Certificate; end
+    class PushCertificate < Certificate; end  #abstract class
+    class DevelopmentPush < PushCertificate; end
+    class ProductionPush < PushCertificate; end
+    class WebsitePush < PushCertificate; end
+    class VoIPPush < PushCertificate; end
     class Passbook < Certificate; end
     class ApplePay < Certificate; end
 
     CERTIFICATE_TYPE_IDS = {
       "5QPB9NHCEI" => Development,
-      "R58UK2EWSO" => AppStore,
+      "R58UK2EWSO" => Production,
       "9RQEK7MSXA" => Certificate,
       "LA30L5BJEU" => Certificate,
       "BKLRAVXMGM" => DevelopmentPush,
@@ -96,7 +97,7 @@ module Spaceship
     end
     alias [] find
 
-    def file(cert_id)
+    def download(cert_id)
       cert = find(cert_id)
       file = client.download_certificate(cert.id, cert.type_display_id)
       OpenSSL::X509::Certificate.new(file)
