@@ -1,6 +1,7 @@
 require 'faraday' # HTTP Client
 require 'faraday_middleware'
 require 'faraday_middleware/response_middleware'
+require 'spaceship/helper/team_selection'
 
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
@@ -59,6 +60,9 @@ module Spaceship
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
+
+        current_team_id =team_selection(teams) # this will do nothing if the 
+        
         return @client
       else
         # User Credentials are wrong
@@ -76,7 +80,7 @@ module Spaceship
     end
 
     def team_id
-      @current_team_id ||= teams[0]['teamId']
+      @current_team_id
     end
 
     def current_team_id=(team_id)
