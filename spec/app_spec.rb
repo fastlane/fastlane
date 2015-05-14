@@ -1,17 +1,16 @@
 require 'spec_helper'
 
-describe Spaceship::Apps do
-  subject { Spaceship.apps }
+describe Spaceship::App do
   before { Spaceship.login }
-  let(:client) { subject.client }
+  let(:client) { Spaceship::App.client }
 
   describe "successfully loads and parses all apps" do
     it "the number is correct" do
-      expect(subject.count).to eq(5)
+      expect(Spaceship::App.all.count).to eq(5)
     end
 
     it "parses app correctly" do
-      app = subject.first
+      app = Spaceship::App.all.first
 
       expect(app.app_id).to eq("B7JBD8LHAA")
       expect(app.name).to eq("The App Name")
@@ -22,7 +21,7 @@ describe Spaceship::Apps do
     end
 
     it "parses wildcard apps correctly" do
-      app = subject.last
+      app = Spaceship::App.all.last
 
       expect(app.app_id).to eq("L42E9BTRAA")
       expect(app.name).to eq("SunApps")
@@ -37,19 +36,19 @@ describe Spaceship::Apps do
   describe "Filter app based on app identifier" do
 
     it "works with specific App IDs" do
-      app = subject.find("net.sunapps.151")
+      app = Spaceship::App.find("net.sunapps.151")
       expect(app.app_id).to eq("B7JBD8LHAA")
       expect(app.is_wildcard).to eq(false)
     end
 
     it "works with wilcard App IDs" do
-      app = subject.find("net.sunapps.*")
+      app = Spaceship::App.find("net.sunapps.*")
       expect(app.app_id).to eq("L42E9BTRAA")
       expect(app.is_wildcard).to eq(true)
     end
 
     it "returns nil app ID wasn't found" do
-      expect(subject.find("asdfasdf")).to be_nil
+      expect(Spaceship::App.find("asdfasdf")).to be_nil
     end
   end
 
@@ -58,7 +57,7 @@ describe Spaceship::Apps do
       expect(client).to receive(:create_app).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app') {
         {'isWildCard' => true}
       }
-      app = subject.create('tools.fastlane.spaceship.some-explicit-app', 'Production App')
+      app = Spaceship::App.create('tools.fastlane.spaceship.some-explicit-app', 'Production App')
       expect(app.is_wildcard).to eq(true)
     end
 
@@ -66,21 +65,17 @@ describe Spaceship::Apps do
       expect(client).to receive(:create_app).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*') {
         {'isWildCard' => false}
       }
-      app = subject.create('tools.fastlane.spaceship.*', 'Development App')
+      app = Spaceship::App.create('tools.fastlane.spaceship.*', 'Development App')
       expect(app.is_wildcard).to eq(false)
     end
   end
 
   describe '#delete' do
+    subject { Spaceship::App.find("net.sunapps.151") }
     it 'deletes the app by a given bundle_id' do
       expect(client).to receive(:delete_app).with('B7JBD8LHAA')
-      app = subject.delete('net.sunapps.151')
+      app = subject.delete
       expect(app.app_id).to eq('B7JBD8LHAA')
-    end
-
-    it 'returns nil if the given bundle_id is not a valid app' do
-      expect(client).to_not receive(:delete_app)
-      expect(subject.delete('net.sunapps.XXX')).to eq(nil)
     end
   end
 end

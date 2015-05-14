@@ -21,16 +21,17 @@ def stub_login
 end
 
 def stub_provisioning
-  stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action").
-    with(:body => "teamId=5A997XSHAA",
-         :headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developerservices2.apple.com:443'}).
-    to_return(:status => 200, :body => read_fixture_file( "list_provisioning_profiles.plist"), :headers => {})
-  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=7EKAHRBJ99").
-    with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developer.apple.com:443'}).
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action").
+    with(:body => {"includeInactiveProfiles"=>"true", "onlyCountLists"=>"true", "pageNumber"=>"1", "pageSize"=>"500", "search"=>"", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"},
+         :headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.json'), :headers => {'Content-Type' => 'application/json'})
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+    with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('getProvisioningProfile.action.json'), :headers => {'Content-Type' => 'application/json'})
+
+  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=RB2R97WA9W&teamId=XXXXXXXXXX").
+    with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file( "downloaded_provisioning_profile.mobileprovision"), :headers => {})
-  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action?teamId=5A997XSHAA").
-    with(:headers => {'Cookie'=>'myacinfo=abcdef', 'Host'=>'developer.apple.com:443'}).
-    to_return(:status => 200, :body => "", :headers => {csrf: "csrc", csrf_ts: "csrf_ts"})
 
   # Create Profiles
 

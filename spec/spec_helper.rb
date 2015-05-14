@@ -1,5 +1,6 @@
 require 'spaceship'
 require 'spaceship_stubbing'
+require 'plist'
 require 'pry'
 
 require 'coveralls'
