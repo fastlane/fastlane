@@ -11,7 +11,7 @@ module Spaceship
       end
 
       ##
-      # bang method since it
+      # bang method since it changes the parameter in-place
       def remap_keys!(attrs)
         return if @attr_mapping.nil?
 
