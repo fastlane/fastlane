@@ -5,11 +5,11 @@ describe Spaceship::ProvisioningProfiles do
   subject { Spaceship.provisioning_profiles }
 
   it "downloads an existing provisioning profile" do
-    path = @client.fetch_provisioning_profile('net.sunapps.9', 'store').download
+    file = subject.find{|profile| profile. }.download
 
     # File is correct
-    expect(path).to eq("/tmp/net.sunapps.9.store.mobileprovision")
-    xml = Plist::parse_xml(File.read(path))
+    #expect(path).to eq("/tmp/net.sunapps.9.store.mobileprovision")
+    xml = Plist::parse_xml(file)
     expect(xml['AppIDName']).to eq("SunApp Setup")
     expect(xml['TeamName']).to eq("SunApps GmbH")
   end
@@ -48,9 +48,9 @@ describe Spaceship::ProvisioningProfiles do
     }.to raise_exception("Invalid distribution_method 'invalid_parameter'".red)
   end
 
-  describe "Create a new profile" do
-    before do
-      ENV.delete "SIGH_PROVISIONING_PROFILE_NAME"
+  describe '#create' do
+    it 'creates a new profivisioning profile' do
+      subject.create('limited', 'Delete Me', 'tools.fastlane.apps')
     end
 
     # TODO: Fix test after configuration was finished

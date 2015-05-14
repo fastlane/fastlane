@@ -2,7 +2,7 @@ require 'spaceship/version'
 require 'fastlane_core'
 require 'spaceship/client'
 require 'spaceship/profile_types'
-require 'spaceship/apps'
+require 'spaceship/app'
 require 'spaceship/certificates'
 require 'spaceship/devices'
 require 'spaceship/provisioning_profiles'
@@ -19,7 +19,7 @@ module Spaceship
     end
 
     def apps
-      Apps.new(client)
+      App.all
     end
 
     def certificates
@@ -31,7 +31,7 @@ module Spaceship
     end
 
     def provisioning_profiles
-      ProvisioningProfiles.new(client)
+      ProvisioningProfile.all
     end
   end
 

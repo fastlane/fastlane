@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastlane_core', '>= 0.5.0' # all shared code and dependencies
   spec.add_dependency 'multi_xml', '~> 0.5'
+  spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'faraday', '~> 0.9'
   spec.add_dependency 'faraday_middleware', '~> 0.9'
 
