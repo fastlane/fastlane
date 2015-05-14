@@ -2,11 +2,6 @@
 
 $:.push File.expand_path("../../lib", __FILE__)
 
-# TODO: To remove
-# ENV['https_proxy'] = "https://127.0.0.1:8888"
-# require 'excon'
-# Excon.ssl_verify_peer = false
-
 require 'spaceship'
 require 'commander'
 
