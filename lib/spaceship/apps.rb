@@ -25,8 +25,11 @@ module Spaceship
       @apps = client.apps.map {|app| self.class.factory(app) }
     end
 
-    #if bundle_id ends with '*' then it is a wildcard id
-    #otherwise, it is an explicit id
+    # Creates a new App ID on the Apple Dev Portal
+    # @param bundle_id [String] the bundle id of the app associated with this provisioning profile
+    # @param name [String] the name of the App
+    # if bundle_id ends with '*' then it is a wildcard id
+    # otherwise, it is an explicit id
     def create(bundle_id, name)
       if bundle_id.end_with?('*')
         type = :wildcard
