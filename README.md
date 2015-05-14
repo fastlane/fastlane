@@ -101,7 +101,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-If you want to take a look at a project, already using `fastlane`, check out the [fastlane-example project](https://github.com/krausefx/fastlane-example), or [Eidolon by Artsy](https://github.com/artsy/eidolon).
+If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
 
 ## Quick Start
 
