@@ -62,15 +62,15 @@ module Spaceship
     ##
     # Creates a new provisioning profile
     #
-    # @param klass [Spaceship::ProvisioningProfiles::Profile] the class of the profile to create. Must be a `Development`, `AppStore`, or `AdHoc`
+    # @param type [Spaceship::ProvisioningProfiles::Profile] the class of the profile to create. Must be a `Development`, `AppStore`, or `AdHoc`
     # @param name [String] the name of the provisioning profile
     # @param bundle_id [String] the bundle id of the app associated with this provisioning profile
     # @param certificate [Spaceship::Certificates::Certificate] an instance of a certificate used for the provisioning profile. Either `Production` or `Development`
     #
     # @return [Spaceship::ProvisioningProfiles::Profile] the newly created provisioning profile
-    def create(klass: nil, name: nil, bundle_id: nil, certificate: nil, devices: nil)
+    def create(type: nil, name: nil, bundle_id: nil, certificate: nil, devices: nil)
       app = Spaceship.apps.find(bundle_id)
-      profile = client.create_provisioning_profile(name, klass.type, app.app_id, [certificate.id], devices)
+      profile = client.create_provisioning_profile(name, type.type, app.app_id, [certificate.id], devices)
       @profiles << self.class.factory(profile)
     end
 
