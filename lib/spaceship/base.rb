@@ -6,6 +6,8 @@ module Spaceship
         @@client ||= Spaceship.client
       end
 
+      ##
+      # this operation is not thread-safe
       def client=(client)
         @@client = client
       end
@@ -13,15 +15,19 @@ module Spaceship
       ##
       # bang method since it changes the parameter in-place
       def remap_keys!(attrs)
-        return if @attr_mapping.nil?
+        return if attr_mapping.nil?
 
         @attr_mapping.each do |from, to|
           attrs[to] = attrs.delete(from)
         end
       end
 
-      def attr_mapping(attrs)
-        @attr_mapping = attrs
+      def attr_mapping(attrs = nil)
+        if attrs
+          @attr_mapping = attrs
+        else
+          @attr_mapping ||= ancestors[1].attr_mapping rescue nil
+        end
       end
     end
 

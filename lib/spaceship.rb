@@ -4,7 +4,7 @@ require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/profile_types'
 require 'spaceship/app'
-require 'spaceship/certificates'
+require 'spaceship/certificate'
 require 'spaceship/devices'
 require 'spaceship/provisioning_profile'
 
@@ -24,7 +24,7 @@ module Spaceship
     end
 
     def certificates
-      Certificates.new(client)
+      Certificate.all
     end
 
     def devices

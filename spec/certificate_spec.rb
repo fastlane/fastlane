@@ -1,17 +1,16 @@
 require 'spec_helper'
 
-describe Spaceship::Certificates do
+describe Spaceship::Certificate do
   before { Spaceship.login }
-  subject { Spaceship.certificates }
-  let(:client) { Spaceship.client }
+  let(:client) { Spaceship::Certificate.client }
 
   describe "successfully loads and parses all certificates" do
     it "the number is correct" do
-      expect(subject.count).to eq(3)
+      expect(Spaceship::Certificate.all.count).to eq(3)
     end
 
     it "parses code signing identities correctly" do
-      cert = subject.first
+      cert = Spaceship::Certificate.all.first
 
       expect(cert.id).to eq('XC5PH8DAAA')
       expect(cert.name).to eq('SunApps GmbH')
@@ -25,7 +24,7 @@ describe Spaceship::Certificates do
     end
 
     it "parses push certificates correctly" do
-      push = subject['32KPRBAAAA'] # that's the push certificate
+      push = Spaceship::Certificate.find('32KPRBAAAA') # that's the push certificate
 
       expect(push.id).to eq('32KPRBAAAA')
       expect(push.name).to eq('net.sunapps.54')
@@ -40,7 +39,7 @@ describe Spaceship::Certificates do
   end
 
   it "Correctly filters the listed certificates" do
-    certs = Spaceship::Certificates.new(client, [Spaceship::Client::ProfileTypes::SigningCertificate.development])
+    certs = Spaceship::Certificate::Development.all
     expect(certs.count).to eq(1)
 
     cert = certs.first
@@ -56,18 +55,18 @@ describe Spaceship::Certificates do
   end
 
   describe '#download' do
-    let(:cert) { subject.first }
+    let(:cert) { Spaceship::Certificate.all.first }
     it 'downloads the associated .cer file' do
-      x509 = OpenSSL::X509::Certificate.new(subject.download(cert.id))
+      x509 = OpenSSL::X509::Certificate.new(cert.download)
       expect(x509.issuer.to_s).to match('Apple Worldwide Developer Relations')
     end
   end
 
   describe '#revoke' do
-    let(:cert) { subject.first }
+    let(:cert) { Spaceship::Certificate.all.first }
     it 'revokes certificate by the given cert id' do
       expect(client).to receive(:revoke_certificate).with('XC5PH8DAAA', 'R58UK2EAAA')
-      subject.revoke(cert.id)
+      cert.revoke
     end
   end
 
@@ -76,13 +75,8 @@ describe Spaceship::Certificates do
       expect(client).to receive(:create_certificate).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
       }
-      certificate = nil
-
-      expect {
-        certificate = subject.create(Spaceship::Certificates::ProductionPush, Spaceship::Certificates.certificate_signing_request.first, 'net.sunapps.151')
-      }.to change(subject, :count).by(+1)
-
-      expect(certificate).to be_instance_of(Spaceship::Certificates::ProductionPush)
+      certificate = Spaceship::Certificate::ProductionPush.create(Spaceship::Certificate.certificate_signing_request.first, 'net.sunapps.151')
+      expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
     end
   end
 end
