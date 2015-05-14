@@ -21,6 +21,7 @@ module Frameit
         screenshots.each do |full_path|
           next if full_path.include?"_framed.png"
           next if full_path.include?".itmsp/" # a package file, we don't want to modify that
+          next if full_path.include?"device_frames/" # these are the device frames the user is using
           
           begin
             screenshot = Screenshot.new(full_path, color)
