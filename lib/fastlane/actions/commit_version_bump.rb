@@ -67,9 +67,14 @@ module Fastlane
 
         # then create a commit with a message
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
-        Actions.sh("git commit -m '#{params[:message]}'")
 
-        Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
+        begin
+          Actions.sh("git commit -m '#{params[:message]}'")
+
+          Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
+        rescue => ex
+          Helper.log.info "Didn't commit any changes.".yellow
+        end
       end
 
       def self.description
