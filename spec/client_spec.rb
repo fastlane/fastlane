@@ -96,7 +96,7 @@ describe Spaceship::Client do
     end
     describe '#revoke_certificate' do
       it 'makes a revoke request and returns the revoked certificate' do
-        response = subject.revoke_certificate('WHT3M5V55A', '3BQKVH9I2X')
+        response = subject.revoke_certificate('XC5PH8DAAA', 'R58UK2EAAA')
         expect(response.first.keys).to include('certificateId', 'certificateType', 'certificate')
       end
     end

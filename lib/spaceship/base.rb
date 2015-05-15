@@ -31,7 +31,7 @@ module Spaceship
       end
     end
 
-    def initialize(attrs)
+    def initialize(attrs = {})
       self.class.remap_keys!(attrs)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")

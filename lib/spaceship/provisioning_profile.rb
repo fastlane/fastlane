@@ -17,9 +17,13 @@ module Spaceship
     })
 
     class << self
-      def create(type: nil, name: nil, bundle_id: nil, certificate: nil, devices: [])
-        app = Spaceship.apps.find(bundle_id)
-        profile = client.create_provisioning_profile(name, type.type, app.app_id, [certificate.id], devices.map{|d| d.id})
+      def type
+        raise "You cannot create a ProvisioningProfile without a type. Use a subclass."
+      end
+
+      def create(name: nil, bundle_id: nil, certificate: nil, devices: [])
+        app = Spaceship::App.find(bundle_id)
+        profile = client.create_provisioning_profile(name, self.type, app.app_id, [certificate.id], devices.map{|d| d.id})
         self.new(profile)
       end
 
@@ -59,7 +63,7 @@ module Spaceship
     end
 
     def app
-      @app ||= Spaceship::App.new(client.provisioning_profile(profile.id)['appId'])
+      @app ||= Spaceship::App.new(client.provisioning_profile(self.id)['appId'])
     end
 
     def managed_by_xcode?
