@@ -30,13 +30,18 @@ module Deliver
           run_unit_tests
           fetch_app_key_information
           fetch_information_from_ipa_file
+
+          create_app # we need it here already for the get_latest_version
+          @app_version ||= get_latest_version
           verify_ipa_file
         else
           fetch_app_key_information
-          @app_version ||= ask("Which version number should be updated? ")
           @app_identifier ||= ask("App Identifier (e.g. com.krausefx.app): ")
+
+          create_app # we need it here already for the get_latest_version
+          @app_version ||= get_latest_version || ask("Which version number should be updated? ")
         end
-        create_app
+        create_app # just to be sure
 
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
@@ -126,8 +131,16 @@ module Deliver
     def fetch_app_key_information
       @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
+      fetch_app_identifier_from_app_file
     end
 
+    # returns the latest app version from iTunes Connect
+    def get_latest_version
+      data = itc.get_app_information(@app)
+      return (data['version']['value'] rescue nil)
+    rescue
+      return nil
+    end
 
     def fetch_information_from_ipa_file
       used_ipa_file = ENV["IPA_OUTPUT_PATH"]# if (ENV["IPA_OUTPUT_PATH"] and File.exists?(ENV["IPA_OUTPUT_PATH"]))
@@ -176,7 +189,7 @@ module Deliver
     end
 
     def fetch_app_identifier_from_app_file
-      @app_identifier = (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
+      @app_identifier ||= (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
     end
 
     def verify_ipa_file
@@ -334,9 +347,12 @@ module Deliver
       raise "Error uploading app metadata".red unless result == true
     end
 
+    def itc
+      @itc ||= ItunesConnect.new
+    end
+
     def additional_itc_information
       # e.g. rating or copyright
-      itc = ItunesConnect.new
       itc.set_copyright!(@app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
       itc.set_app_review_information!(@app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
       itc.set_release_after_approval!(@app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE] != nil
