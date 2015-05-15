@@ -141,6 +141,12 @@ Usually you'll use fastlane by triggering individual lanes:
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 
+## Statistics
+
+`fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer) and is available publicly.
+
+You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`.
+
 ## Credentials
 A detailed description about how ```fastlane``` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 

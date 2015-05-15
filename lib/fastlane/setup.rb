@@ -39,8 +39,8 @@ module Fastlane
     end
 
     def show_analytics
-      Helper.log.info "fastlane will send the number of crashes for each action to"
-      Helper.log.info "https://github.com/fastlane/enhancer to fix failing integrations"
+      Helper.log.info "fastlane will send the number of errors for each action to"
+      Helper.log.info "https://github.com/fastlane/enhancer to detect integration issues"
       Helper.log.info "No sensitive/private information will be uploaded"
       Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
