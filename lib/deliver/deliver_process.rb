@@ -229,7 +229,7 @@ module Deliver
       
       if screens_path
         # Not using Snapfile. Not a good user.
-        if not @app.metadata.set_all_screenshots_from_path(screens_path)
+        if not @app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
           # This path does not contain folders for each language
           if screens_path.kind_of?String
             if @deploy_information[Deliverer::ValKey::DEFAULT_LANGUAGE]
@@ -240,9 +240,16 @@ module Deliver
               screens_path = nil
             end
           end
-          @app.metadata.set_screenshots_for_each_language(screens_path) if screens_path
+          @app.metadata.set_screenshots_for_each_language(screens_path, use_framed_screenshots?) if screens_path
         end
       end
+    end
+
+    # Should _framed screenshots be used for the screenshot upload?
+    # This will only be true if there is a Framefile, as this makes the screenshots valid
+    # since the resolution is only correct when using a background + title using frameit 2.0
+    def use_framed_screenshots?
+      return Dir["../**/Framefile.json"].count > 0
     end
 
     def verify_pdf_file
