@@ -31,17 +31,14 @@ module Deliver
           fetch_app_key_information
           fetch_information_from_ipa_file
 
-          create_app # we need it here already for the get_latest_version
           @app_version ||= get_latest_version
           verify_ipa_file
         else
           fetch_app_key_information
           @app_identifier ||= ask("App Identifier (e.g. com.krausefx.app): ")
-
-          create_app # we need it here already for the get_latest_version
           @app_version ||= get_latest_version || ask("Which version number should be updated? ")
         end
-        create_app # just to be sure
+        create_app
 
         Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
 
@@ -106,6 +103,7 @@ module Deliver
     # Is the app already ready for sale?
     # if so, we can't update the app metadata: http://www.openradar.appspot.com/18263306
     def ready_for_sale?
+      return false if Helper.is_test?
       return @ready if @checked_for_ready
 
       @checked_for_ready = true
@@ -136,7 +134,9 @@ module Deliver
 
     # returns the latest app version from iTunes Connect
     def get_latest_version
-      data = itc.get_app_information(@app)
+      return nil if Helper.is_test?
+
+      data = itc.get_app_information(Deliver::App.new(app_identifier: @app_identifier))
       return (data['version']['value'] rescue nil)
     rescue
       return nil
@@ -280,17 +280,22 @@ module Deliver
       @app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER]) if @deploy_information[Deliverer::ValKey::PRICE_TIER]
     end
 
+    def screenshots_path
+      return @screens_path if @screens_path
 
-    def set_screenshots
-      screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
-
+      @screens_path = @deploy_information[Deliverer::ValKey::SCREENSHOTS_PATH]
       if (ENV["DELIVER_SCREENSHOTS_PATH"] || '').length > 0
-        Helper.log.warn "Overwriting screenshots path from config (#{screens_path}) with (#{ENV["DELIVER_SCREENSHOTS_PATH"]})".yellow
-        screens_path = ENV["DELIVER_SCREENSHOTS_PATH"]
+        Helper.log.warn "Overwriting screenshots path from config (#{@screens_path}) with (#{ENV["DELIVER_SCREENSHOTS_PATH"]})".yellow
+        @screens_path = ENV["DELIVER_SCREENSHOTS_PATH"]
       end
 
-      screens_path ||= "./screenshots/" # default value
-      
+      @screens_path ||= "./screenshots/" # default value
+
+      return @screens_path
+    end
+
+    def set_screenshots
+      screens_path = screenshots_path
       if screens_path
         # Not using Snapfile. Not a good user.
         if not @app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
@@ -313,7 +318,7 @@ module Deliver
     # This will only be true if there is a Framefile, as this makes the screenshots valid
     # since the resolution is only correct when using a background + title using frameit 2.0
     def use_framed_screenshots?
-      return Dir["../**/Framefile.json"].count > 0
+      return Dir[screenshots_path + "**/Framefile.json"].count > 0
     end
 
     def verify_pdf_file
