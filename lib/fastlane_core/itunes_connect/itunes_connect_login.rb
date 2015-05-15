@@ -39,7 +39,7 @@ module FastlaneCore
 
       begin
         (wait_for_elements(".enabled").first.click rescue nil) # Login Button
-        wait_for_elements('.homepageWrapper.ng-scope')
+        wait_for_elements('.ng-scope')
         
         if page.has_content?"My Apps"
           # Everything looks good
