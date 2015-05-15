@@ -19,6 +19,7 @@ module Fastlane
         ask_to_enable_other_tools
         FileUtils.mkdir(File.join(folder, 'actions'))
         generate_fastfile
+        show_analytics
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue Exception => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
@@ -33,8 +34,15 @@ module Fastlane
       Helper.log.info 'This setup will help you get up and running in no time.'.green
       Helper.log.info 'First, it will move the config files from `deliver` and `snapshot`'.green
       Helper.log.info "into the subfolder `fastlane`.\n".green
-      Helper.log.info "Fastlane will check what tools you're already using and set up".green
+      Helper.log.info "fastlane will check what tools you're already using and set up".green
       Helper.log.info 'the tool automatically for you. Have fun! '.green
+    end
+
+    def show_analytics
+      Helper.log.info "fastlane will send the number of crashes for each action to"
+      Helper.log.info "https://github.com/fastlane/enhancer to fix failing integrations"
+      Helper.log.info "No sensitive/private information will be uploaded"
+      Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
 
     def files_to_copy
