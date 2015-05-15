@@ -254,8 +254,10 @@ I'll try to keep the script up to date. If you need to change the iOS version, y
 ios_version "9.0"
 ```
 
-### Html Title
+### HTML Title
+
 If you want to change the title of the generated HTML page, you can use:
+
 ```ruby
 html_title 'Example'
 ```
