@@ -81,7 +81,7 @@ module Fastlane
         exit_status = nil
         status = IO.popen(command, err: [:child, :out]) do |io|
           io.each do |line|
-            Helper.log.info ['[SHELL OUTPUT]', line.strip].join(': ')
+            Helper.log.info ['[SHELL]', line.strip].join(': ')
             result << line
           end
           io.close
