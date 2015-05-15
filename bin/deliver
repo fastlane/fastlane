@@ -28,7 +28,21 @@ class FastlaneApplication
       c.syntax = 'deliver'
       c.description = 'Run a deploy process using the Deliverfile in the current folder'
       c.action do |args, options|
-        path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
+        run_deliver(options)
+      end
+    end
+
+    command :upload_metadata do |c|
+      c.syntax = 'deliver upload_metadata'
+      c.description = "Uploads new app metadata only. No binary will be uploaded"
+      c.action do |args, options|
+        ENV["DELIVER_SKIP_BINARY"] = "1"
+        run_deliver(options)
+      end
+    end
+
+    def run_deliver(options)
+      path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
           if File.exists?(deliver_path)
             # Everything looks alright, use the given Deliverfile
@@ -41,7 +55,6 @@ class FastlaneApplication
             end
           end
         end
-      end
     end
 
     command :init do |c|
