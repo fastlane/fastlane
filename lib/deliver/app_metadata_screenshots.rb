@@ -101,7 +101,9 @@ module Deliver
     #
     # This will also clear all existing screenshots before setting the new ones.
     # @param (Hash) hash A hash containing a different path for each locale ({FastlaneCore::Languages::ALL_LANGUAGES})
-    def set_screenshots_for_each_language(hash)
+    # @param (Bool) Use the framed screenshots? Only use it if you use frameit 2.0
+
+    def set_screenshots_for_each_language(hash, use_framed = false)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
 
       hash.each do |language, current_path|
@@ -117,7 +119,11 @@ module Deliver
           self.clear_all_screenshots(language)
 
           Dir.glob(resulting_path, File::FNM_CASEFOLD).sort.each do |path|
-            next if path.include?"_framed."
+            if use_framed
+              next unless path.include?"_framed."
+            else
+              next if path.include?"_framed."
+            end
 
             begin
               add_screenshot(language, Deliver::AppScreenshot.new(path))
@@ -134,7 +140,8 @@ module Deliver
     # This method will run through all the available locales, check if there is
     # a folder for this language (e.g. 'en-US') and use all screenshots in there
     # @param (String) path A path to the folder, which contains a folder for each locale
-    def set_all_screenshots_from_path(path)
+    # @param (Bool) Use the framed screenshots? Only use it if you use frameit 2.0
+    def set_all_screenshots_from_path(path, use_framed = false)
       raise AppMetadataParameterError.new("Parameter needs to be a path (string)") unless path.kind_of?String
 
       found = false
@@ -144,7 +151,7 @@ module Deliver
           found = true
           set_screenshots_for_each_language({
             language => full_path
-          })
+          }, use_framed)
         end
       end
       return found

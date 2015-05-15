@@ -280,7 +280,7 @@ module Deliver
       
       if screens_path
         # Not using Snapfile. Not a good user.
-        if not @app.metadata.set_all_screenshots_from_path(screens_path)
+        if not @app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
           # This path does not contain folders for each language
           if screens_path.kind_of?String
             if @deploy_information[Deliverer::ValKey::DEFAULT_LANGUAGE]
@@ -291,9 +291,16 @@ module Deliver
               screens_path = nil
             end
           end
-          @app.metadata.set_screenshots_for_each_language(screens_path) if screens_path
+          @app.metadata.set_screenshots_for_each_language(screens_path, use_framed_screenshots?) if screens_path
         end
       end
+    end
+
+    # Should _framed screenshots be used for the screenshot upload?
+    # This will only be true if there is a Framefile, as this makes the screenshots valid
+    # since the resolution is only correct when using a background + title using frameit 2.0
+    def use_framed_screenshots?
+      return Dir["../**/Framefile.json"].count > 0
     end
 
     def verify_pdf_file
@@ -302,21 +309,21 @@ module Deliver
       else
         # Everything is prepared for the upload
         # We may have to ask the user if that's okay
-        pdf_path = PdfGenerator.new.render(self)
+        html_path = HtmlGenerator.new.render(self)
         unless Helper.is_test?
           puts "----------------------------------------------------------------------------"
-          puts "Verifying the upload via the PDF file can be disabled by either adding"
+          puts "Verifying the upload via the HTML file can be disabled by either adding"
           puts "'skip_pdf true' to your Deliverfile or using the flag --force."
           puts "----------------------------------------------------------------------------"
 
-          system("open '#{pdf_path}'")
-          okay = agree("Does the PDF on path '#{pdf_path}' look okay for you? (blue = updated) (y/n)", true)
+          system("open '#{html_path}'")
+          okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
 
           unless okay
             dir ||= app.get_metadata_directory
             dir += "/#{app.apple_id}.itmsp"
             FileUtils.rm_rf(dir) unless Helper.is_test?
-            raise "Did not upload the metadata, because the PDF file was rejected by the user".yellow
+            raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
           end
         end
       end
