@@ -290,13 +290,13 @@ This project is well documented, check it out on [Rubydoc](http://www.rubydoc.in
 
 # Credentials
 
-A detailed description about your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/CredentialsManager).
 
 
 # Can I trust `deliver`? 
 ###How does this thing even work? Is magic involved? 🎩###
 
-`deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables.
+`deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/CredentialsManager))
 
 Before actually uploading anything to iTunes, ```deliver``` will generate a [PDF summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
 
