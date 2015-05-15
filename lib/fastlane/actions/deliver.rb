@@ -11,6 +11,7 @@ module Fastlane
 
         begin
           ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots if there
+          ENV['DELIVER_SKIP_BINARY'] = "1" if config[:metadata_only]
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
@@ -53,6 +54,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_deploy,
                                        env_name: "FL_DELIVER_SKIP_DEPLOY",
                                        description: "Skip the submission of the app - it will only be uploaded",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :metadata_only,
+                                       env_name: "DELIVER_SKIP_BINARY",
+                                       description: "Skip the binary upload and upload app metadata only",
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
