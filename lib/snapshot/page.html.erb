@@ -176,7 +176,7 @@
           overlay.style.display = "none";
         })
         
-      document.onkeypress = function(e) {
+      function keyPressed(e) {
         e = e || window.event;
         var charCode = e.keyCode || e.which;
         switch(charCode) {
@@ -196,9 +196,11 @@
           case 100:
             e.preventDefault();
             document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
+            doClick(imageDisplay);
             break;
          }
       };
+      document.body.addEventListener('keydown', keyPressed);
       </script>
   </body>
 </html>
