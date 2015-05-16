@@ -31,7 +31,7 @@ module Spaceship
       #     {...}
       #   ]
 
-      def team_selection
+      def select_team
         teams = client.teams
 
         raise "Your account is in no teams" if teams.count == 0
