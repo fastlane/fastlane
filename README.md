@@ -64,6 +64,20 @@ client is shared. Your credentials are not saved anywhere.
 Spaceship.login(username, password)
 ```
 
+### Multiple Teams
+
+Show a UI to the user:
+
+```ruby
+Spaceship.UI.select_team
+```
+
+Set a team manually
+
+```ruby
+Spaceship.client.current_team_id = "5A997XSHAA"
+```
+
 ### App Ids
 
 For instance, this is how you can list all of your app ids:
