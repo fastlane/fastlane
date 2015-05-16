@@ -15,8 +15,9 @@ module CredentialsManager
 
     # A singleton object, which also makes sure, to use the correct Apple ID
     # @param id_to_use (String) The Apple ID email address which should be used
-    def self.shared_manager(id_to_use = nil)
-      @@instance ||= PasswordManager.new(id_to_use)
+    # @param ask_if_missing (boolean) true by default: if no credentials are found, should the user be asked?
+    def self.shared_manager(id_to_use = nil, ask_if_missing = true)
+      @@instance ||= PasswordManager.new(id_to_use, ask_if_missing)
     end
 
     def self.logout
@@ -27,18 +28,21 @@ module CredentialsManager
     # 
     # This already check the Keychain if there is a username and password stored.
     # If that's not the case, it will ask for login data via stdin
-    # @param id_to_use (String) Apple ID (e.g. steve@apple.com) which should be used for this upload.
+    # @param id_to_use (String) Apple ID (e.g. user@apple.com) which should be used for this upload.
     #  if given, only the password will be asked/loaded.
-    def initialize(id_to_use = nil)
+    # @param ask_if_missing (boolean) true by default: if no credentials are found, should the user be asked?
+    def initialize(id_to_use = nil, ask_if_missing = true)
       
       self.username ||= id_to_use || ENV["DELIVER_USER"] || AppfileConfig.try_fetch_value(:apple_id) || load_from_keychain[0]
       self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
       if (self.username || '').length == 0 or (self.password || '').length == 0
-        puts "No username or password given. You can set environment variables:"
-        puts "DELIVER_USER, DELIVER_PASSWORD"
+        if ask_if_missing
+          puts "No username or password given. You can set environment variables:"
+          puts "DELIVER_USER, DELIVER_PASSWORD"
 
-        ask_for_login
+          ask_for_login
+        end
       end
     end
 
