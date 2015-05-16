@@ -94,7 +94,7 @@ app = Spaceship.apps.find('tools.fastlane.test-app')
 
 Creating an app:
 ```ruby
-Spaceship.apps.create('com.company.appname', 'Next Big App')
+Spaceship.apps.create!('com.company.appname', 'Next Big App')
 ```
 
 ### Certificates
@@ -119,7 +119,7 @@ Create a new certificate
 
 ```ruby
 csr = Spaceship::Certificates.certificate_signing_request
-Spaceship.certificates.create(Spaceship::Certificates::ProductionPush, csr, 'tools.fastlane.test-app')
+Spaceship.certificates.create!(Spaceship::Certificates::ProductionPush, csr, 'tools.fastlane.test-app')
 ```
 
 ### Provisioning Profiles
@@ -132,12 +132,12 @@ profiles = Spaceship.provisioning_profiles
 create a distribution provisioning profile for an app
 ```ruby
 production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certificates::Production)}.first
-Spaceship.provisioning_profiles.create(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
+Spaceship.provisioning_profiles.create!(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
 ```
 
 Named Parameters
 ```ruby
-Spaceship.provisioning_profiles.create(
+Spaceship.provisioning_profiles.create!(
     klass: Spaceship::ProvisioningProfiles::Development,
     name: "Spaceship",
     bundle_id: "net.sunapps.1",

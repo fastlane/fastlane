@@ -48,8 +48,8 @@ describe Spaceship::ProvisioningProfile do
   describe '#create' do
     let(:certificate) { Spaceship::Certificate.all.first }
     it 'creates a new profivisioning profile' do
-      expect(client).to receive(:create_provisioning_profile).with('Delete Me', 'limited', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
-      Spaceship::ProvisioningProfile::Development.create(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
+      Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
     # TODO: Fix test after configuration was finished

@@ -116,7 +116,7 @@ module Spaceship
       parse_response('appIds')
     end
 
-    def create_app(type, name, bundle_id)
+    def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym
       when :explicit
         {
@@ -146,7 +146,7 @@ module Spaceship
       parse_response('appId')
     end
 
-    def delete_app(app_id)
+    def delete_app!(app_id)
       request(:post, 'account/ios/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
@@ -175,7 +175,7 @@ module Spaceship
       parse_response('certRequests')
     end
 
-    def create_certificate(type, csr, app_id = nil)
+    def create_certificate!(type, csr, app_id = nil)
       request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
         type: type,
@@ -193,7 +193,7 @@ module Spaceship
       parse_response
     end
 
-    def revoke_certificate(certificate_id, type)
+    def revoke_certificate!(certificate_id, type)
       request(:post, 'account/ios/certificate/revokeCertificate.action', {
         teamId: team_id,
         certificateId: certificate_id,
@@ -225,7 +225,7 @@ module Spaceship
       parse_response('provisioningProfile')
     end
 
-    def create_provisioning_profile(name, distribution_method, app_id, certificate_ids, device_ids)
+    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)
       request(:post, 'account/ios/profile/createProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileName: name,
@@ -245,7 +245,7 @@ module Spaceship
       parse_response
     end
 
-    def delete_provisioning_profile(profile_id)
+    def delete_provisioning_profile!(profile_id)
       request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id

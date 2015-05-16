@@ -23,14 +23,14 @@ module Spaceship
       # @param name [String] the name of the App
       # if bundle_id ends with '*' then it is a wildcard id
       # otherwise, it is an explicit id
-      def create(bundle_id, name)
+      def create!(bundle_id, name)
         if bundle_id.end_with?('*')
           type = :wildcard
         else
           type = :explicit
         end
 
-        new_app = client.create_app(type, name, bundle_id)
+        new_app = client.create_app!(type, name, bundle_id)
         self.new(new_app)
       end
 
@@ -41,8 +41,8 @@ module Spaceship
       end
     end
 
-    def delete
-      client.delete_app(app_id)
+    def delete!
+      client.delete_app!(app_id)
       self
     end
 

@@ -51,14 +51,14 @@ describe Spaceship::Client do
 
     describe '#create_app' do
       it 'should make a request create an explicit app id' do
-        response = subject.create_app(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app')
+        response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app')
         expect(response['isWildCard']).to eq(false)
         expect(response['name']).to eq('Production App')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
 
       it 'should make a request create a wildcard app id' do
-        response = subject.create_app(:wildcard, 'Development App', 'tools.fastlane.spaceship.*')
+        response = subject.create_app!(:wildcard, 'Development App', 'tools.fastlane.spaceship.*')
         expect(response['isWildCard']).to eq(true)
         expect(response['name']).to eq('Development App')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.*')
@@ -67,7 +67,7 @@ describe Spaceship::Client do
 
     describe '#delete_app' do
       it 'should make a request to delete the app' do
-        subject.delete_app('LXD24VUE49')
+        subject.delete_app!('LXD24VUE49')
       end
     end
 
@@ -90,13 +90,13 @@ describe Spaceship::Client do
     describe '#create_certificate' do
       let(:csr) { read_fixture_file('certificateSigningRequest.certSigningRequest')}
       it 'makes a request to create a certificate' do
-        response = subject.create_certificate('BKLRAVXMGM', csr, '2HNR359G63')
+        response = subject.create_certificate!('BKLRAVXMGM', csr, '2HNR359G63')
         expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')
       end
     end
     describe '#revoke_certificate' do
       it 'makes a revoke request and returns the revoked certificate' do
-        response = subject.revoke_certificate('XC5PH8DAAA', 'R58UK2EAAA')
+        response = subject.revoke_certificate!('XC5PH8DAAA', 'R58UK2EAAA')
         expect(response.first.keys).to include('certificateId', 'certificateType', 'certificate')
       end
     end

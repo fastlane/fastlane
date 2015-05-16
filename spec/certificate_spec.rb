@@ -20,7 +20,7 @@ describe Spaceship::Certificate do
       expect(cert.owner_type).to eq('team')
       expect(cert.owner_name).to eq('SunApps GmbH')
       expect(cert.owner_id).to eq('5A997XSAAA')
-      expect(cert.is_push).to eq(false)
+      expect(cert.is_push?).to eq(false)
     end
 
     it "parses push certificates correctly" do
@@ -34,7 +34,7 @@ describe Spaceship::Certificate do
       expect(push.owner_type).to eq('bundle')
       expect(push.owner_name).to eq('Timelack')
       expect(push.owner_id).to eq('3599RCHAAA')
-      expect(push.is_push).to eq(true)
+      expect(push.is_push?).to eq(true)
     end
   end
 
@@ -51,7 +51,7 @@ describe Spaceship::Certificate do
     expect(cert.owner_type).to eq('teamMember')
     expect(cert.owner_name).to eq('Felix Krause')
     expect(cert.owner_id).to eq('5Y354CXU3A')
-    expect(cert.is_push).to eq(false)
+    expect(cert.is_push?).to eq(false)
   end
 
   describe '#download' do
@@ -65,17 +65,17 @@ describe Spaceship::Certificate do
   describe '#revoke' do
     let(:cert) { Spaceship::Certificate.all.first }
     it 'revokes certificate by the given cert id' do
-      expect(client).to receive(:revoke_certificate).with('XC5PH8DAAA', 'R58UK2EAAA')
-      cert.revoke
+      expect(client).to receive(:revoke_certificate!).with('XC5PH8DAAA', 'R58UK2EAAA')
+      cert.revoke!
     end
   end
 
   describe '#create' do
     it 'should create and return a new certificate' do
-      expect(client).to receive(:create_certificate).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
+      expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
       }
-      certificate = Spaceship::Certificate::ProductionPush.create(Spaceship::Certificate.certificate_signing_request.first, 'net.sunapps.151')
+      certificate = Spaceship::Certificate::ProductionPush.create!(Spaceship::Certificate.certificate_signing_request.first, 'net.sunapps.151')
       expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
     end
   end

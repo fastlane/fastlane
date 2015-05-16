@@ -82,7 +82,7 @@ module Spaceship
         }
       end
 
-      def create(csr, bundle_id = nil)
+      def create!(csr, bundle_id = nil)
         type = CERTIFICATE_TYPE_IDS.key(self)
 
         # look up the app_id by the bundle_id
@@ -91,7 +91,7 @@ module Spaceship
         end
 
         # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-        response = client.create_certificate(type, csr.to_pem, app_id)
+        response = client.create_certificate!(type, csr.to_pem, app_id)
         # munge the response to make it work for the factory
         response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
         self.new(response)
@@ -104,15 +104,15 @@ module Spaceship
       OpenSSL::X509::Certificate.new(file)
     end
 
-    def revoke
-      client.revoke_certificate(id, type_display_id)
+    def revoke!
+      client.revoke_certificate!(id, type_display_id)
     end
 
     def expires_at
       Time.parse(expires)
     end
 
-    def is_push
+    def is_push?
       # does display_type_id match push?
       [Client::ProfileTypes::Push.development, Client::ProfileTypes::Push.production].include?(type_display_id)
     end

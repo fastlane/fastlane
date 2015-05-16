@@ -21,9 +21,9 @@ module Spaceship
         raise "You cannot create a ProvisioningProfile without a type. Use a subclass."
       end
 
-      def create(name: nil, bundle_id: nil, certificate: nil, devices: [])
+      def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
         app = Spaceship::App.find(bundle_id)
-        profile = client.create_provisioning_profile(name, self.type, app.app_id, [certificate.id], devices.map{|d| d.id})
+        profile = client.create_provisioning_profile!(name, self.type, app.app_id, [certificate.id], devices.map{|d| d.id})
         self.new(profile)
       end
 
@@ -60,6 +60,10 @@ module Spaceship
 
     def download
       client.download_provisioning_profile(self.id)
+    end
+
+    def delete!
+      client.delete_provisioning_profile!(self.id)
     end
 
     def app
