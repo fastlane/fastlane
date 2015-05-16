@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
 
       def self.run(params)
