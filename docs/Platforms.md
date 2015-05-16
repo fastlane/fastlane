@@ -58,4 +58,4 @@ The same is the case for the `after_all` and `error` block: Always both blocks a
 
 ### Future
 
-As you might have guessed, this doesn't only work for `ios` and `mac`, but also for `android`. This not only allows you to automate the deployment process of your Android app, but also enabled developers to maintain both platforms in a single configuration file. This is super useful if you're using cross platform technology like [Xamarin](http://xamarin.com/).
+As you might have guessed, this doesn't only work for `ios` and `mac`, but also for `android`. This not only allows you to automate the deployment process of your Android app, but also enabled developers to maintain both platforms in a single configuration file. Over the next few months, `fastlane` will be extended to also work for Android apps.
