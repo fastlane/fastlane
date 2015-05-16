@@ -29,7 +29,7 @@ def stub_provisioning
     with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('getProvisioningProfile.action.json'), :headers => {'Content-Type' => 'application/json'})
 
-  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=RB2R97WA9W&teamId=XXXXXXXXXX").
+  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=PP00000001&teamId=XXXXXXXXXX").
     with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file( "downloaded_provisioning_profile.mobileprovision"), :headers => {})
 

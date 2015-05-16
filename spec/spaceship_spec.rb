@@ -8,18 +8,18 @@ describe Spaceship do
   end
 
   it 'should return apps' do
-    expect(Spaceship.apps).to be_instance_of(Spaceship::Apps)
+    expect(Spaceship.apps.sample).to be_instance_of(Spaceship::App)
   end
 
   it 'should return certificates' do
-    expect(Spaceship.certificates).to be_instance_of(Spaceship::Certificates)
+    expect(Spaceship.certificates.sample).to be_instance_of(Spaceship::Certificate)
   end
 
   it 'should return devices' do
-    expect(Spaceship.devices).to be_instance_of(Spaceship::Devices)
+    expect(Spaceship.devices.sample).to be_instance_of(Spaceship::Device)
   end
 
   it 'should return provisioning profiles' do
-    expect(Spaceship.provisioning_profiles).to be_instance_of(Spaceship::ProvisioningProfiles)
+    expect(Spaceship.provisioning_profiles.sample).to be_instance_of(Spaceship::ProvisioningProfile)
   end
 end

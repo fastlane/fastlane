@@ -1,35 +1,32 @@
 require 'spec_helper'
 
-describe Spaceship::ProvisioningProfiles do
+describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
-  subject { Spaceship.provisioning_profiles }
+  let(:client) { Spaceship::ProvisioningProfile.client }
 
   it "downloads an existing provisioning profile" do
-    file = subject.find{|profile| profile. }.download
-
-    # File is correct
-    #expect(path).to eq("/tmp/net.sunapps.9.store.mobileprovision")
+    file = Spaceship::ProvisioningProfile.all.first.download
     xml = Plist::parse_xml(file)
     expect(xml['AppIDName']).to eq("SunApp Setup")
     expect(xml['TeamName']).to eq("SunApps GmbH")
   end
 
   it "properly stores the provisioning profiles as structs" do
-    expect(subject.count).to eq(33) # ignore the Xcode generated profiles
+    expect(Spaceship::ProvisioningProfile.all.count).to eq(33) # ignore the Xcode generated profiles
 
-    profile = subject.last
-    expect(profile.name).to eq('net.sunapps.9 Development')
-    expect(profile.type).to eq('iOS Development')
-    expect(profile.app_id).to eq('572SH8263D')
-    expect(profile.status).to eq('Active')
-    expect(profile.expiration.to_s).to eq('2016-03-05T11:46:57+00:00')
-    expect(profile.uuid).to eq('34b221d4-31aa-4e55-9ea1-e5fac4f7ff8c')
-    expect(profile.is_xcode_managed).to eq(false)
-    expect(profile.distribution_method).to eq('limited')
+    profile = Spaceship::ProvisioningProfile.all.last
+    expect(profile.name).to eq('delete.me.please AppStore')
+    expect(profile.type).to eq('iOS Distribution')
+    expect(profile.app.app_id).to eq('2UMR2S6P4L')
+    expect(profile.status).to eq('Invalid')
+    expect(profile.expires.to_s).to eq('2016-02-10')
+    expect(profile.uuid).to eq('58ce5b78-15f8-4ceb-83f1-a29f6c4d066f')
+    expect(profile.managed_by_xcode?).to eq(false)
+    expect(profile.distribution_method).to eq('adhoc')
   end
 
   it "updates the distribution method to adhoc if devices are enabled" do
-    adhoc = subject[2]
+    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
 
     expect(adhoc.distribution_method).to eq('adhoc')
     expect(adhoc.devices.count).to eq(13)
@@ -49,8 +46,10 @@ describe Spaceship::ProvisioningProfiles do
   end
 
   describe '#create' do
+    let(:certificate) { Spaceship::Certificate.all.first }
     it 'creates a new profivisioning profile' do
-      subject.create('limited', 'Delete Me', 'tools.fastlane.apps')
+      expect(client).to receive(:create_provisioning_profile).with('Delete Me', 'limited', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
+      Spaceship::ProvisioningProfile::Development.create(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
     # TODO: Fix test after configuration was finished
