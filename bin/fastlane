@@ -67,7 +67,7 @@ class FastlaneApplication
       c.description = 'Lists all available lanes'
 
       c.action do |_args, _options|
-        ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+        ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
         puts "\nAvailable lanes:".green
         ff.runner.available_lanes.each do |lane|
           puts "- #{lane}"
