@@ -715,6 +715,21 @@ Post a message to a **group**
   )
 ```
 
+### [ChatWork](http://www.chatwork.com/)
+Post a message to a **group chat**.
+
+[How to authenticate ChatWork API](http://developer.chatwork.com/ja/authenticate.html)
+
+```ruby
+  ENV["CHATWORK_API_TOKEN"] = "Your API token"
+
+  chatwork(
+    message: "App successfully released!",
+    roomid: 12345,
+    success: true
+  )
+```
+
 ### Notify
 Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
