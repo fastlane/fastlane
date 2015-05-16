@@ -78,6 +78,7 @@ module Spaceship
     end
 
     def team_id
+      return ENV['FASTLANE_TEAM_ID'] if ENV['FASTLANE_TEAM_ID']
       return @current_team_id if @current_team_id
       
       if teams.count > 1
