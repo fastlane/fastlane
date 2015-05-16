@@ -1,7 +1,7 @@
 require 'faraday' # HTTP Client
 require 'faraday_middleware'
 require 'faraday_middleware/response_middleware'
-require 'spaceship/helper/team_selection'
+require 'spaceship/ui'
 
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
@@ -60,8 +60,6 @@ module Spaceship
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
-
-        current_team_id =team_selection(teams) # this will do nothing if the 
         
         return @client
       else
@@ -80,7 +78,16 @@ module Spaceship
     end
 
     def team_id
-      @current_team_id
+      return @current_team_id if @current_team_id
+      
+      if teams.count > 1
+        Helper.log.warn "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['teamId']
+    end
+
+    def select_team
+      @current_team_id = team_selection(teams)
     end
 
     def current_team_id=(team_id)
