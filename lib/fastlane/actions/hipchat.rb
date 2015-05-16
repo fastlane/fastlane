@@ -13,7 +13,9 @@ module Fastlane
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
-        message = "<table><tr><td><img src=\"https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png\" width=\"50\" height=\"50\"></td><td>" + options[:message] + '</td></tr></table>'
+        
+        the_message = options[:message]
+        message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{the_message[0..9999]}</td></tr></table>"
 
         if api_version.to_i == 1
           ########## running on V1 ##########
@@ -66,11 +68,11 @@ module Fastlane
           when 200, 204
             true
           when 404
-            raise "Unknown #{channel}".red
+            raise "Channel `#{channel}` not found".red
           when 401
-            raise "Access denied #{channel}".red
+            raise "Access denied for channel `#{channel}`".red
           else
-            raise "Unexpected #{response.code} for `#{channel}'".red
+            raise "Unexpected #{response.code} for `#{channel}` with response: #{response.body}".red
         end
       end
 
@@ -86,8 +88,7 @@ module Fastlane
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :channel,
                                        env_name: "FL_HIPCHAT_CHANNEL",
-                                       description: "The room or @username",
-                                       optional: true),
+                                       description: "The room or @username"),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "HIPCHAT_API_TOKEN",
                                        description: "Hipchat API Token",
