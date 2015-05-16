@@ -18,10 +18,13 @@ module Spaceship
     class InvalidUserCredentialsError < StandardError; end
     class UnexpectedResponse < StandardError; end
 
-    def self.login(username, password)
+    def self.login(username = nil, password = nil)
       instance = self.new
-      instance.login(username, password)
-      instance
+      if instance.login(username, password)
+        instance
+      else
+        raise InvalidUserCredentialsError.new
+      end
     end
 
     def initialize
@@ -51,7 +54,15 @@ module Spaceship
     # raises InvalidUserCredentialsError if authentication failed.
     #
     # returns Spaceship::Client
-    def login(username, password)
+    def login(username = nil, password = nil)
+
+      if !username or !password
+        require 'credentials_manager'
+        data = CredentialsManager::PasswordManager.shared_manager(username, false)
+        username ||= data.username
+        password ||= data.password
+      end
+
       response = @client.post("https://idmsa.apple.com/IDMSWebAuth/authenticate", {
         appleId: username,
         accountPassword: password,

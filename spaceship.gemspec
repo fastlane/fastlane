@@ -17,11 +17,14 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["lib/**/*"] + %w{ bin/spaceship README.md LICENSE }
 
-  # spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.5.0' # all shared code and dependencies
+  # fastlane specific
+  spec.add_dependency 'fastlane_core', '>= 0.7.0' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.5.0' # to automatically get login information
+
+  # external
   spec.add_dependency 'multi_xml', '~> 0.5'
   spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'faraday', '~> 0.9'
