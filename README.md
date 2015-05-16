@@ -154,6 +154,21 @@ file = Spaceship.provisioning_profiles.download('tools.fastlane.flappy-bird')
 Check out the wiki for a full list of all supported actions.
 
 
+The goal is to get to a point to be able to do this:
+
+```ruby
+Spaceship.login
+
+app = Spaceship.apps.create!(identifier: ‘com.krausefx.app’, name: ‘New App’)
+
+profile = app.provisioning_profiles.create!(
+  type: :appstore,
+  name: "Spaceship Profile"
+)
+
+profile.download
+```
+
 ## Debugging
 
 In order to inspect traffic during development, it is useful to enable network debugging.
