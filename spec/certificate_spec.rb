@@ -21,6 +21,7 @@ describe Spaceship::Certificate do
       expect(cert.owner_name).to eq('SunApps GmbH')
       expect(cert.owner_id).to eq('5A997XSAAA')
       expect(cert.is_push?).to eq(false)
+      expect(cert.expires_at).to eq(Time.at(1448491550))
     end
 
     it "parses push certificates correctly" do
