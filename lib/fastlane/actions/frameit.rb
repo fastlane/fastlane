@@ -47,7 +47,13 @@ module Fastlane
                                        env_name: "FRAMEIT_FORCE_DEVICE_TYPE",
                                        description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
                                        default_value: '',
-                                       optional: true)
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                        available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
+                                        unless available.include?value
+                                          raise "Invalid device type '#{value}'. Available values: #{available}".red
+                                        end
+                                       end)
         ]
       end
 
