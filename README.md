@@ -159,6 +159,7 @@ A detailed description about how ```fastlane``` stores your credentials is avail
 Thanks to all contributors for extending and improving the `fastlane` suite:
 
 - [Product Hunt](http://producthunt.com)
+- [MindNode](https://mindnode.com)
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Ash Furrow ([@ashfurrow](https://twitter.com/ashfurrow))
