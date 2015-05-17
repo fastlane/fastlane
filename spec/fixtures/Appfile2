@@ -1,0 +1,14 @@
+app_identifier "net.sunapps.1"
+apple_id "felix@sunapps.net"
+team_id "Q2CBPJ58CC"
+
+for_platform :ios do
+  app_identifier "net.sunapps.ios"
+  apple_id "fabio@sunapps.net"
+  team_id "3ECBP458AA"
+end
+
+for_platform :osx do
+  app_identifier "net.sunapps.osx"
+  team_id "Q2CBPJ58AA"
+end
