@@ -1,12 +1,14 @@
 require 'faraday' # HTTP Client
 require 'faraday_middleware'
-require 'faraday_middleware/response_middleware'
 require 'spaceship/ui'
+require 'spaceship/helper/plist_middleware'
+require 'spaceship/helper/net_http_generic_request'
 
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
+
 
 module Spaceship
   class Client
@@ -31,7 +33,8 @@ module Spaceship
       @client = Faraday.new("https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/") do |c|
         c.response :json, :content_type => /\bjson$/
         c.response :xml, :content_type => /\bxml$/
-        c.request :url_encoded
+        c.response :plist, :content_type => /\bplist$/
+        #c.request :url_encoded
         c.adapter Faraday.default_adapter #can be Excon
 
         if ENV['DEBUG']
@@ -63,7 +66,7 @@ module Spaceship
         password ||= data.password
       end
 
-      response = @client.post("https://idmsa.apple.com/IDMSWebAuth/authenticate", {
+      response = request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate", {
         appleId: username,
         accountPassword: password,
         appIdKey: api_key
@@ -71,7 +74,7 @@ module Spaceship
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
-        
+
         return @client
       else
         # User Credentials are wrong
@@ -91,7 +94,7 @@ module Spaceship
     def team_id
       return ENV['FASTLANE_TEAM_ID'] if ENV['FASTLANE_TEAM_ID']
       return @current_team_id if @current_team_id
-      
+
       if teams.count > 1
         Helper.log.warn "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
       end
@@ -203,15 +206,16 @@ module Spaceship
     end
 
     def provisioning_profiles
-      request(:post, 'account/ios/profile/listProvisioningProfiles.action', {
-        teamId: team_id,
-        includeInactiveProfiles: true,
-        onlyCountLists: true,
-        search: nil,
-        pageSize: 500,
-        pageNumber: 1,
-        sort: 'name=asc'
-      })
+      request(:post) do |r|
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          search: nil,
+          pageSize: 500,
+          pageNumber: 1,
+          sort: 'name=asc'
+        }
+      end
       parse_response('provisioningProfiles')
     end
 
@@ -267,11 +271,19 @@ module Spaceship
         end
       end
 
-      def request(method, url_or_path, params = {}, headers = {}, &block)
+      def request(method, url_or_path = nil, params = nil, headers = {}, &block)
         if session?
           headers.merge!({'Cookie' => cookie})
           headers.merge!(csrf_tokens)
         end
+
+        #form-encode the params only if there are params, and the block is not supplied.
+        # this is so that certain requests can be made using the block for more control
+        if params && !block_given?
+          params = Faraday::Utils::ParamsHash[params].to_query
+          headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
+        end
+
         @last_response = @client.send(method, url_or_path, params, headers, &block)
       end
 
