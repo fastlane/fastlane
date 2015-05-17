@@ -164,7 +164,7 @@ module Frameit
       end
 
       def actual_font_size
-        (@image.width / 30.0).round # depends on the width of the screenshot
+        [top_space_above_device / 3.0, @image.width / 30.0].max.round
       end
 
       def keyword_padding
