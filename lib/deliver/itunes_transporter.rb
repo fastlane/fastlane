@@ -173,7 +173,7 @@ module Deliver
         if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
           # General logging for debug purposes
           unless output_done
-            Helper.log.debug "[Transporter Output]: #{$1}"
+            Helper.log.debug "[Transporter]: #{$1}"
           end
         end
       end
