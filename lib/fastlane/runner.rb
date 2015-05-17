@@ -16,7 +16,8 @@ module Fastlane
       full_lane_name = [platform, lane].reject(&:nil?).join(' ')
       Helper.log.info "Driving the lane '#{full_lane_name}'".green
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
-      ENV["FASTLANE_LANE_NAME"] = full_lane_name
+      ENV["FASTLANE_LANE_NAME"] = lane
+      ENV["FASTLANE_PLATFORM_NAME"] = platform
 
       return_val = nil
 
