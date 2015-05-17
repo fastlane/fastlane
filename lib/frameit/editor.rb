@@ -96,7 +96,7 @@ module Frameit
           image.resize "#{frame_width}x"
         end
 
-        @@image = put_device_into_background(background)
+        @image = put_device_into_background(background)
 
         if fetch_config['title']
           @image = add_title
@@ -164,7 +164,7 @@ module Frameit
       end
 
       def actual_font_size
-        (screenshot.size[0] / 20.0).round # depends on the width of the screenshot
+        (@image.width / 30.0).round # depends on the width of the screenshot
       end
 
       def keyword_padding
