@@ -331,7 +331,7 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### AWS S3 Distribution
 
-Upload a new build to Amazon S3 to distribute the build to bete testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML and plist files for you.
+Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML and plist files for you.
 
 Add the `s3` action after the `ipa` step:
 
