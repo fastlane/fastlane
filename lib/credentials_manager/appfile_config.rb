@@ -36,17 +36,17 @@ module CredentialsManager
 
       # Plaform specified.
       if for_platform_configuration?(blocks)
-        blocks[ENV["FASTLANE_PLATFORM_NAME"].to_sym].call
-        inner_block = blocks[ENV["FASTLANE_PLATFORM_NAME"].to_sym]
+        blocks[ENV["FASTLANE_PLATFORM_NAME"]].call
+        inner_block = blocks[ENV["FASTLANE_PLATFORM_NAME"]]
         if for_lane_configuration?(inner_block)
           # .. Lane specified
-          inner_block[ENV["FASTLANE_LANE_NAME"].to_sym].call
+          inner_block[ENV["FASTLANE_LANE_NAME"]].call
         end
       else
         # Platform not specified
         if for_lane_configuration?(blocks)
           # .. Lane specified
-          blocks[ENV["FASTLANE_LANE_NAME"].to_sym].call
+          blocks[ENV["FASTLANE_LANE_NAME"]].call
         end
       end
     end
@@ -92,11 +92,11 @@ module CredentialsManager
       raise "Configuration for lane '#{lane_name}' is defined multiple times!".red if blocks[lane_name]
       if ENV["FASTLANE_PLATFORM_NAME"].nil?
         # No platform specified, assigned configuration by lane name
-        blocks[lane_name] = block
+        blocks[lane_name.to_s] = block
       else
         if ENV["FASTLANE_LANE_NAME"]
           # Platform and lane name specified, assigned lane configuration per different platforms
-          blocks[ENV["FASTLANE_PLATFORM_NAME"].to_sym] = {lane_name => block } if lane_name == ENV["FASTLANE_LANE_NAME"].to_sym
+          blocks[ENV["FASTLANE_PLATFORM_NAME"]] = {lane_name.to_s => block } if lane_name.to_s == ENV["FASTLANE_LANE_NAME"]
         end
       end
     end
@@ -110,18 +110,18 @@ module CredentialsManager
     #             be applied.
     def for_platform(platform_name, &block)
       raise "Configuration for platform '#{platform_name}' is defined multiple times!".red if blocks[platform_name]
-      blocks[platform_name] = block
+      blocks[platform_name.to_s] = block
     end
 
     # Private helpers
 
     def for_lane_configuration?(block)
-      return block[ENV["FASTLANE_LANE_NAME"].to_sym] if ENV["FASTLANE_LANE_NAME"]
+      return block[ENV["FASTLANE_LANE_NAME"].to_s] if ENV["FASTLANE_LANE_NAME"]
       false
     end
 
     def for_platform_configuration?(block)
-      return block[ENV["FASTLANE_PLATFORM_NAME"].to_sym] if ENV["FASTLANE_PLATFORM_NAME"]
+      return block[ENV["FASTLANE_PLATFORM_NAME"].to_s] if ENV["FASTLANE_PLATFORM_NAME"]
       false
     end
   end
