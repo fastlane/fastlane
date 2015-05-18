@@ -68,11 +68,5 @@ describe Spaceship::ProvisioningProfile do
       expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
-
-    # TODO: Fix test after configuration was finished
-    # it "creates a new provisioning profile if it doesn't exist" do
-    #   ENV["SIGH_PROVISIONING_PROFILE_NAME"] = "Not Yet Taken" # custom name
-    #   path = @client.fetch_provisioning_profile('net.sunapps.106', 'limited').download
-    # end
   end
 end
