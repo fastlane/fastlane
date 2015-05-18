@@ -16,6 +16,8 @@ DELIVER_USER
 DELIVER_PASSWORD
 ```
 
+If you don't want to have your password stored in the Keychain use `FASTLANE_DONT_STORE_PASSWORD`.
+
 ## Implementing a custom solution
 
 All ```fastlane``` tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
