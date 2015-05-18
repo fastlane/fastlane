@@ -119,8 +119,8 @@ prod_push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certi
 Create a new certificate
 
 ```ruby
-csr = Spaceship::Certificates.certificate_signing_request
-Spaceship::Certificate.create!(Spaceship::Certificates::ProductionPush, csr, 'tools.fastlane.test-app')
+csr = Spaceship::Certificate.certificate_signing_request
+Spaceship::Certificate::ProductionPush.create!(csr, 'tools.fastlane.test-app')
 ```
 
 ### Provisioning Profiles
