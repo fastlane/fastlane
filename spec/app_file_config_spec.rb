@@ -15,6 +15,9 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:app_identifier]).to eq('enterprise.com')
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:apple_id]).to eq('felix@sunapps.net')
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
+
+        ENV["FASTLANE_LANE_NAME"] = "ios something"
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:app_identifier]).to eq('platform.com')
       end
     end
 
