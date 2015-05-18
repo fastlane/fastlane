@@ -119,8 +119,12 @@ module Deliver
           self.clear_all_screenshots(language)
 
           Dir.glob(resulting_path, File::FNM_CASEFOLD).sort.each do |path|
+            # When frameit is enabled, we only want to upload the framed screenshots
             if use_framed
-              next unless path.include?"_framed."
+              # Except for Watch screenshots, they are okay without _framed
+              if AppScreenshot.new(path).screen_size != AppScreenshot::ScreenSize::IOS_APPLE_WATCH
+                next unless path.include?"_framed."
+              end
             else
               next if path.include?"_framed."
             end
