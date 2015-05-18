@@ -27,6 +27,7 @@ spaceship
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/spaceship/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
+[![Codeship Status for KrauseFx/spaceship](https://img.shields.io/codeship/96bb1040-c2b6-0132-4c5b-22f8b41c2618/master.svg)](https://codeship.com/projects/73801)
 
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
