@@ -13,7 +13,8 @@ module Spaceship
       'type' => :type,
       'version' => :version,
       'proProPlatform' => :platform,
-      'managingApp' => :managing_app
+      'managingApp' => :managing_app,
+      'appId' => :app
     })
 
     class << self
@@ -36,8 +37,9 @@ module Spaceship
           raise attrs['distributionMethod']
         end
 
-        attrs['devices'].map! {|d| Device.new(d) }
-        attrs['certificates'].map! {|c| Certificate.factory(c) }
+        attrs['appId'] = App.factory(attrs['appId'])
+        attrs['devices'].map! {|device| Device.factory(device) }
+        attrs['certificates'].map! {|cert| Certificate.factory(cert) }
 
         klass.new(attrs)
       end
@@ -53,9 +55,14 @@ module Spaceship
           self.factory(profile)
         end
 
+        #filter out the profiles managed by xcode
+        profiles.delete_if do |profile|
+          profile.managed_by_xcode?
+        end
+
         return profiles if self == ProvisioningProfile
 
-        #filter out the profiles that don't match the class.
+        #only return the profiles that match the class
         profiles.select do |profile|
           profile.class == self
         end

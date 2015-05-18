@@ -14,8 +14,12 @@ module Spaceship
     )
 
     class << self
+      def factory(attrs)
+        self.new(attrs)
+      end
+
       def all
-        client.apps.map {|app| self.new(app) }
+        client.apps.map {|app| self.factory(app) }
       end
 
       # Creates a new App ID on the Apple Dev Portal

@@ -4,25 +4,33 @@ describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
 
-  it "downloads an existing provisioning profile" do
-    file = Spaceship::ProvisioningProfile.all.first.download
-    xml = Plist::parse_xml(file)
-    expect(xml['AppIDName']).to eq("SunApp Setup")
-    expect(xml['TeamName']).to eq("SunApps GmbH")
-  end
+  describe '#all' do
+    let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 
-  it "properly stores the provisioning profiles as structs" do
-    expect(Spaceship::ProvisioningProfile.all.count).to eq(33) # ignore the Xcode generated profiles
+    it "properly retrieves and filters the provisioning profiles" do
+      expect(provisioning_profiles.count).to eq(33) # ignore the Xcode generated profiles
 
-    profile = Spaceship::ProvisioningProfile.all.last
-    expect(profile.name).to eq('delete.me.please AppStore')
-    expect(profile.type).to eq('iOS Distribution')
-    expect(profile.app.app_id).to eq('2UMR2S6P4L')
-    expect(profile.status).to eq('Invalid')
-    expect(profile.expires.to_s).to eq('2016-02-10')
-    expect(profile.uuid).to eq('58ce5b78-15f8-4ceb-83f1-a29f6c4d066f')
-    expect(profile.managed_by_xcode?).to eq(false)
-    expect(profile.distribution_method).to eq('adhoc')
+      profile = provisioning_profiles.last
+      expect(profile.name).to eq('net.sunapps.9 Development')
+      expect(profile.type).to eq('iOS Development')
+      expect(profile.app.app_id).to eq('572SH8263D')
+      expect(profile.status).to eq('Active')
+      expect(profile.expires.to_s).to eq('2016-03-05T11:46:57+00:00')
+      expect(profile.uuid).to eq('34b221d4-31aa-4e55-9ea1-e5fac4f7ff8c')
+      expect(profile.managed_by_xcode?).to eq(false)
+      expect(profile.distribution_method).to eq('limited')
+    end
+
+    it 'should filter by the correct types' do
+      expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(3)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(13)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(17)
+    end
+
+    it 'should have an app' do
+      profile = provisioning_profiles.first
+      expect(profile.app).to be_instance_of(Spaceship::App)
+    end
   end
 
   it "updates the distribution method to adhoc if devices are enabled" do
@@ -39,17 +47,26 @@ describe Spaceship::ProvisioningProfile do
     expect(device.status).to eq('c')
   end
 
-  it "raises an exception when passing an invalid distribution type" do
-    expect {
-      @client.fetch_provisioning_profile('net.sunapps.999', 'invalid_parameter')
-    }.to raise_exception("Invalid distribution_method 'invalid_parameter'".red)
+  describe '#download' do
+    it "downloads an existing provisioning profile" do
+      file = Spaceship::ProvisioningProfile.all.first.download
+      xml = Plist::parse_xml(file)
+      expect(xml['AppIDName']).to eq("SunApp Setup")
+      expect(xml['TeamName']).to eq("SunApps GmbH")
+    end
   end
 
-  describe '#create' do
+  describe '#create!' do
     let(:certificate) { Spaceship::Certificate.all.first }
-    it 'creates a new profivisioning profile' do
+
+    it 'creates a new development provisioning profile' do
       expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
       Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
+    end
+
+    it 'creates a new appstore provisioning profile' do
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
+      Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
     # TODO: Fix test after configuration was finished
@@ -57,12 +74,5 @@ describe Spaceship::ProvisioningProfile do
     #   ENV["SIGH_PROVISIONING_PROFILE_NAME"] = "Not Yet Taken" # custom name
     #   path = @client.fetch_provisioning_profile('net.sunapps.106', 'limited').download
     # end
-
-    it "Throws a warning if name is already taken" do
-      expect {
-        # This uses the standard name which is already taken
-        @client.fetch_provisioning_profile('net.sunapps.106', 'limited').download
-      }.to raise_exception('Multiple profiles found with the name "Test Name 3".  Please remove the duplicate profiles and try again.\nThere are no current certificates on this team matching the provided certificate IDs.'.red)
-    end
   end
 end

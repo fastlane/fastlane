@@ -25,11 +25,16 @@ def stub_provisioning
     with(:body => {"includeInactiveProfiles"=>"true", "onlyCountLists"=>"true", "pageNumber"=>"1", "pageSize"=>"500", "search"=>"", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"},
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.json'), :headers => {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?pageNumber=1&pageSize=500&search=&sort=name=asc&teamId=XXXXXXXXXX").
+         with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
+         to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.plist'), :headers => {'Content-Type' => 'application/x-xml-plist'})
+
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
     with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('getProvisioningProfile.action.json'), :headers => {'Content-Type' => 'application/json'})
 
-  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=PP00000001&teamId=XXXXXXXXXX").
+  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=2MAY7NPHRU&teamId=XXXXXXXXXX").
     with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file( "downloaded_provisioning_profile.mobileprovision"), :headers => {})
 

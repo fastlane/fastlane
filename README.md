@@ -132,23 +132,27 @@ profiles = Spaceship.provisioning_profiles
 create a distribution provisioning profile for an app
 ```ruby
 production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certificates::Production)}.first
-Spaceship::ProvisioningProfile.create!(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
+Spaceship::ProvisioningProfile::AppStore.create!('Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
 ```
 
 Named Parameters
 ```ruby
-Spaceship.ProvisioningProfile.create!(
-    klass: Spaceship::ProvisioningProfiles::Development,
+Spaceship::ProvisioningProfile::Development.create!(
     name: "Spaceship",
     bundle_id: "net.sunapps.1",
     certificate: Spaceship.certificates.all_of_type(Spaceship::Certificates::Development).first,
-    devices: [Spaceship.devices.first]
-)
+    devices: [Spaceship.devices.first])
 ```
 
 download the .mobileprovision profile
 ```ruby
-file = Spaceship.ProvisioningProfile.download('tools.fastlane.flappy-bird')
+profile = Spaceship.provisioning_profiles.find do |pp|
+  pp.app.bundle_id == 'net.sunapps.1' && pp.distribution_method == 'store'
+end
+file = profile.download
+
+#provisioning profiles also can be scoped by their types like this:
+file = Spaceship::ProvisioningProfile::AppStore.find {|p| pp.app.bundle_id == 'net.sunapps.1' }.download
 ```
 
 Check out the wiki for a full list of all supported actions.

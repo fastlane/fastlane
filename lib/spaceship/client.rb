@@ -74,7 +74,6 @@ module Spaceship
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         @cookie = "myacinfo=#{$1};"
-
         return @client
       else
         # User Credentials are wrong
@@ -279,9 +278,8 @@ module Spaceship
 
         #form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
-        if params && !block_given?
-          params = Faraday::Utils::ParamsHash[params].to_query
-          headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
+        if method == :post && params && !block_given?
+          params, headers = encode_params(params, headers)
         end
 
         @last_response = @client.send(method, url_or_path, params, headers, &block)
@@ -299,6 +297,12 @@ module Spaceship
         else
           content
         end
+      end
+
+      def encode_params(params, headers)
+        params = Faraday::Utils::ParamsHash[params].to_query
+        headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
+        return params, headers
       end
   end
 end
