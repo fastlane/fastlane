@@ -345,7 +345,7 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### AWS S3 Distribution
 
-Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML and plist files for you.
+Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you. 
 
 Add the `s3` action after the `ipa` step:
 
@@ -362,11 +362,22 @@ s3(
   bucket: ENV['S3_BUCKET'],                       # Required from user.
   file: 'AppName.ipa',                            # This would come from IpaAction.
   dsym: 'AppName.app.dSYM.zip',                   # This would come from IpaAction.
-  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/' # This is actually the default.
+  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/', # This is actually the default.
+  version_file_name: 'app_version.json',          # Name of the file to upload to S3. Defaults to 'version.json'
+  version_template_path: 'path/to/erb'            # Path to an ERB to configure the structure of the version JSON file
 )
 ```
 
 It is recommended to **not** store the AWS access keys in the `Fastfile`.
+
+The uploaded `version.json` file provides an easy way for apps to poll if a new update is available. The JSON looks like:
+
+```json
+{ 
+    "latestVersion": "<%= full_version %>",
+    "updateUrl": "itms-services://?action=download-manifest&url=<%= url %>"
+}
+```
 
 ### [DeployGate](https://deploygate.com/)
 
