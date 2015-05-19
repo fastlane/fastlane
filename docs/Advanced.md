@@ -67,7 +67,7 @@ apple_id "felix@krausefx.com" # Your Apple email address
 # team_id "Q2CBPJ58CA"
 ```
 
-If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_lane` block declaration. 
+If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_platform` and/or `for_lane` block declaration. 
 
 ```ruby
 app_identifier "net.sunapps.1"
@@ -80,6 +80,13 @@ end
 
 for_lane "ios enterprise" do
   app_identifier "enterprise.com"
+end
+
+for_platform :ios do
+  team_id '123' # for all iOS related things
+  for_lane :test do
+    app_identifier 'com.app.test'
+  end
 end
 ```
 
