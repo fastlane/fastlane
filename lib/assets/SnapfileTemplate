@@ -32,6 +32,11 @@ screenshots_path "./screenshots"
 # By default, the latest version should be used automatically. If you want to change it, do it here
 # ios_version '8.1'
 
+# Comment out the line below to add a `SNAPSHOT` preprocessor macro
+# More information available: https://github.com/krausefx/snapshot#custom-args-for-the-build-command
+# custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1'"
+
+
 # Custom Callbacks
 
 # setup_for_device_change do |device, udid, language|
