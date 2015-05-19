@@ -10,6 +10,7 @@ module Fastlane
       S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
       S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
       S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -41,6 +42,8 @@ module Fastlane
         params[:plist_template_path] = config[:plist_template_path]
         params[:html_template_path] = config[:html_template_path]
         params[:html_file_name] = config[:html_file_name]
+        params[:version_template_path] = config[:version_template_path]
+        params[:version_file_name] = config[:version_file_name]
 
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
@@ -62,6 +65,8 @@ module Fastlane
         plist_template_path = params[:plist_template_path]
         html_template_path = params[:html_template_path]
         html_file_name = params[:html_file_name]
+        version_template_path = params[:version_template_path]
+        version_file_name = params[:version_file_name]
 
         if Helper.is_test?
           return build_args 
@@ -81,7 +86,7 @@ module Fastlane
         #####################################
 
         # Gets info used for the plist
-        bundle_id, bundle_version, title = get_ipa_info( ipa_file )
+        bundle_id, bundle_version, title, full_version = get_ipa_info( ipa_file )
 
         # Gets URL for IPA file
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
@@ -104,6 +109,9 @@ module Fastlane
 
         html_file_name ||= "index.html"
         html_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{html_file_name}"
+
+        version_file_name ||= "version.json"
+        version_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{version_file_name}"
 
         # Creates plist from template
         plist_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_plist_template.erb"
@@ -129,6 +137,16 @@ module Fastlane
           })
         html_render = et.render(html_template)
 
+        # Creates version from template
+        version_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_version_template.erb"
+        version_template = File.read(version_template_path)
+
+        et = ErbalT.new({
+          url: plist_url,
+          full_version: full_version,
+          })
+        version_render = et.render(version_template)
+
         #####################################
         #
         # html and plist uploading
@@ -142,7 +160,9 @@ module Fastlane
           plist_file_name,
           plist_render,
           html_file_name,
-          html_render
+          html_render,
+          version_file_name,
+          version_render
           )        
 
         return true
@@ -163,7 +183,7 @@ module Fastlane
         end.compact
       end
 
-      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render)
+      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
         require 'aws-sdk'
         s3_client = AWS::S3.new(
             access_key_id: s3_access_key,
@@ -173,6 +193,7 @@ module Fastlane
 
         plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, :acl => :public_read)
         html_obj = bucket.objects.create(html_file_name, html_render.to_s, :acl => :public_read)
+        version_obj = bucket.objects.create(version_file_name, version_render.to_s, :acl => :public_read)
 
         # Setting actionand environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
@@ -180,6 +201,9 @@ module Fastlane
 
         Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH] = html_obj.public_url.to_s
         ENV[SharedValues::S3_HTML_OUTPUT_PATH.to_s] = html_obj.public_url.to_s
+
+        Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_obj.public_url.to_s
+        ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_obj.public_url.to_s
 
         Helper.log.info "Successfully uploaded ipa file to '#{html_obj.public_url.to_s}'".green
       end
@@ -214,7 +238,7 @@ module Fastlane
       end
 
       def self.get_ipa_info(ipa_file)
-        bundle_id, bundle_version, title = nil
+        bundle_id, bundle_version, title, full_version = nil
         Dir.mktmpdir do |dir|
 
           system "unzip -q #{ipa_file} -d #{dir} 2> /dev/null"
@@ -224,8 +248,11 @@ module Fastlane
           bundle_version = Shenzhen::PlistBuddy.print(plist, 'CFBundleShortVersionString')
           title = Shenzhen::PlistBuddy.print(plist, 'CFBundleName')
 
+          # This is the string: {CFBundleShortVersionString}.{CFBundleVersion}
+          full_version = bundle_version + '.' + Shenzhen::PlistBuddy.print(plist, 'CFBundleVersion')
+  
         end
-        return bundle_id, bundle_version, title
+        return bundle_id, bundle_version, title, full_version
       end
 
       def self.description
@@ -255,6 +282,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :html_file_name,
                                        env_name: "",
                                        description: "uploaded html filename",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_template_path,
+                                       env_name: "",
+                                       description: "version erb template path",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_file_name,
+                                       env_name: "",
+                                       description: "uploaded version filename",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :access_key,
                                        env_name: "S3_ACCESS_KEY",
@@ -297,7 +332,8 @@ module Fastlane
           ['S3_IPA_OUTPUT_PATH', 'Direct HTTP link to the uploaded ipa file'],
           ['S3_DSYM_OUTPUT_PATH', 'Direct HTTP link to the uploaded dsym file'],
           ['S3_PLIST_OUTPUT_PATH', 'Direct HTTP link to the uploaded plist file'],
-          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file']
+          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file'],
+          ['S3_VERSION_OUTPUT_PATH', 'Direct HTTP link to the uploaded Version file']
         ]
       end
 
