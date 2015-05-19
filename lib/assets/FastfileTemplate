@@ -56,7 +56,7 @@ platform :ios do
   lane :deploy do
     snapshot
     sigh
-    deliver(skip_deploy: true, :force: true)
+    deliver(skip_deploy: true, force: true)
     # frameit
   end
 
