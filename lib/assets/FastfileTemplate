@@ -45,7 +45,7 @@ platform :ios do
   lane :beta do
     snapshot
     sigh
-    deliver(skip_deploy: true, beta: true)
+    deliver(beta: true)
 
     # sh "your_script.sh"
     # You can also use other beta testing services here
