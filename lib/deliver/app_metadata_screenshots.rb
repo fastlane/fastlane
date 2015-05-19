@@ -105,7 +105,6 @@ module Deliver
 
     def set_screenshots_for_each_language(hash, use_framed = false)
       raise AppMetadataParameterError.new("Parameter needs to be an hash, containg strings with the new description") unless hash.kind_of?Hash
-
       hash.each do |language, current_path|
         resulting_path = "#{current_path}/**/*.{png,jpg,jpeg}"
 
@@ -122,7 +121,8 @@ module Deliver
             # When frameit is enabled, we only want to upload the framed screenshots
             if use_framed
               # Except for Watch screenshots, they are okay without _framed
-              if AppScreenshot.new(path).screen_size != AppScreenshot::ScreenSize::IOS_APPLE_WATCH
+              is_apple_watch = ((AppScreenshot.new(path).screen_size == AppScreenshot::ScreenSize::IOS_APPLE_WATCH) rescue false)
+              unless is_apple_watch
                 next unless path.include?"_framed."
               end
             else
