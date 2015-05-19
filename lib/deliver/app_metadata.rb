@@ -145,7 +145,14 @@ module Deliver
     #  as keys.
     # @raise (AppMetadataParameterError) Is thrown when don't pass a correct hash with correct language codes.
     def update_changelog(hash)
-      update_metadata_key(:version_whats_new, hash)
+      # check if we're allowed to do that
+      if FastlaneCore::ItunesSearchApi.fetch(@app.apple_id)
+        # App is already in the store
+        update_metadata_key(:version_whats_new, hash)
+      else
+        # App is not in the store, skipping changelog for now
+        Helper.log.info "It seems like this it the initial release of your app, which can't contain a changelog. Skipping the changelog for now.".yellow
+      end
     end
 
     # Updates the Marketing URL

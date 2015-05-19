@@ -27,5 +27,11 @@ RSpec.configure do |config|
     stub_request(:get, "https://itunes.apple.com/lookup?bundleId=net.sunapps.invalid").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-net.sunapps.invalid.json"), :headers => {})
+
+    [464686641, 878567776, 794902327].each do |apple_id|
+      stub_request(:get, "https://itunes.apple.com/lookup?id=#{apple_id}").
+           with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+           to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-com.facebook.Facebook.json"), :headers => {})
+    end
   end
 end
