@@ -37,7 +37,7 @@ carthage
 
 ### [xctool](https://github.com/facebook/xctool)
 
-You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
+You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
 
 ```ruby
 xctool :test
@@ -76,6 +76,8 @@ To show the output of `UIAutomation`:
 snapshot :verbose
 ```
 
+Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
@@ -106,6 +108,8 @@ The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `Depl
 **Important:**
 
 To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
+
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
 
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
 Use this command if you are supporting multiple versions of Xcode
@@ -190,6 +194,8 @@ More usage examples (assumes the above .env setup is being used):
   xcexport
 ```
 
+See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
+
 ### clean_build_artifacts
 This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 
@@ -198,6 +204,8 @@ Useful if you quickly want to send out a test build by dropping down to the comm
 ```ruby
 clean_build_artifacts
 ```
+
+See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) cleans their build artifacts after building and distributing their app.
 
 ### [frameit](https://github.com/KrauseFx/frameit)
 By default, the device color will be black
@@ -209,6 +217,8 @@ To use white (sorry, silver) device frames
 ```ruby
 frameit :silver
 ```
+
+See how [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) uses `frameit` to not only frame the screenshots, but also add a title and a background around the screenshots. More information available in their [Fastfile](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) and the [screenshots folder](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) ([Framefile.json](https://github.com/fastlane/examples/blob/master/MindNode/screenshots/Framefile.json))
 
 ### dsym_zip
 
@@ -303,6 +313,8 @@ If you want to use a different Apple ID for iTunes Connect in `deliver`, just ad
 email "itunes@connect.com"
 ```
 
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
+
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey(
@@ -315,6 +327,8 @@ hockey(
 Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.
 
 More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
+
+See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) distributes new builds via Hockey in their [Fastfile](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile).
 
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
@@ -331,7 +345,7 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### AWS S3 Distribution
 
-Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML and plist files for you.
+Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you. 
 
 Add the `s3` action after the `ipa` step:
 
@@ -348,11 +362,22 @@ s3(
   bucket: ENV['S3_BUCKET'],                       # Required from user.
   file: 'AppName.ipa',                            # This would come from IpaAction.
   dsym: 'AppName.app.dSYM.zip',                   # This would come from IpaAction.
-  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/' # This is actually the default.
+  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/', # This is actually the default.
+  version_file_name: 'app_version.json',          # Name of the file to upload to S3. Defaults to 'version.json'
+  version_template_path: 'path/to/erb'            # Path to an ERB to configure the structure of the version JSON file
 )
 ```
 
 It is recommended to **not** store the AWS access keys in the `Fastfile`.
+
+The uploaded `version.json` file provides an easy way for apps to poll if a new update is available. The JSON looks like:
+
+```json
+{ 
+    "latestVersion": "<%= full_version %>",
+    "updateUrl": "itms-services://?action=download-manifest&url=<%= url %>"
+}
+```
 
 ### [DeployGate](https://deploygate.com/)
 
@@ -388,6 +413,8 @@ increment_build_numer(
 )
 ```
 
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_build_number` action.
+
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
@@ -411,6 +438,8 @@ increment_version_number(
   xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
+
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_version_number` action.
 
 ### set_build_number_repository
 ```ruby
@@ -441,6 +470,8 @@ sigh(
 )
 ```
 
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `sigh` to automatically retrieve the latest provisioning profile.
+
 ### [PEM](https://github.com/KrauseFx/PEM)
 
 This will generate a new push profile if necessary (the old one is about to expire).
@@ -464,6 +495,8 @@ pem(
 ```
 
 Use the `fastlane action pem` command to view all available options.
+
+[Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
 ### [cert](https://github.com/KrauseFx/cert)
 
@@ -499,6 +532,8 @@ produce(
   produce_team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
 )
 ```
+
+[SunApps](https://github.com/fastlane/examples/blob/master/SunApps/Fastfile#L41-L49) uses `produce` to automatically generate new apps for new customers.
 
 ### register_devices
 This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.
@@ -540,6 +575,8 @@ A sanity check to make sure you are working in a repo that is clean. Especially 
 ensure_git_status_clean
 ```
 
+[Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `ensure_git_status_clean` to make sure, no uncommited changes are deployed by `fastlane.
+
 ### commit_version_bump
 This action will create a "Version Bump" commit in your repo. Useful in conjunction with `increment_build_number`.
 
@@ -561,6 +598,8 @@ commit_version_bump(
   xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project here
 )
 ```
+
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### add_git_tag
 This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
@@ -590,6 +629,8 @@ add_git_tag(
 )
 ```
 
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
@@ -605,6 +646,8 @@ push_to_git_remote(
   force: true,              # optional, default: false
 )
 ```
+
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
@@ -628,6 +671,8 @@ reset_git_repo(
   ])
 ```
 
+[MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) uses this action to reset temporary changes of the project configuration after successfully building it.
+
 ## Notifications
 
 ### [Slack](http://slack.com)
@@ -649,6 +694,8 @@ slack(
   default_payloads: [:git_branch, :git_author] # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`.
 )
 ```
+
+Take a look at the [example projects](https://github.com/fastlane/examples) of how you can use the slack action, for example the [MindNode configuration](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile).
 
 ### [Mailgun](http://www.mailgun.com)
 Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com). 
@@ -739,6 +786,8 @@ Display a notification using the OS X notification centre. Uses [terminal-notifi
   notify "Finished driving lane"
 ```
 
+[ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
+
 ### [Testmunk](http://testmunk.com)
 Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
 
@@ -759,8 +808,8 @@ If you are using rbenv or rvm, everything should be good to go. However, if you 
 The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:
 
 ```bash
-  export GEM_HOME=~/.gems
-  export PATH=$PATH:~/.gems/bin
+export GEM_HOME=~/.gems
+export PATH=$PATH:~/.gems/bin
 ```
 
 After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
@@ -768,11 +817,11 @@ After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to cr
 Recommended usage of the `update_fastlane` action is at the top of the `before_all` block, before running any other action:
 
 ```ruby
-  before_all do
-    update_fastlane
-
-    cocoapods
-    increment_build_number
-    ...
-  end
+before_all do
+  update_fastlane
+  
+  cocoapods
+  increment_build_number
+  ...
+end
 ```

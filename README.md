@@ -30,6 +30,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
     <a href="#quick-start">Quick Start</a> &bull;
+    <a href="#examples">Example Setups</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -41,11 +42,13 @@ Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily test, builld, and deploy from _any_ computer.
 
-Just edit the ```Fastfile``` to define multiple ```lanes```, or different workflows.
+[Take a look at how Wikipedia and Product Hunt use `fastlane`](https://github.com/fastlane/examples).
 
-Examples are: ```appstore```, ```beta``` and ```test```.
+Just edit the `Fastfile` to define multiple `lanes`, or different workflows.
 
-You define a ```lane``` like this (more details about the commands in the [Actions](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) documentation):
+Examples are: `appstore`, `beta` and `test`.
+
+You define a `lane` like this (more details about the commands in the [Actions](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) documentation):
 
 ```ruby
 lane :appstore do
@@ -127,6 +130,10 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane actions`: List all available `fastlane` actions
 - `fastlane action [action_name]`: Shows a more detailed description of an action
 - `fastlane new_action`: Create a new action (integration) for fastlane  
+
+## Examples
+
+See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-foundation), [Product Hunt](https://github.com/fastlane/examples#product-hunt) and [MindNode](https://github.com/fastlane/examples#mindnode) use `fastlane` to automate their iOS submission process.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
