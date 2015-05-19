@@ -16,9 +16,6 @@ RSpec.configure do |config|
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-com.facebook.Facebook.json"), :headers => {})
 
-    stub_request(:get, "https://itunes.apple.com/lookup?bundleId=at.felixkrause.iTanky").
-         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
-         to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-at.felixkrause.iTanky.json"), :headers => {})
 
     stub_request(:get, "https://itunes.apple.com/lookup?bundleId=net.sunapps.54").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
@@ -27,6 +24,12 @@ RSpec.configure do |config|
     stub_request(:get, "https://itunes.apple.com/lookup?bundleId=net.sunapps.invalid").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-net.sunapps.invalid.json"), :headers => {})
+
+    ['at.felixkrause.iTanky', 'net.sunapps.321', 'net.sunapps.1'].each do |app_identifier|
+      stub_request(:get, "https://itunes.apple.com/lookup?bundleId=#{app_identifier}").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+         to_return(:status => 200, :body => File.read("spec/responses/itunesLookup-at.felixkrause.iTanky.json"), :headers => {})
+    end
 
     [464686641, 878567776, 794902327].each do |apple_id|
       stub_request(:get, "https://itunes.apple.com/lookup?id=#{apple_id}").

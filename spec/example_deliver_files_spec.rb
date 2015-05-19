@@ -9,18 +9,16 @@ describe Deliver do
           }.to raise_exception "Deliverfile not found at path '#{error_path}'".red
         end
 
-        it "raises an error if some key information is missing" do
-          expect {
-            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
-          }.to raise_exception("You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')".red)
-
-          expect {
-            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
-          }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')".red)
-
+        it "raises an error if the language definition is missing" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
           }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE.red)
+        end
+
+        it "raises an error if app identifier is missing" do
+          expect {
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
+          }.to raise_exception("No App Identifier given")
         end
 
         it "throws an exception when block does not return anything" do
@@ -44,6 +42,13 @@ describe Deliver do
         describe "Valid Deliverfiles" do
           before do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
+          end
+
+          it "automatically fetches the version number from the iTunes Connect API" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
+            expect(meta.deliver_process.app.metadata.fetch_value("//x:version").first['string']).to eq("1.0")
           end
 
           it "successfully loads the Deliverfile if it's valid" do
@@ -282,7 +287,7 @@ describe Deliver do
               expect(File.exists?@error_path).to eq(true)
             end
 
-            it "Error on unit tests" do
+            it "Error on unit tests", nower: true do
               Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
 
               expect(File.exists?@tests_path).to eq(false)
@@ -302,6 +307,7 @@ describe Deliver do
             end
           end
         end
+
 
         it "raises an exception if app identifier of ipa does not match the given one" do
           expect {

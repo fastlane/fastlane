@@ -4,7 +4,7 @@ describe Deliver do
       it "raises an exception when some information is missing" do
         expect {
           @meta = Deliver::Deliverer.new(nil, hash: {})
-        }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')".red)
+        }.to raise_exception("No App Version given")
       end
 
       it "raises exception if not beta_ipa is given in beta build" do

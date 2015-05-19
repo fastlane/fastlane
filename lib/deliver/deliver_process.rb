@@ -26,21 +26,14 @@ module Deliver
 
     def run
       begin
+        pre_load_default_values
+
         unless metadata_only?
           run_unit_tests
-          fetch_app_key_information
           fetch_information_from_ipa_file
-
-          @app_version ||= get_latest_version
-          verify_ipa_file
-        else
-          fetch_app_key_information
-          @app_identifier ||= ask("App Identifier (e.g. com.krausefx.app): ")
-          @app_version ||= get_latest_version || ask("Which version number should be updated? ")
         end
-        create_app
 
-        Helper.log.info("Got all information needed to deploy a new update ('#{@app_version}') for app '#{@app_identifier}'")
+        Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
 
         verify_app_on_itunesconnect unless metadata_only?
 
@@ -74,6 +67,47 @@ module Deliver
       additional_itc_information # e.g. copyright, age rating
 
       trigger_metadata_upload
+    end
+
+    #####################################################
+    # @!group Getters
+    #####################################################
+
+    def app
+      return @app if @app
+
+      @app = Deliver::App.new(app_identifier: app_identifier,
+                                    apple_id: @deploy_information[Deliverer::ValKey::APPLE_ID]) # apple_id can be nil, will be fetched automatically
+    end
+
+    def app_version
+      return @app_version if @app_version
+
+      if Helper.is_test?
+        raise "No App Version given"
+      end
+
+      @app_version ||= ask("Which version number should be updated? ")
+    end
+
+    def app_identifier
+      return @app_identifier if @app_identifier
+
+      if Helper.is_test?
+        raise "No App Identifier given"
+      end
+
+      Helper.log.info "No App Identifier found. Pass one using `app_identifier` in your Deliverfile".yellow
+      @app_identifier = ask("App Identifier (e.g. com.krausefx.app): ")
+    end
+
+    # Preloads default values from the given hashes + Appfile
+    def pre_load_default_values
+      @app_identifier ||= @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
+      @app_identifier ||= (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
+
+      @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
+      @app_version ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['version'] rescue nil)
     end
 
     #####################################################
@@ -125,23 +159,6 @@ module Deliver
       end
     end
 
-    # Tries to fetch app version and app identifier from Deliverfile
-    def fetch_app_key_information
-      @app_version = @deploy_information[Deliverer::ValKey::APP_VERSION]
-      @app_identifier = @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
-      fetch_app_identifier_from_app_file
-    end
-
-    # returns the latest app version from iTunes Connect
-    def get_latest_version
-      return nil if Helper.is_test?
-
-      data = itc.get_app_information(Deliver::App.new(app_identifier: @app_identifier))
-      return (data['version']['value'] rescue nil)
-    rescue
-      return nil
-    end
-
     def fetch_information_from_ipa_file
       used_ipa_file = ENV["IPA_OUTPUT_PATH"]# if (ENV["IPA_OUTPUT_PATH"] and File.exists?(ENV["IPA_OUTPUT_PATH"]))
 
@@ -183,31 +200,17 @@ module Deliver
 
         # We are able to fetch some metadata directly from the ipa file
         # If they were also given in the Deliverfile, we will compare the values
-        @app_identifier = verify_app_identifier(@app_identifier)
-        @app_version = verify_app_version(@app_version)
+        # Overwrite the cached value if there is any
+        load_app_identifier_from_ipa
+        load_app_version_from_ipa
       end
-    end
-
-    def fetch_app_identifier_from_app_file
-      @app_identifier ||= (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
-    end
-
-    def verify_ipa_file
-      fetch_app_identifier_from_app_file unless @app_identifier
-      raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_APP_IDENTIFIER_MESSAGE.red) unless @app_identifier
-      raise Deliverfile::Deliverfile::DeliverfileDSLError.new(Deliverfile::Deliverfile::MISSING_VERSION_NUMBER_MESSAGE.red) unless @app_version
-    end
-
-    def create_app
-      @app = Deliver::App.new(app_identifier: @app_identifier,
-                                    apple_id: @deploy_information[Deliverer::ValKey::APPLE_ID])
     end
 
     def verify_app_on_itunesconnect
       if (@ipa and is_release_build?) or !@ipa
         # This is a real release, which should also upload the ipa file onto production
-        @app.create_new_version!(@app_version) unless Helper.is_test?
-        @app.metadata.verify_version(@app_version) if @ipa
+        app.create_new_version!(app_version) unless Helper.is_test?
+        app.metadata.verify_version(app_version) if @ipa
       end
     end
 
@@ -267,17 +270,17 @@ module Deliver
     end
 
     def set_app_metadata
-      @app.metadata.update_title(@deploy_information[Deliverer::ValKey::TITLE]) if @deploy_information[Deliverer::ValKey::TITLE]
-      @app.metadata.update_description(@deploy_information[Deliverer::ValKey::DESCRIPTION]) if @deploy_information[Deliverer::ValKey::DESCRIPTION]
+      app.metadata.update_title(@deploy_information[Deliverer::ValKey::TITLE]) if @deploy_information[Deliverer::ValKey::TITLE]
+      app.metadata.update_description(@deploy_information[Deliverer::ValKey::DESCRIPTION]) if @deploy_information[Deliverer::ValKey::DESCRIPTION]
 
-      @app.metadata.update_support_url(@deploy_information[Deliverer::ValKey::SUPPORT_URL]) if @deploy_information[Deliverer::ValKey::SUPPORT_URL]
-      @app.metadata.update_changelog(@deploy_information[Deliverer::ValKey::CHANGELOG]) if @deploy_information[Deliverer::ValKey::CHANGELOG]
-      @app.metadata.update_marketing_url(@deploy_information[Deliverer::ValKey::MARKETING_URL]) if @deploy_information[Deliverer::ValKey::MARKETING_URL]
-      @app.metadata.update_privacy_url(@deploy_information[Deliverer::ValKey::PRIVACY_URL]) if @deploy_information[Deliverer::ValKey::PRIVACY_URL]
+      app.metadata.update_support_url(@deploy_information[Deliverer::ValKey::SUPPORT_URL]) if @deploy_information[Deliverer::ValKey::SUPPORT_URL]
+      app.metadata.update_changelog(@deploy_information[Deliverer::ValKey::CHANGELOG]) if @deploy_information[Deliverer::ValKey::CHANGELOG]
+      app.metadata.update_marketing_url(@deploy_information[Deliverer::ValKey::MARKETING_URL]) if @deploy_information[Deliverer::ValKey::MARKETING_URL]
+      app.metadata.update_privacy_url(@deploy_information[Deliverer::ValKey::PRIVACY_URL]) if @deploy_information[Deliverer::ValKey::PRIVACY_URL]
 
-      @app.metadata.update_keywords(@deploy_information[Deliverer::ValKey::KEYWORDS]) if @deploy_information[Deliverer::ValKey::KEYWORDS]
+      app.metadata.update_keywords(@deploy_information[Deliverer::ValKey::KEYWORDS]) if @deploy_information[Deliverer::ValKey::KEYWORDS]
 
-      @app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER]) if @deploy_information[Deliverer::ValKey::PRICE_TIER]
+      app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER]) if @deploy_information[Deliverer::ValKey::PRICE_TIER]
     end
 
     def screenshots_path
@@ -298,7 +301,7 @@ module Deliver
       screens_path = screenshots_path
       if screens_path
         # Not using Snapfile. Not a good user.
-        if not @app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
+        if not app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
           # This path does not contain folders for each language
           if screens_path.kind_of?String
             if @deploy_information[Deliverer::ValKey::DEFAULT_LANGUAGE]
@@ -309,7 +312,7 @@ module Deliver
               screens_path = nil
             end
           end
-          @app.metadata.set_screenshots_for_each_language(screens_path, use_framed_screenshots?) if screens_path
+          app.metadata.set_screenshots_for_each_language(screens_path, use_framed_screenshots?) if screens_path
         end
       end
     end
@@ -348,7 +351,7 @@ module Deliver
     end
 
     def trigger_metadata_upload
-      result = @app.metadata.upload!
+      result = app.metadata.upload!
       raise "Error uploading app metadata".red unless result == true
     end
 
@@ -358,28 +361,28 @@ module Deliver
 
     def additional_itc_information
       # e.g. rating or copyright
-      itc.set_copyright!(@app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
-      itc.set_app_review_information!(@app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
-      itc.set_release_after_approval!(@app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE] != nil
+      itc.set_copyright!(app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
+      itc.set_app_review_information!(app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
+      itc.set_release_after_approval!(app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE] != nil
 
       # Categories
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
       secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
-      itc.set_categories!(@app, primary, secondary) if (primary or secondary)
+      itc.set_categories!(app, primary, secondary) if (primary or secondary)
 
       # App Rating
-      itc.set_app_rating!(@app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
+      itc.set_app_rating!(app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
 
       # App Icon
-      itc.upload_app_icon!(@app, @deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
+      itc.upload_app_icon!(app, @deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
 
       # Apple Watch App Icon
-      itc.upload_apple_watch_app_icon!(@app, @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]) if @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]
+      itc.upload_apple_watch_app_icon!(app, @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]) if @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]
     end
 
     def trigger_ipa_upload
       if @ipa
-        @ipa.app = @app # we now have the resulting app
+        @ipa.app = app # we now have the resulting app
         result = @ipa.upload! # Important: this will also actually deploy the app on iTunesConnect
         raise "Error uploading ipa file".red unless result == true
       else
@@ -411,8 +414,8 @@ module Deliver
       def hash_for_callback(error = nil)
         {
           error: error,
-          app_version: @app_version,
-          app_identifier: @app_identifier,
+          app_version: (app_version rescue nil),
+          app_identifier: (app_identifier rescue nil),
           skipped_deploy: skip_deployment?,
           is_release_build: is_release_build?,
           is_beta_build: is_beta_build?,
@@ -420,26 +423,24 @@ module Deliver
         }
       end
 
-      def verify_app_identifier(app_identifier)
+      def load_app_identifier_from_ipa
+        @app_identifier ||= @ipa.fetch_app_identifier # to not ask the user if there is no identifier there yet
+
         if app_identifier
           if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
             raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
           end
-        else
-          app_identifier = @ipa.fetch_app_identifier
         end
-        return app_identifier
       end
 
-      def verify_app_version(app_version)
+      def load_app_version_from_ipa
+        @app_version ||= @ipa.fetch_app_version # to not ask the user if there is no version there yet
+
         if app_version
           if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
             raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
           end
-        else
-          app_version = @ipa.fetch_app_version
         end
-        return app_version
       end
   end
 end
