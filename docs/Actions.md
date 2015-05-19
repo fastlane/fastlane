@@ -349,7 +349,7 @@ s3(
   file: 'AppName.ipa',                            # This would come from IpaAction.
   dsym: 'AppName.app.dSYM.zip',                   # This would come from IpaAction.
   path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/', # This is actually the default.
-  version_file_name: 'index.html',                # Name of the file to upload to S3. Defaults to 'version.son'
+  version_file_name: 'app_version.json',          # Name of the file to upload to S3. Defaults to 'version.json'
   version_template_path: 'path/to/erb'            # Path to an ERB to configure the structure of the version JSON file
 )
 ```
