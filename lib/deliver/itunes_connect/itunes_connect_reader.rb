@@ -44,16 +44,7 @@ module Deliver
       begin
         verify_app(app)
 
-        open_app_page(app)
-
-        begin
-          version_number = wait_for_elements("input[ng-model='versionInfo.version.value']").first.value
-          version_number ||= first(".status.ready").text.split(" ").first
-          return version_number
-        rescue
-          Helper.log.debug "Could not fetch version number of the live version for app #{app}."
-          return nil
-        end
+        return (get_app_information(app)['version']['value'] rescue nil)
       rescue => ex
         error_occured(ex)
       end
