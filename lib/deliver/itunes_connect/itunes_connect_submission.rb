@@ -72,9 +72,12 @@ module Deliver
         Helper.log.info "DELIVER_BETA_DESCRIPTION: '#{ENV['DELIVER_BETA_DESCRIPTION']}'"
         Helper.log.info "DELIVER_BETA_FEEDBACK_EMAIL: '#{ENV['DELIVER_BETA_FEEDBACK_EMAIL']}'"
 
-        build_info['details'][0]['whatsNew']['value'] = ENV["DELIVER_WHAT_TO_TEST"]
-        build_info['details'][0]['description']['value'] = ENV["DELIVER_BETA_DESCRIPTION"]
-        build_info['details'][0]['feedbackEmail']['value'] = ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
+        build_info['details'].each_with_index do |hash, index|
+          build_info['details'][0]['whatsNew']['value'] = ENV["DELIVER_WHAT_TO_TEST"]
+          build_info['details'][index]['description']['value'] = ENV["DELIVER_BETA_DESCRIPTION"]
+          build_info['details'][index]['feedbackEmail']['value'] = ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
+        end
+        
         h = Excon.post(build_url, body: build_info.to_json, headers: { "Cookie" => cookie_string } )
 
         if h.status == 200
