@@ -108,6 +108,7 @@ module Deliver
 
       @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_version ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['version'] rescue nil)
+      @app_version ||= (app.get_live_version rescue nil)
     end
 
     #####################################################
