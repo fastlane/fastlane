@@ -37,7 +37,7 @@ What's missing?
 
 You want them to look **perfect** and **gorgeous**. They should show the same screens on all devices in all languages.
 
-You have to manually create 20 (languages) x 4 (devices) x 5 (screenshots) = **400 screenshots**.
+You have to manually create 20 (languages) x 5 (devices) x 5 (screenshots) = **500 screenshots**.
 
 It's hard to get everything right!
 
@@ -73,9 +73,10 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Create hundreds of screenshots in multiple languages on all simulators
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Integrated with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/KrauseFx/deliver)
+- Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/KrauseFx/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - ```snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
+- Support for advanced configuration, like preprocess macros or [prefilling of data](#prefilling)
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -90,7 +91,7 @@ This gem automatically switches the language and device type and runs the automa
 - It takes **hours** to take screenshots
 - It is an integration test: You can test for UI elements and other things inside your scripts
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
-- You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script.
+- You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script
 - You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
 - Easy verification that localizations fit into labels on all screen dimensions
 - Easy verification for translators (without an iDevice) that translations do make sense in real App context
@@ -101,7 +102,7 @@ I've been using many other solutions out there. Unfortunately none of them were 
 
 - **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
 - **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This is the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
-- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately it has a lot of open issues with the latest release of Xcode. Also, it requires modifications of your Xcode project and schemes, which might break some other things.
+- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately the project seems to be dead and doesn't work with the latest version of Xcode yet. Also, it requires modifications of your Xcode project and schemes, which might break some other things.
 
 # Installation
 
@@ -367,7 +368,82 @@ You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for 
 
 If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://github.com/fastlane/frameit).
 
-## Run in Continuous Integration
+## Prefilling
+
+Usually you want to mock your screenshot data to show the same content for all screenshots.
+
+There are 2 ways of doing this:
+
+#### Preprocessor macro
+Use the preprocessor macro `SNAPSHOT` to check if `snapshot` is currently running in your code. This enables you to add checks like this:
+
+```objective-c
+#ifdef SNAPSHOT
+// Your Code here
+#endif
+```
+
+Open your `Snapfile` and add `custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1'"` to it.
+
+#### By pre-filling data/documents in the bundle
+
+As used by [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Snapfile) you can fill your bundle after building with demo data using your `Snapfile` to use it on run-time.
+
+```ruby
+example_files = './ExampleDocuments'
+folder_name = "ExampleDocuments"
+
+setup_for_device_change do |lang, device|
+  # This will make sure, all example documents are installed on the simulator
+
+  puts "Copying example files to .app"
+
+  app_path = "/tmp/snapshot/build/MindNode.app/"
+
+  FileUtils.mkdir_p(File.join(app_path, folder_name))
+
+  Dir.glob(File.join(example_files, '*.mindnode')).each do |example_path|
+    puts "Copying '#{example_path}' to .app container"
+    FileUtils.cp_r(example_path, File.join(app_path, folder_name)) rescue nil # in case the file already exists
+  end
+end
+```
+
+This is simple Ruby that gets executed **after** the app was built and **before** it is installed on the simulator.
+
+In your `Objective-C` code you can now load the documents from your bundle and copy them over to your `Documents` folder (if necessary).
+
+```objective-c
+#ifdef SNAPSHOT
+/** This method will take care of copying over the example documents from the app's bundle into the `Documents` directory */
++ (void)load
+{
+    static NSString *exampleFolderName = @"ExampleDocuments";
+    if ([[NSBundle mainBundle] pathForResource:exampleFolderName ofType:@""]) {
+        NSArray *filesToCopy = @[@"File1",
+                                 @"File2"];
+        NSString *documents = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+        
+        for (NSString *currentFile in filesToCopy) {
+            NSString *from = [[NSBundle mainBundle] pathForResource:currentFile ofType:@"filetype" inDirectory:exampleFolderName];
+            if (from && documents) {
+                NSError *error = nil;
+                NSString *resultingFileName = [NSString stringWithFormat:@"%@.filetype", currentFile];
+                [[NSFileManager defaultManager] copyItemAtPath:from
+                                                        toPath:[documents stringByAppendingPathComponent:resultingFileName]
+                                                         error:&error];
+                
+                if (error) {
+                    NSLog(@"Error copying the example MindNode file: %@", error);
+                }
+            }
+        }
+    }
+}
+
+```
+
+## Run in Continuous Integration System
 If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
 
 You can disable this dialog, running the following command:
