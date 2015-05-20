@@ -1,0 +1,18 @@
+app_identifier "net.sunapps.1"
+apple_id "felix@sunapps.net"
+team_id "Q2CBPJ58CC"
+
+for_platform :ios do
+  apple_id "fabio@sunapps.ios.net"
+  team_id 'Q2CBPJ58AA' # for all iOS related things
+  for_lane :enterprise do
+    app_identifier 'net.sunapps.ios.enterprise'
+  end
+end
+
+for_platform :osx do
+  team_id '3ECBP458AA' # for all iOS related things
+  for_lane :enterprise do
+    app_identifier 'net.sunapps.osx.enterprise'
+  end
+end
