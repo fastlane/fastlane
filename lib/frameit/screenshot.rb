@@ -36,6 +36,11 @@ module Frameit
       end
     end
 
+    # Is the device a 3x device? (e.g. 6 Plus)
+    def is_triple_density?
+      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55)
+    end
+
     def is_mac?
       return device_name == 'Mac'
     end

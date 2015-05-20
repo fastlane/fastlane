@@ -92,7 +92,7 @@ module Frameit
           @image = put_into_frame
 
           # Decrease the size of the framed screenshot to fit into the defined padding + background
-          frame_width = background.width - fetch_config['padding'] * 2
+          frame_width = background.width - frame_padding * 2
           image.resize "#{frame_width}x"
         end
 
@@ -103,6 +103,12 @@ module Frameit
         end
 
         image
+      end
+
+      # Padding around the frames
+      def frame_padding
+        multi = (self.screenshot.is_triple_density?? 1.7 : 1.0)
+        return fetch_config['padding'] * multi
       end
 
       # Returns a correctly sized background image
