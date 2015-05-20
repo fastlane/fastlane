@@ -41,6 +41,11 @@ module Frameit
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55)
     end
 
+    # Super old devices
+    def is_mini?
+      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35)
+    end
+
     def is_mac?
       return device_name == 'Mac'
     end
