@@ -35,7 +35,7 @@ module Fastlane
             if Helper.test?
               version_array = [1,0,0]
             else
-              raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
+              raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d+.\d+.\d+/)
               version_array = current_version.split(".").map(&:to_i)
             end
 
