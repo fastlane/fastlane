@@ -27,7 +27,28 @@ module CredentialsManager
       end
 
       # If necessary override per lane configuration
-      blocks[ENV["FASTLANE_LANE_NAME"].to_s].call if (ENV["FASTLANE_LANE_NAME"] && blocks[ENV["FASTLANE_LANE_NAME"].to_s])
+      #
+      # Appfile can specify different rules per:
+      # - Platform
+      # - Lane
+      #
+      # It is forbidden to specify multiple configuration for the same platform. It will raise an exception.
+
+      # Plaform specified.
+      if for_platform_configuration?(blocks)
+        blocks[ENV["FASTLANE_PLATFORM_NAME"]].call
+        inner_block = blocks[ENV["FASTLANE_PLATFORM_NAME"]]
+        if for_lane_configuration?(inner_block)
+          # .. Lane specified
+          inner_block[ENV["FASTLANE_LANE_NAME"]].call
+        end
+      else
+        # Platform not specified
+        if for_lane_configuration?(blocks)
+          # .. Lane specified
+          blocks[ENV["FASTLANE_LANE_NAME"]].call
+        end
+      end
     end
 
     def blocks
@@ -68,8 +89,40 @@ module CredentialsManager
     # Discussion If received lane name does not match the lane name available as environment variable, no changes will
     #             be applied.
     def for_lane(lane_name, &block)
-      raise "Configuration for lane '#{lane_name}' was defined multiple times!".red if blocks[lane_name]
-      blocks[lane_name] = block
+      raise "Configuration for lane '#{lane_name}' is defined multiple times!".red if blocks[lane_name]
+      if ENV["FASTLANE_PLATFORM_NAME"].nil?
+        # No platform specified, assigned configuration by lane name
+        blocks[lane_name.to_s] = block
+      else
+        if ENV["FASTLANE_LANE_NAME"]
+          # Platform and lane name specified, assigned lane configuration per different platforms
+          blocks[ENV["FASTLANE_PLATFORM_NAME"]] = {lane_name.to_s => block } if lane_name.to_s == ENV["FASTLANE_LANE_NAME"]
+        end
+      end
+    end
+
+    # Override Appfile configuration for a specific platform.
+    #
+    # platform_name  - Symbol representing a platform name.
+    # block - Block to execute to override configuration values.
+    #
+    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
+    #             be applied.
+    def for_platform(platform_name, &block)
+      raise "Configuration for platform '#{platform_name}' is defined multiple times!".red if blocks[platform_name]
+      blocks[platform_name.to_s] = block
+    end
+
+    # Private helpers
+
+    def for_lane_configuration?(block)
+      return block[ENV["FASTLANE_LANE_NAME"].to_s] if ENV["FASTLANE_LANE_NAME"]
+      false
+    end
+
+    def for_platform_configuration?(block)
+      return block[ENV["FASTLANE_PLATFORM_NAME"].to_s] if ENV["FASTLANE_PLATFORM_NAME"]
+      false
     end
   end
 end
