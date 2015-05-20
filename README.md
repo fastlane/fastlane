@@ -311,7 +311,7 @@ To run a shell script, just use ```system('./script.sh')```.
 ```ruby
 setup_for_device_change do |device, udid, language|
   puts "Running #{language} on #{device}"
-  system("./popuplateDatabase.sh")
+  system("./populateDatabase.sh")
 end
 
 teardown_device do |language, device|
