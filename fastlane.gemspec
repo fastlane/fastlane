@@ -30,7 +30,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'cupertino', '>= 1.3.3' # for registering iOS devices with the Apple Developer Center
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
-
+  spec.add_dependency 'ruby-trello', '~> 1.2.1' # Trello 
+  
   spec.add_dependency 'fastlane_core', '>= 0.7.3' # all shared code and dependencies
 
   # All the fastlane tools
