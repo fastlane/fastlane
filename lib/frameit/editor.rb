@@ -126,7 +126,7 @@ module Frameit
         left_space = (background.width / 2.0 - image.width / 2.0).round
         bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
         bottom_space -= 40 if screenshot.is_portrait? # even more for portrait mode
-        bottom_space -= 50 if screenshot.is_mini? # super old devices
+        bottom_space -= 50 if (screenshot.is_mini? and screenshot.is_portrait?) # super old devices
 
         self.top_space_above_device = background.height - image.height - bottom_space
 
