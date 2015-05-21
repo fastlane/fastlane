@@ -73,6 +73,10 @@ module Fastlane
     end
 
     def self.sh_no_action(command)
+      # Set the encoding first, the user might have set it wrong
+      Encoding.default_external = Encoding::UTF_8
+      Encoding.default_internal = Encoding::UTF_8
+
       command = command.join(' ') if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
       Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ')
 
