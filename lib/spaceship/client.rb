@@ -99,7 +99,7 @@ module Spaceship
     end
 
     def select_team
-      @current_team_id = team_selection(teams)
+      @current_team_id = self.UI.select_team
     end
 
     def current_team_id=(team_id)
