@@ -66,15 +66,9 @@ snapshot
 
 To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
 
-To skip cleaning the project on every build:
-```ruby
-snapshot :noclean
-```
+To skip cleaning the project on every build use ```snapshot(noclean: true)```.
 
-To show the output of `UIAutomation`:
-```ruby
-snapshot :verbose
-```
+To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
 
 Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
 
