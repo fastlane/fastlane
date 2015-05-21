@@ -64,7 +64,7 @@ module Fastlane
           raise "Trello action failed!".red          
         end
       end
-      
+            
       def self.description
         "Sets the :TRELLO_WHAT_TO_TEST from titles from a trello board & moves tickets"
       end
@@ -111,6 +111,10 @@ module Fastlane
         "ldrr"
       end
       
+      def self.is_supported?(platform)
+        true
+      end
+            
     end
   end
 end
