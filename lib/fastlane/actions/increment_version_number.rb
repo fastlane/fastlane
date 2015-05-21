@@ -16,7 +16,7 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
         begin
-          folder = '.' #Current folder is the default folder
+          folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
 
           command_prefix = [
               'cd',
