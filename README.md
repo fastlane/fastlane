@@ -27,6 +27,7 @@ spaceship
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/spaceship/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
+[![Codeship Status for KrauseFx/spaceship](https://img.shields.io/codeship/96bb1040-c2b6-0132-4c5b-22f8b41c2618/master.svg)](https://codeship.com/projects/73801)
 
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
@@ -118,8 +119,8 @@ prod_push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certi
 Create a new certificate
 
 ```ruby
-csr = Spaceship::Certificates.certificate_signing_request
-Spaceship::Certificate.create!(Spaceship::Certificates::ProductionPush, csr, 'tools.fastlane.test-app')
+csr = Spaceship::Certificate.certificate_signing_request
+Spaceship::Certificate::ProductionPush.create!(csr, 'tools.fastlane.test-app')
 ```
 
 ### Provisioning Profiles
@@ -132,23 +133,27 @@ profiles = Spaceship.provisioning_profiles
 create a distribution provisioning profile for an app
 ```ruby
 production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certificates::Production)}.first
-Spaceship::ProvisioningProfile.create!(Spaceship::ProvisioningProfiles::AppStore, 'Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
+Spaceship::ProvisioningProfile::AppStore.create!('Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
 ```
 
 Named Parameters
 ```ruby
-Spaceship.ProvisioningProfile.create!(
-    klass: Spaceship::ProvisioningProfiles::Development,
+Spaceship::ProvisioningProfile::Development.create!(
     name: "Spaceship",
     bundle_id: "net.sunapps.1",
     certificate: Spaceship.certificates.all_of_type(Spaceship::Certificates::Development).first,
-    devices: [Spaceship.devices.first]
-)
+    devices: [Spaceship.devices.first])
 ```
 
 download the .mobileprovision profile
 ```ruby
-file = Spaceship.ProvisioningProfile.download('tools.fastlane.flappy-bird')
+profile = Spaceship.provisioning_profiles.find do |pp|
+  pp.app.bundle_id == 'net.sunapps.1' && pp.distribution_method == 'store'
+end
+file = profile.download
+
+#provisioning profiles also can be scoped by their types like this:
+file = Spaceship::ProvisioningProfile::AppStore.find {|p| pp.app.bundle_id == 'net.sunapps.1' }.download
 ```
 
 Check out the wiki for a full list of all supported actions.

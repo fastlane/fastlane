@@ -11,8 +11,12 @@ module Spaceship
     })
 
     class << self
+      def factory(attrs)
+        self.new(attrs)
+      end
+
       def all
-        client.devices.map {|device| self.new(device)}
+        client.devices.map {|device| self.factory(device)}
       end
 
       def find(device_id)
