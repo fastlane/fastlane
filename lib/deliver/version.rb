@@ -1,3 +1,3 @@
 module Deliver
-  VERSION = "0.11.1.beta"
+  VERSION = "0.11.1"
 end
