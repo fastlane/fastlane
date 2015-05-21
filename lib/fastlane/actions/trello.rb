@@ -66,7 +66,7 @@ module Fastlane
       end
             
       def self.description
-        "Sets the :TRELLO_WHAT_TO_TEST from titles from a trello board & moves tickets"
+        "Enumerate trello card titles for changelogs"
       end
 
 
