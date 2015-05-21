@@ -307,19 +307,6 @@ describe Deliver do
             end
           end
         end
-
-
-        it "raises an exception if app identifier of ipa does not match the given one" do
-          expect {
-            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not match with the given one ('net.sunapps.321' != 'at.felixkrause.iTanky')".red)
-        end
-
-        it "raises an exception if app version of ipa does not match the given one" do
-          expect {
-            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)".red)
-        end
       end
     end
   end

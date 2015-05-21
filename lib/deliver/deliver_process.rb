@@ -26,11 +26,11 @@ module Deliver
 
     def run
       begin
+        fetch_information_from_ipa_file
         pre_load_default_values
 
         unless metadata_only?
           run_unit_tests
-          fetch_information_from_ipa_file
         end
 
         Helper.log.info("Got all information needed to deploy a new update ('#{app_version}') for app '#{app_identifier}'")
@@ -106,8 +106,10 @@ module Deliver
     def pre_load_default_values
       @app_identifier ||= @deploy_information[Deliverer::ValKey::APP_IDENTIFIER]
       @app_identifier ||= (CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue nil)
+      @app_identifier ||= (@ipa.fetch_app_identifier rescue nil) # since ipa might be nil
 
       @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
+      @app_version ||= (@ipa.fetch_app_version rescue nil) # since ipa might be nil
       @app_version ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['version'] rescue nil)
       @app_version ||= (app.get_live_version rescue nil)
     end
@@ -199,12 +201,6 @@ module Deliver
         end
 
         @ipa = Deliver::IpaUploader.new(Deliver::App.new, '/tmp/', used_ipa_file, upload_strategy)
-
-        # We are able to fetch some metadata directly from the ipa file
-        # If they were also given in the Deliverfile, we will compare the values
-        # Overwrite the cached value if there is any
-        load_app_identifier_from_ipa
-        load_app_version_from_ipa
       end
     end
 
@@ -423,26 +419,6 @@ module Deliver
           is_beta_build: is_beta_build?,
           ipa_path: ENV["DELIVER_IPA_PATH"]
         }
-      end
-
-      def load_app_identifier_from_ipa
-        @app_identifier ||= @ipa.fetch_app_identifier # to not ask the user if there is no identifier there yet
-
-        if app_identifier
-          if @ipa.fetch_app_identifier and app_identifier != @ipa.fetch_app_identifier
-            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Identifier of IPA does not match with the given one ('#{app_identifier}' != '#{@ipa.fetch_app_identifier}')".red)
-          end
-        end
-      end
-
-      def load_app_version_from_ipa
-        @app_version ||= @ipa.fetch_app_version # to not ask the user if there is no version there yet
-
-        if app_version
-          if @ipa.fetch_app_version and app_version != @ipa.fetch_app_version
-            raise Deliver::Deliverfile::Deliverfile::DeliverfileDSLError.new("App Version of IPA does not match with the given one (#{app_version} != #{@ipa.fetch_app_version})".red)
-          end
-        end
       end
   end
 end
