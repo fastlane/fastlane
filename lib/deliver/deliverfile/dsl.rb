@@ -6,7 +6,7 @@ module Deliver
     class Deliverfile
       module DSL
         MISSING_VALUE_ERROR_MESSAGE = "You have to pass either a value or a block to the given method."
-        SPECIFY_LANGUAGE_FOR_VALUE = "You have to specify the language of the given value. Either set a default language using 'default_language \"en\"' on the top of the file or pass a hash containing the language codes"
+        SPECIFY_LANGUAGE_FOR_VALUE = "You have to specify the language of the given value. Either set a default language using 'default_language \"en-US\"' on the top of the file or pass a hash containing the language codes"
 
         MISSING_APP_IDENTIFIER_MESSAGE = "You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')"
         MISSING_VERSION_NUMBER_MESSAGE = "You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')"
