@@ -165,7 +165,7 @@ Or delete all `iOS Team Provisioning Profile` by using a regular expression
 In case you prefer environment variables:
 
 - `SIGH_USERNAME`
-- `SIGH_APP_IDENTIFIER`
+- `SIGH_APP_IDENTIFIER` (The App's Bundle ID , e.g. `com.yourteam.awesomeapp`)
 - `SIGH_TEAM_ID` (The Team ID, e.g. `Q2CBPK58CA`)
 - `SIGH_PROVISIONING_PROFILE_NAME` (set a custom name for the name of the generated file)
 
