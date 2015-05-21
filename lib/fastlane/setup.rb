@@ -3,7 +3,10 @@
 module Fastlane
   class Setup
     def run
-      raise "Fastlane already set up at path #{folder}".yellow if (FastlaneFolder.setup? and not Helper.is_test?)
+      if (FastlaneFolder.setup? and not Helper.is_test?)
+        Helper.log.info "Fastlane already set up at path #{folder}".yellow
+        return
+      end
 
       show_infos
       response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
