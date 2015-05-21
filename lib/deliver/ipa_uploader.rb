@@ -94,6 +94,15 @@ module Deliver
         else
           Helper.log.info "deliver will **not** submit the app for Review or for TestFlight distribution".yellow
           Helper.log.info "If you want to distribute the binary, don't define `skip_deploy` ".yellow
+
+          if ENV["DELIVER_WHAT_TO_TEST"] or ENV["DELIVER_BETA_DESCRIPTION"] or ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
+            Helper.log.warn "---------------------------------------------------".yellow
+            Helper.log.warn "You provided beta version metadata, but used the ".yellow
+            Helper.log.warn "`skip_deploy` option when running deliver.".yellow
+            Helper.log.warn "You have to remove `skip_deploy` to set a changelog".yellow
+            Helper.log.warn "for TestFlight builds".yellow
+            Helper.log.warn "---------------------------------------------------".yellow
+          end
         end
         return true
       end
