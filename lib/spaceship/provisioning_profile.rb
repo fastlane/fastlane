@@ -21,6 +21,10 @@ module Spaceship
         raise "You cannot create a ProvisioningProfile without a type. Use a subclass."
       end
 
+      # Creates a new provisioning profile
+      # @param name (String) The name of the provisioning profile to use on the Dev Portal
+      # @param bundle_id (String) The bundle identifier of the provisioning profile to create
+      # TODO: add more
       def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
         app = Spaceship::App.find(bundle_id)
         profile = client.create_provisioning_profile!(name, self.type, app.app_id, [certificate.id], devices.map{|d| d.id})

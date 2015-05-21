@@ -44,13 +44,10 @@ module Spaceship
             puts "#{i + 1}) #{team['teamId']} #{team['name']} (#{team['type']})".green
           end
 
-          selected = gets.strip.to_i - 1
+          selected = $stdin.gets.strip.to_i - 1
           team_to_use = teams[selected] if selected >= 0
 
-          if team_to_use
-            client.current_team_id = team_to_use['team_id']
-            return
-          end
+          return team_to_use['teamId'] if team_to_use
         end
       end
     end
