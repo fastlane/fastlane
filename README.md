@@ -96,6 +96,10 @@ If you want to generate a development certificate instead:
 
     pem --development
 
+Set a password for your `p12` file:
+
+    pem -p "MyPass"
+
 To get a list of available options run:
 
     pem --help
