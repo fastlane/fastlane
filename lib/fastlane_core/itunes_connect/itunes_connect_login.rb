@@ -44,7 +44,11 @@ module FastlaneCore
         if page.has_content?"My Apps"
           # Everything looks good
         else
-          raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.".red)
+          visit current_url # iTC sometimes is super buggy, try reloading the site
+          sleep 3
+          unless page.has_content?"My Apps"
+            raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.".red)
+          end
         end
       rescue => ex
         Helper.log.debug(ex)
