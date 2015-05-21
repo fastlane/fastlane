@@ -100,6 +100,10 @@ Set a password for your `p12` file:
 
     pem -p "MyPass"
 
+You can specify a name for the output file:
+
+    pem -n my.pem
+
 To get a list of available options run:
 
     pem --help
