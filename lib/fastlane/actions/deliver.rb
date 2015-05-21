@@ -15,6 +15,7 @@ module Fastlane
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
+            return if Helper.is_test?
 
             Deliver::Deliverer.new(nil,
                                    force: config[:force],
