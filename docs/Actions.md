@@ -70,6 +70,16 @@ To skip cleaning the project on every build use ```snapshot(noclean: true)```.
 
 To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
 
+Other options
+
+```ruby
+snapshot(
+  noclean: true, # Skip cleaning
+  verbose: true, # Show output of UIAutomation
+  snapshot_file_path: './nothere' # Specify a path to the directory containing the Snapfile
+)
+```
+
 Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
 
 ### ipa
