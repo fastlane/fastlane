@@ -78,6 +78,8 @@ module Fastlane
         rescue => ex
           [
             "-------------------------------------------------------",
+            "Original Error:",
+            " => " + ex.to_s,
             "A build error occured. This can have many reasons, usually",
             "it has something to do with code signing. The `ipa` action",
             "uses `shenzhen` under the hood: https://github.com/nomad/shenzhen",
