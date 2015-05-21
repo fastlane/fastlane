@@ -52,7 +52,7 @@ module PEM
                                      description: "The password that is used for your p12 file",
                                      default_value: ""),
         FastlaneCore::ConfigItem.new(key: :pem_name,
-                                     short_option: "-n",
+                                     short_option: "-o",
                                      env_name: "PEM_FILE_NAME",
                                      description: "The file name of the generated .pem file",
                                      optional: true)

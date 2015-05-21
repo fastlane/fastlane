@@ -102,7 +102,7 @@ Set a password for your `p12` file:
 
 You can specify a name for the output file:
 
-    pem -n my.pem
+    pem -o my.pem
 
 To get a list of available options run:
 
