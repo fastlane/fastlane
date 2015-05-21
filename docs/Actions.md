@@ -76,7 +76,7 @@ Other options
 snapshot(
   noclean: true, # Skip cleaning
   verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './nothere' # Specify a path to the directory containing the Snapfile
+  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
 )
 ```
 
