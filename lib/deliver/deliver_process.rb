@@ -37,11 +37,12 @@ module Deliver
 
         verify_app_on_itunesconnect unless metadata_only?
 
-        if ready_for_sale?
-          raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
-        end
 
         if is_beta_build?
+          if ready_for_sale?
+            raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
+          end
+
           Helper.log.info "Beta builds don't upload new metadata to iTunesConnet".yellow
         else
           upload_metadata
