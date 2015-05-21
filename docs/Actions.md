@@ -100,7 +100,6 @@ ipa(
   identity: "MyIdentity",          # Identity to be used along with --embed
   sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
   archive: nil,                    # this means 'Do Archive'. Archive project after building.
-  verbose: nil,                    # this means 'Do Verbose'.
 )
 ```
 
