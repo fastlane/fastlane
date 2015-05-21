@@ -63,8 +63,10 @@ module Fastlane
     def generate_app_metadata
       Helper.log.info '------------------------------'
       Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
+      
       app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
       apple_id = ask('Your Apple ID (fastlane@krausefx.com): '.yellow)
+
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
       template.gsub!('[[APPLE_ID]]', apple_id)
@@ -116,6 +118,14 @@ module Fastlane
 
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
+
+      scheme = ask("Optional: The scheme name of your app. If you don't need one, just click enter: ").to_s.strip
+      if scheme.length > 0
+        template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
+      else
+        template.gsub!('[[SCHEME]]', "")
+      end
+
 
       template.gsub!('deliver', '# deliver') unless @tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
