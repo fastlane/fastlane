@@ -17,7 +17,7 @@ module PEM
         self.rsa_file = File.join(TMP_FOLDER, 'private_key.key')
         self.certificate_type = (PEM.config[:development] ? 'development' : 'production')
         self.pem_file = File.join(TMP_FOLDER, "#{certificate_type}_#{PEM.config[:app_identifier]}.pem")
-        self.passphrase = ''
+        self.passphrase = PEM.config[:p12_password] || ''
 
         File.write(pem_file, pem_certificate)
 
