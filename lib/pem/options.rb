@@ -13,7 +13,7 @@ module PEM
                                      env_name: "PEM_GENERATE_P12_FILE",
                                      description: "Generate a p12 file additionally to a PEM file",
                                      is_string: false, 
-                                     default_value: false),
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :save_private_key,
                                      short_option: "-s",
                                      env_name: "PEM_SAVE_PRIVATEKEY",
