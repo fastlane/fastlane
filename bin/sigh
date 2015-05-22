@@ -21,7 +21,7 @@ class SighApplication
     program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/sigh'
-    # program :help_formatter, :compact # https://github.com/commander-rb/commander/issues/12
+    program :help_formatter, :compact
 
     always_trace!
 
