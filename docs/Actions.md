@@ -82,6 +82,31 @@ snapshot(
 
 Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
 
+### update_project_provisioning
+
+Updated your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action.
+
+```ruby
+update_project_provisioning(
+  xcodeproj: "Project.xcodeproj",
+  profile: "./app_store.mobileprovision" # optional if you use sigh
+)
+```
+
+Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) you can use the `filter` option:
+
+```ruby
+update_project_provisioning(
+  xcodeproj: "Project.xcodeproj",
+  profile: "./app_store.mobileprovision", # optional if you use sigh
+  build_configuration_filter: ".*WatchKit Extension.*"
+)
+```
+
+The `build_configuration_filter` is a standard regex.
+
+Since you'll probably not want to commit this change into version control, take a look at how [MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47) uses this technique to temporary set the code signing, then build and upload the `ipa` file.
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
