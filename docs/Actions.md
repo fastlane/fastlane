@@ -107,7 +107,7 @@ The `build_configuration_filter` is a standard regex.
 
 Since you'll probably not want to commit this change into version control, take a look at how [MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47) uses this technique to temporary set the code signing, then build and upload the `ipa` file.
 
-**[Show Example Usage]([MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47))**
+**[Show Example Usage](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
 
 ### ipa
 
