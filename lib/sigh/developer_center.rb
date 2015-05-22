@@ -28,7 +28,9 @@ module Sigh
       cert_name += '.mobileprovision' unless cert_name.include?'mobileprovision'
 
       output_path = File.join(TMP_FOLDER, cert_name)
-      File.write(output_path, cert)
+      dataWritten = File.open(output_path, "wb") do |f|
+        f.write(cert)
+      end
 
       store_provisioning_id_in_environment(output_path)
 
