@@ -158,7 +158,7 @@ module Sigh
         all(:xpath, "//option").each do |current|
           puts "\t- #{current.text}".yellow
         end
-        raise "Could not find Apple ID '#{app_identifier}'.".red
+        raise "Could not find App ID '#{app_identifier}'.".red
       else
         identifiers.first.select_option
       end
