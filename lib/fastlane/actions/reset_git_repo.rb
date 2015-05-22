@@ -6,6 +6,8 @@ module Fastlane
         if params[:force] || params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
           paths = (params[:files] rescue nil)
 
+          return paths if Helper.is_test?
+          
           if (paths || []).count == 0
             Actions.sh('git reset --hard HEAD')
             Actions.sh('git clean -qfdx')
@@ -40,6 +42,7 @@ module Fastlane
                                        env_name: "FL_RESET_GIT_FILES",
                                        description: "Array of files the changes should be discarded from. If not given, all files will be discarded",
                                        optional: true,
+                                       is_string: false,
                                        verify_block: Proc.new do |value|
                                         raise "Please pass an array only" unless value.kind_of?Array
                                        end),
