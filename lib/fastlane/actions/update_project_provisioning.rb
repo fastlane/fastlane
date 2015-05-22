@@ -66,16 +66,16 @@ module Fastlane
                                         raise "Path to xcode project is invalid".red unless File.exists?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :profile,
-                                       env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE_NAME",
+                                       env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
                                        description: "Path to provisioning profile (.mobileprovision)",
-                                       default_value: ENV["SIGH_PROFILE_FILE_NAME"],
+                                       default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
                                        verify_block: Proc.new do |value|
                                         raise "Path to provisioning profile is invalid".red unless File.exists?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
-                                       default_value: "AppleIncRootCertificate.cer")
+                                       default_value: "/tmp/AppleIncRootCertificate.cer")
         ]
       end
 
