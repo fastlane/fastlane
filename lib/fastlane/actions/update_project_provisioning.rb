@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.description
-        "Update projects code signing settings from your profisioning profile (.mobileprovision)"
+        "Update projects code signing settings from your profisioning profile"
       end
 
       def self.details
@@ -80,7 +80,7 @@ module Fastlane
       end
 
       def self.author
-        "Tobias Strebitzer (tobias.strebitzer@magloft.com)"
+        "tobiasstrebitzer"
       end
 
       def self.is_supported?(platform)
