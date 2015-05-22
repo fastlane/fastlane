@@ -127,7 +127,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 
 
 ## How is my password stored?
-```cert``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
+```cert``` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
 
 # Tips
 
