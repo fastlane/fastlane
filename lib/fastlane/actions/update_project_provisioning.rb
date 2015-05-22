@@ -1,4 +1,3 @@
-require 'pbxplorer'
 module Fastlane
   module Actions
     module SharedValues
@@ -35,13 +34,31 @@ module Fastlane
         verification = p7.verify([cert], store)
         data = Plist::parse_xml(p7.data)
         
+        filter = params[:build_configuration_filter]
+
         # manipulate project file
-        Helper.log.info("Updating project '#{folder}' with UUID")
+        Helper.log.info("Going to update project '#{folder}' with UUID".green)
+        require 'pbxplorer'
+
         project_file = XCProjectFile.new(folder)
-        project_file.project.targets.first.build_configuration_list.build_configurations.each do |build_configuration|
-          build_configuration["buildSettings"]["PROVISIONING_PROFILE"] = data["UUID"]
-          build_configuration["buildSettings"]["CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]"] = "$(SDKROOT)/ResourceRules.plist"
+        project_file.project.targets.each do |target|
+          if filter
+            if target['productName'].match(filter) or target['productType'].match(filter)
+              Helper.log.info "Updating target #{target['productName']}...".green
+            else
+              Helper.log.info "Skipping target #{target['productName']} as it doesn't match the filter '#{filter}'".yellow
+              next
+            end
+          else
+            Helper.log.info "Updating target #{target['productName']}...".green
+          end
+
+          target.build_configuration_list.build_configurations.each do |build_configuration|
+            build_configuration["buildSettings"]["PROVISIONING_PROFILE"] = data["UUID"]
+            build_configuration["buildSettings"]["CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]"] = "$(SDKROOT)/ResourceRules.plist"
+          end
         end
+
         project_file.save
 
         # complete
@@ -53,7 +70,14 @@ module Fastlane
       end
 
       def self.details
-        "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj"
+        [
+          "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
+          "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
+          "",
+          "The `build_configuration_filter` value can be used to only update code signing for one target",
+          "Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles",
+          "Example: `update_project_provisioning(xcodeproj: \"..\", build_configuration_filter: \".*WatchKit App.*\")"
+        ].join("\n")
       end
 
       def self.available_options
@@ -72,6 +96,10 @@ module Fastlane
                                        verify_block: Proc.new do |value|
                                         raise "Path to provisioning profile is invalid".red unless File.exists?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
+                                       env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
+                                       description: "A filter for the target name. Use a standard regex",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
