@@ -39,10 +39,6 @@ module Deliver
 
 
         if is_beta_build?
-          if ready_for_sale?
-            raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
-          end
-
           Helper.log.info "Beta builds don't upload new metadata to iTunesConnet".yellow
         else
           upload_metadata
@@ -58,6 +54,10 @@ module Deliver
     end
 
     def upload_metadata
+      if ready_for_sale?
+        raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
+      end
+      
       load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
       load_metadata_folder # this is the new way of defining app metadata
       set_app_metadata
