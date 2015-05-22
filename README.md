@@ -99,6 +99,8 @@ I recommend following the [fastlane guide](https://github.com/KrauseFx/fastlane/
 If you are familiar with the command line and Ruby, install `fastlane` yourself:
 
     sudo gem install fastlane
+    
+The initial installation might take a few minutes without showing any output. 
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
