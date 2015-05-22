@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
 
-  spec.add_dependency 'fastlane_core', '>= 0.7.4' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.7.5' # all shared code and dependencies
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 0.11.0'
