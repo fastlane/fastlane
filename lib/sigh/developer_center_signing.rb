@@ -28,51 +28,68 @@ module Sigh
       certificateRequestTypes = wait_for_variable('certificateRequestTypes')
       certificateStatuses = wait_for_variable('certificateStatuses')
 
-      url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
-
-      # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
-
-      certs = post_ajax(url, "{pageNumber: 1, pageSize: 500, sort: 'name%3dasc'}")['certRequests']
-
-      ret_certs = []
-
-      # Select certificate
+      # Setup search criteria
       certificate_name = Sigh.config[:cert_owner_name]
       cert_date = Sigh.config[:cert_date]
       cert_id = Sigh.config[:cert_id]
 
       # The other profiles are push profiles
       certificate_type = type == DEVELOPMENT ? 'iOS Development' : 'iOS Distribution'
-      
-      # New profiles first
-      certs.sort! do |a, b|
-        Time.parse(b['expirationDate']) <=> Time.parse(a['expirationDate'])
-      end
 
-      certs.each do |current_cert|
-        next unless current_cert['typeString'] == certificate_type
+      url = [certificateDataURL, certificateRequestTypes, certificateStatuses].join('')
+      # https://developer.apple.com/services-account/.../account/ios/certificate/listCertRequests.action?content-type=application/x-www-form-urlencoded&accept=application/json&requestId=...&userLocale=en_US&teamId=...&types=...&status=4&certificateStatus=0&type=distribution
 
-        if cert_date || certificate_name || cert_id
-          if current_cert['expirationDateString'] == cert_date
-            Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located".green
-            ret_certs << current_cert
+      has_all_certificates = false
+      page_index = 1
+      page_size = 500
+
+      matched_certificates = []
+
+      until has_all_certificates do
+        certs = post_ajax(url, "{pageNumber: #{page_index}, pageSize: #{page_size}, sort: 'name%3dasc'}")['certRequests']
+
+        if certs
+          certificates_count = certs.count
+
+          Helper.log.info "Attempting to locate certificate. (#{certificates_count} certificates found on page #{page_index})"
+
+          # New profiles first
+          certs.sort! do |a, b|
+            Time.parse(b['expirationDate']) <=> Time.parse(a['expirationDate'])
           end
 
-          if current_cert['name'] == certificate_name
-            Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{certificate_name}' located".green
-            ret_certs << current_cert
-          end
+          certs.each do |current_cert|
+            next unless current_cert['typeString'] == certificate_type
 
-          if current_cert['certificateId'] == cert_id
-            Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{current_cert['name']}' located".green
-            ret_certs << current_cert
+            if cert_date || certificate_name || cert_id
+              if current_cert['expirationDateString'] == cert_date
+                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with expiry date '#{current_cert['expirationDateString']}' located".green
+                matched_certificates << current_cert
+              end
+
+              if current_cert['name'] == certificate_name
+                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{certificate_name}' located".green
+                matched_certificates << current_cert
+              end
+
+              if current_cert['certificateId'] == cert_id
+                Helper.log.info "Certificate ID '#{current_cert['certificateId']}' with name '#{current_cert['name']}' located".green
+                matched_certificates << current_cert
+              end
+            else
+              matched_certificates << current_cert
+            end
           end
+        end
+
+        if page_size <= certificates_count
+          page_index += 1
         else
-          ret_certs << current_cert
+          has_all_certificates = true
         end
       end
 
-      return ret_certs unless ret_certs.empty?
+      return matched_certificates unless matched_certificates.empty?
 
       predicates = []
       predicates << "name: #{certificate_name}" if certificate_name
