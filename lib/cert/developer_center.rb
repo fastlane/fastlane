@@ -126,7 +126,10 @@ module Cert
 
         raise "Something went wrong when downloading the certificate" unless data
 
-        dataWritten = File.write(output_path, data)
+        # write data to file
+        dataWritten = File.open(output_path, "wb") do |f|
+          f.write(data)
+        end
 
         if dataWritten == 0
           raise "Can't write to #{output_path}"
