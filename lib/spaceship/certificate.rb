@@ -21,7 +21,7 @@ module Spaceship
     class Production < Certificate; end
 
     # all these certs have apps.
-    class PushCertificate < Certificate; end
+    class PushCertificate < Certificate; end # abstract class
     class DevelopmentPush < PushCertificate; end
     class ProductionPush < PushCertificate; end
     class WebsitePush < PushCertificate; end
@@ -36,7 +36,6 @@ module Spaceship
       "LA30L5BJEU" => Certificate,
       "BKLRAVXMGM" => DevelopmentPush,
       "3BQKVH9I2X" => ProductionPush,
-      "BKLRAVXMGM,3BQKVH9I2X" => PushCertificate,
       "Y3B2F3TYSI" => Passbook,
       "3T2ZP62QW8" => WebsitePush,
       "E5D663CMZW" => WebsitePush,
