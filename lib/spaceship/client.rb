@@ -39,7 +39,7 @@ module Spaceship
         if ENV['DEBUG']
           # for debugging:
           c.response :logger
-          c.proxy "http://localhost:8080"
+          c.proxy "https://127.0.0.1:8888"
         end
       end
     end
