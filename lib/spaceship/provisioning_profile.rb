@@ -45,9 +45,24 @@ module Spaceship
         klass.new(attrs)
       end
 
+      # @param name (String) The name of the provisioning profile on the Dev Portal
+      # @param bundle_id (String) The app identifier, this paramter is required
+      # TODO: complete
       def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
+        raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
+        raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
+
         app = Spaceship::App.find(bundle_id)
-        profile = client.create_provisioning_profile!(name, self.type, app.app_id, [certificate.id], devices.map{|d| d.id})
+
+        # Fill in sensible default values
+        name ||= [bundle_id, self.type.capitalize].join(' ')
+        devices ||= client.devices # all devices by default
+
+        profile = client.create_provisioning_profile!(name, 
+                                              self.type, 
+                                              app.app_id, 
+                                              [certificate.id], 
+                                              devices.map {|d| d.id} )
         self.new(profile)
       end
 
