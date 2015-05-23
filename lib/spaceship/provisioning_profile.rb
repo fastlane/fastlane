@@ -23,8 +23,9 @@ module Spaceship
       end
 
       def factory(attrs)
-
+        # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
         attrs['distributionMethod'] = 'adhoc' if attrs['distributionMethod'] == 'store' && attrs['devices'].size > 0
+        # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
 
         klass = case attrs['distributionMethod']
         when 'limited'
@@ -34,12 +35,12 @@ module Spaceship
         when 'adhoc'
           AdHoc
         else
-          raise attrs['distributionMethod']
+          raise "Can't find class '#{attrs['distributionMethod']}'"
         end
 
         attrs['appId'] = App.factory(attrs['appId'])
-        attrs['devices'].map! {|device| Device.factory(device) }
-        attrs['certificates'].map! {|cert| Certificate.factory(cert) }
+        attrs['devices'].map! { |device| Device.factory(device) }
+        attrs['certificates'].map! { |cert| Certificate.factory(cert) }
 
         klass.new(attrs)
       end
@@ -55,23 +56,23 @@ module Spaceship
           self.factory(profile)
         end
 
-        #filter out the profiles managed by xcode
+        # filter out the profiles managed by xcode
         profiles.delete_if do |profile|
           profile.managed_by_xcode?
         end
 
         return profiles if self == ProvisioningProfile
 
-        #only return the profiles that match the class
+        # only return the profiles that match the class
         profiles.select do |profile|
           profile.class == self
         end
       end
 
       def find_by_bundle_id(bundle_id)
-        all.find_all { |profile|
+        all.find_all do |profile|
           profile.app.bundle_id == bundle_id
-        }
+        end
       end
 
     end
