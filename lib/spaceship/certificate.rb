@@ -129,9 +129,16 @@ module Spaceship
     end
 
     # instance methods
+
+    # The raw data without parsing
+    def download_raw
+      client.download_certificate(id, type_display_id)
+    end
+
+    # Parse the server response
     def download
-      file = client.download_certificate(id, type_display_id)
-      OpenSSL::X509::Certificate.new(file)
+      OpenSSL::X509::Certificate.new(download_raw)
+    end
     end
 
     def revoke!
