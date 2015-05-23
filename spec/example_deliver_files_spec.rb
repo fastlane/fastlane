@@ -44,13 +44,6 @@ describe Deliver do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/download_valid_apple_id.txt")
           end
 
-          it "automatically fetches the version number from the iTunes Connect API" do
-            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
-
-            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
-            expect(meta.deliver_process.app.metadata.fetch_value("//x:version").first['string']).to eq("1.0")
-          end
-
           it "successfully loads the Deliverfile if it's valid" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
 
@@ -87,7 +80,7 @@ describe Deliver do
 
             ipa_path = "./spec/fixtures/ipas/Example1.ipa"
             ENV["IPA_OUTPUT_PATH"] = ipa_path
-            
+
             meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileIpaFromEnv")
 
             expect(ENV["DELIVER_IPA_PATH"]).to eq(ipa_path) # use this ipa
@@ -97,7 +90,7 @@ describe Deliver do
 
           it "Raises an exception when iTunes Transporter results in an error" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
-            
+
             expect {
               Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
             }.to raise_exception("Return status of iTunes Transporter was 1: ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"".red)
@@ -236,9 +229,9 @@ describe Deliver do
               expect(File.exists?@tests_path).to eq(false)
               Deliver::ItunesTransporter.clear_mock_files # we don't even download the app metadata
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks", 
-                                force: true, 
-                                is_beta_ipa: true, 
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks",
+                                force: true,
+                                is_beta_ipa: true,
                                 skip_deploy: true)
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(true)

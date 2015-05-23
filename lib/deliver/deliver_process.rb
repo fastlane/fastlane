@@ -55,9 +55,9 @@ module Deliver
 
     def upload_metadata
       if ready_for_sale?
-        raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red 
+        raise "Cannot update metadata of apps 'Ready for Sale'. You can dupe: http://www.openradar.appspot.com/18263306".red
       end
-      
+
       load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
       load_metadata_folder # this is the new way of defining app metadata
       set_app_metadata
@@ -110,8 +110,7 @@ module Deliver
 
       @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_version ||= (@ipa.fetch_app_version rescue nil) # since ipa might be nil
-      @app_version ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['version'] rescue nil)
-      @app_version ||= (app.get_live_version rescue nil)
+      @app_version ||= (app.get_live_version rescue nil) # pull the latest version from iTunes Connect
     end
 
     #####################################################
@@ -178,11 +177,11 @@ module Deliver
 
         Deliverfile::Deliverfile::DSL.validate_ipa!(used_ipa_file)
       end
-      
+
       if (used_ipa_file || '').length == 0 and is_beta_build?
         # Beta Release but no ipa given
         used_ipa_file = Dir["*.ipa"].first
-        
+
         unless used_ipa_file
           raise "Could not find an ipa file for 'beta' mode. Provide one using `beta_ipa do ... end` in your Deliverfile.".red
         end
@@ -399,7 +398,7 @@ module Deliver
         # Custom error handling, we just call this one
         @deploy_information[:blocks][:error].call(hash_for_callback(ex))
       end
-      
+
       # Re-Raise the exception
       raise ex
     end
