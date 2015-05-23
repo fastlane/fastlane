@@ -98,7 +98,7 @@ module Spaceship
       end
 
       def self.pretty_type
-        return 'development'.capitalize
+        return 'Development'
       end
     end
 
@@ -106,11 +106,19 @@ module Spaceship
       def self.type
         'store'
       end
+
+      def self.pretty_type
+        'AppStore'
+      end
     end
 
     class AdHoc < ProvisioningProfile
       def self.type
         'adhoc'
+      end
+
+      def self.pretty_type
+        'AdHoc'
       end
     end
 
