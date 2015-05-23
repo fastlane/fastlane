@@ -55,7 +55,7 @@ module Spaceship
         app = Spaceship::App.find(bundle_id)
 
         # Fill in sensible default values
-        name ||= [bundle_id, self.type.capitalize].join(' ')
+        name ||= [bundle_id, self.pretty_type].join(' ')
         devices = Spaceship.devices if (devices.nil? or devices.count == 0) # all devices by default
 
         profile = client.create_provisioning_profile!(name, 
@@ -96,6 +96,10 @@ module Spaceship
       def self.type
         'limited'
       end
+
+      def self.pretty_type
+        return 'development'.capitalize
+      end
     end
 
     class AppStore < ProvisioningProfile
@@ -116,6 +120,10 @@ module Spaceship
 
     def delete!
       client.delete_provisioning_profile!(self.id)
+    end
+
+    def self.pretty_type
+      type.capitalize
     end
 
     def managed_by_xcode?

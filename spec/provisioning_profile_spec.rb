@@ -19,6 +19,9 @@ describe Spaceship::ProvisioningProfile do
       expect(profile.uuid).to eq('34b221d4-31aa-4e55-9ea1-e5fac4f7ff8c')
       expect(profile.managed_by_xcode?).to eq(false)
       expect(profile.distribution_method).to eq('limited')
+      expect(profile.class.type).to eq('limited')
+      expect(profile.class.pretty_type).to eq('Development')
+      expect(profile.type).to eq('iOS Development')
     end
 
     it 'should filter by the correct types' do
