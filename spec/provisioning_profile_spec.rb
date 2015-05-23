@@ -68,5 +68,15 @@ describe Spaceship::ProvisioningProfile do
       expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', ["XC5PH8DAAA"], []).and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
+
+    it 'creates a provisioning profile with only the required parameters and auto fills all available devices' do
+      expect(client).to receive(:create_provisioning_profile!).with('net.sunapps.1 Store', 
+                                                                    'store', 
+                                                                    '2UMR2S6PAA', 
+                                                                    ["XC5PH8DAAA"], 
+                                                                    ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"]).
+                        and_return({})
+      Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
+    end
   end
 end
