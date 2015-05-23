@@ -1,9 +1,13 @@
 require 'plist'
+require 'sigh/spaceship/runner'
 
 module Sigh
   class Manager
     def self.start
-      path = Sigh::DeveloperCenter.new.run
+      start = Time.now
+      puts "Start!"
+      path = Sigh::Runner.new.run
+      puts "Finished in #{Time.now - start}".green
 
       return nil unless path
 
