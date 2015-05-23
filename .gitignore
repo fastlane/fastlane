@@ -33,6 +33,8 @@ build/
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
+# OS X Junk
+.DS_Store
 
 # Added by Felix
 /*.itmsp
