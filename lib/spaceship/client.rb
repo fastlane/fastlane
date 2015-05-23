@@ -66,6 +66,10 @@ module Spaceship
         password ||= data.password
       end
 
+      if username.to_s.empty? or password.to_s.empty?
+        raise InvalidUserCredentialsError.new("No login data provided")
+      end
+
       response = request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate", {
         appleId: username,
         accountPassword: password,

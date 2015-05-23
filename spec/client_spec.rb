@@ -23,6 +23,12 @@ describe Spaceship::Client do
         subject.login('bad-username', 'bad-password')
       }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
     end
+
+    it "raises an exception if no login data is provided at all" do
+      expect {
+        subject.login('', '')
+      }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
+    end
   end
 
   context 'authenticated' do
