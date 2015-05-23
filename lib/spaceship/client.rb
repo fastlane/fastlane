@@ -278,13 +278,15 @@ module Spaceship
       # memoize the last csrf tokens from responses
       def csrf_tokens
         return {} unless @last_response
+        return @csrf_tokens if @csrf_tokens
 
         tokens = @last_response.headers.select{|k,v| %w[csrf csrf_ts].include?(k) }
-        if tokens.empty? && @crsf_tokens && !@csrf_tokens.empty?
-          @csrf_tokens
-        else
+
+        if (@csrf_tokens || {}).empty? and !(tokens || {}).empty?
           @csrf_tokens = tokens
         end
+
+        return {}
       end
 
       def request(method, url_or_path = nil, params = nil, headers = {}, &block)
@@ -293,7 +295,7 @@ module Spaceship
           headers.merge!(csrf_tokens)
         end
 
-        #form-encode the params only if there are params, and the block is not supplied.
+        # form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
         if method == :post && params && !block_given?
           params, headers = encode_params(params, headers)
