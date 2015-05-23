@@ -1,3 +1,5 @@
+require 'net/http'
+
 ## monkey-patch Net::HTTP
 #
 # Certain apple endpoints return 415 responses if a Content-Type is supplied.
