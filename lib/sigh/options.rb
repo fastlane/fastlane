@@ -22,7 +22,7 @@ module Sigh
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "SIGH_FORCE",
-                                     description: "Renew non-development provisioning profiles regardless of its state",
+                                     description: "Renew provisioning profiles regardless of its state",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,

@@ -42,7 +42,7 @@ module Sigh
       (FileUtils.copy profile, destination rescue nil) # if the directory doesn't exist yet
 
       if File.exists? destination
-        Helper.log.info "Profile installed at \"#{destination}\""
+        Helper.log.info "Profile successfully installed at \"#{destination}\"".green
       else
         raise "Failed installation of provisioning profile at location: #{destination}".red
       end
