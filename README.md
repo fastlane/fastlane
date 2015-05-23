@@ -111,9 +111,9 @@ File.write('/tmp/test', x509_cert.to_pem)
 
 Filter by certificate types:
 ```ruby
-push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certificates::PushCertificate) }
-#or
-prod_push_certs = Spaceship.certificates.select {|c| c.kind_of?(Spaceship::Certificates::ProductionPush) }
+push_certs = Spaceship::Certificate::PushCertificate.all
+# or
+prod_push_certs = Spaceship::Certificate::ProductionPush.all
 ```
 
 Create a new certificate

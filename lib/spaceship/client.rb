@@ -37,6 +37,7 @@ module Spaceship
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
+          # for debugging:
           c.response :logger
           c.proxy "http://localhost:8080"
         end
