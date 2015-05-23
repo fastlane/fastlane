@@ -137,7 +137,6 @@ module Spaceship
     def download
       OpenSSL::X509::Certificate.new(download_raw)
     end
-    end
 
     def revoke!
       client.revoke_certificate!(id, type_display_id)
