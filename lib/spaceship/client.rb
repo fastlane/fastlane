@@ -240,7 +240,7 @@ module Spaceship
         appIdId: app_id,
         distributionType: distribution_method,
         certificateIds: certificate_ids,
-        deviceIds: device_ids,
+        deviceIds: device_ids
       })
       parse_response('provisioningProfile')
     end
@@ -257,6 +257,18 @@ module Spaceship
       request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id
+      })
+      parse_response
+    end
+
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids)
+      request(:post, 'account/ios/profile/regenProvisioningProfile.action', {
+        teamId: team_id,
+        provisioningProfileName: name,
+        appIdId: app_id,
+        distributionType: distribution_method,
+        certificateIds: certificate_ids,
+        deviceIds: device_ids
       })
       parse_response
     end

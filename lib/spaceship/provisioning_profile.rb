@@ -122,6 +122,18 @@ module Spaceship
       client.delete_provisioning_profile!(self.id)
     end
 
+    # Repair an existing provisioning profile
+    def repair!
+      client.repair_provisioning_profile!(
+        self.id,
+        self.name,
+        self.distribution_method,
+        self.app.app_id,
+        self.certificates.map { |c| c.id },
+        self.devices.map { |d| d.id }
+      )
+    end
+
     def self.pretty_type
       type.capitalize
     end
