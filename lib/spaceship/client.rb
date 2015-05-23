@@ -191,6 +191,8 @@ module Spaceship
     end
 
     def download_certificate(certificate_id, type)
+      {type: type, certificate_id: certificate_id}.each { |k, v| raise "#{k} must not be nil" if v.nil? }
+
       request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
         displayId: certificate_id,
         type: type
