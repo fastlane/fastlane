@@ -56,7 +56,7 @@ module Spaceship
 
         # Fill in sensible default values
         name ||= [bundle_id, self.type.capitalize].join(' ')
-        devices ||= client.devices # all devices by default
+        devices = Spaceship.devices if (devices.nil? or devices.count == 0) # all devices by default
 
         profile = client.create_provisioning_profile!(name, 
                                               self.type, 
