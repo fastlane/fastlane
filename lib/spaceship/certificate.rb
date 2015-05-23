@@ -84,8 +84,6 @@ module Spaceship
           attrs.delete('certificateType')
         end
 
-        puts attrs
-
         # Here we go
         klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
         klass ||= Certificate
