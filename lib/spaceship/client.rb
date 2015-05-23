@@ -34,11 +34,9 @@ module Spaceship
         c.response :json, :content_type => /\bjson$/
         c.response :xml, :content_type => /\bxml$/
         c.response :plist, :content_type => /\bplist$/
-        #c.request :url_encoded
-        c.adapter Faraday.default_adapter #can be Excon
+        c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
-          #for debugging:
           c.response :logger
           c.proxy "http://localhost:8080"
         end

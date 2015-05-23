@@ -65,7 +65,7 @@ module Spaceship
       ##
       # @param types
       def all
-        if(self == Certificate) # are we the base-class?
+        if (self == Certificate) # are we the base-class?
           types = CERTIFICATE_TYPE_IDS.keys
         else
           types = [CERTIFICATE_TYPE_IDS.key(self)]
@@ -77,9 +77,9 @@ module Spaceship
       end
 
       def find(certificate_id)
-        all.find {|c|
+        all.find do |c|
           c.id == certificate_id
-        }
+        end
       end
 
       def create!(csr, bundle_id = nil)
@@ -98,7 +98,7 @@ module Spaceship
       end
     end
 
-    #instance methods
+    # instance methods
     def download
       file = client.download_certificate(id, type_display_id)
       OpenSSL::X509::Certificate.new(file)
