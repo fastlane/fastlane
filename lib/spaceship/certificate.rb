@@ -57,6 +57,36 @@ module Spaceship
       end
 
       def factory(attrs)
+        # TODO: does this belong here?
+
+        # Example:
+        # => {"name"=>"iOS Distribution: SunApps GmbH",
+        #  "certificateId"=>"XC5PH8DAAA",
+        #  "serialNumber"=>"797E732CCE8B7AAA",
+        #  "status"=>"Issued",
+        #  "statusCode"=>0,
+        #  "expirationDate"=>#<DateTime: 2015-11-25T22:45:50+00:00 ((2457352j,81950s,0n),+0s,2299161j)>,
+        #  "certificatePlatform"=>"ios",
+        #  "certificateType"=>
+        #   {"certificateTypeDisplayId"=>"R58UK2EAAA",
+        #    "name"=>"iOS Distribution",
+        #    "platform"=>"ios",
+        #    "permissionType"=>"distribution",
+        #    "distributionType"=>"store",
+        #    "distributionMethod"=>"app",
+        #    "ownerType"=>"team",
+        #    "daysOverlap"=>364,
+        #    "maxActive"=>2}}
+
+        if attrs['certificateType']
+          # On some accounts this is nested, so we need to flatten it
+          attrs.merge!(attrs['certificateType'])
+          attrs.delete('certificateType')
+        end
+
+        puts attrs
+
+        # Here we go
         klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
         klass ||= Certificate
         klass.new(attrs)
