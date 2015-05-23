@@ -123,7 +123,14 @@ module Spaceship
     end
 
     # Repair an existing provisioning profile
+    # alias to update!
     def repair!
+      update!
+    end
+
+    # Updates the provisioning profile from the local data
+    # e.g. after you added new devices to the profile
+    def update!
       client.repair_provisioning_profile!(
         self.id,
         self.name,
