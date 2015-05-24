@@ -30,12 +30,13 @@ spaceship
 [![Codeship Status for KrauseFx/spaceship](https://img.shields.io/codeship/96bb1040-c2b6-0132-4c5b-22f8b41c2618/master.svg)](https://codeship.com/projects/73801)
 
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx)
 
 
 -------
 <p align="center">
     insert points here
+    <a href="#technical-details">Technical Details</a>
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -45,157 +46,232 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
+# What's `spaceship`?
+
+> `spaceship` is named after the new Apple HQ in Cupertino. It allows you to seamlessly interact with the Apple Developer Portal using very simple Ruby code. 
+
+`spaceship` uses simple HTTPs requests without any sort of web scraping. This allows `spaceship` to have a 95% test coverage.
+
+Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds :rocket:
+
+`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you, so you don't have to think about it. [More details about the APIs](#technical-details).
+
+Up until now, the [fastlane tools](https://fastlane.tools) use web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
+
 # Installation
 
     sudo gem install spaceship
 
 # Usage
 
-Spaceship is library designed to provide an interface to all of the functionality of Apple's Developer Portal via a simple HTTP client.
-
-
-## Authorization
-
-In order to use the library you must login with you Apple ID credentials. This
-only needs to be done once during the lifetime of your app as the authenticated
-client is shared. Your credentials are not saved anywhere.
-
+## Login
 
 ```ruby
-Spaceship.login(username, password)
+Spaceship.login("felix@krausefx.com", "password")
+
+Spaceship.client.select_team # call this method to let the user select a team
 ```
 
-### Multiple Teams
-
-Show a UI to the user:
+## Apps
 
 ```ruby
-Spaceship.UI.select_team
-```
+# Fetch all available apps
+all_apps = Spaceship.apps
 
-Set a team manually
+# Find a specific app based on the bundle identifier
+app = Spaceship.apps.find("com.krausefx.app")
 
-```ruby
-Spaceship.client.current_team_id = "5A997XSHAA"
-```
-
-### App Ids
-
-For instance, this is how you can list all of your app ids:
-```ruby
+# Show the names of all your apps
 Spaceship.apps.each do |app|
-  puts app
+  puts app.name
 end
+
+# Create a new app
+app = Spaceship::App.create!(app_identifier: "com.krausefx.app_name", name: "fastlane App")
 ```
 
-Finding an app by it's bundle_id
-```ruby
-app = Spaceship.apps.find('tools.fastlane.test-app')
-```
-
-Creating an app:
-```ruby
-Spaceship::App.create!('com.company.appname', 'Next Big App')
-```
-
-### Certificates
-
-Download a certificate:
+## Certificates
 
 ```ruby
+# Fetch all available certificates (includes signing and push profiles)
 certificates = Spaceship.certificates
-
-x509_cert = certificates.download('CERTID')
-File.write('/tmp/test', x509_cert.to_pem)
 ```
 
-Filter by certificate types:
+### Code Signing Certificates
+
 ```ruby
-push_certs = Spaceship::Certificate::PushCertificate.all
-# or
+# Production identities
+prod_certs = Spaceship::Certificate::Production.all
+
+# Development identities
+dev_certs = Spaceship::Certificate::Development.all
+
+# Download a certificate
+cert_content = prod_certs.first.download
+```
+
+### Push Certificates
+```ruby
+# Production push profiles
 prod_push_certs = Spaceship::Certificate::ProductionPush.all
+
+# Development push profiles
+dev_push_certs = Spaceship::Certificate::DevelopmentPush.all
+
+# Download a push profile
+cert_content = dev_push_certs.first.download
 ```
 
-Create a new certificate
+### Create a Certificate
 
 ```ruby
-csr = Spaceship::Certificate.certificate_signing_request
-Spaceship::Certificate::ProductionPush.create!(csr, 'tools.fastlane.test-app')
+# Create a new certificate signing request
+csr = Spaceship::Certificate.create_certificate_signing_request
+
+# Use the signing request to create a new distribution certificate
+Spaceship::Certificate::Production.create!(csr)
+
+# Use the signing request to create a new push certificate
+Spaceship::Certificate::ProductionPush.create!(csr, "com.krausefx.app")
 ```
 
-### Provisioning Profiles
+## Provisioning Profiles
 
-List provisioning profiles
+### Receiving profiles
+
 ```ruby
+##### Finding #####
+
+# Get all available provisioning profiles
 profiles = Spaceship.provisioning_profiles
-```
 
-create a distribution provisioning profile for an app
-```ruby
-production_cert = Spaceship.certificates.select {|c| c.is_a?(Spaceship::Certificates::Production)}.first
-Spaceship::ProvisioningProfile::AppStore.create!('Flappy Bird 2.0', 'tools.fastlane.flappy-bird', production_cert)
-```
+# Get all App Store profiles
+profiles_appstore = Spaceship::ProvisioningProfile::AppStore.all
 
-Named Parameters
-```ruby
-Spaceship::ProvisioningProfile::Development.create!(
-    name: "Spaceship",
-    bundle_id: "net.sunapps.1",
-    certificate: Spaceship.certificates.all_of_type(Spaceship::Certificates::Development).first,
-    devices: [Spaceship.devices.first])
-```
+# Get all AdHoc profiles
+profiles_adhoc = Spaceship::ProvisioningProfile::AdHoc.all
 
-download the .mobileprovision profile
-```ruby
-profile = Spaceship.provisioning_profiles.find do |pp|
-  pp.app.bundle_id == 'net.sunapps.1' && pp.distribution_method == 'store'
+# Get all Development profiles
+profiles_dev = Spaceship::ProvisioningProfile::Development.all
+
+##### Downloading #####
+
+# Download a profile
+profile_content = profiles.first.download
+
+# Download a specific profile as file
+my_profile = profiles.find do |p|
+  p.app.bundle_id == "com.krausefx.app"
 end
-file = profile.download
-
-#provisioning profiles also can be scoped by their types like this:
-file = Spaceship::ProvisioningProfile::AppStore.find {|p| pp.app.bundle_id == 'net.sunapps.1' }.download
+File.write("output.mobileprovision", my_profile.download)
 ```
 
-Check out the wiki for a full list of all supported actions.
+### Example Profile
 
+Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
 
-The goal is to get to a point to be able to do this:
+```
+#<Spaceship::ProvisioningProfile::AdHoc 
+  @devices=[
+    #<Spaceship::Device 
+      @id="5YTNZ5A9AA", 
+      @name="Felix iPhone 6", 
+      @udid="39d2cab02642dc2bfdbbff4c0cb0e50c8632faaa"
+    >, 
+    ...], 
+  @certificates=[
+    #<Spaceship::Certificate::Production 
+      @id="LHNT9C2AAA", 
+      @name="iOS Distribution", 
+      @expires=#<DateTime: 2016-02-10T23:44:20>
+    ], 
+  @id="72SRVUNAAA", 
+  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa", 
+  @expires=#<DateTime: 2016-02-10T23:44:20>, 
+  @distribution_method="adhoc", 
+  @name="com.krausefx.app AppStore", 
+  @status="Active", 
+  @platform="ios", 
+  @app=#<Spaceship::App 
+    @app_id="2UMR2S6AAA", 
+    @name="App Name", 
+    @platform="ios", 
+    @bundle_id="com.krausefx.app", 
+    @is_wildcard=false>
+  >
+>
+```
+
+### Create a Provisioning Profile
 
 ```ruby
-Spaceship.login
+# Choose the certificate to use
+cert = Spaceship::Certificate::Production.all.first
 
-app = Spaceship.apps.create!(identifier: ‘com.krausefx.app’, name: ‘New App’)
+# Create a new provisioning profile with a default name
+# The name of the new profile is "com.krausefx.app AppStore"
+profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.krausefx.app",
+                                                         certificate: cert)
 
-profile = app.provisioning_profiles.create!(
-  type: :appstore,
-  name: "Spaceship Profile"
-)
+# AdHoc Profiles will add all devices by default
+profile = Spaceship::ProvisioningProfile::AdHoc.create!(bundle_id: "com.krausefx.app",
+                                                      certificate: cert,
+                                                             name: "Such Custom Name, Much Special")
 
-profile.download
+# Store the new profile on the filesystem
+File.write("NewProfile.mobileprovision", profile.download)
 ```
 
-## Debugging
+### Repair a broken provisioning profile
 
-In order to inspect traffic during development, it is useful to enable network debugging.
-A man-in-the-middle proxy such as Charles or mitmproxy on `localhost:8080` is required for this to work.
+```ruby
+# Select all 'Invalid' or 'Expired' provisioning profiles
+broken_profiles = Spaceship.provisioning_profiles.find_all do |profile| 
+  (profile.status == "Invalid" or profile.status == "Expired")
+end
 
-### Example
+# Iterate over all broken profiles and repair them
+broken_profiles.each do |profile|
+  profile.repair! # yes, that's all you need to repair a  profile
+end
 
-`$ brew install mitmproxy`
+# or to make the same thing, just more Ruby like:
+Spaceship.provisioning_profiles.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
+```
 
-`$ mitmproxy`
+## Devices
 
-in another terminal
+```ruby
+all_devices = Spaceship.devices
+```
 
-`$ DEBUG=1 bundle exec pry -rspaceship`
+## More cool things you can do
+```ruby
+# Find a profile with a specific name
+profile = Spaceship::ProvisioningProfile::Development.all.find { |p| p.name == "ProfileName" }
 
-`>> Spaceship.login('username', 'password')`
+# Add all available devices to the profile
+profile.devices = Spaceship.devices
 
-You should see the requests and responses in mitmproxy
+# Push the changes back to the Apple Developer Portal
+profile.update!
 
-## Credit
+# Get the currently used team_id
+Spaceship.client.team_id
 
-This project has been sponsored by [https://zeropush.com](ZeroPush).
+# We generally don't want to be destructive, but you can also delete things
+# This method might fail for various reasons, e.g. app is already in the store
+app = Spaceship.apps.find("com.krausefx.app")
+app.delete!
+```
+
+# Technical Details
+
+TODO
+
+# Credits
+
+This project has been sponsored by [ZeroPush](https://zeropush.com). `spaceship` was developed by [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
@@ -203,9 +279,8 @@ This project is licensed under the terms of the MIT license. See the LICENSE fil
 # Contributing
 
 1. Create an issue to start a discussion about your idea
-2. Fork it (https://github.com/KrauseFx/spaceship/fork)
+2. Fork it (https://github.com/KrauseFx/fastlane/fork)
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create a new Pull Request
-

@@ -6,6 +6,7 @@ require 'spaceship/helper/net_http_generic_request'
 
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
+  require 'openssl'
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
@@ -51,20 +52,35 @@ module Spaceship
       end
     end
 
+    # Automatic paging
+
+    def page_size
+      @page_size ||= 500
+    end
+
+    # Handles the paging for you... for free
+    # Just pass a block and use the parameter as page number
+    def paging
+      page = 0
+      results = []
+      loop do
+        page += 1
+        current = yield(page)
+
+        results = results + current
+        
+        break if ((current || []).count < page_size) # no more results
+      end
+
+      return results
+    end
+
     ##
     # perform login procedure. this sets a cookie that will be used in subsequent requests
     # raises InvalidUserCredentialsError if authentication failed.
     #
     # returns Spaceship::Client
     def login(username = nil, password = nil)
-
-      if !username or !password
-        require 'credentials_manager'
-        data = CredentialsManager::PasswordManager.shared_manager(username, false)
-        username ||= data.username
-        password ||= data.password
-      end
-
       if username.to_s.empty? or password.to_s.empty?
         raise InvalidUserCredentialsError.new("No login data provided")
       end
@@ -89,8 +105,8 @@ module Spaceship
     end
 
     def teams
-      request(:post, 'account/listTeams.action')
-      parse_response('teams')
+      r = request(:post, 'account/listTeams.action')
+      parse_response(r, 'teams')
     end
 
     def team_id
@@ -112,13 +128,15 @@ module Spaceship
     end
 
     def apps
-      request(:post, 'account/ios/identifiers/listAppIds.action', {
-        teamId: team_id,
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'name=asc'
-      })
-      parse_response('appIds')
+      paging do |page_number|
+        r = request(:post, 'account/ios/identifiers/listAppIds.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'appIds')
+      end
     end
 
     def create_app!(type, name, bundle_id)
@@ -147,26 +165,28 @@ module Spaceship
 
       params.merge!(ident_params)
 
-      request(:post, 'account/ios/identifiers/addAppId.action', params)
-      parse_response('appId')
+      r = request(:post, 'account/ios/identifiers/addAppId.action', params)
+      parse_response(r, 'appId')
     end
 
     def delete_app!(app_id)
-      request(:post, 'account/ios/identifiers/deleteAppId.action', {
+      r = request(:post, 'account/ios/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
       })
-      parse_response
+      parse_response(r)
     end
 
     def devices
-      request(:post, 'account/ios/device/listDevices.action', {
-        teamId: team_id,
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'name=asc'
-      })
-      parse_response('devices')
+      paging do |page_number|
+        r = request(:post, 'account/ios/device/listDevices.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'devices')
+      end
     end
 
     def create_device(device_name, device_id)
@@ -181,71 +201,72 @@ module Spaceship
     end
 
     def certificates(types)
-      request(:post, 'account/ios/certificate/listCertRequests.action', {
-        teamId: team_id,
-        types: types.join(','),
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'certRequestStatusCode=asc'
-      })
-      parse_response('certRequests')
+      paging do |page_number|
+        r = request(:post, 'account/ios/certificate/listCertRequests.action', {
+          teamId: team_id,
+          types: types.join(','),
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'certRequestStatusCode=asc'
+        })
+        parse_response(r, 'certRequests')
+      end
     end
 
     def create_certificate!(type, csr, app_id = nil)
-      request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
         type: type,
         csrContent: csr,
         appIdId: app_id  #optional
       })
-      parse_response('certRequest')
+      parse_response(r, 'certRequest')
     end
 
     def download_certificate(certificate_id, type)
       {type: type, certificate_id: certificate_id}.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
-      request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
+      r = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
         displayId: certificate_id,
         type: type
       })
-      parse_response
+      parse_response(r)
     end
 
     def revoke_certificate!(certificate_id, type)
-      request(:post, 'account/ios/certificate/revokeCertificate.action', {
+      r = request(:post, 'account/ios/certificate/revokeCertificate.action', {
         teamId: team_id,
         certificateId: certificate_id,
         type: type
       })
-      parse_response('certRequests')
+      parse_response(r, 'certRequests')
     end
 
     def provisioning_profiles
-      request(:post) do |r|
+      r = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
-          search: nil,
-          pageSize: 500,
-          pageNumber: 1,
-          sort: 'name=asc'
+          includeInactiveProfiles: true,
+          onlyCountLists: true,
         }
       end
-      parse_response('provisioningProfiles')
+
+      parse_response(r, 'provisioningProfiles')
     end
 
     def provisioning_profile(profile_id)
-      request(:post, 'account/ios/profile/getProvisioningProfile.action', {
+      r = request(:post, 'account/ios/profile/getProvisioningProfile.action', {
         teamId: team_id,
         includeInactiveProfiles: true,
         onlyCountLists: true,
         provisioningProfileId: profile_id
       })
-      parse_response('provisioningProfile')
+      parse_response(r, 'provisioningProfile')
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)
-      request(:post, 'account/ios/profile/createProvisioningProfile.action', {
+      r = request(:post, 'account/ios/profile/createProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileName: name,
         appIdId: app_id,
@@ -253,27 +274,27 @@ module Spaceship
         certificateIds: certificate_ids,
         deviceIds: device_ids
       })
-      parse_response('provisioningProfile')
+      parse_response(r, 'provisioningProfile')
     end
 
     def download_provisioning_profile(profile_id)
-      request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
+      r = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
         teamId: team_id,
         displayId: profile_id
       })
-      parse_response
+      parse_response(r)
     end
 
     def delete_provisioning_profile!(profile_id)
-      request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
+      r = request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id
       })
-      parse_response
+      parse_response(r)
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids)
-      request(:post, 'account/ios/profile/regenProvisioningProfile.action', {
+      r = request(:post, 'account/ios/profile/regenProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id,
         provisioningProfileName: name,
@@ -283,23 +304,23 @@ module Spaceship
         deviceIds: device_ids
       })
 
-      parse_response('provisioningProfile')
+      parse_response(r, 'provisioningProfile')
     end
 
     private
+      # Is called from `parse_response` to strore 
+      def store_csrf_tokens(response)
+        if response and response.headers
+          tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
+          if tokens and not tokens.empty?
+            @csrf_tokens = tokens
+          end
+        end
+      end
       ##
       # memoize the last csrf tokens from responses
       def csrf_tokens
-        return {} unless @last_response
-        return @csrf_tokens if @csrf_tokens
-
-        tokens = @last_response.headers.select{|k,v| %w[csrf csrf_ts].include?(k) }
-
-        if (@csrf_tokens || {}).empty? and !(tokens || {}).empty?
-          @csrf_tokens = tokens
-        end
-
-        return {}
+        @csrf_tokens || {}
       end
 
       def request(method, url_or_path = nil, params = nil, headers = {}, &block)
@@ -307,6 +328,7 @@ module Spaceship
           headers.merge!({'Cookie' => cookie})
           headers.merge!(csrf_tokens)
         end
+        headers.merge!({'User-Agent' => 'spaceship'})
 
         # form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
@@ -314,19 +336,20 @@ module Spaceship
           params, headers = encode_params(params, headers)
         end
 
-        @last_response = @client.send(method, url_or_path, params, headers, &block)
+        @client.send(method, url_or_path, params, headers, &block)
       end
 
-      def parse_response(expected_key = nil)
+      def parse_response(response, expected_key = nil)
         if expected_key
-          content = @last_response.body[expected_key]
+          content = response.body[expected_key]
         else
-          content = @last_response.body
+          content = response.body
         end
 
         if content.nil?
-          raise UnexpectedResponse.new(@last_response.body)
+          raise UnexpectedResponse.new(response.body)
         else
+          store_csrf_tokens(response)
           content
         end
       end
