@@ -138,6 +138,7 @@ module Spaceship
 
     # Updates the provisioning profile from the local data
     # e.g. after you added new devices to the profile
+    # If you want to download the profile afterwards you need to fetch it again
     def update!
       client.repair_provisioning_profile!(
         self.id,

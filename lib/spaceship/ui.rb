@@ -1,7 +1,10 @@
 # require all the UI files
-Dir[File.join(Dir.pwd, "**/ui/*.rb")].each do |file|
+paths = Dir[File.expand_path "**/ui/*.rb", File.dirname(__FILE__)]
+raise "Could not find UI classes to import" unless paths.count > 0
+paths.each do |file|
   require file
 end
+
 
 module Spaceship
   class Client
