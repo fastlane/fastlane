@@ -82,4 +82,28 @@ describe Spaceship::ProvisioningProfile do
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
     end
   end
+
+  describe "#repair" do
+    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+
+    it "repairs an existing profile with added devices" do
+      profile.devices = Spaceship.devices
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["XC5PH8D47H"], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"]).and_return({})
+      profile.repair!
+    end
+
+    it "repairs an existing profile with no devices" do
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["XC5PH8D47H"], []).and_return({})
+      profile.repair!
+    end
+  end
+
+  describe "#update!" do
+    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+
+    it "repairs an existing profile" do
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["XC5PH8D47H"], []).and_return({})
+      profile.update!
+    end
+  end
 end

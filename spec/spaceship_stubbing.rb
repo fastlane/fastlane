@@ -50,6 +50,12 @@ def stub_provisioning
     with(:body => {"appIdId"=>"R9YNDTPLJX", "certificateIds"=>"C8DL7464RQ", "deviceIds"=>"[RK3285QATH,E687498679,5YTNZ5A9RV,VCD3RH54BK,VA3Z744A8R,T5VFWSCC2Z,GD25LDGN99,XJXGVS46MW,LEL449RZER,WXQ7V239BE,9T5RA84V77,S4227Y42V5,L4378H292Z]", "distributionType"=>"limited", "provisioningProfileName"=>"Not Yet Taken", "returnFullObjects"=>"false"},
          :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef', 'Csrf'=>'csrc', 'Csrf-Ts'=>'', 'Host'=>'developer.apple.com:443'}).
     to_return(:status => 200, :body => read_fixture_file( 'create_profile_success.json'), :headers => {})
+
+  # Repair Profiles
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
+         with(:body => {"appIdId"=>"572XTN75U2", "certificateIds"=>["XC5PH8D47H"], "deviceIds"=>["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType"=>"store", "provisioningProfileName"=>"net.sunapps.7 AppStore", "teamId"=>"XXXXXXXXXX"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'Faraday v0.9.1'}).
+         to_return(:status => 200, :body => read_fixture_file('repair_profile_success.json'), :headers => {})
 end
 
 def stub_devices

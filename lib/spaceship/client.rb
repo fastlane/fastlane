@@ -39,7 +39,7 @@ module Spaceship
         if ENV['DEBUG']
           # for debugging:
           c.response :logger
-          c.proxy "http://localhost:8080"
+          c.proxy "https://127.0.0.1:8888"
         end
       end
     end
@@ -246,7 +246,7 @@ module Spaceship
         appIdId: app_id,
         distributionType: distribution_method,
         certificateIds: certificate_ids,
-        deviceIds: device_ids,
+        deviceIds: device_ids
       })
       parse_response('provisioningProfile')
     end
@@ -267,18 +267,34 @@ module Spaceship
       parse_response
     end
 
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids)
+      request(:post, 'account/ios/profile/regenProvisioningProfile.action', {
+        teamId: team_id,
+        provisioningProfileId: profile_id,
+        provisioningProfileName: name,
+        appIdId: app_id,
+        distributionType: distribution_method,
+        certificateIds: certificate_ids,
+        deviceIds: device_ids
+      })
+
+      parse_response('provisioningProfile')
+    end
+
     private
       ##
       # memoize the last csrf tokens from responses
       def csrf_tokens
         return {} unless @last_response
+        return @csrf_tokens if @csrf_tokens
 
         tokens = @last_response.headers.select{|k,v| %w[csrf csrf_ts].include?(k) }
-        if tokens.empty? && @crsf_tokens && !@csrf_tokens.empty?
-          @csrf_tokens
-        else
+
+        if (@csrf_tokens || {}).empty? and !(tokens || {}).empty?
           @csrf_tokens = tokens
         end
+
+        return {}
       end
 
       def request(method, url_or_path = nil, params = nil, headers = {}, &block)
@@ -287,7 +303,7 @@ module Spaceship
           headers.merge!(csrf_tokens)
         end
 
-        #form-encode the params only if there are params, and the block is not supplied.
+        # form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
         if method == :post && params && !block_given?
           params, headers = encode_params(params, headers)
