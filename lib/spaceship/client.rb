@@ -169,6 +169,12 @@ module Spaceship
       parse_response('devices')
     end
 
+    def create_device(device_name, device_id)
+      request(:post, 'account/ios/device/deviceImportUploadSave.action' {
+
+        })
+    end
+
     def certificates(types)
       request(:post, 'account/ios/certificate/listCertRequests.action', {
         teamId: team_id,
