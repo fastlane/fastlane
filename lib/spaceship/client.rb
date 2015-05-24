@@ -198,7 +198,7 @@ module Spaceship
           name: device_name
         }
       end
-
+      
       parse_response(r, 'device')
     end
 
