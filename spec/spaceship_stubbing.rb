@@ -26,8 +26,8 @@ def stub_provisioning
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.json'), :headers => {'Content-Type' => 'application/json'})
 
-  stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?pageNumber=1&pageSize=500&search=&sort=name=asc&teamId=XXXXXXXXXX").
-         with(:headers => {'Cookie'=>'myacinfo=abcdef;'}).
+  stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Length'=>'0', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'Faraday v0.9.1'}).
          to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.plist'), :headers => {'Content-Type' => 'application/x-xml-plist'})
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").

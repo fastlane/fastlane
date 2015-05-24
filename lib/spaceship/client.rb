@@ -214,12 +214,11 @@ module Spaceship
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
-          search: nil,
-          pageSize: 500,
-          pageNumber: 1,
-          sort: 'name=asc'
+          includeInactiveProfiles: true,
+          onlyCountLists: true,
         }
       end
+
       parse_response('provisioningProfiles')
     end
 
