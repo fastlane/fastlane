@@ -44,7 +44,7 @@ module Spaceship
 
     #class methods
     class << self
-      def certificate_signing_request
+      def create_certificate_signing_request
         key = OpenSSL::PKey::RSA.new 2048
         csr = OpenSSL::X509::Request.new
         csr.version = 0
