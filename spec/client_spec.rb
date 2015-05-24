@@ -82,7 +82,7 @@ describe Spaceship::Client do
         expect(subject.page_size).to eq(500)
       end
 
-      it "Properly pages if required with support for a custom page size", now: true do
+      it "Properly pages if required with support for a custom page size" do
         allow(subject).to receive(:page_size).and_return(8)
 
         expect(subject.devices.count).to eq(9)
@@ -106,6 +106,21 @@ describe Spaceship::Client do
       end
     end
 
+    describe "#create_provisioning_profile" do
+      it "works when the name is free" do
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
+        expect(response['distributionMethod']).to eq('limited')
+      end
+
+      it "works when the name is already taken" do
+        error_text = 'Multiple profiles found with the name &#x27;Test Name 3&#x27;.  Please remove the duplicate profiles and try again.\nThere are no current certificates on this team matching the provided certificate IDs.' # not ", as this would convert the \n
+        expect {
+          response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
+        }.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+    end
+
     describe '#create_certificate' do
       let(:csr) { read_fixture_file('certificateSigningRequest.certSigningRequest')}
       it 'makes a request to create a certificate' do
@@ -113,6 +128,7 @@ describe Spaceship::Client do
         expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')
       end
     end
+
     describe '#revoke_certificate' do
       it 'makes a revoke request and returns the revoked certificate' do
         response = subject.revoke_certificate!('XC5PH8DAAA', 'R58UK2EAAA')

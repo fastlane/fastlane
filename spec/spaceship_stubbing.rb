@@ -44,16 +44,17 @@ def stub_provisioning
 
   # Create Profiles
 
+  # Name is free
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+         with(:body => {"appIdId"=>"R9YNDTPLJX", "certificateIds"=>["C8DL7464RQ"], "deviceIds"=>["C8DLAAAARQ"], "distributionType"=>"limited", "provisioningProfileName"=>"net.sunapps.106 limited", "teamId"=>"XXXXXXXXXX"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => read_fixture_file( 'create_profile_success.json'), :headers => {'Content-Type' => 'application/json'})
+
   # Name already taken
-  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action?teamId=5A997XSHAA").
-    with(:body => {"appIdId"=>"R9YNDTPLJX", "certificateIds"=>"C8DL7464RQ", "deviceIds"=>"[RK3285QATH,E687498679,5YTNZ5A9RV,VCD3RH54BK,VA3Z744A8R,T5VFWSCC2Z,GD25LDGN99,XJXGVS46MW,LEL449RZER,WXQ7V239BE,9T5RA84V77,S4227Y42V5,L4378H292Z]", "distributionType"=>"limited", "provisioningProfileName"=>"net.sunapps.106 limited", "returnFullObjects"=>"false"},
-         :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef', 'Csrf'=>'csrc', 'Csrf-Ts'=>'', 'Host'=>'developer.apple.com:443'}).
-    to_return(:status => 200, :body => read_fixture_file( "create_profile_name_taken.txt"), :headers => {})
-  # Name not yet taken
-  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action?teamId=5A997XSHAA").
-    with(:body => {"appIdId"=>"R9YNDTPLJX", "certificateIds"=>"C8DL7464RQ", "deviceIds"=>"[RK3285QATH,E687498679,5YTNZ5A9RV,VCD3RH54BK,VA3Z744A8R,T5VFWSCC2Z,GD25LDGN99,XJXGVS46MW,LEL449RZER,WXQ7V239BE,9T5RA84V77,S4227Y42V5,L4378H292Z]", "distributionType"=>"limited", "provisioningProfileName"=>"Not Yet Taken", "returnFullObjects"=>"false"},
-         :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef', 'Csrf'=>'csrc', 'Csrf-Ts'=>'', 'Host'=>'developer.apple.com:443'}).
-    to_return(:status => 200, :body => read_fixture_file( 'create_profile_success.json'), :headers => {})
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+         with(:body => {"appIdId"=>"R9YNDTPLJX", "certificateIds"=>["C8DL7464RQ"], "deviceIds"=>["C8DLAAAARQ"], "distributionType"=>"limited", "provisioningProfileName"=>"taken", "teamId"=>"XXXXXXXXXX"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => read_fixture_file( "create_profile_name_taken.txt"), :headers => {})
 
   # Repair Profiles
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
