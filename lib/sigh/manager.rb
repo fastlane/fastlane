@@ -5,7 +5,7 @@ module Sigh
   class Manager
     def self.start
       start = Time.now
-      puts "Start!"
+      puts "Start!".green
       path = Sigh::Runner.new.run
       puts "Finished in #{Time.now - start}".green
 

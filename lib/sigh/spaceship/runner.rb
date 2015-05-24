@@ -20,6 +20,8 @@ module Sigh
           unless profile_type == Spaceship::ProvisioningProfile::AppStore
             Helper.log.info "Updating the profile to include all devices".yellow
             profile.devices = Spaceship.devices    
+          else
+            Helper.log.info "Updating the provisioning profile".yellow
           end
 
           profile.update!
@@ -28,8 +30,6 @@ module Sigh
       else
         Helper.log.info "No existing profiles found, creating a new one for you".yellow
         profile = create_profile!
-        # We don't want to use the return value here, as this doesn't include all the information we need
-        profile = fetch_profiles.first # better fetch it from the server again
       end
 
       raise "Something went wrong fetching the latest profile".red unless profile
@@ -57,7 +57,7 @@ module Sigh
         
         # Does the app identifier match
         next unless (profile.app.bundle_id == Sigh.config[:app_identifier])
-
+        
         true
       end
     end
