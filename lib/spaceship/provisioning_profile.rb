@@ -142,8 +142,16 @@ module Spaceship
 
     # Updates the provisioning profile from the local data
     # e.g. after you added new devices to the profile
-    # If you want to download the profile afterwards you need to fetch it again
+    # This will also update the code signing identity if necessary
     def update!
+      unless certificate_valid?
+        if self.kind_of?Development
+          self.certificates = [Spaceship::Certificate::Development.all.first]
+        else
+          self.certificates = [Spaceship::Certificate::Production.all.first]
+        end
+      end
+
       client.repair_provisioning_profile!(
         self.id,
         self.name,

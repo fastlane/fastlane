@@ -89,12 +89,13 @@ def stub_certificates
     with(:body => {"pageNumber"=>"1", "pageSize"=>"500", "sort"=>"certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => '5QPB9NHCEI'},
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {'Content-Type' => 'application/json'})
-=begin
+
+  # When looking for distribution or development certificates only:
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-    with(:body => {'teamId' => '5A997XSHAA', 'types' => 'R58UK2EWSO'},
+    with(:body => {"pageNumber"=>"1", "pageSize"=>"500", "sort"=>"certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => 'R58UK2EWSO'},
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
-    to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {})
-=end
+    to_return(:status => 200, :body => read_fixture_file( "list_certificates_filtered.json"), :headers => {'Content-Type' => 'application/json'})
+
   stub_request(:post, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action").
     with(:body => {"displayId"=>"XC5PH8DAAA", "type"=>"R58UK2EAAA"},
          :headers => {'Cookie'=>'myacinfo=abcdef;'}).
