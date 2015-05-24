@@ -6,6 +6,7 @@ require 'spaceship/helper/net_http_generic_request'
 
 if ENV['DEBUG']
   require 'pry' # TODO: Remove
+  require 'openssl'
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
