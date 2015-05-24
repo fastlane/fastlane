@@ -288,6 +288,7 @@ module Spaceship
           headers.merge!({'Cookie' => cookie})
           headers.merge!(csrf_tokens)
         end
+        headers.merge!({'User-Agent' => 'spaceship'})
 
         # form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
