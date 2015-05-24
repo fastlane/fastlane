@@ -63,7 +63,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :cert_id,
                                      short_option: "-i",
                                      env_name: "SIGH_CERTIFICATE_ID",
-                                     description: "The ID of the certificate to use",
+                                     description: "The ID of the code signing certificate to use (e.g. 78ADL6LVAA) ",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :cert_owner_name,
                                      short_option: "-c",

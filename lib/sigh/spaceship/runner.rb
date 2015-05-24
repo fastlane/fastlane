@@ -87,11 +87,33 @@ module Sigh
         certificates = Spaceship::Certificate::Production.all # Ad hoc or App Store
       end
 
+      # Filter them
+      certificates = certificates.find_all do |c|
+        if Sigh.config[:cert_id]
+          next unless (c.id == Sigh.config[:cert_id].strip)
+        end
+
+        if Sigh.config[:cert_owner_name]
+          next unless (c.owner_name.strip == Sigh.config[:cert_owner_name].strip)
+        end
+
+        true
+      end
+
       if certificates.count > 1
         Helper.log.info "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options.".yellow
+        Helper.log.info "Available Code Signing Identities for current filters:".green
+        certificates.each do |c|
+          Helper.log.info ("\t- Name: " + c.owner_name + " - ID: " + c.id + " - Expires: " + c.expires).green
+        end
       end
+
       if certificates.count == 0
-        raise "Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)"
+        filters = ""
+        filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
+        filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
+        Helper.log.info "No certificates for filter: #{filters}".yellow if filters.length > 0
+        raise "Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)".red
       end
 
       return certificates.first
