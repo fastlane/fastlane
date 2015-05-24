@@ -66,7 +66,7 @@ Enough words, here is some code:
 Spaceship.login
  
 # Create a new app
-app = Spaceship::App.create!(bundle_id: "com.krausefx.app_name", name: "Spaceship App")
+app = Spaceship::App.create!(bundle_id: "com.krausefx.app", name: "Spaceship App")
  
 # Use an existing certificate
 cert = Spaceship::Certificate::Production.all.first
