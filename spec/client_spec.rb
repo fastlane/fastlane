@@ -47,6 +47,21 @@ describe Spaceship::Client do
       end
     end
 
+    describe "csrf_tokens" do
+      it "uses the stored token for all upcoming requests" do
+        # Temporary stub a request to require the csrf_tokens
+        stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
+            with(:body => {:teamId => 'XXXXXXXXXX', :pageSize => "10", :pageNumber => "1", :sort => 'name=asc'}, :headers => {'Cookie' => 'myacinfo=abcdef;', 'csrf' => 'top_secret', 'csrf_ts' => '123123'}).
+            to_return(:status => 200, :body => read_fixture_file('listDevices.action.json'), :headers => {'Content-Type' => 'application/json'})
+
+        # Hard code the tokens
+        allow(subject).to receive(:csrf_tokens).and_return({csrf: 'top_secret', csrf_ts: '123123'})
+        allow(subject).to receive(:page_size).and_return(10) # to have a seperate stubbing
+        
+        expect(subject.devices.count).to eq(4)
+      end
+    end
+
     describe '#apps' do
       let(:apps) { subject.apps }
       it 'returns a list of apps' do

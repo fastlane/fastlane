@@ -13,7 +13,7 @@ def stub_login
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
     with(:body => {"accountPassword"=>"so_secret", "appIdKey"=>"891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId"=>"spaceship@krausefx.com"},
          :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
-    to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;"})
+    to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => "myacinfo=abcdef;" })
 
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
     with(:body => {"accountPassword"=>"bad-password", "appIdKey"=>"891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId"=>"bad-username"}).
@@ -59,7 +59,7 @@ def stub_provisioning
   # Repair Profiles
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
          with(:body => {"appIdId"=>"572XTN75U2", "certificateIds"=>["XC5PH8D47H"], "deviceIds"=>["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType"=>"store", "provisioningProfileName"=>"net.sunapps.7 AppStore", "teamId"=>"XXXXXXXXXX"},
-              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'Faraday v0.9.1'}).
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, :body => read_fixture_file('repair_profile_success.json'), :headers => {})
 end
 
