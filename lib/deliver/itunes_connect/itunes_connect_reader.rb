@@ -2,8 +2,7 @@ module Deliver
   # For all the information reading (e.g. version number)
   class ItunesConnect < FastlaneCore::ItunesConnect
     # This method will fetch the current status ({Deliver::App::AppStatus})
-    # of your app and return it. This method uses a headless browser
-    # under the hood, so it might take some time until you get the result
+    # of your app and return it.
     # @param app (Deliver::App) the app you want this information from
     # @raise [ItunesConnectGeneralError] General error while executing 
     #  this action
@@ -12,22 +11,15 @@ module Deliver
       begin
         verify_app(app)
 
-        open_app_page(app)
+        status = (get_app_information(app)['status'] rescue nil)
 
-        if page.has_content?WAITING_FOR_REVIEW
-          # That's either Upload Received or Waiting for Review
-          if page.has_content?"To submit a new build, you must remove this version from review"
-            return Deliver::App::AppStatus::WAITING_FOR_REVIEW
-          else
-            return Deliver::App::AppStatus::UPLOAD_RECEIVED
-          end
-        elsif page.has_content?BUTTON_STRING_NEW_VERSION
-          return Deliver::App::AppStatus::READY_FOR_SALE
-        elsif page.has_content?BUTTON_STRING_SUBMIT_FOR_REVIEW
-          return Deliver::App::AppStatus::PREPARE_FOR_SUBMISSION
-        else
-          raise "App status not yet implemented"
-        end
+        return Deliver::App::AppStatus::PREPARE_FOR_SUBMISSION if status == 'prepareForUpload'
+        return Deliver::App::AppStatus::PREPARE_FOR_SUBMISSION if status == 'devRejected' # that's the same thing
+        return Deliver::App::AppStatus::WAITING_FOR_REVIEW if status == 'waitingForReview'
+        return Deliver::App::AppStatus::READY_FOR_SALE if status == 'readyForSale'
+
+        Helper.log.info "App Status '#{status}' not yet implemented, please submit an issue on GitHub"
+        return nil
       rescue Exception => ex
         error_occured(ex)
       end
