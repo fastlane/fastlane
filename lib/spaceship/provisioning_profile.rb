@@ -56,7 +56,7 @@ module Spaceship
 
         # Fill in sensible default values
         name ||= [bundle_id, self.pretty_type].join(' ')
-        devices = Spaceship.devices if (devices.nil? or devices.count == 0) # all devices by default
+        devices = [] if self.kind_of?AppStore # App Store Profiles MUST NOT have devices
 
         profile = client.create_provisioning_profile!(name, 
                                               self.type, 
