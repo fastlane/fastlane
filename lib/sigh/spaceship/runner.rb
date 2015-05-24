@@ -13,23 +13,23 @@ module Sigh
       profiles = fetch_profiles # download the profile if it's there
 
       if profiles.count > 0
-        Helper.log.info "Found #{profiles.count} profiles, downloading the first one".yellow if profiles.count > 1
+        Helper.log.info "Found #{profiles.count} existing profiles".yellow if profiles.count > 1
         profile = profiles.first
+
+        if Sigh.config[:force]
+          unless profile_type == Spaceship::ProvisioningProfile::AppStore
+            Helper.log.info "Updating the profile to include all devices".yellow
+            profile.devices = Spaceship.devices    
+          end
+
+          profile.update!
+          profile = fetch_profiles.first # to have the latest profile information
+        end
       else
         Helper.log.info "No existing profiles found, creating a new one for you".yellow
         profile = create_profile!
         # We don't want to use the return value here, as this doesn't include all the information we need
-        profile = fetch_profiles.first # better fetch it frmo the server again
-      end
-
-      if Sigh.config[:force]
-        unless profile_type == Spaceship::ProvisioningProfile::AppStore
-          Helper.log.info "Updating the profile to include all devices".yellow
-          profile.devices = Spaceship.devices          
-        end
-
-        profile.update!
-        profile = fetch_profiles.first # to have the latest profile information
+        profile = fetch_profiles.first # better fetch it from the server again
       end
       
       path = download_profile(profile)
