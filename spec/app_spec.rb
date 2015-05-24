@@ -57,7 +57,7 @@ describe Spaceship::App do
       expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app') {
         {'isWildCard' => true}
       }
-      app = Spaceship::App.create!(app_identifier: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
+      app = Spaceship::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
       expect(app.is_wildcard).to eq(true)
     end
 
@@ -65,7 +65,7 @@ describe Spaceship::App do
       expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*') {
         {'isWildCard' => false}
       }
-      app = Spaceship::App.create!(app_identifier: 'tools.fastlane.spaceship.*', name: 'Development App')
+      app = Spaceship::App.create!(bundle_id: 'tools.fastlane.spaceship.*', name: 'Development App')
       expect(app.is_wildcard).to eq(false)
     end
   end

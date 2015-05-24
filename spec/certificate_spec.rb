@@ -76,7 +76,7 @@ describe Spaceship::Certificate do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
       }
-      certificate = Spaceship::Certificate::ProductionPush.create!(Spaceship::Certificate.create_certificate_signing_request.first, 'net.sunapps.151')
+      certificate = Spaceship::Certificate::ProductionPush.create!(csr: Spaceship::Certificate.create_certificate_signing_request.first, bundle_id: 'net.sunapps.151')
       expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
     end
   end

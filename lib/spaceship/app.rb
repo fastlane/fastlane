@@ -23,18 +23,18 @@ module Spaceship
       end
 
       # Creates a new App ID on the Apple Dev Portal
-      # @param app_identifier [String] the bundle id of the app associated with this provisioning profile
+      # @param bundle_id [String] the bundle id of the app associated with this provisioning profile
       # @param name [String] the name of the App
       # if bundle_id ends with '*' then it is a wildcard id
       # otherwise, it is an explicit id
-      def create!(app_identifier: app_identifier, name: name)
-        if app_identifier.end_with?('*')
+      def create!(bundle_id: bundle_id, name: name)
+        if bundle_id.end_with?('*')
           type = :wildcard
         else
           type = :explicit
         end
 
-        new_app = client.create_app!(type, name, app_identifier)
+        new_app = client.create_app!(type, name, bundle_id)
         self.new(new_app)
       end
 
