@@ -269,7 +269,32 @@ The example data below is a provisioning profile, containg a device, certificate
 
 # Technical Details
 
-TODO
+## HTTP Client
+
+Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and drastically improved speed. 
+
+Advantages of `spaceship` (HTTP client) over web scraping: 
+
+- Blazing fast :rocket: 90% faster than previous methods
+- No more overhead by loading images, HTML, JS and CSS files on each page load
+- Great test coverage by stubbing server responses
+- Resistant against design changes of the Apple Developer Portal
+- Automatic re-trying of requests in case a timeout occurs
+- By stubbing the `spaceship` objects it is possible to also implement tests for tools like [sigh](https://github.com/KrauseFx/sigh)
+
+## API Endpoints
+
+I won't go into too much technical details about the various API endpoints, but just to give you an idea:
+
+- `https://idmsa.apple.com`: Used to authenticate and get a valid session
+- `https://developerservices2.apple.com`: Used to get a detailed list of all available provisioning profiles. This API requires the devices, certificates and app for each of the profiles.
+- `https://developer.apple.com`: 
+ - List all devices
+ - List all certificates
+ - Repair provisioning profiles
+ - Download provisioning profiles
+
+`spaceship` uses all those API points to offer this seamless experience.
 
 # Credits
 
