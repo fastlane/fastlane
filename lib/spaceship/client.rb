@@ -325,7 +325,23 @@ module Spaceship
           params, headers = encode_params(params, headers)
         end
 
-        @client.send(method, url_or_path, params, headers, &block)
+        send_request(method, url_or_path, params, headers, &block)
+      end
+
+      # Actually sends the request to the remote server
+      # Automatically retries the request up to 3 times if something goes wrong
+      def send_request(method, url_or_path, params, headers, &block)
+        tries ||= 5
+
+        return @client.send(method, url_or_path, params, headers, &block)
+
+      rescue Faraday::TimeoutError => ex
+        unless (tries -= 1).zero?
+          sleep 3
+          retry 
+        end
+
+        raise ex # re-raise the exception
       end
 
       def parse_response(response, expected_key = nil)
