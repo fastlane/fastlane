@@ -1,3 +1,3 @@
 module Deliver
-  VERSION = "0.11.4"
+  VERSION = "0.11.5"
 end
