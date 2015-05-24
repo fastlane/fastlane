@@ -68,7 +68,7 @@ module Spaceship
         current = yield(page)
 
         results = results + current
-        
+
         break if ((current || []).count < page_size) # no more results
       end
 
@@ -190,7 +190,7 @@ module Spaceship
     end
 
     def create_device(device_name, device_id)
-      request(:post) do |r|
+      r = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
         r.params = {
           teamId: team_id,
@@ -198,6 +198,8 @@ module Spaceship
           name: device_name
         }
       end
+
+      parse_response(r, 'device')
     end
 
     def certificates(types)
@@ -308,7 +310,7 @@ module Spaceship
     end
 
     private
-      # Is called from `parse_response` to strore 
+      # Is called from `parse_response` to strore
       def store_csrf_tokens(response)
         if response and response.headers
           tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }

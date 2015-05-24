@@ -18,7 +18,6 @@ module Spaceship
       def all
         client.devices.map {|device| self.factory(device)}
       end
-
       def find(device_id)
         all.find do |device|
           device.id == device_id
@@ -36,8 +35,9 @@ module Spaceship
         device = self.find(device_udid)
 
         # If the device is nil, create it
-        if not existing_device
-          device = client.create_device(device_udid, device_name)
+        if not device
+          device = client.create_device(device_name, device_udid)
+          puts device.body
         end
 
         # Update self with the new device
