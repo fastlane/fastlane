@@ -154,52 +154,17 @@ profiles_adhoc = Spaceship::ProvisioningProfile::AdHoc.all
 # Get all Development profiles
 profiles_dev = Spaceship::ProvisioningProfile::Development.all
 
+# Fetch all profiles for a specific app identifier for the App Store
+filtered_profiles = Spaceship::ProvisioningProfile::AppStore.find_by_bundle_id("com.krausefx.app")
+
 ##### Downloading #####
 
 # Download a profile
 profile_content = profiles.first.download
 
 # Download a specific profile as file
-my_profile = profiles.find do |p|
-  p.app.bundle_id == "com.krausefx.app"
-end
+my_profile = Spaceship::ProvisioningProfile::AppStore.find_by_bundle_id("com.krausefx.app")
 File.write("output.mobileprovision", my_profile.download)
-```
-
-### Example Profile
-
-Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
-
-```
-#<Spaceship::ProvisioningProfile::AdHoc 
-  @devices=[
-    #<Spaceship::Device 
-      @id="5YTNZ5A9AA", 
-      @name="Felix iPhone 6", 
-      @udid="39d2cab02642dc2bfdbbff4c0cb0e50c8632faaa"
-    >, 
-    ...], 
-  @certificates=[
-    #<Spaceship::Certificate::Production 
-      @id="LHNT9C2AAA", 
-      @name="iOS Distribution", 
-      @expires=#<DateTime: 2016-02-10T23:44:20>
-    ], 
-  @id="72SRVUNAAA", 
-  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa", 
-  @expires=#<DateTime: 2016-02-10T23:44:20>, 
-  @distribution_method="adhoc", 
-  @name="com.krausefx.app AppStore", 
-  @status="Active", 
-  @platform="ios", 
-  @app=#<Spaceship::App 
-    @app_id="2UMR2S6AAA", 
-    @name="App Name", 
-    @platform="ios", 
-    @bundle_id="com.krausefx.app", 
-    @is_wildcard=false>
-  >
->
 ```
 
 ### Create a Provisioning Profile
@@ -263,6 +228,43 @@ Spaceship.client.team_id
 # This method might fail for various reasons, e.g. app is already in the store
 app = Spaceship.apps.find("com.krausefx.app")
 app.delete!
+```
+
+## Example Data
+
+Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
+
+The example data below is a provisioning profile, containg a device, certificate and app. 
+
+```
+#<Spaceship::ProvisioningProfile::AdHoc 
+  @devices=[
+    #<Spaceship::Device 
+      @id="5YTNZ5A9AA", 
+      @name="Felix iPhone 6", 
+      @udid="39d2cab02642dc2bfdbbff4c0cb0e50c8632faaa"
+    >,  ...], 
+  @certificates=[
+    #<Spaceship::Certificate::Production 
+      @id="LHNT9C2AAA", 
+      @name="iOS Distribution", 
+      @expires=#<DateTime: 2016-02-10T23:44:20>
+    ], 
+  @id="72SRVUNAAA", 
+  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa", 
+  @expires=#<DateTime: 2016-02-10T23:44:20>, 
+  @distribution_method="adhoc", 
+  @name="com.krausefx.app AppStore", 
+  @status="Active", 
+  @platform="ios", 
+  @app=#<Spaceship::App 
+    @app_id="2UMR2S6AAA", 
+    @name="App Name", 
+    @platform="ios", 
+    @bundle_id="com.krausefx.app", 
+    @is_wildcard=false>
+  >
+>
 ```
 
 # Technical Details
