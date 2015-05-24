@@ -232,7 +232,7 @@ end
 
 # Iterate over all broken profiles and repair them
 broken_profiles.each do |profile|
-  profile.repair! # yes, that's all you need to repair a  profile
+  profile.repair! # yes, that's all you need to repair a profile
 end
 
 # or to make the same thing, just more Ruby like:
