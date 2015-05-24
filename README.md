@@ -36,6 +36,7 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 -------
 <p align="center">
     insert points here
+    <a href="#technical-details">Technical Details</a>
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -53,9 +54,9 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds :rocket:
 
-`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you, so you don't have to think about it. 
+`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you, so you don't have to think about it. [More details about the APIs](#technical-details).
 
-`spaceship` will soon power all [fastlane](https://fastlane.tools) to be even faster and more stable.
+Up until now, the [fastlane tools](https://fastlane.tools) use web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
 
 # Installation
 
@@ -68,10 +69,8 @@ Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh
 ```ruby
 Spaceship.login("felix@krausefx.com", "password")
 
-Spaceship.client.select_team # call this method to get a team selection
+Spaceship.client.select_team # call this method to let the user select a team
 ```
-
-Both values are optional and will be taken from the `Appfile` or the Mac OS X Keychain (if they exists)
 
 ## Apps
 
@@ -127,7 +126,10 @@ cert_content = dev_push_certs.first.download
 
 ```ruby
 # Create a new certificate signing request
-csr = Spaceship::Certificate.certificate_signing_request
+csr = Spaceship::Certificate.create_certificate_signing_request
+
+# Use the signing request to create a new distribution certificate
+Spaceship::Certificate::Production.create!(csr)
 
 # Use the signing request to create a new push certificate
 Spaceship::Certificate::ProductionPush.create!(csr, "com.krausefx.app")
@@ -223,8 +225,18 @@ File.write("NewProfile.mobileprovision", profile.download)
 ### Repair a broken provisioning profile
 
 ```ruby
-# This will automatically repair `Invalid` or `Expired` provisioning profiles
-broken_profile.repair! # yes, that's all you need
+# Select all 'Invalid' or 'Expired' provisioning profiles
+broken_profiles = Spaceship.provisioning_profiles.find_all do |profile| 
+  (profile.status == "Invalid" or profile.status == "Expired")
+end
+
+# Iterate over all broken profiles and repair them
+broken_profiles.each do |profile|
+  profile.repair! # yes, that's all you need to repair a profile
+end
+
+# or to make the same thing, just more Ruby like:
+Spaceship.provisioning_profiles.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
 ```
 
 ## Devices
@@ -253,7 +265,11 @@ app = Spaceship.apps.find("com.krausefx.app")
 app.delete!
 ```
 
-## Credits
+# Technical Details
+
+TODO
+
+# Credits
 
 This project has been sponsored by [ZeroPush](https://zeropush.com). `spaceship` was developed by [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx).
 
