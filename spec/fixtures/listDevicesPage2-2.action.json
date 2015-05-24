@@ -1,0 +1,23 @@
+{
+  "creationTimestamp": "2015-05-24T16:37:33Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/device/listDevices.action",
+  "responseId": "558ba377-d979-45c6-b2f8-ee6d2d692aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": true,
+  "pageNumber": 2,
+  "pageSize": 8,
+  "totalRecords": 9,
+  "httpResponseHeaders": null,
+  "devices": [{
+    "deviceId": "XJXGVS4AAAA",
+    "name": "The last phone",
+    "deviceNumber": "4c24a7ee5c8674847f49b4fb2d87483053faaaaa",
+    "devicePlatform": "ios",
+    "status": "c"
+  }]
+}

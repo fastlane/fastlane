@@ -66,6 +66,16 @@ def stub_devices
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
     with(:body => {:teamId => 'XXXXXXXXXX', :pageSize => "500", :pageNumber => "1", :sort => 'name=asc'}, :headers => {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listDevices.action.json'), :headers => {'Content-Type' => 'application/json'})
+
+  # Custom paging
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
+         with(:body => {"pageNumber"=>"1", "pageSize"=>"8", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => read_fixture_file('listDevicesPage1-2.action.json'), :headers => {'Content-Type' => 'application/json'})
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
+         with(:body => {"pageNumber"=>"2", "pageSize"=>"8", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => read_fixture_file('listDevicesPage2-2.action.json'), :headers => {'Content-Type' => 'application/json'})
 end
 
 def stub_certificates

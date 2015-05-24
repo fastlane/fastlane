@@ -77,6 +77,19 @@ describe Spaceship::Client do
       end
     end
 
+    describe "#paging" do
+      it "default page size is correct" do
+        expect(subject.page_size).to eq(500)
+      end
+
+      it "Properly pages if required with support for a custom page size", now: true do
+        allow(subject).to receive(:page_size).and_return(8)
+
+        expect(subject.devices.count).to eq(9)
+        expect(subject.devices.last['name']).to eq("The last phone")
+      end
+    end
+
     describe '#devices' do
       let(:devices) { subject.devices }
       it 'returns a list of device hashes' do

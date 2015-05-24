@@ -1,0 +1,65 @@
+{
+  "creationTimestamp": "2015-05-24T16:37:32Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/device/listDevices.action",
+  "responseId": "881a1f34-bc13-425b-ae18-9f4f8fb40aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": true,
+  "pageNumber": 1,
+  "pageSize": 8,
+  "totalRecords": 9,
+  "httpResponseHeaders": null,
+  "devices": [{
+    "deviceId": "9T5RA84AAA",
+    "name": "Felix Krause's iPhone 6",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "L4378H2AAA",
+    "name": "Felix's iPad",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "LEL449RAAA",
+    "name": "4s",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "S4227Y4AAA",
+    "name": "Simon iOS",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "5YTNZ5AAAA",
+    "name": "iPhone 4S",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "WXQ7V239BE",
+    "name": "iPhone 4s",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "9K3WR66AAA",
+    "name": "MyName",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }, {
+    "deviceId": "GD25LDGAAA",
+    "name": "iPhonekajsdf",
+    "deviceNumber": "aaabbbccccddddaaabbb",
+    "devicePlatform": "ios",
+    "status": "c"
+  }]
+}

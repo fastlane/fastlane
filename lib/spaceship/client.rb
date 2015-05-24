@@ -52,6 +52,29 @@ module Spaceship
       end
     end
 
+    # Automatic paging
+
+    def page_size
+      @page_size ||= 500
+    end
+
+    # Handles the paging for you... for free
+    # Just pass a block and use the parameter as page number
+    def paging
+      page = 0
+      results = []
+      loop do
+        page += 1
+        current = yield(page)
+
+        results = results + current
+        
+        break if ((current || []).count < page_size) # no more results
+      end
+
+      return results
+    end
+
     ##
     # perform login procedure. this sets a cookie that will be used in subsequent requests
     # raises InvalidUserCredentialsError if authentication failed.
@@ -105,13 +128,15 @@ module Spaceship
     end
 
     def apps
-      r = request(:post, 'account/ios/identifiers/listAppIds.action', {
-        teamId: team_id,
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'name=asc'
-      })
-      parse_response(r, 'appIds')
+      paging do |page_number|
+        r = request(:post, 'account/ios/identifiers/listAppIds.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'appIds')
+      end
     end
 
     def create_app!(type, name, bundle_id)
@@ -153,24 +178,28 @@ module Spaceship
     end
 
     def devices
-      r = request(:post, 'account/ios/device/listDevices.action', {
-        teamId: team_id,
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'name=asc'
-      })
-      parse_response(r, 'devices')
+      paging do |page_number|
+        r = request(:post, 'account/ios/device/listDevices.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'devices')
+      end
     end
 
     def certificates(types)
-      r = request(:post, 'account/ios/certificate/listCertRequests.action', {
-        teamId: team_id,
-        types: types.join(','),
-        pageNumber: 1,
-        pageSize: 500,
-        sort: 'certRequestStatusCode=asc'
-      })
-      parse_response(r, 'certRequests')
+      paging do |page_number|
+        r = request(:post, 'account/ios/certificate/listCertRequests.action', {
+          teamId: team_id,
+          types: types.join(','),
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'certRequestStatusCode=asc'
+        })
+        parse_response(r, 'certRequests')
+      end
     end
 
     def create_certificate!(type, csr, app_id = nil)
