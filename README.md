@@ -154,15 +154,16 @@ profiles_adhoc = Spaceship::ProvisioningProfile::AdHoc.all
 # Get all Development profiles
 profiles_dev = Spaceship::ProvisioningProfile::Development.all
 
+# Fetch all profiles for a specific app identifier for the App Store
+filtered_profiles = Spaceship::ProvisioningProfile::AppStore.find_by_bundle_id("com.krausefx.app")
+
 ##### Downloading #####
 
 # Download a profile
 profile_content = profiles.first.download
 
 # Download a specific profile as file
-my_profile = profiles.find do |p|
-  p.app.bundle_id == "com.krausefx.app"
-end
+my_profile = Spaceship::ProvisioningProfile::AppStore.find_by_bundle_id("com.krausefx.app")
 File.write("output.mobileprovision", my_profile.download)
 ```
 
