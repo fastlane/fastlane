@@ -57,14 +57,6 @@ module Spaceship
     #
     # returns Spaceship::Client
     def login(username = nil, password = nil)
-
-      if !username or !password
-        require 'credentials_manager'
-        data = CredentialsManager::PasswordManager.shared_manager(username, false)
-        username ||= data.username
-        password ||= data.password
-      end
-
       if username.to_s.empty? or password.to_s.empty?
         raise InvalidUserCredentialsError.new("No login data provided")
       end
