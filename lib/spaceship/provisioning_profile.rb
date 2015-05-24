@@ -154,6 +154,17 @@ module Spaceship
       )
     end
 
+    # Is the certificate of this profile available?
+    def certificate_valid?
+      return false if (certificates || []).count == 0
+      certificates.each do |c|
+        if Spaceship.certificates.collect { |s| s.id }.include?c.id
+          return true
+        end
+      end
+      return false
+    end
+
     def self.pretty_type
       type.capitalize
     end
