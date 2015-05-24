@@ -24,6 +24,25 @@ module Spaceship
           device.id == device_id
         end
       end
+
+      def create!(device_udid, device_name)
+
+        # Check whether the user has passed in a UDID and a name
+        if not device_udid or not device_name
+          raise "You cannot create a device without a device_id (UDID) and device_name"
+        end
+
+        # Attempt to find the device if already existing
+        device = self.find(device_udid)
+
+        # If the device is nil, create it
+        if not existing_device
+          device = client.create_device(device_udid, device_name)
+        end
+
+        # Update self with the new device
+        self.new(device)
+      end
     end
   end
 end
