@@ -4,6 +4,10 @@ def read_fixture_file(filename)
   File.read(File.join('spec', 'fixtures', filename))
 end
 
+def user_agent # as this might change
+  'spaceship'
+end
+
 # Let the stubbing begin
 def stub_login
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
@@ -27,7 +31,7 @@ def stub_provisioning
     to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.json'), :headers => {'Content-Type' => 'application/json'})
 
   stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
-         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Length'=>'0', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'Faraday v0.9.1'}).
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Length'=>'0', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent' => 'spaceship'}).
          to_return(:status => 200, :body => read_fixture_file('listProvisioningProfiles.action.plist'), :headers => {'Content-Type' => 'application/x-xml-plist'})
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
