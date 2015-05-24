@@ -10,18 +10,26 @@ module Sigh
       spaceship = Spaceship.login(Sigh.config[:username], nil)
       # spaceship.UI.select_team # TODO: FIX
       
-      if Sigh.config[:force]
-        # The user wants to have a new profile, even if one exists already
-        profile = create_profile!
+      profiles = fetch_profiles # download the profile if it's there
+
+      if profiles.count > 0
+        Helper.log.info "Found #{profiles.count} profiles, downloading the first one".yellow if profiles.count > 1
+        profile = profiles.first
       else
-        profiles = fetch_profiles # download the profile if it's there
-        if profiles.count > 0
-          Helper.log.info "Found #{profiles.count} profiles, downloading the first one".yellow if profiles.count > 1
-          profile = profiles.first
-        else
-          Helper.log.info "No existing profiles found, creating a new one for you".yellow
-          profile = create_profile!
+        Helper.log.info "No existing profiles found, creating a new one for you".yellow
+        profile = create_profile!
+        # We don't want to use the return value here, as this doesn't include all the information we need
+        profile = fetch_profiles.first # better fetch it frmo the server again
+      end
+
+      if Sigh.config[:force]
+        unless profile_type == Spaceship::ProvisioningProfile::AppStore
+          Helper.log.info "Updating the profile to include all devices".yellow
+          profile.devices = Spaceship.devices          
         end
+
+        profile.update!
+        profile = fetch_profiles.first # to have the latest profile information
       end
       
       path = download_profile(profile)
@@ -55,10 +63,17 @@ module Sigh
     # Create a new profile and return it
     def create_profile!
       cert = certificate_to_use
+      bundle_id = Sigh.config[:app_identifier]
+      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
-      Helper.log.info "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}'".yellow
-      profile = profile_type.create!(name: Sigh.config[:provisioning_name], 
-                                bundle_id: Sigh.config[:app_identifier],
+      if Spaceship::ProvisioningProfile.all.find { |p| p.name == name }
+        Helper.log.error "The name '#{name}' is already taken, using another one."
+        name += " #{Time.now.to_i}"
+      end
+
+      Helper.log.info "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'".yellow
+      profile = profile_type.create!(name: name, 
+                                bundle_id: bundle_id,
                               certificate: cert)
       profile
     end
@@ -86,7 +101,7 @@ module Sigh
     def download_profile(profile)
       Helper.log.info "Downloading provisioning profile...".yellow
 
-      profile_name ||= "#{profile.class.type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
+      profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include?'mobileprovision'
 
       output_path = File.join('/tmp', profile_name)
