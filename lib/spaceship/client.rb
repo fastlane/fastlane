@@ -170,9 +170,14 @@ module Spaceship
     end
 
     def create_device(device_name, device_id)
-      request(:post, 'account/ios/device/deviceImportUploadSave.action' {
-
-        })
+      request(:post) do |r|
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
+        r.params = {
+          teamId: team_id,
+          deviceNumber: device_id,
+          name: device_name
+        }
+      end
     end
 
     def certificates(types)
