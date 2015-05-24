@@ -53,10 +53,10 @@ module Spaceship
         raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
         app = Spaceship::App.find(bundle_id)
-
         # Fill in sensible default values
         name ||= [bundle_id, self.pretty_type].join(' ')
-        devices = [] if self.kind_of?AppStore # App Store Profiles MUST NOT have devices
+        devices = [] if self == AppStore # App Store Profiles MUST NOT have devices
+        devices ||= Spaceship.Devices.all unless self == AppStore # by default all devices
 
         profile = client.create_provisioning_profile!(name, 
                                               self.type, 
