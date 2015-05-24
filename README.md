@@ -58,7 +58,27 @@ Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh
 
 Up until now, the [fastlane tools](https://fastlane.tools) use web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
 
-No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
+> No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
+
+Enough words, here is some code:
+
+```ruby
+Spaceship.login
+ 
+# Create a new app
+app = Spaceship::App.create!(bundle_id: "com.krausefx.app_name", name: "Spaceship App")
+ 
+# Use an existing certificate
+cert = Spaceship::Certificate::Production.all.first
+ 
+# Create a new provisioning profile
+profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: app.bundle_id,
+                                                         certificate: cert)
+ 
+# Print the name and download the new profile
+puts "Created Profile " + profile.name
+profile.download
+```
 
 # Installation
 
