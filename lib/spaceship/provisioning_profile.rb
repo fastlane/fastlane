@@ -51,8 +51,10 @@ module Spaceship
       def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
         raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
         raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
-
+        
         app = Spaceship::App.find(bundle_id)
+        raise "Could not find app with bundle id '#{bundle_id}'" unless app
+
         # Fill in sensible default values
         name ||= [bundle_id, self.pretty_type].join(' ')
 

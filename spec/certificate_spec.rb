@@ -79,5 +79,11 @@ describe Spaceship::Certificate do
       certificate = Spaceship::Certificate::ProductionPush.create!(csr: Spaceship::Certificate.create_certificate_signing_request.first, bundle_id: 'net.sunapps.151')
       expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
     end
+
+    it 'raises an error if the user wants to create a certificate for a non-existing app' do
+      expect {
+        Spaceship::Certificate::ProductionPush.create!(csr: Spaceship::Certificate.create_certificate_signing_request.first, bundle_id: 'notExisting')
+      }.to raise_error "Could not find app with bundle id 'notExisting'"
+    end
   end
 end
