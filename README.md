@@ -87,7 +87,7 @@ Spaceship.apps.each do |app|
 end
 
 # Create a new app
-app = Spaceship::App.create!(app_identifier: "com.krausefx.app_name", name: "fastlane App")
+app = Spaceship::App.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
 ```
 
 ## Certificates
@@ -129,10 +129,10 @@ cert_content = dev_push_certs.first.download
 csr = Spaceship::Certificate.create_certificate_signing_request
 
 # Use the signing request to create a new distribution certificate
-Spaceship::Certificate::Production.create!(csr)
+Spaceship::Certificate::Production.create!(csr: csr)
 
 # Use the signing request to create a new push certificate
-Spaceship::Certificate::ProductionPush.create!(csr, "com.krausefx.app")
+Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
 ## Provisioning Profiles

@@ -110,12 +110,13 @@ module Spaceship
         end
       end
 
-      def create!(csr, bundle_id = nil)
+      def create!(csr: csr, bundle_id: nil)
         type = CERTIFICATE_TYPE_IDS.key(self)
 
         # look up the app_id by the bundle_id
         if bundle_id
-          app_id = Spaceship::App.find(bundle_id).app_id
+          app = Spaceship::App.find(bundle_id)
+          app_id = app.app_id
         end
 
         # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
