@@ -13,7 +13,7 @@ module Sigh
       profiles = fetch_profiles # download the profile if it's there
 
       if profiles.count > 0
-        Helper.log.info "Found #{profiles.count} existing profiles".yellow if profiles.count > 1
+        Helper.log.info "Found #{profiles.count} existing profile(s)".yellow
         profile = profiles.first
 
         if Sigh.config[:force]
@@ -31,6 +31,8 @@ module Sigh
         # We don't want to use the return value here, as this doesn't include all the information we need
         profile = fetch_profiles.first # better fetch it from the server again
       end
+
+      raise "Something went wrong fetching the latest profile".red unless profile
       
       path = download_profile(profile)
       store_provisioning_id_in_environment(path)
@@ -122,7 +124,6 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       Helper.log.info "Downloading provisioning profile...".yellow
-
       profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include?'mobileprovision'
 
