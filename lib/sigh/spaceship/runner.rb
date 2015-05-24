@@ -7,8 +7,8 @@ module Sigh
     # Uses the spaceship to create or download a provisioning profile
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
-      spaceship = Spaceship.login(Sigh.config[:username], nil)
-      # spaceship.UI.select_team # TODO: FIX
+      Spaceship.login(Sigh.config[:username], nil)
+      Spaceship.client.select_team
       
       profiles = fetch_profiles # download the profile if it's there
 
