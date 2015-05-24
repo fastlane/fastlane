@@ -58,6 +58,8 @@ Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh
 
 Up until now, the [fastlane tools](https://fastlane.tools) use web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
 
+No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
+
 # Installation
 
     sudo gem install spaceship
@@ -289,12 +291,25 @@ I won't go into too much technical details about the various API endpoints, but 
 - `https://idmsa.apple.com`: Used to authenticate and get a valid session
 - `https://developerservices2.apple.com`: Used to get a detailed list of all available provisioning profiles. This API requires the devices, certificates and app for each of the profiles.
 - `https://developer.apple.com`: 
- - List all devices
- - List all certificates
+ - List all devices, certificates and apps
+ - Create new certificates, provisioning profiles and apps
+ - Delete certificates and apps
  - Repair provisioning profiles
  - Download provisioning profiles
+ - Team selection
 
 `spaceship` uses all those API points to offer this seamless experience.
+
+## Magic involved
+
+`spaceship` does a lot of magic to get everything working so neatly: 
+
+- **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
+- **Local Validation**: When pushing changes back to the Apple Dev Portal `spaceship` will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
+- **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests. 
+- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spacehip` to create hundreds of profiles and then accessing them using `spaceship`.
+- **Session, Cookie and CSRF token**: All the security aspects are handled by `spaceship`.
+- **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
 
 # Credits
 
