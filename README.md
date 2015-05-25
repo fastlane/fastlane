@@ -35,8 +35,10 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 -------
 <p align="center">
-    insert points here
-    <a href="#technical-details">Technical Details</a>
+    <a href="#why">Why?</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#technical-details">Technical Details</a>  &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
