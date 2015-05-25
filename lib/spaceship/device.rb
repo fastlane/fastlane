@@ -36,24 +36,24 @@ module Spaceship
         end
       end
 
-      def create!(device_name, device_udid)
+      def create!(name: nil, udid: nil)
 
         # Check whether the user has passed in a UDID and a name
-        if not device_udid or not device_name
+        if not udid or not name
           raise "You cannot create a device without a device_id (UDID) and device_name"
         end
 
         # Find the device by UDID, raise an exception if it already exists
-        if self.find_by_udid(device_udid)
-          raise "The device UDID '#{device_udid}' already exists on this team."
+        if self.find_by_udid(udid)
+          raise "The device UDID '#{udid}' already exists on this team."
         end
 
         # Find the device by name, raise an exception if it already exists
-        if self.find_by_name(device_name)
-          raise "The device name '#{device_name}' already exists on this team, use different one."
+        if self.find_by_name(name)
+          raise "The device name '#{name}' already exists on this team, use different one."
         end
 
-        device = client.create_device!(device_name, device_udid)
+        device = client.create_device!(name, udid)
 
         # Update self with the new device
         self.new(device)

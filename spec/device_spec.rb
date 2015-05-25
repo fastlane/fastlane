@@ -18,18 +18,18 @@ describe Spaceship::Device do
   describe "#create" do
     it "should create and return a new device" do
       expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b").and_return({})
-      device = Spaceship::Device.create!("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+      device = Spaceship::Device.create!(name: "Demo Device", udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
     end
 
     it "should fail to create a nil device UDID" do
       expect {
-        Spaceship::Device.create!("Demo Device", nil)
+        Spaceship::Device.create!(name: "Demo Device", udid: nil)
       }.to raise_error("You cannot create a device without a device_id (UDID) and device_name")
     end
 
     it "should fail to create a nil device name" do
       expect {
-        Spaceship::Device.create!(nil, "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+        Spaceship::Device.create!(name: nil, udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
       }.to raise_error("You cannot create a device without a device_id (UDID) and device_name")
     end
   end
