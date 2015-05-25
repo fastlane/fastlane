@@ -53,7 +53,7 @@ module Spaceship
           raise "The device name '#{device_name}' already exists on this team, use different one."
         end
 
-        device = client.create_device(device_name, device_udid)
+        device = client.create_device!(device_name, device_udid)
 
         # Update self with the new device
         self.new(device)

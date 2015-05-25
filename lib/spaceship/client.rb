@@ -189,7 +189,7 @@ module Spaceship
       end
     end
 
-    def create_device(device_name, device_id)
+    def create_device!(device_name, device_id)
       r = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
         r.params = {

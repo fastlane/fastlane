@@ -15,33 +15,22 @@ describe Spaceship::Device do
     expect(device.status).to eq('c')
   end
 
-  describe "#create"
-
+  describe "#create" do
     it "should create and return a new device" do
-      expect(client).to receive(:create_device).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+      expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b").and_return({})
       device = Spaceship::Device.create!("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
-      expect(device).to exist
-      expect(device.name).to eq("Demo Device")
-      expect(device.udid).to eq("7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
-      expect(device.platform).to eq('ios')
-      expect(device.status).to eq('c')
     end
 
     it "should fail to create a nil device UDID" do
-      expect(client).to receive(:create_device).with("Demo Device", nil)
-
-      Spaceship::Device.create!("Demo Device", nil)
       expect {
         Spaceship::Device.create!("Demo Device", nil)
       }.to raise_error("You cannot create a device without a device_id (UDID) and device_name")
     end
 
     it "should fail to create a nil device name" do
-      expect(client).to receive(:create_device).with(nil, "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
-
-      Spaceship::Device.create!(nil, "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
       expect {
         Spaceship::Device.create!(nil, "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
       }.to raise_error("You cannot create a device without a device_id (UDID) and device_name")
+    end
   end
 end
