@@ -14,13 +14,6 @@ module Spaceship
     attr_accessor :config, :client
 
     def login(username = nil, password = nil)
-      if !username or !password
-        require 'credentials_manager'
-        data = CredentialsManager::PasswordManager.shared_manager(username, false)
-        username ||= data.username
-        password ||= data.password
-      end
-
       @client = Client.login(username, password)
     end
   end
