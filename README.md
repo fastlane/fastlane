@@ -157,7 +157,7 @@ cert_content = dev_push_certs.first.download
 
 ```ruby
 # Create a new certificate signing request
-csr = Spaceship::Certificate.create_certificate_signing_request
+csr, pkey = Spaceship::Certificate.create_certificate_signing_request
 
 # Use the signing request to create a new distribution certificate
 Spaceship::Certificate::Production.create!(csr: csr)
