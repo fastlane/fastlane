@@ -69,7 +69,7 @@ module Spaceship
         if devices.nil? or devices.count == 0
           if self == Development or self == AdHoc
             # For Development and AdHoc we usually want all devices by default
-            devices = Spaceship.devices
+            devices = Spaceship::Device.all
           end
         end
 
@@ -171,7 +171,7 @@ module Spaceship
     def certificate_valid?
       return false if (certificates || []).count == 0
       certificates.each do |c|
-        if Spaceship.certificates.collect { |s| s.id }.include?c.id
+        if Spaceship::Certificate.all.collect { |s| s.id }.include?(c.id)
           return true
         end
       end

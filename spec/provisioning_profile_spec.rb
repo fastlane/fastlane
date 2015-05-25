@@ -73,10 +73,10 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it 'creates a provisioning profile with only the required parameters and auto fills all available devices' do
-      expect(client).to receive(:create_provisioning_profile!).with('net.sunapps.1 AppStore', 
-                                                                    'store', 
-                                                                    '2UMR2S6PAA', 
-                                                                    ["XC5PH8DAAA"], 
+      expect(client).to receive(:create_provisioning_profile!).with('net.sunapps.1 AppStore',
+                                                                    'store',
+                                                                    '2UMR2S6PAA',
+                                                                    ["XC5PH8DAAA"],
                                                                     []).
                         and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
@@ -93,7 +93,7 @@ describe Spaceship::ProvisioningProfile do
     let (:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "repairs an existing profile with added devices" do
-      profile.devices = Spaceship.devices
+      profile.devices = Spaceship::Device.all
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"]).and_return({})
       profile.repair!
     end

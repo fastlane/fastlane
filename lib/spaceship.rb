@@ -23,22 +23,6 @@ module Spaceship
 
       @client = Client.login(username, password)
     end
-
-    def apps
-      App.all
-    end
-
-    def certificates
-      Certificate.all
-    end
-
-    def devices
-      Device.all
-    end
-
-    def provisioning_profiles
-      ProvisioningProfile.all
-    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
