@@ -255,6 +255,25 @@ profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.kraus
                                                          certificate: cert)
 ```
 
+## Multiple Spaceships
+
+Sometimes one `spaceship` just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple `spaceships` at the same time :rocket:
+
+```ruby
+# Launch 2 spaceships
+spaceship1 = Spaceship::Launcher.new("felix@krausefx.com", "password")
+spaceship2 = Spaceship::Launcher.new("stefan@spaceship.airforce", "password")
+
+# Fetch all registered devices from spaceship1
+devices = spaceship1.device.all
+
+# Iterate over the list of available devices
+# and register each device from the first account also on the second one
+devices.each do |device|
+  spaceship2.device.create!(name: device.name, udid: device.udid)
+end
+```
+
 ## More cool things you can do
 ```ruby
 # Find a profile with a specific name
