@@ -4,6 +4,14 @@ describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
 
+  describe '.factory' do
+    it 'should instantiate a subclass and pass the client' do
+      propro = Spaceship::ProvisioningProfile.factory({'distributionMethod' => 'store', 'appId' => {}, 'devices' => [{}], 'certificates' => []})
+      expect(propro).to be_instance_of(Spaceship::ProvisioningProfile::AdHoc)
+      expect(propro.client).to eq(client)
+    end
+  end
+
   describe '#all' do
     let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 

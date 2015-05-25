@@ -82,6 +82,13 @@ module Spaceship
     # returns Spaceship::Client
     def login(username = nil, password = nil)
       if username.to_s.empty? or password.to_s.empty?
+        require 'credentials_manager'
+        data = CredentialsManager::PasswordManager.shared_manager(username, false)
+        username ||= data.username
+        password ||= data.password
+      end
+
+      if username.to_s.empty? or password.to_s.empty?
         raise InvalidUserCredentialsError.new("No login data provided")
       end
 
@@ -114,7 +121,7 @@ module Spaceship
       return @current_team_id if @current_team_id
 
       if teams.count > 1
-        Helper.log.warn "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
       end
       @current_team_id ||= teams[0]['teamId']
     end

@@ -26,7 +26,7 @@ module Spaceship
     class DevelopmentPush < PushCertificate; end
     class ProductionPush < PushCertificate; end
     class WebsitePush < PushCertificate; end
-    class VoIPPush < PushCertificate; end
+    class VoipPush < PushCertificate; end
     class Passbook < Certificate; end
     class ApplePay < Certificate; end
 
@@ -88,6 +88,7 @@ module Spaceship
         # Here we go
         klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
         klass ||= Certificate
+        klass.client = @client
         klass.new(attrs)
       end
 
