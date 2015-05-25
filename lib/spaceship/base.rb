@@ -18,14 +18,14 @@ module Spaceship
       def remap_keys!(attrs)
         return if attr_mapping.nil?
 
-        @attr_mapping.each do |from, to|
+        attr_mapping.each do |from, to|
           attrs[to] = attrs.delete(from)
         end
       end
 
-      def attr_mapping(attrs = nil)
-        if attrs
-          @attr_mapping = attrs
+      def attr_mapping(attr_map = nil)
+        if attr_map
+          @attr_mapping = attr_map
         else
           @attr_mapping ||= ancestors[1].attr_mapping rescue nil
         end
