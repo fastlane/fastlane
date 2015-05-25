@@ -49,8 +49,7 @@ module Spaceship
          val = instance_variable_get(ivar)
          "#{ivar}=#{val.inspect}"
       end
-      "#<#{self.class.name} #{inspect_vars.join(', ')}>"
+      "\n#<#{self.class.name}\n\t#{inspect_vars.join("\n\t")}>"
     end
-
   end
 end
