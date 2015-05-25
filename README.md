@@ -2,7 +2,7 @@
   <a href="https://github.com/KrauseFx/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
-    fastlane
+    spaceship
   </a>
 </h3>
 <p align="center">
@@ -298,7 +298,7 @@ app.delete!
 
 Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
 
-The example data below is a provisioning profile, containg a device, certificate and app. 
+The example data below is a provisioning profile, containing a device, certificate and app. 
 
 ```
 #<Spaceship::ProvisioningProfile::AdHoc 
@@ -335,7 +335,7 @@ The example data below is a provisioning profile, containg a device, certificate
 
 ## HTTP Client
 
-Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and drastically improved speed. 
+Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and extremely improved speed. 
 
 Advantages of `spaceship` (HTTP client) over web scraping: 
 
@@ -372,9 +372,10 @@ I won't go into too much technical details about the various API endpoints, but 
 - **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
 - **Local Validation**: When pushing changes back to the Apple Dev Portal `spaceship` will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
 - **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests. 
-- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spacehip` to create hundreds of profiles and then accessing them using `spaceship`.
+- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spaceship` to create hundreds of profiles and then accessing them using `spaceship`.
 - **Session, Cookie and CSRF token**: All the security aspects are handled by `spaceship`.
 - **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
+- **Multiple Spaceship**: You can launch multiple `spaceships` with different Apple accounts to do things like syncing the registered devices.
 
 # Credits
 
