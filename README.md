@@ -83,6 +83,12 @@ puts "Created Profile " + profile.name
 profile.download
 ```
 
+## Speed
+
+How fast are tools using `spaceship` compared to web scraping? 
+
+![assets/spaceshipRecording.gif](assets/spaceshipRecording.gif)
+
 # Installation
 
     sudo gem install spaceship
