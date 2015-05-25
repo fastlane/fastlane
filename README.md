@@ -95,6 +95,8 @@ How fast are tools using `spaceship` compared to web scraping?
 
 # Usage
 
+To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`. 
+
 ## Login
 
 ```ruby
