@@ -24,9 +24,4 @@ module Spaceship
       @client = Client.login(username, password)
     end
   end
-
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-
-  # FastlaneCore::UpdateChecker.verify_latest_version('spaceship', Spaceship::VERSION)
-
 end
