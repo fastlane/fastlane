@@ -263,6 +263,9 @@ Spaceship.client.team_id
 # This method might fail for various reasons, e.g. app is already in the store
 app = Spaceship.apps.find("com.krausefx.app")
 app.delete!
+
+# Register a new device
+Spaceship::Device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 ```
 
 # Technical Details
