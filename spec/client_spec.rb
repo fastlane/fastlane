@@ -57,7 +57,7 @@ describe Spaceship::Client do
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({csrf: 'top_secret', csrf_ts: '123123'})
         allow(subject).to receive(:page_size).and_return(10) # to have a seperate stubbing
-        
+
         expect(subject.devices.count).to eq(4)
       end
     end
@@ -143,6 +143,13 @@ describe Spaceship::Client do
         expect {
           response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
         }.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+    end
+
+    describe '#delete_provisioning_profile!' do
+      it 'makes a requeset to delete a provisioning profile' do
+        response = subject.delete_provisioning_profile!('2MAY7NPHRU')
+        expect(response['resultCode']).to eq(0)
       end
     end
 
