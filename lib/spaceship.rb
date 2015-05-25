@@ -17,6 +17,21 @@ module Spaceship
       @client = Client.login(username, password)
     end
 
+    # Open up the team selection for the user (if necessary).
+    # 
+    # If the user is in multiple teams, a team selection is shown.
+    # The user can then select a team by entering the number
+    # 
+    # Additionally, the team ID is shown next to each team name
+    # so that the user can use the environment variable `FASTLANE_TEAM_ID`
+    # for future user.
+    # 
+    # @return (String) The ID of the select team. You also get the value if 
+    #   the user is only in one team.
+    def select_team
+      @client.select_team
+    end
+
     # Helper methods for managing multiple instances of spaceship
 
     # @return (Class) Access the apps for the spaceship
