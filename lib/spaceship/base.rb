@@ -1,15 +1,16 @@
 module Spaceship
   class Base
     class << self
+      attr_accessor :client
 
       def client
-        @@client ||= Spaceship.client
+        @client || Spaceship.client
       end
 
-      ##
-      # this operation is not thread-safe
-      def client=(client)
-        @@client = client
+      #set client and return self for chaining
+      def set_client(client)
+        self.client = client
+        self
       end
 
       ##
@@ -27,6 +28,23 @@ module Spaceship
           @attr_mapping = attrs
         else
           @attr_mapping ||= ancestors[1].attr_mapping rescue nil
+        end
+      end
+
+      ##
+      # are we trying to get a subclass?
+      # if the method matches a underscored version
+      # return the class with the current client passed into it.
+      def method_missing(method_sym, *args, &block)
+        module_name = method_sym.to_s
+        module_name.sub!(/^[a-z\d]/) { $&.upcase }
+        module_name.gsub!(/(?:_|(\/))([a-z\d])/) { $2.upcase }
+        const_name = "#{self.name}::#{module_name}"
+        if const_defined?(const_name)
+          klass = const_get(const_name)
+          klass.set_client(@client)
+        else
+          super
         end
       end
     end

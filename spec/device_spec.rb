@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Spaceship::Device do
   before { Spaceship.login }
-  let(:client) { Spaceship::Certificate.client }
+  let(:client) { Spaceship::Device.client }
 
   subject { Spaceship::Device.all }
   it "successfully loads and parses all devices" do

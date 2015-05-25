@@ -28,4 +28,33 @@ module Spaceship
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   # FastlaneCore::UpdateChecker.verify_latest_version('spaceship', Spaceship::VERSION)
+
+  class Control
+
+    attr_accessor :client
+
+    def initialize
+      @client = Client.new
+    end
+
+    ## helper methods for managing multiple instances of spaceship
+
+    ##
+    #
+    def app
+      Spaceship::App.set_client(@client)
+    end
+
+    def device
+      Spaceship::Device.set_client(@client)
+    end
+
+    def certificate
+      Spaceship::Certificate.set_client(@client)
+    end
+
+    def provisioning_profile
+      Spaceship::ProvisioningProfile.set_client(@client)
+    end
+  end
 end
