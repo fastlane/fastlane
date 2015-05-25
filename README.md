@@ -52,13 +52,13 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 > `spaceship` is named after the new Apple HQ in Cupertino. It allows you to seamlessly interact with the Apple Developer Portal using very simple Ruby code. 
 
-`spaceship` uses simple HTTPs requests without any sort of web scraping. This allows `spaceship` to have a 95% test coverage.
+`spaceship` uses simple HTTPs requests without any sort of web scraping. 
 
 Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds :rocket:
 
-`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you, so you don't have to think about it. [More details about the APIs](#technical-details).
+`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you. [More details about the APIs](#technical-details).
 
-Up until now, the [fastlane tools](https://fastlane.tools) use web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
+Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
 
 > No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
 
@@ -205,7 +205,7 @@ profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.kraus
 # AdHoc Profiles will add all devices by default
 profile = Spaceship::ProvisioningProfile::AdHoc.create!(bundle_id: "com.krausefx.app",
                                                       certificate: cert,
-                                                             name: "Such Custom Name, Much Special")
+                                                             name: "Profile Name")
 
 # Store the new profile on the filesystem
 File.write("NewProfile.mobileprovision", profile.download)
@@ -251,7 +251,7 @@ profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.kraus
 ## More cool things you can do
 ```ruby
 # Find a profile with a specific name
-profile = Spaceship::ProvisioningProfile::Development.all.find { |p| p.name == "ProfileName" }
+profile = Spaceship::ProvisioningProfile::Development.all.find { |p| p.name == "Name" }
 
 # Add all available devices to the profile
 profile.devices = Spaceship.devices
@@ -324,8 +324,11 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 
 I won't go into too much technical details about the various API endpoints, but just to give you an idea:
 
-- `https://idmsa.apple.com`: Used to authenticate and get a valid session
-- `https://developerservices2.apple.com`: Used to get a detailed list of all available provisioning profiles. This API requires the devices, certificates and app for each of the profiles.
+- `https://idmsa.apple.com`: Used to authenticate to get a valid session
+- `https://developerservices2.apple.com`: 
+ - Get a detailed list of all available provisioning profiles
+ - This API returns the devices, certificates and app for each of the profiles
+ - Register new devices
 - `https://developer.apple.com`: 
  - List all devices, certificates and apps
  - Create new certificates, provisioning profiles and apps
