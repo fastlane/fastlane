@@ -32,9 +32,22 @@ module Spaceship
       end
 
       ##
-      # are we trying to get a subclass?
-      # if the method matches a underscored version
+      # Call a method to return a subclass constant.
+      #
+      # If `method_sym` is an underscored name of a class,
       # return the class with the current client passed into it.
+      # If the method does not match, NoMethodError is raised.
+      #
+      # Example:
+      #
+      #   Certificate.production_push
+      #   #=> Certificate::ProductionPush
+      #
+      #   ProvisioningProfile.ad_hoc
+      #   #=> ProvisioningProfile::AdHoc
+      #
+      #   ProvisioningProfile.some_other_method
+      #   #=> NoMethodError: undefined method `some_other_method' for ProvisioningProfile
       def method_missing(method_sym, *args, &block)
         module_name = method_sym.to_s
         module_name.sub!(/^[a-z\d]/) { $&.upcase }
