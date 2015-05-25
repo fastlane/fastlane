@@ -42,7 +42,8 @@ module Spaceship
     )
 
     class << self
-      # Create a new app from the server response. Is used internally
+      # Create a new object based on a hash.
+      # This is used to create a new object based on the server response.
       def factory(attrs)
         self.new(attrs)
       end
