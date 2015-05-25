@@ -87,7 +87,7 @@ profile.download
 
 How fast are tools using `spaceship` compared to web scraping? 
 
-![assets/spaceshipRecording.gif](assets/spaceshipRecording.gif)
+![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
 # Installation
 
