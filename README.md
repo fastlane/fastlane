@@ -18,7 +18,7 @@
 -------
 
 <p align="center">
-    <img src="assets/spaceship.png">
+  <img src="assets/spaceship.png">
 </p>
 
 spaceship
@@ -107,13 +107,13 @@ Spaceship.client.select_team # call this method to let the user select a team
 
 ```ruby
 # Fetch all available apps
-all_apps = Spaceship.apps
+all_apps = Spaceship::App.all
 
 # Find a specific app based on the bundle identifier
-app = Spaceship.apps.find("com.krausefx.app")
+app = Spaceship::App.find("com.krausefx.app")
 
 # Show the names of all your apps
-Spaceship.apps.each do |app|
+Spaceship::App.all.each do |app|
   puts app.name
 end
 
@@ -125,7 +125,7 @@ app = Spaceship::App.create!(bundle_id: "com.krausefx.app_name", name: "fastlane
 
 ```ruby
 # Fetch all available certificates (includes signing and push profiles)
-certificates = Spaceship.certificates
+certificates = Spaceship::Certificate.all
 ```
 
 ### Code Signing Certificates
@@ -174,7 +174,7 @@ Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: "com.krausef
 ##### Finding #####
 
 # Get all available provisioning profiles
-profiles = Spaceship.provisioning_profiles
+profiles = Spaceship::ProvisioningProfile.all
 
 # Get all App Store profiles
 profiles_appstore = Spaceship::ProvisioningProfile::AppStore.all
@@ -222,7 +222,7 @@ File.write("NewProfile.mobileprovision", profile.download)
 
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
-broken_profiles = Spaceship.provisioning_profiles.find_all do |profile| 
+broken_profiles = Spaceship::ProvisioningProfile.all.find_all do |profile| 
   (profile.status == "Invalid" or profile.status == "Expired")
 end
 
@@ -232,13 +232,13 @@ broken_profiles.each do |profile|
 end
 
 # or to make the same thing, just more Ruby like:
-Spaceship.provisioning_profiles.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
+Spaceship::ProvisioningProfile.all.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
 ```
 
 ## Devices
 
 ```ruby
-all_devices = Spaceship.devices
+all_devices = Spaceship::Device.all
 
 # Register a new device
 Spaceship::Device.create!(name: "Private iPhone 6", udid: "5814abb3...")
@@ -261,7 +261,7 @@ profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.kraus
 profile = Spaceship::ProvisioningProfile::Development.all.find { |p| p.name == "Name" }
 
 # Add all available devices to the profile
-profile.devices = Spaceship.devices
+profile.devices = Spaceship::Device.all
 
 # Push the changes back to the Apple Developer Portal
 profile.update!
@@ -271,7 +271,7 @@ Spaceship.client.team_id
 
 # We generally don't want to be destructive, but you can also delete things
 # This method might fail for various reasons, e.g. app is already in the store
-app = Spaceship.apps.find("com.krausefx.app")
+app = Spaceship::App.find("com.krausefx.app")
 app.delete!
 ```
 
