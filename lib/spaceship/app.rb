@@ -3,22 +3,28 @@ module Spaceship
   class App < Base
 
     # @return (String) The identifier of this app, provided by the Dev Portal
-    # @example RGAWZGXSAA
+    # @example 
+    #   "RGAWZGXSAA"
     attr_accessor :app_id
 
     # @return (String) The name you provided for this app
+    # @example
+    #   "Spaceship"
     attr_accessor :name
 
     # @return (String) the supported platform of this app
-    # @example ios
+    # @example 
+    #   "ios"
     attr_accessor :platform
 
     # Prefix provided by the Dev Portal
-    # @example 5A997XSHK2
+    # @example 
+    #   "5A997XSHK2"
     attr_accessor :prefix
 
     # @return (String) The bundle_id (app identifier) of your app
-    # @example com.krausefx.app
+    # @example 
+    #   "com.krausefx.app"
     attr_accessor :bundle_id
 
     # @return (Bool) Is this app a wildcard app (e.g. com.krausefx.*)

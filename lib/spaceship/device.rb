@@ -2,23 +2,28 @@ module Spaceship
   # Represents a device from the Apple Developer Portal
   class Device < Base
     # @return (String) The ID given from the developer portal. You'll probably not need it.
-    # @example "XJXGVS46MW"
+    # @example 
+    #   "XJXGVS46MW"
     attr_accessor :id
 
     # @return (String) The name of the device
-    # @example "Felix Krause's iPhone 6"
+    # @example 
+    #   "Felix Krause's iPhone 6"
     attr_accessor :name
 
     # @return (String) The UDID of the device
-    # @example "4c24a7ee5caaa4847f49aaab2d87483053f53b65"
+    # @example 
+    #   "4c24a7ee5caaa4847f49aaab2d87483053f53b65"
     attr_accessor :udid
 
     # @return (String) The platform of the device. This is probably always "ios"
-    # @example "ios"
+    # @example 
+    #   "ios"
     attr_accessor :platform
 
     # @return (String) Status of the device. Probably always "c"
-    # @example "c"
+    # @example 
+    #   "c"
     attr_accessor :status
 
     attr_mapping({
@@ -67,6 +72,7 @@ module Spaceship
       # @param name (String) (required): The UDID of the new device
       # @example 
       #   Spaceship.device.create!(name: "Felix Krause's iPhone 6", udid: "4c24a7ee5caaa4847f49aaab2d87483053f53b65")
+      # @return (Device): The newly created device
       def create!(name: nil, udid: nil)
         # Check whether the user has passed in a UDID and a name
         unless (udid and name)
