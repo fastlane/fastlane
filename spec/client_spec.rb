@@ -121,6 +121,16 @@ describe Spaceship::Client do
       end
     end
 
+    describe "#create_device" do
+      it "works as expected when the name is free" do
+        device = subject.create_device!("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+        expect(device['name']).to eq("Demo Device")
+        expect(device['deviceNumber']).to eq("7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+        expect(device['devicePlatform']).to eq('ios')
+        expect(device['status']).to eq('c')
+      end
+    end
+
     describe "#create_provisioning_profile" do
       it "works when the name is free" do
         response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])

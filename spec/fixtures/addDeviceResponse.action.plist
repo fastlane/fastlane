@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>device</key>
+    <dict>
+      <key>deviceId</key>
+      <string>M2WM9F639U</string>
+      <key>name</key>
+      <string>Demo Device</string>
+      <key>deviceNumber</key>
+      <string>7f6c8dc83d77134b5a3a1c53f1202b395b04482b</string>
+      <key>devicePlatform</key>
+      <string>ios</string>
+      <key>status</key>
+      <string>c</string>
+    </dict>
+    <key>creationTimestamp</key>
+    <string>2015-05-24T18:20:31Z</string>
+    <key>resultCode</key>
+    <integer>0</integer>
+    <key>userLocale</key>
+    <string>en_US</string>
+    <key>protocolVersion</key>
+    <string>QH65B2</string>
+    <key>requestId</key>
+    <string>116282DE-76A9-4CE3-A18C-9D0290123C42</string>
+    <key>requestUrl</key>
+    <string>https://developerservices2.apple.com:443//services/QH65B2/ios/addDevice.action?clientId=XABBG36SBA</string>
+    <key>responseId</key>
+    <string>09d5e0c4-ecd8-46d4-8c55-e2229a52073c</string>
+  </dict>
+</plist>

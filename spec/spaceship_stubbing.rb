@@ -68,6 +68,11 @@ def stub_devices
     with(:body => {:teamId => 'XXXXXXXXXX', :pageSize => "500", :pageNumber => "1", :sort => 'name=asc'}, :headers => {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(:status => 200, :body => read_fixture_file('listDevices.action.json'), :headers => {'Content-Type' => 'application/json'})
 
+  # Register a new device
+  stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/addDevice.action?deviceNumber=7f6c8dc83d77134b5a3a1c53f1202b395b04482b&name=Demo%20Device&teamId=XXXXXXXXXX").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Length'=>'0', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => read_fixture_file('addDeviceResponse.action.plist'), :headers => {'Content-Type' => 'application/x-xml-plist'})
+
   # Custom paging
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
          with(:body => {"pageNumber"=>"1", "pageSize"=>"8", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"},
@@ -146,4 +151,3 @@ RSpec.configure do |config|
     stub_apps
   end
 end
-
