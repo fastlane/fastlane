@@ -88,6 +88,7 @@ module Spaceship
         # Here we go
         klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
         klass ||= Certificate
+        klass.client = @client
         klass.new(attrs)
       end
 

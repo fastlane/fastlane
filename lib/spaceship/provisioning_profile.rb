@@ -48,6 +48,7 @@ module Spaceship
         attrs['devices'].map! { |device| Device.factory(device) }
         attrs['certificates'].map! { |cert| Certificate.factory(cert) }
 
+        klass.client = @client
         klass.new(attrs)
       end
 
