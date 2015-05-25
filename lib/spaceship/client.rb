@@ -198,7 +198,7 @@ module Spaceship
           name: device_name
         }
       end
-      
+
       parse_response(r, 'device')
     end
 
@@ -351,7 +351,7 @@ module Spaceship
       rescue Faraday::TimeoutError => ex
         unless (tries -= 1).zero?
           sleep 3
-          retry 
+          retry
         end
 
         raise ex # re-raise the exception

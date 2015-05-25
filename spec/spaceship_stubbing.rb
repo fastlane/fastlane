@@ -61,6 +61,12 @@ def stub_provisioning
          with(:body => {"appIdId"=>"572XTN75U2", "certificateIds"=>["XC5PH8D47H"], "deviceIds"=>["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType"=>"store", "provisioningProfileName"=>"net.sunapps.7 AppStore", "teamId"=>"XXXXXXXXXX"},
               :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, :body => read_fixture_file('repair_profile_success.json'), :headers => {})
+
+  # Delete Profiles
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").
+    with(:body => {"provisioningProfileId"=>"2MAY7NPHRU", "teamId"=>"XXXXXXXXXX"},
+         :headers => {'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;'}).
+    to_return(:status => 200, :body => read_fixture_file('deleteProvisioningProfile.action.json'), :headers => {'Content-Type' => 'application/json'})
 end
 
 def stub_devices
