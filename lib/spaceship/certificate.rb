@@ -19,6 +19,7 @@ module Spaceship
     # these certs are not associated with apps
     class Development < Certificate; end
     class Production < Certificate; end
+    class InHouse < Certificate; end # only on Enterprise Profiles
 
     # all these certs have apps.
     class PushCertificate < Certificate; end # abstract class
@@ -32,7 +33,7 @@ module Spaceship
     CERTIFICATE_TYPE_IDS = {
       "5QPB9NHCEI" => Development,
       "R58UK2EWSO" => Production,
-      "9RQEK7MSXA" => Certificate,
+      "9RQEK7MSXA" => InHouse,
       "LA30L5BJEU" => Certificate,
       "BKLRAVXMGM" => DevelopmentPush,
       "3BQKVH9I2X" => ProductionPush,

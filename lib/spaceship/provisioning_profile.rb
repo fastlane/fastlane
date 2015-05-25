@@ -34,6 +34,8 @@ module Spaceship
           AppStore
         when 'adhoc'
           AdHoc
+        when 'inhouse'
+          InHouse
         else
           raise "Can't find class '#{attrs['distributionMethod']}'"
         end
@@ -61,7 +63,10 @@ module Spaceship
         devices = [] if self == AppStore # App Store Profiles MUST NOT have devices
 
         if devices.nil? or devices.count == 0
-          devices = Spaceship.devices if self != AppStore # by default all devices
+          if self == Development or self == AdHoc
+            # For Development and AdHoc we usually want all devices by default
+            devices = Spaceship.devices
+          end
         end
 
         profile = client.create_provisioning_profile!(name, 
@@ -125,6 +130,16 @@ module Spaceship
 
       def self.pretty_type
         'AdHoc'
+      end
+    end
+
+    class InHouse < ProvisioningProfile
+      def self.type
+        'inhouse'
+      end
+
+      def self.pretty_type
+        'InHouse'
       end
     end
 

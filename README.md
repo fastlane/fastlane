@@ -46,7 +46,7 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-# What's `spaceship`?
+# What's Spaceship?
 
 > `spaceship` is named after the new Apple HQ in Cupertino. It allows you to seamlessly interact with the Apple Developer Portal using very simple Ruby code. 
 
@@ -230,6 +230,20 @@ Spaceship.provisioning_profiles.find_all { |p| %w[Invalid Expired].include?p.sta
 
 ```ruby
 all_devices = Spaceship.devices
+
+# Register a new device
+Spaceship::Device.create!(name: "Private iPhone 6", udid: "5814abb3...")
+```
+
+## Enterprise
+
+```ruby
+# Use the InHouse class to get all enterprise certificates
+cert = Spaceship::Certificate::InHouse.all.first 
+
+# Create a new InHouse Enterprise distribution profile
+profile = Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: "com.krausefx.*",
+                                                         certificate: cert)
 ```
 
 ## More cool things you can do
@@ -250,9 +264,6 @@ Spaceship.client.team_id
 # This method might fail for various reasons, e.g. app is already in the store
 app = Spaceship.apps.find("com.krausefx.app")
 app.delete!
-
-# Register a new device
-Spaceship::Device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 ```
 
 ## Example Data
