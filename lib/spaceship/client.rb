@@ -310,7 +310,7 @@ module Spaceship
     end
 
     private
-      # Is called from `parse_response` to strore
+      # Is called from `parse_response` to store
       def store_csrf_tokens(response)
         if response and response.headers
           tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
