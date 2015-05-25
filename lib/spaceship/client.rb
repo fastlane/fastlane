@@ -257,16 +257,6 @@ module Spaceship
       parse_response(r, 'provisioningProfiles')
     end
 
-    def provisioning_profile(profile_id)
-      r = request(:post, 'account/ios/profile/getProvisioningProfile.action', {
-        teamId: team_id,
-        includeInactiveProfiles: true,
-        onlyCountLists: true,
-        provisioningProfileId: profile_id
-      })
-      parse_response(r, 'provisioningProfile')
-    end
-
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)
       r = request(:post, 'account/ios/profile/createProvisioningProfile.action', {
         teamId: team_id,

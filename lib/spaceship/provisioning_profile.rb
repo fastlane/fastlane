@@ -22,6 +22,10 @@ module Spaceship
         raise "You cannot create a ProvisioningProfile without a type. Use a subclass."
       end
 
+      def pretty_type
+        name.split('::').last
+      end
+
       def factory(attrs)
         # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
         attrs['distributionMethod'] = 'adhoc' if attrs['distributionMethod'] == 'store' && attrs['devices'].size > 0
@@ -53,7 +57,7 @@ module Spaceship
       def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
         raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
         raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
-        
+
         app = Spaceship::App.find(bundle_id)
         raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
@@ -69,10 +73,10 @@ module Spaceship
           end
         end
 
-        profile = client.create_provisioning_profile!(name, 
-                                              self.type, 
-                                              app.app_id, 
-                                              [certificate.id], 
+        profile = client.create_provisioning_profile!(name,
+                                              self.type,
+                                              app.app_id,
+                                              [certificate.id],
                                               devices.map {|d| d.id} )
         self.new(profile)
       end
@@ -107,19 +111,11 @@ module Spaceship
       def self.type
         'limited'
       end
-
-      def self.pretty_type
-        return 'Development'
-      end
     end
 
     class AppStore < ProvisioningProfile
       def self.type
         'store'
-      end
-
-      def self.pretty_type
-        'AppStore'
       end
     end
 
@@ -127,19 +123,11 @@ module Spaceship
       def self.type
         'adhoc'
       end
-
-      def self.pretty_type
-        'AdHoc'
-      end
     end
 
     class InHouse < ProvisioningProfile
       def self.type
         'inhouse'
-      end
-
-      def self.pretty_type
-        'InHouse'
       end
     end
 
@@ -188,10 +176,6 @@ module Spaceship
         end
       end
       return false
-    end
-
-    def self.pretty_type
-      type.capitalize
     end
 
     def managed_by_xcode?
