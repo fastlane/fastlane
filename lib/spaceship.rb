@@ -1,5 +1,4 @@
 require 'spaceship/version'
-require 'fastlane_core'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/profile_types'
@@ -7,6 +6,7 @@ require 'spaceship/app'
 require 'spaceship/certificate'
 require 'spaceship/device'
 require 'spaceship/provisioning_profile'
+require 'spaceship/launcher'
 
 module Spaceship
   # Use this to just setup the configuration attribute and set it later somewhere else
@@ -29,32 +29,4 @@ module Spaceship
 
   # FastlaneCore::UpdateChecker.verify_latest_version('spaceship', Spaceship::VERSION)
 
-  class Control
-
-    attr_accessor :client
-
-    def initialize
-      @client = Client.new
-    end
-
-    ## helper methods for managing multiple instances of spaceship
-
-    ##
-    #
-    def app
-      Spaceship::App.set_client(@client)
-    end
-
-    def device
-      Spaceship::Device.set_client(@client)
-    end
-
-    def certificate
-      Spaceship::Certificate.set_client(@client)
-    end
-
-    def provisioning_profile
-      Spaceship::ProvisioningProfile.set_client(@client)
-    end
-  end
 end

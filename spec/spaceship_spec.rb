@@ -7,7 +7,7 @@ describe Spaceship do
     expect(Spaceship.client).to be_instance_of(Spaceship::Client)
   end
 
-  describe Spaceship::Control do
+  describe Spaceship::Launcher do
     it 'has a client' do
       expect(subject.client).to be_instance_of(Spaceship::Client)
     end
