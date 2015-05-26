@@ -55,7 +55,7 @@ module Fastlane
           end
           changes.chomp!
 
-          ENV[":TRELLO_WHAT_TO_TEST"] = changes    
+          ENV["TRELLO_WHAT_TO_TEST"] = changes    
           Actions.lane_context[SharedValues::TRELLO_WHAT_TO_TEST] = changes    
           Helper.log.info "Successfully generated TRELLO_WHAT_TO_TEST: #{changes}".green
           
