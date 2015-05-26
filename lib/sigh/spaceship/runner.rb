@@ -55,13 +55,7 @@ module Sigh
 
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
-      profile_type.all.select do |profile|
-        
-        # Does the app identifier match
-        next unless (profile.app.bundle_id == Sigh.config[:app_identifier])
-        
-        true
-      end
+      profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
     end
 
     # Create a new profile and return it
