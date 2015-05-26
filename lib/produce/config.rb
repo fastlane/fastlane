@@ -67,7 +67,7 @@ module Produce
         bundle_identifier_suffix: ENV['PRODUCE_APP_IDENTIFIER_SUFFIX'],
         app_name: ENV['PRODUCE_APP_NAME'],
         version: ENV['PRODUCE_VERSION'],
-        sku: ENV['PRODUCE_SKU'],
+        sku: ENV['PRODUCE_SKU'] || Time.now.to_i.to_s,
         skip_itc: is_truthy?(ENV['PRODUCE_SKIP_ITC']),
         skip_devcenter: is_truthy?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
