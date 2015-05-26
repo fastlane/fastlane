@@ -75,7 +75,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "ipa distribute:s3 #{build_args}"
+        command = "krausefx-ipa distribute:s3 #{build_args}"
         Helper.log.debug command
         Actions.sh command
 
