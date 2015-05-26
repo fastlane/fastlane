@@ -295,6 +295,8 @@ module Spaceship
 
     # Repair an existing provisioning profile
     # alias to update!
+    # @return (ProvisioningProfile) A new provisioning profile, as 
+    #  the repair method will generate a profile with a new ID
     def repair!
       update!
     end
@@ -302,6 +304,8 @@ module Spaceship
     # Updates the provisioning profile from the local data
     # e.g. after you added new devices to the profile
     # This will also update the code signing identity if necessary
+    # @return (ProvisioningProfile) A new provisioning profile, as 
+    #  the repair method will generate a profile with a new ID
     def update!
       unless certificate_valid?
         if self.kind_of?Development
@@ -319,6 +323,13 @@ module Spaceship
         self.certificates.map { |c| c.id },
         self.devices.map { |d| d.id }
       )
+
+      # We need to fetch the provisioning profile again, as the ID changes
+      profile = Spaceship::ProvisioningProfile.all.find do |profile|
+        profile.name == self.name # we can use the name as it's valid
+      end
+
+      return profile
     end
 
     # Is the certificate of this profile available?
