@@ -74,6 +74,7 @@ module Fastlane
 
     def self.sh_no_action(command)
       # Set the encoding first, the user might have set it wrong
+      previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
@@ -101,6 +102,11 @@ module Fastlane
       end
 
       result
+    rescue => ex
+      raise ex
+    ensure
+      Encoding.default_external = previous_encoding.first
+      Encoding.default_internal = previous_encoding.last
     end
 
     # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
