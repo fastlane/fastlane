@@ -123,9 +123,11 @@ module PEM
         raise "Something went wrong when downloading the certificate" unless data
 
         path = "#{TMP_FOLDER}aps_#{certificate_type}_#{@app_identifier}.cer"
-        dataWritten = File.write(path, data)
+        data_written = File.open(output_path, "wb") do |f|
+          f.write(data)
+        end
 
-        if dataWritten == 0
+        if data_written == 0
           raise "Can't write to #{TMP_FOLDER}"
         end
 
