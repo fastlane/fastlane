@@ -170,6 +170,8 @@ To let the computer create the screenshots for you, checkout [this section of th
 
 If you want to have the screenshots inside a device frame, with a background and a fancy label on top, you can use [Sketch to App Store](http://sketchtoappstore.com/).
 
+To download all existing screenshots, use `deliver download_screenshots`.
+
 #### Update App description, keywords and more
 
 If you used `deliver init`, take a look at the `./metadata/` folder, which contains your app description, keywords and app title. If you change the content of the files, it will get updated when you run `deliver`.
