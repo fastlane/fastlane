@@ -287,7 +287,7 @@ app.itc.submit_for_review!(app)
 
 FastlaneCore::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches public metadata
 ```
-This project is well documented, check it out on [Rubydoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
+This project is well documented, check it out on [RubyDoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
 
 
 # Credentials
