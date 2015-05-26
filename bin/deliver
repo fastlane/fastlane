@@ -4,6 +4,7 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'deliver'
 require 'commander'
+require 'deliver/download_screenshots'
 
 HighLine.track_eof = false
 
@@ -43,18 +44,18 @@ class FastlaneApplication
 
     def run_deliver(options)
       path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
-        Dir.chdir(path) do # switch the context
-          if File.exists?(deliver_path)
-            # Everything looks alright, use the given Deliverfile
-            options.default :beta => false, :skip_deploy => false
-            Deliver::Deliverer.new(deliver_path, force: options.force, is_beta_ipa: options.beta, skip_deploy: options.skip_deploy)
-          else
-            Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
-            if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
-              Deliver::DeliverfileCreator.create(enclosed_directory)
-            end
+      Dir.chdir(path) do # switch the context
+        if File.exists?(deliver_path)
+          # Everything looks alright, use the given Deliverfile
+          options.default :beta => false, :skip_deploy => false
+          Deliver::Deliverer.new(deliver_path, force: options.force, is_beta_ipa: options.beta, skip_deploy: options.skip_deploy)
+        else
+          Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
+          if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
+            Deliver::DeliverfileCreator.create(enclosed_directory)
           end
         end
+      end
     end
 
     command :init do |c|
@@ -67,6 +68,24 @@ class FastlaneApplication
 
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Deliver::DeliverfileCreator.create(path)
+      end
+    end
+
+    command :download_screenshots do |c|
+      c.syntax = 'deliver download_screenshots'
+      c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
+      c.option '-a', '--app_identifier String', String, 'The App Identifier (e.g. com.krausefx.app)'
+      c.option '-u', '--username String', String, 'Your Apple ID'
+      c.action do |args, options|
+        set_username(options.username)
+
+        app_identifier = options.app_identifier || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) || ask("Please enter the app's bundle identifier: ")
+        app = Deliver::App.new(app_identifier: app_identifier)
+
+        path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
+        path = File.join(path, "deliver")
+
+        Deliver::DownloadScreenshots.run(app, path)
       end
     end
 
