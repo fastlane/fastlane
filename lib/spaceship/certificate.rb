@@ -1,9 +1,70 @@
 require 'openssl'
 
 module Spaceship
+  # Represents a certificate from the Apple Developer Portal.
+  # 
+  # This can either be a code signing identity or a push profile
   class Certificate < Base
+    # @return (String) The ID given from the developer portal. You'll probably not need it.
+    # @example 
+    #   "P577TH3PAA"
+    attr_accessor :id
 
-    attr_accessor :id, :name, :status, :created, :expires, :owner_type, :owner_name, :owner_id, :type_display_id, :app
+    # @return (String) The name of the certificate
+    # @example Company
+    #   "SunApps GmbH"
+    # @example Push Profile
+    #   "com.krausefx.app"
+    attr_accessor :name
+
+    # @return (String) Status of the certificate
+    # @example 
+    #   "Issued"
+    attr_accessor :status
+
+    # @return (Date) The date and time when the certificate was created
+    # @example 
+    #   2015-04-01 21:24:00 UTC
+    attr_accessor :created
+
+    # @return (Date) The date and time when the certificate will expire
+    # @example 
+    #   2016-04-01 21:24:00 UTC
+    attr_accessor :expires
+    
+    # @return (String) The owner type that defines if it's a push profile
+    #  or a code signing identity
+    # 
+    # @example Code Signing Identity
+    #   "team"
+    # @example Push Certificate
+    #   "bundle"
+    attr_accessor :owner_type
+
+    # @return (String) The name of the owner
+    # 
+    # @example Code Signing Identity (usually the company name)
+    #   "SunApps Gmbh"
+    # @example Push Certificate (the name of your App ID)
+    #   "Awesome App"
+    attr_accessor :owner_name
+
+    # @return (String) The ID of the owner, that can be used to 
+    #  fetch more information
+    # @example
+    #   "75B83SPLAA"
+    attr_accessor :owner_id
+
+    # Indicates the type of this certificate
+    # which is automatically used to determine the class of 
+    # the certificate. Available values listed in CERTIFICATE_TYPE_IDS
+    # @return (String) The type of the certificate
+    # @example Production Certificate
+    #   "R58UK2EWSO"
+    # @example Development Certificate
+    #   "5QPB9NHCEI"
+    attr_accessor :type_display_id
+
     attr_mapping({
       'certificateId' => :id,
       'name' => :name,
@@ -16,18 +77,43 @@ module Spaceship
       'certificateTypeDisplayId' => :type_display_id
     })
 
-    # these certs are not associated with apps
-    class Development < Certificate; end
-    class Production < Certificate; end
-    class InHouse < Certificate; end # only on Enterprise Profiles
+    #####################################################
+    # Certs are not associated with apps
+    #####################################################
 
-    # all these certs have apps.
-    class PushCertificate < Certificate; end # abstract class
+    # A development code signing certificate used for development environment
+    class Development < Certificate; end
+
+    # A production code signing certificate used for distribution environment
+    class Production < Certificate; end
+
+    # An In House code signing certificate used for enterprise distributions
+    class InHouse < Certificate; end
+
+    #####################################################
+    # Certs that are specific for one app
+    #####################################################
+
+    # Abstract class for push certificates. Check out the subclasses
+    # DevelopmentPush, ProductionPush, WebsitePush and VoipPush
+    class PushCertificate < Certificate; end
+
+    # A push notification certificate for development environment
     class DevelopmentPush < PushCertificate; end
+
+    # A push notification certificate for production environment
     class ProductionPush < PushCertificate; end
+
+    # A push notification certificate for websites
     class WebsitePush < PushCertificate; end
+
+    # A push notification certificate for the VOIP environment
     class VoipPush < PushCertificate; end
+
+    # Passbook certificate
     class Passbook < Certificate; end
+
+    # ApplePay certificate
     class ApplePay < Certificate; end
 
     CERTIFICATE_TYPE_IDS = {
@@ -45,6 +131,14 @@ module Spaceship
 
     #class methods
     class << self
+      # Create a new code signing request that can be used to 
+      # generate a new certificate
+      # @example
+      #  Create a new certificate signing request
+      #  csr, pkey = Spaceship.certificate.create_certificate_signing_request
+      # 
+      #  # Use the signing request to create a new distribution certificate
+      #  Spaceship.certificate.production.create!(csr: csr)
       def create_certificate_signing_request
         key = OpenSSL::PKey::RSA.new 2048
         csr = OpenSSL::X509::Request.new
@@ -57,9 +151,9 @@ module Spaceship
         return [csr, key]
       end
 
+      # Create a new object based on a hash.
+      # This is used to create a new object based on the server response.
       def factory(attrs)
-        # TODO: does this belong here?
-
         # Example:
         # => {"name"=>"iOS Distribution: SunApps GmbH",
         #  "certificateId"=>"XC5PH8DAAA",
@@ -96,8 +190,9 @@ module Spaceship
         klass.new(attrs)
       end
 
-      ##
-      # @param types
+      # @return (Array) Returns all certificates of this account.
+      #  If this is called from a subclass of Certificate, this will
+      #  only include certificates matching the current type.
       def all
         if (self == Certificate) # are we the base-class?
           types = CERTIFICATE_TYPE_IDS.keys
@@ -110,12 +205,26 @@ module Spaceship
         end
       end
 
+      # @return (Certificate) Find a certificate based on the ID of the certificate. 
       def find(certificate_id)
         all.find do |c|
           c.id == certificate_id
         end
       end
 
+      # Generate a new certificate based on a code certificate signing request
+      # @param csr (required): The certificate signing request to use. Get one using 
+      #   `create_certificate_signing_request`
+      # @param bundle_id (String) (optional): The app identifier this certificate is for.
+      #  This value is only needed if you create a push profile. For normal code signing
+      #  certificates, you must only pass a certificate signing request.
+      # @example 
+      #  # Create a new certificate signing request
+      #  csr, pkey = Spaceship::Certificate.create_certificate_signing_request
+      #  
+      #  # Use the signing request to create a new distribution certificate
+      #  Spaceship::Certificate::Production.create!(csr: csr)
+      # @return (Device): The newly created device
       def create!(csr: csr, bundle_id: nil)
         type = CERTIFICATE_TYPE_IDS.key(self)
 
@@ -136,24 +245,22 @@ module Spaceship
 
     # instance methods
 
-    # The raw data without parsing
+    # @return (String) Download the raw data of the certificate without parsing
     def download_raw
       client.download_certificate(id, type_display_id)
     end
 
-    # Parse the server response
+    # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate
     def download
       OpenSSL::X509::Certificate.new(download_raw)
     end
 
+    # Revoke the certificate. You shouldn't use this method probably.
     def revoke!
       client.revoke_certificate!(id, type_display_id)
     end
 
-    def expires_at
-      Time.parse(expires)
-    end
-
+    # @return (Bool): Is this certificate a push profile for apps? 
     def is_push?
       # does display_type_id match push?
       [Client::ProfileTypes::Push.development, Client::ProfileTypes::Push.production].include?(type_display_id)

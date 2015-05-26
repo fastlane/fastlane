@@ -46,7 +46,8 @@ module Spaceship
         client.devices.map { |device| self.factory(device) }
       end
 
-      # @return (Device) Find a device based on the ID of the device. *Attention*: This is *not* the UDID. nil if no device was found.
+      # @return (Device) Find a device based on the ID of the device. *Attention*: 
+      #  This is *not* the UDID. nil if no device was found.
       def find(device_id)
         all.find do |device|
           device.id == device_id
@@ -69,7 +70,7 @@ module Spaceship
 
       # Register a new device to this account
       # @param name (String) (required): The name of the new device
-      # @param name (String) (required): The UDID of the new device
+      # @param udid (String) (required): The UDID of the new device
       # @example 
       #   Spaceship.device.create!(name: "Felix Krause's iPhone 6", udid: "4c24a7ee5caaa4847f49aaab2d87483053f53b65")
       # @return (Device): The newly created device
