@@ -11,10 +11,25 @@ require 'spaceship/launcher'
 module Spaceship
   # Use this to just setup the configuration attribute and set it later somewhere else
   class << self
-    attr_accessor :config, :client
+    # This client stores the default client when using the lazy syntax
+    # Spaceship.app instead of using the spaceship launcher
+    attr_accessor :client
 
-    def login(username = nil, password = nil)
-      @client = Client.login(username, password)
+    # Authenticates with Apple's web services. This method has to be called once
+    # to generate a valid session. The session will automatically be used from then
+    # on.
+    # 
+    # This method will automatically use the username from the Appfile (if available)
+    # and fetch the password from the Keychain (if available)
+    # 
+    # @param user (String) (optional): The username (usually the email address)
+    # @param password (String) (optional): The password
+    # 
+    # @raise InvalidUserCredentialsError: raised if authentication failed
+    # 
+    # @return (Spaceship::Client) The client the login method was called for
+    def login(user = nil, password = nil)
+      @client = Client.login(user, password)
     end
 
     # Open up the team selection for the user (if necessary).

@@ -2,8 +2,8 @@ module Spaceship
   class Client
     class UserInterface
       # Shows the UI to select a team
-      # Example `teams` value:
-      # => [{"status"=>"active",
+      # @example teams value:
+      #  [{"status"=>"active",
       #   "teamId"=>"5A997XAAAA",
       #   "type"=>"Company/Organization",
       #   "extendedTeamAttributes"=>{},

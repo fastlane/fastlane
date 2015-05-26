@@ -2,19 +2,47 @@ module Spaceship
   class Launcher
     attr_accessor :client
 
-    # Create a new spaceship client
-    # @param user (String) (optional): Username
-    # @param password (String) (optional): Password
+    # Launch a new spaceship, which can be used to maintain multiple instances of
+    # spaceship. You can call `.new` without any parameters, but you'll have to call
+    # `.login` at a later point. If you prefer, you can pass the login credentials
+    # here already.
+    # 
+    # Authenticates with Apple's web services. This method has to be called once
+    # to generate a valid session. The session will automatically be used from then
+    # on.
+    # 
+    # This method will automatically use the username from the Appfile (if available)
+    # and fetch the password from the Keychain (if available)
+    # 
+    # @param user (String) (optional): The username (usually the email address)
+    # @param password (String) (optional): The password
+    # 
+    # @raise InvalidUserCredentialsError: raised if authentication failed
     def initialize(user = nil, password = nil)
       @client = Client.new
-      @client.login(user, password)
+
+      if user or password
+        @client.login(user, password)
+      end
     end
 
-    # Login Helper
+    #####################################################
+    # @!group Login Helper
+    #####################################################
 
-    # Login using username and password
-    # @param user (String): Username
-    # @param password (String): Password
+    # Authenticates with Apple's web services. This method has to be called once
+    # to generate a valid session. The session will automatically be used from then
+    # on.
+    # 
+    # This method will automatically use the username from the Appfile (if available)
+    # and fetch the password from the Keychain (if available)
+    # 
+    # @param user (String) (optional): The username (usually the email address)
+    # @param password (String) (optional): The password
+    # 
+    # @raise InvalidUserCredentialsError: raised if authentication failed
+    # 
+    # @return (Spaceship::Client) The client the login method was called for
     def login(user, password) 
       @client.login(user, password)
     end
@@ -34,7 +62,9 @@ module Spaceship
       @client.select_team
     end
 
-    # Helper methods for managing multiple instances of spaceship
+    #####################################################
+    # @!group Helper methods for managing multiple instances of spaceship
+    #####################################################
 
     # @return (Class) Access the apps for this spaceship
     def app
