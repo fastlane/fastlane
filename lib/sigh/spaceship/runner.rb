@@ -26,8 +26,7 @@ module Sigh
             Helper.log.info "Updating the provisioning profile".yellow
           end
 
-          profile.update!
-          profile = fetch_profiles.first # to have the latest profile information
+          profile = profile.update! # assign it, as it's a new profile
         end
       else
         Helper.log.info "No existing profiles found, creating a new one for you".yellow
