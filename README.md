@@ -296,6 +296,10 @@ app = Spaceship.app.find("com.krausefx.app")
 app.delete!
 ```
 
+## spaceship in use
+
+The beta version of [sigh](https://github.com/KrauseFx/sigh) is already using `spaceship` to communicate with Apple's web services. You can see all relevant source code in [runner.rb](https://github.com/KrauseFx/sigh/blob/feature/spaceship/lib/sigh/spaceship/runner.rb).
+
 ## Example Data
 
 Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
