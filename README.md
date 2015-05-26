@@ -296,9 +296,13 @@ app = Spaceship.app.find("com.krausefx.app")
 app.delete!
 ```
 
-## spaceship in use
+## Spaceship in use
 
 The beta version of [sigh](https://github.com/KrauseFx/sigh) is already using `spaceship` to communicate with Apple's web services. You can see all relevant source code in [runner.rb](https://github.com/KrauseFx/sigh/blob/feature/spaceship/lib/sigh/spaceship/runner.rb).
+
+## Full Documentation
+
+The detailed documentation of all available classes is available on [RubyDoc](http://www.rubydoc.info/github/fastlane/spaceship/frames).
 
 ## Example Data
 
