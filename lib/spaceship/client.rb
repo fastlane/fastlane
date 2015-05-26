@@ -34,9 +34,9 @@ module Spaceship
     # @raise InvalidUserCredentialsError: raised if authentication failed
     # 
     # @return (Spaceship::Client) The client the login method was called for
-    def self.login(username = nil, password = nil)
+    def self.login(user = nil, password = nil)
       instance = self.new
-      if instance.login(username, password)
+      if instance.login(user, password)
         instance
       else
         raise InvalidUserCredentialsError.new
@@ -101,20 +101,20 @@ module Spaceship
     # @raise InvalidUserCredentialsError: raised if authentication failed
     # 
     # @return (Spaceship::Client) The client the login method was called for
-    def login(username = nil, password = nil)
-      if username.to_s.empty? or password.to_s.empty?
+    def login(user = nil, password = nil)
+      if user.to_s.empty? or password.to_s.empty?
         require 'credentials_manager'
-        data = CredentialsManager::PasswordManager.shared_manager(username, false)
-        username ||= data.username
+        data = CredentialsManager::PasswordManager.shared_manager(user, false)
+        user ||= data.username
         password ||= data.password
       end
 
-      if username.to_s.empty? or password.to_s.empty?
+      if user.to_s.empty? or password.to_s.empty?
         raise InvalidUserCredentialsError.new("No login data provided")
       end
 
       response = request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate", {
-        appleId: username,
+        appleId: user,
         accountPassword: password,
         appIdKey: api_key
       })

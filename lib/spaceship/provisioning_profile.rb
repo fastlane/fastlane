@@ -133,7 +133,7 @@ module Spaceship
     })
 
     class << self
-      # The profile type used for web requests to the Dev Portal
+      # @return (String) The profile type used for web requests to the Dev Portal
       # @example
       #  "limited"
       #  "store"
@@ -238,6 +238,9 @@ module Spaceship
         end
       end
 
+      # @return (ProvisioningProfile) Find a provisioning based on the
+      #  bundle_id (app identifier). This will return nil if it can't be
+      #  found.
       def find_by_bundle_id(bundle_id)
         all.find_all do |profile|
           profile.app.bundle_id == bundle_id
