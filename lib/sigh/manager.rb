@@ -5,9 +5,7 @@ module Sigh
   class Manager
     def self.start
       start = Time.now
-      puts "Start!".green
       path = Sigh::Runner.new.run
-      puts "Finished in #{Time.now - start}".green
 
       return nil unless path
 
@@ -42,7 +40,7 @@ module Sigh
       (FileUtils.copy profile, destination rescue nil) # if the directory doesn't exist yet
 
       if File.exists? destination
-        Helper.log.info "Profile successfully installed at \"#{destination}\"".green
+        Helper.log.info "Profile successfully installed".green
       else
         raise "Failed installation of provisioning profile at location: #{destination}".red
       end

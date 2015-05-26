@@ -7,19 +7,21 @@ module Sigh
     # Uses the spaceship to create or download a provisioning profile
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
+      Helper.log.info "Starting login"
       Spaceship.login(Sigh.config[:username], nil)
-      Spaceship.client.select_team
+      Spaceship.select_team
+      Helper.log.info "Successfully logged in"
       
       profiles = fetch_profiles # download the profile if it's there
 
       if profiles.count > 0
-        Helper.log.info "Found #{profiles.count} existing profile(s)".yellow
+        Helper.log.info "Found #{profiles.count} matching profile(s)".yellow
         profile = profiles.first
 
         if Sigh.config[:force]
-          unless profile_type == Spaceship::ProvisioningProfile::AppStore
+          unless profile_type == Spaceship.provisioning_profile::AppStore
             Helper.log.info "Updating the profile to include all devices".yellow
-            profile.devices = Spaceship.devices    
+            profile.devices = Spaceship.device.all    
           else
             Helper.log.info "Updating the provisioning profile".yellow
           end
@@ -44,9 +46,9 @@ module Sigh
     def profile_type
       return @profile_type if @profile_type
 
-      @profile_type = Spaceship::ProvisioningProfile::AppStore
-      @profile_type = Spaceship::ProvisioningProfile::AdHoc if Sigh.config[:adhoc]
-      @profile_type = Spaceship::ProvisioningProfile::Development if Sigh.config[:development]
+      @profile_type = Spaceship.provisioning_profile.app_store
+      @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
+      @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
 
       @profile_type
     end
@@ -68,7 +70,7 @@ module Sigh
       bundle_id = Sigh.config[:app_identifier]
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
-      if Spaceship::ProvisioningProfile.all.find { |p| p.name == name }
+      if Spaceship.provisioning_profile.all.find { |p| p.name == name }
         Helper.log.error "The name '#{name}' is already taken, using another one."
         name += " #{Time.now.to_i}"
       end
@@ -83,10 +85,10 @@ module Sigh
 
     # Certificate to use based on the current distribution mode
     def certificate_to_use
-      if profile_type == Spaceship::ProvisioningProfile::Development
-        certificates = Spaceship::Certificate::Development.all
+      if profile_type == Spaceship.provisioning_profile.Development
+        certificates = Spaceship.certificate.development.all
       else
-        certificates = Spaceship::Certificate::Production.all # Ad hoc or App Store
+        certificates = Spaceship.certificate.production.all # Ad hoc or App Store
       end
 
       # Filter them
