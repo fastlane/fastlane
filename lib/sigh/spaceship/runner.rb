@@ -11,7 +11,7 @@ module Sigh
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
-      
+
       profiles = fetch_profiles # download the profile if it's there
 
       if profiles.count > 0
@@ -21,7 +21,7 @@ module Sigh
         if Sigh.config[:force]
           unless profile_type == Spaceship.provisioning_profile::AppStore
             Helper.log.info "Updating the profile to include all devices".yellow
-            profile.devices = Spaceship.device.all    
+            profile.devices = Spaceship.device.all
           else
             Helper.log.info "Updating the provisioning profile".yellow
           end
@@ -34,7 +34,7 @@ module Sigh
       end
 
       raise "Something went wrong fetching the latest profile".red unless profile
-      
+
       path = download_profile(profile)
       store_provisioning_id_in_environment(path)
 
@@ -69,7 +69,7 @@ module Sigh
       end
 
       Helper.log.info "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'".yellow
-      profile = profile_type.create!(name: name, 
+      profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert)
       profile
@@ -101,7 +101,7 @@ module Sigh
         Helper.log.info "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options.".yellow
         Helper.log.info "Available Code Signing Identities for current filters:".green
         certificates.each do |c|
-          Helper.log.info ("\t- Name: " + c.owner_name + " - ID: " + c.id + " - Expires: " + c.expires).green
+          Helper.log.info ("\t- Name: " + c.owner_name + " - ID: " + c.id + " - Expires: " + c.expires.strftime("%d/%m/%Y")).green
         end
       end
 
