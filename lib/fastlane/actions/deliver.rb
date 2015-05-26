@@ -12,6 +12,7 @@ module Fastlane
         begin
           ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots if there
           ENV['DELIVER_SKIP_BINARY'] = "1" if config[:metadata_only]
+          ENV['DELIVER_VERSION'] = Actions.lane_context[SharedValues::VERSION_NUMBER].to_s
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
