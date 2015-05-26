@@ -85,6 +85,10 @@ module Spaceship
           attrs.delete('certificateType')
         end
 
+        # Parse the dates
+        attrs['expirationDate'] = (Time.parse(attrs['expirationDate']) rescue attrs['expirationDate'])
+        attrs['dateCreated'] = (Time.parse(attrs['dateCreated']) rescue attrs['dateCreated'])
+
         # Here we go
         klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
         klass ||= Certificate
