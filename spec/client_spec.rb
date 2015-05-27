@@ -8,7 +8,7 @@ describe Spaceship::Client do
 
   describe '#api_key' do
     it 'returns the extracted api key from the login page' do
-      expect(subject.api_key).to eq('891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757')
+      expect(subject.api_key).to eq('0123abcdef123123')
     end
   end
 
