@@ -39,7 +39,7 @@ module Spaceship
         team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
         team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
 
-        if team_id
+        if team_id.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
             return team_id if (team['teamId'].strip == team_id)
@@ -47,7 +47,7 @@ module Spaceship
           puts "Couldn't find team with ID '#{team_id}'"
         end
 
-        if team_name
+        if team_name.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
             return team['teamId'] if (team['name'].strip == team_name)
