@@ -44,8 +44,18 @@ module Sigh
                                      env_name: "SIGH_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "SIGH_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_NAME"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
@@ -83,6 +93,7 @@ module Sigh
                                      verify_block: Proc.new do |value|
                                        raise "The output name must end with .mobileprovision".red unless value.end_with?".mobileprovision"
                                      end)
+    
       ]
     end
   end
