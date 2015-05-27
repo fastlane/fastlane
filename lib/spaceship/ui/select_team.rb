@@ -36,14 +36,23 @@ module Spaceship
 
         raise "Your account is in no teams" if teams.count == 0
 
-        user_team = (ENV['FASTLANE_TEAM_ID'] || '').strip
-        if user_team
+        team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
+        team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
+
+        if team_id
           # User provided a value, let's see if it's valid
-          puts "Looking for team with ID '#{user_team}'"
           teams.each_with_index do |team, i|
-            return user_team if (team['teamId'].strip == user_team)
+            return team_id if (team['teamId'].strip == team_id)
           end
-          puts "Couldn't find team with ID '#{user_team}'"
+          puts "Couldn't find team with ID '#{team_id}'"
+        end
+
+        if team_name
+          # User provided a value, let's see if it's valid
+          teams.each_with_index do |team, i|
+            return team['teamId'] if (team['name'].strip == team_name)
+          end
+          puts "Couldn't find team with Name '#{team_name}'"
         end
 
 
