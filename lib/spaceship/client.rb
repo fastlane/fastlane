@@ -366,7 +366,7 @@ module Spaceship
 
         return @client.send(method, url_or_path, params, headers, &block)
 
-      rescue Faraday::TimeoutError => ex
+      rescue Faraday::Error::TimeoutError => ex # New Farday version: Faraday::TimeoutError => ex
         unless (tries -= 1).zero?
           sleep 3
           retry
