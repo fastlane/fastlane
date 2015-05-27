@@ -36,7 +36,7 @@ module Spaceship
 
         raise "Your account is in no teams" if teams.count == 0
 
-        user_team = ENV['FASTLANE_TEAM_ID'].strip
+        user_team = (ENV['FASTLANE_TEAM_ID'] || '').strip
         if user_team
           # User provided a value, let's see if it's valid
           puts "Looking for team with ID '#{user_team}'"
