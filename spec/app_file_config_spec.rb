@@ -95,5 +95,20 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
       end
     end
+
+    describe "#load_lane_configuration_if_platform_specifier_is_blank" do
+      it "ignores the platform specifier if it is blank" do
+        ENV["FASTLANE_LANE_NAME"] = "enterprise"
+        ENV["FASTLANE_PLATFORM_NAME"] = ""
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:app_identifier]).to eq('enterprise.com')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:apple_id]).to eq('felix@sunapps.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
+
+        ENV["FASTLANE_PLATFORM_NAME"] = "    "
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:app_identifier]).to eq('enterprise.com')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:apple_id]).to eq('felix@sunapps.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
+      end
+    end
   end
 end

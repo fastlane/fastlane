@@ -90,7 +90,7 @@ module CredentialsManager
     #             be applied.
     def for_lane(lane_name, &block)
       raise "Configuration for lane '#{lane_name}' is defined multiple times!".red if blocks[lane_name]
-      if ENV["FASTLANE_PLATFORM_NAME"].nil?
+      if ENV["FASTLANE_PLATFORM_NAME"].to_s.strip.empty?
         # No platform specified, assigned configuration by lane name
         blocks[lane_name.to_s] = block
       else
