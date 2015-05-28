@@ -11,7 +11,7 @@ module Fastlane
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
         # find the repo root path
-        repo_path = `git rev-parse --show-toplevel`.strip
+        repo_path = Actions.sh('git rev-parse --show-toplevel').strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
@@ -49,7 +49,7 @@ module Fastlane
         expected_changed_files.flatten!.uniq!
 
         # get the list of files that have actually changed in our git workdir
-        git_dirty_files = `git diff --name-only HEAD`.split("\n") + `git ls-files --other --exclude-standard`.split("\n")
+        git_dirty_files = Actions.sh('git diff --name-only HEAD').split("\n") + Actions.sh('git ls-files --other --exclude-standard').split("\n")
 
         # little user hint
         raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if git_dirty_files.empty?
