@@ -47,6 +47,20 @@ describe FastlaneCore do
         }.to raise_error "Multiple entries for configuration key 'cert_name' found!".red
       end
 
+      it "verifies the default value as well" do
+        c = FastlaneCore::ConfigItem.new(key: :output, 
+                                  env_name: "SIGH_OUTPUT_PATH", 
+                               description: "Directory in which the profile should be stored",
+                             default_value: "notExistent",
+                              verify_block: Proc.new do |value|
+                                raise "Could not find output directory '#{value}'"
+                              end)
+        expect {
+          @config = FastlaneCore::Configuration.create([c], {})
+        }.to raise_error "Invalid default value for output, doesn't match verify_block".red
+        
+      end
+
       describe "Use a valid Configuration Manager" do
         before do
           @options = [

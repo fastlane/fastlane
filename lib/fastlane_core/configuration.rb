@@ -24,6 +24,7 @@ module FastlaneCore
       verify_input_types      
       verify_value_exists
       verify_no_duplicates
+      verify_default_value_matches_verify_block
     end
 
     def verify_input_types
@@ -55,6 +56,20 @@ module FastlaneCore
         unless current.short_option.to_s.empty?
           count = @available_options.select { |option| option.short_option == current.short_option }.count
           raise "Multiple entries for short_option '#{current.short_option}' found!".red if count > 1
+        end
+      end
+    end
+
+    # Verifies the default value is also valid
+    def verify_default_value_matches_verify_block
+      @available_options.each do |item|
+        if item.verify_block and item.default_value
+          begin
+            item.verify_block.call(item.default_value)
+          rescue => ex
+            Helper.log.fatal ex
+            raise "Invalid default value for #{item.key}, doesn't match verify_block".red
+          end
         end
       end
     end
