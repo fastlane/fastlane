@@ -43,6 +43,7 @@ module Spaceship
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
             return team_id if (team['teamId'].strip == team_id)
+            return team_id if (team['currentTeamMember']['teamMemberId'].to_s.strip == team_id)
           end
           puts "Couldn't find team with ID '#{team_id}'"
         end
