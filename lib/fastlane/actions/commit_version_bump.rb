@@ -100,8 +100,7 @@ module Fastlane
                                        description: "Forces the commit, even if other files than the ones containing the version number have been modified",
                                        optional: true,
                                        default_value: false,
-                                       is_string: false
-                                       )
+                                       is_string: false)
         ]
       end
 
