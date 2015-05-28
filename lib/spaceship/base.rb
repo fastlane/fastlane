@@ -52,13 +52,12 @@ module Spaceship
         module_name = method_sym.to_s
         module_name.sub!(/^[a-z\d]/) { $&.upcase }
         module_name.gsub!(/(?:_|(\/))([a-z\d])/) { $2.upcase }
-        const_name = "#{self.name}::#{module_name}"
-        # if const_defined?(const_name)
-          klass = const_get(const_name)
+        if const_defined?(module_name)
+          klass = const_get(module_name)
           klass.set_client(@client)
-        # else
-        #   super
-        # end
+        else
+          super
+        end
       end
     end
 
