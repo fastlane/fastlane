@@ -1,4 +1,5 @@
 require 'faraday' # HTTP Client
+require 'logger'
 require 'faraday_middleware'
 require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
@@ -17,6 +18,10 @@ module Spaceship
 
     attr_reader :client
     attr_accessor :cookie
+
+    # The logger in which all requests are logged
+    # /tmp/spaceship.log by default
+    attr_accessor :logger
 
     class InvalidUserCredentialsError < StandardError; end
     class UnexpectedResponse < StandardError; end
@@ -63,6 +68,24 @@ module Spaceship
       if page =~ %r{<a href="https://idmsa.apple.com/IDMSWebAuth/login\?.*appIdKey=(\h+)}
         return $1
       end
+    end
+
+    # The logger in which all requests are logged
+    # /tmp/spaceship.log by default
+    def logger
+      unless @logger
+        if $verbose || ENV["VERBOSE"]
+          @logger = Logger.new(STDOUT)
+        else
+          # Log to file by default
+          @logger = Logger.new("/tmp/spaceship.log")
+        end
+        @logger.formatter = proc do |severity, datetime, progname, msg|
+          string = "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
+        end
+      end
+
+      @logger
     end
 
     # Automatic paging
@@ -350,13 +373,33 @@ module Spaceship
         end
         headers.merge!({'User-Agent' => 'spaceship'})
 
+        # Before encoding the parameters, log them
+        log_request(method, url_or_path, params)
+
         # form-encode the params only if there are params, and the block is not supplied.
         # this is so that certain requests can be made using the block for more control
         if method == :post && params && !block_given?
           params, headers = encode_params(params, headers)
         end
 
-        send_request(method, url_or_path, params, headers, &block)
+        response = send_request(method, url_or_path, params, headers, &block)
+
+        log_response(method, url_or_path, response)
+
+        return response
+      end
+
+      def log_request(method, url, params)
+        params_to_log = Hash(params).dup # to also work with nil
+        params_to_log.delete(:accountPassword)
+        params_to_log = params_to_log.collect do |key, value|
+          "{#{key}: #{value}}"
+        end
+        logger.info("#{method.upcase}: #{url} #{params_to_log.join(', ')}")
+      end
+
+      def log_response(method, url, response)
+        logger.debug("#{method.upcase}: #{url}: #{response.body}")
       end
 
       # Actually sends the request to the remote server
