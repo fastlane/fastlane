@@ -6,7 +6,8 @@ module Produce
       app_name: "App Name: ",
       version: "Initial version number (e.g. '1.0'): ",
       sku: "SKU Number (e.g. '1234'): ",
-      primary_language: "Primary Language (e.g. 'English', 'German'): "
+      primary_language: "Primary Language (e.g. 'English', 'German'): ",
+      company_name: "Company name (Leave blank to use the current): "
     }
 
     # Left to prevent fastlane from crashing. Should be removed upon version bump.
@@ -42,7 +43,7 @@ module Produce
             q.validate = lambda { |val| is_valid_language?(val) }
             q.responses[:not_valid] = "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}"
           else
-            q.validate = lambda { |val| !val.empty? }
+            q.validate = lambda { |val| !val.empty? } unless key == :company_name
             q.responses[:not_valid] = "#{key.to_s.gsub('_', ' ').capitalize} can't be blank"
           end
         end
@@ -71,7 +72,8 @@ module Produce
         skip_itc: is_truthy?(ENV['PRODUCE_SKIP_ITC']),
         skip_devcenter: is_truthy?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
-        team_name: ENV['PRODUCE_TEAM_NAME']
+        team_name: ENV['PRODUCE_TEAM_NAME'],
+        company_name: ENV['PRODUCE_COMPANY_NAME']
       }
       
       if ENV['PRODUCE_LANGUAGE']

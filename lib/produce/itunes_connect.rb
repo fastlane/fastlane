@@ -74,11 +74,16 @@ module Produce
 
     def initial_create
       open_new_app_popup
-      
+
       # Fill out the initial information
       wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set @config[:app_name]
       wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
       wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
+      if @config[:company_name] != ''
+        Capybara.ignore_hidden_elements = false
+        wait_for_elements("input[ng-model='createAppDetails.companyName.value']").first.set @config[:company_name]
+        Capybara.ignore_hidden_elements = true
+      end
 
       all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
       wait_for_elements("option[value='#{@config[:bundle_identifier]}']").first.select_option
