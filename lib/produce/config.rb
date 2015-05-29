@@ -7,7 +7,7 @@ module Produce
       version: "Initial version number (e.g. '1.0'): ",
       sku: "SKU Number (e.g. '1234'): ",
       primary_language: "Primary Language (e.g. 'English', 'German'): ",
-      company_name: "Company name (Leave blank to use the current): "
+      company_name: "Company name (Leave blank to leave the current one): "
     }
 
     # Left to prevent fastlane from crashing. Should be removed upon version bump.

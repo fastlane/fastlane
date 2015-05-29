@@ -79,7 +79,7 @@ module Produce
       wait_for_elements("input[ng-model='createAppDetails.newApp.name.value']").first.set @config[:app_name]
       wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
       wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
-      if @config[:company_name] != ''
+      if not @config[:company_name].to_s.empty?
         wait_for_elements("input[ng-model='createAppDetails.companyName.value']", true).first.set @config[:company_name]
       end
 
