@@ -46,7 +46,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force_device_type,
                                        env_name: "FRAMEIT_FORCE_DEVICE_TYPE",
                                        description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
-                                       default_value: '',
                                        optional: true,
                                        verify_block: Proc.new do |value|
                                         available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
