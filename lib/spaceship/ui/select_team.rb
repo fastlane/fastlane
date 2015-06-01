@@ -42,8 +42,9 @@ module Spaceship
         if team_id.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
-            return team_id if (team['teamId'].strip == team_id)
-            return team_id if (team['currentTeamMember']['teamMemberId'].to_s.strip == team_id)
+            # There are 2 different values - one from the login page one from the Dev Team Page
+            return team['teamId'] if (team['teamId'].strip == team_id)
+            return team['teamId'] if (team['currentTeamMember']['teamMemberId'].to_s.strip == team_id)
           end
           puts "Couldn't find team with ID '#{team_id}'"
         end
