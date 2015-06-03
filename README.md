@@ -20,8 +20,7 @@
 <p align="center">
   <img src="assets/spaceship.png" width="470">
 </p>
-
-============
+-------
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/spaceship/blob/master/LICENSE)
