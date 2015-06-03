@@ -1,5 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/KrauseFx/fastlane">
+    <img src="assets/fastlane.png" width="100" />
     <br />
     fastlane
   </a>
@@ -17,10 +18,9 @@
 -------
 
 <p align="center">
-  <img src="assets/spaceship.png">
+  <img src="assets/spaceship.png" width="470">
 </p>
 
-spaceship
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
