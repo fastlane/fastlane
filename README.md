@@ -1,8 +1,7 @@
 <h3 align="center">
   <a href="https://github.com/KrauseFx/fastlane">
-    <img src="assets/fastlane.png" width="150" />
     <br />
-    spaceship
+    fastlane
   </a>
 </h3>
 <p align="center">
@@ -53,9 +52,11 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 > `spaceship` is named after the new Apple HQ in Cupertino. It allows you to seamlessly interact with the Apple Developer Portal using very simple Ruby code. 
 
+Spaceship is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
+
 `spaceship` uses simple HTTPs requests without any sort of web scraping. 
 
-Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds :rocket:
+Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds.
 
 `spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you. [More details about the APIs](#technical-details).
 
