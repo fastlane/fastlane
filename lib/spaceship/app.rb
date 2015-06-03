@@ -65,7 +65,7 @@ module Spaceship
       # @param bundle_id [String] the bundle id (app_identifier) of the app associated with this provisioning profile
       # @param name [String] the name of the App
       # @return (App) The app you just created
-      def create!(bundle_id: bundle_id, name: name)
+      def create!(bundle_id: nil, name: nil)
         if bundle_id.end_with?('*')
           type = :wildcard
         else
