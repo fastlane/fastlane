@@ -249,8 +249,11 @@ Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 cert = Spaceship.certificate.in_house.all.first 
 
 # Create a new InHouse Enterprise distribution profile
-profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: "com.krausefx.*",
-                                                         certificate: cert)
+profile = Spaceship.provisioning_profile.in_house.create!(bundle_id: "com.krausefx.*",
+                                                        certificate: cert)
+
+# List all In-House Provisioning Profiles
+profiles = Spaceship.provisioning_profile.in_house.all
 ```
 
 ## Multiple Spaceships
