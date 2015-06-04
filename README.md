@@ -47,17 +47,17 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 # What's spaceship?
 
-`spaceship` is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
+spaceship is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
 
-Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With `spaceship` it is possible to directly access the underlying APIs using a simple HTTP client only.
+Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
-Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds.
+Using spaceship, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds.
 
-`spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you. [More details about the APIs](#technical-details).
+spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 
-More details about why `spaceship` is useful on [spaceship.airforce](https://spaceship.airforce).
+More details about why spaceship is useful on [spaceship.airforce](https://spaceship.airforce).
 
-> No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
+> No matter how many apps or profiles you have, spaceship **can** handle your scale.
 
 Enough words, here is some code:
 
