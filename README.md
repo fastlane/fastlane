@@ -46,21 +46,17 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 <h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+# What's spaceship?
 
-# What's Spaceship?
+`spaceship` is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
 
-> `spaceship` is named after the new Apple HQ in Cupertino. It allows you to seamlessly interact with the Apple Developer Portal using very simple Ruby code. 
-
-Spaceship is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
-
-`spaceship` uses simple HTTPs requests without any sort of web scraping. 
+Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With `spaceship` it is possible to directly access the underlying APIs using a simple HTTP client only.
 
 Using `spaceship`, the execution time of [sigh](https://github.com/KrauseFx/sigh) was reduced from over 1 minute to less than 5 seconds.
 
 `spaceship` uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, `spaceship` combines all APIs for you. [More details about the APIs](#technical-details).
 
-Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. By upgrading them to use `spaceship` all [fastlane tools](https://fastlane.tools) will be even faster and much more stable.
+More details about why `spaceship` is useful on [spaceship.airforce](https://spaceship.airforce).
 
 > No matter how many apps or profiles you have, `spaceship` **can** handle your scale.
 
@@ -391,6 +387,8 @@ I won't go into too much technical details about the various API endpoints, but 
 # Credits
 
 This project has been sponsored by [ZeroPush](https://zeropush.com). `spaceship` was developed by [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx).
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
