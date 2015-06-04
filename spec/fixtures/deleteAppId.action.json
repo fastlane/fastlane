@@ -1,0 +1,16 @@
+{
+  "responseId": "20399f66-db67-49dd-b5c0-9db7ef5ca442",
+  "resultCode": 0,
+  "creationTimestamp": "2015-05-25T14:44:24Z",
+  "protocolVersion": "QH65B2",
+  "requestId": "dc4a31db-c440-4737-ad6f-1416ec67b050",
+  "userLocale": "en_US",
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/profile/deleteAppId.action",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "httpResponseHeaders": null
+}
