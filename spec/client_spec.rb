@@ -101,9 +101,10 @@ describe Spaceship::Client do
       end
     end
 
-    describe '#delete_app' do
+    describe '#delete_app!' do
       it 'should make a request to delete the app' do
-        subject.delete_app!('LXD24VUE49')
+        response = subject.delete_app!('LXD24VUE49')
+        expect(response['resultCode']).to eq(0)
       end
     end
 

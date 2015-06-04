@@ -139,7 +139,7 @@ def stub_apps
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteAppId.action").
     with(:body => {"appIdId"=>"LXD24VUE49", "teamId"=>"XXXXXXXXXX"}).
-    to_return(:status => 200, :body => "", :headers => {})
+    to_return(:status => 200, :body => read_fixture_file('deleteAppId.action.json'), :headers => {'Content-Type' => 'application/json'})
 end
 
 WebMock.disable_net_connect!
