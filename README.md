@@ -84,7 +84,7 @@ To upload a new build to Apple `TestFlight` use the following command:
 deliver testflight
 ```
 
-This will auotmatically look for an ipa file in the current directory.
+This will automatically look for an ipa file in the current directory.
 
 `deliver` currently supports **Internal Testers** only.
 
