@@ -28,7 +28,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :branch,
                                        env_name: "FL_ENSURE_GIT_BRANCH_NAME",
-                                       description: "Branch name for EnsureGitBranchAction",
+                                       description: "The branch that should be checked for",
                                        is_string: true,
                                        default_value: 'master'),
         ]
