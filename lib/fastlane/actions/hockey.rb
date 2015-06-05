@@ -35,7 +35,7 @@ module Fastlane
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
         values = options.values
-        values[:dsym_filename] = dsym_path
+        values[:dsym_filename] = dsym_filename
         values[:notes_type] = options[:notes_type]
 
         return values if Helper.test?
