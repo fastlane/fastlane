@@ -33,7 +33,14 @@ module Sigh
       puts command.magenta
       output = `#{command}`
       puts output
-      if output.include?('Assuming Distribution Identity')
+
+      if signing_identity =~ /^iPhone Developer:*/
+        ptn = 'Assuming Development Identity'
+      else
+        ptn = 'Assuming Distribution Identity'
+      end
+
+      if output.include?(ptn)
         Helper.log.info "Successfully signed #{ipa}!".green
         true
       else
