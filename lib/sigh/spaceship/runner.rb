@@ -80,6 +80,8 @@ module Sigh
     def certificate_to_use
       if profile_type == Spaceship.provisioning_profile.Development
         certificates = Spaceship.certificate.development.all
+      elsif profile_type == Spaceship.provisioning_profile.InHouse
+        certificates = Spaceship.certificate.in_house.all
       else
         certificates = Spaceship.certificate.production.all # Ad hoc or App Store
       end
