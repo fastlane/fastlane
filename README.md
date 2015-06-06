@@ -216,7 +216,7 @@ profile = Spaceship.provisioning_profile.ad_hoc.create!(bundle_id: "com.krausefx
 File.write("NewProfile.mobileprovision", profile.download)
 ```
 
-### Repair a broken provisioning profile
+### Repair all broken provisioning profiles
 
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
