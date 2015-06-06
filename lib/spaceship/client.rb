@@ -62,7 +62,9 @@ module Spaceship
     end
 
     def api_key
-      page = @client.get("https://developer.apple.com/devcenter/ios/index.action").body
+      landing_url = "https://developer.apple.com/devcenter/ios/index.action"
+      logger.info("GET: " + landing_url)
+      page = @client.get(landing_url).body
       if page =~ %r{<a href="https://idmsa.apple.com/IDMSWebAuth/login\?.*appIdKey=(\h+)}
         return $1
       end
