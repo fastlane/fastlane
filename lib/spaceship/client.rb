@@ -83,7 +83,9 @@ module Spaceship
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          @logger = Logger.new("/tmp/spaceship.log")
+          path = "/tmp/spaceship.log"
+          puts "Logging spaceship web requests to '#{path}'"
+          @logger = Logger.new(path)
         end
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
