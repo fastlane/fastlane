@@ -17,7 +17,7 @@ module Deliver
 
       Helper.log.info "Ready to upload new build to TestFlight (#{app_identifier} - #{app_id})".green
 
-      # Got everything to replaoy
+      # Got everything to ready to deploy
       app = App.new(app_identifier: app_identifier, apple_id: app_id)
       ipa = IpaUploader.new(app, '/tmp/', ipa_path, strategy)
       result = ipa.upload!
