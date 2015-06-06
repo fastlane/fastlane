@@ -7,8 +7,25 @@ describe Spaceship::Client do
   let(:password) { 'so_secret' }
 
   describe '#api_key' do
+    let(:path) { "/tmp/spaceship_api_key.txt" }
     it 'returns the extracted api key from the login page' do
       expect(subject.api_key).to eq('0123abcdef123123')
+    end
+
+    it "stores a cached result in /tmp" do
+      File.delete(path)
+      expect(subject.api_key).to eq('0123abcdef123123')
+      expect(File.read(path)).to eq("0123abcdef123123")
+    end
+
+    it "uses the cached api key if it exists" do
+      new_value = "NewValue"
+      File.write(path, new_value)
+      expect(subject.api_key).to eq(new_value)
+    end
+
+    after do
+      File.delete(path)
     end
   end
 

@@ -67,11 +67,17 @@ module Spaceship
 
     # Fetches the latest API Key from the Apple Dev Portal
     def api_key
+      cache_path = "/tmp/spaceship_api_key.txt"
+      cached = File.read(cache_path) rescue nil
+      return cached if cached
+
       landing_url = "https://developer.apple.com/devcenter/ios/index.action"
       logger.info("GET: " + landing_url)
       page = @client.get(landing_url).body
       if page =~ %r{<a href="https://idmsa.apple.com/IDMSWebAuth/login\?.*appIdKey=(\h+)}
-        return $1
+        api_key = $1
+        File.write(cache_path, api_key)
+        return api_key
       end
     end
 
