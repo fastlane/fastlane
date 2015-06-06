@@ -5,7 +5,11 @@ require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 
-
+if ENV["DEBUG"]
+  require 'openssl'
+  # this has to be on top of this file, since the value can't be changed later
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
 
 module Spaceship
   class Client
@@ -18,7 +22,9 @@ module Spaceship
     # /tmp/spaceship.log by default
     attr_accessor :logger
 
+    # Invalid user credentials were provided
     class InvalidUserCredentialsError < StandardError; end
+
     class UnexpectedResponse < StandardError; end
 
     # Authenticates with Apple's web services. This method has to be called once
@@ -53,14 +59,13 @@ module Spaceship
         if ENV['DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          require 'openssl'
-          OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
           c.response :logger
           c.proxy "https://127.0.0.1:8888"
         end
       end
     end
 
+    # Fetches the latest API Key from the Apple Dev Portal
     def api_key
       landing_url = "https://developer.apple.com/devcenter/ios/index.action"
       logger.info("GET: " + landing_url)
@@ -80,6 +85,7 @@ module Spaceship
           # Log to file by default
           @logger = Logger.new("/tmp/spaceship.log")
         end
+
         @logger.formatter = proc do |severity, datetime, progname, msg|
           string = "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
         end
@@ -88,8 +94,11 @@ module Spaceship
       @logger
     end
 
-    # Automatic paging
+    #####################################################
+    # @!group Automatic Paging
+    #####################################################
 
+    # The page size we want to request, defaults to 500
     def page_size
       @page_size ||= 500
     end
@@ -110,6 +119,10 @@ module Spaceship
 
       return results
     end
+
+    #####################################################
+    # @!group Login and Team Selection
+    #####################################################
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
@@ -151,15 +164,18 @@ module Spaceship
       end
     end
 
+    # @return (Bool) Do we have a valid session? 
     def session?
       !!@cookie
     end
 
+    # @return (Array) A list of all available teams
     def teams
       r = request(:post, 'account/listTeams.action')
       parse_response(r, 'teams')
     end
 
+    # @return (String) The currently selected Team ID
     def team_id
       return @current_team_id if @current_team_id
 
@@ -169,13 +185,20 @@ module Spaceship
       @current_team_id ||= teams[0]['teamId']
     end
 
+    # Shows a team selection for the user in the terminal. This should not be
+    # called on CI systems
     def select_team
       @current_team_id = self.UI.select_team
     end
 
+    # Set a new team ID which will be used from now on
     def current_team_id=(team_id)
       @current_team_id = team_id
     end
+
+    #####################################################
+    # @!group Apps
+    #####################################################
 
     def apps
       paging do |page_number|
@@ -227,6 +250,10 @@ module Spaceship
       parse_response(r)
     end
 
+    #####################################################
+    # @!group Devices
+    #####################################################
+
     def devices
       paging do |page_number|
         r = request(:post, 'account/ios/device/listDevices.action', {
@@ -251,6 +278,10 @@ module Spaceship
 
       parse_response(r, 'device')
     end
+
+    #####################################################
+    # @!group Certificates
+    #####################################################
 
     def certificates(types)
       paging do |page_number|
@@ -293,6 +324,10 @@ module Spaceship
       })
       parse_response(r, 'certRequests')
     end
+
+    #####################################################
+    # @!group Provisioning Profiles
+    #####################################################
 
     def provisioning_profiles
       r = request(:post) do |r|
@@ -350,7 +385,7 @@ module Spaceship
     end
 
     private
-      # Is called from `parse_response` to store
+      # Is called from `parse_response` to store the latest csrf_token (if available)
       def store_csrf_tokens(response)
         if response and response.headers
           tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
@@ -359,7 +394,7 @@ module Spaceship
           end
         end
       end
-      ##
+      
       # memoize the last csrf tokens from responses
       def csrf_tokens
         @csrf_tokens || {}
