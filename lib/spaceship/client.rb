@@ -5,11 +5,6 @@ require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 
-if ENV['DEBUG']
-  require 'pry' # TODO: Remove
-  require 'openssl'
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-end
 
 
 module Spaceship
@@ -56,7 +51,10 @@ module Spaceship
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
-          # for debugging:
+          # for debugging only
+          # This enables tracking of networking requests using Charles Web Proxy
+          require 'openssl'
+          OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
           c.response :logger
           c.proxy "https://127.0.0.1:8888"
         end
