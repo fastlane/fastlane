@@ -262,9 +262,7 @@ module Spaceship
 
     # @return (Bool): Is this certificate a push profile for apps? 
     def is_push?
-      # does display_type_id match push?
-      [Client::ProfileTypes::Push.development, Client::ProfileTypes::Push.production].include?(type_display_id)
+      self.kind_of?PushCertificate
     end
-
   end
 end
