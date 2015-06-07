@@ -64,8 +64,18 @@ class FastlaneApplication
 
     command :lanes do |c|
       c.syntax = 'fastlane lanes'
-      c.description = 'Lists all available lanes'
+      c.description = 'Lists all available lanes and shows their description'
 
+      c.action do |_args, _options|
+        require 'fastlane/lane_list'
+        path = File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile')
+        Fastlane::LaneList.output(path)
+      end
+    end
+
+    command :list do |c|
+      c.syntax = 'fastlane list'
+      c.description = 'Lists all available lanes without description'
       c.action do |_args, _options|
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
         puts "\nAvailable lanes:".green
