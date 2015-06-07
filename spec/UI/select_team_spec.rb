@@ -22,12 +22,12 @@ describe Spaceship::Client do
             to_return(:status => 200, :body => read_fixture_file('listTeams_multiple.action.json'), :headers => {'Content-Type' => 'application/json'})
         end
 
-        it "lets the user select the team if in multiple teams" do
+        it "Lets the user select the team if in multiple teams" do
           allow($stdin).to receive(:gets).and_return("2")
           expect(subject.select_team).to eq("SecondTeam") # a different team
         end
 
-        it "fallsback to user selection if team wasn't found" do
+        it "Falls back to user selection if team wasn't found" do
           ENV["FASTLANE_TEAM_ID"] = "Not Here"
           allow($stdin).to receive(:gets).and_return("2")
           expect(subject.select_team).to eq("SecondTeam") # a different team
@@ -43,8 +43,25 @@ describe Spaceship::Client do
           expect(subject.select_team).to eq("XXXXXXXXXX") # a different team
         end
 
+        it "Let's the user specify the team name" do
+          ENV["FASTLANE_TEAM_NAME"] = "SecondTeamProfiName"
+          expect(subject.select_team).to eq("SecondTeam")
+        end
+
+        it "Strips out spaces before and after the team name" do
+          ENV["FASTLANE_TEAM_NAME"] = "   SecondTeamProfiName   "
+          expect(subject.select_team).to eq("SecondTeam")
+        end
+
+        it "Asks for the team if the name couldn't be found" do
+          ENV["FASTLANE_TEAM_NAME"] = "NotExistent"
+          allow($stdin).to receive(:gets).and_return("2")
+          expect(subject.select_team).to eq("SecondTeam")
+        end
+
         after do
           ENV.delete("FASTLANE_TEAM_ID")
+          ENV.delete("FASTLANE_TEAM_NAME")
         end
       end
     end
