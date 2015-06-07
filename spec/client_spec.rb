@@ -62,6 +62,12 @@ describe Spaceship::Client do
       it 'returns the default team_id' do
         expect(subject.team_id).to eq('XXXXXXXXXX')
       end
+
+      it "set custom Team ID" do
+        team_id = "ABCDEF"
+        subject.team_id = team_id
+        expect(subject.team_id).to eq(team_id)
+      end
     end
 
     describe "test timeout catching" do

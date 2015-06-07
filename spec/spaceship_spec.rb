@@ -18,6 +18,7 @@ describe Spaceship do
       expect(subject.device).to eq(Spaceship::Device)
       expect(subject.provisioning_profile).to eq(Spaceship::ProvisioningProfile)
     end
+    
     it 'passes the client to the models' do
       expect(subject.device.client).to eq(subject.client)
     end

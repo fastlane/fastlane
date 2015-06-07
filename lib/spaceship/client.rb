@@ -200,7 +200,7 @@ module Spaceship
     end
 
     # Set a new team ID which will be used from now on
-    def current_team_id=(team_id)
+    def team_id=(team_id)
       @current_team_id = team_id
     end
 
