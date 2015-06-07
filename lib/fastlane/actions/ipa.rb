@@ -139,7 +139,8 @@ module Fastlane
 
       def self.details
         [
-          "More information on the shenzhen project page: https://github.com/nomad/shenzhen"
+          "More information on the shenzhen project page: https://github.com/nomad/shenzhen",
+          "To make code signing work, it is recommended to set a the provisioning profile in the project settings."
         ].join(' ')
       end
 

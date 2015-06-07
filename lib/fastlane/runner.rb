@@ -7,8 +7,14 @@ module Fastlane
     def execute(lane, platform = nil)
       raise "No lane given" unless lane
 
+      ENV["FASTLANE_LANE_NAME"] = lane.to_s
+      if platform
+        ENV["FASTLANE_PLATFORM_NAME"] = platform.to_s
+      else
+        ENV["FASTLANE_PLATFORM_NAME"] = nil
+      end
+      
       lane = lane.to_sym
-
       platform = platform.to_sym if platform # might be nil, which is okay => root element
 
       Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = platform # set this in any case: important
@@ -16,8 +22,6 @@ module Fastlane
       full_lane_name = [platform, lane].reject(&:nil?).join(' ')
       Helper.log.info "Driving the lane '#{full_lane_name}'".green
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
-      ENV["FASTLANE_LANE_NAME"] = lane.to_s
-      ENV["FASTLANE_PLATFORM_NAME"] = platform.to_s
 
       return_val = nil
 

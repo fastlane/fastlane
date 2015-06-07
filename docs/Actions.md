@@ -598,6 +598,17 @@ register_devices(
 
 ## Using git
 
+### ensure_git_branch
+This action will check if your git repo is checked out to a specific branch. You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
+
+```ruby
+ensure_git_branch # defaults to `master` branch
+
+ensure_git_branch(
+  branch: 'develop'
+)
+```
+
 ### ensure_git_status_clean
 A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
 
