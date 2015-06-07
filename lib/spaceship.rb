@@ -1,7 +1,6 @@
 require 'spaceship/version'
 require 'spaceship/base'
 require 'spaceship/client'
-require 'spaceship/profile_types'
 require 'spaceship/app'
 require 'spaceship/certificate'
 require 'spaceship/device'
