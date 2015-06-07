@@ -393,7 +393,7 @@ As used by [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/
 example_files = './ExampleDocuments'
 folder_name = "ExampleDocuments"
 
-setup_for_device_change do |lang, device|
+setup_for_device_change do |device, udid, language|
   # This will make sure, all example documents are installed on the simulator
 
   puts "Copying example files to .app"
