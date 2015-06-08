@@ -59,6 +59,16 @@ describe Spaceship::ProvisioningProfile do
       expect(profiles.last.distribution_method).to eq('limited')
     end
   end
+
+  describe '#class.type' do
+    it "Returns only valid profile types" do
+      valid = %w|limited adhoc store|
+      Spaceship::ProvisioningProfile.all.each do |profile|
+        expect(valid).to include(profile.class.type)
+      end
+    end
+  end
+
   it "updates the distribution method to adhoc if devices are enabled" do
     adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
 
