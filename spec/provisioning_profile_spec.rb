@@ -44,6 +44,21 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
+  describe '#find_by_bundle_id' do
+    it "returns [] if there are no profiles" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("notExistent")
+      expect(profiles).to eq([])
+    end
+
+    it "returns the profile in an array if matching" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.9")
+      expect(profiles.count).to eq(2)
+
+      expect(profiles.first.app.bundle_id).to eq('net.sunapps.9')
+      expect(profiles.first.distribution_method).to eq('store')
+      expect(profiles.last.distribution_method).to eq('limited')
+    end
+  end
   it "updates the distribution method to adhoc if devices are enabled" do
     adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
 

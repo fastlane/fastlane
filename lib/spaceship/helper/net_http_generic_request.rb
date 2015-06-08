@@ -7,6 +7,6 @@ require 'net/http'
 # This monkey-patch allows us to leave out the content-type if we do not specify one.
 class Net::HTTPGenericRequest
   def supply_default_content_type
-    return if content_type()
+    return if content_type
   end
 end

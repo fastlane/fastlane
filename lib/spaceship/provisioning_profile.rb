@@ -238,9 +238,9 @@ module Spaceship
         end
       end
 
-      # @return (ProvisioningProfile) Find a provisioning based on the
-      #  bundle_id (app identifier). This will return nil if it can't be
-      #  found.
+      # @return (Array) Returns an array of provisioning
+      #   profiles matching the bundle identifier
+      #   Returns [] if no profiles were found
       def find_by_bundle_id(bundle_id)
         all.find_all do |profile|
           profile.app.bundle_id == bundle_id
