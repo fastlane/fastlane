@@ -68,6 +68,11 @@ describe Spaceship::Client do
         subject.team_id = team_id
         expect(subject.team_id).to eq(team_id)
       end
+
+      it "shows a warning when user is in multiple teams and didn't call select_team" do
+        stub_multiple_teams
+        expect(subject.team_id).to eq("XXXXXXXXXX")
+      end
     end
 
     describe "test timeout catching" do

@@ -16,6 +16,12 @@ def enterprise_subbing
          to_return(:status => 200, :body => read_fixture_file(File.join("enterprise", "listCertRequests.action.json")), :headers => {'Content-Type' => 'application/json'})
 end
 
+# Optional: Team Selection
+def stub_multiple_teams
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
+            to_return(:status => 200, :body => read_fixture_file('listTeams_multiple.action.json'), :headers => {'Content-Type' => 'application/json'})
+end
+
 # Let the stubbing begin
 def stub_login
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").

@@ -18,8 +18,7 @@ describe Spaceship::Client do
 
       describe "Multiple Teams" do
         before do
-          stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
-            to_return(:status => 200, :body => read_fixture_file('listTeams_multiple.action.json'), :headers => {'Content-Type' => 'application/json'})
+          stub_multiple_teams
         end
 
         it "Lets the user select the team if in multiple teams" do
