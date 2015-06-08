@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Spaceship do
   before { Spaceship.login }
 
+  it "#select_team" do
+    expect(Spaceship.select_team).to eq('XXXXXXXXXX')
+  end
+
   it 'should initialize with a client' do
     expect(Spaceship.client).to be_instance_of(Spaceship::Client)
   end
