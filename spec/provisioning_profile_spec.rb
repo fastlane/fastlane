@@ -122,6 +122,14 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
+  describe "#delete" do
+    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+    it "deletes an existing profile" do
+      expect(client).to receive(:delete_provisioning_profile!).with(profile.id).and_return({})
+      profile.delete!
+    end
+  end
+
   describe "#repair" do
     let (:profile) { Spaceship::ProvisioningProfile.all.first }
 
