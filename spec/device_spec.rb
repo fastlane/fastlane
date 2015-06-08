@@ -15,6 +15,14 @@ describe Spaceship::Device do
     expect(device.status).to eq('c')
   end
 
+  describe "#find" do
+    it "finds a device by its ID" do
+      device = Spaceship::Device.find("AAAAAAAAAA")
+      expect(device.id).to eq("AAAAAAAAAA")
+      expect(device.udid).to eq("a03b816861e89fac0a4da5884cb9d2f01bd5641e")
+    end
+  end
+
   describe "#create" do
     it "should create and return a new device" do
       expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b").and_return({})
