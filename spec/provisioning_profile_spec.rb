@@ -155,6 +155,16 @@ describe Spaceship::ProvisioningProfile do
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], []).and_return({})
       profile.repair!
     end
+
+    describe "Different Environments", now: true do
+      it "Development" do
+        profile = Spaceship::ProvisioningProfile::Development.all.first
+        devices = ["RK3285QATH", "E687498679", "5YTNZ5A9RV", "VCD3RH54BK", "VA3Z744A8R", "T5VFWSCC2Z", "GD25LDGN99", "XJXGVS46MW", "L4378H292Z", "9T5RA84V77", "S4227Y42V5", "LEL449RZER", "WXQ7V239BE"]
+        expect(client).to receive(:repair_provisioning_profile!).with('475ESRP5F3', 'net.sunapps.7 Development', 'limited', '572XTN75U2', ["C8DL7464RQ"], devices).and_return({})
+        profile.repair!
+      end
+
+    end
   end
 
   describe "#update!" do
