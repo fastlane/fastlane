@@ -310,8 +310,10 @@ module Spaceship
       unless certificate_valid?
         if self.kind_of?Development
           self.certificates = [Spaceship::Certificate::Development.all.first]
+        elsif self.kind_of?InHouse
+          self.certificates = [Spaceship::Certificate::InHouse.all.first]
         else
-          self.certificates = [Spaceship::Certificate::Production.all.first]
+          self.certificates = [Spaceship::Certificate::Production.all.first]  
         end
       end
 
