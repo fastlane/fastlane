@@ -161,8 +161,10 @@ WebMock.disable_net_connect!
 RSpec.configure do |config|
   config.before(:each) do
 
-    stub_request(:get, "https://developer.apple.com/devcenter/ios/index.action").
-      to_return(:status => 200, :body => read_fixture_file("landing_page.html"), :headers => {})
+    stub_request(:get, "https://developer.apple.com/membercenter/index.action").
+      to_return(:status => 200, :body => nil, 
+        :headers => {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=0123abcdef123123&path=%2F%2Fmembercenter%2Findex.action"}
+      )
 
     stub_login
     stub_provisioning
