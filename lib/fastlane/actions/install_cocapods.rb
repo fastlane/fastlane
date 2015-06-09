@@ -37,7 +37,7 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Show nothing",
                                        default_value: false),
-          FastlaneCore::ConfigItem.new(key: :verbode,
+          FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_COCOAPODS_VERBOSE",
                                        description: "Show more debugging information",
                                        default_value: false),
