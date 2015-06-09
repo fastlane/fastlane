@@ -108,7 +108,7 @@ module Fastlane
             if k == :clean
               v == true ? '--clean' : '--no-clean'
             elsif k == :archive
-              v == true ? '--archive' : nil
+              v == true ? '--archive' : '--no-archive'
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip

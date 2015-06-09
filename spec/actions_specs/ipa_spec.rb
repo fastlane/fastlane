@@ -37,7 +37,7 @@ describe Fastlane do
             configuration: 'Release',
             scheme: 'TestScheme',
             clean: true,
-            archive: nil,
+            archive: true,
             destination: nil,
             embed: nil,
             identity: nil,
@@ -45,7 +45,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(5)
+        expect(result.size).to eq(6)
       end
 
       it "works with object argument with all" do
@@ -102,6 +102,26 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("--no-clean")
+      end
+
+      it "respects the archive argument when true" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            archive: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--archive")
+      end
+
+      it "respects the archive argument when false" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            archive: false,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--no-archive")
       end
 
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
