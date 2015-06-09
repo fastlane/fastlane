@@ -26,7 +26,7 @@
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/spaceship/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/fastlane/spaceship/badge.svg?branch=master&t=ldL8gg)](https://coveralls.io/r/fastlane/spaceship?branch=master)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
-[![Codeship Status for KrauseFx/spaceship](https://img.shields.io/codeship/96bb1040-c2b6-0132-4c5b-22f8b41c2618/master.svg)](https://codeship.com/projects/73801)
+[![Build Status](https://img.shields.io/travis/fastlane/spaceship/master.svg?style=flat)](https://travis-ci.org/fastlane/spaceship)
 
 
 Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx)
