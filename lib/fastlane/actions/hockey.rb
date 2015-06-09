@@ -116,6 +116,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
                                       description: "Public identifier of the app you are targeting, usually you won't need this value",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :commit_sha,
+                                      env_name: "FL_HOCKEY_COMMIT_SHA",
+                                      description: "The Git commit SHA for this build",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :repository_url,
+                                      env_name: "FL_HOCKEY_REPOSITORY_URL",
+                                      description: "The URL of your source repository",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_server_url,
+                                      env_name: "FL_HOCKEY_BUILD_SERVER_URL",
+                                      description: "The URL of the build job on your build server",
                                       optional: true)
         ]
       end
@@ -137,3 +149,4 @@ module Fastlane
     end
   end
 end
+
