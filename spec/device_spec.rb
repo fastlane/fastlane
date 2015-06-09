@@ -49,7 +49,7 @@ describe Spaceship::Device do
 
     it "raises an exception if the device name is already registererd" do
       expect {
-        # Personal iPhone is already taken
+        # "Personal iPhone" is already taken
         device = Spaceship::Device.create!(name: "Personal iPhone", udid: "asdfasdf")
       }.to raise_error "The device name 'Personal iPhone' already exists on this team, use different one."
     end

@@ -71,13 +71,16 @@ module Spaceship
       cached = File.read(cache_path) rescue nil
       return cached if cached
 
-      landing_url = "https://developer.apple.com/devcenter/ios/index.action"
+      landing_url = "https://developer.apple.com/membercenter/index.action"
       logger.info("GET: " + landing_url)
-      page = @client.get(landing_url).body
-      if page =~ %r{<a href="https://idmsa.apple.com/IDMSWebAuth/login\?.*appIdKey=(\h+)}
-        api_key = $1
+      headers = @client.get(landing_url).headers
+      results = headers['location'].match(/.*appIdKey=(\h+)/)
+      if results.length > 1
+        api_key = results[1]
         File.write(cache_path, api_key)
         return api_key
+      else
+        raise "Could not find latest API Key from the Dev Portal"
       end
     end
 
