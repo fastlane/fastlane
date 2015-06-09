@@ -37,7 +37,7 @@ module Fastlane
 
         # Used to get the final path of the IPA and dSYM
         if dest = params[:destination]
-          absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
+          absolute_dest_directory = File.expand_path(dest)
         end
 
         # Maps nice developer build parameters to Shenzhen args
