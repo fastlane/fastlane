@@ -1,20 +1,44 @@
 module Spaceship
+  ##
+  # Spaceship::Base is the superclass for models in Apple Developer Portal.
+  # It's mainly responsible for mapping responses to objects.
+  #
+  # A class-level attribute `client` is used to maintain the which spaceship we
+  # are using to talk to ADP.
+  #
+  # Example of creating a new ADP model:
+  #
+  #   class Widget < Spaceship::Base
+  #     attr_accessor :id, :name, :foo_bar, :wiz_baz
+  #     attr_mapping({
+  #       'name' => :name,
+  #       'fooBar' => :foo_bar,
+  #       'wizBaz' => :wiz_baz
+  #     })
+  #   end
+  #
+  # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
     class << self
       attr_accessor :client
 
+      ##
+      # The client used to make requests.
+      # @return (Spaceship::Client) Defaults to the singleton `Spaceship.client`
       def client
         @client || Spaceship.client
       end
 
-      #set client and return self for chaining
+      ##
+      # Sets client and returns self for chaining.
+      # @return (Spaceship::Base)
       def set_client(client)
         self.client = client
         self
       end
 
       ##
-      # bang method since it changes the parameter in-place
+      # Remaps the attributes passed into the initializer to the model attributes using the map defined by `attr_map`
       def remap_keys!(attrs)
         return if attr_mapping.nil?
 
@@ -23,6 +47,20 @@ module Spaceship
         end
       end
 
+      ##
+      # Defines the attribute mapping between the response from Apple and our model objects.
+      # Keys are to match keys in the response and the values are to match attributes on the model.
+      #
+      # Example of using `attr_mapping`
+      #
+      #   class Widget < Spaceship::Base
+      #     attr_accessor :id, :name, :foo_bar, :wiz_baz
+      #     attr_mapping({
+      #       'name' => :name,
+      #       'fooBar' => :foo_bar,
+      #       'wizBaz' => :wiz_baz
+      #     })
+      #   end
       def attr_mapping(attr_map = nil)
         if attr_map
           @attr_mapping = attr_map
@@ -61,6 +99,11 @@ module Spaceship
       end
     end
 
+    ##
+    # The initialize method accepts a parsed response from Apple and sets all
+    # attributes that are defined by `attr_mapping`
+    #
+    # Do not override `initialize` in your own models.
     def initialize(attrs = {})
       self.class.remap_keys!(attrs)
       attrs.each do |key, val|
@@ -69,6 +112,8 @@ module Spaceship
       @client = self.class.client
     end
 
+    ##
+    # @return (Spaceship::Client) The current spaceship client used by the model to make requests.
     def client
       @client
     end
