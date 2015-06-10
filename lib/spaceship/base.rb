@@ -38,7 +38,13 @@ module Spaceship
       end
 
       ##
-      # Remaps the attributes passed into the initializer to the model attributes using the map defined by `attr_map`
+      # Remaps the attributes passed into the initializer to the model
+      # attributes using the map defined by `attr_map`.
+      #
+      # This method consumes the input parameter meaning attributes that were
+      # remapped are deleted.
+      #
+      # @return (Hash) the attribute mapping used by `remap_keys!`
       def remap_keys!(attrs)
         return if attr_mapping.nil?
 
