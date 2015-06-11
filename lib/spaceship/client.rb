@@ -207,6 +207,19 @@ module Spaceship
       @current_team_id = team_id
     end
 
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
+    end
+
+    # Is the current session from an Enterprise In House account?
+    def in_house?
+      return @in_house unless @in_house.nil?
+      @in_house = (team_information['type'] == 'In-House')
+    end
+
     #####################################################
     # @!group Apps
     #####################################################

@@ -60,7 +60,7 @@
     {
       "status": "active",
       "teamId": "SecondTeam",
-      "type": "Company/Organization",
+      "type": "In-House",
       "extendedTeamAttributes": {
       },
       "teamAgent": {

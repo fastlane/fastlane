@@ -113,6 +113,28 @@ describe Spaceship::Client do
       end
     end
 
+    describe "#team_information" do
+      it 'returns all available information' do
+        s = subject.team_information
+        expect(s['status']).to eq('active')
+        expect(s['type']).to eq('Company/Organization')
+        expect(s['name']).to eq('SpaceShip')
+      end
+    end
+
+    describe "#in_house?", now: true do
+      it 'returns false for normal accounts' do
+        expect(subject.in_house?).to eq(false)
+      end
+
+      it 'returns true for enterprise accounts' do
+        stub_multiple_teams
+
+        subject.team_id = 'SecondTeam'
+        expect(subject.in_house?).to eq(true)
+      end
+    end
+
     describe '#create_app' do
       it 'should make a request create an explicit app id' do
         response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app')
@@ -157,7 +179,7 @@ describe Spaceship::Client do
       end
     end
 
-    describe '#certificates', now: true do
+    describe '#certificates' do
       let(:certificates) { subject.certificates(["5QPB9NHCEI"]) }
       it 'returns a list of certificates hashes' do
         expect(certificates).to be_instance_of(Array)
