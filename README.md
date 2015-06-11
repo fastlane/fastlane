@@ -51,10 +51,6 @@ Special thanks to [Matthias Tretter](https://twitter.com/myell0w) for coming up 
 
 <h5 align="center"><code>sigh</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
-### spaceship version
-
-If you're feeling adventurous and want to test the new `sigh` beta with [spaceship](https://spaceship.airforce), update using `sudo gem update sigh --pre`. More information in the [release notes](https://github.com/KrauseFx/sigh/releases/tag/1.0.0.beta5).
-
 # Features
 
 - **Download** the latest provisioning profile for your app
@@ -176,7 +172,6 @@ Choose signing certificate to use:
 
 - `SIGH_CERTIFICATE` (The name of the certificate to use)
 - `SIGH_CERTIFICATE_ID` (The ID of the certificate)
-- `SIGH_CERTIFICATE_EXPIRE_DATE` (The expire date of the certificate)
 
 As always, run `sigh --help` to get a list of all variables.
 
@@ -186,7 +181,7 @@ If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fa
 
 # How does it work?
 
-```sigh``` will access the ```iOS Dev Center``` to download, renew or generate the ```.mobileprovision``` file. Check out the full source code: [developer_center.rb](https://github.com/KrauseFx/sigh/blob/master/lib/sigh/developer_center.rb).
+```sigh``` will access the ```iOS Dev Center``` to download, renew or generate the ```.mobileprovision``` file. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
 
 
 ## How is my password stored?
