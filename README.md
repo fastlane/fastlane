@@ -51,6 +51,9 @@ Special thanks to [Matthias Tretter](https://twitter.com/myell0w) for coming up 
 
 <h5 align="center"><code>sigh</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
+### spaceship version
+
+If you're feeling adventurous and want to test the new `sigh` beta with [spaceship](https://spaceship.airforce), update using `sudo gem update sigh --pre`. More information in the [release notes](https://github.com/KrauseFx/sigh/releases/tag/1.0.0.beta5).
 
 # Features
 
@@ -174,6 +177,8 @@ Choose signing certificate to use:
 - `SIGH_CERTIFICATE` (The name of the certificate to use)
 - `SIGH_CERTIFICATE_ID` (The ID of the certificate)
 - `SIGH_CERTIFICATE_EXPIRE_DATE` (The expire date of the certificate)
+
+As always, run `sigh --help` to get a list of all variables.
 
 If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fastlane](https://github.com/KrauseFx/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
 

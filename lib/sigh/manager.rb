@@ -1,9 +1,11 @@
 require 'plist'
+require 'sigh/spaceship/runner'
 
 module Sigh
   class Manager
     def self.start
-      path = Sigh::DeveloperCenter.new.run
+      start = Time.now
+      path = Sigh::Runner.new.run
 
       return nil unless path
 
@@ -38,7 +40,7 @@ module Sigh
       (FileUtils.copy profile, destination rescue nil) # if the directory doesn't exist yet
 
       if File.exists? destination
-        Helper.log.info "Profile installed at \"#{destination}\""
+        Helper.log.info "Profile successfully installed".green
       else
         raise "Failed installation of provisioning profile at location: #{destination}".red
       end

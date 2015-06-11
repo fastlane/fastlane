@@ -1,4 +1,5 @@
 require 'fastlane_core'
+require 'credentials_manager'
 
 module Sigh
   class Options
@@ -22,7 +23,7 @@ module Sigh
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "SIGH_FORCE",
-                                     description: "Renew non-development provisioning profiles regardless of its state",
+                                     description: "Renew provisioning profiles regardless of its state",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -34,7 +35,7 @@ module Sigh
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
+                                     default_value: ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
                                      verify_block: Proc.new do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
                                      end),
@@ -43,8 +44,18 @@ module Sigh
                                      env_name: "SIGH_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "SIGH_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_NAME"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
@@ -62,7 +73,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :cert_id,
                                      short_option: "-i",
                                      env_name: "SIGH_CERTIFICATE_ID",
-                                     description: "The ID of the certificate to use",
+                                     description: "The ID of the code signing certificate to use (e.g. 78ADL6LVAA) ",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :cert_owner_name,
                                      short_option: "-c",
@@ -82,6 +93,7 @@ module Sigh
                                      verify_block: Proc.new do |value|
                                        raise "The output name must end with .mobileprovision".red unless value.end_with?".mobileprovision"
                                      end)
+    
       ]
     end
   end
