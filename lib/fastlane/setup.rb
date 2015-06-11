@@ -27,7 +27,7 @@ module Fastlane
       rescue Exception => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
         # and restore previous files
-        Helper.log.fatal 'Error occured with the setup program! Reverting changes now!'.red
+        Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
         restore_previous_state
         raise ex
       end
