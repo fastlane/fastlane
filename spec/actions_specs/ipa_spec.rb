@@ -37,7 +37,7 @@ describe Fastlane do
             configuration: 'Release',
             scheme: 'TestScheme',
             clean: true,
-            archive: nil,
+            archive: true,
             destination: nil,
             embed: nil,
             identity: nil,
@@ -45,7 +45,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq(5)
+        expect(result.size).to eq(6)
       end
 
       it "works with object argument with all" do
@@ -104,6 +104,26 @@ describe Fastlane do
         expect(result).to include("--no-clean")
       end
 
+      it "respects the archive argument when true" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            archive: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--archive")
+      end
+
+      it "respects the archive argument when false" do
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          ipa ({
+            archive: false,
+          })
+        end").runner.execute(:test)
+
+        expect(result).to include("--no-archive")
+      end
+
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
         ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
@@ -124,6 +144,10 @@ describe Fastlane do
 
         expect(result).to include("-m \"#{ENV['SIGH_PROFILE_PATH']}\"")
         expect(result.size).to eq(11)
+
+        dest_path = File.expand_path(File.join('..', 'Nowhere'))
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH]).to eq(File.join(dest_path, 'test.ipa'))
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH]).to eq(File.join(dest_path, 'test.app.dSYM.zip'))
 
         ENV["SIGH_PROFILE_PATH"] = nil
       end
