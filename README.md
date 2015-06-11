@@ -338,7 +338,11 @@ If you want to integrate ```deliver``` with ```snapshot```, check out [fastlane]
 More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
 
 ## Jenkins integration
-Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane#jenkins-integration).
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
+
+## Limits
+
+Apple has a limit of 150 binary uploads per day. 
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
