@@ -16,3 +16,10 @@ ENV["DELIVER_PASSWORD"] = "so_secret"
 unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
+
+RSpec.configure do |config|
+  config.after(:each) do
+    cache_path = "/tmp/spaceship_api_key.txt"
+    File.delete(cache_path) rescue nil # to not break the actual spaceship
+  end
+end
