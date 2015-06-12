@@ -340,8 +340,15 @@ More information about ```snapshot``` can be found on the [Snapshot GitHub page]
 ## Jenkins integration
 Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
 
-## Limits
+## Firewall Issues
 
+`deliver` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocoll using
+
+```
+DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" deliver
+```
+
+## Limit
 Apple has a limit of 150 binary uploads per day. 
 
 ## Editing the ```Deliverfile```
