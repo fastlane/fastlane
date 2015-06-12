@@ -25,20 +25,32 @@
   {
   "locale": "en-AU",
   "name": "Australian English",
-  "game-center": false,
-  "readable-alternatives": ["English_Australian"]
+  "game-center": false
+  },
+  {
+  "locale": "en-AU",
+  "name": "English_Australian",
+  "game-center": false
   },
   {
   "locale": "en-CA",
   "name": "Canadian English",
-  "game-center": false,
-  "readable-alternatives": ["English_CA"]
+  "game-center": false
+  },
+  {
+  "locale": "en-CA",
+  "name": "English_CA",
+  "game-center": false
   },
   {
   "locale": "en-GB",
   "name": "UK English",
-  "game-center": true,
-  "readable-alternatives": ["English_UK"]
+  "game-center": true
+  },
+  {
+  "locale": "en-GB",
+  "name": "English_UK",
+  "game-center": true
   },
   {
   "locale": "en-US",
@@ -54,8 +66,12 @@
   {
   "locale": "fr-CA",
   "name": "Canadian French",
-  "game-center": false,
-  "readable-alternatives": ["French_CA"]
+  "game-center": false
+  },
+  {
+  "locale": "fr-CA",
+  "name": "French_CA",
+  "game-center": false
   },
   {
   "locale": "fr-FR",
@@ -131,8 +147,12 @@
   {
   "locale": "es-MX",
   "name": "Mexican Spanish",
-  "game-center": false,
-  "readable-alternatives": ["Spanish_MX"]
+  "game-center": false
+  },
+  {
+  "locale": "es-MX",
+  "name": "Spanish_MX",
+  "game-center": false
   },
   {
   "locale": "es-ES",
