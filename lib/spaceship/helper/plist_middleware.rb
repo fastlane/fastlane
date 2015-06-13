@@ -12,4 +12,4 @@ module FaradayMiddleware
   end
 end
 
-Faraday::Response.register_middleware(:plist => FaradayMiddleware::PlistMiddleware)
+Faraday::Response.register_middleware(plist: FaradayMiddleware::PlistMiddleware)
