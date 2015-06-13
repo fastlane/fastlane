@@ -331,7 +331,6 @@ Other options
 ```ruby
 deliver(
   force: true,# Set to true to skip PDF verification
-  beta: true, # Upload a new version to TestFlight
   skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
   deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
 )
@@ -344,6 +343,22 @@ email "itunes@connect.com"
 ```
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
+
+### TestFlight
+
+To upload a new binary to Apple TestFlight use the `testflight` action:
+
+```ruby
+testflight
+```
+
+This will use [deliver](https://github.com/KrauseFx/deliver) under the hood.
+
+Additionally you can skip the submission of the new binary to the testers to only upload the build:
+
+```ruby
+testflight(skip_deploy: true)
+```
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
