@@ -2,4 +2,4 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'deliver'
-Deliver::CommandsGenerator.start
+Deliver::CommandsGenerator.start(:testflight)
