@@ -35,19 +35,18 @@ This includes
 To upload a new build, just run 
 
 ```
-pizzacutter
+pilot
 ```
 
 This will automatically look for an `ipa` in your current directory and tries to fetch the login credentials from your [fastlane setup](https://fastlane.tools).
 
-You'll be asked for any missing information. Additionally, you can pass all kinds of parameters to `pizzacutter`:
+You'll be asked for any missing information. Additionally, you can pass all kinds of parameters to `pilot`:
 
 ```
-pizzacutter -u "felix@krausefx.com"
-   --changelog "This build is better"
+pilot -u "felix@krausefx.com" --changelog "This build is better"
 ```
 
-`pizzacutter` does all kinds of magic for you:
+`pilot` does all kinds of magic for you:
 
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
