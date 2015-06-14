@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Pilot::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["pilot@krausefx.com"]
-  spec.summary       = %q{The unofficial TestFlight CLI to upload builds and manage testers}
-  spec.description   = %q{The unofficial TestFlight CLI to upload builds and manage testers}
+  spec.summary       = Pilot::DESCRIPTION
+  spec.description   = Pilot::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 

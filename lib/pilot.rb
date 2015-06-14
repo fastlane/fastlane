@@ -1,5 +1,7 @@
 require 'json'
 require 'pilot/version'
+require 'pilot/manager'
+require 'pilot/package_builder'
 
 require 'fastlane_core'
 
