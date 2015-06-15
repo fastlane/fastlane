@@ -17,9 +17,12 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 
+cache_path = "/tmp/spaceship_api_key.txt"
 RSpec.configure do |config|
+  config.before(:each) do
+    File.delete(cache_path) rescue nil
+  end
   config.after(:each) do
-    cache_path = "/tmp/spaceship_api_key.txt"
     File.delete(cache_path) rescue nil # to not break the actual spaceship
   end
 end
