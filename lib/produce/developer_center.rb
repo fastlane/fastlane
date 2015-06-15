@@ -1,4 +1,5 @@
 require 'spaceship'
+require 'babosa'
 
 module Produce
   class DeveloperCenter
@@ -10,7 +11,7 @@ module Produce
     end
 
     def create_new_app
-      ENV["CREATED_NEW_APP_ID"] = Time.now.to_i
+      ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
       if app_exists?
         Helper.log.info "App '#{@config[:app_name]}' already exists, nothing to do on the Dev Center".green
@@ -24,11 +25,10 @@ module Produce
                                          name: app_name)
 
         Helper.log.info "Created app #{app}"
-        require 'pry'; binding.pry
         
         raise "Something went wrong when creating the new app - it's not listed in the apps list" unless app_exists?
 
-        ENV["CREATED_NEW_APP_ID"] = Time.now.to_s
+        ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
         Helper.log.info "Finished creating new app '#{app_name}' on the Dev Center".green
       end
@@ -36,6 +36,10 @@ module Produce
       return true
     end
 
+    def valid_name_for(input)
+      latinazed = input.to_slug.transliterate.to_s # remove accents
+      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+    end
 
     private
       def app_exists?
@@ -47,6 +51,7 @@ module Produce
         manager = CredentialsManager::PasswordManager.shared_manager(user)
 
         Spaceship.login(user, manager.password)
+        Spaceship.select_team
       end
   end
 end
