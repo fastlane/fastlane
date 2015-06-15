@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'produce'
 require 'commander'
-require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 
 HighLine.track_eof = false
@@ -18,7 +17,7 @@ class ProduceApplication
     program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
     program :help, 'GitHub', 'https://github.com/krausefx/produce'
-    # program :help_formatter, :compact # https://github.com/commander-rb/commander/issues/12
+    program :help_formatter, :compact
 
     always_trace!
 
