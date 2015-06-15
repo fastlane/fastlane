@@ -125,13 +125,18 @@ If you need the provisioning profile to be renewed regardless of its state use t
 
     sigh --force
 
-By default, ```sigh``` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
+By default, `sigh` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
     sigh -c "SunApps GmbH"
 
-Or identify be expire date if you're using the same names for multiple certificates
+# Repair
 
-    sigh -d "Nov 11, 2017"
+`sigh` can automatically repair all your existing provisioning profiles which are expired or just invalid.
+
+All you have to do is
+
+    sigh repair
+
 
 # Resign
 
