@@ -37,6 +37,17 @@ class SighApplication
       end
     end
 
+    command :repair do |c|
+      c.syntax = 'sigh repair'
+      c.description = 'Repairs all expired or invalid provisioning profiles'
+
+      c.action do |args, options|
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
+        require 'sigh/repair'
+        Sigh::Repair.new.repair_all
+      end
+    end
+
     command :resign do |c|
       c.syntax = 'sigh resign'
       c.description = 'Resigns an existing ipa file with the given provisioning profile'
