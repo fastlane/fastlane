@@ -30,11 +30,26 @@ module Spaceship
     # @return (Bool) Is this app a wildcard app (e.g. com.krausefx.*)
     attr_accessor :is_wildcard
 
+    # @return (Hash) Feature details
+    attr_accessor :features
+    
+    # @return (Array) List of enabled features
+    attr_accessor :enabled_features
+
     # @return (Bool) Development Push Enabled?
     attr_accessor :dev_push_enabled
 
     # @return (Bool) Production Push Enabled?
     attr_accessor :prod_push_enabled
+
+    # @return (Fixnum) Number of associated app groups
+    attr_accessor :app_groups_count
+    
+    # @return (Fixnum) Number of associated cloud containers
+    attr_accessor :cloud_containers_count
+    
+    # @return (Fixnum) Number of associated identifiers
+    attr_accessor :identifiers_count
 
     attr_mapping(
       'appIdId' => :app_id,
@@ -43,8 +58,14 @@ module Spaceship
       'prefix' => :prefix,
       'identifier' => :bundle_id,
       'isWildCard' => :is_wildcard,
+      'features' => :features,
+      'enabledFeatures' => :enabled_features,
       'isDevPushEnabled' => :dev_push_enabled,
-      'isProdPushEnabled' => :prod_push_enabled
+      'isProdPushEnabled' => :prod_push_enabled,
+      'associatedApplicationGroupsCount' => :app_groups_count,
+      'associatedCloudContainersCount' => :cloud_containers_count,
+      'associatedIdentifiersCount' => :identifiers_count
+      
     )
 
     class << self
@@ -92,5 +113,13 @@ module Spaceship
       client.delete_app!(app_id)
       self
     end
+    
+    # Fetch a specific App ID details based on the bundle_id
+    # @return (App) The app you're looking for. This is nil if the app can't be found.
+    def details
+      app = client.details_for_app(self)
+      self.class.factory(app)
+    end
+    
   end
 end
