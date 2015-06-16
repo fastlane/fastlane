@@ -92,6 +92,18 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
+  describe '#valid?' do
+    it "Valid profile" do
+      expect(Spaceship::ProvisioningProfile.all.first.valid?).to eq(true)
+    end
+
+    it "Invalid profile" do
+      profile = Spaceship::ProvisioningProfile.all.first
+      profile.status = 'Expired'
+      expect(profile.valid?).to eq(false)
+    end
+  end
+
   describe '#create!' do
     let(:certificate) { Spaceship::Certificate.all.first }
 
