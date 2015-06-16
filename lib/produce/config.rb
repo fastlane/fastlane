@@ -72,7 +72,7 @@ module Produce
         skip_itc: is_truthy?(ENV['PRODUCE_SKIP_ITC']),
         skip_devcenter: is_truthy?(ENV['PRODUCE_SKIP_DEVCENTER']),
         team_id: ENV['PRODUCE_TEAM_ID'],
-        team_name: ENV['PRODUCE_TEAM_NAME'],
+        team_name: ENV['PRODUCE_TEAM_NAME'] || ENV["FASTLANE_TEAM_NAME"],
         company_name: ENV['PRODUCE_COMPANY_NAME']
       }
       
