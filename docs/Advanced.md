@@ -1,7 +1,7 @@
 # Advanced fastlane
 
 ### Environment Variables
-You can define environment variables in a `.env` or `.env.default` file in the same directory as your `Fastfile`. Environment variables are loading used [dotenv](https://github.com/bkeepers/dotenv). Here's an example.
+You can define environment variables in a `.env` or `.env.default` file in the same directory as your `Fastfile`. Environment variables are loading using [dotenv](https://github.com/bkeepers/dotenv). Here's an example.
 
 ```
 WORKSPACE=YourApp.xcworkspace
