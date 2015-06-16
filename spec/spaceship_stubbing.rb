@@ -122,7 +122,7 @@ def stub_certificates
     to_return(status: 200, body: read_fixture_file( "list_certificates_filtered.json"), headers: {'Content-Type' => 'application/json'})
 
   stub_request(:post, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action").
-    with(body: {"displayId"=>"XC5PH8DAAA", "type"=>"R58UK2EAAA"},
+    with(body: {"displayId"=>"XC5PH8DAAA", "type"=>"R58UK2EAAA", "teamId" => "XXXXXXXXXX"},
          headers: {'Cookie'=>'myacinfo=abcdef;'}).
     to_return(status: 200, body: read_fixture_file('aps_development.cer'))
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
@@ -166,7 +166,7 @@ RSpec.configure do |config|
   config.before(:each) do
 
     stub_request(:get, "https://developer.apple.com/membercenter/index.action").
-      to_return(status: 200, body: nil, 
+      to_return(status: 200, body: nil,
         headers: {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=0123abcdef123123&path=%2F%2Fmembercenter%2Findex.action"}
       )
 

@@ -346,6 +346,11 @@ module Spaceship
       return false
     end
 
+    # @return (Bool) Is the current provisioning profile valid?
+    def valid?
+      return status == 'Active'
+    end
+
     # @return (Bool) Is this profile managed by Xcode?
     def managed_by_xcode?
       managing_app == 'Xcode'
