@@ -235,6 +235,14 @@ module Spaceship
         parse_response(r, 'appIds')
       end
     end
+    
+    def details_for_app(app)
+      r = request(:post, 'account/ios/identifiers/getAppIdDetail.action', {
+        teamId: team_id,
+        appIdId: app.app_id
+      })
+      parse_response(r, 'appId')
+    end
 
     def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym

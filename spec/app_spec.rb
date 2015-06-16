@@ -30,6 +30,26 @@ describe Spaceship::App do
       expect(app.bundle_id).to eq("net.sunapps.*")
       expect(app.is_wildcard).to eq(true)
     end
+    
+    it "parses app details correctly" do
+      app = Spaceship::App.all.first
+      app = app.details
+
+      expect(app.app_id).to eq("B7JBD8LHAA")
+      expect(app.name).to eq("The App Name")
+      expect(app.platform).to eq("ios")
+      expect(app.prefix).to eq("5A997XSHK2")
+      expect(app.bundle_id).to eq("net.sunapps.151")
+      expect(app.is_wildcard).to eq(false)
+      
+      expect(app.features).to include("push" => true)
+      expect(app.enabled_features).to include("push")
+      expect(app.dev_push_enabled).to eq(false)
+      expect(app.prod_push_enabled).to eq(true)
+      expect(app.app_groups_count).to eq(0)
+      expect(app.cloud_containers_count).to eq(0)
+      expect(app.identifiers_count).to eq(0)
+    end
   end
 
 
