@@ -107,6 +107,10 @@ To generate the profile in a specific directory:
 
     sigh -o "~/Certificates/"
 
+To download all your provisioning profiles use
+
+    sigh download_all
+
 For a list of available commands run
 
     sigh --help
