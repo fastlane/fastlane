@@ -13,13 +13,15 @@ module PEM
         puts output.green
       end
       
-      if PEM.config[:save_private_key]
-        file_name = File.basename(rsa_file)
-        output = "./#{file_name}"
-        FileUtils.mv(rsa_file, output)
-        puts output.green          
-      else
-        File.delete(rsa_file) if rsa_file
+      if path and rsa_file
+        if PEM.config[:save_private_key]
+          file_name = File.basename(rsa_file)
+          output = "./#{file_name}"
+          FileUtils.mv(rsa_file, output)
+          puts output.green          
+        else
+          File.delete(rsa_file)
+        end
       end
 
       return path
