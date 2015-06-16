@@ -334,6 +334,7 @@ module Spaceship
       {type: type, certificate_id: certificate_id}.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
       r = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
+        teamId: team_id,
         displayId: certificate_id,
         type: type
       })
