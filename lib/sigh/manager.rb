@@ -4,7 +4,6 @@ require 'sigh/spaceship/runner'
 module Sigh
   class Manager
     def self.start
-      start = Time.now
       path = Sigh::Runner.new.run
 
       return nil unless path
@@ -25,8 +24,18 @@ module Sigh
       return File.expand_path(output)
     end
 
+    def self.download_all
+      require 'sigh/download_all'
+      DownloadAll.new.download_all
+    end
+
     def self.install_profile(profile)
       Helper.log.info "Installing provisioning profile..."
+
+      require 'sigh/profile_analyser'
+      udid = Sigh::ProfileAnalyser.run(profile)
+      ENV["SIGH_UDID"] = udid if udid
+
       profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
       profile_filename = ENV["SIGH_UDID"] + ".mobileprovision"
       destination = profile_path + profile_filename
