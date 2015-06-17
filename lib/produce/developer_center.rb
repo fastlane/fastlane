@@ -50,6 +50,8 @@ module Produce
         user = ENV["CERT_USERNAME"] || ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
         manager = CredentialsManager::PasswordManager.shared_manager(user)
 
+        ENV["FASTLANE_TEAM_NAME"] ||= ENV['PRODUCE_TEAM_NAME']
+
         Spaceship.login(user, manager.password)
         Spaceship.select_team
       end
