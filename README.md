@@ -124,6 +124,7 @@ Here a few links to get started:
 - [Apple's official documentation](https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UsingtheAutomationInstrument/UsingtheAutomationInstrument.html)
 - [UI Automation: An Introduction (cocoamanifest.net)](http://cocoamanifest.net/articles/2011/05/uiautomation-an-introduction.html)
 - [Functional Testing UI Automation (mattmccomb.com)](http://www.mattmccomb.com/blog/2013/06/02/ios-functional-testing-with-uiautomation/)
+- [Cheat and use NSNotifications with HSUIAutomationCheat (github.com)](https://github.com/ConfusedVorlon/HSUIAutomationCheat)
 
 # Quick Start
 
