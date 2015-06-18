@@ -39,6 +39,7 @@ module Fastlane
         params[:acl] = config[:acl]
         params[:source] = config[:source]
         params[:path] = config[:path]
+        params[:upload_metadata] = config[:upload_metadata]
         params[:plist_template_path] = config[:plist_template_path]
         params[:html_template_path] = config[:html_template_path]
         params[:html_file_name] = config[:html_file_name]
@@ -79,15 +80,6 @@ module Fastlane
         Helper.log.debug command
         Actions.sh command
 
-        #####################################
-        #
-        # html and plist building
-        #
-        #####################################
-
-        # Gets info used for the plist
-        bundle_id, bundle_version, title, full_version = get_ipa_info( ipa_file )
-
         # Gets URL for IPA file
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
         ipa_file_name = File.basename(ipa_file)
@@ -102,6 +94,19 @@ module Fastlane
           Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
           ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_url
         end
+
+        if params[:upload_metadata] == false
+          return true
+        end
+
+        #####################################
+        #
+        # html and plist building
+        #
+        #####################################
+
+        # Gets info used for the plist
+        bundle_id, bundle_version, title, full_version = get_ipa_info( ipa_file )
 
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title}.plist"
@@ -271,6 +276,11 @@ module Fastlane
                                        description: "zipped .dsym package for the build ",
                                        optional: true,
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
+          FastlaneCore::ConfigItem.new(key: :upload_metadata,
+                                       env_name: "",
+                                       description: "Upload relevant metadata for this build",
+                                       optional: true,
+                                       default_value: true),
           FastlaneCore::ConfigItem.new(key: :plist_template_path,
                                        env_name: "",
                                        description: "plist template path",
