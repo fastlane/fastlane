@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
+  spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
   spec.add_dependency 'fastlane_core', '>= 0.7.6' # all shared code and dependencies
 
