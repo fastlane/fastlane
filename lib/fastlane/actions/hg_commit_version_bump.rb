@@ -4,16 +4,25 @@ module Fastlane
     class HgCommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
+        require 'pathname'
+        require 'set'
+        require 'shellwords'
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
+        if Helper.is_test?
+          xcodeproj_path = "/tmp/Test.xcodeproj"
+        end
+
         # get the repo root path
-        repo_path = Actions.sh('hg root').strip
+        repo_path = Helper.is_test? ? '/tmp/repo' : Actions.sh('hg root').strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
-          raise "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
+          unless Helper.is_test?
+            raise "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
+          end
         else
           # find an xcodeproj (ignoring the Cocoapods one)
           xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| /Pods\/.*.xcodeproj/ =~ path }
@@ -29,8 +38,13 @@ module Fastlane
 
           # one project found: great
           xcodeproj_path = xcodeproj_paths.first
+        end
 
-          # find the pbxproj path, relative to hg directory
+        # find the pbxproj path, relative to hg directory
+        if Helper.is_test?
+          hg_dirty_files = params[:test_dirty_files].split(",")
+          expected_changed_files = params[:test_expected_files].split(",")
+        else
           pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
           pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
@@ -46,28 +60,30 @@ module Fastlane
 
           # get the list of files that have actually changed in our hg workdir
           hg_dirty_files = Actions.sh('hg status -n').split("\n")
+        end
 
-          # little user hint
-          raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if hg_dirty_files.empty?
+        # little user hint
+        raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if hg_dirty_files.empty?
 
-          # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
-          dirty_set = Set.new(hg_dirty_files.map(&:downcase))
-          expected_set = Set.new(expected_changed_files.map(&:downcase))
-          changed_files_as_expected = dirty_set.subset? expected_set
-          unless changed_files_as_expected
-            unless params[:force]
-              raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: \n#{expected_changed_files.join("\n")}.\nBut found these actual changes: \n#{hg_dirty_files.join("\n")}.\nMake sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to bypass this check, and always commit a version bump regardless of the state of the working directory.".red
-            end
+        # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
+        dirty_set = Set.new(hg_dirty_files.map(&:downcase))
+        expected_set = Set.new(expected_changed_files.map(&:downcase))
+        changed_files_as_expected = dirty_set.subset? expected_set
+        unless changed_files_as_expected
+          unless params[:force]
+            raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: \n#{expected_changed_files.join("\n")}.\nBut found these actual changes: \n#{hg_dirty_files.join("\n")}.\nMake sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to bypass this check, and always commit a version bump regardless of the state of the working directory.".red
           end
+        end
 
-          # create a commit with a message
-          begin
-            Actions.sh("hg commit -m '#{params[:message]}'")
+        # create a commit with a message
+        command = "hg commit -m '#{params[:message]}'"
+        return command if Helper.is_test?
+        begin
+          Actions.sh(command)
 
-            Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
-          rescue => ex
-            Helper.log.info "Didn't commit any changes. 😐".yellow
-          end
+          Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
+        rescue => ex
+          Helper.log.info "Didn't commit any changes. 😐".yellow
         end
       end
 
@@ -94,7 +110,17 @@ module Fastlane
                                        description: "Forces the commit, even if other files than the ones containing the version number have been modified",
                                        optional: true,
                                        default_value: false,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :test_dirty_files,
+                                       env_name: "FL_HG_COMMIT_TEST_DIRTY_FILES",
+                                       description: "A list of dirty files passed in for testing",
+                                       optional: true,
+                                       default_value: "file1, file2"),
+          FastlaneCore::ConfigItem.new(key: :test_expected_files,
+                                       env_name: "FL_HG_COMMIT_TEST_EXP_FILES",
+                                       description: "A list of expected changed files passed in for testin",
+                                       optional: true,
+                                       default_value: "file1, file2")
         ]
       end
 
