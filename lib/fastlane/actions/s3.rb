@@ -1,4 +1,4 @@
-require 'fastlane/mail_helper'
+require 'fastlane/erb_template_helper'
 require 'ostruct'
 require 'shenzhen'
 
@@ -114,9 +114,9 @@ module Fastlane
         version_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{version_file_name}"
 
         #grabs module
-        mh = Fastlane::MailHelper
+        eth = Fastlane::ErbTemplateHelper
         # Creates plist from template
-        plist_render = mh.render_template(mh.load_template("s3_plist_template"),{
+        plist_render = eth.render(eth.load("s3_plist_template"),{
           url: ipa_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
@@ -124,7 +124,7 @@ module Fastlane
         })
 
         # Creates html from template
-        html_render = mh.render_template(mh.load_template("s3_html_template"),{
+        html_render = eth.render(eth.load("s3_html_template"),{
           url: plist_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
@@ -133,7 +133,7 @@ module Fastlane
 
 
         # Creates version from template
-        version_render = mh.render_template(mh.load_template("s3_version_template"),{
+        version_render = eth.render(eth.load("s3_version_template"),{
           url: plist_url,
           full_version: full_version
         })

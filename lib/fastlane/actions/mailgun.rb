@@ -1,4 +1,4 @@
-require 'fastlane/mail_helper'
+require 'fastlane/erb_template_helper'
 
 module Fastlane
   module Actions
@@ -10,8 +10,7 @@ module Fastlane
 
       def self.run(options)
         require 'rest_client'
-        require 'erb'
-
+        handle_params_transition(options)
         handle_exceptions(options)
         mailgunit(options)
       end
@@ -22,6 +21,22 @@ module Fastlane
 
       def self.available_options
         [
+          #This is here just for while due to the transition, not needed anymore
+          FastlaneCore::ConfigItem.new(key: :mailgun_sandbox_domain,
+                                       env_name: "MAILGUN_SANDBOX_POSTMASTER",
+                                       optional: true,
+                                       description: "Mailgun sandbox domain postmaster for your mail. Please use postmaster instead"),
+          #This is here just for while due to the transition, should use postmaster instead
+          FastlaneCore::ConfigItem.new(key: :mailgun_sandbox_postmaster,
+                                       env_name: "MAILGUN_SANDBOX_POSTMASTER",
+                                       optional: true,
+                                       description: "Mailgun sandbox domain postmaster for your mail. Please use postmaster instead"),
+          #This is here just for while due to the transition, should use apikey instead
+          FastlaneCore::ConfigItem.new(key: :mailgun_apikey,
+                                       env_name: "MAILGUN_APIKEY",
+                                       optional: true,
+                                       description: "Mailgun apikey for your mail. Please use postmaster instead"),
+
           FastlaneCore::ConfigItem.new(key: :postmaster,
                                        env_name: "MAILGUN_SANDBOX_POSTMASTER",
                                        description: "Mailgun sandbox domain postmaster for your mail"),
@@ -66,6 +81,14 @@ module Fastlane
       end
 
       private
+      def self.handle_params_transition(options)
+          options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
+          puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow
+
+          options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
+          puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow
+      end
+
       def self.handle_exceptions(options)
           unless (options[:apikey] rescue nil)
             Helper.log.fatal "Please add 'ENV[\"MAILGUN_APIKEY\"] = \"a_valid_mailgun_apikey\"' to your Fastfile's `before_all` section.".red
@@ -113,8 +136,8 @@ module Fastlane
         }
         hash[:success] = options[:success] if options[:success]
         hash[:ci_build_link] = options[:success] if options[:ci_build_link]
-        Fastlane::MailHelper.render_template(
-          Fastlane::MailHelper.load_template("mailgun_html_template"),
+        Fastlane::ErbTemplateHelper.render(
+          Fastlane::ErbTemplateHelper.load("mailgun_html_template"),
           hash
         )
       end
