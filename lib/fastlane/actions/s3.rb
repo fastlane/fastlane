@@ -278,7 +278,7 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
           FastlaneCore::ConfigItem.new(key: :upload_metadata,
                                        env_name: "",
-                                       description: "upload relevant metadata for this build ",
+                                       description: "Upload relevant metadata for this build",
                                        optional: true,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :plist_template_path,
