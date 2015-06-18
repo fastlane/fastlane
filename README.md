@@ -124,6 +124,7 @@ Here a few links to get started:
 - [Apple's official documentation](https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UsingtheAutomationInstrument/UsingtheAutomationInstrument.html)
 - [UI Automation: An Introduction (cocoamanifest.net)](http://cocoamanifest.net/articles/2011/05/uiautomation-an-introduction.html)
 - [Functional Testing UI Automation (mattmccomb.com)](http://www.mattmccomb.com/blog/2013/06/02/ios-functional-testing-with-uiautomation/)
+- [Cheat and use NSNotifications with HSUIAutomationCheat (github.com)](https://github.com/ConfusedVorlon/HSUIAutomationCheat)
 
 # Quick Start
 
@@ -393,7 +394,7 @@ As used by [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/
 example_files = './ExampleDocuments'
 folder_name = "ExampleDocuments"
 
-setup_for_device_change do |lang, device|
+setup_for_device_change do |device, udid, language|
   # This will make sure, all example documents are installed on the simulator
 
   puts "Copying example files to .app"
@@ -462,7 +463,7 @@ Be aware: The file will be executed from the current directory, not the location
 
 ## Available language codes
 ```ruby
-["da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "cmn-Hant"]
+["cs-CZ", "da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "cmn-Hant"]
 ```
 
 ## Use a clean status bar
