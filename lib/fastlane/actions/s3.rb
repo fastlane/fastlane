@@ -1,4 +1,4 @@
-require 'erb'
+require 'fastlane/mail_helper'
 require 'ostruct'
 require 'shenzhen'
 
@@ -69,7 +69,7 @@ module Fastlane
         version_file_name = params[:version_file_name]
 
         if Helper.is_test?
-          return build_args 
+          return build_args
         end
 
         # Joins args into space delimited string
@@ -113,39 +113,30 @@ module Fastlane
         version_file_name ||= "version.json"
         version_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{version_file_name}"
 
+        #grabs module
+        mh = Fastlane::MailHelper
         # Creates plist from template
-        plist_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_plist_template.erb"
-        plist_template = File.read(plist_template_path)
-
-        et = ErbalT.new({
+        plist_render = mh.render_template(mh.load_template("s3_plist_template"),{
           url: ipa_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
-          })
-        plist_render = et.render(plist_template)
+        })
 
         # Creates html from template
-        html_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_html_template.erb"
-        html_template = File.read(html_template_path)
-
-        et = ErbalT.new({
+        html_render = mh.render_template(mh.load_template("s3_html_template"),{
           url: plist_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
-          })
-        html_render = et.render(html_template)
+        })
+
 
         # Creates version from template
-        version_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_version_template.erb"
-        version_template = File.read(version_template_path)
-
-        et = ErbalT.new({
+        version_render = mh.render_template(mh.load_template("s3_version_template"),{
           url: plist_url,
-          full_version: full_version,
-          })
-        version_render = et.render(version_template)
+          full_version: full_version
+        })
 
         #####################################
         #
@@ -163,7 +154,7 @@ module Fastlane
           html_render,
           version_file_name,
           version_render
-          )        
+          )
 
         return true
 
@@ -211,7 +202,7 @@ module Fastlane
       #
       # NOT a fan of this as this was taken straight from Shenzhen
       # https://github.com/nomad/shenzhen/blob/986792db5d4d16a80c865a2748ee96ba63644821/lib/shenzhen/plugins/s3.rb#L32
-      # 
+      #
       # Need to find a way to not use this copied method
       #
       # AGAIN, I am not happy about this right now.
@@ -250,7 +241,7 @@ module Fastlane
 
           # This is the string: {CFBundleShortVersionString}.{CFBundleVersion}
           full_version = bundle_version + '.' + Shenzhen::PlistBuddy.print(plist, 'CFBundleVersion')
-  
+
         end
         return bundle_id, bundle_version, title, full_version
       end
@@ -345,11 +336,5 @@ module Fastlane
         platform == :ios
       end
     end
-  end
-end
-
-class ErbalT < OpenStruct
-  def render(template)
-    ERB.new(template).result(binding)
   end
 end

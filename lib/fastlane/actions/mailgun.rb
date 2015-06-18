@@ -1,3 +1,5 @@
+require 'fastlane/mail_helper'
+
 module Fastlane
   module Actions
     class MailgunAction < Action
@@ -98,31 +100,25 @@ module Fastlane
             :to => "#{options[:to]}",
             :subject => options[:subject],
             :html => mail_teplate(options)
+        mail_teplate(options)
       end
 
 
       def self.mail_teplate(options)
-        html_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/mailgun_html_template.erb"
-        html_template = File.read(html_template_path)
-
-        et = ErbalT.new({
+        hash = {
           author: Actions.git_author,
           last_commit: Actions.last_git_commit,
           message: options[:message],
-          app_link: options[:app_link],
-          success: options[:success],
-          ci_build_link: options[:ci_build_link]
-          })
-        et.render(html_template)
+          app_link: options[:app_link]
+        }
+        hash[:success] = options[:success] if options[:success]
+        hash[:ci_build_link] = options[:success] if options[:ci_build_link]
+        Fastlane::MailHelper.render_template(
+          Fastlane::MailHelper.load_template("mailgun_html_template"),
+          hash
+        )
       end
 
     end
-  end
-end
-
-
-class ErbalT < OpenStruct
-  def render(template)
-    ERB.new(template).result(binding)
   end
 end
