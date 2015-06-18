@@ -40,7 +40,7 @@ module Snapshot
         Helper.log.info '#############################################################'
         Helper.log.info "# xctool is recommended to build the apps"
         Helper.log.info "# Install it using 'brew install xctool'"
-        Helper.log.info "# Falling back to xcode build instead "
+        Helper.log.info "# Falling back to xcodebuild instead "
         Helper.log.info '#############################################################'
       end
     end
