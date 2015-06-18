@@ -99,7 +99,8 @@ module Fastlane
       end
 
       def self.author
-        "lmirosevic (original git version), sjrmanning (hg adaptation)"
+        # credits to lmirosevic for original git version
+        "sjrmanning"
       end
 
       def self.is_supported?(platform)

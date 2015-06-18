@@ -32,7 +32,8 @@ module Fastlane
       end
 
       def self.author
-        "sjrmanning (adapted from lmirosevic's push_to_git_remote)"
+        # credits to lmirosevic for original git version
+        "sjrmanning"
       end
 
       def self.is_supported?(platform)

@@ -23,6 +23,7 @@ module Fastlane
       end
 
       def self.author
+        # credits to lmirosevic for original git version
         "sjrmanning"
       end
 

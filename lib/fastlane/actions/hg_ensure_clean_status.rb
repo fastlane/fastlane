@@ -27,7 +27,8 @@ module Fastlane
       end
 
       def self.author
-        "sjrmanning (modified from lmirosevic's git version)"
+        # credits to lmirosevic for original git version
+        "sjrmanning"
       end
 
       def self.is_supported?(platform)
