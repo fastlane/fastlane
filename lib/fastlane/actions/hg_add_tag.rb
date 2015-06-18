@@ -5,8 +5,11 @@ module Fastlane
       def self.run(options)
         tag = options[:tag]
 
+        command = "hg tag \"#{tag}\""
+        return command if Helper.is_test?
+
         Helper.log.info "Adding mercurial tag '#{tag}' 🎯."
-        Actions.sh("hg tag \"#{tag}\"")
+        Actions.sh(command)
       end
 
       def self.description
@@ -17,8 +20,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :tag,
                                        env_name: "FL_HG_TAG_TAG",
-                                       description: "Tag to create",
-                                       optional: false)
+                                       description: "Tag to create")
         ]
       end
 
