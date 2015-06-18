@@ -48,7 +48,7 @@ module Fastlane
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
         if update_needed.count == 0
-          Helper.log.info "Nothing to update! 😮".yellow
+          Helper.log.info "Nothing to update ✅".yellow
           return
         end
 
