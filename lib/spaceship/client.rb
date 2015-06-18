@@ -30,15 +30,15 @@ module Spaceship
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
     # on.
-    # 
+    #
     # This method will automatically use the username from the Appfile (if available)
     # and fetch the password from the Keychain (if available)
-    # 
+    #
     # @param user (String) (optional): The username (usually the email address)
     # @param password (String) (optional): The password
-    # 
+    #
     # @raise InvalidUserCredentialsError: raised if authentication failed
-    # 
+    #
     # @return (Spaceship::Client) The client the login method was called for
     def self.login(user = nil, password = nil)
       instance = self.new
@@ -138,15 +138,15 @@ module Spaceship
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
     # on.
-    # 
+    #
     # This method will automatically use the username from the Appfile (if available)
     # and fetch the password from the Keychain (if available)
-    # 
+    #
     # @param user (String) (optional): The username (usually the email address)
     # @param password (String) (optional): The password
-    # 
+    #
     # @raise InvalidUserCredentialsError: raised if authentication failed
-    # 
+    #
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
       if user.to_s.empty? or password.to_s.empty?
@@ -175,7 +175,7 @@ module Spaceship
       end
     end
 
-    # @return (Bool) Do we have a valid session? 
+    # @return (Bool) Do we have a valid session?
     def session?
       !!@cookie
     end
@@ -235,7 +235,7 @@ module Spaceship
         parse_response(r, 'appIds')
       end
     end
-    
+
     def details_for_app(app)
       r = request(:post, 'account/ios/identifiers/getAppIdDetail.action', {
         teamId: team_id,
@@ -427,7 +427,7 @@ module Spaceship
           end
         end
       end
-      
+
       # memoize the last csrf tokens from responses
       def csrf_tokens
         @csrf_tokens || {}
@@ -476,7 +476,7 @@ module Spaceship
 
         return @client.send(method, url_or_path, params, headers, &block)
 
-      rescue Faraday::Error::TimeoutError => ex # New Farday version: Faraday::TimeoutError => ex
+      rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
         unless (tries -= 1).zero?
           sleep 3
           retry
