@@ -106,6 +106,33 @@ describe Fastlane do
 
       end
 
+      it "works with upload_metadata argument as false" do
+
+        # Environment variables
+        ENV['S3_ACCESS_KEY'] = 'access_key'
+        ENV['S3_SECRET_ACCESS_KEY'] = 'secret_access_key'
+        ENV['S3_BUCKET'] = 'bucket'
+
+        # IPA Action
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = 'ipa'
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = 'dsym'
+
+        result = Fastlane::FastFile.new.parse("lane :test do 
+          s3({ 
+            upload_metadata: false 
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq(6) # 6 because path is defaulted
+        expect(result).to include('-a "access_key"')
+        expect(result).to include('-s "secret_access_key"')
+        expect(result).to include('-b "bucket"')
+        expect(result).to include('-f "ipa"')
+        expect(result).to include('-d "dsym"')
+        expect(result).to include('-P "v{CFBundleShortVersionString}_b{CFBundleVersion}/"')
+
+      end
+
       it "works with no arguments (magic variables)" do
 
         # Environment variables
