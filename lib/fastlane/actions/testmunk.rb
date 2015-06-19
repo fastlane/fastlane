@@ -14,9 +14,14 @@ module Fastlane
     class TestmunkAction < Action
       def self.run(config)
         Helper.log.info 'Testmunk: Uploading the .ipa and starting your tests'.green
+        
+        Helper.log.info 'Zipping features/ to features.zip'.green
+        zipped_features_path = File.expand_path('features.zip')
+        Actions.sh(%Q[zip -r "features" "features/"])
 
         response = system("#{"curl -H 'Accept: application/vnd.testmunk.v1+json'" +
             " -F 'file=@#{config[:ipa]}' -F 'autoStart=true'" +
+            " -F 'testcases=@#{zipped_features_path}'" +
             " -F 'email=#{config[:email]}'" +
             " https://#{config[:api]}@api.testmunk.com/apps/#{config[:app]}/testruns"}")
 
@@ -36,6 +41,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "TESTMUNK_IPA",
                                        description: "Path to IPA",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: Proc.new do |value|
                                         raise "Please pass to existing ipa" unless File.exists?value
                                        end),
@@ -56,12 +62,12 @@ module Fastlane
                                        description: "Testmunk App Name",
                                        verify_block: Proc.new do |value|
                                         raise "Please pass your Testmunk app name using `ENV['TESTMUNK_APP'] = 'value'`" unless value
-                                       end),
+                                       end)
         ]
       end
 
       def self.author
-        "mposchen"
+        "mposchen & johannesberdin"
       end
 
       def self.is_supported?(platform)
