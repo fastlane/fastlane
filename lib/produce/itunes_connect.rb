@@ -80,7 +80,9 @@ module Produce
       wait_for_elements("input[ng-model='createAppDetails.versionString.value']").first.set @config[:version]
       wait_for_elements("input[ng-model='createAppDetails.newApp.vendorId.value']").first.set @config[:sku]
       if not @config[:company_name].to_s.empty?
-        wait_for_elements("input[ng-model='createAppDetails.companyName.value']", true).first.set @config[:company_name]
+        Capybara.ignore_hidden_elements = false
+        wait_for_elements("input[ng-model='createAppDetails.companyName.value']").first.set @config[:company_name]
+        Capybara.ignore_hidden_elements = true
       end
 
       all(:xpath, "//option[text()='#{@config[:primary_language]}']").first.select_option
