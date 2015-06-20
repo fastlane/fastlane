@@ -51,9 +51,9 @@ module Fastlane
         ]
       end
 
-      def self.author
+      def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        '[Your GitHub/Twitter Name]'
+        ["Your GitHub/Twitter Name"]
       end
 
       def self.is_supported?(platform)
