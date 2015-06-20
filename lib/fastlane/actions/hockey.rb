@@ -99,7 +99,7 @@ module Fastlane
                                       default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :release_type,
                                       env_name: "FL_HOCKEY_RELEASE_TYPE",
-                                      description: "Release type of the app",
+                                      description: "Release type of the app: 0 = Beta (default), 1 = Store, 2 = Alpha, 3 = Enterprise",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :mandatory,
                                       env_name: "FL_HOCKEY_MANDATORY",
