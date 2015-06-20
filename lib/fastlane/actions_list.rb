@@ -32,8 +32,9 @@ module Fastlane
         rows: rows
       )
       puts table
+      puts "  Total of #{rows.count} actions"
 
-      puts "Get more information for one specific action using `fastlane action [name]`"
+      puts "\nGet more information for one specific action using `fastlane action [name]`\n".green
     end
 
     def self.show_details(filter)
