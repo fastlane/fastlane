@@ -30,6 +30,10 @@ module Fastlane
         "Generates a provisioning profile. Stores the profile in the current folder"
       end
 
+      def self.author
+        "KrauseFx"
+      end
+
       def self.available_options
         require 'sigh'
         require 'sigh/options'

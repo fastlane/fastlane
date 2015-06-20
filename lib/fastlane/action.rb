@@ -34,7 +34,11 @@ module Fastlane
     end
 
     def self.author
-      "KrauseFx"
+      nil
+    end
+
+    def self.authors
+      nil
     end
 
     def self.is_supported?(platform)

@@ -14,7 +14,9 @@ module Fastlane
 
         if action < Action
           current << action.description if action.description
-          current << action.author.green if action.author
+
+          authors = Array(action.author || action.authors)
+          current << authors.join(', ').green if authors.count > 0
 
           l = (action.description || '').length
         else
@@ -49,7 +51,10 @@ module Fastlane
           rows << [action.details]
           rows << [' ']
         end
-        rows << ["Created by #{action.author.green}"] if action.author
+
+        authors = Array(action.author || action.authors)
+
+        rows << ["Created by #{authors.join(', ').green}"] if authors.count > 0
 
         puts Terminal::Table.new(
           title: filter.green,

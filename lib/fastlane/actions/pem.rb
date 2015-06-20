@@ -31,6 +31,10 @@ module Fastlane
         "Makes sure a valid push profile is active and creates a new one if needed"
       end
 
+      def self.author
+        "KrauseFx"
+      end
+
       def self.details
         [
           "Additionally to the available options, you can also specify a block that only gets executed if a new",
