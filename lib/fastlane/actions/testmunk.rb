@@ -67,7 +67,7 @@ module Fastlane
       end
 
       def self.author
-        "mposchen & johannesberdin"
+        ["mposchen", "johannesberdin"]
       end
 
       def self.is_supported?(platform)
