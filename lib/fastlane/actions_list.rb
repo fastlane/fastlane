@@ -104,7 +104,7 @@ module Fastlane
     # Iterates through all available actions and yields from there
     def self.all_actions
       all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
-      all_actions.each do |symbol|        
+      all_actions.sort.each do |symbol|        
         action = Fastlane::Actions.const_get(symbol)
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
         yield action, name
