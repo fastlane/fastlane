@@ -229,7 +229,7 @@ broken_profiles.each do |profile|
   profile.repair! # yes, that's all you need to repair a profile
 end
 
-# or to make the same thing, just more Ruby like:
+# or to do the same thing, just more Ruby like
 Spaceship.provisioning_profile.all.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
 ```
 
