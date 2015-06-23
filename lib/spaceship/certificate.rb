@@ -235,6 +235,9 @@ module Spaceship
           app_id = app.app_id
         end
 
+        # ensure csr is a OpenSSL::X509::Request
+        csr = OpenSSL::X509::Request.new(csr) if csr.is_a?(String)
+
         # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
         response = client.create_certificate!(type, csr.to_pem, app_id)
         # munge the response to make it work for the factory
