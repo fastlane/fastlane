@@ -391,7 +391,7 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### AWS S3 Distribution
 
-Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you. 
+Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.
 
 Add the `s3` action after the `ipa` step:
 
@@ -420,7 +420,7 @@ It is recommended to **not** store the AWS access keys in the `Fastfile`.
 The uploaded `version.json` file provides an easy way for apps to poll if a new update is available. The JSON looks like:
 
 ```json
-{ 
+{
     "latestVersion": "<%= full_version %>",
     "updateUrl": "itms-services://?action=download-manifest&url=<%= url %>"
 }
@@ -808,12 +808,12 @@ slack(
 Take a look at the [example projects](https://github.com/fastlane/examples) of how you can use the slack action, for example the [MindNode configuration](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile).
 
 ### [Mailgun](http://www.mailgun.com)
-Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com). 
+Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com).
 
 ```ruby
-ENV['MAILGUN_SANDBOX_DOMAIN'] ||= "MY_SANDBOX_DOMAIN"
 ENV['MAILGUN_SANDBOX_POSTMASTER'] ||= "MY_POSTMASTER"
 ENV['MAILGUN_APIKEY'] = "MY_API_KEY"
+ENV['MAILGUN_APP_LINK'] = "MY_APP_LINK"
 
 mailgun(
   to: "fastlane@krausefx.com",
@@ -824,12 +824,13 @@ mailgun(
 or
 
 mailgun(
-  mailgun_sandbox_domain: "SANDBOX_DOMAIN",
-  mailgun_sandbox_postmaster: "MY_POSTMASTER",
-  mailgun_apikey: "MY_API_KEY",
+  postmaster: "MY_POSTMASTER",
+  apikey: "MY_API_KEY",
   to: "DESTINATION_EMAIL",
   success: true,
-  message: "Mail Body"
+  message: "Mail Body",
+  app_link: "http://www.myapplink.com",
+  ci_build_link: "http://www.mycibuildlink.com" 
 )
 ```
 
@@ -929,7 +930,7 @@ Recommended usage of the `update_fastlane` action is at the top of the `before_a
 ```ruby
 before_all do
   update_fastlane
-  
+
   cocoapods
   increment_build_number
   ...
