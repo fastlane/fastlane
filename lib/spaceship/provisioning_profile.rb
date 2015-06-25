@@ -241,6 +241,7 @@ module Spaceship
       # @return (Array) Returns an array of provisioning
       #   profiles matching the bundle identifier
       #   Returns [] if no profiles were found
+      #   This may also contain invalid or expired profiles
       def find_by_bundle_id(bundle_id)
         all.find_all do |profile|
           profile.app.bundle_id == bundle_id
@@ -348,7 +349,7 @@ module Spaceship
 
     # @return (Bool) Is the current provisioning profile valid?
     def valid?
-      return status == 'Active'
+      return status == 'Active' and certificate_valid?
     end
 
     # @return (Bool) Is this profile managed by Xcode?
