@@ -55,7 +55,7 @@ module Sigh
 
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
-      profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
     end
 
     # Create a new profile and return it
