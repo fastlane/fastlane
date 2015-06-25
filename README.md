@@ -221,7 +221,8 @@ File.write("NewProfile.mobileprovision", profile.download)
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
 broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile| 
-  (profile.status == "Invalid" or profile.status == "Expired")
+  # the below could be replaced with `!profile.valid?`, which takes longer but also verifies the code signing identity
+  (profile.status == "Invalid" or profile.status == "Expired") 
 end
 
 # Iterate over all broken profiles and repair them
@@ -230,7 +231,7 @@ broken_profiles.each do |profile|
 end
 
 # or to do the same thing, just more Ruby like
-Spaceship.provisioning_profile.all.find_all { |p| %w[Invalid Expired].include?p.status}.map(&:repair!)
+Spaceship.provisioning_profile.all.find_all { |p| !p.valid? }.map(&:repair!)
 ```
 
 ## Devices
