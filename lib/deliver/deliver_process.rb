@@ -39,7 +39,7 @@ module Deliver
 
 
         if is_beta_build?
-          Helper.log.info "Beta builds don't upload new metadata to iTunesConnet".yellow
+          Helper.log.info "Beta builds don't upload new metadata to iTunesConnect".yellow
         else
           upload_metadata
         end
