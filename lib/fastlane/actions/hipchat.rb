@@ -15,6 +15,7 @@ module Fastlane
 
         api_token = ENV['HIPCHAT_API_TOKEN']
         api_version = ENV['HIPCHAT_API_VERSION']
+        api_host = ENV['HIPCHAT_API_HOST']
 
         unless api_token
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
@@ -23,6 +24,10 @@ module Fastlane
         if api_version.nil? || ![1, 2].include?(api_version[0].to_i)
           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
           raise 'No HIPCHAT_API_VERSION given.'.red
+        end
+
+        if api_host.nil? 
+          api_host = 'api.hipchat.com'
         end
 
         channel = options[:channel]
@@ -34,7 +39,7 @@ module Fastlane
           if user?(channel)
             raise 'HipChat private message not working with API V1 please use API V2 instead'.red
           else
-            uri = URI.parse('https://api.hipchat.com/v1/rooms/message')
+            uri = URI.parse("https://#{api_host}/v1/rooms/message")
             response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
                                                   'auth_token' => api_token,
                                                   'color' => color,
@@ -52,14 +57,14 @@ module Fastlane
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
-            uri = URI.parse("https://api.hipchat.com/v2/user/#{channel}/message")
+            uri = URI.parse("https://#{api_host}/v2/user/#{channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
 
             response = http.post(uri.path, params.to_json, json_headers)
             check_response_code(response, channel)
           else
-            uri = URI.parse("https://api.hipchat.com/v2/room/#{channel}/notification")
+            uri = URI.parse("https://#{api_host}/v2/room/#{channel}/notification")
             response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
                                                   'auth_token' => api_token,
                                                   'color' => color,
