@@ -77,13 +77,28 @@ describe Spaceship::Certificate do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
       }
-      certificate = Spaceship::Certificate::ProductionPush.create!(csr: Spaceship::Certificate.create_certificate_signing_request.first, bundle_id: 'net.sunapps.151')
+      csr, pkey = Spaceship::Certificate.create_certificate_signing_request
+      certificate = Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
       expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
+    end
+
+    it 'should create a new certificate using a CSR from a file' do
+      expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
+        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+      }
+      csr, pkey = Spaceship::Certificate.create_certificate_signing_request
+      Tempfile.open('csr') do |f|
+        f.write(csr.to_pem)
+        f.rewind
+        pem = f.read
+        Spaceship::Certificate::ProductionPush.create!(csr: pem, bundle_id: 'net.sunapps.151')
+      end
     end
 
     it 'raises an error if the user wants to create a certificate for a non-existing app' do
       expect {
-        Spaceship::Certificate::ProductionPush.create!(csr: Spaceship::Certificate.create_certificate_signing_request.first, bundle_id: 'notExisting')
+        csr, pkey = Spaceship::Certificate.create_certificate_signing_request
+        Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
       }.to raise_error "Could not find app with bundle id 'notExisting'"
     end
   end

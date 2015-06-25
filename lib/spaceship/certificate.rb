@@ -2,11 +2,11 @@ require 'openssl'
 
 module Spaceship
   # Represents a certificate from the Apple Developer Portal.
-  # 
+  #
   # This can either be a code signing identity or a push profile
   class Certificate < Base
     # @return (String) The ID given from the developer portal. You'll probably not need it.
-    # @example 
+    # @example
     #   "P577TH3PAA"
     attr_accessor :id
 
@@ -18,23 +18,23 @@ module Spaceship
     attr_accessor :name
 
     # @return (String) Status of the certificate
-    # @example 
+    # @example
     #   "Issued"
     attr_accessor :status
 
     # @return (Date) The date and time when the certificate was created
-    # @example 
+    # @example
     #   2015-04-01 21:24:00 UTC
     attr_accessor :created
 
     # @return (Date) The date and time when the certificate will expire
-    # @example 
+    # @example
     #   2016-04-01 21:24:00 UTC
     attr_accessor :expires
-    
+
     # @return (String) The owner type that defines if it's a push profile
     #  or a code signing identity
-    # 
+    #
     # @example Code Signing Identity
     #   "team"
     # @example Push Certificate
@@ -42,21 +42,21 @@ module Spaceship
     attr_accessor :owner_type
 
     # @return (String) The name of the owner
-    # 
+    #
     # @example Code Signing Identity (usually the company name)
     #   "SunApps Gmbh"
     # @example Push Certificate (the name of your App ID)
     #   "Awesome App"
     attr_accessor :owner_name
 
-    # @return (String) The ID of the owner, that can be used to 
+    # @return (String) The ID of the owner, that can be used to
     #  fetch more information
     # @example
     #   "75B83SPLAA"
     attr_accessor :owner_id
 
     # Indicates the type of this certificate
-    # which is automatically used to determine the class of 
+    # which is automatically used to determine the class of
     # the certificate. Available values listed in CERTIFICATE_TYPE_IDS
     # @return (String) The type of the certificate
     # @example Production Certificate
@@ -131,12 +131,12 @@ module Spaceship
 
     #class methods
     class << self
-      # Create a new code signing request that can be used to 
+      # Create a new code signing request that can be used to
       # generate a new certificate
       # @example
       #  Create a new certificate signing request
       #  csr, pkey = Spaceship.certificate.create_certificate_signing_request
-      # 
+      #
       #  # Use the signing request to create a new distribution certificate
       #  Spaceship.certificate.production.create!(csr: csr)
       def create_certificate_signing_request
@@ -205,7 +205,7 @@ module Spaceship
         end
       end
 
-      # @return (Certificate) Find a certificate based on the ID of the certificate. 
+      # @return (Certificate) Find a certificate based on the ID of the certificate.
       def find(certificate_id)
         all.find do |c|
           c.id == certificate_id
@@ -213,15 +213,15 @@ module Spaceship
       end
 
       # Generate a new certificate based on a code certificate signing request
-      # @param csr (required): The certificate signing request to use. Get one using 
+      # @param csr (OpenSSL::X509::Request) (required): The certificate signing request to use. Get one using
       #   `create_certificate_signing_request`
       # @param bundle_id (String) (optional): The app identifier this certificate is for.
       #  This value is only needed if you create a push profile. For normal code signing
       #  certificates, you must only pass a certificate signing request.
-      # @example 
+      # @example
       #  # Create a new certificate signing request
       #  csr, pkey = Spaceship::Certificate.create_certificate_signing_request
-      #  
+      #
       #  # Use the signing request to create a new distribution certificate
       #  Spaceship::Certificate::Production.create!(csr: csr)
       # @return (Device): The newly created device
@@ -234,6 +234,9 @@ module Spaceship
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
           app_id = app.app_id
         end
+
+        # ensure csr is a OpenSSL::X509::Request
+        csr = OpenSSL::X509::Request.new(csr) if csr.is_a?(String)
 
         # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
         response = client.create_certificate!(type, csr.to_pem, app_id)
@@ -260,7 +263,7 @@ module Spaceship
       client.revoke_certificate!(id, type_display_id)
     end
 
-    # @return (Bool): Is this certificate a push profile for apps? 
+    # @return (Bool): Is this certificate a push profile for apps?
     def is_push?
       self.kind_of?PushCertificate
     end
