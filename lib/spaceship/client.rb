@@ -93,7 +93,6 @@ module Spaceship
         else
           # Log to file by default
           path = "/tmp/spaceship.log"
-          puts "Logging spaceship web requests to '#{path}'"
           @logger = Logger.new(path)
         end
 
