@@ -55,8 +55,17 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you will be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
 
-It's still work in progress. This will change the complete architecture of how `snapshot` works. The API should stay the same. 
+It's still work in progress and there are some technical difficulties I need to solve. 
 
+As a result, `snapshot` will be completely rewritten from ground up without changing its public API :rocket:
+
+**Why change to UI Tests?**
+
+- UI Automation is deprecated
+- UI Tests will evolve and support even more features in the future
+- UI Tests are much easier to debug
+- UI Tests are written in Swift or Objective C
+- UI Tests can be executed in a much cleaner and better way
 
 -------
 <p align="center">
