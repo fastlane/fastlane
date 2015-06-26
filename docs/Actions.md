@@ -278,6 +278,7 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
   # Run tests in given simulator
   xctest(
     destination: "name=iPhone 5s,OS=8.1",
+    destination_timeout: 120, # increase device/simulator timeout, usually used on slow CI boxes
     reports: [{
       report: 'html',
       output: './build-dir/test-report.html',  # will use XCODE_BUILD_PATH/report, if output is not provided
