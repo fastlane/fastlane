@@ -64,9 +64,11 @@ module Sigh
       bundle_id = Sigh.config[:app_identifier]
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
-      if Spaceship.provisioning_profile.all.find { |p| p.name == name }
-        Helper.log.error "The name '#{name}' is already taken, using another one."
-        name += " #{Time.now.to_i}"
+      unless Sigh.config[:skip_name_verify]
+        if Spaceship.provisioning_profile.all.find { |p| p.name == name }
+          Helper.log.error "The name '#{name}' is already taken, using another one."
+          name += " #{Time.now.to_i}"
+        end
       end
 
       Helper.log.info "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'".yellow
