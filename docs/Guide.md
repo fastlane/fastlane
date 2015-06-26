@@ -1,4 +1,4 @@
-This guide will help you set up Continuous Deployment for your iOS project. 
+This guide will help you set up Continuous Delivery for your iOS project. 
 
 It will help you set up all needed build tools. I tested everything with a fresh Yosemite installation.
 
@@ -28,23 +28,11 @@ Additionally, to an Xcode installation, you also need the Xcode command line too
 
     xcode-select --install
 
-### [Homebrew](http://brew.sh/) & [`xctool`](https://github.com/facebook/xctool) (optional)
-
-You don't have to use [homebrew](http://brew.sh/) to install the dependencies, but it is the easiest way to get started.
-
-If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/). This just makes sure it's up to date.
-
-    brew doctor && brew update
-
-Finally, you can then install `xctool`. 
-
-    brew install xctool
-
 ### [fastlane](https://github.com/KrauseFx/fastlane)
 
 Install the gem and all its dependencies (this might take a few minutes).
 
-    [sudo] gem install fastlane
+    sudo gem install fastlane --verbose
 
 In case RubyGems has a hard time installing Nokogiri, check out their [official installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html).
 
