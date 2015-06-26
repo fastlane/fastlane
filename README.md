@@ -51,7 +51,7 @@ This gem solves all those problems. It will run completely in the background - y
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-### Note: Support for UI Tests in Xcode 7
+### Note: Support for UI Tests with Xcode 7
 
 Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you will be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
 
