@@ -24,7 +24,7 @@ module Produce
         app = Spaceship.app.create!(bundle_id: @config[:bundle_identifier].to_s, 
                                          name: app_name)
 
-        Helper.log.info "Created app #{app}"
+        Helper.log.info "Created app #{app.app_id}"
         
         raise "Something went wrong when creating the new app - it's not listed in the apps list" unless app_exists?
 
