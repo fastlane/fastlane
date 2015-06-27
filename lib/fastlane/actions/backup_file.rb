@@ -7,7 +7,7 @@ module Fastlane
       end
 
       def self.description
-        'This action backup your file to "[path].back".'
+        'This action backup your file to "[path].back"'
       end
 
       def self.is_supported?(platform)
