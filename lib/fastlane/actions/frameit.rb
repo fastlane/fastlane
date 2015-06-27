@@ -35,7 +35,6 @@ module Fastlane
                                          optional: true,
                                          is_string: false),
           FastlaneCore::ConfigItem.new(key: :silver,
-                                       env_name: "",
                                        description: "Use white device frames. Alias for :white",
                                        optional: true,
                                        is_string: false),
