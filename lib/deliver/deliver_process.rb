@@ -366,7 +366,9 @@ module Deliver
       # Categories
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
       secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
-      itc.set_categories!(app, primary, secondary) if (primary or secondary)
+      primary_subcategories = @deploy_information[Deliverer::ValKey::PRIMARY_SUBCATEGORIES]
+      secondary_subcategories = @deploy_information[Deliverer::ValKey::SECONDARY_SUBCATEGORIES]
+      itc.set_categories!(app, primary, secondary, primary_subcategories, secondary_subcategories) if (primary or secondary)
 
       # App Rating
       itc.set_app_rating!(app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]

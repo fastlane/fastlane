@@ -52,7 +52,7 @@ module Deliver
       error_occured(ex)
     end
 
-    def set_categories!(app, primary, secondary)
+    def set_categories!(app, primary, secondary, primarySubs, secondarySubs)
       verify_app(app)
       open_app_page(app)
 
@@ -61,6 +61,24 @@ module Deliver
       set_category_dropdown(primary, "primaryCategory")
 
       set_category_dropdown(secondary, "secondaryCategory")
+
+      if primarySubs
+        if primarySubs.length > 0
+          set_category_dropdown(primarySubs[0], "primaryFirstSubCategory")
+        end
+        if primarySubs.length > 1
+          set_category_dropdown(primarySubs[1], "primarySecondSubCategory")
+        end
+      end
+
+      if secondarySubs
+        if secondarySubs.length > 0
+          set_category_dropdown(secondarySubs[0], "secondaryFirstSubCategory")
+        end
+        if secondarySubs.length > 1
+          set_category_dropdown(secondarySubs[1], "secondarySecondSubCategory")
+        end
+      end
 
       (click_on "Save" rescue nil) # if nothing has changed, there is no back button and we don't care
     rescue => ex

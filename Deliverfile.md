@@ -77,6 +77,12 @@ The english name of the category you want to set (e.g. `Business`, `Books`)
 ##### secondary_category
 The english name of the secondary category you want to set
 
+##### primary_subcategories
+The array of english names of the primary sub categories you want to set
+
+##### secondary_subcategories
+The array of english names of the secondary sub categories you want to set
+
 ##### automatic_release
 Should the app be released to all users once Apple approves it? If set to no, you'll have to manually release the update once it got approved.
 
@@ -157,7 +163,8 @@ app_review_information(
 )
 
 primary_category "Business"
-secondary_category "Books"
+secondary_category "Games"
+secondary_subcategories ["Educational", "Puzzle"]
 
 ratings_config_path "~/Downloads/config.json"
 

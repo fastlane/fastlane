@@ -40,6 +40,8 @@ module Deliver
       COPYRIGHT = :copyright
       PRIMARY_CATEGORY = :primary_category
       SECONDARY_CATEGORY = :secondary_category
+      PRIMARY_SUBCATEGORIES = :primary_subcategories
+      SECONDARY_SUBCATEGORIES = :secondary_subcategories
       
       AUTOMATIC_RELEASE = :automatic_release # should the update go live after approval
       RATINGS_CONFIG_PATH = :ratings_config_path # a path to the configuration for the app's ratings
