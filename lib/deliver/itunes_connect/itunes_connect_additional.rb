@@ -57,36 +57,31 @@ module Deliver
       open_app_page(app)
 
       Helper.log.info "Setting primary/secondary category.'".green
-      if primary
-        all("select[ng-model='versionInfo.primaryCategory.value'] > option").each do |category|
-          if category.text.to_s == primary.to_s
-            category.select_option
-            primary = nil
-            break
-          end
-        end
-        if primary
-          Helper.log.info "Could not find category '#{primary}'. Make sure it's available on iTC".red
-        end
-      end
 
-      if secondary
-        all("select[ng-model='versionInfo.secondaryCategory.value'] > option").each do |category|
-          if category.text.to_s == secondary.to_s
-            category.select_option
-            secondary = nil
-            break
-          end
-        end
-        if secondary
-          Helper.log.info "Could not find category '#{secondary}'. Make sure it's available on iTC".red
-        end
-      end
+      set_category_dropdown(primary, "primaryCategory")
 
+      set_category_dropdown(secondary, "secondaryCategory")
 
       (click_on "Save" rescue nil) # if nothing has changed, there is no back button and we don't care
     rescue => ex
       error_occured(ex)
+    end
+
+    private
+
+    def set_category_dropdown(value, catId)
+      if value
+        all("select[ng-model='versionInfo.#{catId}.value'] > option").each do |category|
+          if category.text.to_s == value.to_s
+            category.select_option
+            value = nil
+            break
+          end
+        end
+        if value
+          Helper.log.info "Could not find #{catId} '#{value}'. Make sure it's available on iTC".red
+        end
+      end
     end
   end
 end
