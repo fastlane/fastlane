@@ -863,18 +863,6 @@ Send a message to **topic** with success (:smile:) or failure (:rage:) status.
   )
 ```
 
-### [Hall](https://hall.com/)
-Post a message to a **group**
-
-```ruby
-  ENV["HALL_GROUP_API_TOKEN"] = "Your Group API token" # Activate an Incoming Webhook integration to get your Group API token
-
-  hall(
-    message: "App successfully released!",
-    title: "fastlane",
-    picture: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png"
-  )
-```
 
 ### [ChatWork](http://www.chatwork.com/)
 Post a message to a **group chat**.
