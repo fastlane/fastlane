@@ -83,12 +83,10 @@ module FastlaneCore
       option = option_for_key(key)
       raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect { |a| a.key }.join(', ')}".red unless option
 
-      # `if value == nil` instead of ||= because false is also a valid value
-
       value = @values[key]
-      # TODO: configuration files
-
-      if value == nil
+      
+      # `if value == nil` instead of ||= because false is also a valid value
+      if value == nil and option.env_name
         value = ENV[option.env_name]
         option.verify!(value) if value
       end

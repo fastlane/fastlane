@@ -15,7 +15,7 @@ module FastlaneCore
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, optional: false)
       raise "key must be a symbol" unless key.kind_of?Symbol
-      raise "env_name must be a String" unless env_name.kind_of?String
+      raise "env_name must be a String" unless (env_name || '').kind_of?String
       if short_option
         raise "short_option must be a String of length 1" unless (short_option.kind_of?String and short_option.gsub('-', '').length == 1)
       end

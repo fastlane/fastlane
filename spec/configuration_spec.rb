@@ -58,7 +58,13 @@ describe FastlaneCore do
         expect {
           @config = FastlaneCore::Configuration.create([c], {})
         }.to raise_error "Invalid default value for output, doesn't match verify_block".red
-        
+      end
+
+      it "supports options without 'env_name'" do
+        c = FastlaneCore::ConfigItem.new(key: :test, 
+                               default_value: '123')
+        config = FastlaneCore::Configuration.create([c], {})
+        expect(config.values[:test]).to eq('123')
       end
 
       describe "Use a valid Configuration Manager" do
