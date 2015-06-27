@@ -122,7 +122,7 @@ describe Spaceship::Client do
       end
     end
 
-    describe "#in_house?", now: true do
+    describe "#in_house?" do
       it 'returns false for normal accounts' do
         expect(subject.in_house?).to eq(false)
       end

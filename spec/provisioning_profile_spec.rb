@@ -94,7 +94,9 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#valid?' do
     it "Valid profile" do
-      expect(Spaceship::ProvisioningProfile.all.first.valid?).to eq(true)
+      p = Spaceship::ProvisioningProfile.all.last
+      expect(p).to receive(:certificate_valid?).and_return(true)
+      expect(p.valid?).to eq(true)
     end
 
     it "Invalid profile" do
@@ -168,7 +170,7 @@ describe Spaceship::ProvisioningProfile do
       profile.repair!
     end
 
-    describe "Different Environments", now: true do
+    describe "Different Environments" do
       it "Development" do
         profile = Spaceship::ProvisioningProfile::Development.all.first
         devices = ["RK3285QATH", "E687498679", "5YTNZ5A9RV", "VCD3RH54BK", "VA3Z744A8R", "T5VFWSCC2Z", "GD25LDGN99", "XJXGVS46MW", "L4378H292Z", "9T5RA84V77", "S4227Y42V5", "LEL449RZER", "WXQ7V239BE"]
