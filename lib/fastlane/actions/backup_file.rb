@@ -4,10 +4,11 @@ module Fastlane
       def self.run params
         path = params[:path]
         FileUtils.cp(path, "#{path}.back", {:preserve => true})
+        Helper.log.info "Successfully created a backup 💾"
       end
 
       def self.description
-        'This action backup your file to "[path].back"'
+        'This action backs up your file to "[path].back"'
       end
 
       def self.is_supported?(platform)
@@ -21,8 +22,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "",
-                                       description: "File name you want to back up",
+                                       description: "Path to the file you want to backup",
                                        optional: false),
         ]
       end

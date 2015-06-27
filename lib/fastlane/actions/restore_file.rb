@@ -4,13 +4,14 @@ module Fastlane
       def self.run params
         path = params[:path]
         backup_path = "#{path}.back"
-        raise "not exist #{backup_path}" unless File.exist? backup_path
+        raise "Could not find file '#{backup_path}'" unless File.exist? backup_path
         FileUtils.cp(backup_path, path, {:preserve => true})
         FileUtils.rm(backup_path)
+        Helper.log.info "Successfully restored backup 📤"
       end
 
       def self.description
-        'This action restore your file that backuped in `backup_file` action'
+        'This action restore your file that was backuped with the `backup_file` action'
       end
 
       def self.is_supported?(platform)
@@ -24,7 +25,6 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "",
                                        description: "Original file name you want to restore",
                                        optional: false),
         ]

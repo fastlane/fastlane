@@ -36,7 +36,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               restore_file path: '#{File.join(test_path, file_path)}'
             end").runner.execute(:test)
-          }.to raise_error("not exist #{File.join(test_path, backup_path)}")
+          }.to raise_error("Could not find file '#{File.join(test_path, backup_path)}'")
         end
       end
 
