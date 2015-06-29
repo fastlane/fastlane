@@ -12,7 +12,7 @@ module Fastlane
         api_version = options[:version]
         api_host = options[:api_host]
 
-        notify_room = (options[:notify_room] ? "1" : "0")
+        notify_room = (options[:notify_room] ? '1' : '0')
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
