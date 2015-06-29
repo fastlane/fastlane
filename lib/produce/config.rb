@@ -35,7 +35,9 @@ module Produce
         end
       end
 
-      unless @config.has_key? key
+      return nil if key == :company_name
+
+      unless @config.has_key?key
         @config[key] = ask(ASK_MESSAGES[key]) do |q|
           case key
           when :primary_language
