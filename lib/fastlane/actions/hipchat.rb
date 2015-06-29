@@ -12,6 +12,8 @@ module Fastlane
         api_version = options[:version]
         api_host = options[:api_host]
 
+        notify_room = (options[:notify_room] ? '1' : '0')
+
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
         
@@ -29,7 +31,8 @@ module Fastlane
                                                   'color' => color,
                                                   'message_format' => 'html',
                                                   'room_id' => channel,
-                                                  'message' => message })
+                                                  'message' => message,
+                                                  'notify' => notify_room })
 
             check_response_code(response, channel)
           end
@@ -53,7 +56,8 @@ module Fastlane
                                                   'auth_token' => api_token,
                                                   'color' => color,
                                                   'message_format' => 'html',
-                                                  'message' => message })
+                                                  'message' => message,
+                                                  'notify' => notify_room })
 
             check_response_code(response, channel)
           end
@@ -114,6 +118,12 @@ module Fastlane
                                           raise 'No HIPCHAT_API_VERSION given.'.red
                                         end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :notify_room,
+                                       env_name: "HIPCHAT_NOTIFY_ROOM",
+                                       description: "Should the people in the room be notified? (true/false)",
+                                       default_value: false,
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :api_host,
                                        env_name: "HIPCHAT_API_HOST",
                                        description: "The host of the HipChat-Server API",
