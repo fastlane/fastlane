@@ -91,11 +91,11 @@ module Produce
     end
 
 
-    def is_valid_language? language
+    def is_valid_language?(language)
       AvailableDefaultLanguages.all_languages.include? language
     end
 
-    def valid_language language
+    def valid_language(language)
       AvailableDefaultLanguages.all_languages.each do |l| 
 
         if l.casecmp(language) == 0
@@ -108,7 +108,7 @@ module Produce
     end
 
     # TODO: this could be moved inside fastlane_core
-    def is_truthy? value
+    def is_truthy?(value)
       %w( true t 1 yes y ).include? value.to_s.downcase
     end
 
