@@ -68,7 +68,10 @@ module Spaceship
     # Fetches the latest API Key from the Apple Dev Portal
     def api_key
       cache_path = "/tmp/spaceship_api_key.txt"
-      cached = File.read(cache_path) rescue nil
+      begin
+        cached = File.read(cache_path) 
+      rescue Errno::ENOENT
+      end
       return cached if cached
 
       landing_url = "https://developer.apple.com/membercenter/index.action"

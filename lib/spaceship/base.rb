@@ -71,7 +71,10 @@ module Spaceship
         if attr_map
           @attr_mapping = attr_map
         else
-          @attr_mapping ||= ancestors[1].attr_mapping rescue nil
+          begin
+            @attr_mapping ||= ancestors[1].attr_mapping 
+          rescue NameError, NoMethodError
+          end
         end
       end
 
