@@ -19,6 +19,7 @@ module Fastlane
       ipa: '--ipa',
       xcconfig: '--xcconfig',
       xcargs: '--xcargs',
+      silent: '--silent',
     }
 
     class IpaAction < Action
@@ -27,7 +28,6 @@ module Fastlane
         platform == :ios
       end
 
-      
       def self.run(params)
         # The args we will build with
         build_args = nil
@@ -59,7 +59,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        core_command = "krausefx-ipa build #{build_args} --verbose | xcpretty"
+        core_command = "krausefx-ipa build #{build_args} | xcpretty"
         command = "set -o pipefail && #{core_command}"
         Helper.log.debug command
 
@@ -89,7 +89,7 @@ module Fastlane
           ].each do |txt|
             Helper.log.error txt.yellow
           end
-          
+
           # Raise a custom exception, as the the normal one is useless for the user
           raise "A build error occured, this is usually related to code signing. Take a look at the error above".red
         end
@@ -109,6 +109,8 @@ module Fastlane
               v == true ? '--clean' : '--no-clean'
             elsif k == :archive
               v == true ? '--archive' : '--no-archive'
+            elsif k == :silent
+              v == true ? '' : '--verbose'
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip

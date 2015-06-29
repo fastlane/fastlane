@@ -110,6 +110,15 @@ Since you'll probably not want to commit this change into version control, take 
 
 **[Show Example Usage](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
 
+### update_app_group_identifiers
+Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
+
+```ruby
+update_app_group_identifiers(
+	entitlements_file: '/path/to/entitlements_file.entitlements',
+	app_group_identifiers: ['group.your.app.group.identifier'])
+```
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
