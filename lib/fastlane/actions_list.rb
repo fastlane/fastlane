@@ -78,7 +78,7 @@ module Fastlane
         puts "\n"
 
         output = parse_options(action.output, false) if action.output
-        if output
+        if output and output.count > 0
           puts Terminal::Table.new(
             title: filter.green,
             headings: ['Key', 'Description'],
