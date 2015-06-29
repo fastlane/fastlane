@@ -20,9 +20,15 @@ end
 cache_path = "/tmp/spaceship_api_key.txt"
 RSpec.configure do |config|
   config.before(:each) do
-    File.delete(cache_path) rescue nil
+    begin
+      File.delete(cache_path) 
+    rescue Errno::ENOENT
+    end
   end
   config.after(:each) do
-    File.delete(cache_path) rescue nil # to not break the actual spaceship
+    begin
+      File.delete(cache_path)  # to not break the actual spaceship
+    rescue Errno::ENOENT
+    end
   end
 end
