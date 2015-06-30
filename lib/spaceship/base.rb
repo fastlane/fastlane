@@ -24,9 +24,9 @@ module Spaceship
 
       ##
       # The client used to make requests.
-      # @return (Spaceship::Client) Defaults to the singleton `Spaceship.client`
+      # @return (Spaceship::Client) Defaults to the singleton
       def client
-        @client || Spaceship.client
+        raise "`client` must be implemented in subclasses"
       end
 
       ##

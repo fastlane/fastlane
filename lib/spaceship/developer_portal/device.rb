@@ -1,6 +1,6 @@
 module Spaceship
   # Represents a device from the Apple Developer Portal
-  class Device < Base
+  class Device < PortalBase
     # @return (String) The ID given from the developer portal. You'll probably not need it.
     # @example 
     #   "XJXGVS46MW"

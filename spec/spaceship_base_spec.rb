@@ -2,25 +2,25 @@ require 'spec_helper'
 
 describe Spaceship::Base do
   let(:client) { double('Client') }
-  before { Spaceship.client = double('Default Client') }
+  before { Spaceship::Portal.client = double('Default Client') }
 
   describe 'Class Methods' do
     it 'will use a default client' do
-      expect(Spaceship::Base.client).to eq(Spaceship.client)
+      expect(Spaceship::PortalBase.client).to eq(Spaceship::Portal.client)
     end
 
     it 'can set a client' do
-      Spaceship::Base.client = client
-      expect(Spaceship::Base.client).to eq(client)
+      Spaceship::PortalBase.client = client
+      expect(Spaceship::PortalBase.client).to eq(client)
     end
 
     it 'can set a client and return itself' do
-      expect(Spaceship::Base.set_client(client)).to eq(Spaceship::Base)
+      expect(Spaceship::PortalBase.set_client(client)).to eq(Spaceship::PortalBase)
     end
 
     describe 'instantiation from an attribute hash' do
       let(:test_class) do
-        Class.new(Spaceship::Base) do
+        Class.new(Spaceship::PortalBase) do
           attr_accessor :some_attr_name
           attr_mapping({
             'someAttributeName' => :some_attr_name
@@ -41,7 +41,7 @@ describe Spaceship::Base do
     end
 
     it 'can constantize subclasses by calling a method on the parent class' do
-      class Developer < Spaceship::Base
+      class Developer < Spaceship::PortalBase
         class RubyDeveloper < Developer
         end
       end

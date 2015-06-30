@@ -19,7 +19,7 @@ module Spaceship
     # 
     # @raise InvalidUserCredentialsError: raised if authentication failed
     def initialize(user = nil, password = nil)
-      @client = Client.new
+      @client = DeveloperPortalClient.new
 
       if user or password
         @client.login(user, password)

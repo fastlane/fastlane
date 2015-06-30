@@ -4,7 +4,7 @@ module Spaceship
   # Represents a certificate from the Apple Developer Portal.
   #
   # This can either be a code signing identity or a push profile
-  class Certificate < Base
+  class Certificate < PortalBase
     # @return (String) The ID given from the developer portal. You'll probably not need it.
     # @example
     #   "P577TH3PAA"
