@@ -26,20 +26,28 @@ module Spaceship
     #   "com.krausefx.app"
     attr_accessor :bundle_id
 
-    # @return (DateTime) Last modified
+    # @return (String) Last modified
     attr_accessor :last_modified
 
     # @return (Integer) The number of issues provided by iTunes Connect
     attr_accessor :issues_count
 
-    # @return (String) The URL to a low resolution app icon of this app (340x340px)
+    # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
     # @example 
     #   "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0bafaa/pr_source.png/340x340bb-80.png"
+    # @example
+    #   nil
     attr_accessor :app_icon_preview_url
 
     attr_mapping(
       'adamId' => :apple_id,
-      'name' => :name
+      'name' => :name,
+      'appType' => :platform,
+      'vendorId' => :vendor_id,
+      'bundleId' => :bundle_id,
+      'lastModifiedDate' => :last_modified,
+      'issuesCount' => :issues_count,
+      'iconUrl' => :app_icon_preview_url
     )
 
     class << self
@@ -53,6 +61,14 @@ module Spaceship
       def all
         client.applications.map { |application| self.factory(application) }
       end
+    end
+
+    def live_version
+      v = Spaceship::AppVersion.find(self, self.apple_id, true)
+    end
+
+    def edit_version
+      Spaceship::AppVersion.find(self, self.apple_id, false)
     end
   end
 end

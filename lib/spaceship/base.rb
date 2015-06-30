@@ -23,6 +23,11 @@ module Spaceship
       attr_accessor :client
 
       ##
+      # @return (Hash/Array) Holds the raw data we got from Apple's
+      #   server to use it later
+      attr_accessor :raw_data
+
+      ##
       # The client used to make requests.
       # @return (Spaceship::Client) Defaults to the singleton
       def client
@@ -49,7 +54,11 @@ module Spaceship
         return if attr_mapping.nil?
 
         attr_mapping.each do |from, to|
-          attrs[to] = attrs.delete(from)
+          if attrs[from].is_a?(Hash) and (attrs[from]['value'] rescue nil)
+            attrs[to] = attrs.delete(from).fetch('value')
+          else
+            attrs[to] = attrs.delete(from) 
+          end
         end
       end
 

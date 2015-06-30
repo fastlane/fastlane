@@ -20,13 +20,14 @@ module Spaceship
 
       host = "https://itunesconnect.apple.com"
       begin
-        url = host + request(:get, host).body.match(/action="(\/WebObjects\/iTunesConnect.woa\/wo\/.*)"/)[1]
+        url = host + request(:get, self.class.hostname).body.match(/action="(\/WebObjects\/iTunesConnect.woa\/wo\/.*)"/)[1]
         raise "" unless url.length > 0
 
         File.write(cache_path, url) # TODO
         return url
       rescue => ex
-        raise "Could not fetch the login URL from iTunes Connect, the server might be down".red
+        puts ex
+        raise "Could not fetch the login URL from iTunes Connect, the server might be down"
       end
     end
 
@@ -65,6 +66,18 @@ module Spaceship
       end
     end
 
+    def handle_itc_response(data)
+      return unless data
+      return unless data.kind_of?Hash
+ 
+      puts "Handle errors"
+      puts data['sectionErrorKeys'] if data['sectionErrorKeys']
+      puts data['sectionInfoKeys'] if data['sectionInfoKeys']
+      puts data['sectionWarningKeys'] if data['sectionWarningKeys']
+      puts "Done handle errors"
+      # TODO
+    end
+
     #####################################################
     # @!group Applications
     #####################################################
@@ -72,6 +85,29 @@ module Spaceship
     def applications
       r = request(:get, 'ra/apps/manageyourapps/summary')
       parse_response(r, 'data')['summaries']
+    end
+
+    def app_version(app_id, is_live)
+      raise "app_id is required" unless app_id
+
+      v_text = (is_live ? 'live' : nil)
+
+      r = request(:get, "ra/apps/version/#{app_id}", {v: v_text})
+      parse_response(r, 'data')
+    end
+
+    def update_app_version(app_id, is_live, data)
+      raise "app_id is required" unless app_id
+
+      v_text = (is_live ? 'live' : nil)
+
+      r = request(:post) do |req|
+        req.url "ra/apps/version/save/#{app_id}?v=#{v_text}"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      
+      handle_itc_response(r.body['data'])
     end
   end
 end
