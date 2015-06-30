@@ -83,7 +83,6 @@ module Spaceship
       Spaceship::Portal.certificate
     end
 
-    # @return (Class) Access the provisioning profiles for the spaceship
     def provisioning_profile
       Spaceship::Portal.provisioning_profile
     end
