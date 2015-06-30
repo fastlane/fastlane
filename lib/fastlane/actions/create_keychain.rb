@@ -2,10 +2,11 @@ module Fastlane
   module Actions
     class CreateKeychainAction < Action
       def self.run(params)
-        sh "security create-keychain -p #{params[:password]} #{params[:name]}"
+        commands = []
+        commands << sh("security create-keychain -p #{params[:password]} #{params[:name]}")
 
-        sh "security default-keychain -s #{params[:name]}" if params[:default_keychain]
-        sh "security unlock-keychain -p #{params[:password]} #{params[:name]}" if params[:unlock]
+        commands << sh("security default-keychain -s #{params[:name]}") if params[:default_keychain]
+        commands << sh("security unlock-keychain -p #{params[:password]} #{params[:name]}") if params[:unlock]
 
         command = "security set-keychain-settings"
         command << " -t #{params[:timeout]}" if params[:timeout]
@@ -13,7 +14,8 @@ module Fastlane
         command << " -u" if params[:lock_after_timeout]
         command << " ~/Library/Keychains/#{params[:name]}"
 
-        sh command
+        commands << sh(command)
+        commands
       end
 
       def self.description
