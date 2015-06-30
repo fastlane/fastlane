@@ -55,6 +55,7 @@ module Sigh
 
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
+      Helper.log.info "Fetching profiles..."
       profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
     end
 
