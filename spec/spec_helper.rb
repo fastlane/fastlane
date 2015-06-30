@@ -2,7 +2,7 @@ require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'spaceship'
-require 'spaceship_stubbing'
+require 'developer_portal/developer_portal_stubbing'
 require 'plist'
 require 'pry'
 
