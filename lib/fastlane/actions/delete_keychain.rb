@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      DELETE_KEYCHAIN_CUSTOM_VALUE = :DELETE_KEYCHAIN_CUSTOM_VALUE
-    end
-
     class DeleteKeychainAction < Action
       def self.run(params)
         sh "security delete-keychain #{params[:name]}"
