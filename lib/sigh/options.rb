@@ -93,11 +93,6 @@ module Sigh
                                      description: "Skips the verification of existing profiles which is useful if you have thousands of profiles",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :skip_name_verify,
-                                     env_name: "SIGH_SKIP_NAME_VERIFY",
-                                     description: "Skips the extra verification of the name which is useful if you have thousands of profiles",
-                                     is_string: false,
-                                     default_value: false),
       ]
     end
   end

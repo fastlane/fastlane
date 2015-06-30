@@ -70,7 +70,7 @@ module Sigh
       bundle_id = Sigh.config[:app_identifier]
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
-      unless Sigh.config[:skip_name_verify]
+      unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all.find { |p| p.name == name }
           Helper.log.error "The name '#{name}' is already taken, using another one."
           name += " #{Time.now.to_i}"
