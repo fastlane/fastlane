@@ -69,8 +69,9 @@ module Spaceship
     # @!group Applications
     #####################################################
 
-    def apps
-      r = request(:get, 'ra/apps/manageyourapps/summary', {})
+    def applications
+      r = request(:get, 'ra/apps/manageyourapps/summary')
+      parse_response(r, 'data')['summaries']
     end
   end
 end

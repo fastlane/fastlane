@@ -65,7 +65,6 @@ module Spaceship
       'associatedApplicationGroupsCount' => :app_groups_count,
       'associatedCloudContainersCount' => :cloud_containers_count,
       'associatedIdentifiersCount' => :identifiers_count
-      
     )
 
     class << self
