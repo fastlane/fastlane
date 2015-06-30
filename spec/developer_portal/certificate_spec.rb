@@ -75,7 +75,7 @@ describe Spaceship::Certificate do
   describe '#create' do
     it 'should create and return a new certificate' do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Certificate.create_certificate_signing_request
       certificate = Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
@@ -84,7 +84,7 @@ describe Spaceship::Certificate do
 
     it 'should create a new certificate using a CSR from a file' do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Certificate.create_certificate_signing_request
       Tempfile.open('csr') do |f|

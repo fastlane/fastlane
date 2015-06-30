@@ -5,7 +5,7 @@ describe Spaceship::ProvisioningProfile do
     before do
       Spaceship.login
 
-      enterprise_stubbing
+      adp_enterprise_stubbing
     end
     let(:client) { Spaceship::ProvisioningProfile.client }
 
