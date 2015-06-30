@@ -34,11 +34,11 @@ module Spaceship
     # @return (Bool)
     attr_accessor :can_send_version_live
 
+    attr_accessor :languages
+
     ####
     # Localized values:
     ####
-
-    attr_accessor :languages
 
     # @return (Hash) A hash representing the app name in all languages
     attr_accessor :name
@@ -62,7 +62,6 @@ module Spaceship
     attr_mapping({
       'versionId' => :version_id,
       'copyright' => :copyright,
-      'isLive' => :is_live,
       'primaryCategory' => :primary_category,
       'primaryFirstSubCategory' => :primary_first_sub_category,
       'primarySecondSubCategory' => :primary_second_sub_category,

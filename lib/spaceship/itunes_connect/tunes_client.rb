@@ -70,12 +70,16 @@ module Spaceship
       return unless data
       return unless data.kind_of?Hash
  
-      puts "Handle errors"
+      if data['sectionErrorKeys'].count == 0 and
+        data['sectionInfoKeys'].count == 0 and 
+        data['sectionWarningKeys'].count == 0
+        # success
+      end
+
       puts data['sectionErrorKeys'] if data['sectionErrorKeys']
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
-      puts "Done handle errors"
-      # TODO
+      
     end
 
     #####################################################

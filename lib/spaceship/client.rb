@@ -233,7 +233,8 @@ module Spaceship
 
       def log_request(method, url, params)
         params_to_log = Hash(params).dup # to also work with nil
-        params_to_log.delete(:accountPassword)
+        params_to_log.delete(:accountPassword) # Dev Portal
+        params_to_log.delete(:theAccountPW) # iTC
         params_to_log = params_to_log.collect do |key, value|
           "{#{key}: #{value}}"
         end
