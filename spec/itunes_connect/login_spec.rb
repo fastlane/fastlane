@@ -7,7 +7,7 @@ describe Spaceship::Tunes do
       cookies = client.cookie.split(';')
       
       expect(cookies.count).to eq(3)
-      expect(cookies[0]).to include("myacinfo=DAWTKNV26f95d158d3de1550") # this is actually longer
+      expect(cookies[0]).to include("myacinfo=DAWTKN") # this is actually longer
       expect(cookies[1]).to eq("woinst=3363")
       expect(cookies[2]).to eq("wosid=xBJMOVttbAQ1Cwlt8ktafw")
     end
