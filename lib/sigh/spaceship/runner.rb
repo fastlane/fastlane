@@ -66,7 +66,6 @@ module Sigh
 
     # Create a new profile and return it
     def create_profile!
-      Helper.log.info "Creating profile..."
       cert = certificate_to_use
       bundle_id = Sigh.config[:app_identifier]
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
