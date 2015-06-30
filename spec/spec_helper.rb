@@ -3,6 +3,7 @@ Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'spaceship'
 require 'developer_portal/developer_portal_stubbing'
+require 'itunes_connect/itunes_connect_stubbing'
 require 'plist'
 require 'pry'
 
@@ -17,17 +18,21 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 
-cache_path = "/tmp/spaceship_api_key.txt"
+cache_paths = [
+  "/tmp/spaceship_api_key.txt",
+  "/tmp/spaceship_itc_login_url.txt"
+]
+
 RSpec.configure do |config|
   config.before(:each) do
     begin
-      File.delete(cache_path) 
+      cache_paths.each { |path| File.delete(path) }
     rescue Errno::ENOENT
     end
   end
   config.after(:each) do
     begin
-      File.delete(cache_path)  # to not break the actual spaceship
+      cache_paths.each { |path| File.delete(path) }
     rescue Errno::ENOENT
     end
   end
