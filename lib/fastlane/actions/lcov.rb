@@ -1,9 +1,6 @@
 module Fastlane
   module Actions
     class LcovAction < Action
-      @@derived_data_path = "#{Dir.home}/Library/Developer/Xcode/DerivedData/"
-      @@out_cov_file = "/tmp/coverage.info"
-      @@exclude_dirs = ["/Applications/*","/Frameworks/*"]
 
       def self.is_supported?(platform)
         true
@@ -61,29 +58,41 @@ module Fastlane
         end
 
         def self.gen_cov(options)
-          system("lcov --capture --directory \"#{derived_data_dir(options)}\" --output-file #{@@out_cov_file}")
-          cmd = "lcov "
-          @@exclude_dirs.each do |e|
-            cmd << "--remove #{@@out_cov_file} \"#{e}\" "
-          end
-          cmd << "--output #{@@out_cov_file} "
-          system(cmd)
-          system("genhtml #{@@out_cov_file} --output-directory #{options[:output_dir]}")
+          tmp_cov_file = "/tmp/coverage.info"
+          output_dir = options[:output_dir]
+          derived_data_path = derived_data_dir(options)
+
+          system("lcov --capture --directory \"#{derived_data_path}\" --output-file #{tmp_cov_file}")
+          system(gen_lcov_cmd(tmp_cov_file))
+          system("genhtml #{tmp_cov_file} --output-directory #{output_dir}")
         end
 
+        def self.gen_lcov_cmd(cov_file)
+          cmd = "lcov "
+          exclude_dirs.each do |e|
+            cmd << "--remove #{cov_file} \"#{e}\" "
+          end
+          cmd << "--output #{cov_file} "
+        end
 
         def self.derived_data_dir(options)
            pn = options[:project_name]
            sc = options[:scheme]
 
-           match = find_project_dir(pn)
+           initial_path = "#{Dir.home}/Library/Developer/Xcode/DerivedData/"
+           end_path = "/Build/Intermediates/#{pn}.build/Debug-iphonesimulator/#{sc}.build/Objects-normal/i386/"
 
-           derived_data_end_path = "/Build/Intermediates/#{pn}.build/Debug-iphonesimulator/#{sc}.build/Objects-normal/i386/"
-           "#{@@derived_data_path}#{match}#{derived_data_end_path}"
+           match = find_project_dir(pn,initial_path)
+
+           "#{initial_path}#{match}#{end_path}"
         end
 
-        def self.find_project_dir(project_name)
-          `ls -t #{@@derived_data_path}| grep #{project_name} | head -1`.to_s.gsub(/\n/, "")
+        def self.find_project_dir(project_name,path)
+          `ls -t #{path}| grep #{project_name} | head -1`.to_s.gsub(/\n/, "")
+        end
+
+        def self.exclude_dirs
+          ["/Applications/*","/Frameworks/*"]
         end
 
     end
