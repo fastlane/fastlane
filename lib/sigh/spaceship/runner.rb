@@ -12,24 +12,29 @@ module Sigh
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
 
-      profiles = fetch_profiles # download the profile if it's there
+      unless Sigh.config[:skip_fetch_profiles]
+        profiles = fetch_profiles # download the profile if it's there
 
-      if profiles.count > 0
-        Helper.log.info "Found #{profiles.count} matching profile(s)".yellow
-        profile = profiles.first
+        if profiles.count > 0
+          Helper.log.info "Found #{profiles.count} matching profile(s)".yellow
+          profile = profiles.first
 
-        if Sigh.config[:force]
-          unless profile_type == Spaceship.provisioning_profile::AppStore
-            Helper.log.info "Updating the profile to include all devices".yellow
-            profile.devices = Spaceship.device.all
-          else
-            Helper.log.info "Updating the provisioning profile".yellow
+          if Sigh.config[:force]
+            unless profile_type == Spaceship.provisioning_profile::AppStore
+              Helper.log.info "Updating the profile to include all devices".yellow
+              profile.devices = Spaceship.device.all
+            else
+              Helper.log.info "Updating the provisioning profile".yellow
+            end
+
+            profile = profile.update! # assign it, as it's a new profile
           end
-
-          profile = profile.update! # assign it, as it's a new profile
+        else
+          Helper.log.info "No existing profiles found, creating a new one for you".yellow
+          profile = create_profile!
         end
       else
-        Helper.log.info "No existing profiles found, creating a new one for you".yellow
+        Helper.log.info "Not checking for existing profiles, creating a new one for you".yellow
         profile = create_profile!
       end
 
