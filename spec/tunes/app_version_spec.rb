@@ -12,6 +12,8 @@ describe Spaceship::AppVersion do
 
       expect(version.application).to eq(app)
       expect(version.is_live?).to eq(false)
+      expect(version.copyright).to eq("2015 SunApps GmbH")
+      expect(version.version_id).to eq(812106519)
       expect(version.primary_category).to eq('MZGenre.Reference')
       expect(version.secondary_category).to eq('MZGenre.Business')
       expect(version.status).to eq('readyForSale')
