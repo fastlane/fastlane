@@ -1,9 +1,11 @@
+require 'shellwords'
+
 module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        command = "security import #{params[:certificate_path]} -k ~/Library/Keychains/#{params[:keychain_name]}"
-        command << " -P #{params[:certificate_password]}" if params[:certificate_password]
+        command = "security import #{params[:certificate_path].shellescape} -k ~/Library/Keychains/#{params[:keychain_name].shellescape}"
+        command << " -P #{params[:certificate_password].shellescape}" if params[:certificate_password]
         command << " -T /usr/bin/codesign"
 
         sh command

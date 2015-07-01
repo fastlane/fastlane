@@ -20,6 +20,18 @@ describe Fastlane do
         expect(result[1]).to include '~/Library/Keychains/test.keychain'
       end
 
+      it "works with name and password that contain spaces or `\"`" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: '\"test password\"',
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 2
+        expect(result[0]).to eq %(security create-keychain -p \\\"test\\ password\\\" test.keychain)
+      end
+
       it "works with keychain-settings and name and password" do
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
