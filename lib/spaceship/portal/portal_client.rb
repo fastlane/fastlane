@@ -1,5 +1,5 @@
 module Spaceship
-  class DeveloperPortalClient < Spaceship::Client
+  class PortalClient < Spaceship::Client
 
     #####################################################
     # @!group Init and Login

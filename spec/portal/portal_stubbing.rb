@@ -1,7 +1,7 @@
 require 'webmock/rspec'
 
 def adp_read_fixture_file(filename)
-  File.read(File.join('spec', 'developer_portal', 'fixtures', filename))
+  File.read(File.join('spec', 'portal', 'fixtures', filename))
 end
 
 def adp_user_agent # as this might change

@@ -3,14 +3,25 @@ require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'
 
-module Spaceship
-  
-end
-
 # Dev Portal
-require 'spaceship/developer_portal/developer_portal'
-require 'spaceship/developer_portal/spaceship'
+require 'spaceship/portal/portal'
+require 'spaceship/portal/spaceship'
 
 # iTunes Connect
-require 'spaceship/itunes_connect/itunes_connect'
-require 'spaceship/itunes_connect/spaceship'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/spaceship'
+
+# To support legacy code
+module Spaceship
+  # Dev Portal
+  Certificate = Spaceship::Portal::Certificate
+  ProvisioningProfile = Spaceship::Portal::ProvisioningProfile
+  Device = Spaceship::Portal::Device
+  App = Spaceship::Portal::App
+
+  # iTunes Connect
+  AppVersion = Spaceship::Tunes::AppVersion
+  Application = Spaceship::Tunes::Application
+
+end
+

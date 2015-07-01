@@ -1,7 +1,7 @@
 require 'webmock/rspec'
 
 def itc_read_fixture_file(filename)
-  File.read(File.join('spec', 'itunes_connect', 'fixtures', filename))
+  File.read(File.join('spec', 'tunes', 'fixtures', filename))
 end
 
 def itc_user_agent # as this might change

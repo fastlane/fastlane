@@ -1,6 +1,0 @@
-require 'spaceship/developer_portal/portal_base'
-require 'spaceship/developer_portal/app'
-require 'spaceship/developer_portal/certificate'
-require 'spaceship/developer_portal/device'
-require 'spaceship/developer_portal/provisioning_profile'
-require 'spaceship/developer_portal/developer_portal_client'

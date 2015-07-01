@@ -19,7 +19,7 @@ module Spaceship
       # 
       # @return (Spaceship::Client) The client the login method was called for
       def login(user = nil, password = nil)
-        @client = DeveloperPortalClient.login(user, password)
+        @client = PortalClient.login(user, password)
       end
 
       # Open up the team selection for the user (if necessary).
