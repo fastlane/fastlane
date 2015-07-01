@@ -8,7 +8,7 @@ module Fastlane
         command << " -P #{params[:certificate_password].shellescape}" if params[:certificate_password]
         command << " -T /usr/bin/codesign"
 
-        sh command
+        Fastlane::Actions.sh command, log: false
       end
 
       def self.description

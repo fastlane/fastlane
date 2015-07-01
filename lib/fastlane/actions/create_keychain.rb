@@ -8,10 +8,10 @@ module Fastlane
         escaped_password = params[:password].shellescape
 
         commands = []
-        commands << sh("security create-keychain -p #{escaped_password} #{escaped_name}")
+        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{escaped_name}", log:false)
 
-        commands << sh("security default-keychain -s #{escaped_name}") if params[:default_keychain]
-        commands << sh("security unlock-keychain -p #{escaped_password} #{escaped_name}") if params[:unlock]
+        commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log:false) if params[:default_keychain]
+        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_name}", log:false) if params[:unlock]
 
         command = "security set-keychain-settings"
         command << " -t #{params[:timeout]}" if params[:timeout]
@@ -19,7 +19,7 @@ module Fastlane
         command << " -u" if params[:lock_after_timeout]
         command << " ~/Library/Keychains/#{escaped_name}"
 
-        commands << sh(command)
+        commands << Fastlane::Actions.sh(command, log:false)
         commands
       end
 

@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class DeleteKeychainAction < Action
       def self.run(params)
-        sh "security delete-keychain #{params[:name].shellescape}"
+        Fastlane::Actions.sh "security delete-keychain #{params[:name].shellescape}", log:false
       end
 
       def self.description
