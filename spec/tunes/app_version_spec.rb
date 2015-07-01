@@ -18,6 +18,9 @@ describe Spaceship::AppVersion do
       expect(version.can_reject_version).to eq(false)
       expect(version.can_prepare_for_upload).to eq(false)
       expect(version.can_send_version_live).to eq(false)
+      expect(version.release_on_approval).to eq(true)
+      expect(version.can_beta_test).to eq(true)
+      expect(version.supports_apple_watch).to eq(false)
 
       # Multi Lang
       expect(version.name['English']).to eq('App Name 123')

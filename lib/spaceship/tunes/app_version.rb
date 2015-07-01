@@ -37,11 +37,39 @@ module Spaceship
       # @return (Bool)
       attr_accessor :can_send_version_live
 
-      attr_accessor :languages
+      # @return (Bool) Should the app automatically be released once it's approved?
+      attr_accessor :release_on_approval
+
+      # @return (Bool)
+      attr_accessor :can_beta_test
+
+      # @return (Bool) Does the binary contain a watch binary?
+      attr_accessor :supports_apple_watch
+
+      # @return (String) URL to the full resolution 1024x1024 app icon
+      attr_accessor :app_icon_url
+
+      # @return (String) Name of the original file
+      attr_accessor :app_icon_original_name
+
+      # @return (String) URL to the full resolution 1024x1024 app icon
+      attr_accessor :watch_app_icon_url
+
+      # @return (String) Name of the original file
+      attr_accessor :watch_app_icon_original_name
+
+      # TODO
+      attr_accessor :review_first_name
+
+      # @return TODO
+      attr_accessor :company_information
 
       ####
       # Localized values:
       ####
+
+      # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
+      attr_accessor :languages
 
       # @return (Hash) A hash representing the app name in all languages
       attr_reader :name
@@ -75,7 +103,14 @@ module Spaceship
         'canRejectVersion' => :can_reject_version,
         'canPrepareForUpload' => :can_prepare_for_upload,
         'canSendVersionLive' => :can_send_version_live,
-        'details' => :languages
+        'details' => :languages,
+        'largeAppIcon.value.url' => :app_icon_url,
+        'largeAppIcon.value.originalFileName' => :app_icon_original_name,
+        'watchAppIcon.value.url' => :watch_app_icon_url,
+        'watchAppIcon.value.originalFileName' => :watch_app_icon_original_name,
+        'canBetaTest' => :can_beta_test,
+        'releaseOnApproval' => :release_on_approval,
+        'supportsAppleWatch' => :supports_apple_watch
       })
 
       class << self
@@ -86,6 +121,8 @@ module Spaceship
           obj = self.new(attrs)
           obj.raw_data = orig
           obj.unfold_languages
+
+          obj.fix_apples_bugs
 
           obj
         end
@@ -113,6 +150,13 @@ module Spaceship
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
+      end
+
+      # This method takes care of properly parsing values that
+      # are not returned in the right format, e.g. boolean as string
+      def fix_apples_bugs
+        self.release_on_approval = (release_on_approval == 'true')
+        self.supports_apple_watch = (supports_apple_watch != nil)
       end
 
       def is_live?
