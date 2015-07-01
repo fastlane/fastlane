@@ -35,28 +35,32 @@ describe Spaceship::AppVersion do
       expect(version.support_url['German']).to eq('http://url.com')
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
     end
+  end
 
+  describe "Modifying the app version" do
+    let (:version) { Spaceship::Application.all.first.edit_version }
     it "doesn't allow modification of localized properties without the language" do
-      app = Spaceship::Application.all.first
-
-      version = app.edit_version
-
       begin
         version.name = "Yes"
-
         raise "Should raise exception before"
       rescue NoMethodError => ex
       end
     end
 
     it "allows modifications of localized values" do
-      app = Spaceship::Application.all.first
-      version = app.edit_version
-
       new_title = 'New Title'
       version.name['English'] = new_title
       lang = version.languages.find { |a| a['language'] == 'English' }
       expect(lang['name']['value']).to eq(new_title)
+    end
+
+    describe "Pushing the changes back to the server" do
+      it "raises an exception if there was an error" do
+        itc_stub_invalid_update
+        expect {
+          version.save!
+        }.to raise_error "Keyword already taken; Name must not be empty"
+      end
     end
   end
 end

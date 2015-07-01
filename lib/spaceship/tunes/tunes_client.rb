@@ -73,14 +73,39 @@ module Spaceship
       if data['sectionErrorKeys'].count == 0 and
         data['sectionInfoKeys'].count == 0 and 
         data['sectionWarningKeys'].count == 0
-        # success
+        
+        logger.debug("Request was successful")
       end
+
+      def handle_response_hash(hash)
+        errors = []
+        if hash.kind_of?Hash
+          hash.each do |key, value|
+            errors = errors + handle_response_hash(value)
+
+            if key == 'errorKeys' and value.kind_of?String and value.length > 0
+              errors << value
+            end
+          end
+        elsif hash.kind_of?Array
+          hash.each do |value|
+            errors = errors + handle_response_hash(value)
+          end
+        else
+          # We don't care about simple values
+        end
+        return errors
+      end
+
+      errors = handle_response_hash(data)
+      raise errors.join('; ') if errors.count > 0
 
       puts data['sectionErrorKeys'] if data['sectionErrorKeys']
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
       
     end
+
 
     #####################################################
     # @!group Applications

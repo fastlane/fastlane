@@ -29,13 +29,17 @@ def itc_stub_applications
 end
 
 def itc_stub_app_versions
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary").
-         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
-         to_return(:status => 200, :body => itc_read_fixture_file('app_summary.json'), headers: {'Content-Type' => 'application/json'})
-
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/898536088?v=").
+  # Receiving app version
+   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/898536088?v=").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, :body => itc_read_fixture_file('app_version.json'), headers: {'Content-Type' => 'application/json'})
+end
+
+def itc_stub_invalid_update
+  # Called from the specs to simulate invalid server responses
+  body = JSON.parse(itc_read_fixture_file('app_version.json'))['data']
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/save/898536088?v=").
+         to_return(:status => 200, :body => itc_read_fixture_file('update_app_version_failed.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 WebMock.disable_net_connect!
