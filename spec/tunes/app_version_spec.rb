@@ -31,6 +31,19 @@ describe Spaceship::AppVersion do
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
     end
 
+    it "doesn't allow modification of localized properties without the language" do
+      app = Spaceship::Application.all.first
+
+      version = app.edit_version
+
+      begin
+        version.name = "Yes"
+
+        raise "Should raise exception before"
+      rescue NoMethodError => ex
+      end
+    end
+
     it "allows modifications of localized values" do
       app = Spaceship::Application.all.first
       version = app.edit_version

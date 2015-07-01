@@ -4,7 +4,7 @@ describe Spaceship::Portal::App do
   before { Spaceship.login }
   let(:client) { Spaceship::Portal::App.client }
 
-  describe "successfully loads and parses all apps", now: true do
+  describe "successfully loads and parses all apps" do
     it "the number is correct" do
       expect(Spaceship::Portal::App.all.count).to eq(5)
     end

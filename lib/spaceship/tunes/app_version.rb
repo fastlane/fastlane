@@ -1,5 +1,7 @@
 module Spaceship
   module Tunes
+    # Represents an editable version of an iTunes Connect Application
+    # This can either be the live or the edit version retrieved via the app
     class AppVersion < TunesBase
       attr_accessor :application
 
@@ -42,22 +44,22 @@ module Spaceship
       ####
 
       # @return (Hash) A hash representing the app name in all languages
-      attr_accessor :name
+      attr_reader :name
 
       # @return (Hash) A hash representing the keywords in all languages
-      attr_accessor :keywords
+      attr_reader :keywords
 
       # @return (Hash) A hash representing the description in all languages
-      attr_accessor :description
+      attr_reader :description
 
       # @return (Hash) A hash representing the keywords in all languages
-      attr_accessor :privacy_url
+      attr_reader :privacy_url
 
       # @return (Hash) A hash representing the keywords in all languages
-      attr_accessor :support_url
+      attr_reader :support_url
 
       # @return (Hash) A hash representing the keywords in all languages
-      attr_accessor :marketing_url
+      attr_reader :marketing_url
 
 
       attr_mapping({
