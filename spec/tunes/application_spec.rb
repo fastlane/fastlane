@@ -24,6 +24,35 @@ describe Spaceship::Application do
       expect(app.raw_data['versions'].count).to eq(2)
     end
 
+    describe "#find" do
+      describe "find using bundle identifier" do
+        it "returns the application if available" do
+          a = Spaceship::Application.find('net.sunapps.107')
+          expect(a.class).to eq(Spaceship::Application)
+          expect(a.apple_id).to eq('898536088')
+        end
+
+        it "returns nil if not available" do
+          a = Spaceship::Application.find('netnot.available')
+          expect(a).to eq(nil)
+        end
+      end
+
+      describe "find using Apple ID" do
+        it "returns the application if available" do
+          a = Spaceship::Application.find('898536088')
+          expect(a.class).to eq(Spaceship::Application)
+          expect(a.bundle_id).to eq('net.sunapps.107')
+        end
+
+        it "supports int parameters too" do
+          a = Spaceship::Application.find(898536088)
+          expect(a.class).to eq(Spaceship::Application)
+          expect(a.bundle_id).to eq('net.sunapps.107')
+        end
+      end
+    end
+
     describe "Access app_versions" do
       describe "#edit_version" do
         it "returns nil if there is only a live version" do
@@ -50,7 +79,7 @@ describe Spaceship::Application do
       end
     end
 
-    describe "Create new version", now: true do
+    describe "Create new version" do
       it "raises an exception if there already is a new version" do
         app = Spaceship::Application.all.first
         expect {

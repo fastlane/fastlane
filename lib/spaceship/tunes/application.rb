@@ -62,6 +62,14 @@ module Spaceship
         def all
           client.applications.map { |application| self.factory(application) }
         end
+
+        # @return (Spaceship::Tunes::Application) Returns the application matching the parameter
+        #   as either the App ID or the bundle identifier
+        def find(identifier)
+          all.find do |app|
+            (app.apple_id == identifier.to_s or app.bundle_id == identifier)
+          end
+        end
       end
 
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
