@@ -21,5 +21,18 @@ describe Spaceship::Application do
       expect(app.issues_count).to eq(0)
       expect(app.app_icon_preview_url).to eq('https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png')
     end
+
+    describe "Create new version", now: true do
+      it "raises an exception if there already is a new version" do
+        app = Spaceship::Application.all.first
+        expect {
+          app.create_version!('0.1')
+        }.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
+      end
+
+      it "works if there is no `edit_version` already available" do
+        
+      end
+    end
   end
 end

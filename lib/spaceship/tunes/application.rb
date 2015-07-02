@@ -64,12 +64,24 @@ module Spaceship
         end
       end
 
+      # @return (Spaceship::AppVersion) Receive the version that is currently live on the
+      #  App Store. You can't modify all values there, so be careful. 
       def live_version
         v = Spaceship::AppVersion.find(self, self.apple_id, true)
       end
 
+      # @return (Spaceship::AppVersion) Receive the version that can fully be edited
       def edit_version
         Spaceship::AppVersion.find(self, self.apple_id, false)
+      end
+
+      # Create a new version of your app
+      def create_version!(version_number)
+        if edit_version
+          raise "Cannot create a new version for this app as there already is an `edit_version` available"
+        end
+
+        # TODO
       end
     end
   end
