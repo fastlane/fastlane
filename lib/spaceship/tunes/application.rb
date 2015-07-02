@@ -88,7 +88,11 @@ module Spaceship
           raise "Cannot create a new version for this app as there already is an `edit_version` available"
         end
 
-        # TODO
+        client.create_version!(apple_id, version_number)
+
+        # Since we have stored the outdated raw_data, we need to refresh this object
+        # otherwise `edit_version` will return nil
+        # TODO: implemented -reload method
       end
     end
   end

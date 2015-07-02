@@ -61,6 +61,7 @@ describe Spaceship::Application do
       it "works if there is no `edit_version` already available" do
         app = Spaceship::Application.all.find { |a| a.apple_id == '1013943394' }
         expect(app.edit_version).to eq(nil)
+        app.create_version!('0.1')
       end
     end
   end

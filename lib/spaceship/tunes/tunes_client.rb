@@ -114,6 +114,20 @@ module Spaceship
       parse_response(r, 'data')['summaries']
     end
 
+    def create_version!(app_id, version_number)
+      r = request(:post) do |req|
+        req.url "ra/apps/version/create/#{app_id}"
+        req.body = {version: version_number.to_s}.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group AppVersions
+    #####################################################
+
     def app_version(app_id, is_live)
       raise "app_id is required" unless app_id
 
