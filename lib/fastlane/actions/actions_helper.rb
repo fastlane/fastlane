@@ -68,18 +68,18 @@ module Fastlane
 
     # Execute a shell command
     # This method will output the string and execute it
-    def self.sh(command)
-      sh_no_action(command)
+    def self.sh(command, log: true)
+      sh_no_action(command, log: log)
     end
 
-    def self.sh_no_action(command)
+    def self.sh_no_action(command, log: true)
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
       command = command.join(' ') if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
-      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ')
+      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ') if log
 
       result = ''
       unless Helper.test?
