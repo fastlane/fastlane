@@ -64,6 +64,7 @@ module Spaceship
 
       ##
       # Binds attributes getters and setters to underlying data returned from the API.
+      # Setting any properties will alter the `raw_data` hash.
       #
       # @return (Hash) the attribute mapping used by `remap_keys!`
       def data_bind!(data)
@@ -74,7 +75,7 @@ module Spaceship
           setter_method = "#{dest}=".to_sym
 
           unless public_method_defined?(getter_method)
-            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{attribute}`")
+            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{getter_method}`")
           end
 
           define_method(getter_method) do
@@ -82,7 +83,7 @@ module Spaceship
           end
 
           unless public_method_defined?(setter_method)
-            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{attribute}`")
+            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{setter_method}`")
           end
 
           define_method(setter_method) do |value|
