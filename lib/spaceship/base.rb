@@ -23,11 +23,6 @@ module Spaceship
       attr_accessor :client
 
       ##
-      # @return (Hash/Array) Holds the raw data we got from Apple's
-      #   server to use it later
-      attr_accessor :raw_data
-
-      ##
       # The client used to make requests.
       # @return (Spaceship::Client) Defaults to the singleton
       def client
@@ -116,6 +111,11 @@ module Spaceship
         end
       end
     end
+
+    ##
+    # @return (Hash/Array) Holds the raw data we got from Apple's
+    #   server to use it later
+    attr_accessor :raw_data
 
     ##
     # The initialize method accepts a parsed response from Apple and sets all

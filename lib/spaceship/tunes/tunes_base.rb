@@ -20,6 +20,7 @@ module Spaceship
           end
         end
 
+        # Overwrite this, to also update the original values (raw_value), when sending back the changes to Apple
         def attr_mapping(attr_map = nil)
           result = super
 
