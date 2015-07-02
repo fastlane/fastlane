@@ -172,7 +172,7 @@ module Spaceship
 
       # Push all changes that were made back to iTunes Connect
       def save!
-        client.update_app_version(application.apple_id, is_live?, raw_data)
+        client.update_app_version!(application.apple_id, is_live?, raw_data)
       end
     end
   end

@@ -83,8 +83,8 @@ module Spaceship
           hash.each do |key, value|
             errors = errors + handle_response_hash(value)
 
-            if key == 'errorKeys' and value.kind_of?String and value.length > 0
-              errors << value
+            if key == 'errorKeys' and value.kind_of?Array and value.count > 0
+              errors = errors + value
             end
           end
         elsif hash.kind_of?Array
@@ -98,12 +98,10 @@ module Spaceship
       end
 
       errors = handle_response_hash(data)
-      raise errors.join('; ') if errors.count > 0
+      raise errors.join(' ') if errors.count > 0 # they are separated by `.` by default
 
-      puts data['sectionErrorKeys'] if data['sectionErrorKeys']
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
-      
     end
 
 
@@ -125,7 +123,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def update_app_version(app_id, is_live, data)
+    def update_app_version!(app_id, is_live, data)
       raise "app_id is required" unless app_id
 
       v_text = (is_live ? 'live' : nil)
