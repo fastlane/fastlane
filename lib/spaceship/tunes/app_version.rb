@@ -123,12 +123,11 @@ module Spaceship
         def factory(attrs)
           orig = attrs.dup
           obj = self.new(attrs)
-          obj.raw_data = orig
           obj.unfold_languages
 
           obj.fix_apples_bugs
 
-          obj
+          return obj
         end
 
         # @return (Array) Returns all apps available for this account

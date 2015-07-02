@@ -127,6 +127,7 @@ module Spaceship
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
+      self.raw_data = attrs
       @client = self.class.client
     end
 
