@@ -114,6 +114,40 @@ module Spaceship
       parse_response(r, 'data')['summaries']
     end
 
+    # Creates a new application on iTunes Connect
+    # @param name (String): The name of your app as it will appear on the App Store. 
+    #   This can't be longer than 255 characters.
+    # @param primary_language (String): If localized app information isn't available in an 
+    #   App Store territory, the information from your primary language will be used instead.
+    # @param version (String): The version number is shown on the App Store and should 
+    #   match the one you used in Xcode.
+    # @param sku (String): A unique ID for your app that is not visible on the App Store.
+    # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It 
+    #   can't be changed after you submit your first build.
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil)
+      # First, we need to fetch the data from Apple, which we then modify with the user's values
+      r = request(:get, 'ra/apps/create/?appType=ios')
+      data = parse_response(r, 'data')
+
+      # Now fill in the values we have
+      data['versionString']['value'] = version
+      data['newApp']['name']['value'] = name
+      data['newApp']['bundleId']['value'] = bundle_id
+      data['newApp']['primaryLanguage']['value'] = primary_language || 'English_CA'
+      data['newApp']['vendorId']['value'] = sku
+
+
+      # Now send back the modified hash
+      r = request(:post) do |req|
+        req.url 'ra/apps/create/?appType=ios'
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def create_version!(app_id, version_number)
       r = request(:post) do |req|
         req.url "ra/apps/version/create/#{app_id}"

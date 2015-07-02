@@ -70,6 +70,24 @@ module Spaceship
             (app.apple_id == identifier.to_s or app.bundle_id == identifier)
           end
         end
+
+        # Creates a new application on iTunes Connect
+        # @param name (String): The name of your app as it will appear on the App Store. 
+        #   This can't be longer than 255 characters.
+        # @param primary_language (String): If localized app information isn't available in an 
+        #   App Store territory, the information from your primary language will be used instead.
+        # @param version (String): The version number is shown on the App Store and should 
+        #   match the one you used in Xcode.
+        # @param sku (String): A unique ID for your app that is not visible on the App Store.
+        # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It 
+        #   can't be changed after you submit your first build.
+        def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil)
+          client.create_application!(name: name, 
+                         primary_language: primary_language, 
+                                  version: version, 
+                                      sku: sku, 
+                                bundle_id: bundle_id)
+        end
       end
 
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the

@@ -53,6 +53,25 @@ describe Spaceship::Application do
       end
     end
 
+    describe "#create!" do
+      it "works with valid data and defaults to English" do
+        Spaceship::Tunes::Application.create!(name: "My Name", 
+                                              version: "1.0", 
+                                              sku: "SKU123", 
+                                              bundle_id: "net.sunapps.123")
+      end
+
+      it "raises an error if something is wrong" do
+        itc_stub_broken_create
+        expect {
+          Spaceship::Tunes::Application.create!(name: "My Name", 
+                                                version: "1.0", 
+                                                sku: "SKU123", 
+                                                bundle_id: "net.sunapps.123")
+        }.to raise_error "You must choose a primary language."
+      end
+    end
+
     describe "Access app_versions" do
       describe "#edit_version" do
         it "returns nil if there is only a live version" do
