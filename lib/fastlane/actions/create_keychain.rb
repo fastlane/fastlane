@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.description
-        "Create keychains"
+        "Create a new Keychain"
       end
 
       def self.available_options

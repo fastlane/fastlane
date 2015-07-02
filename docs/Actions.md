@@ -171,6 +171,37 @@ resign(
 )
 ```
 
+### `create_keychain`
+
+Create a new keychain, which can then be used to import certificates.
+
+```ruby
+create_keychain(
+  name: "KeychainName",
+  default_keychain: true,
+  unlock: true,
+  timeout: 3600,
+  lock_when_sleeps: true
+)
+```
+
+### `delete_keychain`
+
+Delete a keychain, can be used after creating one with `create_keychain`.
+
+```ruby
+delete_keychain(name: "KeychainName")
+```
+
+### `import_certificate`
+
+Import certificates into the current default keychain. Use `create_keychain` to create a new keychain.
+
+```ruby
+import_certificate certificate_path: "certs/AppleWWDRCA.cer"
+import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV['CERT_PASSWORD']
+```
+
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
 Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
 such as; archive, build, clean, test, export & more.
