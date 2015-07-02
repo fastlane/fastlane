@@ -342,7 +342,7 @@ Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` 
 
 ## Firewall Issues
 
-`deliver` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocoll using
+`deliver` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol using
 
 ```
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" deliver
