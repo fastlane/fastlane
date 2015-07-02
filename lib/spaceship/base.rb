@@ -19,6 +19,31 @@ module Spaceship
   #
   # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
+    class DataHash
+      def initialize(hash)
+        @hash = hash
+      end
+
+      def [](*keys)
+        lookup(keys)
+      end
+
+      def set(keys, value)
+        last = keys.pop
+        ref = lookup(keys) || @hash
+        ref[last] = value
+      end
+
+      def lookup(keys)
+        head, *tail = *keys
+        if tail.empty?
+          @hash[head]
+        else
+          DataHash.new(@hash[head]).lookup(tail)
+        end
+      end
+    end
+
     class << self
       attr_accessor :client
 
@@ -38,21 +63,31 @@ module Spaceship
       end
 
       ##
-      # Remaps the attributes passed into the initializer to the model
-      # attributes using the map defined by `attr_map`.
-      #
-      # This method consumes the input parameter meaning attributes that were
-      # remapped are deleted.
+      # Binds attributes getters and setters to underlying data returned from the API.
       #
       # @return (Hash) the attribute mapping used by `remap_keys!`
-      def remap_keys!(attrs)
+      def data_bind!(data)
         return if attr_mapping.nil?
 
-        attr_mapping.each do |from, to|
-          if attrs[from].is_a?(Hash) and (attrs[from]['value'] rescue nil)
-            attrs[to] = attrs.delete(from).fetch('value')
-          else
-            attrs[to] = attrs.delete(from) 
+        attr_mapping.each do |source, dest|
+          getter_method = dest.to_sym
+          setter_method = "#{dest}=".to_sym
+
+          unless public_method_defined?(getter_method)
+            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{attribute}`")
+          end
+
+          define_method(getter_method) do
+            raw_data[*source.split('.')]
+          end
+
+          unless public_method_defined?(setter_method)
+            raise NoMethodError.new("Cannot define attribute mapping for missing attribute `#{attribute}`")
+          end
+
+          define_method(setter_method) do |value|
+            self.raw_data ||= DataHash.new({})
+            raw_data.set(source.split('.'), value)
           end
         end
       end
@@ -76,7 +111,7 @@ module Spaceship
           @attr_mapping = attr_map
         else
           begin
-            @attr_mapping ||= ancestors[1].attr_mapping 
+            @attr_mapping ||= ancestors[1].attr_mapping
           rescue NameError, NoMethodError
           end
         end
@@ -123,11 +158,12 @@ module Spaceship
     #
     # Do not override `initialize` in your own models.
     def initialize(attrs = {})
-      self.class.remap_keys!(attrs)
+      #self.class.remap_keys!(attrs)
+      self.class.data_bind!(attrs)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
-      self.raw_data = attrs
+      self.raw_data = DataHash.new(attrs)
       @client = self.class.client
     end
 

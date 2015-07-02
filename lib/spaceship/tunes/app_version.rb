@@ -95,26 +95,26 @@ module Spaceship
 
 
       attr_mapping({
-        'versionId' => :version_id,
-        'copyright' => :copyright,
-        'primaryCategory' => :primary_category,
-        'primaryFirstSubCategory' => :primary_first_sub_category,
-        'primarySecondSubCategory' => :primary_second_sub_category,
-        'secondaryCategory' => :secondary_category,
-        'secondaryFirstSubCategory' => :secondary_first_sub_category,
-        'secondarySecondSubCategory' => :secondary_second_sub_category,
-        'status' => :status,
-        'canRejectVersion' => :can_reject_version,
-        'canPrepareForUpload' => :can_prepare_for_upload,
-        'canSendVersionLive' => :can_send_version_live,
-        'details' => :languages,
-        'largeAppIcon.value.url' => :app_icon_url,
-        'largeAppIcon.value.originalFileName' => :app_icon_original_name,
-        'watchAppIcon.value.url' => :watch_app_icon_url,
-        'watchAppIcon.value.originalFileName' => :watch_app_icon_original_name,
         'canBetaTest' => :can_beta_test,
-        'releaseOnApproval' => :release_on_approval,
-        'supportsAppleWatch' => :supports_apple_watch
+        'canPrepareForUpload' => :can_prepare_for_upload,
+        'canRejectVersion' => :can_reject_version,
+        'canSendVersionLive' => :can_send_version_live,
+        'copyright.value' => :copyright,
+        'details.value' => :languages,
+        'largeAppIcon.value.originalFileName' => :app_icon_original_name,
+        'largeAppIcon.value.url' => :app_icon_url,
+        'primaryCategory.value' => :primary_category,
+        'primaryFirstSubCategory.value' => :primary_first_sub_category,
+        'primarySecondSubCategory.value' => :primary_second_sub_category,
+        'releaseOnApproval.value' => :release_on_approval,
+        'secondaryCategory.value' => :secondary_category,
+        'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
+        'secondarySecondSubCategory.value' => :secondary_second_sub_category,
+        'status' => :status,
+        'supportsAppleWatch' => :supports_apple_watch,
+        'versionId' => :version_id,
+        'watchAppIcon.value.originalFileName' => :watch_app_icon_original_name,
+        'watchAppIcon.value.url' => :watch_app_icon_url
       })
 
       class << self
@@ -146,11 +146,11 @@ module Spaceship
       # Prefill name, keywords, etc...
       def unfold_languages
         {
-          name: :name, 
-          keywords: :keywords, 
-          description: :description, 
-          privacyURL: :privacy_url, 
-          supportURL: :support_url, 
+          name: :name,
+          keywords: :keywords,
+          description: :description,
+          privacyURL: :privacy_url,
+          supportURL: :support_url,
           marketingURL: :marketing_url
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
@@ -175,4 +175,4 @@ module Spaceship
       end
     end
   end
-end 
+end
