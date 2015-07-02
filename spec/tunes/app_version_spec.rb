@@ -23,6 +23,11 @@ describe Spaceship::AppVersion do
       expect(version.release_on_approval).to eq(true)
       expect(version.can_beta_test).to eq(true)
       expect(version.supports_apple_watch).to eq(false)
+      # expect(version.app_icon_url).to eq(false)
+      # expect(version.app_icon_original_name).to eq(false)
+      # expect(version.watch_app_icon_url).to eq(false)
+      # expect(version.watch_app_icon_original_name).to eq(false)
+
 
       # Multi Lang
       expect(version.name['English']).to eq('App Name 123')
@@ -39,6 +44,7 @@ describe Spaceship::AppVersion do
 
   describe "Modifying the app version" do
     let (:version) { Spaceship::Application.all.first.edit_version }
+
     it "doesn't allow modification of localized properties without the language" do
       begin
         version.name = "Yes"
@@ -55,11 +61,20 @@ describe Spaceship::AppVersion do
     end
 
     describe "Pushing the changes back to the server" do
+      
       it "raises an exception if there was an error" do
         itc_stub_invalid_update
         expect {
           version.save!
-        }.to raise_error "Keyword already taken; Name must not be empty"
+        }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line."
+      end
+
+      it "works with valid update data" do
+        itc_stub_valid_update
+
+        expect(client).to receive(:update_app_version!).with('898536088', false, version.raw_data)
+
+        version.save!
       end
     end
   end

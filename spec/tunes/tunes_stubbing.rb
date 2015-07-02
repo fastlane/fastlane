@@ -37,9 +37,14 @@ end
 
 def itc_stub_invalid_update
   # Called from the specs to simulate invalid server responses
-  body = JSON.parse(itc_read_fixture_file('app_version.json'))['data']
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/save/898536088?v=").
          to_return(:status => 200, :body => itc_read_fixture_file('update_app_version_failed.json'), headers: {'Content-Type' => 'application/json'})
+end
+
+def itc_stub_valid_update
+  # Called from the specs to simulate invalid server responses
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/save/898536088?v=").
+         to_return(:status => 200, :body => itc_read_fixture_file('update_app_version_success.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 WebMock.disable_net_connect!
