@@ -81,7 +81,7 @@ module Sigh
                                      description: "The certificate name to use for new profiles, or to renew with. (e.g. \"Felix Krause\")",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :filename,
-                                     short_option: "-f",
+                                     short_option: "-q",
                                      env_name: "SIGH_PROFILE_FILE_NAME",
                                      optional: true,
                                      description: "Filename to use for the generated provisioning profile (must include .mobileprovision)",
