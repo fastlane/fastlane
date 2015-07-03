@@ -9,7 +9,7 @@ module SpecHelper
   
 end
 
-WebMock.disable_net_connect!(:allow => 'coveralls.io')
+WebMock.disable_net_connect!(allow: 'coveralls.io')
 WebMock.allow_net_connect!
 
 RSpec.configure do |config|

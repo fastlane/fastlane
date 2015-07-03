@@ -15,9 +15,9 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :to => 'valid@gmail.com',
-            :message => 'A valid email text',
-            :subject => 'A valid subject'
+            to: 'valid@gmail.com',
+            message: 'A valid email text',
+            subject: 'A valid subject'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_SANDBOX_POSTMASTER given.'.red)
@@ -28,8 +28,8 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :to => 'valid@gmail.com',
-            :message => 'A valid email text'
+            to: 'valid@gmail.com',
+            message: 'A valid email text'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_APIKEY given.'.red)
@@ -39,7 +39,7 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :message => 'A valid email text'
+            message: 'A valid email text'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_TO given.'.red)
@@ -49,7 +49,7 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :to => 'valid@gmail.com'
+            to: 'valid@gmail.com'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_MESSAGE given.'.red)
@@ -60,8 +60,8 @@ describe Fastlane do
         expect {
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
-            :to => 'valid@gmail.com',
-            :message => 'A valid email text'
+            to: 'valid@gmail.com',
+            message: 'A valid email text'
             })
           end").runner.execute(:test)
         }.to raise_exception('No MAILGUN_APP_LINK given.'.red)
