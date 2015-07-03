@@ -29,6 +29,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
   spec.add_dependency 'excon' # HTTP client
 
+  spec.add_dependency 'spaceship', '~> 1.0' # Communication with iTunes Connect
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
