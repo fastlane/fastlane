@@ -3,7 +3,7 @@ module Fastlane
     class LcovAction < Action
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include? platform
       end
 
       def self.run(options)
@@ -22,15 +22,15 @@ module Fastlane
         [
 
           FastlaneCore::ConfigItem.new(key: :project_name,
-                                       env_name: "PROJECT_NAME",
+                                       env_name: "FL_LCOV_PROJECT_NAME",
                                        description: "Name of the project"),
 
           FastlaneCore::ConfigItem.new(key: :scheme,
-                                       env_name: "SCHEME",
+                                       env_name: "FL_LCOV_SCHEME",
                                        description: "Scheme of the project"),
 
           FastlaneCore::ConfigItem.new(key: :output_dir,
-                                       env_name: "OUTPUT_DIR",
+                                       env_name: "FL_LCOV_OUTPUT_DIR",
                                        description: "The output directory that coverage data will be stored. If not passed will use coverage_reports as default value",
                                        optional: true,
                                        is_string: true,
@@ -47,13 +47,13 @@ module Fastlane
       private
         def self.handle_exceptions(options)
             unless (options[:project_name] rescue nil)
-              Helper.log.fatal "Please add 'ENV[\"PROJECT_NAME\"] = \"a_valid_project_name\"' to your Fastfile's `before_all` section.".red
-              raise 'No PROJECT_NAME given.'.red
+              Helper.log.fatal "Please add 'ENV[\"FL_LCOV_PROJECT_NAME\"] = \"a_valid_project_name\"' to your Fastfile's `before_all` section.".red
+              raise 'No FL_LCOV_PROJECT_NAME given.'.red
             end
 
             unless (options[:scheme] rescue nil)
-              Helper.log.fatal "Please add 'ENV[\"SCHEME\"] = \"a_valid_scheme\"' to your Fastfile's `before_all` section.".red
-              raise 'No SCHEME given.'.red
+              Helper.log.fatal "Please add 'ENV[\"FL_LCOV_SCHEME\"] = \"a_valid_scheme\"' to your Fastfile's `before_all` section.".red
+              raise 'No FL_LCOV_SCHEME given.'.red
             end
         end
 
