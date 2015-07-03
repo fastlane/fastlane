@@ -66,6 +66,7 @@ describe Spaceship::AppVersion do
         expect(s1.thumbnail_url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/500x500bb-80.png')
         expect(s1.sort_order).to eq(1)
         expect(s1.original_file_name).to eq('b6a876130fa48da21db6622f08b815b4.png')
+        expect(s1.language).to eq('English')
 
         expect(v.screenshots['English'].count).to eq(8)
 

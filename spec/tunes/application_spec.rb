@@ -89,6 +89,13 @@ describe Spaceship::Application do
         end
       end
 
+      describe "#latest_version" do
+        it "returns the edit_version if available" do
+          app = Spaceship::Application.all.first
+          expect(app.latest_version.class).to eq(Spaceship::Tunes::AppVersion)
+        end
+      end
+
       describe "#live_version" do
         it "there is always a live version" do
           v = Spaceship::Application.all.first.live_version

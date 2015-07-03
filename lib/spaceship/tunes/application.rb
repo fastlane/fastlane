@@ -108,6 +108,12 @@ module Spaceship
         Spaceship::AppVersion.find(self, self.apple_id, false)
       end
 
+      # @return (Spaceship::AppVersion) This will return the `edit_version` if available
+      #   and fallback to the `edit_version`. Use this to just access the latest data
+      def latest_version
+        edit_version || live_version
+      end
+
       # Create a new version of your app
       def create_version!(version_number)
         if edit_version
