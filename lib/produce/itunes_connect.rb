@@ -4,23 +4,22 @@ require 'spaceship'
 module Produce
   class ItunesConnect
     
-    def run(config)
-      @config = config
+    def run
       login
       create_new_app
     end
 
     def create_new_app
       if app_exists?
-        Helper.log.info "App '#{@config[:app_name]}' exists already, nothing to do on iTunes Connect".green
+        Helper.log.info "App '#{Produce.config[:app_name]}' exists already, nothing to do on iTunes Connect".green
         # Nothing to do here
       else
-        Helper.log.info "Creating new app '#{@config[:app_name]}' on iTunes Connect".green
+        Helper.log.info "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect".green
 
-        app_name = @config[:app_name]
-        version = @config[:version]
-        sku = @config[:sku]
-        bundle_id = @config[:bundle_identifier]
+        app_name = Produce.config[:app_name]
+        version = Produce.config[:version]
+        sku = Produce.config[:sku]
+        bundle_id = Produce.config[:bundle_identifier]
 
         # Invoque spaceship
         Spaceship::Tunes::Application.create!(name: app_name, 
@@ -30,7 +29,7 @@ module Produce
 
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless app_exists?
 
-        Helper.log.info "Finished creating new app '#{@config[:app_name]}' on iTunes Connect".green
+        Helper.log.info "Finished creating new app '#{Produce.config[:app_name]}' on iTunes Connect".green
       end
 
       return true
@@ -39,20 +38,15 @@ module Produce
     private
 
       def app_exists?
-        Spaceship::Application.find(@config[:bundle_identifier]) != nil
+        Spaceship::Application.find(Produce.config[:bundle_identifier]) != nil
       end
 
       def wildcard_bundle?
-        return @config[:bundle_identifier].end_with?("*")
+        return Produce.config[:bundle_identifier].end_with?("*")
       end
 
       def login
-        user = ENV["CERT_USERNAME"] || ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-        manager = CredentialsManager::PasswordManager.shared_manager(user)
-
-        ENV["FASTLANE_TEAM_NAME"] ||= ENV['PRODUCE_TEAM_NAME']
-
-        Spaceship::Tunes.login(user, manager.password)
+        Spaceship::Tunes.login(Produce.config[:username], nil)
       end
 
   end

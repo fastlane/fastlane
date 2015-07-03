@@ -5,6 +5,7 @@ $:.push File.expand_path("../../lib", __FILE__)
 require 'produce'
 require 'commander'
 require 'credentials_manager/appfile_config'
+require 'produce/options'
 
 HighLine.track_eof = false
 
@@ -21,24 +22,17 @@ class ProduceApplication
 
     always_trace!
 
-    global_option('-u', '--username STRING', 'Your Apple ID username')
+    FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
 
     command :create do |c|
       c.syntax = 'produce create'
       c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
 
       c.action do |args, options|
-        set_username(options.username)
+        Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
 
         puts Produce::Manager.start_producing
       end
-    end
-
-    def set_username(username)
-      user = username
-      user ||= ENV["PRODUCE_USERNAME"]
-      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)      
-      CredentialsManager::PasswordManager.shared_manager(user) if user
     end
 
     default_command :create
