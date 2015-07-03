@@ -151,7 +151,7 @@ module Spaceship
     def create_version!(app_id, version_number)
       r = request(:post) do |req|
         req.url "ra/apps/version/create/#{app_id}"
-        req.body = {version: version_number.to_s}.to_json
+        req.body = { version: version_number.to_s }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 

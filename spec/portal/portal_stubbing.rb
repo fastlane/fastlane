@@ -14,6 +14,10 @@ def adp_enterprise_stubbing
          with(body: {"pageNumber"=>"1", "pageSize"=>"500", "sort"=>"certRequestStatusCode=asc", "teamId"=>"XXXXXXXXXX", "types"=>"9RQEK7MSXA"},
               headers: {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'myacinfo=abcdef;', 'User-Agent'=>'spaceship'}).
          to_return(status: 200, body: adp_read_fixture_file(File.join("enterprise", "listCertRequests.action.json")), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+         with(:body => {"appIdId"=>"2UMR2S6PAA", "certificateIds"=>["Q82WC5JRE9"], "distributionType"=>"inhouse", "provisioningProfileName"=>"Delete Me", "teamId"=>"XXXXXXXXXX"}).
+         to_return(:status => 200, body: adp_read_fixture_file( 'create_profile_success.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 # Optional: Team Selection
