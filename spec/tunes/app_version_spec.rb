@@ -52,6 +52,27 @@ describe Spaceship::AppVersion do
         expect(Spaceship::Tunes::AppStatus.get_from_string('prepareForUpload')).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
       end
     end
+
+    describe "Screenshots" do
+      it "properly parses all the screenshots" do
+        v = Spaceship::Application.all.first.live_version
+        
+        # This app only has screenshots in the English version
+        expect(v.screenshots['German']).to eq([])
+
+        s1 = v.screenshots['English'].first
+        expect(s1.device_type).to eq('iphone4')
+        expect(s1.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/640x1136ss-80.png')
+        expect(s1.thumbnail_url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/500x500bb-80.png')
+        expect(s1.sort_order).to eq(1)
+        expect(s1.original_file_name).to eq('b6a876130fa48da21db6622f08b815b4.png')
+
+        expect(v.screenshots['English'].count).to eq(8)
+
+        # 2 iPhone 6 Plus Screenshots
+        expect(v.screenshots['English'].find_all { |s| s.device_type == 'iphone6Plus' }.count).to eq(2)
+      end
+    end
   end
 
   describe "Modifying the app version" do

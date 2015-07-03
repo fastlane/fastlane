@@ -97,6 +97,9 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :marketing_url
 
+      # @return Represents the screenshots of this app version (read-only)
+      attr_accessor :screenshots
+
 
       attr_mapping({
         'canBetaTest' => :can_beta_test,
@@ -151,6 +154,37 @@ module Spaceship
         # Properly parse the AppStatus
         status = raw_data['status']
         @app_status = Tunes::AppStatus.get_from_string(status)
+
+        # Setup the screenshots
+        self.screenshots = {}
+        raw_data['details']['value'].each do |row|
+          # Now that's one language right here
+          lang = row['language']
+          self.screenshots[lang] = setup_screenshots(row)
+        end
+      end
+
+      # generates the nested data structure to represent screenshots
+      def setup_screenshots(row)
+        screenshots = row.fetch('screenshots', {}).fetch('value', nil)
+        return [] unless screenshots
+
+        result = []
+
+        screenshots.each do |device_type, value|
+          value['value'].each do |screenshot|
+            screenshot = screenshot['value']
+            result << Tunes::AppScreenshot.new({
+              url: screenshot['url'],
+              thumbnail_url: screenshot['thumbNailUrl'],
+              sort_order: screenshot['sortOrder'],
+              original_file_name: screenshot['originalFileName'],
+              device_type: device_type,
+            })
+          end
+        end
+
+        return result
       end
 
       # Prefill name, keywords, etc...
