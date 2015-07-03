@@ -116,6 +116,10 @@ module Deliver
         user ||= ENV["DELIVER_USERNAME"]
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
         CredentialsManager::PasswordManager.shared_manager(user) if user
+
+        Helper.log.info "Login to iTunes Connect"
+        Spaceship::Tunes.login(user, CredentialsManager::PasswordManager.shared_manager(user).password)
+        Helper.log.info "Login successful"
       end
 
       def determine_ipa

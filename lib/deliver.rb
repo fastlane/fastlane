@@ -17,6 +17,7 @@ require 'deliver/ipa_file_analyser'
 require 'deliver/testflight'
 require 'deliver/commands_generator'
 
+require 'spaceship'
 require 'fastlane_core'
 
 module Deliver
