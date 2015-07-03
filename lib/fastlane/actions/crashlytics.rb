@@ -51,7 +51,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
-                                       description: "Path to your Crashlytics bundle",
+                                       description: "Path to the submit binary in the Crashlytics bundle",
                                        verify_block: Proc.new do |value|
                                         raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exists?(value)
                                        end),
