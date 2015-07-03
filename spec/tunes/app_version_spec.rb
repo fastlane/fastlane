@@ -23,11 +23,10 @@ describe Spaceship::AppVersion do
       expect(version.release_on_approval).to eq(true)
       expect(version.can_beta_test).to eq(true)
       expect(version.supports_apple_watch).to eq(false)
-      # expect(version.app_icon_url).to eq(false)
-      # expect(version.app_icon_original_name).to eq(false)
-      # expect(version.watch_app_icon_url).to eq(false)
-      # expect(version.watch_app_icon_original_name).to eq(false)
-
+      expect(version.app_icon_url).to eq('https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/1024x1024ss-80.png')
+      expect(version.app_icon_original_name).to eq('AppIconFull.png')
+      expect(version.watch_app_icon_url).to eq('https://muycustomurl.com')
+      expect(version.watch_app_icon_original_name).to eq('OriginalName.png')
 
       # Multi Lang
       expect(version.name['English']).to eq('App Name 123')

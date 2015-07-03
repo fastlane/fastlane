@@ -541,10 +541,10 @@
         "watchAppIcon": {
             "value": {
                 "assetToken": null,
-                "url": null,
+                "url": "https://muycustomurl.com",
                 "thumbNailUrl": null,
                 "sortOrder": null,
-                "originalFileName": null
+                "originalFileName": "OriginalName.png"
             },
             "isEditable": false,
             "isRequired": false,
