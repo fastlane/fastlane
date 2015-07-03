@@ -1,4 +1,3 @@
-require 'fastlane_core/itunes_connect/itunes_connect'
 require 'spaceship'
 
 module Produce
