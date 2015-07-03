@@ -159,8 +159,7 @@ module Spaceship
         @screenshots = {}
         raw_data['details']['value'].each do |row|
           # Now that's one language right here
-          lang = row['language']
-          @screenshots[lang] = setup_screenshots(row)
+          @screenshots[row['language']] = setup_screenshots(row)
         end
       end
 
@@ -180,6 +179,7 @@ module Spaceship
               sort_order: screenshot['sortOrder'],
               original_file_name: screenshot['originalFileName'],
               device_type: device_type,
+              language: row['language']
             })
           end
         end
