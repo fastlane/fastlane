@@ -159,13 +159,19 @@ module Spaceship
     #
     # Do not override `initialize` in your own models.
     def initialize(attrs = {})
-      #self.class.remap_keys!(attrs)
       self.class.data_bind!(attrs)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
       self.raw_data = DataHash.new(attrs)
       @client = self.class.client
+      self.setup
+    end
+
+    # This method can be used by subclasses to do additional initialisation 
+    # using the `raw_data`
+    def setup
+      
     end
 
     ##

@@ -13,6 +13,10 @@ module Spaceship
       # @return (String) The copyright information of this app
       attr_accessor :copyright
 
+      # @return (Spaceship::Tunes::AppStatus) What's the current status of this app
+      #   e.g. Waiting for Review, Ready for Sale, ...
+      attr_reader :app_status
+
       # @return (Bool) Is that the version that's currently available in the App Store?
       attr_accessor :is_live
 
@@ -29,8 +33,8 @@ module Spaceship
 
       attr_accessor :secondary_second_sub_category
 
-      # @return (String) App Status (e.g. 'readyForSale')
-      attr_accessor :status
+      # @return (String) App Status (e.g. 'readyForSale'). You should use `app_status` instead
+      attr_accessor :raw_status
 
       # @return (Bool)
       attr_accessor :can_reject_version
@@ -110,7 +114,7 @@ module Spaceship
         'secondaryCategory.value' => :secondary_category,
         'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
         'secondarySecondSubCategory.value' => :secondary_second_sub_category,
-        'status' => :status,
+        'status' => :raw_status,
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'watchAppIcon.value.originalFileName' => :watch_app_icon_original_name,
@@ -141,6 +145,12 @@ module Spaceship
 
           return self.factory(attrs)
         end
+      end
+
+      def setup
+        # Properly parse the AppStatus
+        status = raw_data['status']
+        @app_status = Tunes::AppStatus.get_from_string(status)
       end
 
       # Prefill name, keywords, etc...

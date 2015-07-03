@@ -16,7 +16,7 @@ describe Spaceship::AppVersion do
       expect(version.version_id).to eq(812106519)
       expect(version.primary_category).to eq('MZGenre.Reference')
       expect(version.secondary_category).to eq('MZGenre.Business')
-      expect(version.status).to eq('readyForSale')
+      expect(version.raw_status).to eq('readyForSale')
       expect(version.can_reject_version).to eq(false)
       expect(version.can_prepare_for_upload).to eq(false)
       expect(version.can_send_version_live).to eq(false)
@@ -39,6 +39,19 @@ describe Spaceship::AppVersion do
       expect(version.privacy_url['English']).to eq('http://privacy.sunapps.net')
       expect(version.support_url['German']).to eq('http://url.com')
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
+    end
+
+    describe "App Status" do
+      it "parses readyForSale" do
+        version = Spaceship::Application.all.first.live_version
+
+        expect(version.app_status).to eq("Ready for Sale")
+        expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
+      end
+
+      it "parses readyForSale" do
+        expect(Spaceship::Tunes::AppStatus.get_from_string('prepareForUpload')).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
+      end
     end
   end
 
