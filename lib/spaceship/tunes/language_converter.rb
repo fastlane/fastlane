@@ -32,3 +32,13 @@ module Spaceship
     end
   end
 end
+
+class String
+  def to_language_code
+    Spaceship::Tunes::LanguageConverter.from_itc_to_standard(self)
+  end
+
+  def to_full_language
+    Spaceship::Tunes::LanguageConverter.from_standard_to_itc(self)
+  end
+end

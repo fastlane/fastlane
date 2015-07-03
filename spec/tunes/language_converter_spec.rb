@@ -30,3 +30,17 @@ describe Spaceship::Tunes::LanguageConverter do
     end
   end
 end
+
+describe String do
+  describe "#to_language_code" do
+    it "redirects to the actual converter" do
+      expect("German".to_language_code).to eq("de-DE")
+    end
+  end
+
+  describe "#to_full_language" do
+    it "redirects to the actual converter" do
+      expect("de".to_full_language).to eq("German")
+    end
+  end
+end
