@@ -10,7 +10,6 @@ module Fastlane
         unless Helper.test?
           raise 'lcov not installed, please install using `brew install lcov`'.red if `which lcov`.length == 0
         end
-        handle_exceptions(options)
         gen_cov(options)
       end
 
@@ -45,17 +44,6 @@ module Fastlane
       end
 
       private
-        def self.handle_exceptions(options)
-            unless (options[:project_name] rescue nil)
-              Helper.log.fatal "Please add 'ENV[\"FL_LCOV_PROJECT_NAME\"] = \"a_valid_project_name\"' to your Fastfile's `before_all` section.".red
-              raise 'No FL_LCOV_PROJECT_NAME given.'.red
-            end
-
-            unless (options[:scheme] rescue nil)
-              Helper.log.fatal "Please add 'ENV[\"FL_LCOV_SCHEME\"] = \"a_valid_scheme\"' to your Fastfile's `before_all` section.".red
-              raise 'No FL_LCOV_SCHEME given.'.red
-            end
-        end
 
         def self.gen_cov(options)
           tmp_cov_file = "/tmp/coverage.info"
