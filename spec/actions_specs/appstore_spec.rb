@@ -9,7 +9,7 @@ describe Fastlane do
         
         expect(result[:beta]).to eq(false)
 
-        options = {:force=>false, :skip_deploy=>false, :metadata_only=>false, :deliver_file_path=>"./fastlane/", :beta=>false}
+        options = {force:false, skip_deploy:false, metadata_only:false, deliver_file_path:"./fastlane/", beta:false}
         expect(result.values).to eq(options)
       end
 
@@ -26,7 +26,7 @@ describe Fastlane do
           appstore(skip_deploy: true)
         end").runner.execute(:test)
         
-        expect(result.values).to eq({:force=>false, :skip_deploy=>true, :metadata_only=>false, :deliver_file_path=>"./fastlane/", :beta=>false})
+        expect(result.values).to eq({force:false, skip_deploy:true, metadata_only:false, deliver_file_path:"./fastlane/", beta:false})
       end
 
     end
