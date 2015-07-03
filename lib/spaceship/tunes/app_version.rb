@@ -97,8 +97,8 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :marketing_url
 
-      # @return Represents the screenshots of this app version (read-only)
-      attr_accessor :screenshots
+      # @return (Hash) Represents the screenshots of this app version (read-only)
+      attr_reader :screenshots
 
 
       attr_mapping({
@@ -156,11 +156,11 @@ module Spaceship
         @app_status = Tunes::AppStatus.get_from_string(status)
 
         # Setup the screenshots
-        self.screenshots = {}
+        @screenshots = {}
         raw_data['details']['value'].each do |row|
           # Now that's one language right here
           lang = row['language']
-          self.screenshots[lang] = setup_screenshots(row)
+          @screenshots[lang] = setup_screenshots(row)
         end
       end
 
