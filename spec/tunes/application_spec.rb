@@ -72,6 +72,19 @@ describe Spaceship::Application do
       end
     end
 
+    describe "#resolution_center" do
+      it "when the app was rejected" do
+        itc_stub_resolution_center
+        result = Spaceship::Tunes::Application.all.first.resolution_center
+        expect(result['appNotes']['threads'].first['messages'].first['body']).to include('Your app declares support for audio in the UIBackgroundModes')
+      end
+
+      it "when the app was not rejected" do
+        itc_stub_resolution_center_valid
+        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}})
+      end
+    end
+
     describe "Access app_versions" do
       describe "#edit_version" do
         it "returns nil if there is only a live version" do

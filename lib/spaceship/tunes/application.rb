@@ -90,6 +90,10 @@ module Spaceship
         end
       end
 
+      #####################################################
+      # @!group Getting information
+      #####################################################
+
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful. 
       def live_version
@@ -114,6 +118,17 @@ module Spaceship
         edit_version || live_version
       end
 
+      # @return (Hash) Contains the reason for rejection. 
+      #  if everything is alright, the result will be
+      #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
+      def resolution_center
+        client.get_resolution_center(apple_id)
+      end
+
+      #####################################################
+      # @!group Modifying
+      #####################################################
+     
       # Create a new version of your app
       def create_version!(version_number)
         if edit_version

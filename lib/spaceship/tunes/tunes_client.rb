@@ -158,6 +158,11 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def get_resolution_center(app_id)
+      r = request(:get, "ra/apps/#{app_id}/resolutionCenter?v=latest")
+      data = parse_response(r, 'data')
+    end
+
     #####################################################
     # @!group AppVersions
     #####################################################
