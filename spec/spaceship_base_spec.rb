@@ -22,8 +22,10 @@ describe Spaceship::Base do
       let(:test_class) do
         Class.new(Spaceship::PortalBase) do
           attr_accessor :some_attr_name
+          attr_accessor :nested_attr_name
           attr_mapping({
-            'someAttributeName' => :some_attr_name
+            'someAttributeName' => :some_attr_name,
+            'nestedAttribute.name.value' => :nested_attr_name
           })
         end
       end
@@ -37,6 +39,11 @@ describe Spaceship::Base do
         subclass = Class.new(test_class)
         inst = subclass.new('someAttributeName' => 'some value')
         expect(inst.some_attr_name).to eq('some value')
+      end
+
+      it 'can map nested attributes' do
+        inst = test_class.new({'nestedAttribute' => {'name' => {'value' => 'a value'}}})
+        expect(inst.nested_attr_name).to eq('a value')
       end
     end
 
