@@ -342,6 +342,17 @@ gcovr(
 )
 ```
 
+### [lcov](http://ltp.sourceforge.net/coverage/lcov.php)
+Generate code coverage reports based on lcov.
+
+```ruby
+lcov(
+      project_name: "yourProjectName",
+      scheme: "yourScheme",
+      output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+)
+```
+
 ### [OCLint](http://oclint.org)
 Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
 
@@ -871,7 +882,7 @@ mailgun(
   success: true,
   message: "Mail Body",
   app_link: "http://www.myapplink.com",
-  ci_build_link: "http://www.mycibuildlink.com" 
+  ci_build_link: "http://www.mycibuildlink.com"
 )
 ```
 
