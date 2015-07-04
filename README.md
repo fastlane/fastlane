@@ -116,6 +116,8 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/KrauseFx/fastlane/blob/master/docs).
 
+There is also a [Japanese fastlane guide](http://qiita.com/gin0606/items/162d756dfda7b84e97d4) available.
+
 ## Available commands
 
 Usually you'll use fastlane by triggering individual lanes:
