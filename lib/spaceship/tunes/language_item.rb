@@ -26,6 +26,17 @@ module Spaceship
 
         raise "Language '#{lang}' is not activated for this app version. Use the `create_languages!` method."
       end
+
+      def inspect
+        result = ""
+        self.original_array.collect do |current|
+          result += current['language'] + ": " + current[identifier]['value'] + "\n"
+        end
+        result
+      end
+
+      def to_s
+        inspect
       end
     end
   end
