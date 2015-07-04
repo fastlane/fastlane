@@ -75,21 +75,6 @@ describe Spaceship::Client do
       end
     end
 
-    describe "test timeout catching" do
-      it "should automatically retry the request if there was a timeout" do
-        puts "Testing re-trying behaviour"
-
-        start = Time.now
-        expect(subject.client).to receive(:send).at_least(5).and_raise(Faraday::Error::TimeoutError.new)
-        expect {
-          subject.devices
-        }.to raise_error Faraday::Error::TimeoutError
-
-        diff = Time.now - start
-        expect(diff).to be > 10
-      end
-    end
-
     describe "csrf_tokens" do
       it "uses the stored token for all upcoming requests" do
         # Temporary stub a request to require the csrf_tokens
