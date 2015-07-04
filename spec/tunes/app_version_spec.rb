@@ -38,6 +38,8 @@ describe Spaceship::AppVersion do
       expect(version.privacy_url['English']).to eq('http://privacy.sunapps.net')
       expect(version.support_url['German']).to eq('http://url.com')
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
+      expect(version.release_notes['German']).to eq('Wow, News')
+      expect(version.release_notes['English']).to eq('Also News')
     end
 
     describe "App Status" do

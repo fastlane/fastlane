@@ -235,7 +235,7 @@
                     "language": "German",
                     "detailId": "1166839124",
                     "releaseNotes": {
-                        "value": null,
+                        "value": "Wow, News",
                         "isEditable": false,
                         "isRequired": false,
                         "errorKeys": null
@@ -285,7 +285,7 @@
                     "language": "English",
                     "detailId": "1166878681",
                     "releaseNotes": {
-                        "value": null,
+                        "value": "Also News",
                         "isEditable": false,
                         "isRequired": false,
                         "errorKeys": null
