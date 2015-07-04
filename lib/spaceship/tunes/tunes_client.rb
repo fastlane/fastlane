@@ -58,7 +58,6 @@ module Spaceship
           raise InvalidUserCredentialsError.new(response)
         end
         
-
         return @client
       else
         # User Credentials are wrong
@@ -70,9 +69,9 @@ module Spaceship
       return unless data
       return unless data.kind_of?Hash
  
-      if data['sectionErrorKeys'].count == 0 and
-        data['sectionInfoKeys'].count == 0 and 
-        data['sectionWarningKeys'].count == 0
+      if data.fetch('sectionErrorKeys', []).count == 0 and
+        data.fetch('sectionInfoKeys', []).count == 0 and 
+        data.fetch('sectionWarningKeys', []).count == 0
         
         logger.debug("Request was successful")
       end
@@ -98,10 +97,17 @@ module Spaceship
       end
 
       errors = handle_response_hash(data)
+
+      # Sometimes there is a different kind of error in the JSON response
+      different_error = data.fetch('messages', {}).fetch('error', nil)
+      errors << different_error if different_error
+
       raise errors.join(' ') if errors.count > 0 # they are separated by `.` by default
 
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
+
+      return data
     end
 
 
