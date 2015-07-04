@@ -1,6 +1,6 @@
 module Spaceship
   module Tunes
-    # Represents one attribute (e.g. name) of an app in multiple langauges
+    # Represents one attribute (e.g. name) of an app in multiple languages
     class LanguageItem
       attr_accessor :identifier # title or description
       attr_accessor :original_array # reference to original array
@@ -19,9 +19,13 @@ module Spaceship
       end
 
       def get_lang(lang)
-        self.original_array.find do |current|
+        result = self.original_array.find do |current|
           current['language'] == lang
         end
+        return result if result
+
+        raise "Language '#{lang}' is not activated for this app version. Use the `create_languages!` method."
+      end
       end
     end
   end

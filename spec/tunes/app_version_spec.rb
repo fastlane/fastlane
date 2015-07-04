@@ -111,5 +111,13 @@ describe Spaceship::AppVersion do
         version.save!
       end
     end
+
+    describe "Accessing different languages", now: true do
+      it "raises an exception if language is not available" do
+        expect {
+          version.name["English_CA"]
+        }.to raise_error "Language 'English_CA' is not activated for this app version. Use the `create_languages!` method."
+      end
+    end
   end
 end
