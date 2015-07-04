@@ -35,7 +35,7 @@ module Produce
                                      env_name: "PRODUCE_LANGUAGE",
                                      description: "Primary Language (e.g. 'English', 'German')",
                                      verify_block: Proc.new do |language|
-                                       AvailableDefaultLanguages.all_languages.include?(language)
+                                       raise "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}".red unless AvailableDefaultLanguages.all_languages.include?(language)
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
