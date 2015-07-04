@@ -40,13 +40,13 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
                                      env_name: "PRODUCE_SKIP_ITC",
-                                     description: "Skip ITC",
+                                     description: "Skip the creation of the app on iTunes Connect",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_devcenter,
                                      short_option: "-d",
                                      env_name: "PRODUCE_SKIP_DEVCENTER",
-                                     description: "Skip Developer Center",
+                                     description: "Skip the creation of the app on the Apple Developer Portal",
                                      is_string: false,
                                      default_value: false)
         
