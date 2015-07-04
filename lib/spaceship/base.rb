@@ -42,6 +42,10 @@ module Spaceship
           DataHash.new(@hash[head]).lookup(tail)
         end
       end
+
+      def to_json
+        @hash.to_json
+      end
     end
 
     class << self
