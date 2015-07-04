@@ -97,6 +97,7 @@ module Spaceship
       end
 
       errors = handle_response_hash(data)
+      errors = errors + data.fetch('sectionErrorKeys') if data.fetch('sectionErrorKeys')
 
       # Sometimes there is a different kind of error in the JSON response
       different_error = data.fetch('messages', {}).fetch('error', nil)
