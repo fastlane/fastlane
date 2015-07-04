@@ -31,7 +31,7 @@ describe Spaceship::TunesClient do
       data = JSON.parse(itc_read_fixture_file('update_app_version_failed.json'))['data']
       expect {
         subject.handle_itc_response(data)
-      }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line."
+      }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
     end
 
     it "does nothing if everything works as expected and returns the original data" do

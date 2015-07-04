@@ -97,12 +97,11 @@ describe Spaceship::AppVersion do
     end
 
     describe "Pushing the changes back to the server" do
-      
       it "raises an exception if there was an error" do
         itc_stub_invalid_update
         expect {
           version.save!
-        }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line."
+        }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
       end
 
       it "works with valid update data" do
@@ -112,12 +111,18 @@ describe Spaceship::AppVersion do
       end
     end
 
-    describe "Accessing different languages", now: true do
+    describe "Accessing different languages" do
       it "raises an exception if language is not available" do
         expect {
           version.name["English_CA"]
-        }.to raise_error "Language 'English_CA' is not activated for this app version. Use the `create_languages!` method."
+        }.to raise_error "Language 'English_CA' is not activated for this app version."
       end
+
+      # it "allows the creation of a new language" do
+      #   version.create_languages!(['German', 'English_CA'])
+      #   expect(version.name['German']).to eq("yep, that's the name")
+      #   expect(version.name['English_CA']).to eq("yep, that's the name")
+      # end
     end
   end
 end

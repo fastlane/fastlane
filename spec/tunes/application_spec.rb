@@ -68,7 +68,7 @@ describe Spaceship::Application do
                                                 version: "1.0", 
                                                 sku: "SKU123", 
                                                 bundle_id: "net.sunapps.123")
-        }.to raise_error "You must choose a primary language."
+        }.to raise_error "You must choose a primary language. You must choose a primary language."
       end
     end
 

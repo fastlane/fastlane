@@ -153,6 +153,51 @@ module Spaceship
         end
       end
 
+      # @return (Bool) Is that version currently available in the App Store?
+      def is_live?
+        is_live
+      end
+
+      # Call this method to make sure the given languages are available for this app
+      # You should call this method before accessing the name, description and other localized values
+      # This will create the new language if it's not available yet and do nothing if everything's there
+      # def create_languages!(languages)
+      #   raise "Please pass an array" unless languages.kind_of?Array
+
+      #   copy_from = self.languages.first
+      #   languages.each do |language|
+      #     # First, see if it's already available
+      #     found = self.languages.find do |local|
+      #       local['language'] == language
+      #     end
+
+      #     unless found
+      #       new_language = copy_from.dup
+      #       new_language['language'] = language
+      #       [:description, :releaseNotes, :keywords].each do |key|
+      #         new_language[key.to_s]['value'] = nil
+      #       end
+
+      #       self.languages << new_language
+      #       unfold_languages
+
+      #       # Now we need to set a useless `pageLanguageValue` value because iTC says so, after adding a new version
+      #       self.languages.each do |current|
+      #         current['pageLanguageValue'] = current['language']
+      #       end
+      #     end
+      #   end
+
+      #   languages
+      # end
+
+      # Push all changes that were made back to iTunes Connect
+      def save!
+        client.update_app_version!(application.apple_id, is_live?, raw_data)
+      end
+
+
+      # Private methods
       def setup
         # Properly parse the AppStatus
         status = raw_data['status']
@@ -166,29 +211,6 @@ module Spaceship
         end
       end
 
-      # generates the nested data structure to represent screenshots
-      def setup_screenshots(row)
-        screenshots = row.fetch('screenshots', {}).fetch('value', nil)
-        return [] unless screenshots
-
-        result = []
-
-        screenshots.each do |device_type, value|
-          value['value'].each do |screenshot|
-            screenshot = screenshot['value']
-            result << Tunes::AppScreenshot.new({
-              url: screenshot['url'],
-              thumbnail_url: screenshot['thumbNailUrl'],
-              sort_order: screenshot['sortOrder'],
-              original_file_name: screenshot['originalFileName'],
-              device_type: device_type,
-              language: row['language']
-            })
-          end
-        end
-
-        return result
-      end
 
       # Prefill name, keywords, etc...
       def unfold_languages
@@ -212,15 +234,30 @@ module Spaceship
         self.supports_apple_watch = (supports_apple_watch != nil)
       end
 
-      # @return (Bool) Is that version currently available in the App Store?
-      def is_live?
-        is_live
-      end
+      private
+        # generates the nested data structure to represent screenshots
+        def setup_screenshots(row)
+          screenshots = row.fetch('screenshots', {}).fetch('value', nil)
+          return [] unless screenshots
 
-      # Push all changes that were made back to iTunes Connect
-      def save!
-        client.update_app_version!(application.apple_id, is_live?, raw_data)
-      end
+          result = []
+
+          screenshots.each do |device_type, value|
+            value['value'].each do |screenshot|
+              screenshot = screenshot['value']
+              result << Tunes::AppScreenshot.new({
+                url: screenshot['url'],
+                thumbnail_url: screenshot['thumbNailUrl'],
+                sort_order: screenshot['sortOrder'],
+                original_file_name: screenshot['originalFileName'],
+                device_type: device_type,
+                language: row['language']
+              })
+            end
+          end
+
+          return result
+        end
     end
   end
 end

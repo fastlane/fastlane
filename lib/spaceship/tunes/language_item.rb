@@ -24,7 +24,7 @@ module Spaceship
         end
         return result if result
 
-        raise "Language '#{lang}' is not activated for this app version. Use the `create_languages!` method."
+        raise "Language '#{lang}' is not activated for this app version."
       end
 
       def inspect
