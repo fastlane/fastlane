@@ -187,9 +187,9 @@ module Fastlane
         )
         bucket = s3_client.buckets[s3_bucket]
 
-        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, :acl => :public_read)
-        html_obj = bucket.objects.create(html_file_name, html_render.to_s, :acl => :public_read)
-        version_obj = bucket.objects.create(version_file_name, version_render.to_s, :acl => :public_read)
+        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
+        html_obj = bucket.objects.create(html_file_name, html_render.to_s, acl: :public_read)
+        version_obj = bucket.objects.create(version_file_name, version_render.to_s, acl: :public_read)
 
         # Setting actionand environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s

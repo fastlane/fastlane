@@ -119,10 +119,10 @@ module Fastlane
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-            :from => "Mailgun Sandbox<#{options[:postmaster]}>",
-            :to => "#{options[:to]}",
-            :subject => options[:subject],
-            :html => mail_teplate(options)
+            from: "Mailgun Sandbox<#{options[:postmaster]}>",
+            to: "#{options[:to]}",
+            subject: options[:subject],
+            html: mail_teplate(options)
         mail_teplate(options)
       end
 

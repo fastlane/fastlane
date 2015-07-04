@@ -30,7 +30,7 @@ describe Fastlane do
 
         it "Uses the default platform if given" do
           ff = Fastlane::LaneManager.cruise_lane(nil, 'empty') # look, without `ios`
-          expect(ff.runner.description_blocks).to eq({nil=>{:test=>"", :anotherroot=>""}, :ios=>{:beta=>"", :empty=>"", :crashy=>""}})
+          expect(ff.runner.description_blocks).to eq({nil=>{test:"", anotherroot:""}, ios:{beta:"", empty:"", crashy:""}})
         end
       end
     end

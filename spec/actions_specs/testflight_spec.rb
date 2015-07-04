@@ -7,7 +7,7 @@ describe Fastlane do
         end").runner.execute(:test)
         
         expect(result[:beta]).to eq(true)
-        expect(result.values).to eq({:skip_deploy=>false, :beta=>true, :force=>false, :metadata_only=>false, :deliver_file_path=>"./fastlane/"})
+        expect(result.values).to eq({skip_deploy:false, beta:true, force:false, metadata_only:false, deliver_file_path:"./fastlane/"})
       end
 
       it "uses the passed skip_deploy value if given" do
@@ -15,7 +15,7 @@ describe Fastlane do
           testflight(skip_deploy: true)
         end").runner.execute(:test)
         
-        expect(result.values).to eq({:skip_deploy=>true, :beta=>true, :force=>false, :metadata_only=>false, :deliver_file_path=>"./fastlane/"})
+        expect(result.values).to eq({skip_deploy:true, beta:true, force:false, metadata_only:false, deliver_file_path:"./fastlane/"})
       end
     end
   end
