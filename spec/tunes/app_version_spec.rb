@@ -105,9 +105,7 @@ describe Spaceship::AppVersion do
 
       it "works with valid update data" do
         itc_stub_valid_update
-
         expect(client).to receive(:update_app_version!).with('898536088', false, version.raw_data)
-
         version.save!
       end
     end
