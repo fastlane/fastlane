@@ -150,7 +150,7 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-
+        
       data = parse_response(r, 'data')
       handle_itc_response(data)
     end
