@@ -196,5 +196,17 @@ module Spaceship
       
       handle_itc_response(r.body['data'])
     end
+
+    #####################################################
+    # @!group Build Trains
+    #####################################################
+
+    def build_trains(app_id)
+      raise "app_id is required" unless app_id
+
+      r = request(:get, "ra/apps/#{app_id}/trains/")
+      data = parse_response(r, 'data')
+    end
+
   end
 end

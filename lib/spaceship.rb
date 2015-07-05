@@ -22,6 +22,7 @@ module Spaceship
   # iTunes Connect
   AppVersion = Spaceship::Tunes::AppVersion
   Application = Spaceship::Tunes::Application
+  BuildTrain = Spaceship::Tunes::BuildTrain
 
 end
 

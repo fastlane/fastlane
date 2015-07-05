@@ -140,7 +140,6 @@ module Spaceship
           return obj
         end
 
-        # @return (Array) Returns all apps available for this account
         # @param application (Spaceship::Tunes::Application) The app this version is for
         # @param app_id (String) The unique Apple ID of this app
         # @param is_live (Boolean) Is that the version that's live in the App Store?

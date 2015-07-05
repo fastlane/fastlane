@@ -141,6 +141,15 @@ module Spaceship
         # otherwise `edit_version` will return nil
         # TODO: implemented -reload method
       end
+
+      #####################################################
+      # @!group Builds
+      #####################################################
+
+      # A reference to all the build trains
+      def build_trains
+        Tunes::BuildTrain.all(self, self.apple_id)
+      end
     end
   end
 end
