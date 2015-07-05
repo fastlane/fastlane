@@ -19,8 +19,6 @@ module FastlaneCore
         end
       end
 
-      ids = []
-
       return ids
     end
 
