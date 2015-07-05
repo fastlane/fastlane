@@ -30,7 +30,7 @@ module Spaceship
       def inspect
         result = ""
         self.original_array.collect do |current|
-          result += current['language'] + ": " + current[identifier]['value'] + "\n"
+          result += "#{current.fetch('language')}: #{current.fetch(identifier, {}).fetch('value')}\n"
         end
         result
       end
