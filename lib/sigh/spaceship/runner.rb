@@ -36,10 +36,7 @@ module Sigh
 
       raise "Something went wrong fetching the latest profile".red unless profile
 
-      path = download_profile(profile)
-      store_provisioning_id_in_environment(path)
-
-      return path
+      return download_profile(profile)
     end
 
     # The kind of provisioning profile we're interested in
@@ -119,7 +116,7 @@ module Sigh
         true
       end
 
-      if certificates.count > 1
+      if certificates.count > 1 and not Sigh.config[:development]
         Helper.log.info "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options.".yellow
         Helper.log.info "Available Code Signing Identities for current filters:".green
         certificates.each do |c|
@@ -135,6 +132,7 @@ module Sigh
         raise "Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)".red
       end
 
+      return certificates if Sigh.config[:development] # development profiles support multiple certificates
       return certificates.first
     end
 
@@ -151,13 +149,6 @@ module Sigh
 
       Helper.log.info "Successfully downloaded provisioning profile...".green
       return output_path
-    end
-
-    # Store the profile ID into the environment
-    def store_provisioning_id_in_environment(path)
-      require 'sigh/profile_analyser'
-      udid = Sigh::ProfileAnalyser.run(path)
-      ENV["SIGH_UDID"] = udid if udid
     end
   end
 end
