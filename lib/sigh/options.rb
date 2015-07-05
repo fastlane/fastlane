@@ -93,6 +93,12 @@ module Sigh
                                      description: "Skips the verification of existing profiles which is useful if you have thousands of profiles",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_certificate_verification,
+                                     short_option: '-z',
+                                     env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
+                                     description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine.",
+                                     is_string: false,
+                                     default_value: false),
       ]
     end
   end

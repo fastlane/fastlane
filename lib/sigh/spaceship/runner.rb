@@ -57,7 +57,22 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       Helper.log.info "Fetching profiles..."
-      profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
+
+      return results if Sigh.config[:skip_certificate_verification]
+
+
+      return results.find_all do |a|
+        # Also make sure we have the certificate installed on the local machine
+        installed = false
+        a.certificates.each do |cert|
+          file = Tempfile.new('cert')
+          file.write(cert.download_raw)
+          file.close
+          installed = true if FastlaneCore::CertChecker.is_installed?(file.path)
+        end
+        installed
+      end
     end
 
     # Create a new profile and return it
