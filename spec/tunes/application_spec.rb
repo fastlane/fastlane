@@ -70,6 +70,16 @@ describe Spaceship::Application do
                                                 bundle_id: "net.sunapps.123")
         }.to raise_error "You must choose a primary language. You must choose a primary language."
       end
+
+      it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
+        itc_stub_broken_create_wildcard
+        expect {
+          Spaceship::Tunes::Application.create!(name: "My Name", 
+                                                version: "1.0", 
+                                                sku: "SKU123", 
+                                                bundle_id: "net.sunapps.*")
+        }.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+      end
     end
 
     describe "#resolution_center" do
