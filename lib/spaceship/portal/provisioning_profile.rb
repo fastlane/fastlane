@@ -186,7 +186,8 @@ module Spaceship
         # @param name (String): The name of the provisioning profile on the Dev Portal
         # @param bundle_id (String): The app identifier, this paramter is required
         # @param certificate (Certificate): The certificate that should be used with this
-        #  provisioning profile
+        #   provisioning profile. You can also pass an array of certificates to this method. This will
+        #   only work for development profiles
         # @param devices (Array) (optional): An array of Device objects that should be used in this profile.
         #  It is recommend to not pass devices as spaceship will automatically add all devices for AdHoc
         #  and Development profiles and add none for AppStore and Enterprise Profiles
@@ -203,6 +204,9 @@ module Spaceship
 
           devices = [] if self == AppStore # App Store Profiles MUST NOT have devices
 
+          certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of?Array
+          certificate_parameter ||= [certificate.id]
+
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all devices by default
@@ -213,7 +217,7 @@ module Spaceship
           profile = client.create_provisioning_profile!(name,
                                                 self.type,
                                                 app.app_id,
-                                                [certificate.id],
+                                                certificate_parameter,
                                                 devices.map {|d| d.id} )
           self.new(profile)
         end
