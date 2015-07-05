@@ -208,5 +208,45 @@ module Spaceship
       data = parse_response(r, 'data')
     end
 
+    #####################################################
+    # @!group Applications
+    #####################################################
+    def external_testers
+      r = request(:get, 'ra/users/pre/ext')
+      parse_response(r, 'data')['testers']
+    end
+
+    def create_external_tester!(email: nil, first_name: nil, last_name: nil) 
+
+      data = {
+        testers: [
+          {
+            email_address: {
+              value: email
+            }, 
+            first_name: {
+              value: first_name
+            },
+            last_name: {
+              value: last_name
+            },
+            testing: {
+              value: true
+            }
+          }
+        ]
+      }
+
+      # Now send back the modified hash
+      r = request(:post) do |req|
+        req.url 'ra/users/pre/create'
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+        
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+
+    end
   end
 end
