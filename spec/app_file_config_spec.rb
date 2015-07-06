@@ -67,6 +67,24 @@ describe CredentialsManager do
       end
     end
 
+    describe "#load_using_blocks" do
+      it "can load Appfile configurations if the setters are passed blocks instead of values." do
+        ENV["FASTLANE_PLATFORM_NAME"] = nil
+        ENV["FASTLANE_LANE_NAME"] = nil
+
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:apple_id]).to eq('felix@sunapps.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:app_identifier]).to eq('net.sunapps.1')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:team_id]).to eq('Q2CBPJ58CC')
+
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+        ENV["FASTLANE_LANE_NAME"] = :enterprise.to_s
+
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:apple_id]).to eq('fabio@sunapps.ios.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:app_identifier]).to eq('net.sunapps.ios.enterprise')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile5').data[:team_id]).to eq('Q2CBPJ58AA')
+      end
+    end
+
 
     describe "#load_default_configuration_no_lane_or_configuration_found" do
       it "loads Appfile default values for current platform and lane if no override is found" do
