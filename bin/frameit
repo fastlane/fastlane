@@ -20,6 +20,7 @@ class FrameItApplication
 
     always_trace!
 
+    global_option('--verbose') { $verbose = true }
 
     default_command :black
 
