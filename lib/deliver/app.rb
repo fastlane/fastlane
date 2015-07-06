@@ -126,7 +126,15 @@ module Deliver
     # @param version_number (String) the version number as string for 
     # the new version that should be created
     def create_new_version!(version_number)
-      itc.create_new_version!(self, version_number)
+      if (v = spaceship_ref.edit_version)
+        # Version is already there, make sure it matches the one we want to create
+        Helper.log.info "Changing existing version number from '#{v.version}' to '#{version_number}'"
+        v.version = version_number
+        v.save!
+      else
+        # No version created yet, creating it now
+        spaceship_ref.create_version!(version_number)
+      end
     end
 
     # This method has to be called, after modifying the values of .metadata.
