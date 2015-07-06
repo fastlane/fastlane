@@ -28,6 +28,7 @@ module Frameit
             screenshot.frame!
           rescue => ex
             Helper.log.error ex
+            Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}"
           end
         end
       else 
