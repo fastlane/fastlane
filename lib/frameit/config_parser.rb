@@ -70,7 +70,7 @@ module Frameit
 
             value.each do |current|
               raise "You must specify a font path" if current.fetch('font', '').length == 0
-              raise "Could not find font at path '#{File.expand_path(value)}'" unless File.exists?current.fetch('font')
+              raise "Could not find font at path '#{File.expand_path(current.fetch('font'))}'" unless File.exists?current.fetch('font')
               raise "`supported` must be an array" unless current.fetch('supported', []).kind_of?Array
             end
           end
