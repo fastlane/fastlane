@@ -192,10 +192,12 @@ module Frameit
             i.resize "#{max_width}x#{image_height}!" # `!` says it should ignore the ratio
           end
 
+          current_font = font(key)
+          Helper.log.debug "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
+
           # Add the actual title
-          font = fetch_config[key.to_s]['font']
           title_image.combine_options do |i|
-            i.font font if font
+            i.font current_font if current_font
             i.gravity "Center"
             i.pointsize actual_font_size
             i.draw "text 0,0 '#{fetch_text(key)}'"
@@ -243,5 +245,30 @@ module Frameit
         return result
       end
 
+      # The font we want to use
+      def font(key)
+        single_font = fetch_config[key.to_s]['font']
+        return single_font if single_font
+
+        fonts = fetch_config[key.to_s]['fonts']
+        if fonts
+          fonts.each do |font|
+            if font['supported']
+              font['supported'].each do |language|
+                if screenshot.path.include?language
+                  return font["font"]
+                end
+              end
+            else
+              # No `supported` array, this will always be true
+              Helper.log.debug "Found a font with no list of supported languages, using this now" if $verbose
+              return font["font"]
+            end
+          end
+        end
+
+        Helper.log.debug "No custom font specified, using the default one" if $verbose
+        return nil
+      end
   end
 end
