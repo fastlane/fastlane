@@ -158,7 +158,11 @@ module Spaceship
 
       # A reference to all testers
       def testers
-        Tunes::Tester.find_by_app(self.apple_id)
+        Tunes::Tester.all_by_app(self.apple_id)
+      end
+
+      def find_tester(identifier)
+        Tunes::Tester.find_by_app(self.apple_id, identifier)
       end
     end
   end

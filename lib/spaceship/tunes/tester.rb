@@ -39,23 +39,29 @@ module Spaceship
 
         def create!(email: nil, first_name: nil, last_name: nil) 
           client.create_tester!(email: email,
-                                    first_name: first_name,
-                                     last_name: last_name)
+                           first_name: first_name,
+                            last_name: last_name)
         end
 
         #####################################################
         # @!group App
         #####################################################
-        def find_by_app(app_id) 
+        def all_by_app(app_id) 
           client.testers_by_app(app_id).map { |tester| self.factory(tester) }
+        end
+
+        def find_by_app(app_id, identifier)
+          all_by_app(app_id).find do |tester|
+            (tester.tester_id == identifier.to_s or tester.email == identifier)
+          end
         end
       end
 
       #####################################################
       # @!group App
       #####################################################
-      def remove_from_app(app_id)
-        client.remove_tester_from_app(self, app_id)
+      def remove_from_app!(app_id)
+        client.remove_tester_from_app!(self, app_id)
       end
     end
   end

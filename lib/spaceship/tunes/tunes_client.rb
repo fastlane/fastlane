@@ -226,13 +226,13 @@ module Spaceship
       data = {
         testers: [
           {
-            email_address: {
+            emailAddress: {
               value: email
             }, 
-            first_name: {
+            firstName: {
               value: first_name
             },
-            last_name: {
+            lastName: {
               value: last_name
             },
             testing: {
@@ -242,45 +242,32 @@ module Spaceship
         ]
       }
 
-      # Now send back the modified hash
       r = request(:post) do |req|
         req.url 'ra/users/pre/create'
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-        
-      data = parse_response(r, 'data')
+
+      data = parse_response(r, 'data')['testers']
       handle_itc_response(data)
     end
 
-    def remove_tester_from_app(tester, app_id)
+    def remove_tester_from_app!(tester, app_id)
       # TODO: Get struct from the api
       data = {
         users: [
           {
-            email_address: {
-              value: tester.email,
-              isEditable: true,
-              isRequired: true,
-              errorKeys: nil
+            emailAddress: {
+              value: tester.email
             }, 
-            first_name: {
-              value: tester.first_name,
-              isEditable: true,
-              isRequired: false,
-              errorKeys: nil
+            firstName: {
+              value: tester.first_name
             },
-            last_name: {
-              value: tester.last_name,
-              isEditable: true,
-              isRequired: false,
-              errorKeys: nil
+            lastName: {
+              value: tester.last_name
             },
             testing: {
-              value: false,
-              isEditable: true,
-              isRequired: false,
-              errorKeys: nil
+              value: false
             }
           }
         ]
