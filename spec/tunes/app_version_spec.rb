@@ -22,6 +22,7 @@ describe Spaceship::AppVersion do
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
       expect(version.can_beta_test).to eq(true)
+      expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
       expect(version.app_icon_url).to eq('https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/1024x1024ss-80.png')
       expect(version.app_icon_original_name).to eq('AppIconFull.png')
