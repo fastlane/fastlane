@@ -10,12 +10,6 @@ end
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
     let (:name) { 'deliver' }
-    describe "#verify_latest_version" do
-      it "checks for the latest version" do
-        mock_ruby_gems_response("0.3")
-        expect(FastlaneCore::UpdateChecker.verify_latest_version(name, '0.9.11')).to eq(true)
-      end
-    end
 
     describe "#update_available?" do
       it "no update is available" do
@@ -26,7 +20,6 @@ describe FastlaneCore do
       it "new update is available" do
         mock_ruby_gems_response("999.0")
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.11')).to eq(true)
-        FastlaneCore::UpdateChecker.verify_latest_version(name, '0.9.11')
       end
 
       it "same version" do
