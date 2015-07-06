@@ -41,6 +41,8 @@ module FastlaneCore
       @@results ||= {}
     end
 
+    # Legacy Code:
+    # 
     # Is a new official release available (this does not include pre-releases)
     def self.update_available?(gem_name, current_version)
       begin
@@ -57,6 +59,7 @@ module FastlaneCore
     # Relevant code
     def self.fetch_latest(gem_name)
       url = UPDATE_URL + gem_name
+      url += "?ci=1" if Helper.is_ci?
       JSON.parse(open(url).read)["version"]
     end
   end
