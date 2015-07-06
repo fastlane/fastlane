@@ -1,0 +1,54 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "users": [
+      {
+        "testing": {
+          "value": true,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "id": null,
+        "testerId": "607102b1-b7d7-4dac-9371-6335261036e1",
+        "firstName": {
+          "value": "Mathias",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "lastName": {
+          "value": "Carignani",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "emailAddress": {
+          "value": "mathcarignani@gmail.com.com",
+          "isEditable": true,
+          "isRequired": true,
+          "errorKeys": null
+        },
+        "status": "added",
+        "statusModTime": 1436145486442,
+        "sessions": null,
+        "crashes": null,
+        "latestBuild": null,
+        "latestInstallByPlatform": {},
+        "groups": null
+      }
+    ],
+    "maxTestingUsers": 1000,
+    "addingWillInvite": false,
+    "addingWillInviteByPlatform": null,
+    "groups": {}
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

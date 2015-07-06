@@ -209,15 +209,20 @@ module Spaceship
     end
 
     #####################################################
-    # @!group Applications
+    # @!group Testers
     #####################################################
-    def external_testers
-      r = request(:get, 'ra/users/pre/ext')
+    def testers
+      r = request(:get, "ra/users/pre/ext")
       parse_response(r, 'data')['testers']
     end
 
-    def create_external_tester!(email: nil, first_name: nil, last_name: nil) 
+    def testers_by_app(app_id) 
+      r = request(:get, "ra/user/externalTesters/#{app_id}/")
+      parse_response(r, 'data')['users']
+    end
 
+    def create_tester!(email: nil, first_name: nil, last_name: nil) 
+      # TODO: Get struct from the api
       data = {
         testers: [
           {
@@ -246,7 +251,49 @@ module Spaceship
         
       data = parse_response(r, 'data')
       handle_itc_response(data)
+    end
 
+    def remove_tester_from_app(tester, app_id)
+      # TODO: Get struct from the api
+      data = {
+        users: [
+          {
+            email_address: {
+              value: tester.email,
+              isEditable: true,
+              isRequired: true,
+              errorKeys: nil
+            }, 
+            first_name: {
+              value: tester.first_name,
+              isEditable: true,
+              isRequired: false,
+              errorKeys: nil
+            },
+            last_name: {
+              value: tester.last_name,
+              isEditable: true,
+              isRequired: false,
+              errorKeys: nil
+            },
+            testing: {
+              value: false,
+              isEditable: true,
+              isRequired: false,
+              errorKeys: nil
+            }
+          }
+        ]
+      }
+
+      r = request(:post) do |req|
+        req.url "ra/user/externalTesters/#{app_id}/"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+        
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
     end
   end
 end

@@ -151,6 +151,15 @@ module Spaceship
       def build_trains
         Tunes::BuildTrain.all(self, self.apple_id)
       end
+
+      #####################################################
+      # @!group Testers
+      #####################################################
+
+      # A reference to all testers
+      def testers
+        Tunes::Tester.find_by_app(self.apple_id)
+      end
     end
   end
 end

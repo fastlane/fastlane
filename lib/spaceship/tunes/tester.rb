@@ -1,6 +1,6 @@
 module Spaceship
   module Tunes
-    class ExternalTester < TunesBase
+    class Tester < TunesBase
 
       attr_accessor :tester_id
 
@@ -26,22 +26,36 @@ module Spaceship
 
         # @return (Array) Returns all beta testers available for this account
         def all
-          client.external_testers.map { |external_tester| self.factory(external_tester) }
+          client.testers.map { |tester| self.factory(tester) }
         end
 
         # @return (Spaceship::Tunes::ExternalTester) Returns the external tester matching the parameter
         #   as either the Tester id or email
         def find(identifier)
-          all.find do |external_tester|
-            (external_tester.tester_id == identifier.to_s or external_tester.email == identifier)
+          all.find do |tester|
+            (tester.tester_id == identifier.to_s or tester.email == identifier)
           end
         end
 
         def create!(email: nil, first_name: nil, last_name: nil) 
-          client.create_external_tester!(email: email,
+          client.create_tester!(email: email,
                                     first_name: first_name,
                                      last_name: last_name)
         end
+
+        #####################################################
+        # @!group App
+        #####################################################
+        def find_by_app(app_id) 
+          client.testers_by_app(app_id).map { |tester| self.factory(tester) }
+        end
+      end
+
+      #####################################################
+      # @!group App
+      #####################################################
+      def remove_from_app(app_id)
+        client.remove_tester_from_app(self, app_id)
       end
     end
   end
