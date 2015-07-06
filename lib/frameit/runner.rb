@@ -15,7 +15,7 @@ module Frameit
     end
 
     def run(path, color = Color::BLACK)
-      screenshots = Dir.glob("#{path}/**/*.{png,PNG}")
+      screenshots = Dir.glob("#{path}/**/*.{png,PNG}").uniq # uniq because thanks to {png,PNG} there are duplicates
 
       if screenshots.count > 0
         screenshots.each do |full_path|
