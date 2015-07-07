@@ -41,11 +41,14 @@ module Frameit
       values.each do |key, value|
         if value.kind_of?Hash
           change_paths_to_absolutes!(value) # recursive call
+        elsif value.kind_of?Array
+          value.each do |current|
+            change_paths_to_absolutes!(current) if current.kind_of?Hash # recursive call
+          end
         else
           if ['font', 'background'].include?key
             # Change the paths to relative ones
             # `replace`: to change the content of the string, so it's actually stored
-
             if @path # where is the config file. We don't have a config file in tests
               containing_folder = File.expand_path('..', @path) 
               value.replace File.join(containing_folder, value)
