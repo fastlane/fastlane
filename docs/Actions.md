@@ -395,6 +395,8 @@ If you want to use a different Apple ID for iTunes Connect in `deliver`, just ad
 email "itunes@connect.com"
 ```
 
+If you only want to upload a binary without any metadata, use `deliver(beta: true, skip_deploy: true)`
+
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
 ### TestFlight
