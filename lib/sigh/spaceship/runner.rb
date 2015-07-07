@@ -20,11 +20,11 @@ module Sigh
         profile = profiles.first
 
         if Sigh.config[:force]
-          unless profile_type == Spaceship.provisioning_profile::AppStore
+          if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
+            Helper.log.info "Updating the provisioning profile".yellow
+          else
             Helper.log.info "Updating the profile to include all devices".yellow
             profile.devices = Spaceship.device.all
-          else
-            Helper.log.info "Updating the provisioning profile".yellow
           end
 
           profile = profile.update! # assign it, as it's a new profile
