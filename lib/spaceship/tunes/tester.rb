@@ -31,11 +31,8 @@ module Spaceship
 
       class << self
 
-        # @return (String) The tester type used for web requests
-        # @example
-        #  "external"
-        #  "internal"
-        def type
+        # @return (Hash) All urls for the ITC used for web requests
+        def url
           raise "You must select a tester type. Use a subclass."
         end
 
@@ -47,7 +44,7 @@ module Spaceship
 
         # @return (Array) Returns all beta testers available for this account
         def all
-          client.testers(self.type).map { |tester| self.factory(tester) }
+          client.testers(self).map { |tester| self.factory(tester) }
         end
 
         # @return (Spaceship::Tunes::Tester) Returns the tester matching the parameter
@@ -67,10 +64,10 @@ module Spaceship
         #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett")
         # @return (Tester): The newly created tester
         def create!(email: nil, first_name: nil, last_name: nil) 
-          data = client.create_tester!(type: self.type,
-                               email: email,
-                          first_name: first_name,
-                           last_name: last_name)
+          data = client.create_tester!(tester: self,
+                                        email: email,
+                                   first_name: first_name,
+                                    last_name: last_name)
           self.factory(data)
         end
 
@@ -81,7 +78,7 @@ module Spaceship
         # @return (Array) Returns all beta testers available for this account filtered by app
         # @param app_id (String) (required): The app id to filter the testers
         def all_by_app(app_id) 
-          client.testers_by_app(self.type, app_id).map { |tester| self.factory(tester) }
+          client.testers_by_app(self, app_id).map { |tester| self.factory(tester) }
         end
 
         # @return (Spaceship::Tunes::Tester) Returns the tester matching the parameter
@@ -99,12 +96,13 @@ module Spaceship
       # @!group Subclasses
       #####################################################
       class External < Tester 
-        def self.type
-          'external'
-        end
-
-        def type
-          'external'
+        def self.url(app_id = nil)
+          {
+            index: "ra/users/pre/ext",
+            index_by_app: "ra/user/externalTesters/#{app_id}/",
+            create: "ra/users/pre/create",
+            update_by_app: "ra/user/externalTesters/#{app_id}/"
+          }
         end
       end
 
@@ -115,13 +113,13 @@ module Spaceship
       # Add current tester to list of the app testers
       # @param app_id (String) (required): The id of the application to which want to modify the list
       def add_to_app!(app_id)
-        client.add_tester_to_app!(self.type, self, app_id)
+        client.add_tester_to_app!(self, app_id)
       end
 
       # Remove current tester from list of the app testers
       # @param app_id (String) (required): The id of the application to which want to modify the list
       def remove_from_app!(app_id)
-        client.remove_tester_from_app!(self.type, self, app_id)
+        client.remove_tester_from_app!(self, app_id)
       end
     end
   end

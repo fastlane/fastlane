@@ -211,20 +211,20 @@ module Spaceship
     #####################################################
     # @!group Testers
     #####################################################
-    def testers(type)
-      url = type == 'external' ? "ra/users/pre/ext" : ""
+    def testers(tester)
+      url = tester.url[:index]
       r = request(:get, url)
       parse_response(r, 'data')['testers']
     end
 
-    def testers_by_app(type, app_id) 
-      url = type == 'external' ? "ra/user/externalTesters/#{app_id}/" : ""
+    def testers_by_app(tester, app_id) 
+      url = tester.url(app_id)[:index_by_app]
       r = request(:get, url)
       parse_response(r, 'data')['users']
     end
 
-    def create_tester!(type: nil, email: nil, first_name: nil, last_name: nil) 
-      url = type == 'external' ? "ra/users/pre/create" : ""
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil) 
+      url = tester.url[:create]
       data = {
         testers: [
           {
@@ -254,17 +254,17 @@ module Spaceship
       handle_itc_response(data) || data[0]
     end
 
-    def add_tester_to_app!(type, tester, app_id)
-      update_tester_from_app!(type, tester, app_id, true)
+    def add_tester_to_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, true)
     end
 
-    def remove_tester_from_app!(type, tester, app_id)
-      update_tester_from_app!(type, tester, app_id, false)
+    def remove_tester_from_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, false)
     end
 
     private 
-      def update_tester_from_app!(type, tester, app_id, testing)
-        url = type == 'external' ? "ra/user/externalTesters/#{app_id}/" : ""
+      def update_tester_from_app!(tester, app_id, testing)
+        url = tester.class.url(app_id)[:update_by_app]
         data = {
           users: [
             {
