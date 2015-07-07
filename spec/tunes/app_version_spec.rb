@@ -41,6 +41,9 @@ describe Spaceship::AppVersion do
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
       expect(version.release_notes['German']).to eq('Wow, News')
       expect(version.release_notes['English']).to eq('Also News')
+
+      expect(version.description.keys).to eq(version.description.languages)
+      expect(version.description.keys).to eq(["German", "English"])
     end
 
     describe "#url" do
