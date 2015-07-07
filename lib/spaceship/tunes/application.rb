@@ -157,12 +157,29 @@ module Spaceship
       #####################################################
 
       # A reference to all testers
-      def testers
-        Tunes::Tester.all_by_app(self.apple_id)
+      def external_testers
+        Tunes::Tester.external.all_by_app(self.apple_id)
       end
 
-      def find_tester(identifier)
-        Tunes::Tester.find_by_app(self.apple_id, identifier)
+      def find_external_tester(identifier)
+        Tunes::Tester.external.find_by_app(self.apple_id, identifier)
+      end
+
+      def add_external_tester!(email: nil, first_name: nil, last_name: nil)
+        raise "Tester is already on #{self.name} betatesters" if find_external_tester(email)
+
+        tester = Tunes::Tester.external.find(email) || Tunes::Tester.external.create!(email: email, 
+                                                                                 first_name: first_name, 
+                                                                                  last_name: last_name)
+        tester.add_to_app!(self.apple_id)
+      end
+
+      def remove_external_tester!(identifier)
+        tester = find_external_tester(identifier)
+
+        raise "Tester is not on #{self.name} betatesters" unless tester
+
+        tester.remove_from_app!(self.apple_id)
       end
     end
   end

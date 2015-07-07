@@ -211,18 +211,20 @@ module Spaceship
     #####################################################
     # @!group Testers
     #####################################################
-    def testers
-      r = request(:get, "ra/users/pre/ext")
+    def testers(type)
+      url = type == 'external' ? "ra/users/pre/ext" : ""
+      r = request(:get, url)
       parse_response(r, 'data')['testers']
     end
 
-    def testers_by_app(app_id) 
-      r = request(:get, "ra/user/externalTesters/#{app_id}/")
+    def testers_by_app(type, app_id) 
+      url = type == 'external' ? "ra/user/externalTesters/#{app_id}/" : ""
+      r = request(:get, url)
       parse_response(r, 'data')['users']
     end
 
-    def create_tester!(email: nil, first_name: nil, last_name: nil) 
-      # TODO: Get struct from the api
+    def create_tester!(type: nil, email: nil, first_name: nil, last_name: nil) 
+      url = type == 'external' ? "ra/users/pre/create" : ""
       data = {
         testers: [
           {
@@ -243,44 +245,53 @@ module Spaceship
       }
 
       r = request(:post) do |req|
-        req.url 'ra/users/pre/create'
+        req.url url
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
       data = parse_response(r, 'data')['testers']
-      handle_itc_response(data)
+      handle_itc_response(data) || data[0]
     end
 
-    def remove_tester_from_app!(tester, app_id)
-      # TODO: Get struct from the api
-      data = {
-        users: [
-          {
-            emailAddress: {
-              value: tester.email
-            }, 
-            firstName: {
-              value: tester.first_name
-            },
-            lastName: {
-              value: tester.last_name
-            },
-            testing: {
-              value: false
+    def add_tester_to_app!(type, tester, app_id)
+      update_tester_from_app!(type, tester, app_id, true)
+    end
+
+    def remove_tester_from_app!(type, tester, app_id)
+      update_tester_from_app!(type, tester, app_id, false)
+    end
+
+    private 
+      def update_tester_from_app!(type, tester, app_id, testing)
+        url = type == 'external' ? "ra/user/externalTesters/#{app_id}/" : ""
+        data = {
+          users: [
+            {
+              emailAddress: {
+                value: tester.email
+              }, 
+              firstName: {
+                value: tester.first_name
+              },
+              lastName: {
+                value: tester.last_name
+              },
+              testing: {
+                value: testing
+              }
             }
-          }
-        ]
-      }
+          ]
+        }
 
-      r = request(:post) do |req|
-        req.url "ra/user/externalTesters/#{app_id}/"
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
+        r = request(:post) do |req|
+          req.url url
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+          
+        data = parse_response(r, 'data')
+        handle_itc_response(data)
       end
-        
-      data = parse_response(r, 'data')
-      handle_itc_response(data)
-    end
   end
 end
