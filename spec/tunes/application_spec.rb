@@ -24,6 +24,10 @@ describe Spaceship::Application do
       expect(app.raw_data['versions'].count).to eq(2)
     end
 
+    it "#url" do
+      expect(Spaceship::Application.all.first.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/')
+    end
+
     describe "#find" do
       describe "find using bundle identifier" do
         it "returns the application if available" do

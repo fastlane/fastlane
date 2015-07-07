@@ -199,6 +199,11 @@ module Spaceship
         client.update_app_version!(application.apple_id, is_live?, raw_data)
       end
 
+      # @return (String) An URL to this specific resource. You can enter this URL into your browser
+      def url
+        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.application.apple_id}/" + (self.is_live? ? "cur" : "")
+      end
+
 
       # Private methods
       def setup

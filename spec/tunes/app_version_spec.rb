@@ -43,6 +43,17 @@ describe Spaceship::AppVersion do
       expect(version.release_notes['English']).to eq('Also News')
     end
 
+    describe "#url" do
+      let (:app) { Spaceship::Application.all.first }
+      it "live version" do
+        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/cur')
+      end
+
+      it "edit version" do
+        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/')
+      end
+    end
+
     describe "App Status" do
       it "parses readyForSale" do
         version = Spaceship::Application.all.first.live_version
