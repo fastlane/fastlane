@@ -236,6 +236,7 @@ module Frameit
 
         # No string files, fallback to Framefile config
         result = fetch_config[type.to_s]['text']      
+        Helper.log.debug "Falling back to default text as there was nothing specified in the .strings file" if $verbose
 
         if !result and type == :title
           # title is mandatory
