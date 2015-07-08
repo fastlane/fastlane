@@ -51,6 +51,11 @@ module Deliver
       @itc ||= Deliver::ItunesConnect.new
     end
 
+    # Reference to the spaceship app object
+    def spaceship_ref
+      @ref ||= Spaceship::Tunes::Application.find(self.app_identifier)
+    end
+
     # This method fetches the current app status from iTunesConnect.
     # This method may take some time to execute, since it uses frontend scripting under the hood.
     # @return the current App Status defined at {Spaceship::Tunes::AppStatus}, like "Waiting For Review"
@@ -59,14 +64,9 @@ module Deliver
     end
 
     # This method fetches the app version of the latest published version
-    # This method may take some time to execute, since it uses frontend scripting under the hood.
     # @return the currently active app version, which in production
     def get_live_version
-      itc.get_live_version(self)
-    end
-
-    def spaceship_ref
-      @ref ||= Spaceship::Tunes::Application.find(self.app_identifier)
+      spaceship_ref.latest_version.version
     end
 
     #####################################################
@@ -127,10 +127,12 @@ module Deliver
     # the new version that should be created
     def create_new_version!(version_number)
       if (v = spaceship_ref.edit_version)
-        # Version is already there, make sure it matches the one we want to create
-        Helper.log.info "Changing existing version number from '#{v.version}' to '#{version_number}'"
-        v.version = version_number
-        v.save!
+        if v.version != version_number
+          # Version is already there, make sure it matches the one we want to create
+          Helper.log.info "Changing existing version number from '#{v.version}' to '#{version_number}'"
+          v.version = version_number
+          v.save!
+        end
       else
         # No version created yet, creating it now
         spaceship_ref.create_version!(version_number)
