@@ -27,6 +27,7 @@ module Pilot
       program :help, 'GitHub', 'https://github.com/fastlane/pilot'
       program :help_formatter, :compact
 
+      global_option('--verbose') { $verbose = true }
 
       always_trace!
 
@@ -34,7 +35,10 @@ module Pilot
         c.syntax = 'pilot'
         c.description = 'Uploads a new binary to Apple TestFlight'
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, options.__hash__)
+          o = options.__hash__.dup
+          o.delete(:verbose)
+          
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
           Pilot::Manager.new.run(config)
         end
       end
