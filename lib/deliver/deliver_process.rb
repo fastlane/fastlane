@@ -145,7 +145,8 @@ module Deliver
       return @ready if @checked_for_ready
 
       @checked_for_ready = true
-      @ready = (app.get_app_status == App::AppStatus::READY_FOR_SALE)
+
+      @ready = (app.get_app_status == Spaceship::Tunes::AppStatus::READY_FOR_SALE)
     end
 
     #####################################################
@@ -358,11 +359,21 @@ module Deliver
     end
 
     def additional_itc_information
-      # e.g. rating or copyright
-      itc.set_copyright!(app, @deploy_information[Deliverer::ValKey::COPYRIGHT]) if @deploy_information[Deliverer::ValKey::COPYRIGHT]
-      itc.set_app_review_information!(app, @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]) if @deploy_information[Deliverer::ValKey::APP_REVIEW_INFORMATION]
-      itc.set_release_after_approval!(app, @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE]) if @deploy_information[Deliverer::ValKey::AUTOMATIC_RELEASE] != nil
+      k = Deliverer::ValKey
+      d = @deploy_information
+      v = app.spaceship_ref.edit_version
 
+      v.copyright = d[k::COPYRIGHT] if d[k::COPYRIGHT]
+      v.release_on_approval = d[k::AUTOMATIC_RELEASE] if d[k::AUTOMATIC_RELEASE]
+      v.review_first_name = d[k::APP_REVIEW_INFORMATION][:first_name] if d[k::APP_REVIEW_INFORMATION][:first_name]
+      v.review_last_name = d[k::APP_REVIEW_INFORMATION][:last_name] if d[k::APP_REVIEW_INFORMATION][:last_name]
+      v.review_phone_number = d[k::APP_REVIEW_INFORMATION][:phone_number] if d[k::APP_REVIEW_INFORMATION][:phone_number]
+      v.review_email = d[k::APP_REVIEW_INFORMATION][:email_address] if d[k::APP_REVIEW_INFORMATION][:email_address]
+      v.review_demo_user = d[k::APP_REVIEW_INFORMATION][:demo_user] if d[k::APP_REVIEW_INFORMATION][:demo_user]
+      v.review_demo_password = d[k::APP_REVIEW_INFORMATION][:demo_password] if d[k::APP_REVIEW_INFORMATION][:demo_password]
+      v.review_notes = d[k::APP_REVIEW_INFORMATION][:notes] if d[k::APP_REVIEW_INFORMATION][:notes]
+
+      v.save!
       # Categories
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
       secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
