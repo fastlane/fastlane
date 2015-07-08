@@ -26,6 +26,7 @@ module Cert
                                         ENV["FASTLANE_TEAM_ID"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_path,
+                                     short_option: "-o",
                                      env_name: "CERT_OUTPUT_PATH",
                                      description: "The path to a directory in which all certificates and private keys should be stored",
                                      default_value: "."),
