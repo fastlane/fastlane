@@ -17,7 +17,7 @@ module Pilot
       @data = { 
         apple_id: apple_id,
         file_size: File.size(ipa_path),
-        ipa_path: ipa_path,
+        ipa_path: File.basename(ipa_path), # this is only the base name as the ipa is inside the package
         md5: Digest::MD5.hexdigest(ipa_path)
       }
 
@@ -25,6 +25,7 @@ module Pilot
       xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system  
       
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
+      Helper.log.info "Wrote XML data to '#{self.package_path}'".green if $verbose
 
       return package_path
     end
