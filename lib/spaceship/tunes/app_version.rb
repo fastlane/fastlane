@@ -163,8 +163,6 @@ module Spaceship
           obj = self.new(attrs)
           obj.unfold_languages
 
-          obj.fix_apples_bugs
-
           return obj
         end
 
@@ -259,11 +257,14 @@ module Spaceship
         end
       end
 
-      # This method takes care of properly parsing values that
+      # These methods takes care of properly parsing values that
       # are not returned in the right format, e.g. boolean as string
-      def fix_apples_bugs
-        self.release_on_approval = (release_on_approval == 'true')
-        self.supports_apple_watch = (supports_apple_watch != nil)
+      def release_on_approval
+        super == 'true'
+      end
+
+      def supports_apple_watch
+        (super != nil)
       end
 
       private
