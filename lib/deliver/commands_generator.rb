@@ -30,6 +30,8 @@ module Deliver
       global_option '--beta', 'Upload a beta build to iTunes Connect. This uses the `beta_ipa` block.'
       global_option '--skip-deploy', 'Skips submission of the build on iTunes Connect. This will only upload the ipa and/or metadata.'
 
+      global_option('--verbose') { $verbose = true }
+
       always_trace!
 
       command :run do |c|
@@ -50,6 +52,8 @@ module Deliver
       end
 
       def run_deliver(options)
+        set_username(options.username)
+
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
           if File.exists?(deliver_path)

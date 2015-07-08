@@ -25,6 +25,8 @@ module Deliver
     # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
       @@hide_transporter_output = true
+
+      @@hide_transporter_output = false if $verbose
     end
 
     # Returns a new instance of the iTunesTransporter.
