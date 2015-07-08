@@ -40,7 +40,7 @@ module Cert
 
         output = File.join(TMP_FOLDER, "#{display_id}-#{type_id}.cer")
         download_url(url, output)
-        if Cert::CertChecker.is_installed?output
+        if FastlaneCore::CertChecker.is_installed?output
           # We'll use this one, since it's installed on the local machine
           ENV["CER_CERTIFICATE_ID"] = display_id
           Helper.log.info "Found the certificate #{display_id}-#{type_id} which is installed on the local machine. Using this one.".green
@@ -127,11 +127,11 @@ module Cert
         raise "Something went wrong when downloading the certificate" unless data
 
         # write data to file
-        dataWritten = File.open(output_path, "wb") do |f|
+        data_written = File.open(output_path, "wb") do |f|
           f.write(data)
         end
 
-        if dataWritten == 0
+        if data_written == 0
           raise "Can't write to #{output_path}"
         end
       end
