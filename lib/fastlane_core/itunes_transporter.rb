@@ -48,6 +48,7 @@ module FastlaneCore
 
       Helper.log.info "Going to download app metadata from iTunesConnect"
       command = build_download_command(@user, @password, app_id, dir)
+      Helper.log.debug build_download_command(@user, 'YourPassword', app_id, dir) if $verbose
 
       result = execute_transporter(command)
 
@@ -77,6 +78,8 @@ module FastlaneCore
       Helper.log.info "This might take a few minutes, please don't interrupt the script".green
 
       command = build_upload_command(@user, @password, dir)
+      Helper.log.debug build_upload_command(@user, 'YourPassword', dir) if $verbose
+
       result = execute_transporter(command)
 
       if result
