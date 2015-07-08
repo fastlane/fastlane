@@ -120,12 +120,6 @@ end
 This will result in `sigh` always using the correct signing certificate, which is installed on the local machine.
 
 
-# How does it work?
-
-- `cert` accesses the ```iOS Dev Center``` to create or download your certificate. See: [developer_center.rb](https://github.com/KrauseFx/cert/blob/master/lib/cert/developer_center.rb).
-- The ```.certSigningRequest``` file will be generated in [signing_request.rb](https://github.com/KrauseFx/cert/blob/master/lib/cert/signing_request.rb)
-
-
 ## How is my password stored?
 ```cert``` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
 

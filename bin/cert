@@ -31,7 +31,7 @@ class CertApplication
 
       c.action do |args, options|
         Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
-        Cert::CertRunner.run
+        Cert::CertRunner.new.launch
       end
     end
 

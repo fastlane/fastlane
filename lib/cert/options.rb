@@ -25,6 +25,10 @@ module Cert
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_ID"] = value
                                      end),
+        FastlaneCore::ConfigItem.new(key: :output_path,
+                                     env_name: "CERT_OUTPUT_PATH",
+                                     description: "The path to a directory in which all certificates and private keys should be stored",
+                                     default_value: "."),
         FastlaneCore::ConfigItem.new(key: :keychain_path,
                                      short_option: "-k",
                                      env_name: "CERT_KEYCHAIN_PATH",

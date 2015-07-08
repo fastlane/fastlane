@@ -28,7 +28,7 @@ module Cert
 
       # Import the private key into the Keychain
       puts `chmod 600 '#{private_key_path}'` # otherwise we're not allowed to import the private key
-      KeychainImporter::import_file(private_key_path)
+      KeychainImporter.import_file(private_key_path)
 
       Helper.log.info "Successfully generated .certSigningRequest at path '#{path}'".green
       return path

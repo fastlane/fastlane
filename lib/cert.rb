@@ -1,11 +1,11 @@
 require 'cert/version'
 require 'cert/dependency_checker'
-require 'cert/developer_center'
 require 'cert/cert_runner'
 require 'cert/signing_request'
 require 'cert/keychain_importer'
 
 require 'fastlane_core'
+require 'spaceship'
 
 module Cert
   # Use this to just setup the configuration attribute and set it later somewhere else
