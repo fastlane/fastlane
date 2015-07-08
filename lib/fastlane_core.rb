@@ -6,6 +6,7 @@ require 'fastlane_core/update_checker'
 require 'fastlane_core/languages'
 require 'fastlane_core/itunes_search_api'
 require 'fastlane_core/cert_checker'
+require 'fastlane_core/ipa_file_analyser'
 
 # Third Party code
 require 'colored'
