@@ -111,7 +111,7 @@ To download all your provisioning profiles use
 
     sigh download_all
 
-For a list of available commands run
+For a list of available parameters and commands run
 
     sigh --help
     
@@ -121,9 +121,9 @@ By default, ```sigh``` will install the downloaded profile on your machine. If y
 
     sigh --skip_install
     
-To save the provisioning profile under a specific name, use the -f option:
+To save the provisioning profile under a specific name, use the -q option:
 
-    sigh -a com.krausefx.app -u username -f "myProfile.mobileprovision"
+    sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
 
 If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime. `--force` will also add all available devices to this profile.
 
@@ -132,6 +132,10 @@ If you need the provisioning profile to be renewed regardless of its state use t
 By default, `sigh` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
     sigh -c "SunApps GmbH"
+
+For a list of available parameters and commands run
+
+    sigh --help
 
 # Repair
 
