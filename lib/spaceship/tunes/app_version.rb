@@ -76,6 +76,30 @@ module Spaceship
       attr_accessor :company_information
 
       ####
+      # App Review Information
+      ####
+      # @return (String) App Review Information First Name
+      attr_accessor :review_first_name
+
+      # @return (String) App Review Information Last Name
+      attr_accessor :review_last_name
+
+      # @return (String) App Review Information Phone Number
+      attr_accessor :review_phone_number
+
+      # @return (String) App Review Information Email Address
+      attr_accessor :review_email
+
+      # @return (String) App Review Information Demo Account User Name
+      attr_accessor :review_demo_user
+
+      # @return (String) App Review Information Demo Account Password
+      attr_accessor :review_demo_password
+
+      # @return (String) App Review Information Notes
+      attr_accessor :review_notes
+    
+      ####
       # Localized values:
       ####
 
