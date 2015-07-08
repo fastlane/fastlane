@@ -21,6 +21,24 @@ module Pilot
                                      verify_block: Proc.new do |value|
                                        raise "Could not find ipa file at path '#{value}'" unless File.exists?value
                                        raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with?".ipa"
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                     short_option: "-a",
+                                     env_name: "PILOT_APP_IDENTIFIER",
+                                     description: "The bundle identifier of the app to upload (optional)",
+                                     optional: true,
+                                     default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"],
+                                     verify_block: Proc.new do |value|
+                                       
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :apple_id,
+                                     short_option: "-p",
+                                     env_name: "PILOT_APPLE_ID",
+                                     description: "The unique App ID provided by iTunes Connect",
+                                     optional: true,
+                                     default_value: ENV["TESTFLIGHT_APPLE_ID"],
+                                     verify_block: Proc.new do |value|
+                                       
                                      end)
         
       ]
