@@ -10,7 +10,7 @@ module Pilot
 
       Helper.log.info "Ready to upload new build to TestFlight (App: #{config[:apple_id]})...".green
 
-      package_path = PackageBuilder.new.generate(apple_id: 999017138, 
+      package_path = PackageBuilder.new.generate(apple_id: config[:apple_id], 
                                                  ipa_path: config[:ipa],
                                              package_path: "/tmp") # TODO: Config
 

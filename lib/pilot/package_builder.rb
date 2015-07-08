@@ -11,14 +11,14 @@ module Pilot
       FileUtils.rm_rf self.package_path rescue nil
       FileUtils.mkdir_p self.package_path
 
-      lib_path = '.' || Helper.gem_path('pilot') # TODO
+      lib_path = Helper.gem_path('pilot')
 
       ipa_path = copy_ipa(ipa_path)
       @data = { 
         apple_id: apple_id,
         file_size: File.size(ipa_path),
         ipa_path: File.basename(ipa_path), # this is only the base name as the ipa is inside the package
-        md5: Digest::MD5.hexdigest(ipa_path)
+        md5: Digest::MD5.hexdigest(File.read(ipa_path))
       }
 
       xml_path = File.join(lib_path, "lib/assets/XMLTemplate.xml.erb")
