@@ -23,7 +23,7 @@ describe Spaceship::ProvisioningProfile do
     describe "Create a new In House Profile" do
       it "uses the correct type for the create request" do
         cert = Spaceship::Certificate::InHouse.all.first
-        expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'inhouse', '2UMR2S6PAA', [cert.id], []).and_return({})
+        expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'inhouse', '2UMR2S6PAA', cert.id, []).and_return({})
         Spaceship::ProvisioningProfile::InHouse.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: cert)
       end
     end
