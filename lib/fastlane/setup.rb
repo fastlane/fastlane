@@ -101,7 +101,7 @@ module Fastlane
         Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
         Helper.log.info 'Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building'.yellow
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
-        Helper.log.info 'Please read the above carefully and click Enter to confirm.'.green
+        Helper.log.info 'Please read the above carefully and hit Enter to confirm.'.green
         STDIN.gets unless Helper.is_test?
       end
 
@@ -122,7 +122,7 @@ module Fastlane
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
 
-      scheme = ask("Optional: The scheme name of your app. If you don't need one, just click enter: ").to_s.strip
+      scheme = ask("Optional: The scheme name of your app: (If you don't need one, just hit Enter.) ").to_s.strip
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else
