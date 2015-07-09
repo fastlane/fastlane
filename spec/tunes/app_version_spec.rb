@@ -2,10 +2,11 @@ require 'spec_helper'
 
 describe Spaceship::AppVersion do
   before { Spaceship::Tunes.login }
+
   let(:client) { Spaceship::AppVersion.client }
+  let (:app) { Spaceship::Application.all.first }
 
   describe "successfully loads and parses the app version" do
-    let (:app) { Spaceship::Application.all.first }
     it "parses the basic version details correctly" do
       version = app.edit_version
 
@@ -86,7 +87,7 @@ describe Spaceship::AppVersion do
     describe "Screenshots" do
       it "properly parses all the screenshots" do
         v = app.live_version
-        
+
         # This app only has screenshots in the English version
         expect(v.screenshots['German']).to eq([])
 
