@@ -35,8 +35,15 @@
         "statusModTime": 1436145486442,
         "sessions": null,
         "crashes": null,
-        "latestBuild": null,
-        "latestInstallByPlatform": {},
+        "latestBuild": "0.2.9 (37)",
+        "latestInstallByPlatform": {
+          "ios": {
+            "appAdamId": 964913770,
+            "version": "32",
+            "shortVersion": "0.2.5",
+            "installDate": 1427481777051000
+          }
+        },
         "groups": null
       }
     ],

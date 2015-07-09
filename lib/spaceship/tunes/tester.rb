@@ -123,7 +123,7 @@ module Spaceship
             index_by_app: "ra/user/internalTesters/#{app_id}/",
             create: nil,
             delete: nil,
-            update_by_app: "ra/user/externalTesters/#{app_id}/"
+            update_by_app: "ra/user/internalTesters/#{app_id}/"
           }
         end
       end
