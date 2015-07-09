@@ -22,11 +22,23 @@ module Spaceship
       #   "Bennett"
       attr_accessor :last_name
 
+      # @return (Bool) The tester is testing
+      # @example 
+      #   true
+      attr_accessor :testing
+
+      # @return (String) The latest version installed of this tester (Only for apps methods)
+      # @example 
+      #   "0.2.9 (37)"
+      attr_accessor :latest_build
+
       attr_mapping(
         'testerId' => :tester_id,
         'emailAddress.value' => :email,
         'firstName.value' => :first_name,
-        'lastName.value' => :last_name
+        'lastName.value' => :last_name,
+        'testing.value' => :testing,
+        'latestBuild' => :latest_build
       )
 
       class << self
