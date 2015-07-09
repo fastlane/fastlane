@@ -90,6 +90,15 @@ module Spaceship
             (tester.tester_id == identifier.to_s or tester.email == identifier)
           end
         end
+
+        # Add all testers to the app received
+        # @param app_id (String) (required): The app id to filter the testers
+        def add_all_to_app!(app_id)
+          # TODO: Change to not make one request for each tester
+          all.each do |tester|
+            tester.add_to_app!(app_id)
+          end
+        end
       end
 
       #####################################################
@@ -101,9 +110,27 @@ module Spaceship
             index: "ra/users/pre/ext",
             index_by_app: "ra/user/externalTesters/#{app_id}/",
             create: "ra/users/pre/create",
+            delete: "ra/users/pre/ext/delete",
             update_by_app: "ra/user/externalTesters/#{app_id}/"
           }
         end
+      end
+
+      class Internal < Tester 
+        def self.url(app_id = nil)
+          {
+            index: "ra/users/pre/int",
+            index_by_app: "ra/user/internalTesters/#{app_id}/",
+            create: nil,
+            delete: nil,
+            update_by_app: "ra/user/externalTesters/#{app_id}/"
+          }
+        end
+      end
+
+      # Delete current tester
+      def delete! 
+        client.delete_tester!(self)
       end
 
       #####################################################

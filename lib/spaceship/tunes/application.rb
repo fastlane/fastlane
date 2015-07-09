@@ -156,9 +156,19 @@ module Spaceship
       # @!group Testers
       #####################################################
 
+      # Add all testers to the current app list
+      def add_all_testers!
+        Tunes::Tester.external.add_all_to_app!(self.apple_id)
+      end
+
       # @return (Array) Returns all external testers available for this app
       def external_testers
         Tunes::Tester.external.all_by_app(self.apple_id)
+      end
+
+      # @return (Array) Returns all internal testers available for this app
+      def external_testers
+        Tunes::Tester.internal.all_by_app(self.apple_id)
       end
 
       # @return (Spaceship::Tunes::Tester.external) Returns the external tester matching the parameter
@@ -166,6 +176,13 @@ module Spaceship
       # @param identifier (String) (required): Value used to filter the tester
       def find_external_tester(identifier)
         Tunes::Tester.external.find_by_app(self.apple_id, identifier)
+      end
+
+      # @return (Spaceship::Tunes::Tester.external) Returns the internal tester matching the parameter
+      #   as either the Tester id or email
+      # @param identifier (String) (required): Value used to filter the tester
+      def find_external_tester(identifier)
+        Tunes::Tester.internal.find_by_app(self.apple_id, identifier)
       end
 
       # Add external tester to the current app list, if it doesn't exist will be created

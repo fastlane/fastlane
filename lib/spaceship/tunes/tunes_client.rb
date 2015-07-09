@@ -225,6 +225,8 @@ module Spaceship
 
     def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil) 
       url = tester.url[:create]
+      raise "Action not provided for this tester type." unless url
+
       data = {
         testers: [
           {
@@ -243,6 +245,38 @@ module Spaceship
           }
         ]
       }
+
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')['testers']
+      handle_itc_response(data) || data[0]
+    end
+
+    def delete_tester!(tester)
+      url = tester.class.url[:delete]
+      raise "Action not provided for this tester type." unless url
+
+      data = [
+        {
+          emailAddress: {
+            value: tester.email
+          }, 
+          firstName: {
+            value: tester.first_name
+          },
+          lastName: {
+            value: tester.last_name
+          },
+          testing: {
+            value: false
+          }, 
+          testerId: tester.tester_id
+        }
+      ]
 
       r = request(:post) do |req|
         req.url url
