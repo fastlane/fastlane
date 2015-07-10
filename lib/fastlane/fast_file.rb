@@ -208,8 +208,6 @@ module Fastlane
 
     def depends_on(*args, **env)
       raise "Please provide the names of dependencies as a list of symbols".red unless args.is_a? Array and args.all? {|a| a.is_a? Symbol}
-      #args.each do |lane_name|
-      #end
       depends_collection << args
     end
 
