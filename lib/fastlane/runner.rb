@@ -1,6 +1,6 @@
 module Fastlane
   class Runner
-    LaneConfig = Struct.new(:block, :dependencies, :description) do
+    LaneConfig = Struct.new(:name, :block, :dependencies, :description) do
       def call
         block.call
       end
@@ -40,8 +40,7 @@ module Fastlane
         before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
         before_all_blocks[nil].call(lane) if before_all_blocks[nil]
         
-        return_val = configs[platform][lane].block.call
-        
+        return_val = run_lane(configs[platform][lane], platform)
         
         # `after_all` is only called if no exception was raised before
         # Call the platform specific before_all block and then the general one
@@ -74,6 +73,35 @@ module Fastlane
       all
     end
 
+    def run_lane(lane_config, platform)
+      run_dependencies(lane_config, platform)
+      Helper.log.info "Dependencies finished successfully 🎊  Driving back to '#{lane_config.name}'...".green
+      lane_config.call
+    end
+
+    def run_dependencies(lane_config, platform)
+      Helper.log.info "Running dependencies for lane '#{lane_config.name}'...".green unless lane_config.dependencies.empty? 
+
+      lane_config.dependencies.each do |dependency|
+        dependency_config = find_config_for_platform dependency, platform
+        raise "Lane configuration not found for the dependency '#{dependency.to_s}' on platform #{platform}" if dependency_config.nil?
+
+        run_dependencies(dependency_config, platform)
+
+        Helper.log.info "Cruising over to lane '#{dependency_config.name}'...🚖".green
+        dependency_config.call
+      end
+    end
+
+    # Tries to find the config by the dependency name (symbol) for the current platform
+    # Platforms shadow the root configuration, so if a lane is specialized for a platform the specialization is used
+    def find_config_for_platform dependency, platform
+      [platform, nil].uniq.each do |current_platform|
+        config = configs[current_platform][dependency]
+        return config unless config.nil?
+      end
+    end
+
     # Called internally
     def set_before_all(platform, block)
       before_all_blocks[platform] = block
@@ -96,7 +124,7 @@ module Fastlane
 
       raise "Lane '#{lane}' was defined multiple times!".red if configs[platform][lane]
       
-      configs[platform][lane] = LaneConfig.new(block, dependencies, desc)
+      configs[platform][lane] = LaneConfig.new(lane, block, dependencies, desc)
     end
 
     def configs
