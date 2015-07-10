@@ -185,6 +185,16 @@ module Fastlane
           end
         end
       end
+
+      verify_no_circular_dependencies(self.runner.configs)
+    end
+
+    def verify_no_circular_dependencies(configs)
+      configs.each do |current_platform, lanes|
+        lanes.each do |lane_name, config|
+          config.verify_no_circular_dependencies(self.runner, current_platform)
+        end
+      end
     end
 
     # Fastfile was finished executing

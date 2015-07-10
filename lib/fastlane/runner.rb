@@ -1,6 +1,14 @@
 module Fastlane
   class Runner
     LaneConfig = Struct.new(:name, :block, :dependencies, :description) do
+      def verify_no_circular_dependencies(runner, platform, visited_set = [])
+        raise "Circular dependencies detected for lane '#{name}' with dependency chain: #{visited_set.map{|v| v.name }.join " -> "} -> #{name}".red if visited_set.include? self
+        dependencies.each do |dependency|
+          dependency = runner.find_config_for_platform(dependency, platform)
+          dependency.verify_no_circular_dependencies(runner, platform, visited_set.clone << self)
+        end
+      end
+
       def call
         block.call
       end
@@ -95,7 +103,7 @@ module Fastlane
 
     # Tries to find the config by the dependency name (symbol) for the current platform
     # Platforms shadow the root configuration, so if a lane is specialized for a platform the specialization is used
-    def find_config_for_platform dependency, platform
+    def find_config_for_platform(dependency, platform)
       [platform, nil].uniq.each do |current_platform|
         config = configs[current_platform][dependency]
         return config unless config.nil?
