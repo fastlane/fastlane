@@ -339,13 +339,6 @@ end
 ### Skip alpha removal from screenshots
 In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
 
-### Pass Bundle Identifier
-This is only required in case there is a problem automatically detecting it.
-
-```
-SNAPSHOT_APP_IDENTIFIER="com.krausefx.app" snapshot
-```
-
 ### Clear old screenshots
 
 If you add this line in your `Snapfile`, the previously generated screenshots will be deleted before generating new ones:
