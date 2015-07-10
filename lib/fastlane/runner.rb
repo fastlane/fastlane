@@ -1,6 +1,10 @@
 module Fastlane
   class Runner
-    LaneConfig = Struct.new(:block, :dependencies, :description)
+    LaneConfig = Struct.new(:block, :dependencies, :description) do
+      def call
+        block.call
+      end
+    end
 
     # This will take care of executing **one** lane. 
     # @param lane_name The name of the lane to execute
@@ -97,6 +101,22 @@ module Fastlane
 
     def configs
       @configs ||= {}
+    end
+
+    # Keep old inteface to outside the same
+    def blocks
+      configs
+    end
+    def description_blocks
+      desc_blocks = {}
+      configs.each do |platform, lanes|
+        desc_blocks[platform] = {}
+        lanes.each do |lane_name, config| 
+          desc_blocks[platform][lane_name] = config.description
+        end
+      end
+
+      desc_blocks
     end
 
     def before_all_blocks
