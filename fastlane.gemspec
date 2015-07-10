@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastlane_core', '>= 0.9.2' # all shared code and dependencies
 
+
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 0.12.1'
   spec.add_dependency 'snapshot', '>= 0.9.0'
