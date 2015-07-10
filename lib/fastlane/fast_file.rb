@@ -178,10 +178,10 @@ module Fastlane
     def verify_dependencies
       self.runner.configs.each do |current_platform, lanes|
         # Lanes available to all platforms + lanes only available to current platform
-        available = lanes.keys | self.runner.configs[nil].keys
+        available = lanes.keys | (self.runner.configs[nil] || {}).keys
         lanes.each do |lane_name, config|
           config.dependencies.each do |dependency|
-            raise "There is no lane called #{dependency} on platform #{current_platform} that we could use as dependency for #{lane_name}".red unless available.include? dependency
+            raise "There is no lane called #{dependency} on platform '#{current_platform}' that we could use as dependency for #{lane_name}".red unless available.include? dependency
           end
         end
       end
@@ -196,7 +196,7 @@ module Fastlane
       desc_collection << string
     end
 
-    def depends_on(*args)
+    def depends_on(*args, **env)
       raise "Please provide the names of dependencies as a list of symbols".red unless args.is_a? Array and args.all? {|a| a.is_a? Symbol}
       #args.each do |lane_name|
       #end
