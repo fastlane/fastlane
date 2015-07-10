@@ -1,5 +1,6 @@
 module Fastlane
   class Runner
+    LaneConfig = Struct.new(:block, :dependencies, :description)
 
     # This will take care of executing **one** lane. 
     # @param lane_name The name of the lane to execute
@@ -27,8 +28,7 @@ module Fastlane
 
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
       Dir.chdir(path_to_use) do # the file is located in the fastlane folder
-
-        unless (blocks[platform][lane] rescue nil)
+        unless (configs[platform][lane] rescue nil)
           raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red
         end
 
@@ -36,7 +36,7 @@ module Fastlane
         before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
         before_all_blocks[nil].call(lane) if before_all_blocks[nil]
         
-        return_val = blocks[platform][lane].call
+        return_val = configs[platform][lane].block.call
         
         
         # `after_all` is only called if no exception was raised before
@@ -60,10 +60,10 @@ module Fastlane
     # @param filter_platform: Filter, to only show the lanes of a given platform
     def available_lanes(filter_platform = nil)
       all = []
-      blocks.each do |platform, lane| 
+      configs.each do |platform, lane| 
         next if (filter_platform and filter_platform.to_s != platform.to_s) # skip actions that don't match
 
-        lane.each do |lane_name, block|
+        lane.each do |lane_name, config|
           all << [platform, lane_name].reject(&:nil?).join(' ')
         end
       end
@@ -87,18 +87,16 @@ module Fastlane
     # @param platform: The platform for the given block - might be nil - nil is actually the root of Fastfile with no specific platform
     # @param block: The block of the lane
     # @param desc: Description of this action
-    def set_block(lane, platform, block, desc = nil)
-      blocks[platform] ||= {}
-      description_blocks[platform] ||= {}
+    def set_block(lane, platform, block, dependencies = [], desc = nil)
+      configs[platform] ||= {}
 
-      raise "Lane '#{lane}' was defined multiple times!".red if blocks[platform][lane]
+      raise "Lane '#{lane}' was defined multiple times!".red if configs[platform][lane]
       
-      blocks[platform][lane] = block
-      description_blocks[platform][lane] = desc
+      configs[platform][lane] = LaneConfig.new(block, dependencies, desc)
     end
 
-    def blocks
-      @blocks ||= {}
+    def configs
+      @configs ||= {}
     end
 
     def before_all_blocks
@@ -111,10 +109,6 @@ module Fastlane
 
     def error_blocks
       @error_blocks ||= {}
-    end
-
-    def description_blocks
-      @description_blocks ||= {}
     end
   end
 end
