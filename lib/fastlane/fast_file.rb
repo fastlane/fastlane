@@ -19,6 +19,8 @@ module Fastlane
         eval(data) # this is okay in this case
       end
 
+      verify_dependencies
+
       self
     end
 
@@ -33,11 +35,13 @@ module Fastlane
       raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
       
       desc = desc_collection.join("\n\n")
+      dependencies = depends_collection.flatten
       platform = @current_platform
 
-      @runner.set_block(lane_name, platform, block, desc)
+      @runner.set_block(lane_name, platform, block, dependencies, desc)
 
       @desc_collection = nil # reset the collected description again for the next lane
+      @depends_collection = nil # reset the dependencies as well
     end
     
     # User defines a platform block
@@ -171,6 +175,18 @@ module Fastlane
       end
     end
 
+    def verify_dependencies
+      self.runner.configs.each do |current_platform, lanes|
+        # Lanes available to all platforms + lanes only available to current platform
+        available = lanes.keys | self.runner.configs[nil].keys
+        lanes.each do |lane_name, config|
+          config.dependencies.each do |dependency|
+            raise "There is no lane called #{dependency} on platform #{current_platform} that we could use as dependency for #{lane_name}".red unless available.include? dependency
+          end
+        end
+      end
+    end
+
     # Fastfile was finished executing
     def did_finish
       collector.did_finish
@@ -180,12 +196,23 @@ module Fastlane
       desc_collection << string
     end
 
+    def depends_on(*args)
+      raise "Please provide the names of dependencies as a list of symbols".red unless args.is_a? Array and args.all? {|a| a.is_a? Symbol}
+      #args.each do |lane_name|
+      #end
+      depends_collection << args
+    end
+
     def collector
       @collector ||= ActionCollector.new
     end
 
     def desc_collection
       @desc_collection ||= []
+    end
+
+    def depends_collection
+      @depends_collection ||= []
     end
   end
 end
