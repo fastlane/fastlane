@@ -251,5 +251,24 @@ describe Fastlane do
       puts ff.runner.configs
       expect(ff.runner.configs[:ios][:test2].dependencies).to eq([:test])
     end
+
+    it "prevents circular dependencies" do
+      expect {
+        Fastlane::FastFile.new.parse("
+                                     depends_on :test2
+                                     lane :test do
+                                     end
+                                    depends_on :test
+                                    lane :test2 do
+                                    end
+                                     ")
+      }.to raise_exception("Circular dependencies detected for lane 'test' with dependency chain: test -> test2 -> test".red)
+    end
+
+    it "prevents longer circular dependency chains" do
+      expect {
+        Fastlane::FastFile.new("./spec/fixtures/fastfiles/FastfileWithDependencyChain")
+      }.to raise_exception("Circular dependencies detected for lane 'one' with dependency chain: one -> seven -> six -> three -> two -> one".red)
+    end
   end
 end
