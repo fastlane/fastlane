@@ -199,4 +199,57 @@ describe Fastlane do
       end
     end
   end
+
+  describe "dependencies between lanes" do
+    it "collects dependencies from the Fastfile" do
+      ff = Fastlane::FastFile.new.parse("
+                                     lane :test do
+                                     end
+                                     depends_on :test
+                                     lane :test2 do
+                                     end
+                                     ")
+      expect(ff.runner.configs[nil][:test2].dependencies).to eq([:test])
+    end
+
+    it "raises an error if a dependency doesn't exist" do
+      expect {
+        Fastlane::FastFile.new.parse("
+                                     depends_on :test
+                                     lane :test2 do
+                                     end
+                                     ")
+      }.to raise_exception "There is no lane called test on platform '' that we could use as dependency for test2".red
+    end
+
+    it "raises an error if the dependency is from the wrong platform" do
+      expect {
+        Fastlane::FastFile.new.parse("
+                                     platform :mac do
+                                      lane :test do
+                                      end
+                                     end
+                                     platform :ios do
+                                      depends_on :test
+                                      lane :test2 do
+                                      end
+                                     end
+                                     ")
+      }.to raise_exception "There is no lane called test on platform 'ios' that we could use as dependency for test2".red
+    end
+
+    it "allows dependencies that don't have a platform" do
+      ff = Fastlane::FastFile.new.parse("
+                                       lane :test do
+                                      end
+                                     platform :ios do
+                                      depends_on :test
+                                      lane :test2 do
+                                      end
+                                     end
+                                       ")
+      puts ff.runner.configs
+      expect(ff.runner.configs[:ios][:test2].dependencies).to eq([:test])
+    end
+  end
 end
