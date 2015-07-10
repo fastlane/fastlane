@@ -36,12 +36,14 @@ module Fastlane
       
       desc = desc_collection.join("\n\n")
       dependencies = depends_collection.flatten
+      environment = env_collection
       platform = @current_platform
 
-      @runner.set_block(lane_name, platform, block, dependencies, desc)
+      @runner.set_block(lane_name, platform, block, dependencies, environment, desc)
 
       @desc_collection = nil # reset the collected description again for the next lane
       @depends_collection = nil # reset the dependencies as well
+      @env_collection = nil # ... and the environment collection
     end
     
     # User defines a platform block
@@ -209,10 +211,15 @@ module Fastlane
     def depends_on(*args, **env)
       raise "Please provide the names of dependencies as a list of symbols".red unless args.is_a? Array and args.all? {|a| a.is_a? Symbol}
       depends_collection << args
+      env_collection.merge! env
     end
 
     def collector
       @collector ||= ActionCollector.new
+    end
+
+    def env_collection 
+      @env_collection ||= {}
     end
 
     def desc_collection

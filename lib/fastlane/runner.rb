@@ -1,6 +1,6 @@
 module Fastlane
   class Runner
-    LaneConfig = Struct.new(:name, :block, :dependencies, :description) do
+    LaneConfig = Struct.new(:name, :block, :dependencies, :environment, :description) do
       def verify_no_circular_dependencies(runner, platform, visited_set = [])
         raise "Circular dependencies detected for lane '#{name}' with dependency chain: #{visited_set.map{|v| v.name }.join " -> "} -> #{name}".red if visited_set.include? self
         dependencies.each do |dependency|
@@ -81,7 +81,14 @@ module Fastlane
       all
     end
 
+    def modify_env(environment)
+      environment.each do |key, value|
+        Actions.lane_context[key] = value
+      end
+    end
+
     def run_lane(lane_config, platform)
+      modify_env(lane_config.environment)
       run_dependencies(lane_config, platform)
       Helper.log.info "Dependencies finished successfully 🎊  Driving back to '#{lane_config.name}'...".green
       lane_config.call
@@ -127,12 +134,12 @@ module Fastlane
     # @param platform: The platform for the given block - might be nil - nil is actually the root of Fastfile with no specific platform
     # @param block: The block of the lane
     # @param desc: Description of this action
-    def set_block(lane, platform, block, dependencies = [], desc = nil)
+    def set_block(lane, platform, block, dependencies = [], environment = {}, desc = nil)
       configs[platform] ||= {}
 
       raise "Lane '#{lane}' was defined multiple times!".red if configs[platform][lane]
       
-      configs[platform][lane] = LaneConfig.new(lane, block, dependencies, desc)
+      configs[platform][lane] = LaneConfig.new(lane, block, dependencies, environment, desc)
     end
 
     def configs
