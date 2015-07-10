@@ -35,7 +35,6 @@ module Fastlane
 
         updater = Gem::CommandManager.instance[:update]
         cleaner = Gem::CommandManager.instance[:cleanup]
-        updater.options[:minimal_deps] = true
 
         sudo_needed = !File.writable?(Gem.dir)
 
