@@ -40,6 +40,10 @@ module Spaceship
       #   nil
       attr_accessor :app_icon_preview_url
 
+      # @return [Array] A list of binaries which are not even yet processing based on the version
+      #   Those builds are usually the ones that are just stuck on iTunes Connect...
+      attr_accessor :pre_processing_builds
+
       attr_mapping(
         'adamId' => :apple_id,
         'name' => :name,
@@ -153,9 +157,27 @@ module Spaceship
       #####################################################
 
       # A reference to all the build trains
+      # @return [Hash] a hash, the version number being the key
       def build_trains
         Tunes::BuildTrain.all(self, self.apple_id)
       end
+
+      def pre_processing_builds
+        data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
+        
+        data.fetch('processingBuilds', []).collect do |attrs|
+          attrs.merge!(build_train: self)
+          Tunes::ProcessingBuild.factory(attrs)
+        end
+      end
+
+      #####################################################
+      # @!group General
+      #####################################################
+      def setup
+        
+      end
+
     end
   end
 end

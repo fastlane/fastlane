@@ -108,7 +108,7 @@ describe Spaceship::AppVersion do
   end
 
   describe "Modifying the app version" do
-    let (:version) { app.edit_version }
+    let (:version) { Spaceship::Application.all.first.edit_version }
 
     it "doesn't allow modification of localized properties without the language" do
       begin

@@ -150,13 +150,15 @@ module Spaceship
         'version.value' => :version,
         'watchAppIcon.value.originalFileName' => :watch_app_icon_original_name,
         'watchAppIcon.value.url' => :watch_app_icon_url,
+
+        # App Review Information
         'appReviewInfo.firstName.value' => :review_first_name,
         'appReviewInfo.lastName.value' => :review_last_name,
         'appReviewInfo.phoneNumber.value' => :review_phone_number,
         'appReviewInfo.emailAddress.value' => :review_email,
+        'appReviewInfo.reviewNotes.value' => :review_notes,
         'appReviewInfo.userName.value' => :review_demo_user,
-        'appReviewInfo.password.value' => :review_demo_password,
-        'appReviewInfo.reviewNotes.value' => :review_notes
+        'appReviewInfo.password.value' => :review_demo_password
       })
 
       class << self

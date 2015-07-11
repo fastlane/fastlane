@@ -22,10 +22,10 @@ module Spaceship
       # @return (String) The version number (e.g. 1.3)
       attr_accessor :train_version
 
-      # @return (Integer) The number of seconds since 1970 (e.g. 1413966436000)
+      # @return (Integer) The number of ticks since 1970 (e.g. 1413966436000)
       attr_accessor :upload_date
 
-      # @return (String) Icon URL
+      # @return (String) URL to the app icon of this build
       attr_accessor :icon_url
 
       # @return (String)

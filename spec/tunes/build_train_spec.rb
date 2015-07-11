@@ -12,21 +12,45 @@ describe Spaceship::Tunes::BuildTrain do
       trains = app.build_trains
 
       expect(trains.count).to eq(2)
-      train = trains.first
+      train = trains.values.first
 
       expect(train.version_string).to eq("0.9.10")
       expect(train.platform).to eq("ios")
       expect(train.application).to eq(app)
 
       # TestFlight
-      expect(trains.first.testflight_testing_enabled).to eq(false)
-      expect(trains.last.testflight_testing_enabled).to eq(true)
+      expect(trains.values.first.testflight_testing_enabled).to eq(false)
+      expect(trains.values.last.testflight_testing_enabled).to eq(true)
     end
 
     describe "Accessing builds" do
-      let (:train) { app.build_trains.first }
       it "lets the user fetch the builds for a given train" do
+        train = app.build_trains.values.first
         expect(train.builds.count).to eq(1)
+      end
+
+      it "lets the user fetch the builds using the version as a key" do
+        train = app.build_trains['0.9.10']
+        expect(train.version_string).to eq('0.9.10')
+        expect(train.platform).to eq('ios')
+        expect(train.testflight_testing_enabled).to eq(false)
+        expect(train.builds.count).to eq(1)
+      end
+    end
+
+    describe "Processing builds" do
+      let (:train) { app.build_trains.values.first }
+
+      it "builds that are stuck or pre-processing" do
+        expect(app.pre_processing_builds.count).to eq(4)
+
+        created_and_stucked = app.pre_processing_builds.first
+        expect(created_and_stucked.upload_date).to eq(1436381720000)
+        expect(created_and_stucked.state).to eq("ITC.apps.betaProcessingStatus.Created")
+      end
+
+      it "properly extracted the processing builds from a train" do
+        expect(train.processing_builds.count).to eq(0)  
       end
     end
   end

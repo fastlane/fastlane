@@ -106,7 +106,27 @@
       }],
       "buildsInProcessing": []
     }],
-    "processingBuilds": [],
+    "processingBuilds": [{
+      "uploadDate": 1436381720000,
+      "buildVersion": null,
+      "trainVersion": null,
+      "state": "ITC.apps.betaProcessingStatus.Created"
+    }, {
+    "uploadDate": 1436621343000,
+      "buildVersion": "0.9.14",
+      "trainVersion": "0.9.14",
+      "state": "ITC.apps.betaProcessingStatus.Uploaded"
+    }, {
+      "uploadDate": 1436376264000,
+      "buildVersion": null,
+      "trainVersion": null,
+      "state": "ITC.apps.betaProcessingStatus.InvalidBinary"
+    }, {
+      "uploadDate": 1436376035000,
+      "buildVersion": null,
+      "trainVersion": null,
+      "state": "ITC.apps.betaProcessingStatus.Created"
+    }],
     "currentTestingApps": 5,
     "maxTestingApps": 10,
     "isBetaDataAvailable": true,

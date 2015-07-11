@@ -11,9 +11,6 @@ module Spaceship
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
       attr_reader :builds
 
-      # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
-      attr_reader :processing_builds
-
       # @return (String) The version number of this train
       attr_accessor :version_string
 
@@ -23,7 +20,9 @@ module Spaceship
       # @return (Bool) Is beta testing enabled for this train? Only one train can have enabled testing.
       attr_accessor :testflight_testing_enabled
 
-
+      # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
+      #  I never got this to work to properly try and debug this
+      attr_reader :processing_builds
 
       attr_mapping(
         'versionString' => :version_string,
@@ -42,16 +41,24 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id)
           data = client.build_trains(app_id)
-          result = data['trains'].collect do |attrs|
+          result = {}
+          data['trains'].each do |attrs|
             attrs.merge!(application: application)
-            self.factory(attrs)
+            current = self.factory(attrs)
+            result[current.version_string] = current
           end
+          result
         end
       end
 
       # Setup all the builds and processing builds
       def setup
         @builds = self.raw_data['builds'].collect do |attrs|
+          attrs.merge!(build_train: self)
+          Tunes::Build.factory(attrs)
+        end
+
+        @processing_builds = self.raw_data['buildsInProcessing'].collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)
         end
