@@ -85,6 +85,8 @@ Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#
 
 ### update_project_provisioning
 
+This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+
 Updated your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action.
 
 ```ruby
@@ -122,6 +124,8 @@ update_app_group_identifiers(
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 ipa(
@@ -205,6 +209,8 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
 Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
 such as; archive, build, clean, test, export & more.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
