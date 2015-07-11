@@ -78,7 +78,17 @@ module Fastlane
         class_ref = Fastlane::Actions.const_get(class_name)
       rescue NameError => ex
         # Action not found
-        raise "Could not find method '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+
+        # Is there a lane under this name?
+        current_platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        block = @runner.blocks.fetch(current_platform, {}).fetch(method_sym, nil)
+        block ||= @runner.blocks.fetch(nil).fetch(method_sym, nil) # fallback to general lane for multiple platforms
+        if block
+          return block.call(arguments.first || {}) # to always pass a hash
+        else
+          # No action and no lane, raising an exception now
+          raise "Could not find action or lane '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        end
       end
 
       if class_ref && class_ref.respond_to?(:run)

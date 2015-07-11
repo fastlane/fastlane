@@ -132,6 +132,50 @@ describe Fastlane do
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)
       end
 
+      describe "supports switching lanes" do
+        it "use case 1: passing parameters to another lane" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff.runner.execute(:lane1, :ios)
+
+          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
+        end
+
+        it "use case 2: passing no parameter to a lane that takes parameters" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff.runner.execute(:lane3, :ios)
+
+          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + ")
+        end
+
+        it "use case 3: Calling a lane directly which takes parameters" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff.runner.execute(:lane4, :ios)
+
+          expect(File.read("/tmp/deliver_result.txt")).to eq("{}")
+        end
+
+        it "use case 4: Passing parameters to another lane" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff.runner.execute(:lane5, :ios)
+
+          expect(File.read("/tmp/deliver_result.txt")).to eq("{:key=>:value}")
+        end
+
+        it "use case 5: Calling a method outside of the current platform" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff.runner.execute(:call_general_lane, :ios)
+
+          expect(File.read("/tmp/deliver_result.txt")).to eq("{:random=>:value}")
+        end
+
+        it "calling a lane that doesn't exist" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          expect {
+            ff.runner.execute(:invalid, :ios)
+          }.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        end
+      end
+
       it "collects the lane description for documentation" do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)

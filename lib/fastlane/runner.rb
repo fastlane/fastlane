@@ -36,7 +36,7 @@ module Fastlane
         before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
         before_all_blocks[nil].call(lane) if before_all_blocks[nil]
         
-        return_val = blocks[platform][lane].call
+        return_val = blocks[platform][lane].call({}) # by default no parameters
         
         
         # `after_all` is only called if no exception was raised before
