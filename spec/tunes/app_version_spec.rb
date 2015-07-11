@@ -119,6 +119,33 @@ describe Spaceship::AppVersion do
       end
     end
 
+    describe "Modifying the category" do
+      it "prefixes the category with the correct value for all category types" do
+        version.primary_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.primary_first_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.primary_second_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_first_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_second_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+      end
+
+      it "doesn't prefix if the prefix is already there" do
+        version.primary_category = "MZGenre.Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+      end
+    end
+
     it "allows modifications of localized values" do
       new_title = 'New Title'
       version.name['English'] = new_title

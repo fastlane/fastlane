@@ -273,6 +273,41 @@ module Spaceship
         (super != nil)
       end
 
+      def primary_category=(value)
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def primary_category=(value)
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def primary_first_sub_cate=(value)gory
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def primary_second_sub_cat=(value)egory
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def secondary_category=(value)
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def secondary_first_sub_ca=(value)tegory
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
+      def secondary_second_sub_c=(value)ategory
+        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        super(value)
+      end
+
       private
         # generates the nested data structure to represent screenshots
         def setup_screenshots(row)
