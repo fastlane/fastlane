@@ -107,7 +107,12 @@ module Spaceship
       def attr_mapping(attr_map = nil)
         if attr_map
           @attr_mapping = attr_map
-          @attr_mapping.values.each {|meth| remove_method(meth) }
+          @attr_mapping.values.each do |method_name|
+            getter = method_name.to_sym
+            setter = "#{method_name}=".to_sym
+            remove_method(getter) if public_instance_methods.include?(getter)
+            remove_method(setter) if public_instance_methods.include?(setter)
+          end
           include(mapping_module(@attr_mapping))
         else
           begin
