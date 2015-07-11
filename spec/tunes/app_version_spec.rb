@@ -115,6 +115,7 @@ describe Spaceship::AppVersion do
         version.name = "Yes"
         raise "Should raise exception before"
       rescue NoMethodError => ex
+        expect(ex.to_s).to include("undefined method `name='")
       end
     end
 

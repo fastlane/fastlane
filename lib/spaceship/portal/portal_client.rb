@@ -47,13 +47,45 @@ module Spaceship
       end
     end
 
+    # @return (Array) A list of all available teams
     def teams
       r = request(:post, 'account/listTeams.action')
       parse_response(r, 'teams')
     end
 
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['teamId']
+    end
+
+    # Shows a team selection for the user in the terminal. This should not be
+    # called on CI systems
     def select_team
       @current_team_id = self.UI.select_team
+    end
+
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      @current_team_id = team_id
+    end
+
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
+    end
+
+    # Is the current session from an Enterprise In House account?
+    def in_house?
+      # TODO: move to portal
+      return @in_house unless @in_house.nil?
+      @in_house = (team_information['type'] == 'In-House')
     end
 
 
