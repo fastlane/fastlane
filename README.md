@@ -170,6 +170,8 @@ Use it to define the general information:
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
+You can find a more complex [configuration](https://github.com/fastlane/examples/blob/master/MindNode/screenshots/Framefile.json) to also support Chinese, Japanese and Korean languages.
+
 The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
 
 #### `.strings` files
@@ -214,7 +216,7 @@ With `frameit` 2.0 is possible to also frame Mac OS X Applications. You have to 
 }
 ```
 
-Check out the [MindNode example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots)
+Check out the [MindNode example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
 
 # Tips
 
