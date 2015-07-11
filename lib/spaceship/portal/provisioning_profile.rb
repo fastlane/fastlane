@@ -207,6 +207,9 @@ module Spaceship
           certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of?Array
           certificate_parameter ||= [certificate.id]
 
+          # Fix https://github.com/KrauseFx/fastlane/issues/349
+          certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
+
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all devices by default
