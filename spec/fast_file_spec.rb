@@ -10,7 +10,7 @@ describe Fastlane do
       it "raises an error if unknow method is called" do
         expect {
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
-        }.to raise_exception "Could not find method 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        }.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
     end
 
@@ -132,8 +132,8 @@ describe Fastlane do
         expect(File.exists?('/tmp/fastlane/test')).to eq(true)
       end
 
-      describe "supports switching lanes" do
-        it "use case 1: passing parameters to another lane" do
+      describe "supports switching lanes", now: true do
+        it "use case 1: passing parameters to another lane and getting the result", now: true do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane1, :ios)
 

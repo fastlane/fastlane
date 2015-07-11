@@ -68,6 +68,29 @@ module Fastlane
       @runner.set_error(@current_platform, block)
     end
 
+    def try_switch_to_lane(new_lane, parameters)
+      current_platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+      block = @runner.blocks.fetch(current_platform, {}).fetch(new_lane, nil)
+      platform_nil = (block == nil) # used for the output
+      block ||= @runner.blocks.fetch(nil, {}).fetch(new_lane, nil) # fallback to general lane for multiple platforms
+      if block
+        pretty = [new_lane]
+        pretty = [current_platform, new_lane] unless platform_nil
+        Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
+        result = block.call(parameters.first || {}) # to always pass a hash
+        original_lane = Actions.lane_context[Actions::SharedValues::LANE_NAME]
+        Helper.log.info "Cruising back to lane '#{original_lane}' 🚘".green
+        return result
+      else
+        # No action and no lane, raising an exception now
+        raise "Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+      end
+    end
+
+    def execute_action
+
+    end
+
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
       # First, check if there is a predefined method in the actions folder
@@ -78,17 +101,8 @@ module Fastlane
         class_ref = Fastlane::Actions.const_get(class_name)
       rescue NameError => ex
         # Action not found
-
         # Is there a lane under this name?
-        current_platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-        block = @runner.blocks.fetch(current_platform, {}).fetch(method_sym, nil)
-        block ||= @runner.blocks.fetch(nil).fetch(method_sym, nil) # fallback to general lane for multiple platforms
-        if block
-          return block.call(arguments.first || {}) # to always pass a hash
-        else
-          # No action and no lane, raising an exception now
-          raise "Could not find action or lane '#{method_sym}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
-        end
+        return try_switch_to_lane(method_sym, arguments)
       end
 
       if class_ref && class_ref.respond_to?(:run)
