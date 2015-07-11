@@ -2,6 +2,10 @@ require 'shellwords'
 
 module Fastlane
   module Actions
+    module SharedValues
+      ORIGINAL_DEFAULT_KEYCHAIN = :ORIGINAL_DEFAULT_KEYCHAIN
+    end
+
     class CreateKeychainAction < Action
       def self.run(params)
         escaped_name = params[:name].shellescape
@@ -10,7 +14,11 @@ module Fastlane
         commands = []
         commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{escaped_name}", log:false)
 
-        commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log:false) if params[:default_keychain]
+        if params[:default_keychain]
+          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log:false).strip
+          commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log:false)
+        end
+
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_name}", log:false) if params[:unlock]
 
         command = "security set-keychain-settings"
