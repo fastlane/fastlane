@@ -18,8 +18,7 @@ module Fastlane
       sdk: '--sdk',
       ipa: '--ipa',
       xcconfig: '--xcconfig',
-      xcargs: '--xcargs',
-      silent: '--silent',
+      xcargs: '--xcargs'
     }
 
     class IpaAction < Action
@@ -59,7 +58,7 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        core_command = "krausefx-ipa build #{build_args} | xcpretty"
+        core_command = "krausefx-ipa build #{build_args} --verbose | xcpretty"
         command = "set -o pipefail && #{core_command}"
         Helper.log.debug command
 
@@ -109,8 +108,6 @@ module Fastlane
               v == true ? '--clean' : '--no-clean'
             elsif k == :archive
               v == true ? '--archive' : '--no-archive'
-            elsif k == :silent
-              v == true ? '' : '--verbose'
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip
