@@ -2,6 +2,8 @@ module Fastlane
   class FastFile
     attr_accessor :runner
 
+    SharedValues = Fastlane::Actions::SharedValues
+
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       return unless (path || '').length > 0

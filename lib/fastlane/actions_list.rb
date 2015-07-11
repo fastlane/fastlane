@@ -84,7 +84,7 @@ module Fastlane
             headings: ['Key', 'Description'],
             rows: output
           )
-          puts "Access the output values using `Actions.lane_context[Actions::SharedValues::VARIABLE_NAME]`"
+          puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
           puts ""
         end
 

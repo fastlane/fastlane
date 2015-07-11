@@ -489,7 +489,7 @@ deploygate(
   api_token: '...',
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
-  message: "Build #{Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]}",
+  message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
 )
 ```
 
