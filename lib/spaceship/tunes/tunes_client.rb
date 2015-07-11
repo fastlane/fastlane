@@ -208,5 +208,17 @@ module Spaceship
       data = parse_response(r, 'data')
     end
 
+    def update_build_trains!(app_id, data)
+      raise "app_id is required" unless app_id
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/trains/"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body['data'])
+    end
+
   end
 end

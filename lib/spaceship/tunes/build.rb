@@ -25,7 +25,7 @@ module Spaceship
       # @return (Integer) The number of ticks since 1970 (e.g. 1413966436000)
       attr_accessor :upload_date
 
-      # @return (String) URL to the app icon of this build
+      # @return (String) URL to the app icon of this build (150x150px)
       attr_accessor :icon_url
 
       # @return (String)
@@ -34,31 +34,33 @@ module Spaceship
       # @return (String) The platform of this build (e.g. 'ios')
       attr_accessor :platform
 
+      # @return (Integer) When is this build going to be invalid
       attr_accessor :internal_expiry_date
 
+      # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
 
+      # @return (Bool): 
       attr_accessor :ready_to_install
 
       #####################################################
       # @!group Analytics
       #####################################################
 
-      # @return (Integer)
+      # @return (Integer) Number of installs of this build
       attr_accessor :install_count
 
-      # @return (Integer)
+      # @return (Integer) Number of installs for this build that come from internal users
       attr_accessor :internal_install_count
 
-      # @return (Integer)
+      # @return (Integer) Number of installs for this build that come from external users
       attr_accessor :external_install_count
 
-      # @return (Integer) Might be nil
+      # @return (Integer) Might be nil. The number of sessions for this build
       attr_accessor :session_count
 
+      # @return (Integer) Might be nil. The number of crashes of this build
       attr_accessor :crash_count
-
-
 
       attr_mapping(
         'uploadDate' => :upload_date,
