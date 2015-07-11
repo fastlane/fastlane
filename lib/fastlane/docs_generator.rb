@@ -30,6 +30,7 @@ module Fastlane
         end
       end
 
+      output << "Generate this documentation by running `fastlane docs`"
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
       output << "The documentation of fastlane can be found on [GitHub](https://github.com/KrauseFx/fastlane)"
 

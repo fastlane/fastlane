@@ -106,7 +106,7 @@ module Fastlane
         #####################################
 
         # Gets info used for the plist
-        bundle_id, bundle_version, title, full_version = get_ipa_info( ipa_file )
+        bundle_id, bundle_version, title, full_version = get_ipa_info(ipa_file)
 
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title}.plist"

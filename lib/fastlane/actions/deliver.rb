@@ -49,7 +49,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :beta,
                                        env_name: "FL_DELIVER_BETA",
-                                       description: "Upload a new version to TestFlight",
+                                       description: "Upload a new version to TestFlight - this will skip metadata upload",
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
