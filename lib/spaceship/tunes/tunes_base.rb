@@ -3,7 +3,11 @@ module Spaceship
     class TunesBase < Spaceship::Base
       class << self
         def client
-          @client || Spaceship::Tunes.client
+          (
+            @client or
+            Spaceship::Tunes.client or
+            raise "Please login using `Spaceship::Tunes.login('user', 'password')`"
+          )
         end
       end
     end
