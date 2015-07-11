@@ -78,6 +78,29 @@ describe Fastlane do
       )
     end
 
+    it "works with a destination list" do
+      result = Fastlane::FastFile.new.parse("lane :test do
+        xcodebuild(
+          destination: [
+            'name=iPhone 5s,OS=8.1',
+            'name=iPhone 4,OS=7.1',
+          ],
+          destination_timeout: 240,
+        )
+      end").runner.execute(:test)
+
+      expect(result).to eq(
+        "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination \"name=iPhone 4,OS=7.1\" " \
+          + "-destination-timeout \"240\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| xcpretty --color --simple"
+      )
+    end
+
     it "works with build settings" do
       result = Fastlane::FastFile.new.parse("lane :test do
         xcodebuild(

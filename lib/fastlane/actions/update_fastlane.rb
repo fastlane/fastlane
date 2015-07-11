@@ -1,5 +1,5 @@
 require 'rubygems/spec_fetcher'
-require 'rubygems/commands/update_command'
+require 'rubygems/command_manager'
 
 module Fastlane
   module Actions
@@ -33,7 +33,8 @@ module Fastlane
           return
         end
 
-        updater = Gem::Commands::UpdateCommand.new
+        updater = Gem::CommandManager.instance[:update]
+        cleaner = Gem::CommandManager.instance[:cleanup]
 
         sudo_needed = !File.writable?(Gem.dir)
 
@@ -67,11 +68,14 @@ module Fastlane
           Helper.log.info "Finished updating #{tool}"
         end
 
-        any_updates = updater.installer.installed_gems.any? do |updated_tool|
+        all_updated_tools = updater.installer.installed_gems.select do |updated_tool|
           updated_tool.version > highest_versions[updated_tool.name].version
         end
 
-        if any_updates
+        unless all_updated_tools.empty?
+          Helper.log.info "Cleaning up old versions..."
+          cleaner.options[:args] = all_updated_tools.map {|t| t.name }
+          cleaner.execute
           Helper.log.info "fastlane.tools succesfully updated! I will now restart myself... 😴"
           
           # Set no_update to true so we don't try to update again
