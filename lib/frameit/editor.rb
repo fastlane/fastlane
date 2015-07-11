@@ -193,7 +193,9 @@ module Frameit
           end
 
           current_font = font(key)
+          text = fetch_text(key)
           Helper.log.debug "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
+          Helper.log.debug "Adding text '#{fetch_text(key)}'"if $verbose
 
           # Add the actual title
           title_image.combine_options do |i|
@@ -268,7 +270,7 @@ module Frameit
           end
         end
 
-        Helper.log.debug "No custom font specified, using the default one" if $verbose
+        Helper.log.debug "No custom font specified for #{screenshot}, using the default one" if $verbose
         return nil
       end
   end
