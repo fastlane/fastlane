@@ -4,7 +4,7 @@
 
 To pass parameters from the command line to your lane, use the following syntax:
 
-```sh
+```
 fastlane [lane] key:value key2:value2
 
 fastlane deploy submit:false build_number:24
