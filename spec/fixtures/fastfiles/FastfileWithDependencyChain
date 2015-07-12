@@ -1,0 +1,29 @@
+# vim: ft=ruby
+
+depends_on :seven
+lane :one do
+end
+
+depends_on :one
+lane :two do
+end
+
+depends_on :two
+lane :three do
+end
+
+depends_on :five
+lane :four do
+end
+
+depends_on :one
+lane :five do
+end
+
+depends_on :three, :four, :five
+lane :six do
+end
+
+depends_on :six
+lane :seven do
+end

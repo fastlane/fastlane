@@ -17,5 +17,12 @@ describe Fastlane do
         expect(@ff.runner.available_lanes('asdfasdfasdf')).to eq([])
       end
     end
+
+    describe "dependencies" do 
+      it "runs the dependencies in the defined order" do
+        ff = Fastlane::FastFile.new("./spec/fixtures/fastfiles/FastfileWithDependencies")
+        expect(ff.runner.execute(:seven)).to eq([1, 2, 3, 4, 5, 6, 7])
+      end
+    end
   end
 end

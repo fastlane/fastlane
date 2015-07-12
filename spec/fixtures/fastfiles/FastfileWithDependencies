@@ -1,0 +1,36 @@
+# vim: ft=ruby
+
+nums = []
+
+lane :one do
+  nums << 1
+end
+
+depends_on :one
+lane :two do
+  nums << 2
+end
+
+depends_on :two
+lane :three do
+  nums << 3
+end
+
+lane :four do
+  nums << 4
+end
+
+lane :five do
+  nums << 5
+end
+
+depends_on :three, :four, :five
+lane :six do
+  nums << 6
+end
+
+depends_on :six
+lane :seven do
+  nums << 7
+  nums
+end
