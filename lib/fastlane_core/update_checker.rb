@@ -1,15 +1,16 @@
-require 'open-uri'
+require 'excon'
 
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
-
     # This web service is fully open source: https://github.com/fastlane/refresher
     UPDATE_URL = "https://fastlane-refresher.herokuapp.com/"
 
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
       return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
+      @start_time = Time.now
       
       Thread.new do
         begin
@@ -19,15 +20,32 @@ module FastlaneCore
       end
     end
 
-    def self.show_update_status(gem_name, current_version)
-      latest = server_results[gem_name]
-      if latest and Gem::Version.new(latest) > Gem::Version.new(current_version)
-        show_update_message(gem_name, latest, current_version)
-      end
+    def self.server_results
+      @@results ||= {}
     end
 
-    def self.show_update_message(gem_name, available, current_version)
-      v = fetch_latest(gem_name)
+    def self.update_available?(gem_name, current_version)
+      latest = server_results[gem_name]
+      return (latest and Gem::Version.new(latest) > Gem::Version.new(current_version))
+    end
+
+    def self.show_update_status(gem_name, current_version)
+      t = Thread.new do
+        begin
+          finished_running(gem_name)
+        rescue
+        end
+      end
+
+      if update_available?(gem_name, current_version)
+        show_update_message(gem_name, current_version)
+      end
+
+      t.join(3)
+    end
+
+    def self.show_update_message(gem_name, current_version)
+      available = server_results[gem_name]
       puts ""
       puts '#######################################################################'.green
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
@@ -37,30 +55,19 @@ module FastlaneCore
       puts '#######################################################################'.green
     end
 
-    def self.server_results
-      @@results ||= {}
-    end
-
-    # Legacy Code:
-    # 
-    # Is a new official release available (this does not include pre-releases)
-    def self.update_available?(gem_name, current_version)
-      begin
-        latest = fetch_latest(gem_name)
-        if latest and Gem::Version.new(latest) > Gem::Version.new(current_version)
-          return true
-        end
-      rescue => ex
-        Helper.log.error("Could not check if '#{gem_name}' is up to date.")
-      end
-      return false
-    end
-
-    # Relevant code
     def self.fetch_latest(gem_name)
       url = UPDATE_URL + gem_name
       url += "?ci=1" if Helper.is_ci?
-      JSON.parse(open(url).read)["version"]
+      JSON.parse(Excon.post(url).body).fetch("version", nil)
+    end
+
+    def self.finished_running(gem_name)
+      time = (Time.now - @start_time).to_i
+
+      url = UPDATE_URL + "time/#{gem_name}"
+      url += "?time=#{time}"
+      url += "&ci=1" if Helper.is_ci?
+      output = Excon.post(url)
     end
   end
 end
