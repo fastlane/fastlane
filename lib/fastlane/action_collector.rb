@@ -3,14 +3,14 @@ module Fastlane
     HOST_URL = "https://fastlane-enhancer.herokuapp.com/"
 
     def did_launch_action(name)
-      if is_official(name)
+      if is_official?(name)
         launches[name] ||= 0
         launches[name] += 1
       end
     end
 
     def did_raise_error(name)
-      if is_official(name)
+      if is_official?(name)
         @error = name
       end
     end
@@ -51,7 +51,8 @@ module Fastlane
       @launches ||= {}
     end
 
-    def is_official(name)
+    def is_official?(name)
+      return true if name == :lane_switch
       Actions.get_all_official_actions.include?name
     end
 

@@ -77,6 +77,7 @@ module Fastlane
         pretty = [new_lane]
         pretty = [current_platform, new_lane] unless platform_nil
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
+        collector.did_launch_action(:lane_switch)
         result = block.call(parameters.first || {}) # to always pass a hash
         original_lane = Actions.lane_context[Actions::SharedValues::LANE_NAME]
         Helper.log.info "Cruising back to lane '#{original_lane}' 🚘".green
