@@ -77,6 +77,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
                                        description: "Path to your DSYM file",
+                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: Proc.new do |value|
                                         # validation is done in the action
