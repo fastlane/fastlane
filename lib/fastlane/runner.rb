@@ -4,7 +4,8 @@ module Fastlane
     # This will take care of executing **one** lane. 
     # @param lane_name The name of the lane to execute
     # @param platform The name of the platform to execute
-    def execute(lane, platform = nil)
+    # @param parameters [Hash] The parameters passed from the command line to the lane
+    def execute(lane, platform = nil, parameters = nil)
       raise "No lane given" unless lane
 
       ENV["FASTLANE_LANE_NAME"] = lane.to_s
@@ -36,8 +37,7 @@ module Fastlane
         before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
         before_all_blocks[nil].call(lane) if before_all_blocks[nil]
         
-        return_val = blocks[platform][lane].call({}) # by default no parameters
-        
+        return_val = blocks[platform][lane].call(parameters || {}) # by default no parameters
         
         # `after_all` is only called if no exception was raised before
         # Call the platform specific before_all block and then the general one

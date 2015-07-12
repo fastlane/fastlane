@@ -2,9 +2,12 @@ module Fastlane
   class LaneManager
     # @param platform The name of the platform to execute
     # @param lane_name The name of the lane to execute
-    def self.cruise_lane(platform, lane, env = nil)
+    # @param parameters [Hash] The parameters passed from the command line to the lane
+    # @param env Dot Env Information
+    def self.cruise_lane(platform, lane, parameters = nil, env = nil)
       raise 'lane must be a string' unless (lane.is_a?(String) or lane.nil?)
       raise 'platform must be a string' unless (platform.is_a?(String) or platform.nil?)
+      raise 'parameters must be a hash' unless (parameters.is_a?(Hash) or parameters.nil?)
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
@@ -30,7 +33,7 @@ module Fastlane
       started = Time.now
       e = nil
       begin
-        ff.runner.execute(lane, platform)
+        ff.runner.execute(lane, platform, parameters)
       rescue => ex
         Helper.log.info 'Variable Dump:'.yellow
         Helper.log.info Actions.lane_context
