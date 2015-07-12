@@ -1,6 +1,74 @@
 # Advanced fastlane
 
-### Environment Variables
+## Passing Parameters
+
+To pass parameters from the command line to your lane, use the following syntax:
+
+```sh
+fastlane [lane] key:value key2:value2
+
+fastlane deploy submit:false build_number:24
+```
+
+To access those values, change your lane decleration to also include `|options|`
+
+```ruby
+lane :deploy do |options|
+  ...
+  if options[:submit]
+    # Only when submit is true
+  end
+  ...
+  increment_build_number(build_number: options[:build_nymber])
+  ...
+end
+```
+
+## Switching lanes
+
+To switch lanes while executing a lane, use the following code:
+
+```ruby
+lane :deploy do |options|
+  ...
+  build(release: true) # that's the important bit
+  hockey
+  ...
+end
+
+lane :staging do |options|
+  ...
+  build # it also works when you don't pass parameters
+  hockey
+  ...
+end
+
+lane :build do |options|
+  scheme = (options[:release] ? "Release" : "Staging")
+  ipa(scheme: scheme)
+end
+```
+
+`fastlane` takes care of all the magic for you. You can call lanes of the same platform or a general lane outside of the `platform` definition.
+
+If you want you can pass parameters, but you don't have to.
+
+Additionally, you can retrieve the return value. In Ruby, the last line of the `lane` definition is the return value. Here is an example:
+
+```ruby
+lane :deploy do |options|
+  value = calculate(value: 3)
+  puts value # => 5
+end
+
+lane :calculate do |options|
+  ...
+  2 + options[:value] # the last line will always be the return value
+end
+```
+
+
+## Environment Variables
 You can define environment variables in a `.env` or `.env.default` file in the same directory as your `Fastfile`. Environment variables are loading using [dotenv](https://github.com/bkeepers/dotenv). Here's an example.
 
 ```
