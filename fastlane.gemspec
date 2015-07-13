@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
-  spec.add_dependency 'fastlane_core', '>= 0.9.2' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.10.1' # all shared code and dependencies
 
 
   # All the fastlane tools
