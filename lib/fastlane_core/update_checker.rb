@@ -30,7 +30,7 @@ module FastlaneCore
     end
 
     def self.show_update_status(gem_name, current_version)
-      t = Thread.new do
+      fork do
         begin
           finished_running(gem_name)
         rescue
@@ -40,8 +40,6 @@ module FastlaneCore
       if update_available?(gem_name, current_version)
         show_update_message(gem_name, current_version)
       end
-
-      t.join(3)
     end
 
     def self.show_update_message(gem_name, current_version)
@@ -67,7 +65,7 @@ module FastlaneCore
       url = UPDATE_URL + "time/#{gem_name}"
       url += "?time=#{time}"
       url += "&ci=1" if Helper.is_ci?
-      output = Excon.post(url)
+      Excon.post(url)
     end
   end
 end
