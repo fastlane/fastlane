@@ -156,11 +156,13 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`.
 
+To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
+
 ## Credentials
-A detailed description about how ```fastlane``` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 
 ## Need help?
-- If there is a technical problem with ```fastlane```, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
+- If there is a technical problem with `fastlane`, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
 - I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 ## Special Thanks
