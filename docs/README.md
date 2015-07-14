@@ -12,6 +12,8 @@ More advanced settings and tips can be found in [Advanced.md](https://github.com
 
 For more information about multi platform support check out [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md).
 
+You can also pass parameters to lanes from the command line. Additionally you can trigger other lanes from within your lane. Checkout [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters).
+
 ## Fastfile
 
 The Fastfile is used to configure `fastlane`. Open it in your favourite text editor, using Ruby syntax highlighting.
