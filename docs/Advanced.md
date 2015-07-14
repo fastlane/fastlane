@@ -51,8 +51,9 @@ end
 
 `fastlane` takes care of all the magic for you. You can call lanes of the same platform or a general lane outside of the `platform` definition.
 
-If you want you can pass parameters, but you don't have to.
+Passing parameters is optional.
 
+## Returning values
 Additionally, you can retrieve the return value. In Ruby, the last line of the `lane` definition is the return value. Here is an example:
 
 ```ruby
