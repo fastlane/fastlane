@@ -7,6 +7,7 @@ module Fastlane
         command = "security import #{params[:certificate_path].shellescape} -k ~/Library/Keychains/#{params[:keychain_name].shellescape}"
         command << " -P #{params[:certificate_password].shellescape}" if params[:certificate_password]
         command << " -T /usr/bin/codesign"
+        command << " -T /usr/bin/security"
 
         Fastlane::Actions.sh command, log: false
       end
