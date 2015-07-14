@@ -11,7 +11,6 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 98
         expect(result).to start_with 'security'
         expect(result).to include 'import test.cer'
         expect(result).to include '-k ~/Library/Keychains/test.keychain'
@@ -29,7 +28,6 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 120
         expect(result).to start_with 'security'
         expect(result).to include %(import \\\"\\ test\\ \\\".cer)
         expect(result).to include %(-k ~/Library/Keychains/\\\"\\ test\\ \\\".keychain)
@@ -47,7 +45,6 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 82
         expect(result).to start_with 'security'
         expect(result).to include 'import test.cer'
         expect(result).to include '-k ~/Library/Keychains/test.keychain'
