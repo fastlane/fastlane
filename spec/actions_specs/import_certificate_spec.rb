@@ -17,6 +17,7 @@ describe Fastlane do
         expect(result).to include '-k ~/Library/Keychains/test.keychain'
         expect(result).to include '-P testpassword'
         expect(result).to include '-T /usr/bin/codesign'
+        expect(result).to include '-T /usr/bin/security'
       end
 
       it "works with certificate and password that contain spaces or `\"`" do
@@ -34,6 +35,7 @@ describe Fastlane do
         expect(result).to include %(-k ~/Library/Keychains/\\\"\\ test\\ \\\".keychain)
         expect(result).to include %(-P \\\"test\\ password\\\")
         expect(result).to include '-T /usr/bin/codesign'
+        expect(result).to include '-T /usr/bin/security'
 
       end
 
@@ -51,6 +53,7 @@ describe Fastlane do
         expect(result).to include '-k ~/Library/Keychains/test.keychain'
         expect(result).to_not include '-P'
         expect(result).to include '-T /usr/bin/codesign'
+        expect(result).to include '-T /usr/bin/security'
       end
     end
   end
