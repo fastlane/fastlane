@@ -44,9 +44,9 @@ module Sigh
       return @profile_type if @profile_type
 
       @profile_type = Spaceship.provisioning_profile.app_store
+      @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
       @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
       @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
-      @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
 
       @profile_type
     end
