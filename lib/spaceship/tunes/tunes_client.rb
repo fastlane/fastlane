@@ -97,7 +97,7 @@ module Spaceship
       end
 
       errors = handle_response_hash(data)
-      errors = errors + data.fetch('sectionErrorKeys') if data.fetch('sectionErrorKeys')
+      errors = errors + data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
 
       # Sometimes there is a different kind of error in the JSON response
       different_error = data.fetch('messages', {}).fetch('error', nil)
@@ -217,6 +217,22 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
 
+      handle_itc_response(r.body['data'])
+    end
+    
+    #####################################################
+    # @!group Submit for Review
+    #####################################################
+    
+    def send_app_submission(app_id, data, stage)
+      raise "app_id is required" unless app_id
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/version/submit/#{stage}"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      
       handle_itc_response(r.body['data'])
     end
 

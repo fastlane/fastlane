@@ -172,6 +172,15 @@ module Spaceship
       end
 
       #####################################################
+      # @!group Submit for Review
+      #####################################################
+      
+      def create_submission
+        # @TODO: check if submission is allowed
+        Spaceship::AppSubmission.create(self, self.apple_id, self.edit_version)
+      end
+
+      #####################################################
       # @!group General
       #####################################################
       def setup
