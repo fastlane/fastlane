@@ -54,7 +54,7 @@ describe Fastlane do
         expect(fields[2][:title]).to eq('Lane')
         expect(fields[2][:value]).to eq(lane_name)
 
-        expect(fields[3][:title]).to eq('Test Result')
+        expect(fields[3][:title]).to eq('Result')
         expect(fields[3][:value]).to eq('Error')
       end
     end

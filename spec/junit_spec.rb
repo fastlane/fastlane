@@ -20,7 +20,7 @@ describe Fastlane do
         ]
 
         path = Fastlane::JUnitGenerator.generate(results)
-        expect(path).to end_with("fastlane/report.xml")
+        expect(path).to end_with("report.xml")
 
         xml = Nokogiri::XML(File.open(path))
         expect(xml.xpath('//testcase')[0]['name']).to eq("0: My Step Name")
