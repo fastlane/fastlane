@@ -128,7 +128,7 @@ module Fastlane
           # test_result
           if should_add_payload[:test_result]
             slack_attachment[:fields] << {
-              title: 'Test Result',
+              title: 'Result',
               value: (options[:success] ? 'Success' : 'Error'),
               short: true
             }
