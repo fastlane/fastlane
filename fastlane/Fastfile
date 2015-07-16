@@ -11,7 +11,7 @@ lane :current_version do |options|
   JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
 end
 
-desc "Does everything that's needed for a release"
+desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
   tool_name = options[:tool] || 'fastlane'
   require tool_name
