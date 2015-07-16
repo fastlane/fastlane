@@ -97,15 +97,6 @@ module Fastlane
     # @!group Other things
     #####################################################
 
-    # Speak out loud
-    def say(value)
-      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
-      value ||= yield
-      Actions.execute_action('say') do
-        Fastlane::Actions::SayAction.run([value])
-      end
-    end
-
     def collector
       runner.collector
     end
@@ -139,6 +130,29 @@ module Fastlane
 
     def desc_collection
       @desc_collection ||= []
+    end
+
+    #####################################################
+    # @!group Overwriting Ruby methods
+    #####################################################
+
+    # Speak out loud
+    def say(value)
+      # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
+      value ||= yield
+      Actions.execute_action('say') do
+        collector.did_launch_action(:say)
+        Fastlane::Actions::SayAction.run([value])
+      end
+    end
+
+    def puts(value)
+      # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
+      value ||= yield
+      Actions.execute_action('puts') do
+        collector.did_launch_action(:pus)
+        Fastlane::Actions::PutsAction.run([value])
+      end
     end
   end
 end
