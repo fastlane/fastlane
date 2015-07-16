@@ -220,6 +220,9 @@ Download and install the [Provisioning Plugin](https://github.com/chockenberry/P
 It will show you the ```mobileprovision``` files like this: 
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
+## App Identifier couldn't be found
+
+If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/produce), which does exactly that.
 
 # Need help?
 - If there is a technical problem with ```sigh```, submit an issue.
