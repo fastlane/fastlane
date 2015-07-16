@@ -48,7 +48,8 @@ module Spaceship
           'prepareForUpload' => PREPARE_FOR_SUBMISSION,
           'devRejected' => DEVELOPER_REJECTED,
           'pendingContract' => PENDING_CONTRACT,
-          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE
+          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
+          'waitingForReview' => WAITING_FOR_REVIEW
         }
 
         mapping.each do |k, v| 
