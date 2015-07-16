@@ -1,0 +1,5 @@
+app_identifier "such invalid"
+
+apple_id do
+  "from_le_block"
+end

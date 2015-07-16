@@ -1,30 +1,37 @@
 require 'fastlane_core/configuration/config_item'
 require 'fastlane_core/configuration/commander_generator'
+require 'fastlane_core/configuration/configuration_file'
 
 module FastlaneCore
   class Configuration
-    def self.create(available_options, values)
-      Configuration.new(available_options, values)
+
+    attr_accessor :available_options
+
+    attr_accessor :values
+
+    # @return [String] The name of the configuration file (not the path). Optional!
+    attr_accessor :config_file_name
+
+    # @param config_file_name [String] The name of the configuration file to use (optional)
+    def self.create(available_options, values, config_file_name = nil)
+      Configuration.new(available_options, values, config_file_name)
     end
 
-    # Setting up
-
-    def values
-      # As the user accesses all values, we need to iterate through them to receive all the values
-      @available_options.each do |option|
-        @values[option.key] = fetch(option.key) unless @values[option.key]
-      end
-      @values
-    end
-
-    def initialize(available_options, values)
-      @available_options = available_options || []
-      @values = values || {}
+    #####################################################
+    # @!group Setting up the configuration
+    #####################################################
+    
+    def initialize(available_options, values, config_file_name = nil)
+      self.available_options = available_options || []
+      self.values = values || {}
+      self.config_file_name = config_file_name
 
       verify_input_types      
       verify_value_exists
       verify_no_duplicates
       verify_default_value_matches_verify_block
+
+      load_configuration_file
     end
 
     def verify_input_types
@@ -74,7 +81,19 @@ module FastlaneCore
       end
     end
 
-    # Using the class
+    def load_configuration_file
+      return unless self.config_file_name
+      paths = Dir["./fastlane/#{self.config_file_name}"] + Dir["./#{self.config_file_name}"]
+      paths = paths + Dir["./spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
+      return if paths.count == 0
+
+      path = paths.first
+      ConfigurationFile.new(self, path)
+    end
+
+    #####################################################
+    # @!group Actually using the class
+    #####################################################
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     def fetch(key)
@@ -122,18 +141,27 @@ module FastlaneCore
     end
 
     # Overwrites or sets a new value for a given key
+    # @param key [Symbol] Must be a symbol
     def set(key, value)
       raise "Key '#{key}' must be a symbol. Example :#{key}.".red unless key.kind_of?Symbol
       option = option_for_key(key)
       
       unless option
-        raise "Could not find available option '#{key}' in the list of available options #{@available_options.collect { |a| a.key }.join(', ')}".red
+        raise "Could not find available option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
       end
 
       option.verify!(value)
 
       @values[key] = value
       true
+    end
+
+    def values
+      # As the user accesses all values, we need to iterate through them to receive all the values
+      @available_options.each do |option|
+        @values[option.key] = fetch(option.key) unless @values[option.key]
+      end
+      @values
     end
 
     # Returns the config_item object for a given key

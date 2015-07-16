@@ -136,7 +136,7 @@ describe FastlaneCore do
           it "throws an error if the key doesn't exist" do
             expect {
               @config.set(:non_existing, "value")
-            }.to raise_error("Could not find available option 'non_existing' in the list of available options cert_name, output".red)
+            }.to raise_error("Could not find available option 'non_existing' in the list of available options: cert_name, output".red)
           end
 
           it "throws an error if it's invalid" do
