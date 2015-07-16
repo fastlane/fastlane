@@ -91,6 +91,8 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
+        raise "Parameters for a lane must always be a hash".red unless parameters.kind_of?Hash
+
         pretty = [new_lane]
         pretty = [current_platform, new_lane] unless platform_nil
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green

@@ -35,6 +35,10 @@ platform :ios do
   lane :call_general_lane do
     so_shared(random: :value)
   end
+
+  lane :invalid_parameters do
+    lane4(:value)
+  end
 end
 
 platform :mac do

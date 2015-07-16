@@ -185,6 +185,13 @@ describe Fastlane do
             ff.runner.execute(:invalid, :ios)
           }.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
         end
+
+        it "raises an exception when not passing a hash" do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          expect {
+            ff.runner.execute(:invalid_parameters, :ios)
+          }.to raise_error "Parameters for a lane must always be a hash".red
+        end
       end
 
       it "collects the lane description for documentation" do
