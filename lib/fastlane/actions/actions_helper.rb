@@ -8,10 +8,7 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
-    def self.executed_actions
-      @executed_actions ||= []
-    end
-
+    # Helper Methods
     def self.git_author
       s = `git log --name-status HEAD^..HEAD`
       s = s.match(/Author:.*<(.*)>/)[1]
@@ -27,6 +24,18 @@ module Fastlane
       nil
     end
 
+    # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
+    def self.git_branch
+      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
+      s = `git rev-parse --abbrev-ref HEAD`
+      return s.to_s.strip if s.to_s.length > 0
+      nil
+    end
+
+
+    def self.executed_actions
+      @executed_actions ||= []
+    end
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
@@ -107,14 +116,6 @@ module Fastlane
     ensure
       Encoding.default_external = previous_encoding.first
       Encoding.default_internal = previous_encoding.last
-    end
-
-    # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
-    def self.git_branch
-      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-      s = `git rev-parse --abbrev-ref HEAD`
-      return s.to_s.strip if s.to_s.length > 0
-      nil
     end
 
     # returns a list of official integrations
