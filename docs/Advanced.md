@@ -19,7 +19,7 @@ lane :deploy do |options|
     # Only when submit is true
   end
   ...
-  increment_build_number(build_number: options[:build_nymber])
+  increment_build_number(build_number: options[:build_number])
   ...
 end
 ```
