@@ -36,7 +36,7 @@ lane :release do |options|
 
   puts "Found '#{info['name']}'".green
 
-  sh "gem push ./pkg/#{tool_name}-#{version}.gem"
+  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
   slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
 
