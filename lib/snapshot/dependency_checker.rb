@@ -2,19 +2,28 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       self.check_xcode_select
-      self.check_xctool
       self.check_for_automation_subfolder
       self.check_simctl
     end
 
     def self.check_xcode_select
-      unless `xcode-select -v`.include?"xcode-select version "
+      unless `xcode-select -v`.include?"xcode-select version"
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to install the Xcode commdand line tools to use snapshot"
         Helper.log.fatal "# Install the latest version of Xcode from the AppStore"
         Helper.log.fatal "# Run xcode-select --install to install the developer tools"
         Helper.log.fatal '#############################################################'
         raise "Run 'xcode-select --install' and start snapshot again"
+      end
+
+      if Snapshot::LatestIosVersion.version.to_f < 9 # to_f is bad, but should be good enough
+        Helper.log.fatal '#############################################################'
+        Helper.log.fatal "# Your xcode-select Xcode version is below 9.0"
+        Helper.log.fatal "# To use snapshot 1.0 and above you need at leat iOS 9"
+        Helper.log.fatal "# Set the path to the Xcode version that supports UI Tests"
+        Helper.log.fatal "# or downgrade to versions older than snapshot 1.0"
+        Helper.log.fatal '#############################################################'
+        raise "Run 'sudo xcode-select -s /Applications/Xcode-beta.app'"
       end
     end
 
@@ -28,20 +37,6 @@ module Snapshot
         Helper.log.fatal "# Please run `instruments -s` to verify your xcode path"
         Helper.log.fatal '#############################################################'
         raise "Create the new simulators and run this script again"
-      end
-    end
-
-    def self.xctool_installed?
-      return `which xctool`.length > 1
-    end
-
-    def self.check_xctool
-      if not self.xctool_installed?
-        Helper.log.info '#############################################################'
-        Helper.log.info "# xctool is recommended to build the apps"
-        Helper.log.info "# Install it using 'brew install xctool'"
-        Helper.log.info "# Falling back to xcodebuild instead "
-        Helper.log.info '#############################################################'
       end
     end
 

@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'fastlane_core', '>= 0.7.2' # all shared code and dependencies
+  spec.add_dependency 'xcpretty' # beautiful Xcode output
   
 
   # Development only

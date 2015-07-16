@@ -109,7 +109,6 @@ module Snapshot
       }
 
       self.html_title = self.project_name || 'KrauseFx/snapshot'
-
     end
 
     # This has to be done after parsing the Snapfile (iOS version)
