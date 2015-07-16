@@ -234,6 +234,7 @@ module Spaceship
       end
       
       handle_itc_response(r.body['data'])
+      parse_response(r, 'data')
     end
 
   end

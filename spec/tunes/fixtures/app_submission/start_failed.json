@@ -855,7 +855,7 @@
     "messages": {
         "warn": null,
         "error": null,
-        "info": ["Successful POST"]
+        "info": ["Validation errors."]
     },
     "statusCode": "SUCCESS"
 }

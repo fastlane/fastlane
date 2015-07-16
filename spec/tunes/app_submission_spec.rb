@@ -31,5 +31,26 @@ describe Spaceship::AppSubmission do
       expect(submission.submitted_for_review).to eq(true)
     end
     
+    it "raises an error when submitting an app that has validation errors" do
+      itc_stub_app_submissions_invalid
+      
+      expect {
+        app.create_submission
+      }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
+    end
+    
+    it "raises an error when submitting an app that is already in review" do
+      itc_stub_app_submissions_already_submitted
+      submission = app.create_submission
+      submission.content_rights_contains_third_party_content = true
+      submission.content_rights_has_rights = true
+      submission.add_id_info_uses_idfa = false
+      
+      expect {
+        submission.complete!
+      }.to raise_exception(Spaceship::Client::UnexpectedResponse)
+      expect(submission.submitted_for_review).to eq(false)
+    end
+    
   end
 end

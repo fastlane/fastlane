@@ -98,8 +98,26 @@ module Spaceship
         # This is used to create a new object based on the server response.
         def factory(attrs)
           orig = attrs.dup
+          
+          # fill content rights section if iTC returns nil
+          if attrs["contentRights"].nil?
+            attrs.merge!("contentRights" => {
+              "containsThirdPartyContent" => {
+                "errorKeys" => nil,
+                "isEditable" => false,
+                "isRequired" => true,
+                "value" => nil
+              },
+              "hasRights" => {
+                "errorKeys" => nil,
+                "isEditable" => false,
+                "isRequired" => false,
+                "value" => nil
+              }
+            })
+          end
+          
           obj = self.new(attrs)
-
           return obj
         end
         
@@ -107,7 +125,7 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def create(application, app_id, version)
           stage = "start"
-          attrs = client.send_app_submission(application.apple_id, version, stage)
+          attrs = client.send_app_submission(application.apple_id, version.raw_data, stage)
           attrs.merge!(application: application)
           attrs.merge!(version: version)
           attrs.merge!(stage: stage)
@@ -128,7 +146,6 @@ module Spaceship
         "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/#{self.application.apple_id}/version/submit/#{self.stage}"
       end
 
-      # Private methods
       def setup
         @submitted_for_review = false
       end

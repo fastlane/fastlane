@@ -176,8 +176,12 @@ module Spaceship
       #####################################################
       
       def create_submission
-        # @TODO: check if submission is allowed
-        Spaceship::AppSubmission.create(self, self.apple_id, self.edit_version)
+        version = self.latest_version
+        if version.nil?
+          raise "Could not find a valid version to submit for review"
+        end
+        
+        Spaceship::AppSubmission.create(self, self.apple_id, version)
       end
 
       #####################################################
