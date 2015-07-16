@@ -20,7 +20,7 @@ module Fastlane
     def did_finish
       unless ENV["FASTLANE_OPT_OUT_USAGE"]
         begin
-          unless did_show_message?
+          if !did_show_message? and !Helper.is_ci?
             Helper.log.debug("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
             Helper.log.debug("No personal/sensitive data is sent. Only sharing the following:")
             Helper.log.debug(launches)

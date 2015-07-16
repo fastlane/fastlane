@@ -106,6 +106,7 @@ module Fastlane
         return result
       else
         # No action and no lane, raising an exception now
+        Helper.log.error caller.join("\n")
         raise "Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
     end
