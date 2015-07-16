@@ -41,3 +41,4 @@ assets/fastlane_ultra_large.png
 spec/fixtures/*.itmsp/*.png
 /integration
 spec/fixtures/fastfiles/report.xml
+fastlane/report.xml
