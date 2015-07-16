@@ -36,12 +36,10 @@ lane :release do |options|
 
   puts "Found '#{info['name']}'".green
 
-  if prompt(text: "Are you ready to push this now? 🚨", boolean: true, ci_input: 'y')
-    sh "gem push ./pkg/#{tool_name}-#{version}.gem"
+  sh "gem push ./pkg/#{tool_name}-#{version}.gem"
 
-    slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
+  slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
 
-    puts "You can now tweet:".green
-    puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
-  end
+  puts "You can now tweet:".green
+  puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
 end
