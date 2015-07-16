@@ -103,15 +103,9 @@ module Spaceship
           if attrs["contentRights"].nil?
             attrs.merge!("contentRights" => {
               "containsThirdPartyContent" => {
-                "errorKeys" => nil,
-                "isEditable" => false,
-                "isRequired" => true,
                 "value" => nil
               },
               "hasRights" => {
-                "errorKeys" => nil,
-                "isEditable" => false,
-                "isRequired" => false,
                 "value" => nil
               }
             })
