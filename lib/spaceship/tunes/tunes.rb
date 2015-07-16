@@ -1,6 +1,7 @@
 require 'spaceship/tunes/tunes_base'
 require 'spaceship/tunes/application'
 require 'spaceship/tunes/app_version'
+require 'spaceship/tunes/app_submission'
 require 'spaceship/tunes/tunes_client'
 require 'spaceship/tunes/language_item'
 require 'spaceship/tunes/app_status'

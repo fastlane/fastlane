@@ -172,6 +172,19 @@ module Spaceship
       end
 
       #####################################################
+      # @!group Submit for Review
+      #####################################################
+      
+      def create_submission
+        version = self.latest_version
+        if version.nil?
+          raise "Could not find a valid version to submit for review"
+        end
+        
+        Spaceship::AppSubmission.create(self, self.apple_id, version)
+      end
+
+      #####################################################
       # @!group General
       #####################################################
       def setup
