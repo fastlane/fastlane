@@ -22,7 +22,8 @@ module Fastlane
           end 
         end
 
-        raise "Couldn't find release #{params[:version]}, please create one: https://github.com/#{params[:url]}/releases/new".red
+        Helper.log.error "Couldn't find GitHub release #{params[:version]}".yellow
+        return nil
       end
 
       #####################################################
@@ -34,7 +35,48 @@ module Fastlane
       end
 
       def self.details
-        "It's useful to verify the user already provided "
+        sample = '
+              {"url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",
+                 "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",
+                 "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",
+                 "html_url"=>"https://github.com/KrauseFx/fastlane/releases/tag/1.8.0",
+                 "id"=>1537713,
+                 "tag_name"=>"1.8.0",
+                 "target_commitish"=>"master",
+                 "name"=>"1.8.0 Switch Lanes & Pass Parameters",
+                 "draft"=>false,
+                 "author"=>
+                  {"login"=>"KrauseFx",
+                   "id"=>869950,
+                   "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",
+                   "gravatar_id"=>"",
+                   "url"=>"https://api.github.com/users/KrauseFx",
+                   "html_url"=>"https://github.com/KrauseFx",
+                   "followers_url"=>"https://api.github.com/users/KrauseFx/followers",
+                   "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",
+                   "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",
+                   "starred_url"=>"https://api.github.com/users/KrauseFx/starred{/owner}{/repo}",
+                   "subscriptions_url"=>"https://api.github.com/users/KrauseFx/subscriptions",
+                   "organizations_url"=>"https://api.github.com/users/KrauseFx/orgs",
+                   "repos_url"=>"https://api.github.com/users/KrauseFx/repos",
+                   "events_url"=>"https://api.github.com/users/KrauseFx/events{/privacy}",
+                   "received_events_url"=>"https://api.github.com/users/KrauseFx/received_events",
+                   "type"=>"User",
+                   "site_admin"=>false},
+                 "prerelease"=>false,
+                 "created_at"=>"2015-07-14T23:33:01Z",
+                 "published_at"=>"2015-07-14T23:44:10Z",
+                 "assets"=>[],
+                 "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",
+                 "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",
+                 "body"=>
+                "This is one of the biggest updates of `fastlane` yet"
+              }'
+
+        [
+          "This will return all information about a release. For example:",
+          sample
+        ].join("\n")
       end
 
       def self.output
