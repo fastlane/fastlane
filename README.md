@@ -498,12 +498,6 @@ build_dir 'YourProject/bin/iPhoneSimulator'
 build_command '/Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool -v build "--configuration:Debug|iPhoneSimulator" YourProject.sln'
 ```
 
-Unfortunately, Xamarin command line tool is only available for Business Edition licenses. For Indie licenses you can build the app using Xamarin Studio and use the ```--nobuild``` option.
-
-### Skip building
-
-If building via command-line doesn't work for your project or you don't want to build every time, you can run the tool with ```snapshot --nobuild``` to skip the build process and use a pre-built ```.app``` under your ```build_dir```.
-
 ### Simulator doesn't launch the application
 
 When the app dies directly after the application is launched there might be 2 problems

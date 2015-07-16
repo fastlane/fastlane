@@ -14,6 +14,11 @@ require 'fastlane_core'
 require 'open3'
 
 module Snapshot
+  # Use this to just setup the configuration attribute and set it later somewhere else
+  class << self
+    attr_accessor :config
+  end
+  
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   Snapshot::DependencyChecker.check_dependencies

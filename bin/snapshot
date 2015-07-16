@@ -6,6 +6,8 @@ require 'snapshot'
 require 'commander'
 require 'snapshot/snapfile_creator'
 require 'snapshot/snapshot_config'
+require 'snapshot/custom_callback_handler'
+require 'snapshot/options'
 
 HighLine.track_eof = false
 
@@ -21,12 +23,14 @@ class SnapshotApplication
     program :help, 'GitHub', 'https://github.com/krausefx/snapshot'
     program :help_formatter, :compact
 
-    global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
-    global_option '--nobuild', 'Skips the build process when running snapshot.'
-    global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
+    # global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
+    # global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
+    
     global_option('--verbose', 'Shows more output including all output printed by Instruments.') { $verbose = true }
 
     always_trace!
+
+    FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options)
 
     command :run do |c|
       c.syntax = 'snapshot'
@@ -35,23 +39,12 @@ class SnapshotApplication
       c.action do |args, options|
         path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
+          callback = Snapshot::CustomCallbackHandler.get
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.__hash__, 'Snapfile', callback)
+
           Snapshot::DependencyChecker.check_simulators
           Snapshot::SnapshotConfig.shared_instance(options.snapfile)
-          Snapshot::Runner.new.work(clean: !options.noclean, build: !options.nobuild)
-        end
-      end
-    end
-
-    command :test do |c|
-      c.syntax = 'snapshot test'
-      c.description = 'Runs the automated tests.'
-
-      c.action do |args, options|
-        path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
-        Dir.chdir(path) do # switch the context
-          Snapshot::DependencyChecker.check_simulators
-          Snapshot::SnapshotConfig.shared_instance(options.snapfile)
-          Snapshot::Runner.new.work(clean: !options.noclean, build: !options.nobuild, take_snapshots: false)
+          Snapshot::Runner.new.work(clean: !options.noclean)
         end
       end
     end
