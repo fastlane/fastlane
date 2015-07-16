@@ -34,6 +34,7 @@ module FastlaneCore
         begin
           finished_running(gem_name)
         rescue
+           # we don't want to show a stack trace if something goes wrong
         end
       end
 
