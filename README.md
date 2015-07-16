@@ -519,6 +519,10 @@ When the app dies directly after the application is launched there might be 2 pr
 - The simulator is somehow in a broken state and you need to re-create it. You can use `snapshot reset_simulators` to reset all simulators (this will remove all installed apps)
 - You haven't enabled the correct architectures. Make sure you have the same architectures as in the example project of this repository. 
 
+### Snapshot throws an `Instruments Usage Error: Timed out waiting for device to boot: ...` error 
+
+This can happen when you use a tool like `tmux` to launch `snapshot` or `fastlane`. Thankfully, Chris Johnsen wrote a tool to help us out, which you can find [here](https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard). Just follow the instructions there, and launching the Simulator from `tmux` will work!
+
 ## Determine language in UI Automation script
 
 To detect the currently used localization in your Javascript file, use the following code:
