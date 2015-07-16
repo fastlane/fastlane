@@ -82,6 +82,11 @@ module Fastlane
                                        description: "Remove some of the default payloads. More information about the available payloads on GitHub",
                                        optional: true,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :attachment_properties,
+                                       env_name: "FL_SLACK_ATTACHMENT_PROPERTIES",
+                                       description: "Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments",
+                                       default_value: {},
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_SLACK_SUCCESS",
                                        description: "Was this build successful? (true/false)",
@@ -165,7 +170,16 @@ module Fastlane
             }
           end
 
-          slack_attachment
+          # merge additional properties
+          deep_merge(slack_attachment, options[:attachment_properties])
+        end
+
+        # Adapted from http://stackoverflow.com/a/30225093/158525
+        def self.deep_merge(a, b)
+          merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? 
+                            v1.merge(v2, &merger) : Array === v1 && Array === v2 ? 
+                              v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
+          a.merge(b, &merger)
         end
     end
   end
