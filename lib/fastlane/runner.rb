@@ -85,7 +85,6 @@ module Fastlane
 
     def try_switch_to_lane(new_lane, parameters)
       block = lanes.fetch(current_platform, {}).fetch(new_lane, nil)
-      platform_nil = (block == nil) # used for the output
       block ||= lanes.fetch(nil, {}).fetch(new_lane, nil) # fallback to general lane for multiple platforms
       if block
         original_full = full_lane_name
@@ -94,7 +93,7 @@ module Fastlane
         raise "Parameters for a lane must always be a hash".red unless (parameters.first || {}).kind_of?Hash
 
         pretty = [new_lane]
-        pretty = [current_platform, new_lane] unless platform_nil
+        pretty = [current_platform, new_lane] if current_platform
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
 
         # Actually switch lane now
