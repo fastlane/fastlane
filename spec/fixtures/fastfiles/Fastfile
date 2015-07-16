@@ -22,11 +22,14 @@ platform :ios do
     # nothing going on here
   end
 
+  desc "This action does nothing"
+  desc "but crash"
   lane :crashy do
     raise "my exception"
   end
   
 end
+
 before_all do |lane|
   File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
 end

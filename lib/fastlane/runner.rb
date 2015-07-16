@@ -1,48 +1,56 @@
 module Fastlane
   class Runner
+    # Symbol for the current lane
+    attr_accessor :current_lane
 
-    # This will take care of executing **one** lane. 
+    # Symbol for the current platform
+    attr_accessor :current_platform
+
+    # @return [Hash] All the lanes available, first the platform, then the lane
+    attr_accessor :lanes
+
+    def full_lane_name
+      [current_platform, current_lane].reject(&:nil?).join(' ')
+    end
+
+    # This will take care of executing **one** lane. That's when the user triggers a lane from the CLI for example
+    # This method is **not** executed when switching a lane
     # @param lane_name The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def execute(lane, platform = nil, parameters = nil)
       raise "No lane given" unless lane
 
-      ENV["FASTLANE_LANE_NAME"] = lane.to_s
-      if platform
-        ENV["FASTLANE_PLATFORM_NAME"] = platform.to_s
-      else
-        ENV["FASTLANE_PLATFORM_NAME"] = nil
-      end
+      self.current_lane = lane.to_sym
+      self.current_platform = (platform ? platform.to_sym : nil)
+
+      ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
+      ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
       
-      lane = lane.to_sym
-      platform = platform.to_sym if platform # might be nil, which is okay => root element
-
-      Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = platform # set this in any case: important
-
-      full_lane_name = [platform, lane].reject(&:nil?).join(' ')
-      Helper.log.info "Driving the lane '#{full_lane_name}' 🚀".green
+      Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
+
+      Helper.log.info "Driving the lane '#{full_lane_name}' 🚀".green
 
       return_val = nil
 
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
       Dir.chdir(path_to_use) do # the file is located in the fastlane folder
 
-        unless (blocks[platform][lane] rescue nil)
+        unless (lanes[current_platform][current_lane] rescue nil)
           raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red
         end
 
         # Call the platform specific before_all block and then the general one
-        before_all_blocks[platform].call(lane) if (before_all_blocks[platform] and platform != nil)
-        before_all_blocks[nil].call(lane) if before_all_blocks[nil]
+        before_all_blocks[current_platform].call(current_lane) if (before_all_blocks[current_platform] and current_platform)
+        before_all_blocks[nil].call(current_lane) if before_all_blocks[nil]
         
-        return_val = blocks[platform][lane].call(parameters || {}) # by default no parameters
+        return_val = lanes[current_platform][current_lane].call(parameters || {}) # by default no parameters
         
         # `after_all` is only called if no exception was raised before
         # Call the platform specific before_all block and then the general one
-        after_all_blocks[platform].call(lane) if (after_all_blocks[platform] and platform != nil)
-        after_all_blocks[nil].call(lane) if (after_all_blocks[nil])
+        after_all_blocks[current_platform].call(current_lane) if (after_all_blocks[current_platform] and current_platform)
+        after_all_blocks[nil].call(current_lane) if (after_all_blocks[nil])
       end
 
       return return_val
@@ -51,26 +59,125 @@ module Fastlane
         # Provide error block exception without colour code
         error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
 
-        error_blocks[platform].call(lane, error_ex) if (error_blocks[platform] and platform != nil)
-        error_blocks[nil].call(lane, error_ex) if error_blocks[nil]
+        error_blocks[current_platform].call(current_lane, error_ex) if (error_blocks[current_platform] and current_platform)
+        error_blocks[nil].call(current_lane, error_ex) if error_blocks[nil]
       end
       raise ex
     end
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
+    # @return an array of lanes (platform lane_name) to print them out to the user
     def available_lanes(filter_platform = nil)
       all = []
-      blocks.each do |platform, lane| 
+      lanes.each do |platform, platform_lanes|
         next if (filter_platform and filter_platform.to_s != platform.to_s) # skip actions that don't match
 
-        lane.each do |lane_name, block|
+        platform_lanes.each do |lane_name, lane|
           all << [platform, lane_name].reject(&:nil?).join(' ')
         end
       end
       all
     end
 
-    # Called internally
+    # 
+    # All the methods that are usually called on execution
+    # 
+
+    def try_switch_to_lane(new_lane, parameters)
+      block = lanes.fetch(current_platform, {}).fetch(new_lane, nil)
+      platform_nil = (block == nil) # used for the output
+      block ||= lanes.fetch(nil, {}).fetch(new_lane, nil) # fallback to general lane for multiple platforms
+      if block
+        original_full = full_lane_name
+        original_lane = current_lane
+
+        pretty = [new_lane]
+        pretty = [current_platform, new_lane] unless platform_nil
+        Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
+
+        # Actually switch lane now
+        current_lane = new_lane
+        collector.did_launch_action(:lane_switch)
+        result = block.call(parameters.first || {}) # to always pass a hash
+        current_lane = original_lane
+
+        Helper.log.info "Cruising back to lane '#{original_full}' 🚘".green
+        return result
+      else
+        # No action and no lane, raising an exception now
+        raise "Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+      end
+    end
+
+    def execute_action(method_sym, class_ref, arguments)
+      collector.did_launch_action(method_sym)
+
+      step_name = class_ref.step_text rescue nil
+      step_name = method_sym.to_s unless step_name
+
+      verify_supported_os(method_sym, class_ref)
+
+      Helper.log_alert("Step: " + step_name)
+
+      begin
+        Dir.chdir('..') do # go up from the fastlane folder, to the project folder
+          Actions.execute_action(method_sym) do
+            # arguments is an array by default, containing an hash with the actual parameters
+            # Since we usually just need the passed hash, we'll just use the first object if there is only one
+            if arguments.count == 0 
+              arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
+            elsif arguments.count == 1 and arguments.first.kind_of?Hash
+              arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
+            elsif not class_ref.available_options
+              # This action does not use the new action format
+              # Just passing the arguments to this method
+            else
+              raise "You have to pass the options for '#{method_sym}' in a different way. Please check out the current documentation on GitHub!".red
+            end
+
+            class_ref.run(arguments)
+          end
+        end
+      rescue => ex
+        collector.did_raise_error(method_sym)
+        raise ex
+      end
+    end
+
+    def verify_supported_os(name, class_ref)
+      if class_ref.respond_to?(:is_supported?)
+        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+
+          unless class_ref.is_supported?(platform)
+            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red 
+          end
+        end
+      end
+    end
+
+    def collector
+      @collector ||= ActionCollector.new
+    end
+
+    # Fastfile was finished executing
+    def did_finish
+      collector.did_finish
+    end
+
+    # Called internally to setup the runner object
+    # 
+
+    # @param lane [Lane] A lane object
+    def add_lane(lane)
+      lanes[lane.platform] ||= {}
+
+      raise "Lane '#{lane.name}' was defined multiple times!".red if lanes[lane.platform][lane.name]
+      
+      lanes[lane.platform][lane.name] = lane
+    end
+
     def set_before_all(platform, block)
       before_all_blocks[platform] = block
     end
@@ -83,22 +190,8 @@ module Fastlane
       error_blocks[platform] = block
     end
 
-    # @param lane: The name of the lane
-    # @param platform: The platform for the given block - might be nil - nil is actually the root of Fastfile with no specific platform
-    # @param block: The block of the lane
-    # @param desc: Description of this action
-    def set_block(lane, platform, block, desc = nil)
-      blocks[platform] ||= {}
-      description_blocks[platform] ||= {}
-
-      raise "Lane '#{lane}' was defined multiple times!".red if blocks[platform][lane]
-      
-      blocks[platform][lane] = block
-      description_blocks[platform][lane] = desc
-    end
-
-    def blocks
-      @blocks ||= {}
+    def lanes
+      @lanes ||= {}
     end
 
     def before_all_blocks
@@ -111,10 +204,6 @@ module Fastlane
 
     def error_blocks
       @error_blocks ||= {}
-    end
-
-    def description_blocks
-      @description_blocks ||= {}
     end
   end
 end

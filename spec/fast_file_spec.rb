@@ -191,8 +191,8 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
 
-        expect(ff.runner.description_blocks[nil][:deploy]).to eq("My Deploy\n\ndescription")
-        expect(ff.runner.description_blocks[:mac][:specific]).to eq("look at my mac, my mac is amazing")
+        expect(ff.runner.lanes[nil][:deploy].description).to eq(["My Deploy", "description"])
+        expect(ff.runner.lanes[:mac][:specific].description).to eq(["look at my mac, my mac is amazing"])
       end
 
       it "execute different envs with lane in before block" do
