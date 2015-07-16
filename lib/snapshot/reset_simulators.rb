@@ -28,6 +28,8 @@ module Snapshot
       end
 
       device_types.each do |device_type|
+        next if device_type.include?"Watch" # we don't want to deal with the Watch right now
+
         puts "Creating #{device_type} for iOS version #{ios_version}"
         command = "xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{ios_version}"
         command_output = `#{command}`
