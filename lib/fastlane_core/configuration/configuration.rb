@@ -9,22 +9,28 @@ module FastlaneCore
 
     attr_accessor :values
 
+    # @return [Array] An array of symbols which are all available keys
+    attr_reader :all_keys
+
     # @return [String] The name of the configuration file (not the path). Optional!
     attr_accessor :config_file_name
 
     # @param config_file_name [String] The name of the configuration file to use (optional)
-    def self.create(available_options, values, config_file_name = nil)
-      Configuration.new(available_options, values, config_file_name)
+    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
+    #   in the configuration file
+    def self.create(available_options, values, config_file_name = nil, block_for_missing = nil)
+      Configuration.new(available_options, values, config_file_name, block_for_missing)
     end
 
     #####################################################
     # @!group Setting up the configuration
     #####################################################
     
-    def initialize(available_options, values, config_file_name = nil)
+    def initialize(available_options, values, config_file_name = nil, block_for_missing = nil)
       self.available_options = available_options || []
       self.values = values || {}
       self.config_file_name = config_file_name
+      @block_for_missing = block_for_missing
 
       verify_input_types      
       verify_value_exists
@@ -88,7 +94,7 @@ module FastlaneCore
       return if paths.count == 0
 
       path = paths.first
-      ConfigurationFile.new(self, path)
+      ConfigurationFile.new(self, path, @block_for_missing)
     end
 
     #####################################################
@@ -162,6 +168,10 @@ module FastlaneCore
         @values[option.key] = fetch(option.key) unless @values[option.key]
       end
       @values
+    end
+
+    def all_keys
+      @available_options.collect { |o| o.key }
     end
 
     # Returns the config_item object for a given key

@@ -90,6 +90,12 @@ describe FastlaneCore do
           @config = FastlaneCore::Configuration.create(@options, @values)
         end
 
+        describe "#keys" do
+          it "returns all available keys" do
+            expect(@config.all_keys).to eq([:cert_name, :output])
+          end
+        end
+
         describe "#values" do
           it "returns the user values" do
             values = @config.values

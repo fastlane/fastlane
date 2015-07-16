@@ -1,6 +1,6 @@
 describe FastlaneCore do
   describe FastlaneCore::ConfigurationFile do
-    describe "Properly loads and handles various configuration files", now: true do
+    describe "Properly loads and handles various configuration files" do
       let (:options) do
         [
           FastlaneCore::ConfigItem.new(key: :devices,
@@ -47,6 +47,20 @@ describe FastlaneCore do
         # not overwrite
         config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"}, 'ConfigFileEmpty')
         expect(config[:app_identifier]).to eq("detlef.app.super")
+      end
+
+      it "allows using a custom block to handle special callbacks" do
+        config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileUnhandledBlock', Proc.new do |method_sym, arguments, block|
+          if method_sym == :some_custom_block
+            if arguments == ["parameter"]
+              expect {
+                block.call(arguments.first, "custom")
+              }.to raise_error "Yeah: parameter custom"
+            else raise 'no'
+            end
+          else raise 'no'
+          end
+        end)
       end
     end
   end
