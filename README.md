@@ -521,7 +521,7 @@ When the app dies directly after the application is launched there might be 2 pr
 
 ### Snapshot throws an `Instruments Usage Error: Timed out waiting for device to boot: ...` error 
 
-This can happen when you use a tool like `tmux` to launch `snapshot` or `fastlane`. Thankfully, Chris Johnsen wrote a tool to help us out, which you can find [here](https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard). Just follow the instructions there, and launching the Simulator from `tmux` will work!
+This can happen when you launch `fastlane` or `snapshot` inside of a tool like `tmux`. Thankfully, Chris Johnsen wrote a fix to help us out, which you can find [here](https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard). Just follow the instructions at his repository, and launching the Simulator from `tmux` will work!
 
 ## Determine language in UI Automation script
 
