@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class ExampleActionAction
+    class ExampleActionAction < Action
       def self.run(params)
         File.write("/tmp/example_action.txt", Time.now.to_i)
       end
