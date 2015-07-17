@@ -107,6 +107,11 @@ module Fastlane
       def self.author
         ['dral3x']
       end
+
+      def self.is_supported?(platform)
+        [:ios, :mac].include?platform
+      end
+      
     end
   end
 end
