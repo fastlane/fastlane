@@ -80,16 +80,20 @@ module Fastlane
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
-        if class_ref && class_ref.respond_to?(:run)
-          # Action is available, now execute it
-          return self.runner.execute_action(method_sym, class_ref, arguments)
-        else
-          raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
-        end
       rescue NameError => ex
         # Action not found
         # Is there a lane under this name?
         return self.runner.try_switch_to_lane(method_sym, arguments)
+      end
+
+      # It's important to *not* have this code inside the rescue block
+      # otherwise all NameErrors will be catched and the error message is
+      # confusing
+      if class_ref && class_ref.respond_to?(:run)
+        # Action is available, now execute it
+        return self.runner.execute_action(method_sym, class_ref, arguments)
+      else
+        raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
       end
     end
 
@@ -149,10 +153,8 @@ module Fastlane
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield
-      Actions.execute_action('puts') do
-        collector.did_launch_action(:pus)
-        Fastlane::Actions::PutsAction.run([value])
-      end
+      collector.did_launch_action(:puts)
+      Fastlane::Actions::PutsAction.run([value])
     end
   end
 end

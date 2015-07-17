@@ -20,6 +20,11 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      # We don't want to show this as step
+      def self.step_text
+        nil
+      end
     end
   end
 end

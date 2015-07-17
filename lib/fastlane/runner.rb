@@ -94,6 +94,7 @@ module Fastlane
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
+        Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
 
         # Actually switch lane now
@@ -119,11 +120,9 @@ module Fastlane
 
       verify_supported_os(method_sym, class_ref)
 
-      Helper.log_alert("Step: " + step_name)
-
       begin
         Dir.chdir('..') do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(method_sym) do
+          Actions.execute_action(class_ref.step_text) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
             if arguments.count == 0 

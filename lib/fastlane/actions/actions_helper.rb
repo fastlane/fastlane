@@ -49,14 +49,16 @@ module Fastlane
 
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
+    #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
+      start = Time.now # before the raise block, since `start` is required in the ensure block
       raise 'No block given'.red unless block_given?
 
-      start = Time.now
       error = nil
       exc = nil
 
       begin
+        Helper.log_alert("Step: " + step_name) if step_name
         yield
       rescue => ex
         exc = ex
@@ -64,19 +66,23 @@ module Fastlane
       end
     ensure
       # This is also called, when the block has a return statement
-      duration = Time.now - start
+      if step_name
+        duration = Time.now - start
 
-      executed_actions << {
-        name: step_name,
-        error: error,
-        time: duration
-        # output: captured_output
-      }
+        executed_actions << {
+          name: step_name,
+          error: error,
+          time: duration
+        }
+      end
+
       raise exc if exc
     end
 
     # Execute a shell command
     # This method will output the string and execute it
+    # Just an alias for sh_no_action
+    # @param log [boolean] should fastlane print out the executed command
     def self.sh(command, log: true)
       sh_no_action(command, log: log)
     end

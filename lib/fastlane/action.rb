@@ -52,7 +52,11 @@ module Fastlane
       raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
     end
 
-
+    # Is printed out in the Steps: output in the terminal
+    # Return nil if you don't want any logging in the terminal/JUnit Report
+    def self.step_text
+      self.action_name
+    end
 
     # to allow a simple `sh` in the custom actions
     def self.sh(command)
