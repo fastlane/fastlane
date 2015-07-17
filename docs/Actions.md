@@ -75,6 +75,7 @@ Other options
 
 ```ruby
 snapshot(
+  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
   noclean: true, # Skip cleaning
   verbose: true, # Show output of UIAutomation
   snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
