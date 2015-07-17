@@ -105,7 +105,7 @@ module Fastlane
       end
 
       def self.author
-        '[dral3x]'
+        ['dral3x']
       end
     end
   end
