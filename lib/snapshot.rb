@@ -17,6 +17,11 @@ module Snapshot
   # Use this to just setup the configuration attribute and set it later somewhere else
   class << self
     attr_accessor :config
+
+    def config=(value)
+      @config = value
+      Options.set_additional_default_values
+    end
   end
   
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

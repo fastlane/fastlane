@@ -9,9 +9,11 @@ module Snapshot
     def work
       self.errors = []
 
-      Helper.log.info "Building and running project '#{SnapshotConfig.shared_instance.project_name}' - this might take some time...".green
+      Helper.log.info "Building and running project - this might take some time...".green
 
-      launch('de', 'iPhone5')
+      Snapshot.config[:devices].each do |device|
+        launch('de', device)
+      end
 
       raise errors.join('; ') if errors.count > 0
     end
@@ -35,20 +37,19 @@ module Snapshot
     end
 
     def generate_test_command(language, device_type)
-      scheme = SnapshotConfig.shared_instance.scheme
-
-      proj_path = SnapshotConfig.shared_instance.project_path
+      proj_path = Snapshot.config[:project_path]
       proj_key = 'project'
       proj_key = 'workspace' if proj_path.end_with?'.xcworkspace'
 
-      pre_command = SnapshotConfig.shared_instance.custom_args || ENV["SNAPSHOT_CUSTOM_ARGS"] || ''
-      custom_build_args = SnapshotConfig.shared_instance.custom_build_args || ENV["SNAPSHOT_CUSTOM_BUILD_ARGS"] || ''
+      pre_command = Snapshot.config[:custom_args] || ENV["SNAPSHOT_CUSTOM_ARGS"] || ''
+      custom_build_args = Snapshot.config[:custom_build_args] || ENV["SNAPSHOT_CUSTOM_BUILD_ARGS"] || ''
       
       build_command = pre_command + ' xcodebuild'
 
       actions = []
       # actions << 'clean' if clean
       actions << 'test'
+      require 'pry'; binding.pry
 
       pipe = "| xcpretty" # TODO
 
@@ -56,8 +57,8 @@ module Snapshot
         build_command,
         "-sdk iphonesimulator",
         "-#{proj_key} '#{proj_path}'",
-        "-scheme '#{scheme}'",
-        "-destination 'platform=iOS Simulator,name=iPad 2,OS=#{Snapshot.config[:ios_version}'",
+        "-scheme '#{Snapshot.config[:scheme]}'",
+        "-destination 'platform=iOS Simulator,name=iPad 2,OS=#{Snapshot.config[:ios_version]}'",
         # "-AppleLanguages='(#{language})'",
         custom_build_args,
         actions.join(' '),
