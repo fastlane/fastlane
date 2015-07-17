@@ -23,10 +23,17 @@ describe Spaceship::Base do
         Class.new(Spaceship::PortalBase) do
           attr_accessor :some_attr_name
           attr_accessor :nested_attr_name
+          attr_accessor :is_live
+
           attr_mapping({
             'someAttributeName' => :some_attr_name,
-            'nestedAttribute.name.value' => :nested_attr_name
+            'nestedAttribute.name.value' => :nested_attr_name,
+            'isLiveString' => :is_live
           })
+
+          def is_live
+            super == 'true'
+          end
         end
       end
 
@@ -44,6 +51,11 @@ describe Spaceship::Base do
       it 'can map nested attributes' do
         inst = test_class.new({'nestedAttribute' => {'name' => {'value' => 'a value'}}})
         expect(inst.nested_attr_name).to eq('a value')
+      end
+
+      it 'can overwrite an attribute and call super' do
+        inst = test_class.new({'isLiveString' => 'true'})
+        expect(inst.is_live).to eq(true)
       end
     end
 

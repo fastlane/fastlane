@@ -12,4 +12,10 @@ describe Spaceship::Base do
       expect(output).to include"The App Name"
     end
   end
+
+  it "allows modification of values and properly retrieving them" do
+    app = Spaceship::App.all.first
+    app.name = "12"
+    expect(app.name).to eq("12")
+  end
 end

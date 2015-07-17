@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe Spaceship::AppVersion do
   before { Spaceship::Tunes.login }
+
   let(:client) { Spaceship::AppVersion.client }
+  let (:app) { Spaceship::Application.all.first }
 
   describe "successfully loads and parses the app version" do
-    it "parses application correctly" do
-      app = Spaceship::Application.all.first
-
+    it "parses the basic version details correctly" do
       version = app.edit_version
 
       expect(version.application).to eq(app)
@@ -22,13 +22,17 @@ describe Spaceship::AppVersion do
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
       expect(version.can_beta_test).to eq(true)
+      expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
       expect(version.app_icon_url).to eq('https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/1024x1024ss-80.png')
       expect(version.app_icon_original_name).to eq('AppIconFull.png')
       expect(version.watch_app_icon_url).to eq('https://muycustomurl.com')
       expect(version.watch_app_icon_original_name).to eq('OriginalName.png')
+    end
 
-      # Multi Lang
+    it "parses the localized values correctly" do
+      version = app.edit_version
+
       expect(version.name['English']).to eq('App Name 123')
       expect(version.name['German']).to eq("yep, that's the name")
       expect(version.description['English']).to eq('Super Description here')
@@ -40,11 +44,36 @@ describe Spaceship::AppVersion do
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
       expect(version.release_notes['German']).to eq('Wow, News')
       expect(version.release_notes['English']).to eq('Also News')
+
+      expect(version.description.keys).to eq(version.description.languages)
+      expect(version.description.keys).to eq(["German", "English"])
+    end
+
+    it "parses the review information correctly" do
+      version = app.edit_version
+
+      expect(version.review_first_name).to eq('Felix')
+      expect(version.review_last_name).to eq('Krause')
+      expect(version.review_phone_number).to eq('+4123123123')
+      expect(version.review_email).to eq('felix@sunapps.net')
+      expect(version.review_demo_user).to eq('MyUser@gmail.com')
+      expect(version.review_demo_password).to eq('SuchPass')
+      expect(version.review_notes).to eq('Such Notes here')
+    end
+
+    describe "#url" do
+      it "live version" do
+        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/cur')
+      end
+
+      it "edit version" do
+        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/')
+      end
     end
 
     describe "App Status" do
       it "parses readyForSale" do
-        version = Spaceship::Application.all.first.live_version
+        version = app.live_version
 
         expect(version.app_status).to eq("Ready for Sale")
         expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
@@ -57,8 +86,8 @@ describe Spaceship::AppVersion do
 
     describe "Screenshots" do
       it "properly parses all the screenshots" do
-        v = Spaceship::Application.all.first.live_version
-        
+        v = app.live_version
+
         # This app only has screenshots in the English version
         expect(v.screenshots['German']).to eq([])
 
@@ -86,6 +115,34 @@ describe Spaceship::AppVersion do
         version.name = "Yes"
         raise "Should raise exception before"
       rescue NoMethodError => ex
+        expect(ex.to_s).to include("undefined method `name='")
+      end
+    end
+
+    describe "Modifying the category" do
+      it "prefixes the category with the correct value for all category types" do
+        version.primary_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.primary_first_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.primary_second_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_first_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+
+        version.secondary_second_sub_category = "Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
+      end
+
+      it "doesn't prefix if the prefix is already there" do
+        version.primary_category = "MZGenre.Weather"
+        expect(version.primary_category).to eq("MZGenre.Weather")
       end
     end
 

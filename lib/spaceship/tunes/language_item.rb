@@ -27,6 +27,17 @@ module Spaceship
         raise "Language '#{lang}' is not activated for this app version."
       end
 
+      # @return (Array) An array containing all languages that are already available
+      def keys
+        self.original_array.collect { |l| l.fetch('language') }
+      end
+
+      # @return (Array) An array containing all languages that are already available
+      #   alias for keys
+      def languages
+        keys
+      end
+
       def inspect
         result = ""
         self.original_array.collect do |current|

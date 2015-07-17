@@ -11,24 +11,23 @@ module Spaceship
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
       attr_reader :builds
 
-      # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
-      attr_reader :processing_builds
-
       # @return (String) The version number of this train
-      attr_accessor :version_string
+      attr_reader :version_string
 
       # @return (String) Platform (e.g. "ios")
-      attr_accessor :platform
+      attr_reader :platform
 
       # @return (Bool) Is beta testing enabled for this train? Only one train can have enabled testing.
-      attr_accessor :testflight_testing_enabled
+      attr_reader :testing_enabled
 
-
+      # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
+      #  I never got this to work to properly try and debug this
+      attr_reader :processing_builds
 
       attr_mapping(
         'versionString' => :version_string,
         'platform' => :platform,
-        'testing.value' => :testflight_testing_enabled
+        'testing.value' => :testing_enabled
       )
 
       class << self
@@ -42,10 +41,13 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id)
           data = client.build_trains(app_id)
-          result = data['trains'].collect do |attrs|
+          result = {}
+          data['trains'].each do |attrs|
             attrs.merge!(application: application)
-            self.factory(attrs)
+            current = self.factory(attrs)
+            result[current.version_string] = current
           end
+          result
         end
       end
 
@@ -55,6 +57,22 @@ module Spaceship
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)
         end
+
+        @processing_builds = self.raw_data['buildsInProcessing'].collect do |attrs|
+          attrs.merge!(build_train: self)
+          Tunes::Build.factory(attrs)
+        end
+      end
+
+      def update_testing_status!(new_value)
+        data = client.build_trains(self.application.apple_id)
+        data['trains'].each do |train|
+          train['testing']['value'] = false
+          train['testing']['value'] = new_value if train['versionString'] == version_string
+        end
+        result = client.update_build_trains!(application.apple_id, data)
+        self.testing_enabled = new_value
+        result
       end
     end
   end

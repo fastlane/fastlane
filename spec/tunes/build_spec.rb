@@ -10,7 +10,7 @@ describe Spaceship::Tunes::Build do
     let (:app) { Spaceship::Application.all.first }
 
     it "filled in all required values" do
-      train = app.build_trains.first
+      train = app.build_trains.values.first
       build = train.builds.first
 
       expect(build.build_train).to eq(train)

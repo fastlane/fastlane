@@ -40,6 +40,10 @@ module Spaceship
       #   nil
       attr_accessor :app_icon_preview_url
 
+      # @return [Array] A list of binaries which are not even yet processing based on the version
+      #   Those builds are usually the ones that are just stuck on iTunes Connect...
+      attr_accessor :pre_processing_builds
+
       attr_mapping(
         'adamId' => :apple_id,
         'name' => :name,
@@ -119,6 +123,11 @@ module Spaceship
         edit_version || live_version
       end
 
+      # @return (String) An URL to this specific resource. You can enter this URL into your browser
+      def url
+        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+      end
+
       # @return (Hash) Contains the reason for rejection. 
       #  if everything is alright, the result will be
       #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
@@ -148,8 +157,38 @@ module Spaceship
       #####################################################
 
       # A reference to all the build trains
+      # @return [Hash] a hash, the version number being the key
       def build_trains
         Tunes::BuildTrain.all(self, self.apple_id)
+      end
+
+      def pre_processing_builds
+        data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
+        
+        data.fetch('processingBuilds', []).collect do |attrs|
+          attrs.merge!(build_train: self)
+          Tunes::ProcessingBuild.factory(attrs)
+        end
+      end
+
+      #####################################################
+      # @!group Submit for Review
+      #####################################################
+      
+      def create_submission
+        version = self.latest_version
+        if version.nil?
+          raise "Could not find a valid version to submit for review"
+        end
+        
+        Spaceship::AppSubmission.create(self, self.apple_id, version)
+      end
+
+      #####################################################
+      # @!group General
+      #####################################################
+      def setup
+        
       end
 
       #####################################################

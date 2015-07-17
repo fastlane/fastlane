@@ -67,6 +67,32 @@ def itc_stub_app_versions
          to_return(:status => 200, :body => itc_read_fixture_file('app_version.json'), headers: {'Content-Type' => 'application/json'})
 end
 
+def itc_stub_app_submissions
+  # Start app submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/start").
+         to_return(:status => 200, :body => itc_read_fixture_file('app_submission/start_success.json'), headers: {'Content-Type' => 'application/json'})
+
+  # Complete app submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/complete").
+         to_return(:status => 200, :body => itc_read_fixture_file('app_submission/complete_success.json'), headers: {'Content-Type' => 'application/json'})
+end
+
+def itc_stub_app_submissions_already_submitted
+  # Start app submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/start").
+         to_return(:status => 200, :body => itc_read_fixture_file('app_submission/start_success.json'), headers: {'Content-Type' => 'application/json'})
+
+  # Complete app submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/complete").
+         to_return(:status => 200, :body => itc_read_fixture_file('app_submission/complete_failed.json'), headers: {'Content-Type' => 'application/json'})
+end
+
+def itc_stub_app_submissions_invalid
+  # Start app submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/start").
+         to_return(:status => 200, :body => itc_read_fixture_file('app_submission/start_failed.json'), headers: {'Content-Type' => 'application/json'})
+end
+
 def itc_stub_resolution_center
   # Called from the specs to simulate invalid server responses
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/resolutionCenter?v=latest").
@@ -78,6 +104,10 @@ def itc_stub_build_trains
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, :body => itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
+  # Update build trains
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/").
+    with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+    to_return(:status => 200, :body => itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 
