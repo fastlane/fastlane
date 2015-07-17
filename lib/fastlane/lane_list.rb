@@ -25,6 +25,8 @@ module Fastlane
         
         if value
           value.each do |lane_name, lane|
+            next if lane.is_private
+            
             output += "----- fastlane #{lane.pretty_name}".green
             output += "\n" + lane.description.join("\n") + "\n\n" if lane.description.count > 0
           end

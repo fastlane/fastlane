@@ -21,6 +21,7 @@ module Fastlane
 
         if value
           value.each do |lane_name, lane|
+            next if lane.is_private
             output << render(platform, lane_name, lane.description.join("\n\n"))          
           end
 
@@ -48,6 +49,9 @@ module Fastlane
         return pl
       end
 
+      # @param platform [String]
+      # @param lane [Fastlane::Lane]
+      # @param description [String]
       def self.render(platform, lane, description)
         full_name = [platform, lane].reject(&:nil?).join(' ')
 

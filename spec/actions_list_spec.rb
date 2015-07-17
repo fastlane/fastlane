@@ -24,6 +24,8 @@ describe Fastlane do
           expect(action.description.strip.end_with?'.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
           action.is_supported?(nil) # this will raise an exception if the method is not implemented
 
+          expect(action).to be < Fastlane::Action
+
           authors = Array(action.author || action.authors)
           expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
 

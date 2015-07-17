@@ -10,11 +10,6 @@ sudo gem install fastlane
 fastlane test
 ```
 Run bundle install and tests
-### current_version
-```
-fastlane current_version
-```
-
 ### release
 ```
 fastlane release

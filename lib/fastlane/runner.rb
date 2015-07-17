@@ -24,6 +24,11 @@ module Fastlane
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
+
+      lane_obj = (lanes[current_platform][current_lane] rescue nil)
+      raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red unless lane_obj
+      raise "You can't call the private lane '#{lane}' directly" if lane_obj.is_private
+
       ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
       ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
       
@@ -35,34 +40,32 @@ module Fastlane
       return_val = nil
 
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
-      Dir.chdir(path_to_use) do # the file is located in the fastlane folder
+      begin
+        Dir.chdir(path_to_use) do # the file is located in the fastlane folder
 
-        unless (lanes[current_platform][current_lane] rescue nil)
-          raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red
+          # Call the platform specific before_all block and then the general one
+          before_all_blocks[current_platform].call(current_lane) if (before_all_blocks[current_platform] and current_platform)
+          before_all_blocks[nil].call(current_lane) if before_all_blocks[nil]
+          
+          return_val = lane_obj.call(parameters || {}) # by default no parameters
+          
+          # `after_all` is only called if no exception was raised before
+          # Call the platform specific before_all block and then the general one
+          after_all_blocks[current_platform].call(current_lane) if (after_all_blocks[current_platform] and current_platform)
+          after_all_blocks[nil].call(current_lane) if (after_all_blocks[nil])
         end
 
-        # Call the platform specific before_all block and then the general one
-        before_all_blocks[current_platform].call(current_lane) if (before_all_blocks[current_platform] and current_platform)
-        before_all_blocks[nil].call(current_lane) if before_all_blocks[nil]
-        
-        return_val = lanes[current_platform][current_lane].call(parameters || {}) # by default no parameters
-        
-        # `after_all` is only called if no exception was raised before
-        # Call the platform specific before_all block and then the general one
-        after_all_blocks[current_platform].call(current_lane) if (after_all_blocks[current_platform] and current_platform)
-        after_all_blocks[nil].call(current_lane) if (after_all_blocks[nil])
-      end
+        return return_val
+      rescue => ex
+        Dir.chdir(path_to_use) do
+          # Provide error block exception without colour code
+          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
 
-      return return_val
-    rescue => ex
-      Dir.chdir(path_to_use) do
-        # Provide error block exception without colour code
-        error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
-
-        error_blocks[current_platform].call(current_lane, error_ex) if (error_blocks[current_platform] and current_platform)
-        error_blocks[nil].call(current_lane, error_ex) if error_blocks[nil]
+          error_blocks[current_platform].call(current_lane, error_ex) if (error_blocks[current_platform] and current_platform)
+          error_blocks[nil].call(current_lane, error_ex) if error_blocks[nil]
+        end
+        raise ex
       end
-      raise ex
     end
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
@@ -94,6 +97,7 @@ module Fastlane
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
+        Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
 
         # Actually switch lane now
@@ -119,11 +123,9 @@ module Fastlane
 
       verify_supported_os(method_sym, class_ref)
 
-      Helper.log_alert("Step: " + step_name)
-
       begin
         Dir.chdir('..') do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(method_sym) do
+          Actions.execute_action(class_ref.step_text) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
             if arguments.count == 0 
