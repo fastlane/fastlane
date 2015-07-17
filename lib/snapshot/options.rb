@@ -27,11 +27,7 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :screenshots_path,
                                      env_name: 'SNAPSHOT_PROJECT_PATH',
                                      description: "The path, in which the screenshots should be stored",
-                                     default_value: './screenshots'),
-        FastlaneCore::ConfigItem.new(key: :build_command,
-                                     env_name: 'SNAPSHOT_BUILD_COMMAND',
-                                     optional: true,
-                                     description: "Use a custom build command"),
+                                     default_value: './screenshots')
       ]
     end
   end

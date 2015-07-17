@@ -4,30 +4,37 @@ require 'shellwords'
 module Snapshot
   class Runner
 
-    def work(clean: true)
-      command = Snapshot.config[:build_command]
-      unless command
-        # That's the default case, user did not provide a custom build_command
-        command = generate_test_command(clean: clean)
-      end
+    attr_accessor :errors
+
+    def work
+      self.errors = []
 
       Helper.log.info "Building and running project '#{SnapshotConfig.shared_instance.project_name}' - this might take some time...".green
+
+      launch('de', 'iPhone5')
+
+      raise errors.join('; ') if errors.count > 0
+    end
+
+    def launch(language, device_type)
+      screenshots_path = "/tmp/snapshot/"
+      FileUtils.rm_rf(screenshots_path)
+      FileUtils.mkdir_p(screenshots_path)
+
+      command = generate_test_command(language, device_type)
+
       Helper.log.debug command.yellow.strip
-
-      all_lines = []
-
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |line|
-          all_lines << line
           puts line
         end
         Process.wait(pid)
       end
       # Exit status for build command, should be 0 if build succeeded
-      cmdstatus = $?.exitstatus
+      errors << "Wrong exist status" unless $?.exitstatus == 0
     end
 
-    def generate_test_command(clean: true)
+    def generate_test_command(language, device_type)
       scheme = SnapshotConfig.shared_instance.scheme
 
       proj_path = SnapshotConfig.shared_instance.project_path
@@ -40,7 +47,7 @@ module Snapshot
       build_command = pre_command + ' xcodebuild'
 
       actions = []
-      actions << 'clean' if clean
+      # actions << 'clean' if clean
       actions << 'test'
 
       pipe = "| xcpretty" # TODO
@@ -50,6 +57,8 @@ module Snapshot
         "-sdk iphonesimulator",
         "-#{proj_key} '#{proj_path}'",
         "-scheme '#{scheme}'",
+        "-destination 'platform=iOS Simulator,name=iPad 2,OS=#{Snapshot.config[:ios_version}'",
+        # "-AppleLanguages='(#{language})'",
         custom_build_args,
         actions.join(' '),
         pipe

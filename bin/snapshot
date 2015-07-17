@@ -40,11 +40,13 @@ class SnapshotApplication
         path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
           callback = Snapshot::CustomCallbackHandler.get
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.__hash__, 'Snapfile', callback)
+          o = options.__hash__.dup
+          o.delete(:verbose)
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o, 'Snapfile', callback)
 
           Snapshot::DependencyChecker.check_simulators
           Snapshot::SnapshotConfig.shared_instance(options.snapfile)
-          Snapshot::Runner.new.work(clean: !options.noclean)
+          Snapshot::Runner.new.work
         end
       end
     end
