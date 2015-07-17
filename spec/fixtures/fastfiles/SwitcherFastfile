@@ -1,0 +1,48 @@
+def path
+  "/tmp/deliver_result.txt"
+end
+
+lane :so_shared do |values|
+  File.write(path, values)
+end
+
+platform :ios do
+  lane :lane1 do
+    str = lane2(parameter1: 'parameter')
+    File.write(path, str)
+  end
+
+  lane :lane2 do |values|
+    "Lane 2 + #{values[:parameter1]}"
+  end
+
+  lane :lane3 do |values|
+    File.write(path, lane2) # without parameters
+  end
+
+  lane :lane4 do |values|
+    File.write(path, values)
+  end
+
+  lane :lane5 do
+    lane4(key: :value)
+  end
+
+  lane :invalid do
+    wrong_platform
+  end
+
+  lane :call_general_lane do
+    so_shared(random: :value)
+  end
+
+  lane :invalid_parameters do
+    lane4(:value)
+  end
+end
+
+platform :mac do
+  lane :wrong_platform do
+
+  end
+end

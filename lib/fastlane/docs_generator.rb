@@ -11,17 +11,17 @@ module Fastlane
 
       output << "# Available Actions"
       
-      all_keys = ff.runner.description_blocks.keys.reject(&:nil?) 
+      all_keys = ff.runner.lanes.keys.reject(&:nil?) 
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
         output << "## #{formatted_platform(platform)}" if platform
 
-        value = ff.runner.description_blocks[platform]
+        value = ff.runner.lanes[platform]
 
         if value
-          value.each do |lane, description|
-            output << render(platform, lane, description)          
+          value.each do |lane_name, lane|
+            output << render(platform, lane_name, lane.description.join("\n\n"))          
           end
 
           output << ""
