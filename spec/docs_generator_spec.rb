@@ -20,6 +20,7 @@ describe Fastlane do
       expect(output).to include('fastlane mac beta')
       expect(output).to include('https://fastlane.tools')
       expect(output).to include('https://github.com/')
+      expect(output).to include('fastlane docs')
     end
   end
 end

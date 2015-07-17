@@ -24,6 +24,11 @@ module Fastlane
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
+
+      lane_obj = (lanes[current_platform][current_lane] rescue nil)
+      raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red unless lane_obj
+      raise "You can't call the private lane '#{lane}' directly" if lane_obj.is_private
+
       ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
       ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
       

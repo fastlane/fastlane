@@ -42,7 +42,21 @@ module Fastlane
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
                                  description: desc_collection,
-                                        name: lane_name))
+                                        name: lane_name,
+                                  is_private: false))
+
+      @desc_collection = nil # reset the collected description again for the next lane
+    end
+
+    # User defines a new private lane, which can't be called from the CLI
+    def private_lane(lane_name, &block)
+      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+
+      self.runner.add_lane(Lane.new(platform: self.current_platform,
+                                       block: block,
+                                 description: desc_collection,
+                                        name: lane_name,
+                                  is_private: true))
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
