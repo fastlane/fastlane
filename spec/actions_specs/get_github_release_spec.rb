@@ -3,7 +3,7 @@ describe Fastlane do
     describe "get_github_release" do
       before do
         stub_request(:get, "https://api.github.com/repos/KrauseFx/fastlane/releases").
-           with(:headers => {'Host'=>'api.github.com:443', 'User-Agent'=>'excon/0.45.3'}).
+           with(:headers => {'Host'=>'api.github.com:443'}).
            to_return(:status => 200, :body => File.read("./spec/fixtures/requests/github_releases.json"), :headers => {})
       end
 
