@@ -1,45 +1,48 @@
 
 desc "Run bundle install and tests"
 lane :test do
-  sh "bundle install"
-  sh "rspec"
-end
-
-lane :current_version do |options|
-  require 'open-uri'
-  puts "Checking the latest version on RubyGems"
-  JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
+  sh "cd .. && bundle install"
+  sh "cd .. && rspec"
 end
 
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
-  tool_name = options[:tool] || 'fastlane'
-  require tool_name
-  module_name = options[:module] || Object.const_get(tool_name.capitalize)
-  version = module_name::VERSION
+  Dir.chdir("..") do
+    tool_name = options[:tool] || 'fastlane'
+    require tool_name
+    module_name = options[:module] || Object.const_get(tool_name.capitalize)
+    version = module_name::VERSION
 
-  puts "Going to deploy #{module_name} #{version}"
-  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+    puts "Going to deploy #{module_name} #{version}"
+    raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
 
-  sh "rspec"
-  sh "bundle install"
-  sh "rake install"
-  ensure_git_status_clean
-  ensure_git_branch(branch: 'master')
-  push_to_git_remote
-  
-  info = get_github_release(url: 'KrauseFx/fastlane', version: version)
-  unless info
-    `open 'https://github.com/KrauseFx/#{tool_name}/releases/new'`
-    raise "No release on GitHub found".red 
+    sh "rspec"
+    sh "bundle install"
+    sh "rake install"
+    ensure_git_status_clean
+    ensure_git_branch(branch: 'master')
+    push_to_git_remote
+    
+    info = get_github_release(url: 'KrauseFx/fastlane', version: version)
+    unless info
+      `open 'https://github.com/KrauseFx/#{tool_name}/releases/new'`
+      raise "No release on GitHub found".red 
+    end
+
+    puts "Found '#{info['name']}'".green
+
+    sh "gem push ../pkg/#{tool_name}-#{version}.gem"
+
+    slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
+
+    puts "You can now tweet:".green
+    puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
   end
+end
 
-  puts "Found '#{info['name']}'".green
 
-  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
-
-  slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
-
-  puts "You can now tweet:".green
-  puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
+private_lane :current_version do |options|
+  require 'open-uri'
+  puts "Checking the latest version on RubyGems"
+  JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
 end
