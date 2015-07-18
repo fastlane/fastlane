@@ -252,13 +252,12 @@ module Spaceship
       parse_response(r, 'data')['users']
     end
 
-    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil) 
+    # @param group (String) an optional group name
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, group: nil) 
       url = tester.url[:create]
       raise "Action not provided for this tester type." unless url
 
-      data = {
-        testers: [
-          {
+      tester_data = {
             emailAddress: {
               value: email
             }, 
@@ -272,8 +271,17 @@ module Spaceship
               value: true
             }
           }
-        ]
-      }
+      
+      if group
+        tester_data[:groups] = [{
+                                  id: nil,
+                                  name: {
+                                    value: group
+                                  }
+                                }]
+      end
+
+      data = { testers: [tester_data] }
 
       r = request(:post) do |req|
         req.url url
