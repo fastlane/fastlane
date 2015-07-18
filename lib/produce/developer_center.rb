@@ -4,8 +4,7 @@ require 'babosa'
 module Produce
   class DeveloperCenter
 
-    def run(config)
-      @config = config
+    def run
       login
       create_new_app
     end
@@ -14,14 +13,14 @@ module Produce
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
       if app_exists?
-        Helper.log.info "App '#{@config[:app_name]}' already exists, nothing to do on the Dev Center".green
+        Helper.log.info "App '#{Produce.config[:app_name]}' already exists, nothing to do on the Dev Center".green
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
-        app_name = valid_name_for(@config[:app_name])
+        app_name = valid_name_for(Produce.config[:app_name])
         Helper.log.info "Creating new app '#{app_name}' on the Apple Dev Center".green
         
-        app = Spaceship.app.create!(bundle_id: @config[:bundle_identifier].to_s, 
+        app = Spaceship.app.create!(bundle_id: Produce.config[:bundle_identifier].to_s, 
                                          name: app_name)
 
         Helper.log.info "Created app #{app.app_id}"
@@ -43,16 +42,11 @@ module Produce
 
     private
       def app_exists?
-        Spaceship.app.find(@config[:bundle_identifier].to_s) != nil
+        Spaceship.app.find(Produce.config[:bundle_identifier].to_s) != nil
       end
 
       def login
-        user = ENV["CERT_USERNAME"] || ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-        manager = CredentialsManager::PasswordManager.shared_manager(user)
-
-        ENV["FASTLANE_TEAM_NAME"] ||= ENV['PRODUCE_TEAM_NAME']
-
-        Spaceship.login(user, manager.password)
+        Spaceship.login(Produce.config[:username], nil)
         Spaceship.select_team
       end
   end
