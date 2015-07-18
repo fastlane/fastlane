@@ -24,6 +24,8 @@ describe Spaceship::Tunes::Build do
       expect(build.app_name).to eq('Yeahaa')
       expect(build.platform).to eq('ios')
       expect(build.internal_expiry_date).to eq(1416562036000)
+      expect(build.external_expiry_date).to eq(0)
+      expect(build.external_testing_enabled).to eq(false)
       expect(build.watch_kit_enabled).to eq(false)
       expect(build.ready_to_install).to eq(false)
 

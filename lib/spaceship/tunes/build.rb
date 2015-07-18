@@ -37,6 +37,14 @@ module Spaceship
       # @return (Integer) When is this build going to be invalid
       attr_accessor :internal_expiry_date
 
+      # @return (Integer): When is the external build going to expire?
+      attr_accessor :external_expiry_date
+
+      # @return (Boolean): Is this build available for external beta testing
+      #   this is only true after the build was approved by Apple
+      attr_accessor :external_testing_enabled
+
+
       # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
 
@@ -78,6 +86,7 @@ module Spaceship
         'sessionCount' => :session_count,
         'crashCount' => :crash_count,
         'internalExpiry' => :internal_expiry_date,
+        'externalExpiry' => :external_expiry_date,
         'watchKitEnabled' => :watch_kit_enabled,
         'readyToInstall' => :ready_to_install,
       )
@@ -88,6 +97,10 @@ module Spaceship
         def factory(attrs)
           self.new(attrs)
         end
+      end
+
+      def setup
+        @external_testing_enabled = self.external_expiry_date > 0
       end
     end
   end
