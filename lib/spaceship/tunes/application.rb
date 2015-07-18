@@ -191,6 +191,63 @@ module Spaceship
         
       end
 
+      #####################################################
+      # @!group Testers
+      #####################################################
+
+      # Add all testers (internal and external) to the current app list
+      def add_all_testers!
+        Tunes::Tester.external.add_all_to_app!(self.apple_id)
+        Tunes::Tester.internal.add_all_to_app!(self.apple_id)
+      end
+
+      # @return (Array) Returns all external testers available for this app
+      def external_testers
+        Tunes::Tester.external.all_by_app(self.apple_id)
+      end
+
+      # @return (Array) Returns all internal testers available for this app
+      def internal_testers
+        Tunes::Tester.internal.all_by_app(self.apple_id)
+      end
+
+      # @return (Spaceship::Tunes::Tester.external) Returns the external tester matching the parameter
+      #   as either the Tester id or email
+      # @param identifier (String) (required): Value used to filter the tester
+      def find_external_tester(identifier)
+        Tunes::Tester.external.find_by_app(self.apple_id, identifier)
+      end
+
+      # @return (Spaceship::Tunes::Tester.internal) Returns the internal tester matching the parameter
+      #   as either the Tester id or email
+      # @param identifier (String) (required): Value used to filter the tester
+      def find_internal_tester(identifier)
+        Tunes::Tester.internal.find_by_app(self.apple_id, identifier)
+      end
+
+      # Add external tester to the current app list, if it doesn't exist will be created
+      # @param email (String) (required): The email of the tester
+      # @param first_name (String) (optional): The first name of the tester (Ignored if user already exist)
+      # @param last_name (String) (optional): The last name of the tester (Ignored if user already exist)
+      def add_external_tester!(email: nil, first_name: nil, last_name: nil)
+        raise "Tester is already on #{self.name} betatesters" if find_external_tester(email)
+
+        tester = Tunes::Tester.external.find(email) || Tunes::Tester.external.create!(email: email, 
+                                                                                 first_name: first_name, 
+                                                                                  last_name: last_name)
+        tester.add_to_app!(self.apple_id)
+      end
+
+      # Remove external tester from the current app list that matching the parameter
+      #   as either the Tester id or email
+      # @param identifier (String) (required): Value used to filter the tester
+      def remove_external_tester!(identifier)
+        tester = find_external_tester(identifier)
+
+        raise "Tester is not on #{self.name} betatesters" unless tester
+
+        tester.remove_from_app!(self.apple_id)
+      end
     end
   end
 end

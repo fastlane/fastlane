@@ -237,5 +237,124 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    #####################################################
+    # @!group Testers
+    #####################################################
+    def testers(tester)
+      url = tester.url[:index]
+      r = request(:get, url)
+      parse_response(r, 'data')['testers']
+    end
+
+    def testers_by_app(tester, app_id) 
+      url = tester.url(app_id)[:index_by_app]
+      r = request(:get, url)
+      parse_response(r, 'data')['users']
+    end
+
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil) 
+      url = tester.url[:create]
+      raise "Action not provided for this tester type." unless url
+
+      data = {
+        testers: [
+          {
+            emailAddress: {
+              value: email
+            }, 
+            firstName: {
+              value: first_name
+            },
+            lastName: {
+              value: last_name
+            },
+            testing: {
+              value: true
+            }
+          }
+        ]
+      }
+
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')['testers']
+      handle_itc_response(data) || data[0]
+    end
+
+    def delete_tester!(tester)
+      url = tester.class.url[:delete]
+      raise "Action not provided for this tester type." unless url
+
+      data = [
+        {
+          emailAddress: {
+            value: tester.email
+          }, 
+          firstName: {
+            value: tester.first_name
+          },
+          lastName: {
+            value: tester.last_name
+          },
+          testing: {
+            value: false
+          }, 
+          testerId: tester.tester_id
+        }
+      ]
+
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')['testers']
+      handle_itc_response(data) || data[0]
+    end
+
+    def add_tester_to_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, true)
+    end
+
+    def remove_tester_from_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, false)
+    end
+
+    private 
+      def update_tester_from_app!(tester, app_id, testing)
+        url = tester.class.url(app_id)[:update_by_app]
+        data = {
+          users: [
+            {
+              emailAddress: {
+                value: tester.email
+              }, 
+              firstName: {
+                value: tester.first_name
+              },
+              lastName: {
+                value: tester.last_name
+              },
+              testing: {
+                value: testing
+              }
+            }
+          ]
+        }
+
+        r = request(:post) do |req|
+          req.url url
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+          
+        data = parse_response(r, 'data')
+        handle_itc_response(data)
+      end
   end
 end
