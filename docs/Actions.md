@@ -631,13 +631,13 @@ Create new apps on iTunes Connect and Apple Developer Portal. If the app already
 
 ```ruby
 produce(
-  produce_username: 'felix@krausefx.com',
-  produce_app_identifier: 'com.krausefx.app',
-  produce_app_name: 'MyApp',
-  produce_language: 'English',
-  produce_version: '1.0',
-  produce_sku: 123,
-  produce_team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
+  username: 'felix@krausefx.com',
+  app_identifier: 'com.krausefx.app',
+  app_name: 'MyApp',
+  language: 'English',
+  version: '1.0',
+  sku: 123,
+  team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
 )
 ```
 
@@ -685,6 +685,22 @@ ensure_git_branch # defaults to `master` branch
 ensure_git_branch(
   branch: 'develop'
 )
+```
+
+### last_git_tag
+
+Simple action to get the latest git tag
+
+```ruby
+last_git_tag
+```
+
+### git_branch
+
+Quickly get the name of the branch you're currently in
+
+```ruby
+git_branch
 ```
 
 ### ensure_git_status_clean
@@ -791,6 +807,17 @@ reset_git_repo(
 ```
 
 [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) uses this action to reset temporary changes of the project configuration after successfully building it.
+
+### get_github_release
+
+You can easily receive information about a specific release from GitHub.com
+
+```ruby
+release = get_github_release(url: "KrauseFx/fastlane", version: "1.0.0")
+puts release['name']
+```
+
+To get a list of all available values run `fastlane action get_github_release`.
 
 ## Using mercurial
 
