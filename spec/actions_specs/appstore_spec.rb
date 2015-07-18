@@ -19,7 +19,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do 
             appstore(beta: true)
           end").runner.execute(:test)
-        }.to raise_error "Could not find available option 'beta' in the list of available options: force, skip_deploy, metadata_only, deliver_file_path".red
+        }.to raise_error(/option 'beta' in the list of available options: force, skip_deploy, metadata_only, deliver_file_path/)
       end
 
       it "uses the passed skip_deploy value if given" do
