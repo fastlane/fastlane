@@ -36,7 +36,7 @@ describe FastlaneCore do
       it "raises an exception if method is not available" do
         expect {
           config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileKeyNotHere')
-        }.to raise_error (/Could not find available option \'not_existent\' in the list of available options.*/)
+        }.to raise_error (/Could not find option \'not_existent\' in the list of available options.*/)
       end
 
       it "overwrites existing values" do

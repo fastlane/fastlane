@@ -55,7 +55,7 @@ module FastlaneCore
         if option
           option.verify!(value) # Call the verify block for it too
         else
-          raise "Could not find available option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
+          raise "Could not find option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
         end
       end
     end
@@ -153,7 +153,7 @@ module FastlaneCore
       option = option_for_key(key)
       
       unless option
-        raise "Could not find available option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
+        raise "Could not find option '#{key}' in the list of available options: #{@available_options.collect { |a| a.key }.join(', ')}".red
       end
 
       option.verify!(value)
