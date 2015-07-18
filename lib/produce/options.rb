@@ -13,7 +13,7 @@ module Produce
                                      verify_block: Proc.new do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :bundle_identifier,
+        FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
@@ -21,16 +21,17 @@ module Produce
                                      env_name: "PRODUCE_APP_IDENTIFIER_SUFFIX",
                                      description: "App Identifier Suffix (Ignored if App Identifier does not ends with .*)"),
         FastlaneCore::ConfigItem.new(key: :app_name,
-                                     env_name: "PRODUCE_APP_IDENTIFIER",
+                                     env_name: "PRODUCE_APP_NAME",
                                      description: "App Name"),
-        FastlaneCore::ConfigItem.new(key: :initial_version,
+        FastlaneCore::ConfigItem.new(key: :version,
                                      env_name: "PRODUCE_VERSION",
                                      description: "Initial version number (e.g. '1.0')"),
         FastlaneCore::ConfigItem.new(key: :sku,
                                      env_name: "PRODUCE_SKU",
                                      description: "SKU Number (e.g. '1234')",
-                                     default_value: Time.now.to_i.to_s),
-        FastlaneCore::ConfigItem.new(key: :primary_language,
+                                     default_value: Time.now.to_i.to_s,
+                                     is_string: false), # false, as we also allow integers
+        FastlaneCore::ConfigItem.new(key: :language,
                                      env_name: "PRODUCE_LANGUAGE",
                                      description: "Primary Language (e.g. 'English', 'German')",
                                      default_value: "English",
@@ -48,7 +49,25 @@ module Produce
                                      env_name: "PRODUCE_SKIP_DEVCENTER",
                                      description: "Skip the creation of the app on the Apple Developer Portal",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-t",
+                                     env_name: "PRODUCE_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "PRODUCE_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: Proc.new do |value|
+                                        ENV["FASTLANE_TEAM_NAME"] = value
+                                     end),
         
       ]
     end

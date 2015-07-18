@@ -20,7 +20,7 @@ module Produce
         app_name = valid_name_for(Produce.config[:app_name])
         Helper.log.info "Creating new app '#{app_name}' on the Apple Dev Center".green
         
-        app = Spaceship.app.create!(bundle_id: Produce.config[:bundle_identifier].to_s, 
+        app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name)
 
         Helper.log.info "Created app #{app.app_id}"
@@ -40,9 +40,13 @@ module Produce
       latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
     end
 
+    def app_identifier
+      Produce.config[:app_identifier].to_s
+    end
+
     private
       def app_exists?
-        Spaceship.app.find(Produce.config[:bundle_identifier].to_s) != nil
+        Spaceship.app.find(app_identifier) != nil
       end
 
       def login
