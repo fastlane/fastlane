@@ -104,7 +104,7 @@ In case you want to pass more information to `produce` using environment variabl
 Your `Fastfile` should look like this
 ```ruby
 lane :appstore do
-  produce({
+  produce(
     username: 'felix@krausefx.com',
     app_identifier: 'com.krausefx.app',
     app_name: 'MyApp',
@@ -112,7 +112,7 @@ lane :appstore do
     version: '1.0',
     sku: 123,
     team_name: 'SunApps GmbH' # only necessary when in multiple teams
-  })
+  )
 
   deliver
 end
