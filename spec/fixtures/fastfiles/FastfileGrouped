@@ -50,6 +50,10 @@ platform :android do
     File.write("/tmp/fastlane/android_beta.txt", Time.now.to_s)
   end
 
+  private_lane :such_private do
+
+  end
+
   lane :witherror do
     raise 'my exception'
   end
