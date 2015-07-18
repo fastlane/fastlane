@@ -16,6 +16,10 @@ describe Fastlane do
       it "returns an empty array if invalid input is given" do
         expect(@ff.runner.available_lanes('asdfasdfasdf')).to eq([])
       end
+
+      it "doesn't show private lanes" do
+        expect(@ff.runner.available_lanes).to_not include('android such_private')
+      end
     end
   end
 end

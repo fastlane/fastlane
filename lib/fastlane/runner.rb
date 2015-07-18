@@ -76,7 +76,7 @@ module Fastlane
         next if (filter_platform and filter_platform.to_s != platform.to_s) # skip actions that don't match
 
         platform_lanes.each do |lane_name, lane|
-          all << [platform, lane_name].reject(&:nil?).join(' ')
+          all << [platform, lane_name].reject(&:nil?).join(' ') unless lane.is_private
         end
       end
       all

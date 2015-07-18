@@ -76,7 +76,7 @@ class FastlaneApplication
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
         puts "\nAvailable lanes:".green
         ff.runner.available_lanes.each do |lane|
-          puts "- #{lane}" unless lane.is_private
+          puts "- #{lane}"
         end
         puts "\nExecute using `fastlane [lane_name]`".yellow
       end
