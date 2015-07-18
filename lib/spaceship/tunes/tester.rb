@@ -22,30 +22,29 @@ module Spaceship
       #   "Bennett"
       attr_accessor :last_name
 
-      # @return (Bool) The tester is testing
-      # @example 
-      #   true
-      attr_accessor :testing
-
-      # @return (String) The latest version installed of this tester (Only for apps methods)
-      # @example 
-      #   "0.2.9 (37)"
-      attr_accessor :latest_build
+      # @return (Array) An array of registered devices for this user
+      # @example
+      #    [{
+      #      "model": "iPhone 6",
+      #      "os": "iOS",
+      #      "osVersion": "8.3",
+      #      "name": null
+      #    }]
+      attr_accessor :devices
 
       attr_mapping(
         'testerId' => :tester_id,
         'emailAddress.value' => :email,
         'firstName.value' => :first_name,
         'lastName.value' => :last_name,
-        'testing.value' => :testing,
-        'latestBuild' => :latest_build
+        'devices' => :devices
       )
 
       class << self
 
         # @return (Hash) All urls for the ITC used for web requests
         def url
-          raise "You must select a tester type. Use a subclass."
+          raise "You have to use a subclass: Internal or External"
         end
 
         # Create a new object based on a hash.
@@ -108,9 +107,22 @@ module Spaceship
         def add_all_to_app!(app_id)
           # TODO: Change to not make one request for each tester
           all.each do |tester|
-            tester.add_to_app!(app_id)
+            begin
+              tester.add_to_app!(app_id)
+            rescue => ex
+              if ex.to_s.include?"testerEmailExistsInternal" or ex.to_s.include?"duplicate.email"
+                # That's a non-relevant error message by iTC
+                # ignore that
+              else
+                raise ex
+              end
+            end
           end
         end
+      end
+
+      def setup
+        self.devices ||= [] # by default, an empty array instead of nil
       end
 
       #####################################################

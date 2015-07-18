@@ -110,6 +110,17 @@ def itc_stub_build_trains
     to_return(:status => 200, :body => itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
 end
 
+def itc_stub_testers
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/int").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('testers/get_internal.json'), headers: {'Content-Type' => 'application/json'})
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/ext").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('testers/get_external.json'), headers: {'Content-Type' => 'application/json'})
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/internalTesters/898536088/").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('testers/existing_internal_testers.json'), headers: {'Content-Type' => 'application/json'})
+end
 
 
 def itc_stub_resolution_center_valid
@@ -139,5 +150,6 @@ RSpec.configure do |config|
     itc_stub_applications
     itc_stub_app_versions
     itc_stub_build_trains
+    itc_stub_testers
   end
 end

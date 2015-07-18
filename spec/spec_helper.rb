@@ -30,6 +30,7 @@ RSpec.configure do |config|
     rescue Errno::ENOENT
     end
   end
+  
   config.after(:each) do
     begin
       cache_paths.each { |path| File.delete(path) }
