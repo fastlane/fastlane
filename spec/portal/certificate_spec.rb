@@ -2,15 +2,15 @@ require 'spec_helper'
 
 describe Spaceship::Certificate do
   before { Spaceship.login }
-  let(:client) { Spaceship::Certificate.client }
+  let(:client) { Spaceship::Portal::Certificate.client }
 
   describe "successfully loads and parses all certificates" do
     it "the number is correct" do
-      expect(Spaceship::Certificate.all.count).to eq(3)
+      expect(Spaceship::Portal::Certificate.all.count).to eq(3)
     end
 
     it "parses code signing identities correctly" do
-      cert = Spaceship::Certificate.all.first
+      cert = Spaceship::Portal::Certificate.all.first
 
       expect(cert.id).to eq('XC5PH8DAAA')
       expect(cert.name).to eq('SunApps GmbH')
@@ -26,7 +26,7 @@ describe Spaceship::Certificate do
     end
 
     it "parses push certificates correctly" do
-      push = Spaceship::Certificate.find('32KPRBAAAA') # that's the push certificate
+      push = Spaceship::Portal::Certificate.find('32KPRBAAAA') # that's the push certificate
 
       expect(push.id).to eq('32KPRBAAAA')
       expect(push.name).to eq('net.sunapps.54')
@@ -41,7 +41,7 @@ describe Spaceship::Certificate do
   end
 
   it "Correctly filters the listed certificates" do
-    certs = Spaceship::Certificate::Development.all
+    certs = Spaceship::Portal::Certificate::Development.all
     expect(certs.count).to eq(1)
 
     cert = certs.first
@@ -57,7 +57,7 @@ describe Spaceship::Certificate do
   end
 
   describe '#download' do
-    let(:cert) { Spaceship::Certificate.all.first }
+    let(:cert) { Spaceship::Portal::Certificate.all.first }
     it 'downloads the associated .cer file' do
       x509 = OpenSSL::X509::Certificate.new(cert.download)
       expect(x509.issuer.to_s).to match('Apple Worldwide Developer Relations')
@@ -65,7 +65,7 @@ describe Spaceship::Certificate do
   end
 
   describe '#revoke' do
-    let(:cert) { Spaceship::Certificate.all.first }
+    let(:cert) { Spaceship::Portal::Certificate.all.first }
     it 'revokes certificate by the given cert id' do
       expect(client).to receive(:revoke_certificate!).with('XC5PH8DAAA', 'R58UK2EAAA')
       cert.revoke!
@@ -75,30 +75,30 @@ describe Spaceship::Certificate do
   describe '#create' do
     it 'should create and return a new certificate' do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
-      csr, pkey = Spaceship::Certificate.create_certificate_signing_request
-      certificate = Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
-      expect(certificate).to be_instance_of(Spaceship::Certificate::ProductionPush)
+      csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
+      certificate = Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
+      expect(certificate).to be_instance_of(Spaceship::Portal::Certificate::ProductionPush)
     end
 
     it 'should create a new certificate using a CSR from a file' do
       expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
-      csr, pkey = Spaceship::Certificate.create_certificate_signing_request
+      csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
       Tempfile.open('csr') do |f|
         f.write(csr.to_pem)
         f.rewind
         pem = f.read
-        Spaceship::Certificate::ProductionPush.create!(csr: pem, bundle_id: 'net.sunapps.151')
+        Spaceship::Portal::Certificate::ProductionPush.create!(csr: pem, bundle_id: 'net.sunapps.151')
       end
     end
 
     it 'raises an error if the user wants to create a certificate for a non-existing app' do
       expect {
-        csr, pkey = Spaceship::Certificate.create_certificate_signing_request
-        Spaceship::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
+        csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
+        Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
       }.to raise_error "Could not find app with bundle id 'notExisting'"
     end
   end

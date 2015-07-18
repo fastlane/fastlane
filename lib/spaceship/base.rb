@@ -19,14 +19,44 @@ module Spaceship
   #
   # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
+    class DataHash
+      def initialize(hash)
+        @hash = hash
+      end
+
+      def get(*keys)
+        lookup(keys)
+      end
+      alias [] get
+
+      def set(keys, value)
+        last = keys.pop
+        ref = lookup(keys) || @hash
+        ref[last] = value
+      end
+
+      def lookup(keys)
+        head, *tail = *keys
+        if tail.empty?
+          @hash[head]
+        else
+          DataHash.new(@hash[head]).lookup(tail)
+        end
+      end
+
+      def to_json
+        @hash.to_json
+      end
+    end
+
     class << self
       attr_accessor :client
 
       ##
       # The client used to make requests.
-      # @return (Spaceship::Client) Defaults to the singleton `Spaceship.client`
+      # @return (Spaceship::Client) Defaults to the singleton
       def client
-        @client || Spaceship.client
+        raise "`client` must be implemented in subclasses"
       end
 
       ##
@@ -38,18 +68,25 @@ module Spaceship
       end
 
       ##
-      # Remaps the attributes passed into the initializer to the model
-      # attributes using the map defined by `attr_map`.
+      # Binds attributes getters and setters to underlying data returned from the API.
+      # Setting any properties will alter the `raw_data` hash.
       #
-      # This method consumes the input parameter meaning attributes that were
-      # remapped are deleted.
-      #
-      # @return (Hash) the attribute mapping used by `remap_keys!`
-      def remap_keys!(attrs)
-        return if attr_mapping.nil?
+      # @return (Module) with the mapped getters and setters defined. Can be `include`, `extend`, or `prepend` into a class or object
+      def mapping_module(attr_mapping)
+        Module.new do
+          attr_mapping.each do |source, dest|
+            getter = dest.to_sym
+            setter = "#{dest}=".to_sym
 
-        attr_mapping.each do |from, to|
-          attrs[to] = attrs.delete(from)
+            define_method(getter) do
+              raw_data.get(*source.split('.'))
+            end
+
+            define_method(setter) do |value|
+              self.raw_data ||= DataHash.new({})
+              raw_data.set(source.split('.'), value)
+            end
+          end
         end
       end
 
@@ -70,12 +107,20 @@ module Spaceship
       def attr_mapping(attr_map = nil)
         if attr_map
           @attr_mapping = attr_map
+          @attr_mapping.values.each do |method_name|
+            getter = method_name.to_sym
+            setter = "#{method_name}=".to_sym
+            remove_method(getter) if public_instance_methods.include?(getter)
+            remove_method(setter) if public_instance_methods.include?(setter)
+          end
+          include(mapping_module(@attr_mapping))
         else
           begin
-            @attr_mapping ||= ancestors[1].attr_mapping 
+            @attr_mapping ||= ancestors[1].attr_mapping
           rescue NameError, NoMethodError
           end
         end
+        return @attr_mapping
       end
 
       ##
@@ -109,16 +154,28 @@ module Spaceship
     end
 
     ##
+    # @return (Hash/Array) Holds the raw data we got from Apple's
+    #   server to use it later
+    attr_accessor :raw_data
+
+    ##
     # The initialize method accepts a parsed response from Apple and sets all
     # attributes that are defined by `attr_mapping`
     #
     # Do not override `initialize` in your own models.
     def initialize(attrs = {})
-      self.class.remap_keys!(attrs)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
+      self.raw_data = DataHash.new(attrs)
       @client = self.class.client
+      self.setup
+    end
+
+    # This method can be used by subclasses to do additional initialisation
+    # using the `raw_data`
+    def setup
+
     end
 
     ##

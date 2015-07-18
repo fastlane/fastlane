@@ -70,23 +70,8 @@ describe Spaceship::Client do
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
-        stub_multiple_teams
+        adp_stub_multiple_teams
         expect(subject.team_id).to eq("XXXXXXXXXX")
-      end
-    end
-
-    describe "test timeout catching" do
-      it "should automatically retry the request if there was a timeout" do
-        puts "Testing re-trying behaviour"
-
-        start = Time.now
-        expect(subject.client).to receive(:send).at_least(5).and_raise(Faraday::Error::TimeoutError.new)
-        expect {
-          subject.devices
-        }.to raise_error Faraday::Error::TimeoutError
-
-        diff = Time.now - start
-        expect(diff).to be > 10
       end
     end
 
@@ -95,7 +80,7 @@ describe Spaceship::Client do
         # Temporary stub a request to require the csrf_tokens
         stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
             with(body: {teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;', 'csrf' => 'top_secret', 'csrf_ts' => '123123'}).
-            to_return(status: 200, body: read_fixture_file('listDevices.action.json'), headers: {'Content-Type' => 'application/json'})
+            to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: {'Content-Type' => 'application/json'})
 
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({csrf: 'top_secret', csrf_ts: '123123'})
@@ -128,7 +113,7 @@ describe Spaceship::Client do
       end
 
       it 'returns true for enterprise accounts' do
-        stub_multiple_teams
+        adp_stub_multiple_teams
 
         subject.team_id = 'SecondTeam'
         expect(subject.in_house?).to eq(true)
@@ -220,7 +205,7 @@ describe Spaceship::Client do
     end
 
     describe '#create_certificate' do
-      let(:csr) { read_fixture_file('certificateSigningRequest.certSigningRequest')}
+      let(:csr) { adp_read_fixture_file('certificateSigningRequest.certSigningRequest')}
       it 'makes a request to create a certificate' do
         response = subject.create_certificate!('BKLRAVXMGM', csr, '2HNR359G63')
         expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')

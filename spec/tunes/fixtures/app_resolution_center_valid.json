@@ -1,0 +1,26 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "replyConstraints": {
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "appNotes": {
+      "threads": []
+    },
+    "betaNotes": {
+      "threads": []
+    },
+    "appMessages": {
+      "threads": []
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

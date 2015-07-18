@@ -8,7 +8,7 @@ describe Spaceship do
   end
 
   it 'should initialize with a client' do
-    expect(Spaceship.client).to be_instance_of(Spaceship::Client)
+    expect(Spaceship.client).to be_instance_of(Spaceship::PortalClient)
   end
 
   it "Device" do
@@ -29,7 +29,7 @@ describe Spaceship do
 
   describe Spaceship::Launcher do
     it 'has a client' do
-      expect(subject.client).to be_instance_of(Spaceship::Client)
+      expect(subject.client).to be_instance_of(Spaceship::PortalClient)
     end
 
     it 'returns a scoped model class' do
