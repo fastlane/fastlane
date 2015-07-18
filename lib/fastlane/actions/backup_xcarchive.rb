@@ -8,7 +8,6 @@ module Fastlane
       require 'fileutils'
 
       def self.run(params)
-
         # Get params
         xcarchive = params[:xcarchive]
         base_destination = params[:destination]
@@ -29,7 +28,6 @@ module Fastlane
 
         # Save archive to destination
         if zipped 
-          
           Helper.log.info "Compressing #{xcarchive}"
 
           xcarchive_folder = File.expand_path(File.dirname(xcarchive))
@@ -43,9 +41,7 @@ module Fastlane
           FileUtils.mv(zip_file, full_destination)
 
           Actions.lane_context[SharedValues::BACKUP_XCARCHIVE_FILE] = "#{full_destination}/#{File.basename(zip_file)}"
-
         else
-
           # Copy xcarchive file
           FileUtils.cp_r(xcarchive, full_destination)
 
@@ -53,8 +49,6 @@ module Fastlane
         end
 
       end
-
-
 
       #####################################################
       # @!group Documentation
@@ -86,15 +80,13 @@ module Fastlane
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
-                                       env_name: 'BACKUP_XCARCHIVE_ZIP'
-                                       ),
+                                       env_name: 'BACKUP_XCARCHIVE_ZIP'),
           FastlaneCore::ConfigItem.new(key: :versioned,
                                        description: 'Create a versioned (date and app version) subfolder where to put the archive. Default value `true`',
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
-                                       env_name: 'BACKUP_XCARCHIVE_VERSIONED'
-                                       )
+                                       env_name: 'BACKUP_XCARCHIVE_VERSIONED')
         ]
       end
 
