@@ -53,6 +53,8 @@ module Spaceship
 
       # Setup all the builds and processing builds
       def setup
+        super
+        
         @builds = self.raw_data['builds'].collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)

@@ -100,7 +100,9 @@ module Spaceship
       end
 
       def setup
-        @external_testing_enabled = self.external_expiry_date > 0
+        super
+
+        @external_testing_enabled = (self.external_expiry_date || 0) > 0
       end
     end
   end
