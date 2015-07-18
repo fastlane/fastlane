@@ -91,13 +91,13 @@ Your `Fastfile` should look like this
 ```ruby
 lane :appstore do
   produce({
-    produce_username: 'felix@krausefx.com',
-    produce_app_identifier: 'com.krausefx.app',
-    produce_app_name: 'MyApp',
-    produce_language: 'English',
-    produce_version: '1.0',
-    produce_sku: 123,
-    produce_team_name: 'SunApps GmbH' # only necessary when in multiple teams
+    username: 'felix@krausefx.com',
+    app_identifier: 'com.krausefx.app',
+    app_name: 'MyApp',
+    language: 'English',
+    version: '1.0',
+    sku: 123,
+    team_name: 'SunApps GmbH' # only necessary when in multiple teams
   })
 
   deliver
@@ -112,16 +112,10 @@ apple_id ENV['PRODUCE_APPLE_ID']
 
 This will tell `deliver`, which `App ID` to use, since the app is not yet available in the App Store.
 
-# How does it work?
-
-```produce``` will access the ```iOS Dev Center``` to create your `App ID`. Check out the full source code: [developer_center.rb](https://github.com/KrauseFx/produce/blob/master/lib/produce/developer_center.rb).
-
-After finishing the first step, `produce` will access `iTunes Connect` to create the new app with some initial values. Check out the full source code: [itunes_connect.rb](https://github.com/KrauseFx/produce/blob/master/lib/produce/itunes_connect.rb).
-
 You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://github.com/KrauseFx/deliver) to upload your app metadata using a CLI
 
 ## How is my password stored?
-```produce``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
+`produce` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain

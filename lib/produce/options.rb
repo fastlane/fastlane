@@ -23,7 +23,7 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :app_name,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      description: "App Name"),
-        FastlaneCore::ConfigItem.new(key: :version,
+        FastlaneCore::ConfigItem.new(key: :initial_version,
                                      env_name: "PRODUCE_VERSION",
                                      description: "Initial version number (e.g. '1.0')"),
         FastlaneCore::ConfigItem.new(key: :sku,
@@ -33,6 +33,7 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :primary_language,
                                      env_name: "PRODUCE_LANGUAGE",
                                      description: "Primary Language (e.g. 'English', 'German')",
+                                     default_value: "English",
                                      verify_block: Proc.new do |language|
                                        raise "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}".red unless AvailableDefaultLanguages.all_languages.include?(language)
                                      end),
