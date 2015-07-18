@@ -8,6 +8,7 @@ module Fastlane
       def self.run(params)
         $verbose = true if params[:verbose]
         clean = !params[:noclean]
+        build = !params[:nobuild]
 
         if Helper.test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
@@ -23,7 +24,7 @@ module Fastlane
         begin
           Dir.chdir(params[:snapshot_file_path] || FastlaneFolder.path) do
             Snapshot::SnapshotConfig.shared_instance
-            Snapshot::Runner.new.work(clean: clean)
+            Snapshot::Runner.new.work(clean: clean, build: build)
 
             results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
 
@@ -56,7 +57,12 @@ module Fastlane
                                        default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
                                        verify_block: Proc.new do |value|
                                         raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :nobuild,
+                                       env_name: "FL_SNAPSHOT_NO_BUILD",
+                                       description: "Skip the build process and use a pre-built .app under your build_dir",
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 
