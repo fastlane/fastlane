@@ -61,18 +61,31 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Installation
     sudo gem install produce
 
-Make sure, you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
-
-If you don't already have homebrew installed, [install it here](http://brew.sh/).
-
 # Usage
 
     produce
+    
+# Parameters
+
+Get the latest list of all available parameters;
+
+    produce --help
+
+```
+    -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
+    -b, --bundle_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
+    -b, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*) (PRODUCE_APP_IDENTIFIER_SUFFIX)
+    -a, --app_name STRING App Name (PRODUCE_APP_IDENTIFIER)
+    -i, --initial_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
+    -s, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
+    -p, --primary_language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
+    -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
+    -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -h, --help           Display help documentation
+```
 
 ## Environment Variables
-In case you want to pass more information to `produce`:
+In case you want to pass more information to `produce` using environment variables:
 
 - `PRODUCE_USERNAME` (your iTunes Connect username)
 - `PRODUCE_APP_IDENTIFIER` (the bundle identifier of the new app)
@@ -83,7 +96,8 @@ In case you want to pass more information to `produce`:
 - `PRODUCE_SKIP_ITC` (should iTunes Connect app be created)
 - `PRODUCE_SKIP_DEVCENTER` (should Apple Developer Portal app be created)
 - `FASTLANE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
-- `FASTLANE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
+- `FASTLANE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`) 
+
 
 ## [`fastlane`](https://github.com/KrauseFx/fastlane) Integration
 
