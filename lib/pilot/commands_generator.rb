@@ -53,6 +53,15 @@ module Pilot
         end
       end
 
+      command :list do |c|
+        c.syntax = "list"
+        c.description = "Lists all registered testers, both internal and external"
+        c.action do |_args, options|
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterManager.new.list_testers(config)
+        end
+      end
+
       command :find do |c|
         c.syntax = "find"
         c.description = "Find a tester (internal or external) by their email address"

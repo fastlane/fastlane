@@ -61,7 +61,28 @@ module Pilot
       end
     end
 
+    def list_testers(options)
+      self.run(options)
+      require 'terminal-table'
+
+      list(Spaceship::Tunes::Tester::Internal.all, "Internal Testers")
+      list(Spaceship::Tunes::Tester::External.all, "External Testers")
+    end
+
     private
+      def list(all_testers, title)
+        rows = []
+        all_testers.each do |tester|
+          rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count]
+        end
+
+        puts Terminal::Table.new(
+          title: title.green,
+          headings: ['First', 'Last', 'Email', 'Devices'],
+          rows: rows
+        )
+      end
+
       # Print out all the details of a specific tester
       def describe_tester(tester)
         return unless tester
@@ -105,12 +126,10 @@ module Pilot
           end
         end
 
-        table = Terminal::Table.new(
+        puts Terminal::Table.new(
           title: tester.email.green,
-          # headings: ['Action', 'Description', 'Author'],
           rows: rows
         )
-        puts table
       end
   end
 end
