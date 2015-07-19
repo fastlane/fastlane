@@ -168,6 +168,14 @@ To remove an external tester:
 pilot remove -e felix@krausefx.com
 ```
 
+### Export testers
+
+To export all external testers to a CSV file. Useful if you need to import tester info to another system, for example to create a mailing list.
+
+```
+pilot export -c ~/Desktop/testers.csv
+```
+
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
