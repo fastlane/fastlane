@@ -12,7 +12,8 @@ module Pilot
                                      default_value: ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
                                      verify_block: Proc.new do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
-                                     end),
+                                    end),
+
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      env_name: "PILOT_IPA",
@@ -21,16 +22,18 @@ module Pilot
                                      verify_block: Proc.new do |value|
                                        raise "Could not find ipa file at path '#{value}'" unless File.exists?value
                                        raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with?".ipa"
-                                     end),
+                                    end),
+
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "PILOT_APP_IDENTIFIER",
-                                     description: "The bundle identifier of the app to upload (optional)",
+                                     description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
                                      default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"],
                                      verify_block: Proc.new do |value|
-                                       
-                                     end),
+
+                                    end),
+
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",
                                      env_name: "PILOT_APPLE_ID",
@@ -38,9 +41,40 @@ module Pilot
                                      optional: true,
                                      default_value: ENV["TESTFLIGHT_APPLE_ID"],
                                      verify_block: Proc.new do |value|
-                                       
-                                     end)
-        
+
+                                    end),
+
+        FastlaneCore::ConfigItem.new(key: :first_name,
+                                     short_option: "-f",
+                                     env_name: "PILOT_TESTER_FIRST_NAME",
+                                     description: "The tester's first name",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                    end),
+
+        FastlaneCore::ConfigItem.new(key: :last_name,
+                                     short_option: "-l",
+                                     env_name: "PILOT_TESTER_FIRST_NAME",
+                                     description: "The tester's last name",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                    end),
+
+        FastlaneCore::ConfigItem.new(key: :email,
+                                     short_option: "-e",
+                                     env_name: "PILOT_TESTER_EMAIL",
+                                     description: "The tester's email",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                    end),
+        FastlaneCore::ConfigItem.new(key: :group_name,
+                                     short_option: "-g",
+                                     env_name: "PILOT_TESTER_GROUP",
+                                     description: "Group to add the tester to",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                    end)        
+
       ]
     end
   end
