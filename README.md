@@ -128,7 +128,11 @@ To add a new tester to both your iTunes Connect account and to your app (if give
 pilot add -e email@invite.com
 ```
 
-Additionally you can specify the app identifier (if necessary): `pilot add -e email@email.com -a com.krausefx.app`
+Additionally you can specify the app identifier (if necessary): 
+
+```
+pilot add -e email@email.com -a com.krausefx.app
+```
 
 ### Find a tester
 
