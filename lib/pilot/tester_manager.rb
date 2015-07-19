@@ -71,6 +71,7 @@ module Pilot
     end
 
     private
+
       def list(all_testers, title)
         rows = []
         all_testers.each do |tester|
@@ -79,7 +80,7 @@ module Pilot
 
         puts Terminal::Table.new(
           title: title.green,
-          headings: ['First', 'Last', 'Email', 'Devices'],
+          headings: ["First", "Last", "Email", "Devices"],
           rows: rows
         )
       end
@@ -87,7 +88,7 @@ module Pilot
       # Print out all the details of a specific tester
       def describe_tester(tester)
         return unless tester
-        require 'terminal-table'
+        require "terminal-table"
 
         rows = []
 
@@ -102,11 +103,11 @@ module Pilot
           rows << ["Groups", group_names.join(', ')]
         end
 
-        latestInstalledDate = tester.raw_data.get("latestInstalledDate")
-        if latestInstalledDate
+        latest_installed_date = tester.raw_data.get("latestInstalledDate")
+        if latest_installed_date
           latest_installed_version = tester.raw_data.get("latestInstalledVersion")
           latest_installed_short_version = tester.raw_data.get("latestInstalledShortVersion")
-          pretty_date = Time.at((latestInstalledDate / 1000)).strftime("%m/%d/%y %H:%M")
+          pretty_date = Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
 
           rows << ["Latest Version", "#{latest_installed_version} (#{latest_installed_short_version})"]
           rows << ["Latest Install Date", pretty_date]
