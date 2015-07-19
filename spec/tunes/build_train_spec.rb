@@ -23,6 +23,14 @@ describe Spaceship::Tunes::BuildTrain do
       expect(trains.values.last.testing_enabled).to eq(true)
     end
 
+    it "returns all processing builds" do
+      builds = app.all_processing_builds
+      expect(builds.count).to eq(4)
+
+      b = builds.first
+      expect(b.state).to eq('ITC.apps.betaProcessingStatus.Created')
+    end
+
     describe "Accessing builds" do
       it "lets the user fetch the builds for a given train" do
         train = app.build_trains.values.first

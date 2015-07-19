@@ -171,6 +171,20 @@ module Spaceship
         end
       end
 
+      # @return [Array] This will return an array of *all* processing builds
+      #   this include pre-processing or standard processing
+      def all_processing_builds
+        builds = self.pre_processing_builds
+      
+        self.build_trains.each do |version_number, train|
+          train.processing_builds.each do |build|
+            builds << build
+          end
+        end
+
+        return builds
+      end
+
       #####################################################
       # @!group Submit for Review
       #####################################################
