@@ -2,124 +2,67 @@ require "fastlane_core"
 
 module Pilot
   class TesterManager < Manager
-    def add_tester(options, external = true)
+    def add_tester(options)
       self.run(options)
-      tester_type = tester_type_str(external)
 
       begin
-        tester = nil
+        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
-        if external
-          tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
-                                                              first_name: config[:first_name],
-                                                              last_name: config[:last_name],
-                                                              group: config[:group_name])
+        if tester
+          Helper.log.info "Existing tester #{tester.email}".green
         else
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
                                                               last_name: config[:last_name],
                                                               group: config[:group_name])
+          Helper.log.info "Successfully invited tester: #{tester.email}".green
         end
-
-        if config[:apple_id]
-          Helper.log.info "Adding #{tester_type} tester to app #{config[:apple_id]}".green
-          tester.add_to_app!(config[:apple_id])
-        end
-
-        if tester
-          Helper.log.info "Invited #{tester_type} tester: #{tester.email}".green
+        
+        app_filter = (config[:apple_id] || config[:app_identifier])
+        if app_filter
+          begin
+            tester.add_to_app!(app_filter)
+            Helper.log.info "Successfully added tester to app #{app_filter}".green
+          rescue => ex
+            Helper.log.error "Could not add #{tester.email} to app: #{ex}".red
+            raise ex
+          end
         end
       rescue => ex
-        Helper.log.error "Could not create #{tester_type} tester: #{ex}".red
+        Helper.log.error "Could not create tester #{config[:email]}".red
         raise ex
       end
     end
 
-    def add_tester_to_app(options)
+    def find_tester(options)
       self.run(options)
 
       tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-      tester = Spaceship::Tunes::Tester::External.find(config[:email]) unless tester
+      tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
-      unless tester
-        Helper.log.error "Tester not found: #{config[:email]}".red
-        return
-      end
-
-      tester.add_to_app!(app.apple_id)
-      Helper.log.info "Added #{tester.email} to #{app.name}".green
+      raise "Tester #{config[:email]} not found".red unless tester
+      
+      describe_tester(tester)
+      return tester
     end
 
-    def find_tester_by_email(options)
+    def remove_tester(options)
       self.run(options)
-
-      internal_tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-      if internal_tester
-        Helper.log.info "Found internal tester #{internal_tester.tester_id}".green
-        describe_tester(internal_tester)
-        return internal_tester
-      else
-        external_tester = Spaceship::Tunes::Tester::External.find(config[:email])
-        if external_tester
-          Helper.log.info "Found external tester #{internal_tester.tester_id}".green
-          describe_tester(external_tester)
-          return external_tester
-        else
-          Helper.log.error "No tester found: #{config[:email]}".red
-        end
-      end
-    end
-
-    def remove_tester(options, external = true)
-      self.run(options)
-
-      tester_type = tester_type_str(external)
-
-      email = config[:email]
-
-      tester = nil
-      if external
-        tester = Spaceship::Tunes::Tester::External.find(email)
-      else
-        tester = Spaceship::Tunes::Tester::Internal.find(email)
-      end
-
-      if tester
-        tester.delete!
-        Helper.log.info "Removed #{tester_type} tester: #{tester.email}".green
-      else
-        Helper.log.error "#{tester_type.capitalize} tester not found: #{email}".red
-      end
-    end
-
-    def reinvite_tester(options)
-      self.run(options)
-
-      tester_type = tester_type_str(external)
-
+      
       tester = Spaceship::Tunes::Tester::External.find(config[:email])
+      tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
 
       if tester
-        Helper.log.info "Sending another invite to #{config[:email]}"
-
-        options[:first_name] = tester.first_name
-        options[:last_name] = tester.last_name
-
         tester.delete!
-
-        new_tester = add_tester(options, external)
-
-        describe_tester(new_tester)
+        Helper.log.info "Successully removed tester #{tester.email}".green
       else
-        Helper.log.error "#{tester_type.capitalize} not found: #{config[:email]}".green
+        Helper.log.error "Tester not found: #{config[:email]}".red
       end
     end
 
     private
-      def tester_type_str(external)
-        external ? "external" : "internal"
-      end
-
+      # Print out all the details of a specific tester
       def describe_tester(tester)
         return unless tester
         require 'terminal-table'

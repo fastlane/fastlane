@@ -3,6 +3,7 @@ require "fastlane_core"
 module Pilot
   class Manager
     def run(options)
+      return if @config # to not login multiple times
       @config = options
       login
 
