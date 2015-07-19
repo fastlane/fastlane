@@ -17,6 +17,12 @@ module Pilot
       FastlaneCore::UpdateChecker.show_update_status("pilot", Pilot::VERSION)
     end
 
+    def convert_options(options)
+      o = options.__hash__.dup
+      o.delete(:verbose)
+      o
+    end
+
     def run
       program :version, Pilot::VERSION
       program :description, Pilot::DESCRIPTION
@@ -33,47 +39,17 @@ module Pilot
         c.syntax = "pilot"
         c.description = "Uploads a new binary to Apple TestFlight"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.run(config)
         end
       end
 
-      command :add_internal_tester do |c|
-        c.syntax = "add_internal_tester"
-        c.description = "Adds a new internal tester"
-        c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.add_internal_tester(config)
-        end
-      end
-
-      command :add_external_tester do |c|
+      command :add_tester do |c|
         c.syntax = "add_external_tester"
         c.description = "Adds a new external tester"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.add_external_tester(config)
-        end
-      end
-
-      command :add_tester_to_app do |c|
-        c.syntax = "add_tester_to_app"
-        c.description = "Adds a tester to an app"
-        c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.add_tester_to_app(config)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterManager.new.add_tester(config)
         end
       end
 
@@ -81,23 +57,17 @@ module Pilot
         c.syntax = "find_tester"
         c.description = "Find a tester (internal or external) by their email address"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterManager.new.find_tester_by_email(config)
         end
       end
 
-      command :remove_internal_tester do |c|
-        c.syntax = "remove_internal_tester"
-        c.description = "Remove an internal tester by their email address"
+      command :add_tester_to_app do |c|
+        c.syntax = "add_tester_to_app"
+        c.description = "Adds an existing tester to an app"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.remove_internal_tester(config)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterManager.new.add_tester_to_app(config)
         end
       end
 
@@ -105,39 +75,21 @@ module Pilot
         c.syntax = "remove_tester"
         c.description = "Remove an external tester by their email address"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.remove_external_tester(config)
-        end
-      end
-
-      command :reinvite_internal_tester do |c|
-        c.syntax = "reinvite_internal_tester"
-        c.description = "Reinvite an internal tester"
-        c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.reinvite_internal_tester(config)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterManager.new.remove_tester(config, true)
         end
       end
 
       command :reinvite_tester do |c|
-        c.syntax = "remove_tester"
+        c.syntax = "reinvite_tester"
         c.description = "Reinvite an external tester"
         c.action do |_args, options|
-          o = options.__hash__.dup
-          o.delete(:verbose)
-
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::TesterManager.new.reinvite_external_tester(config)
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterManager.new.reinvite_tester(config)
         end
       end
 
-      default_command :fly
+      default_command :help
 
       run!
     end
