@@ -7,19 +7,6 @@ module Pilot
       login
 
       config[:apple_id] ||= fetch_app_id
-
-      Helper.log.info "Ready to upload new build to TestFlight (App: #{config[:apple_id]})...".green
-
-      package_path = PackageBuilder.new.generate(apple_id: config[:apple_id], 
-                                                 ipa_path: config[:ipa],
-                                             package_path: "/tmp") # TODO: Config
-
-      result = FastlaneCore::ItunesTransporter.new.upload(config[:apple_id], package_path)
-      if result
-        Helper.log.info "Successfully uploaded the new binary to iTunes Connect"
-      else
-        raise "Error uploading ipa file, more information see above".red
-      end
     end
 
     def login
@@ -33,6 +20,7 @@ module Pilot
       Helper.log.info "Login successful"
     end
 
+    # The app object we're currently using
     def app
       unless (@app ||= Spaceship::Application.find(config[:apple_id] || config[:app_identifier]))
         raise "Could not find app with #{(config[:apple_id] || config[:app_identifier])}"
@@ -40,6 +28,7 @@ module Pilot
       return @app
     end
 
+    # Access the current configuration 
     def config
       @config
     end

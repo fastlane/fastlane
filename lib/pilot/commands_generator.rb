@@ -37,7 +37,7 @@ module Pilot
           o.delete(:verbose)
 
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, o)
-          Pilot::Manager.new.run(config)
+          Pilot::BuildManager.new.run(config)
         end
       end
 
