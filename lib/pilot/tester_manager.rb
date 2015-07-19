@@ -66,6 +66,7 @@ module Pilot
       require 'terminal-table'
 
       list(Spaceship::Tunes::Tester::Internal.all, "Internal Testers")
+      puts "" # new line
       list(Spaceship::Tunes::Tester::External.all, "External Testers")
     end
 
