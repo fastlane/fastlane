@@ -40,6 +40,8 @@ This includes
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
+`pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
+
 -------
 <p align="center">
     <a href="#installation">Installation</a> &bull; 
@@ -87,7 +89,7 @@ pilot --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-This gem uses [spaceship.airforce](https://spaceship.airforce) to submit the build metadata and iTunes Transporter to upload the binary :rocket:
+`pilot` uses [spaceship.airforce](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
 
 ## Managing beta testers
 
@@ -165,6 +167,25 @@ To remove an external tester:
 ```
 pilot remove -e felix@krausefx.com
 ```
+
+# Tips
+
+## [`fastlane`](https://fastlane.tools) Toolchain
+
+- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+
+##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+
+## How is my password stored?
+
+`pilot` uses the [CredentialsManager](https://github.com/fastlane/CredentialsManager) from `fastlane`.
 
 # Need help?
 - If there is a technical problem with `pilot`, submit an issue.
