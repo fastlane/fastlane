@@ -1,4 +1,4 @@
-require 'fastlane_core'
+require "fastlane_core"
 
 module Pilot
   class Manager
