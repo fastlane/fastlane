@@ -1,4 +1,4 @@
-require 'digest/md5'
+require "digest/md5"
 
 module Pilot
   class PackageBuilder
@@ -11,10 +11,10 @@ module Pilot
       FileUtils.rm_rf self.package_path rescue nil
       FileUtils.mkdir_p self.package_path
 
-      lib_path = Helper.gem_path('pilot')
+      lib_path = Helper.gem_path("pilot")
 
       ipa_path = copy_ipa(ipa_path)
-      @data = { 
+      @data = {
         apple_id: apple_id,
         file_size: File.size(ipa_path),
         ipa_path: File.basename(ipa_path), # this is only the base name as the ipa is inside the package
