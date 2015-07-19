@@ -53,7 +53,7 @@ module Pilot
                                      end),
         FastlaneCore::ConfigItem.new(key: :last_name,
                                      short_option: "-l",
-                                     env_name: "PILOT_TESTER_FIRST_NAME",
+                                     env_name: "PILOT_TESTER_LAST_NAME",
                                      description: "The tester's last name",
                                      optional: true,
                                      verify_block: proc do |_value|
