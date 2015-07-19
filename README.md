@@ -140,6 +140,7 @@ pilot find -e felix@krausefx.com
 
 The resulting output will look like this:
 
+```
 +---------------------+---------------------+
 |            felix@krausefx.com             |
 +---------------------+---------------------+
@@ -151,6 +152,7 @@ The resulting output will look like this:
 | 2 Devices           | • iPhone 6, iOS 8.3 |
 |                     | • iPhone 5, iOS 7.0 |
 +---------------------+---------------------+
+```
 
 ### Remove a tester
 
