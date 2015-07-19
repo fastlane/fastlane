@@ -1,8 +1,7 @@
-require 'fastlane_core'
+require "fastlane_core"
 
 module Pilot
   class TesterManager < Manager
-
     @logged_in = false
 
     def login
@@ -17,25 +16,23 @@ module Pilot
     end
 
     def describe_tester(tester)
-
       return if tester.nil?
 
       puts "First name: #{tester.first_name}".green
       puts "Last name: #{tester.last_name}".green
       puts "Email: #{tester.email}".green
 
-      groups = tester.raw_data.get('groups')
+      groups = tester.raw_data.get("groups")
 
       if groups && groups.length > 0
         group_names = groups.map { |group| group["name"]["value"] }
         puts "Groups: #{group_names.join(', ')}".green
       end
 
-      latestInstalledDate = tester.raw_data.get('latestInstalledDate')
-
+      latestInstalledDate = tester.raw_data.get("latestInstalledDate")
       if latestInstalledDate
-        latest_installed_version = tester.raw_data.get('latestInstalledVersion')
-        latest_installed_short_version = tester.raw_data.get('latestInstalledShortVersion')
+        latest_installed_version = tester.raw_data.get("latestInstalledVersion")
+        latest_installed_short_version = tester.raw_data.get("latestInstalledShortVersion")
         pretty_date = Time.at((latestInstalledDate / 1000)).strftime("%m/%d/%y %H:%M")
         puts "Installed version #{latest_installed_version} (#{latest_installed_short_version}) on #{pretty_date}".green
       end
@@ -60,7 +57,7 @@ module Pilot
       add_tester(options, false)
     end
 
-    def add_tester(options, external=true)
+    def add_tester(options, external = true)
       @config = options
 
       tester_type = tester_type_str(external)
@@ -85,7 +82,6 @@ module Pilot
                                                               group: config[:group_name])
         end
 
-
         if config[:apple_id]
           puts "Adding #{tester_type} tester to app #{config[:apple_id]}".green
           tester.add_to_app!(config[:apple_id])
@@ -108,16 +104,13 @@ module Pilot
     end
 
     def add_tester_to_app(options)
-
       @config = options
       login
 
       email = config[:email]
 
       tester = Spaceship::Tunes::Tester::Internal.find(email)
-      if tester.nil?
-        tester = Spaceship::Tunes::Tester::External.find(email)
-      end
+      tester = Spaceship::Tunes::Tester::External.find(email) if tester.nil?
 
       if tester.nil?
         puts "Tester not found: #{email}".red
@@ -143,13 +136,13 @@ module Pilot
       internal_tester = Spaceship::Tunes::Tester::Internal.find(email)
       if internal_tester
         puts "Found internal tester #{internal_tester.tester_id}".green
-        describe_tester(internal_tester) unless !print_description
+        describe_tester(internal_tester) if print_description
         return internal_tester
       else
         external_tester = Spaceship::Tunes::Tester::External.find(email)
         if external_tester
           puts "Found external tester #{internal_tester.tester_id}".green
-          describe_tester(external_tester) unless !print_description
+          describe_tester(external_tester) if print_description
           return external_tester
         else
           puts "No tester found: #{email}".red
@@ -159,7 +152,7 @@ module Pilot
 
     ##
 
-    def remove_tester(options, external=true)
+    def remove_tester(options, external = true)
       tester_type = tester_type_str(external)
 
       @config = options
@@ -199,7 +192,7 @@ module Pilot
       reinvite_tester(options, true)
     end
 
-    def reinvite_tester(options, external=true)
+    def reinvite_tester(options, external = true)
       @config = options
       login
 
@@ -228,6 +221,5 @@ module Pilot
         puts "#{tester_type.capitalize} not found: #{email}".green
       end
     end
-
   end
 end
