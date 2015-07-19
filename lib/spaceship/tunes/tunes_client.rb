@@ -310,7 +310,8 @@ module Spaceship
           },
           testing: {
             value: false
-          }, 
+          },
+          userName: tester.email,
           testerId: tester.tester_id
         }
       ]
