@@ -33,7 +33,7 @@ module Pilot
                                      env_name: "PILOT_APP_IDENTIFIER",
                                      description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
-                                     default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"],
+                                     default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      verify_block: proc do |_value|
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_id,
