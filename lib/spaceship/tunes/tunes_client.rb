@@ -278,7 +278,7 @@ module Spaceship
         current['feedbackEmail']['value'] = feedback_email
         current['marketingUrl']['value'] = marketing_url
         current['privacyPolicyUrl']['value'] = privacy_policy_url
-        current["pageLanguageValue"] = current['language'] # could iTunes Connect be any more buggy? This is required for some reason
+        current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
       build_info['testInfo']['reviewFirstName']['value'] = first_name
       build_info['testInfo']['reviewLastName']['value'] = last_name
