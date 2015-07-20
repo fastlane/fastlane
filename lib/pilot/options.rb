@@ -72,6 +72,13 @@ module Pilot
                                      description: "Group to add the tester to",
                                      optional: true,
                                      verify_block: proc do |_value|
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :testers_file_path,
+                                     short_option: "-c",
+                                     env_name: "PILOT_TESTERS_FILE",
+                                     description: "Path to a CSV file of testers",
+                                     optional: true,
+                                     verify_block: proc do |_value|
                                      end)
 
       ]

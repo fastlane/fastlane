@@ -3,6 +3,8 @@ require "pilot/version"
 require "pilot/manager"
 require "pilot/build_manager"
 require "pilot/tester_manager"
+require "pilot/tester_importer"
+require "pilot/tester_exporter"
 require "pilot/package_builder"
 
 require "fastlane_core"
