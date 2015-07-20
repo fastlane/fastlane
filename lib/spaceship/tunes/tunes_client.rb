@@ -149,7 +149,7 @@ module Spaceship
       data['versionString']['value'] = version
       data['newApp']['name']['value'] = name
       data['newApp']['bundleId']['value'] = bundle_id
-      data['newApp']['primaryLanguage']['value'] = primary_language || 'English_CA'
+      data['newApp']['primaryLanguage']['value'] = primary_language || 'English'
       data['newApp']['vendorId']['value'] = sku
       data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
 

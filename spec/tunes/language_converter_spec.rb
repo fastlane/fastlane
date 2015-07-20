@@ -29,6 +29,26 @@ describe Spaceship::Tunes::LanguageConverter do
       expect(klass.from_standard_to_itc('asdfasdf')).to eq(nil)
     end
   end
+
+  describe "from readable to value" do
+    it "works with valid inputs" do
+      expect(klass.from_itc_readable_to_itc('UK English')).to eq('English_UK')
+    end
+
+    it "returns nil when element doesn't exist" do
+      expect(klass.from_itc_readable_to_itc('notHere')).to eq(nil)
+    end
+  end
+
+  describe "from value to readable" do
+    it "works with valid inputs" do
+      expect(klass.from_itc_to_itc_readable('English_UK')).to eq('UK English')
+    end
+
+    it "returns nil when element doesn't exist" do
+      expect(klass.from_itc_to_itc_readable('notHere')).to eq(nil)
+    end
+  end
 end
 
 describe String do

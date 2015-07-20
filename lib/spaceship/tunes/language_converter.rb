@@ -14,6 +14,19 @@ module Spaceship
           (result || {}).fetch('name', nil)
         end
 
+        # Converts the langauge "UK English" (user facing) to "English_UK" (value)
+        def from_itc_readable_to_itc(from)
+          readable_mapping.each do |key, value|
+            return key if value == from
+          end
+          nil
+        end
+
+        # Converts the langauge "English_UK" (value) to "UK English" (user facing)
+        def from_itc_to_itc_readable(from)
+          readable_mapping[from]
+        end
+
         private
           # Path to the gem to fetch resoures
           def spaceship_gem_path
@@ -27,6 +40,10 @@ module Spaceship
           # Get the mapping JSON parsed
           def mapping
             @languages ||= JSON.parse(File.read(File.join(spaceship_gem_path, "lib", "assets", "languageMapping.json")))
+          end
+
+          def readable_mapping
+            @readable ||= JSON.parse(File.read(File.join(spaceship_gem_path, "lib", "assets", "languageMappingReadable.json")))
           end
       end
     end
