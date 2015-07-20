@@ -62,6 +62,15 @@ module Pilot
         end
       end
 
+      command :import do |c|
+        c.syntax = "import"
+        c.description = "Create external testers from a CSV file"
+        c.action do |_args, options|
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::TesterImporter.new.import_testers(config)
+        end
+      end
+
       command :export do |c|
         c.syntax = "export"
         c.description = "Exports all external testers to a CSV file"
