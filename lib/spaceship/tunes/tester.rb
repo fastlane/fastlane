@@ -32,12 +32,31 @@ module Spaceship
       #    }]
       attr_accessor :devices
 
+
+      # Information about the most recent beta install
+      # @return [Integer] The ID of the most recently installed app
+      attr_accessor :latest_install_app_id
+
+      # @return [Integer] Date of the last install of this tester
+      #   Number of seconds since 1970
+      attr_accessor :latest_install_date
+
+      # @return [Integer] The build number of the last installed build
+      attr_accessor :latest_installed_build_number
+
+      # @return [Integer] The version number of the last installed build
+      attr_accessor :latest_installed_version_number
+
       attr_mapping(
         'testerId' => :tester_id,
         'emailAddress.value' => :email,
         'firstName.value' => :first_name,
         'lastName.value' => :last_name,
-        'devices' => :devices
+        'devices' => :devices,
+        'latestInstalledAppAdamId' => :latest_install_app_id,
+        'latestInstalledDate' => :latest_install_date,
+        'latestInstalledVersion' => :latest_installed_version_number,
+        'latestInstalledShortVersion' => :latest_installed_build_number,
       )
 
       class << self

@@ -55,6 +55,16 @@ describe Spaceship::Tunes::Tester do
     end
   end
 
+  describe "Last Install information" do
+    it "pre-fills this information correctly" do
+      tester = Spaceship::Tunes::Tester::Internal.all[1]
+      expect(tester.latest_install_app_id).to eq(794902327)
+      expect(tester.latest_install_date).to eq(1427565638420)
+      expect(tester.latest_installed_build_number).to eq("1")
+      expect(tester.latest_installed_version_number).to eq("0.9.14")
+    end
+  end
+
   # describe "invite testers to an existing app" do
   #   it "invite all users to an app" do
   #     app.add_all_testers!
