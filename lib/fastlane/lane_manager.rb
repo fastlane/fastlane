@@ -54,6 +54,7 @@ module Fastlane
 
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
+      print_table(Fastlane::Actions.executed_actions)
 
       unless error
         if duration > 5
@@ -65,6 +66,24 @@ module Fastlane
         Helper.log.fatal 'fastlane finished with errors'.red
         raise error
       end
+    end
+
+    # Print a table as summary of the executed actions
+    def self.print_table(actions)
+      require 'terminal-table'
+
+      rows = []
+      actions.each_with_index do |current, i|
+        rows << [i + 1, current[:name], current[:time].to_i]
+      end
+
+      puts ""
+      puts Terminal::Table.new(
+        title: "fastlane summary".green,
+        headings: ["Step", "Action", "Time (in s)"],
+        rows: rows
+      )
+      puts ""
     end
 
     # Lane chooser if user didn't provide a lane
