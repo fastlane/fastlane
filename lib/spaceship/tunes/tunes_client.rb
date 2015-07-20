@@ -73,7 +73,7 @@ module Spaceship
       return unless raw
       return unless raw.kind_of?Hash
 
-      data = raw['data'] || {}
+      data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
  
       if data.fetch('sectionErrorKeys', []).count == 0 and
         data.fetch('sectionInfoKeys', []).count == 0 and 

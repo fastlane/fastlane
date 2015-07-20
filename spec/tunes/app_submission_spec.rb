@@ -48,7 +48,7 @@ describe Spaceship::AppSubmission do
       
       expect {
         submission.complete!
-      }.to raise_exception(Spaceship::Client::UnexpectedResponse)
+      }.to raise_exception("Problem processing review submission.")
       expect(submission.submitted_for_review).to eq(false)
     end
     
