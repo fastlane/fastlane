@@ -62,7 +62,7 @@ module Pilot
                                      short_option: "-e",
                                      env_name: "PILOT_TESTER_EMAIL",
                                      description: "The tester's email",
-                                     optional: false,
+                                     optional: true,
                                      verify_block: proc do |_value|
                                         raise "Please pass a valid email address" unless _value.include?"@"
                                      end),

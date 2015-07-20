@@ -150,7 +150,7 @@ The output will look like this:
 To add a new tester to both your iTunes Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necesssary) or add an existing tester to the app to test.
 
 ```
-pilot add -e email@invite.com
+pilot add email@invite.com
 ```
 
 Additionally you can specify the app identifier (if necessary): 
@@ -164,7 +164,7 @@ pilot add -e email@email.com -a com.krausefx.app
 To find a specific tester use
 
 ```
-pilot find -e felix@krausefx.com
+pilot find felix@krausefx.com
 ```
 
 The resulting output will look like this:
@@ -188,7 +188,7 @@ The resulting output will look like this:
 This command will only remove external beta testers.
 
 ```
-pilot remove -e felix@krausefx.com
+pilot remove felix@krausefx.com
 ```
 
 ### Export testers

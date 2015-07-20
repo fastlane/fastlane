@@ -23,6 +23,11 @@ module Pilot
       o
     end
 
+    def handle_email(config, _args)
+      config[:email] ||= _args.first
+      config[:email] ||= ask("Email address of the tester: ".yellow)
+    end
+
     def run
       program :version, Pilot::VERSION
       program :description, Pilot::DESCRIPTION
@@ -58,6 +63,7 @@ module Pilot
         c.description = "Adds a new external tester to a specific app (if given). This will also add an existing tester to an app."
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          handle_email(config, _args)
           Pilot::TesterManager.new.add_tester(config)
         end
       end
@@ -76,6 +82,7 @@ module Pilot
         c.description = "Find a tester (internal or external) by their email address"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          handle_email(config, _args)
           Pilot::TesterManager.new.find_tester(config)
         end
       end
@@ -85,6 +92,7 @@ module Pilot
         c.description = "Remove an external tester by their email address"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          handle_email(config, _args)
           Pilot::TesterManager.new.remove_tester(config)
         end
       end
