@@ -176,6 +176,14 @@ To export all external testers to a CSV file. Useful if you need to import teste
 pilot export -c ~/Desktop/testers.csv
 ```
 
+### Import testers
+
+Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+
+```
+pilot import -c ~/Desktop/testers.csv
+```
+
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
