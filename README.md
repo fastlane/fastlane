@@ -28,15 +28,15 @@ Pilot
 [![Gem](https://img.shields.io/gem/v/pilot.svg?style=flat)](http://rubygems.org/gems/pilot)
 
 
-###### The unofficial TestFlight CLI
+###### The best way to manage your TestFlight testers and builds from your terminal
 
 This tool allows you to manage all important features of Apple TestFlight using your terminal.
 
-This includes
-
 - Upload new builds and distribute them to all testers
-- Set build information like changelog for new builds
-- Add new testers to your team
+- List all available builds
+- Add and remove beta testers
+- Get information about testers, like the registered devices
+- Export and import all your testers
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
