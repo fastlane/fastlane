@@ -168,6 +168,22 @@ This command will only remove external beta testers.
 pilot remove -e felix@krausefx.com
 ```
 
+### Export testers
+
+To export all external testers to a CSV file. Useful if you need to import tester info to another system, for example to create a mailing list.
+
+```
+pilot export -c ~/Desktop/testers.csv
+```
+
+### Import testers
+
+Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+
+```
+pilot import -c ~/Desktop/testers.csv
+```
+
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain

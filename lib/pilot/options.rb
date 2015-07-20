@@ -53,7 +53,7 @@ module Pilot
                                      end),
         FastlaneCore::ConfigItem.new(key: :last_name,
                                      short_option: "-l",
-                                     env_name: "PILOT_TESTER_FIRST_NAME",
+                                     env_name: "PILOT_TESTER_LAST_NAME",
                                      description: "The tester's last name",
                                      optional: true,
                                      verify_block: proc do |_value|
@@ -70,6 +70,13 @@ module Pilot
                                      short_option: "-g",
                                      env_name: "PILOT_TESTER_GROUP",
                                      description: "Group to add the tester to",
+                                     optional: true,
+                                     verify_block: proc do |_value|
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :testers_file_path,
+                                     short_option: "-c",
+                                     env_name: "PILOT_TESTERS_FILE",
+                                     description: "Path to a CSV file of testers",
                                      optional: true,
                                      verify_block: proc do |_value|
                                      end)
