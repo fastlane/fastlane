@@ -37,6 +37,16 @@ describe Spaceship::Tunes::Build do
       expect(build.crash_count).to eq(nil)
     end
 
+    describe "#testing_status" do
+      it "properly describes a build" do
+        build1 = app.build_trains.values.first.builds.first
+        expect(build1.testing_status).to eq("Expired")
+
+        build2 = app.build_trains.values.last.builds.first
+        expect(build1.testing_status).to eq("Expired")
+      end
+    end
+
     describe "submitting/rejecting a build" do
       before do
         train = app.build_trains.values.first

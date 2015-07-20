@@ -157,6 +157,28 @@ module Spaceship
         return parameters
       end
 
+      # @return [String] A nicely formatted string about the state of this build
+      # @examples:
+      #   External, Internal, Inactive, Expired
+      def testing_status
+        testing ||= "External" if self.external_expiry_date > 0
+
+        if self.build_train.testing_enabled
+          # only the latest build is actually valid
+          if self.build_train.builds.find_all { |b| b.upload_date > self.upload_date }.count == 0
+            testing ||= "Internal"
+          end
+        end
+
+        if (Time.at(self.internal_expiry_date / 1000) > Time.now)
+          testing ||= "Inactive"
+        else
+          testing = "Expired"
+        end
+
+        return testing
+      end
+
       # This will cancel the review process for this TestFlight build
       def cancel_beta_review!
         client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id, 
