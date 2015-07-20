@@ -18,7 +18,7 @@
 -------
 
 <p align="center">
-  <img src="assets/deliver.png">
+  <img src="assets/PilotTextTransparent.png">
 </p>
 
 Pilot
