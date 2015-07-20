@@ -162,7 +162,7 @@ The resulting output will look like this:
 
 ### Remove a tester
 
-To remove an external tester:
+This command will only remove external beta testers.
 
 ```
 pilot remove -e felix@krausefx.com
