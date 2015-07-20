@@ -23,7 +23,7 @@ module Produce
         Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
 
         Spaceship::Tunes::Application.create!(name: Produce.config[:app_name], 
-                                              primary_language: Produce.config[:language],
+                                              primary_language: language,
                                               version: Produce.config[:version], 
                                               sku: Produce.config[:sku].to_s, # might be an int
                                               bundle_id: app_identifier, 
@@ -48,6 +48,22 @@ module Produce
 
       def app_identifier
         Produce.config[:app_identifier].to_s
+      end
+
+      # Makes sure to get the value for the language
+      # Instead of using the user's value `UK English` spaceship should send
+      # `English_UK` to the server
+      def language
+        @language = Produce.config[:language]
+
+        converted = Spaceship::Tunes::LanguageConverter.from_itc_readable_to_itc(@language)
+        @language = converted if converted # overwrite it with the actual value
+
+        unless AvailableDefaultLanguages.all_languages.include?(@language)
+          raise "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}".red
+        end
+
+        return @language
       end
   end
 end
