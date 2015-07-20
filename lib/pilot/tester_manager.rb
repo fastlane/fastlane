@@ -103,11 +103,10 @@ module Pilot
           rows << ["Groups", group_names.join(', ')]
         end
 
-        latest_installed_date = tester.raw_data.get("latestInstalledDate")
-        if latest_installed_date
-          latest_installed_version = tester.raw_data.get("latestInstalledVersion")
-          latest_installed_short_version = tester.raw_data.get("latestInstalledShortVersion")
-          pretty_date = Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
+        if tester.latest_install_date
+          latest_installed_version = tester.latest_installed_version_number
+          latest_installed_short_version = tester.latest_installed_build_number
+          pretty_date = Time.at((tester.latest_install_date / 1000)).strftime("%m/%d/%y %H:%M")
 
           rows << ["Latest Version", "#{latest_installed_version} (#{latest_installed_short_version})"]
           rows << ["Latest Install Date", pretty_date]
