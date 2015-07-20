@@ -13,21 +13,21 @@ module Pilot
       tester_manager = Pilot::TesterManager.new
       imported_tester_count = 0
 
+      is_first = true
       CSV.foreach(file, "r") do |row|
-
-        begin
-          first_name = row[0]
-          last_name = row[1]
-          email = row[2]
-        rescue => ex
-          Helper.log.error "Invalid format for row: #{row}".red
-        end
-
-        if email.nil?
-          Helper.log.error "No email in row: #{row}".red
+        if is_first
+          is_first = false
           next
         end
 
+        first_name, last_name, email = row        
+
+        unless email
+          Helper.log.error "No email found in row: #{row}".red
+          next
+        end
+
+        # Add this the existing config hash to pass it to the TesterManager
         config[:first_name] = first_name
         config[:last_name] = last_name
         config[:email] = email
@@ -41,8 +41,7 @@ module Pilot
 
       end
 
-      Helper.log.info "Imported #{imported_tester_count} testers from #{file}".green
-
+      Helper.log.info "Successfully imported #{imported_tester_count} testers from #{file}".green
     end
   end
 end

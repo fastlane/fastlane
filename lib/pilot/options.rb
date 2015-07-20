@@ -77,6 +77,7 @@ module Pilot
                                      short_option: "-c",
                                      env_name: "PILOT_TESTERS_FILE",
                                      description: "Path to a CSV file of testers",
+                                     default_value: "./testers.csv",
                                      optional: true,
                                      verify_block: proc do |_value|
                                      end)
