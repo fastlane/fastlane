@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
   spec.add_dependency 'fastlane_core', '>= 0.10.1' # all shared code and dependencies
+  spec.add_dependency 'spaceship', '>= 0.2.0' # communication layer
 
 
   # All the fastlane tools
