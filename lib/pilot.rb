@@ -9,6 +9,7 @@ require "pilot/package_builder"
 
 require "fastlane_core"
 require "spaceship"
+require "terminal-table"
 
 module Pilot
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

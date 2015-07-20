@@ -3,7 +3,7 @@ require "fastlane_core"
 module Pilot
   class TesterManager < Manager
     def add_tester(options)
-      self.run(options)
+      start(options)
 
       begin
         tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
@@ -36,7 +36,7 @@ module Pilot
     end
 
     def find_tester(options)
-      self.run(options)
+      start(options)
 
       tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
       tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
@@ -48,7 +48,7 @@ module Pilot
     end
 
     def remove_tester(options)
-      self.run(options)
+      start(options)
       
       tester = Spaceship::Tunes::Tester::External.find(config[:email])
       tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
@@ -62,7 +62,7 @@ module Pilot
     end
 
     def list_testers(options)
-      self.run(options)
+      start(options)
       require 'terminal-table'
 
       list(Spaceship::Tunes::Tester::Internal.all, "Internal Testers")
@@ -88,7 +88,6 @@ module Pilot
       # Print out all the details of a specific tester
       def describe_tester(tester)
         return unless tester
-        require "terminal-table"
 
         rows = []
 

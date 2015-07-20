@@ -2,12 +2,10 @@ require "fastlane_core"
 
 module Pilot
   class Manager
-    def run(options)
+    def start(options)
       return if @config # to not login multiple times
       @config = options
       login
-
-      config[:apple_id] ||= fetch_app_id
     end
 
     def login
@@ -23,7 +21,9 @@ module Pilot
 
     # The app object we're currently using
     def app
-      unless (@app ||= Spaceship::Application.find(config[:apple_id] || config[:app_identifier]))
+      @apple_id ||= fetch_app_id
+
+      unless (@app ||= Spaceship::Application.find(@apple_id))
         raise "Could not find app with #{(config[:apple_id] || config[:app_identifier])}"
       end
       return @app
@@ -38,11 +38,12 @@ module Pilot
     ################
 
     def fetch_app_id
-      return config[:apple_id] if config[:apple_id]
+      return @apple_id if @apple_id
       config[:app_identifier] = fetch_app_identifier
 
       if config[:app_identifier]
-        app_id ||= app.apple_id
+        @app ||= Spaceship::Application.find(config[:app_identifier])
+        app_id ||= @app.apple_id
       end
 
       app_id ||= ask("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")

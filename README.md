@@ -75,13 +75,13 @@ This will automatically look for an `ipa` in your current directory and tries to
 You'll be asked for any missing information. Additionally, you can pass all kinds of parameters to `pilot`:
 
 ```
-pilot -u felix@krausefx.com
+pilot upload -u felix@krausefx.com
 ```
 
 Additionally you can skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributet to testers:
 
 ```
-pilot --skip_submission
+pilot upload --skip_submission
 ```
 
 `pilot` does all kinds of magic for you:
@@ -90,6 +90,29 @@ pilot --skip_submission
 - Automatically fetch the AppID of your app based on the bundle identifier
 
 `pilot` uses [spaceship.airforce](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
+
+## List builds
+
+To list all builds for specific application use
+
+```
+pilot list
+```
+
+The result lists all active builds and processing builds:
+
+```
++-----------+---------+----------+----------+----------+
+|                   Great App Builds                   |
++-----------+---------+----------+----------+----------+
+| Version # | Build # | Testing  | Installs | Sessions |
++-----------+---------+----------+----------+----------+
+| 0.9.13    | 1       | Expired  | 1        | 0        |
+| 0.9.13    | 2       | Expired  | 0        | 0        |
+| 0.9.20    | 3       | Expired  | 0        | 0        |
+| 0.9.20    | 4       | Internal | 5        | 3        |
++-----------+---------+----------+----------+----------+
+```
 
 ## Managing beta testers
 
@@ -170,7 +193,7 @@ pilot remove -e felix@krausefx.com
 
 ### Export testers
 
-To export all external testers to a CSV file. Useful if you need to import tester info to another system, for example to create a mailing list.
+To export all external testers to a CSV file. Useful if you need to import tester info to another system or a new account.
 
 ```
 pilot export -c ~/Desktop/testers.csv

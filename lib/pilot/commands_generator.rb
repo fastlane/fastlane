@@ -40,12 +40,21 @@ module Pilot
         c.description = "Uploads a new binary to Apple TestFlight"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          Pilot::BuildManager.new.run(config)
+          Pilot::BuildManager.new.upload(config)
+        end
+      end
+
+      command :builds do |c|
+        c.syntax = "pilot builds"
+        c.description = "Lists all builds for given application"
+        c.action do |_args, options|
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          Pilot::BuildManager.new.list(config)
         end
       end
 
       command :add do |c|
-        c.syntax = "add"
+        c.syntax = "pilot add"
         c.description = "Adds a new external tester to a specific app (if given). This will also add an existing tester to an app."
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -54,7 +63,7 @@ module Pilot
       end
 
       command :list do |c|
-        c.syntax = "list"
+        c.syntax = "pilot list"
         c.description = "Lists all registered testers, both internal and external"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -63,7 +72,7 @@ module Pilot
       end
 
       command :find do |c|
-        c.syntax = "find"
+        c.syntax = "pilot find"
         c.description = "Find a tester (internal or external) by their email address"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -72,7 +81,7 @@ module Pilot
       end
 
       command :remove do |c|
-        c.syntax = "remove"
+        c.syntax = "pilot remove"
         c.description = "Remove an external tester by their email address"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -81,7 +90,7 @@ module Pilot
       end
 
       command :export do |c|
-        c.syntax = "export"
+        c.syntax = "pilot export"
         c.description = "Exports all external testers to a CSV file"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -90,7 +99,7 @@ module Pilot
       end
 
       command :import do |c|
-        c.syntax = "import"
+        c.syntax = "pilot import"
         c.description = "Create external testers from a CSV file"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))

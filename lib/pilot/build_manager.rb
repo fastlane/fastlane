@@ -1,7 +1,7 @@
 module Pilot
   class BuildManager < Manager
-    def run(options)
-      super(options)
+    def upload(options)
+      start(options)
 
       Helper.log.info "Ready to upload new build to TestFlight (App: #{config[:apple_id]})...".green
 
@@ -24,7 +24,48 @@ module Pilot
       end
     end
 
+    def list(options)
+      start(options)
+      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+        config[:app_identifier] = ask("App Identifier: ")
+      end
+
+      rows = app.all_processing_builds.collect { |build| describe_build(build) }
+      rows = rows + app.builds.collect { |build| describe_build(build) }
+
+      puts Terminal::Table.new(
+        title: "#{app.name} Builds".green,
+        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+        rows: rows
+      )
+    end
+
     private
+      def describe_build(build)
+        testing ||= "External" if build.external_expiry_date > 0
+
+        if build.build_train.testing_enabled
+          # only the latest build is actually valid
+          if build.build_train.builds.find_all { |b| b.upload_date > build.upload_date }.count == 0
+            testing ||= "Internal"
+          end
+        end
+
+        if (Time.at(build.internal_expiry_date / 1000) > Time.now)
+          testing ||= "Inactive"
+        else
+          testing = "Expired"
+        end
+
+        row = [build.train_version, 
+               build.build_version,
+               testing,
+               build.install_count,
+               build.session_count]
+
+        return row
+      end
+
       # This method will takes care of checking for the processing builds every few seconds
       # @return [Integer] The upload date
       def wait_for_processing_build
