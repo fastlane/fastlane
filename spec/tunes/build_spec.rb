@@ -36,5 +36,40 @@ describe Spaceship::Tunes::Build do
       expect(build.session_count).to eq(nil)
       expect(build.crash_count).to eq(nil)
     end
+
+    describe "submitting/rejecting a build" do
+      before do
+        train = app.build_trains.values.first
+        @build = train.builds.first
+      end
+
+      it "#cancel_beta_review!" do
+        @build.cancel_beta_review!
+      end
+
+      it "#submit_for_beta_review!" do
+        r = @build.submit_for_beta_review!({
+          changelog: "Custom Changelog"
+        })
+
+        expect(r).to eq({
+          :app_id=>"898536088", 
+          :train=>"0.9.10", 
+          :build_number=>"123123", 
+          :changelog=>"Custom Changelog", 
+          :description=>"No app description provided", 
+          :feedback_email=>"contact@company.com", 
+          :marketing_url=>"http://marketing.com", 
+          :first_name=>"Felix", 
+          :last_name=>"Krause", 
+          :review_email=>"contact@company.com", 
+          :phone_number=>"0123456789", 
+          :privacy_policy_url=>nil, 
+          :review_notes=>nil, 
+          :review_user_name=>nil, 
+          :review_password=>nil, 
+          :encryption=>false})
+      end
+    end
   end
 end

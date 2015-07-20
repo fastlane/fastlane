@@ -122,6 +122,23 @@ def itc_stub_testers
          to_return(:status => 200, :body => itc_read_fixture_file('testers/existing_internal_testers.json'), headers: {'Content-Type' => 'application/json'})
 end
 
+def itc_stub_testflight
+  # Reject review
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/0.9.10/builds/123123/reject").
+         with(:body => "{}",
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => "{}", headers: {'Content-Type' => 'application/json'})
+
+  # Prepare submission
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/0.9.10/builds/123123/submit/start").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('testflight_submission_start.json'), headers: {'Content-Type' => 'application/json'})
+  # First step of submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/0.9.10/builds/123123/submit/start").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('testflight_submission_submit.json'), headers: {'Content-Type' => 'application/json'})
+end
+
 
 def itc_stub_resolution_center_valid
   # Called from the specs to simulate valid server responses
@@ -151,5 +168,6 @@ RSpec.configure do |config|
     itc_stub_app_versions
     itc_stub_build_trains
     itc_stub_testers
+    itc_stub_testflight
   end
 end

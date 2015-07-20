@@ -99,6 +99,24 @@ describe Spaceship::Application do
       end
     end
 
+    describe "#builds" do
+      let (:app) { Spaceship::Application.all.first }
+
+      it "supports block parameter" do
+        count = 0
+        app.builds do |current|
+          count += 1
+          expect(current.class).to eq(Spaceship::Tunes::Build)
+        end
+        expect(count).to eq(2)
+      end
+
+      it "returns a standard array" do
+        expect(app.builds.count).to eq(2)
+        expect(app.builds.first.class).to eq(Spaceship::Tunes::Build)
+      end
+    end
+
     describe "Access app_versions" do
       describe "#edit_version" do
         it "returns nil if there is only a live version" do

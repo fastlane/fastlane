@@ -1,6 +1,10 @@
 module Spaceship
   class TunesClient < Spaceship::Client
 
+    # ITunesConnectError is only thrown when iTunes Connect raises an exception
+    class ITunesConnectError < StandardError
+    end
+
     #####################################################
     # @!group Init and Login
     #####################################################
@@ -65,9 +69,11 @@ module Spaceship
       end
     end
 
-    def handle_itc_response(data)
-      return unless data
-      return unless data.kind_of?Hash
+    def handle_itc_response(raw)
+      return unless raw
+      return unless raw.kind_of?Hash
+
+      data = raw['data'] || {}
  
       if data.fetch('sectionErrorKeys', []).count == 0 and
         data.fetch('sectionInfoKeys', []).count == 0 and 
@@ -100,10 +106,13 @@ module Spaceship
       errors = errors + data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
 
       # Sometimes there is a different kind of error in the JSON response
-      different_error = data.fetch('messages', {}).fetch('error', nil)
+      # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
+      different_error = raw.fetch('messages', {}).fetch('error', nil)
       errors << different_error if different_error
 
-      raise errors.join(' ') if errors.count > 0 # they are separated by `.` by default
+      if errors.count > 0 # they are separated by `.` by default
+        raise ITunesConnectError.new(errors.join(' '))
+      end
 
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
@@ -194,7 +203,7 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       
-      handle_itc_response(r.body['data'])
+      handle_itc_response(r.body)
     end
 
     #####################################################
@@ -217,7 +226,88 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
 
-      handle_itc_response(r.body['data'])
+      handle_itc_response(r.body)
+    end
+
+    def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil)
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/reject"
+        req.body = {}.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    def submit_testflight_build_for_review!(# Required:
+                                            app_id: nil, 
+                                            train: nil, 
+                                            build_number: nil, 
+                                            cancel_other_submissions: false,
+
+                                            # Required Metadata:
+                                            changelog: nil,
+                                            description: nil,
+                                            feedback_email: nil,
+                                            marketing_url: nil,
+                                            first_name: nil,
+                                            last_name: nil,
+                                            review_email: nil,
+                                            phone_number: nil,
+
+                                            # Optional Metadata:
+                                            privacy_policy_url: nil,
+                                            review_notes: nil,
+                                            review_user_name: nil,
+                                            review_password: nil,
+                                            encryption: false)
+
+      start_url = "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+      r = request(:get) do |req|
+        req.url start_url
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+
+      build_info = r.body['data']
+      # Now fill in the values provided by the user
+      
+      # First the localised values:
+      build_info['testInfo']['details'].each do |current|
+        current['whatsNew']['value'] = changelog
+        current['description']['value'] = description
+        current['feedbackEmail']['value'] = feedback_email
+        current['marketingUrl']['value'] = marketing_url
+        current['privacyPolicyUrl']['value'] = privacy_policy_url
+        current["pageLanguageValue"] = current['language'] # could iTunes Connect be any more buggy? This is required for some reason
+      end
+      build_info['testInfo']['reviewFirstName']['value'] = first_name
+      build_info['testInfo']['reviewLastName']['value'] = last_name
+      build_info['testInfo']['reviewPhone']['value'] = phone_number
+      build_info['testInfo']['reviewEmail']['value'] = review_email
+      build_info['testInfo']['reviewUserName']['value'] = review_user_name
+      build_info['testInfo']['reviewPassword']['value'] = review_password
+
+      r = request(:post) do |req| # same URL, but a POST request
+        req.url start_url
+        req.body = build_info.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+
+      encryption_info = r.body['data']
+      if encryption_info['exportComplianceRequired']
+        # only sometimes this is required
+
+        encryption_info['usesEncryption']['value'] = encryption
+
+        r = request(:post) do |req|
+          req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
+          req.body = encryption_info.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+
+        handle_itc_response(r.body)
+      end
     end
     
     #####################################################
@@ -233,7 +323,7 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       
-      handle_itc_response(r.body['data'])
+      handle_itc_response(r.body)
       parse_response(r, 'data')
     end
 

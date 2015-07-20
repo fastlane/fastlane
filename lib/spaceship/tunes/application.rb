@@ -162,6 +162,8 @@ module Spaceship
         Tunes::BuildTrain.all(self, self.apple_id)
       end
 
+      # @return [Array] A list of all pre-processing builds
+      #   These are all build that have no information except the upload date
       def pre_processing_builds
         data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
         
@@ -185,6 +187,19 @@ module Spaceship
         return builds
       end
 
+      # Get all builds that are already processed for all build trains
+      # You can either use the return value (array) or pass a block
+      def builds
+        all_builds = []
+        self.build_trains.each do |version_number, train|
+          train.builds.each do |build|
+            yield(build) if block_given?
+            all_builds << build unless block_given?
+          end
+        end
+        all_builds
+      end
+
       #####################################################
       # @!group Submit for Review
       #####################################################
@@ -196,6 +211,18 @@ module Spaceship
         end
         
         Spaceship::AppSubmission.create(self, self.apple_id, version)
+      end
+
+      # Cancels all ongoing TestFlight beta submission for this application
+      def cancel_all_testflight_submissions!
+        self.builds do |build|
+          begin
+            build.cancel_beta_review!
+          rescue => ex
+            # We really don't care about any errors here
+          end
+        end
+        true
       end
 
       #####################################################
