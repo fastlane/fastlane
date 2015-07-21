@@ -3,9 +3,9 @@ module Pilot
     def upload(options)
       start(options)
 
-      Helper.log.info "Ready to upload new build to TestFlight (App: #{config[:apple_id]})...".green
-
-      package_path = PackageBuilder.new.generate(apple_id: config[:apple_id], 
+      Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
+      
+      package_path = PackageBuilder.new.generate(apple_id: app.apple_id, 
                                                  ipa_path: config[:ipa],
                                              package_path: "/tmp") # TODO: Config
 
