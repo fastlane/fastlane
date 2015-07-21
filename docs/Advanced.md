@@ -68,7 +68,7 @@ lane :calculate do |options|
 end
 ```
 
-## Importing other Fastfiles
+## Importing another Fastfile
 
 Within your `Fastfile` you can import another `Fastfile`. 
 
