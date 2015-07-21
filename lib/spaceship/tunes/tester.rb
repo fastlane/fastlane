@@ -126,7 +126,6 @@ module Spaceship
         # Add all testers to the app received
         # @param app_id (String) (required): The app id to filter the testers
         def add_all_to_app!(app_id)
-          # TODO: Change to not make one request for each tester
           all.each do |tester|
             begin
               tester.add_to_app!(app_id)
