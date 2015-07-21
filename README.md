@@ -196,7 +196,7 @@ pilot remove felix@krausefx.com
 To export all external testers to a CSV file. Useful if you need to import tester info to another system or a new account.
 
 ```
-pilot export -c ~/Desktop/testers.csv
+pilot export
 ```
 
 ### Import testers
@@ -204,8 +204,15 @@ pilot export -c ~/Desktop/testers.csv
 Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
 
 ```
-pilot import -c ~/Desktop/testers.csv
+pilot import
 ```
+
+You can also specify the directory using
+
+```
+pilot export -c ~/Desktop/testers.csv
+pilot import -c ~/Desktop/testers.csv
+ ```
 
 # Tips
 
