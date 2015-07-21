@@ -81,7 +81,7 @@ You'll be asked for any missing information. Additionally, you can pass all kind
 pilot --help
 ```
 
-You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributet to testers:
+You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributed to testers:
 
 ```
 pilot upload --skip_submission
@@ -92,7 +92,7 @@ pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
 
 ## List builds
 
