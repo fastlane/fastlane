@@ -42,6 +42,7 @@ lane :release do |options|
   # 
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
+  git_pull
   push_to_git_remote
   
   # GitHub verification
@@ -63,7 +64,10 @@ lane :release do |options|
   slack(
     channel: "releases",
     default_payloads: [],
-    message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:"
+    message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:",
+    payload: {
+      "New" => info['body']
+    }
   )
   puts "You can now tweet:".green
   puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
