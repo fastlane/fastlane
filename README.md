@@ -81,7 +81,7 @@ You'll be asked for any missing information. Additionally, you can pass all kind
 pilot --help
 ```
 
-You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributet to testers:
+You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributed to testers:
 
 ```
 pilot upload --skip_submission
