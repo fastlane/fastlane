@@ -152,7 +152,12 @@ module Frameit
         keyword = title_images[:keyword]
         title = title_images[:title]
 
-        sum_width = (keyword.width rescue 0) + title.width + keyword_padding
+        sum_width = (keyword.width rescue 0) + title.width
+
+        if keyword
+          sum_width += keyword_padding
+        end
+
         top_space = (top_space_above_device / 2.0 - actual_font_size / 2.0).round # centered
         
         left_space = (image.width / 2.0 - sum_width / 2.0).round
@@ -161,9 +166,10 @@ module Frameit
             c.compose "Over"
             c.geometry "+#{left_space}+#{top_space}"
           end
-        end
 
-        left_space += (keyword.width rescue 0) + keyword_padding
+          left_space += (keyword.width rescue 0) + keyword_padding
+        end
+        
         @image = image.composite(title, "png") do |c|
           c.compose "Over"
           c.geometry "+#{left_space}+#{top_space}"
