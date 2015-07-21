@@ -18,7 +18,7 @@ lane :release do |options|
   # Verifying RubyGems version
   # 
   version = sh("#{binary_path} -v").match(/#{tool_name} (.*)/)[1]
-  # raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
 
   # Verifying the --help command
   # 
