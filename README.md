@@ -9,7 +9,10 @@
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a>
+  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/boarding">boarding</a>
 </p>
 -------
 
@@ -149,6 +152,9 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 
 ## Statistics
 
@@ -184,3 +190,5 @@ Check out the project pages of the other tools for more sponsors and contributor
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
+
+> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
