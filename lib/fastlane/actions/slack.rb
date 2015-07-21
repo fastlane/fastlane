@@ -116,7 +116,7 @@ module Fastlane
           slack_attachment[:fields] += options[:payload].map do |k, v|
             {
               title: k.to_s,
-              value: v.to_s,
+              value: Slack::Notifier::LinkFormatter.format(v.to_s),
               short: false
             }
           end
