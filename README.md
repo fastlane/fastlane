@@ -43,7 +43,7 @@ This tool allows you to manage all important features of Apple TestFlight using 
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-`pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
+`pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect.
 
 -------
 <p align="center">
