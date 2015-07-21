@@ -13,7 +13,8 @@
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <b>cert</b> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a>
+  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/pilot">pilot</a>
 </p>
 -------
 
@@ -135,6 +136,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -147,6 +149,8 @@ Download and install the [Provisioning Plugin](https://github.com/chockenberry/P
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
+
+This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
 
 # Contributing
 
