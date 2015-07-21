@@ -144,7 +144,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 `fastlane` is designed to make your life easier by bringing together the `fastlane` suite of tools under one roof. 
 
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles

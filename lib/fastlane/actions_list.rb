@@ -16,7 +16,8 @@ module Fastlane
           current << action.description if action.description
 
           authors = Array(action.author || action.authors)
-          current << authors.join(', ').green if authors.count > 0
+          current << authors.first.green if authors.count == 1
+          current << "Multiple".green if authors.count > 1
 
           l = (action.description || '').length
         else
