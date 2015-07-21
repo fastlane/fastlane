@@ -43,7 +43,7 @@ This tool allows you to manage all important features of Apple TestFlight using 
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-`pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect.
+`pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
 
 -------
 <p align="center">
@@ -92,7 +92,7 @@ pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
 
 ## List builds
 
