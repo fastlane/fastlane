@@ -22,8 +22,10 @@ module Produce
                                      description: "App Identifier Suffix (Ignored if App Identifier does not ends with .*)"),
         FastlaneCore::ConfigItem.new(key: :app_name,
                                      env_name: "PRODUCE_APP_NAME",
+                                     short_option: "-q",
                                      description: "App Name"),
         FastlaneCore::ConfigItem.new(key: :version,
+                                     short_option: "-z",
                                      env_name: "PRODUCE_VERSION",
                                      description: "Initial version number (e.g. '1.0')"),
         FastlaneCore::ConfigItem.new(key: :sku,
@@ -32,6 +34,7 @@ module Produce
                                      default_value: Time.now.to_i.to_s,
                                      is_string: false), # false, as we also allow integers
         FastlaneCore::ConfigItem.new(key: :language,
+                                     short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
                                      description: "Primary Language (e.g. 'English', 'German')",
                                      default_value: "English",
