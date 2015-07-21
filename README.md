@@ -136,7 +136,9 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
