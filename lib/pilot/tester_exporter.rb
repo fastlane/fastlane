@@ -6,7 +6,7 @@ module Pilot
 
       raise "Export file path is required".red unless options[:testers_file_path]
 
-      self.run(options)
+      start(options)
       require 'csv'
 
       testers = Spaceship::Tunes::Tester::External.all

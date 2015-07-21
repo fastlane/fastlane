@@ -5,7 +5,7 @@ module Pilot
     def import_testers(options)
       raise "Import file path is required".red unless options[:testers_file_path]
 
-      self.run(options)
+      start(options)
 
       require 'csv'
 
