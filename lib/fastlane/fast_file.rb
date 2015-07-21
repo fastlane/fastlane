@@ -13,7 +13,7 @@ module Fastlane
     def initialize(path = nil)
       return unless (path || '').length > 0
       raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
-      @path = path
+      @path = File.expand_path(path)
       content = File.read(path)
 
       parse(content)
