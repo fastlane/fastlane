@@ -10,32 +10,29 @@ lane :release do |options|
   # Fetching all information required for the release
   # 
   tool_name = options[:tool] || File.basename(File.expand_path('..', Dir.pwd))
+  binary_path = "../../#{tool_name}/bin/#{tool_name}"
 
   github_organisation = "fastlane"
   github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
 
+  # Verifying RubyGems version
+  # 
+  version = sh("#{binary_path} -v").match(/#{tool_name} (.*)/)[1]
+  # raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+
+  # Verifying the --help command
+  # 
+  unless no_binary.include?tool_name
+    content = sh "#{binary_path} --help"
+    ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
+      raise "--help missing information: '#{current}'" unless content.include?current
+    end
+  end
 
   # Running ruby things
   # 
   sh "cd .. && bundle install"
   sh "cd .. && rake install"
-
-  # After running `rake install` we can require the gem
-  # 
-  require tool_name
-
-  # Verifying RubyGems version
-  # 
-  module_name = options[:module] || Object.const_get(tool_name.capitalize)
-  version = module_name::VERSION
-  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
-
-  # Verifying the --help command
-  # 
-  content = sh "../../#{tool_name}/bin/#{tool_name} --help"
-  ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
-    raise "--help missing information: '#{current}'" unless content.include?current
-  end
 
   # Run the tests
   # 
@@ -63,7 +60,11 @@ lane :release do |options|
 
   # After publishing
   # 
-  slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:")
+  slack(
+    channel: "releases",
+    default_payloads: [],
+    message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:"
+  )
   puts "You can now tweet:".green
   puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
 end
@@ -77,6 +78,11 @@ private_lane :current_version do |options|
 end
 
 desc "All repos that are still on github.com/KrauseFx"
-private_lane :krausefx_repos do |options|
+private_lane :krausefx_repos do
   ['fastlane', 'deliver', 'snapshot', 'sigh']
+end
+
+desc "All repos that don't have a binary to test" 
+private_lane :no_binary do
+  ['fastlane_core', 'spaceship']
 end
