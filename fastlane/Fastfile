@@ -7,40 +7,76 @@ end
 
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
-  tool_name = options[:tool] || 'fastlane'
-  require tool_name
-  module_name = options[:module] || Object.const_get(tool_name.capitalize)
-  version = module_name::VERSION
+  # Fetching all information required for the release
+  # 
+  tool_name = options[:tool] || File.basename(File.expand_path('..', Dir.pwd))
 
-  puts "Going to deploy #{module_name} #{version}"
-  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+  github_organisation = "fastlane"
+  github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
 
-  sh "cd .. && rspec"
+
+  # Running ruby things
+  # 
   sh "cd .. && bundle install"
   sh "cd .. && rake install"
+
+  # After running `rake install` we can require the gem
+  # 
+  require tool_name
+
+  # Verifying RubyGems version
+  # 
+  module_name = options[:module] || Object.const_get(tool_name.capitalize)
+  version = module_name::VERSION
+  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+
+  # Verifying the --help command
+  # 
+  content = sh "../../#{tool_name}/bin/#{tool_name} --help"
+  ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
+    raise "--help missing information: '#{current}'" unless content.include?current
+  end
+
+  # Run the tests
+  # 
+  sh "cd .. && rspec"
+
+  # Git verification
+  # 
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
   push_to_git_remote
   
-  info = get_github_release(url: 'KrauseFx/fastlane', version: version)
+  # GitHub verification
+  # 
+  info = get_github_release(url: "#{github_organisation}/#{tool_name}", version: version)
   unless info
-    `open 'https://github.com/KrauseFx/#{tool_name}/releases/new'`
+    `open 'https://github.com/#{github_organisation}/#{tool_name}/releases/new'`
     raise "No release on GitHub found".red 
   end
 
   puts "Found '#{info['name']}'".green
 
+  # Actual release
+  # 
   sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
-  slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/KrauseFx/#{tool_name}) :rocket:")
-
+  # After publishing
+  # 
+  slack(message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:")
   puts "You can now tweet:".green
   puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
 end
 
 
+desc "Get the version number of the last release"
 private_lane :current_version do |options|
   require 'open-uri'
   puts "Checking the latest version on RubyGems"
   JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
+end
+
+desc "All repos that are still on github.com/KrauseFx"
+private_lane :krausefx_repos do |options|
+  ['fastlane', 'deliver', 'snapshot', 'sigh']
 end
