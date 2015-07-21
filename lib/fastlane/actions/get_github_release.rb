@@ -69,7 +69,7 @@ module Fastlane
                  "assets"=>[],
                  "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",
                  "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",
-                 "body"=>
+                 "body"=> ...Markdown...
                 "This is one of the biggest updates of `fastlane` yet"
               }'
 
