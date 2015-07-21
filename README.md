@@ -14,7 +14,9 @@
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <b>cert</b> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a>
+  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/boarding">boarding</a>
 </p>
 -------
 
