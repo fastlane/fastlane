@@ -22,7 +22,9 @@ module Pilot
         app_filter = (config[:apple_id] || config[:app_identifier])
         if app_filter
           begin
-            tester.add_to_app!(app_filter)
+            app = Spaceship::Application.find(app_filter)
+            raise "Couldn't find app with '#{app_filter}'" unless app
+            tester.add_to_app!(app.apple_id)
             Helper.log.info "Successfully added tester to app #{app_filter}".green
           rescue => ex
             Helper.log.error "Could not add #{tester.email} to app: #{ex}".red
