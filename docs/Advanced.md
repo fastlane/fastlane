@@ -68,6 +68,20 @@ lane :calculate do |options|
 end
 ```
 
+## Importing other Fastfiles
+
+Within your `Fastfile` you can import another `Fastfile`. 
+
+```ruby
+import "../GeneralFastfile"
+
+override_lane :from_general do
+  ...
+end
+```
+
+You should import the other `Fastfile` on the top above your lane declarations. When defining a new lane `fastlane` will make sure to not run into any name conflicts. If you want to overwrite an existing lane (from the imported one), use the `override_lane` keyword. 
+
 
 ## Environment Variables
 You can define environment variables in a `.env` or `.env.default` file in the same directory as your `Fastfile`. Environment variables are loading using [dotenv](https://github.com/bkeepers/dotenv). Here's an example.

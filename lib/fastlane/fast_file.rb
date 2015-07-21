@@ -20,7 +20,7 @@ module Fastlane
     end
 
     def parse(data)
-      @runner = Runner.new
+      @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         eval(data) # this is okay in this case
@@ -33,7 +33,6 @@ module Fastlane
     #####################################################
     # @!group DSL
     #####################################################
-
 
     # User defines a new lane
     def lane(lane_name, &block)
@@ -57,6 +56,19 @@ module Fastlane
                                  description: desc_collection,
                                         name: lane_name,
                                   is_private: true))
+
+      @desc_collection = nil # reset the collected description again for the next lane
+    end
+
+    # User defines a lane that can overwrite existing lanes. Useful when importing a Fastfile
+    def override_lane(lane_name, &block)
+      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+
+      self.runner.add_lane(Lane.new(platform: self.current_platform,
+                                       block: block,
+                                 description: desc_collection,
+                                        name: lane_name,
+                                  is_private: false), true)
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
@@ -148,6 +160,18 @@ module Fastlane
 
     def desc_collection
       @desc_collection ||= []
+    end
+
+    def import(path = nil)
+      raise "Please pass a path to the `import` action".red unless path
+
+      unless Pathname.new(path).absolute? # unless an absolute path
+        path = File.join(File.expand_path('..', @path), path)
+      end
+      
+      raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
+      
+      parse(File.read(path))
     end
 
     #####################################################

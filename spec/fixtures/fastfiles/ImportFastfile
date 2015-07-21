@@ -1,0 +1,20 @@
+
+import "./Fastfile"
+
+lane :main_lane do
+  "such main"
+end
+
+platform :ios do
+
+  # override a lane
+  override_lane :empty do
+    "Overwrite"
+  end
+
+  # a new lane
+  lane :extended do
+    "extended"
+  end
+
+end

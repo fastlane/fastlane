@@ -1,0 +1,45 @@
+describe Fastlane do
+  describe Fastlane::FastFile do
+    describe "import" do
+      it "allows the user to import a separate Fastfile" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/ImportFastfile')
+
+        expect(ff.runner.execute(:main_lane)).to eq('such main') # from the original Fastfile
+        expect(ff.runner.execute(:extended, :ios)).to eq('extended') # from the original Fastfile
+        expect(ff.runner.execute(:test)).to eq(1) # fro the imported Fastfile
+
+        # This should not raise an exception
+      end
+
+      it "overwrites existing lanes" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/ImportFastfile')
+
+        expect(ff.runner.execute(:empty, :ios)).to eq("Overwrite")
+      end
+
+      it "raises an exception when no path is given" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do
+            import
+          end").runner.execute(:test)
+        }.to raise_error("Please pass a path to the `import` action".red)
+      end
+
+      it "raises an exception when the given path is invalid (absolute)" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do
+            import('/tmp/asdf')
+          end").runner.execute(:test)
+        }.to raise_error("Could not find Fastfile at path '/tmp/asdf'".red)
+      end
+
+      it "raises an exception when the given path is invalid (relative)" do
+        expect {
+          Fastlane::FastFile.new.parse("lane :test do
+            import('tmp/asdf')
+          end").runner.execute(:test)
+        }.to raise_error(/Could not find Fastfile at path \'\/Users/)
+      end
+    end
+  end
+end

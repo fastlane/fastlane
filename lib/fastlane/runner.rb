@@ -174,10 +174,12 @@ module Fastlane
     # 
 
     # @param lane [Lane] A lane object
-    def add_lane(lane)
+    def add_lane(lane, override = false)
       lanes[lane.platform] ||= {}
 
-      raise "Lane '#{lane.name}' was defined multiple times!".red if lanes[lane.platform][lane.name]
+      if !override and lanes[lane.platform][lane.name]
+        raise "Lane '#{lane.name}' was defined multiple times!".red
+      end
       
       lanes[lane.platform][lane.name] = lane
     end

@@ -6,6 +6,7 @@ default_platform :ios
 
 lane :test do
   File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
+  1
 end
 
 
