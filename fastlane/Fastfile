@@ -1,0 +1,2 @@
+# this required fastlane to be checked out in the same folder
+import "../../fastlane/fastlane/Fastfile"
