@@ -75,13 +75,13 @@ pilot upload
 
 This will automatically look for an `ipa` in your current directory and tries to fetch the login credentials from your [fastlane setup](https://fastlane.tools).
 
-You'll be asked for any missing information. Additionally, you can pass all kinds of parameters to `pilot`:
+You'll be asked for any missing information. Additionally, you can pass all kinds of parameters:
 
 ```
-pilot upload -u felix@krausefx.com
+pilot --help
 ```
 
-Additionally you can skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributet to testers:
+You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributet to testers:
 
 ```
 pilot upload --skip_submission
@@ -92,7 +92,7 @@ pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship.airforce](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary :rocket:
 
 ## List builds
 
@@ -159,7 +159,7 @@ pilot add email@invite.com
 Additionally you can specify the app identifier (if necessary): 
 
 ```
-pilot add -e email@email.com -a com.krausefx.app
+pilot add email@email.com -a com.krausefx.app
 ```
 
 ### Find a tester
