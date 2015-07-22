@@ -10,6 +10,7 @@ lane :release do |options|
   # Fetching all information required for the release
   # 
   tool_name = options[:tool] || File.basename(File.expand_path('..', Dir.pwd))
+  module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
   binary_path = "../../#{tool_name}/bin/#{tool_name}"
 
   github_organisation = "fastlane"
@@ -17,7 +18,9 @@ lane :release do |options|
 
   # Verifying RubyGems version
   # 
-  version = sh("#{binary_path} -v").match(/#{tool_name} (.*)/)[1]
+  require "../lib/#{tool_name}/version"
+  version = module_ref::VERSION
+  puts "Deploying #{tool_name} #{version}"
   raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
 
   # Verifying the --help command
@@ -64,7 +67,7 @@ lane :release do |options|
   slack(
     channel: "releases",
     default_payloads: [],
-    message: "Successfully released a new version of [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) :rocket:",
+    message: "Successfully released [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) #{version} :rocket:",
     payload: {
       "New" => info['body']
     }
@@ -88,5 +91,5 @@ end
 
 desc "All repos that don't have a binary to test" 
 private_lane :no_binary do
-  ['fastlane_core', 'spaceship']
+  ['fastlane_core', 'spaceship', 'credentials_manager']
 end
