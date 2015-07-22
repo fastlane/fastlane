@@ -183,9 +183,7 @@ tester = Spaceship::Tunes::Tester::Internal.find("felix@krausefx.com")
 tester = Spaceship::Tunes::Tester::External.find("guest@krausefx.com")
 
 # Find all testers that were already added to an application
-testers = Spaceship::Tunes::Tester::External.all_by_app(794902327)
-# Or
-app.external_testers
+app.external_testers            # => Array of all external testers for this application
 
 
 # Creating new external testers
@@ -200,6 +198,8 @@ app.add_all_testers!
 # This will add the existing tester (if available) or create a new one
 app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last_name: "Krause")
 ```
+
+Right now, `spaceship` can't modify or create internal testers.
 
 ### License
 
