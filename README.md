@@ -32,7 +32,7 @@
 [![Build Status](https://img.shields.io/travis/fastlane/spaceship/master.svg?style=flat)](https://travis-ci.org/fastlane/spaceship)
 
 
-Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/KrauseFx) and [@snatchev](https://twitter.com/snatchev)
 
 
 -------
@@ -50,7 +50,7 @@ Get in contact with the developers on Twitter: [@snatchev](https://twitter.com/s
 
 # What's spaceship?
 
-spaceship is a Ruby library that exposes the Apple Developer Center API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
+spaceship is a Ruby library that exposes both the Apple Developer Center and the iTunes Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
 
 Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
@@ -60,7 +60,7 @@ spaceship uses a combination of 3 different API endpoints, used by the Apple Dev
 
 More details about why spaceship is useful on [spaceship.airforce](https://spaceship.airforce).
 
-> No matter how many apps or profiles you have, spaceship **can** handle your scale.
+> No matter how many apps or certificates you have, spaceship **can** handle your scale.
 
 Enough words, here is some code:
 
@@ -94,255 +94,21 @@ How fast are tools using `spaceship` compared to web scraping?
 
 # Usage
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`. 
+## Apple Developer Portal API
 
-## Login
+Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
-```ruby
-Spaceship.login("felix@krausefx.com", "password")
+## iTunes Connect API
 
-Spaceship.select_team # call this method to let the user select a team
-```
-
-## Apps
-
-```ruby
-# Fetch all available apps
-all_apps = Spaceship.app.all
-
-# Find a specific app based on the bundle identifier
-app = Spaceship.app.find("com.krausefx.app")
-
-# Show the names of all your apps
-Spaceship.app.all.each do |app|
-  puts app.name
-end
-
-# Create a new app
-app = Spaceship.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
-```
-
-## Certificates
-
-```ruby
-# Fetch all available certificates (includes signing and push profiles)
-certificates = Spaceship.certificate.all
-```
-
-### Code Signing Certificates
-
-```ruby
-# Production identities
-prod_certs = Spaceship.certificate.production.all
-
-# Development identities
-dev_certs = Spaceship.certificate.development.all
-
-# Download a certificate
-cert_content = prod_certs.first.download
-```
-
-### Push Certificates
-```ruby
-# Production push profiles
-prod_push_certs = Spaceship.certificate.production_push.all
-
-# Development push profiles
-dev_push_certs = Spaceship.certificate.development_push.all
-
-# Download a push profile
-cert_content = dev_push_certs.first.download
-```
-
-### Create a Certificate
-
-```ruby
-# Create a new certificate signing request
-csr, pkey = Spaceship.certificate.create_certificate_signing_request
-
-# Use the signing request to create a new distribution certificate
-Spaceship.certificate.production.create!(csr: csr)
-
-# Use the signing request to create a new push certificate
-Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
-```
-
-## Provisioning Profiles
-
-### Receiving profiles
-
-```ruby
-##### Finding #####
-
-# Get all available provisioning profiles
-profiles = Spaceship.provisioning_profile.all
-
-# Get all App Store profiles
-profiles_appstore = Spaceship.provisioning_profile.app_store.all
-
-# Get all AdHoc profiles
-profiles_adhoc = Spaceship.provisioning_profile.ad_hoc.all
-
-# Get all Development profiles
-profiles_dev = Spaceship.provisioning_profile.development.all
-
-# Fetch all profiles for a specific app identifier for the App Store
-filtered_profiles = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
-
-##### Downloading #####
-
-# Download a profile
-profile_content = profiles.first.download
-
-# Download a specific profile as file
-my_profile = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
-File.write("output.mobileprovision", my_profile.download)
-```
-
-### Create a Provisioning Profile
-
-```ruby
-# Choose the certificate to use
-cert = Spaceship.certificate.production.all.first
-
-# Create a new provisioning profile with a default name
-# The name of the new profile is "com.krausefx.app AppStore"
-profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: "com.krausefx.app",
-                                                         certificate: cert)
-
-# AdHoc Profiles will add all devices by default
-profile = Spaceship.provisioning_profile.ad_hoc.create!(bundle_id: "com.krausefx.app",
-                                                      certificate: cert,
-                                                             name: "Profile Name")
-
-# Store the new profile on the filesystem
-File.write("NewProfile.mobileprovision", profile.download)
-```
-
-### Repair all broken provisioning profiles
-
-```ruby
-# Select all 'Invalid' or 'Expired' provisioning profiles
-broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile| 
-  # the below could be replaced with `!profile.valid?`, which takes longer but also verifies the code signing identity
-  (profile.status == "Invalid" or profile.status == "Expired") 
-end
-
-# Iterate over all broken profiles and repair them
-broken_profiles.each do |profile|
-  profile.repair! # yes, that's all you need to repair a profile
-end
-
-# or to do the same thing, just more Ruby like
-Spaceship.provisioning_profile.all.find_all { |p| !p.valid? }.map(&:repair!)
-```
-
-## Devices
-
-```ruby
-all_devices = Spaceship.device.all
-
-# Register a new device
-Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
-```
-
-## Enterprise
-
-```ruby
-# Use the InHouse class to get all enterprise certificates
-cert = Spaceship.certificate.in_house.all.first 
-
-# Create a new InHouse Enterprise distribution profile
-profile = Spaceship.provisioning_profile.in_house.create!(bundle_id: "com.krausefx.*",
-                                                        certificate: cert)
-
-# List all In-House Provisioning Profiles
-profiles = Spaceship.provisioning_profile.in_house.all
-```
-
-## Multiple Spaceships
-
-Sometimes one `spaceship` just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple `spaceships` at the same time :rocket:
-
-```ruby
-# Launch 2 spaceships
-spaceship1 = Spaceship::Launcher.new("felix@krausefx.com", "password")
-spaceship2 = Spaceship::Launcher.new("stefan@spaceship.airforce", "password")
-
-# Fetch all registered devices from spaceship1
-devices = spaceship1.device.all
-
-# Iterate over the list of available devices
-# and register each device from the first account also on the second one
-devices.each do |device|
-  spaceship2.device.create!(name: device.name, udid: device.udid)
-end
-```
-
-## More cool things you can do
-```ruby
-# Find a profile with a specific name
-profile = Spaceship.provisioning_profile.development.all.find { |p| p.name == "Name" }
-
-# Add all available devices to the profile
-profile.devices = Spaceship.device.all
-
-# Push the changes back to the Apple Developer Portal
-profile.update!
-
-# Get the currently used team_id
-Spaceship.client.team_id
-
-# We generally don't want to be destructive, but you can also delete things
-# This method might fail for various reasons, e.g. app is already in the store
-app = Spaceship.app.find("com.krausefx.app")
-app.delete!
-```
+Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
 
 ## Spaceship in use
 
-The beta version of [sigh](https://github.com/KrauseFx/sigh) is already using `spaceship` to communicate with Apple's web services. You can see all relevant source code in [runner.rb](https://github.com/KrauseFx/sigh/blob/feature/spaceship/lib/sigh/spaceship/runner.rb).
+Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
 
 ## Full Documentation
 
 The detailed documentation of all available classes is available on [RubyDoc](http://www.rubydoc.info/github/fastlane/spaceship/frames).
-
-## Example Data
-
-Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/KrauseFx/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
-
-The example data below is a provisioning profile, containing a device, certificate and app. 
-
-```
-#<Spaceship::ProvisioningProfile::AdHoc 
-  @devices=[
-    #<Spaceship::Device 
-      @id="5YTNZ5A9AA", 
-      @name="Felix iPhone 6", 
-      @udid="39d2cab02642dc2bfdbbff4c0cb0e50c8632faaa"
-    >,  ...], 
-  @certificates=[
-    #<Spaceship::Certificate::Production 
-      @id="LHNT9C2AAA", 
-      @name="iOS Distribution", 
-      @expires=#<DateTime: 2016-02-10T23:44:20>
-    ], 
-  @id="72SRVUNAAA", 
-  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa", 
-  @expires=#<DateTime: 2016-02-10T23:44:20>, 
-  @distribution_method="adhoc", 
-  @name="com.krausefx.app AppStore", 
-  @status="Active", 
-  @platform="ios", 
-  @app=#<Spaceship::App 
-    @app_id="2UMR2S6AAA", 
-    @name="App Name", 
-    @platform="ios", 
-    @bundle_id="com.krausefx.app", 
-    @is_wildcard=false>
-  >
->
-```
 
 # Technical Details
 
@@ -357,7 +123,6 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 - Great test coverage by stubbing server responses
 - Resistant against design changes of the Apple Developer Portal
 - Automatic re-trying of requests in case a timeout occurs
-- By stubbing the `spaceship` objects it is possible to also implement tests for tools like [sigh](https://github.com/KrauseFx/sigh)
 
 ## API Endpoints
 
@@ -375,6 +140,11 @@ I won't go into too much technical details about the various API endpoints, but 
  - Repair provisioning profiles
  - Download provisioning profiles
  - Team selection
+- `https://itunesconnect.apple.com`: 
+ - Managing apps
+ - Managing beta testers
+ - Submitting updates to review
+ - Manaing app metadata
 
 `spaceship` uses all those API points to offer this seamless experience.
 
@@ -392,7 +162,14 @@ I won't go into too much technical details about the various API endpoints, but 
 
 # Credits
 
-This project has been sponsored by [ZeroPush](https://zeropush.com). `spaceship` was developed by [@snatchev](https://twitter.com/snatchev/) and [@KrauseFx](https://twitter.com/KrauseFx).
+The initial release was sponsored by [ZeroPush](https://zeropush.com). 
+
+`spaceship` was developed by 
+- [@KrauseFx](https://twitter.com/KrauseFx).
+- [@snatchev](https://twitter.com/snatchev/)
+- [@mathcarignani](https://twitter.com/mathcarignani/)
+
+[Open full list of contributors](https://github.com/fastlane/spaceship/graphs/contributors).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
