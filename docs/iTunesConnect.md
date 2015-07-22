@@ -46,7 +46,7 @@ app = Spaceship::Tunes::Application.create!(name: "App Name",
 
 ## AppVersions
 
-![/assets/AppVersions.png](/assets/AppVersions.png)
+<img src="/assets/AppVersions.png" width="500">
 
 You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
 
