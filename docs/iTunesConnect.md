@@ -126,7 +126,8 @@ attr_accessor :review_demo_password
 attr_accessor :review_notes
 
 ####
-# Localized values:
+# Localized values
+# attr_reader, since you have to access using ["English"]
 ####
 
 attr_accessor :languages

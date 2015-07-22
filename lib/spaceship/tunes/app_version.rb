@@ -97,7 +97,7 @@ module Spaceship
       attr_accessor :review_notes
 
       ####
-      # Localized values:
+      # Localized values
       ####
 
       # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
