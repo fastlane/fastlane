@@ -99,7 +99,7 @@ pilot upload --skip_submission
 To list all builds for specific application use
 
 ```
-pilot list
+pilot builds
 ```
 
 The result lists all active builds and processing builds:
