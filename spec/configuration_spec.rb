@@ -67,6 +67,25 @@ describe FastlaneCore do
         expect(config.values[:test]).to eq('123')
       end
 
+      it "takes the values frmo the environment if available" do
+        c = FastlaneCore::ConfigItem.new(key: :test, 
+                                    env_name: "FL_TEST")
+        config = FastlaneCore::Configuration.create([c], {})
+        ENV["FL_TEST"] = "123value"
+        expect(config.values[:test]).to eq('123value')
+        ENV.delete("FL_TEST")
+      end
+
+      it "supports modifying the value after taken from the environment" do
+        c = FastlaneCore::ConfigItem.new(key: :test, 
+                                    env_name: "FL_TEST")
+        config = FastlaneCore::Configuration.create([c], {})
+        ENV["FL_TEST"] = "123value"
+        config.values[:test].gsub!("123", "456")
+        expect(config.values[:test]).to eq('456value')
+        ENV.delete("FL_TEST")
+      end
+
       describe "Use a valid Configuration Manager" do
         before do
           @options = [
