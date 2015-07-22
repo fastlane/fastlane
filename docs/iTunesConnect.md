@@ -82,6 +82,66 @@ v.description["English"] = "App Description"
 v.save!
 ```
 
+All available options:
+```ruby
+####
+# General app version metadata
+####
+
+attr_accessor :application
+attr_accessor :version
+attr_accessor :copyright
+attr_reader :app_status
+attr_accessor :is_live
+attr_accessor :primary_category
+attr_accessor :primary_first_sub_category
+attr_accessor :primary_second_sub_category
+attr_accessor :secondary_category
+attr_accessor :secondary_first_sub_category
+attr_accessor :secondary_second_sub_category
+attr_accessor :raw_status
+attr_accessor :can_reject_version
+attr_accessor :can_prepare_for_upload
+attr_accessor :can_send_version_live
+attr_accessor :release_on_approval
+attr_accessor :can_beta_test
+attr_accessor :supports_apple_watch
+attr_accessor :app_icon_url
+attr_accessor :app_icon_original_name
+attr_accessor :watch_app_icon_url
+attr_accessor :watch_app_icon_original_name
+attr_accessor :version_id
+attr_accessor :company_information
+
+####
+# App Review Information
+####
+
+attr_accessor :review_first_name
+attr_accessor :review_last_name
+attr_accessor :review_phone_number
+attr_accessor :review_email
+attr_accessor :review_demo_user
+attr_accessor :review_demo_password
+attr_accessor :review_notes
+
+####
+# Localized values:
+####
+
+attr_accessor :languages
+attr_reader :name
+attr_reader :keywords
+attr_reader :description
+attr_reader :release_notes
+attr_reader :privacy_url
+attr_reader :support_url
+attr_reader :marketing_url
+attr_reader :screenshots
+```
+
+**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_version.rb).
+
 ## Build Trains
 
 <img src="/assets/docs/BuildTrains.png" width="700">
