@@ -96,17 +96,17 @@ How fast are tools using `spaceship` compared to web scraping?
 
 ## Apple Developer Portal API
 
-Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
+#### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
 ## iTunes Connect API
 
-Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
+#### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
 
-## Spaceship in use
+### Spaceship in use
 
 Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
 
-## Full Documentation
+### Full Documentation
 
 The detailed documentation of all available classes is available on [RubyDoc](http://www.rubydoc.info/github/fastlane/spaceship/frames).
 
