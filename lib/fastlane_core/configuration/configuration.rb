@@ -111,8 +111,8 @@ module FastlaneCore
       value = @values[key]
       
       # `if value == nil` instead of ||= because false is also a valid value
-      if value == nil and option.env_name
-        value = ENV[option.env_name]
+      if value == nil and option.env_name and ENV[option.env_name]
+        value = ENV[option.env_name].dup
         option.verify!(value) if value
       end
 
