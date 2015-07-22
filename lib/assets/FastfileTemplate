@@ -1,5 +1,7 @@
 # Customise this file, documentation can be found here:
 # https://github.com/KrauseFx/fastlane/tree/master/docs
+# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md
+# can also be listed using the `fastlane actions` command
 
 # Change the syntax highlighting to Ruby
 # All lines starting with a # are ignored when running `fastlane`
@@ -28,9 +30,9 @@ platform :ios do
 
     # increment_build_number
 
-    ipa
+    ipa[[SCHEME]] # Build your app - more options available
 
-    xctool
+    xctool # run the tests of your app
   end
 
   desc "Runs all the tests"
@@ -43,7 +45,7 @@ platform :ios do
   lane :beta do
     snapshot
     sigh
-    deliver :skip_deploy, :beta
+    deliver(beta: true)
 
     # sh "your_script.sh"
     # You can also use other beta testing services here
@@ -54,7 +56,7 @@ platform :ios do
   lane :deploy do
     snapshot
     sigh
-    deliver :skip_deploy, :force
+    deliver(skip_deploy: true, force: true)
     # frameit
   end
 
@@ -75,7 +77,6 @@ platform :ios do
     #   success: false
     # )
   end
-
 end
 
 

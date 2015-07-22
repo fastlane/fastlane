@@ -35,7 +35,7 @@ module Fastlane
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
         values = options.values
-        values[:dsym_filename] = dsym_path
+        values[:dsym_filename] = dsym_filename
         values[:notes_type] = options[:notes_type]
 
         return values if Helper.test?
@@ -77,6 +77,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
                                        description: "Path to your DSYM file",
+                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: Proc.new do |value|
                                         # validation is done in the action
@@ -99,7 +100,7 @@ module Fastlane
                                       default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :release_type,
                                       env_name: "FL_HOCKEY_RELEASE_TYPE",
-                                      description: "Release type of the app",
+                                      description: "Release type of the app: 0 = Beta (default), 1 = Store, 2 = Alpha, 3 = Enterprise",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :mandatory,
                                       env_name: "FL_HOCKEY_MANDATORY",
@@ -109,6 +110,10 @@ module Fastlane
                                       env_name: "FL_HOCKEY_TEAMS",
                                       description: "Comma separated list of team ID numbers to which this build will be restricted",
                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :users,
+                                      env_name: "FL_HOCKEY_USERS",
+                                      description: "Comma separated list of user ID numbers to which this build will be restricted",
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :tags,
                                       env_name: "FL_HOCKEY_TAGS",
                                       description: "Comma separated list of tags which will receive access to the build",
@@ -116,6 +121,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
                                       description: "Public identifier of the app you are targeting, usually you won't need this value",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :commit_sha,
+                                      env_name: "FL_HOCKEY_COMMIT_SHA",
+                                      description: "The Git commit SHA for this build",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :repository_url,
+                                      env_name: "FL_HOCKEY_REPOSITORY_URL",
+                                      description: "The URL of your source repository",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_server_url,
+                                      env_name: "FL_HOCKEY_BUILD_SERVER_URL",
+                                      description: "The URL of the build job on your build server",
                                       optional: true)
         ]
       end
@@ -137,3 +154,4 @@ module Fastlane
     end
   end
 end
+

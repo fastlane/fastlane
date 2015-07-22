@@ -1,0 +1,15 @@
+
+desc "private call"
+private_lane :private_helper do
+  "success"
+end
+
+desc "public"
+lane :public do
+  "publicResult"
+end
+
+desc "such smooth"
+lane :smooth do
+  private_helper
+end

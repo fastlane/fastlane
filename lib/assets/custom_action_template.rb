@@ -24,6 +24,12 @@ module Fastlane
         "A short description with <= 80 characters of what this action does"
       end
 
+      def self.details
+        # Optional:
+        # this is your change to provide a more detailed description of this action
+        "You can use this action to do cool things..."
+      end
+
       def self.available_options
         # Define all options your action supports. 
         
@@ -51,9 +57,9 @@ module Fastlane
         ]
       end
 
-      def self.author
+      def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        '[Your GitHub Name]'
+        ["Your GitHub/Twitter Name"]
       end
 
       def self.is_supported?(platform)

@@ -36,10 +36,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_PROJECT_SIGNING_UDID",
                                        description: "The UDID of the provisioning profile you want to use",
-                                       default_value: ENV["SIGH_UDID"],
-                                       verify_block: Proc.new do |value|
-                                        raise "Path is invalid".red unless File.exists?(value)
-                                       end)
+                                       default_value: ENV["SIGH_UDID"])
         ]
       end
 

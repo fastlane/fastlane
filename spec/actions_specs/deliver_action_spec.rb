@@ -6,6 +6,9 @@ describe Fastlane do
       let (:apple_id) { "deliver@krausefx.com" }
 
       before do
+        ENV.delete('DELIVER_SCREENSHOTS_PATH')
+        ENV.delete('DELIVER_SKIP_BINARY')
+
         @app_file = File.join(test_path, "Appfile")
         @deliver_file = File.join(test_path, "Deliverfile")
 
@@ -14,42 +17,44 @@ describe Fastlane do
         File.write(@deliver_file, "")
       end
 
-      it "works with default setting" do
+      it "works with custom setting and sets the correct snapshot path" do
         test_val = "test_val"
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
 
         Dir.chdir(test_path) do
-          expect {
-            
-            Fastlane::FastFile.new.parse("lane :test do 
-              deliver
-            end").runner.execute(:test)
-
-          }.to raise_error('You have to pass a valid version number using the Deliver file. (e.g. \'version "1.0"\')'.red)
+          Fastlane::FastFile.new.parse("lane :test do 
+            deliver(
+              force: true,
+              beta: true,
+              skip_deploy: true
+            )
+          end").runner.execute(:test)
 
           expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
         end
       end
 
-      it "works with custom setting" do
-        test_val = "test_val"
-        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
-
+      it "raises an error if deliver_path can't be found" do
         Dir.chdir(test_path) do
           expect {
-            
             Fastlane::FastFile.new.parse("lane :test do 
               deliver(
-                force: true,
-                beta: true,
-                skip_deploy: true,
-                deliver_file_path: '../example'
+                deliver_file_path: '../nothere'
               )
             end").runner.execute(:test)
+          }.to raise_error("Couldn't find folder '../nothere'. Make sure to pass the path to the directory not the file!".red)
+        end
+      end
 
-          }.to raise_error("Couldn't find folder '../example'. Make sure to pass the path to the directory not the file!".red)
+      it "supports the metadata_only option" do
+        Dir.chdir(test_path) do
+          Fastlane::FastFile.new.parse("lane :test do 
+            deliver(
+              metadata_only: true
+            )
+          end").runner.execute(:test)
 
-          expect(ENV['DELIVER_SCREENSHOTS_PATH']).to eq(test_val)
+          expect(ENV['DELIVER_SKIP_BINARY']).to eq("1")
         end
       end
 

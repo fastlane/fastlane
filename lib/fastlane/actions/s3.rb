@@ -1,4 +1,4 @@
-require 'erb'
+require 'fastlane/erb_template_helper'
 require 'ostruct'
 require 'shenzhen'
 
@@ -10,6 +10,7 @@ module Fastlane
       S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
       S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
       S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -38,9 +39,12 @@ module Fastlane
         params[:acl] = config[:acl]
         params[:source] = config[:source]
         params[:path] = config[:path]
+        params[:upload_metadata] = config[:upload_metadata]
         params[:plist_template_path] = config[:plist_template_path]
         params[:html_template_path] = config[:html_template_path]
         params[:html_file_name] = config[:html_file_name]
+        params[:version_template_path] = config[:version_template_path]
+        params[:version_file_name] = config[:version_file_name]
 
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
@@ -62,26 +66,19 @@ module Fastlane
         plist_template_path = params[:plist_template_path]
         html_template_path = params[:html_template_path]
         html_file_name = params[:html_file_name]
+        version_template_path = params[:version_template_path]
+        version_file_name = params[:version_file_name]
 
         if Helper.is_test?
-          return build_args 
+          return build_args
         end
 
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "ipa distribute:s3 #{build_args}"
+        command = "krausefx-ipa distribute:s3 #{build_args}"
         Helper.log.debug command
         Actions.sh command
-
-        #####################################
-        #
-        # html and plist building
-        #
-        #####################################
-
-        # Gets info used for the plist
-        bundle_id, bundle_version, title = get_ipa_info( ipa_file )
 
         # Gets URL for IPA file
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
@@ -98,6 +95,19 @@ module Fastlane
           ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_url
         end
 
+        if params[:upload_metadata] == false
+          return true
+        end
+
+        #####################################
+        #
+        # html and plist building
+        #
+        #####################################
+
+        # Gets info used for the plist
+        bundle_id, bundle_version, title, full_version = get_ipa_info(ipa_file)
+
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title}.plist"
         plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
@@ -105,29 +115,33 @@ module Fastlane
         html_file_name ||= "index.html"
         html_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{html_file_name}"
 
-        # Creates plist from template
-        plist_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_plist_template.erb"
-        plist_template = File.read(plist_template_path)
+        version_file_name ||= "version.json"
+        version_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{version_file_name}"
 
-        et = ErbalT.new({
+        #grabs module
+        eth = Fastlane::ErbTemplateHelper
+        # Creates plist from template
+        plist_render = eth.render(eth.load("s3_plist_template"),{
           url: ipa_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
-          })
-        plist_render = et.render(plist_template)
+        })
 
         # Creates html from template
-        html_template_path ||= "#{Helper.gem_path('fastlane')}/lib/assets/s3_html_template.erb"
-        html_template = File.read(html_template_path)
-
-        et = ErbalT.new({
+        html_render = eth.render(eth.load("s3_html_template"),{
           url: plist_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
-          })
-        html_render = et.render(html_template)
+        })
+
+
+        # Creates version from template
+        version_render = eth.render(eth.load("s3_version_template"),{
+          url: plist_url,
+          full_version: full_version
+        })
 
         #####################################
         #
@@ -142,8 +156,10 @@ module Fastlane
           plist_file_name,
           plist_render,
           html_file_name,
-          html_render
-          )        
+          html_render,
+          version_file_name,
+          version_render
+          )
 
         return true
 
@@ -163,7 +179,7 @@ module Fastlane
         end.compact
       end
 
-      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render)
+      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
         require 'aws-sdk'
         s3_client = AWS::S3.new(
             access_key_id: s3_access_key,
@@ -171,8 +187,9 @@ module Fastlane
         )
         bucket = s3_client.buckets[s3_bucket]
 
-        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, :acl => :public_read)
-        html_obj = bucket.objects.create(html_file_name, html_render.to_s, :acl => :public_read)
+        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
+        html_obj = bucket.objects.create(html_file_name, html_render.to_s, acl: :public_read)
+        version_obj = bucket.objects.create(version_file_name, version_render.to_s, acl: :public_read)
 
         # Setting actionand environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
@@ -181,13 +198,16 @@ module Fastlane
         Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH] = html_obj.public_url.to_s
         ENV[SharedValues::S3_HTML_OUTPUT_PATH.to_s] = html_obj.public_url.to_s
 
+        Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_obj.public_url.to_s
+        ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_obj.public_url.to_s
+
         Helper.log.info "Successfully uploaded ipa file to '#{html_obj.public_url.to_s}'".green
       end
 
       #
       # NOT a fan of this as this was taken straight from Shenzhen
       # https://github.com/nomad/shenzhen/blob/986792db5d4d16a80c865a2748ee96ba63644821/lib/shenzhen/plugins/s3.rb#L32
-      # 
+      #
       # Need to find a way to not use this copied method
       #
       # AGAIN, I am not happy about this right now.
@@ -214,7 +234,7 @@ module Fastlane
       end
 
       def self.get_ipa_info(ipa_file)
-        bundle_id, bundle_version, title = nil
+        bundle_id, bundle_version, title, full_version = nil
         Dir.mktmpdir do |dir|
 
           system "unzip -q #{ipa_file} -d #{dir} 2> /dev/null"
@@ -224,8 +244,11 @@ module Fastlane
           bundle_version = Shenzhen::PlistBuddy.print(plist, 'CFBundleShortVersionString')
           title = Shenzhen::PlistBuddy.print(plist, 'CFBundleName')
 
+          # This is the string: {CFBundleShortVersionString}.{CFBundleVersion}
+          full_version = bundle_version + '.' + Shenzhen::PlistBuddy.print(plist, 'CFBundleVersion')
+
         end
-        return bundle_id, bundle_version, title
+        return bundle_id, bundle_version, title, full_version
       end
 
       def self.description
@@ -244,6 +267,11 @@ module Fastlane
                                        description: "zipped .dsym package for the build ",
                                        optional: true,
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
+          FastlaneCore::ConfigItem.new(key: :upload_metadata,
+                                       env_name: "",
+                                       description: "Upload relevant metadata for this build",
+                                       optional: true,
+                                       default_value: true),
           FastlaneCore::ConfigItem.new(key: :plist_template_path,
                                        env_name: "",
                                        description: "plist template path",
@@ -255,6 +283,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :html_file_name,
                                        env_name: "",
                                        description: "uploaded html filename",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_template_path,
+                                       env_name: "",
+                                       description: "version erb template path",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_file_name,
+                                       env_name: "",
+                                       description: "uploaded version filename",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :access_key,
                                        env_name: "S3_ACCESS_KEY",
@@ -297,7 +333,8 @@ module Fastlane
           ['S3_IPA_OUTPUT_PATH', 'Direct HTTP link to the uploaded ipa file'],
           ['S3_DSYM_OUTPUT_PATH', 'Direct HTTP link to the uploaded dsym file'],
           ['S3_PLIST_OUTPUT_PATH', 'Direct HTTP link to the uploaded plist file'],
-          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file']
+          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file'],
+          ['S3_VERSION_OUTPUT_PATH', 'Direct HTTP link to the uploaded Version file']
         ]
       end
 
@@ -309,11 +346,5 @@ module Fastlane
         platform == :ios
       end
     end
-  end
-end
-
-class ErbalT < OpenStruct
-  def render(template)
-    ERB.new(template).result(binding)
   end
 end

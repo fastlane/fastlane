@@ -21,6 +21,8 @@ module Fastlane
 
           Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
           Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
+
+          return ENV["SIGH_UDID"] # return the UDID of the new profile
         ensure
           FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
         end
@@ -28,6 +30,10 @@ module Fastlane
 
       def self.description
         "Generates a provisioning profile. Stores the profile in the current folder"
+      end
+
+      def self.author
+        "KrauseFx"
       end
 
       def self.available_options

@@ -1,4 +1,4 @@
-This guide will help you set up Continuous Deployment for your iOS project. 
+This guide will help you set up Continuous Delivery for your iOS project. 
 
 It will help you set up all needed build tools. I tested everything with a fresh Yosemite installation.
 
@@ -14,6 +14,8 @@ It will help you set up all needed build tools. I tested everything with a fresh
 ## Notes about this guide
 If you don't want to use `sudo`, you can follow the [CocoaPods Guide](http://guides.cocoapods.org/using/getting-started.html#sudo-less-installation) of a *sudo-less installation*.
 
+See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-foundation), [Product Hunt](https://github.com/fastlane/examples#product-hunt) and [MindNode](https://github.com/fastlane/examples#mindnode) use `fastlane` to automate their iOS submission process.
+
 ## Installation
 
 Requirements:
@@ -26,23 +28,11 @@ Additionally, to an Xcode installation, you also need the Xcode command line too
 
     xcode-select --install
 
-### [Homebrew](http://brew.sh/) & [`xctool`](https://github.com/facebook/xctool) (optional)
-
-You don't have to use [homebrew](http://brew.sh/) to install the dependencies, but it is the easiest way to get started.
-
-If you don't have [homebrew](http://brew.sh/) already installed, follow the guide on the [bottom of the official page](http://brew.sh/). This just makes sure it's up to date.
-
-    brew doctor && brew update
-
-Finally, you can then install `xctool`. 
-
-    brew install xctool
-
 ### [fastlane](https://github.com/KrauseFx/fastlane)
 
 Install the gem and all its dependencies (this might take a few minutes).
 
-    [sudo] gem install fastlane
+    sudo gem install fastlane --verbose
 
 In case RubyGems has a hard time installing Nokogiri, check out their [official installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html).
 
@@ -121,14 +111,14 @@ end
 lane :beta do
   snapshot
   sigh
-  deliver :skip_deploy, :beta
+  deliver(skip_deploy: true, beta: true)
   # sh "your_script.sh"
 end
 
 lane :deploy do
   snapshot
   sigh
-  deliver :skip_deploy, :force
+  deliver(skip_deploy: true, force: true)
   # frameit
 end
 
@@ -164,11 +154,15 @@ This will execute your existing build script. Everything inside the `"` will be 
 
 ### Create your own actions (build steps)
 
-If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [this guide](https://github.com/KrauseFx/fastlane/blob/master/docs/README.md#extensions).
+If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [fastlane new_action](https://github.com/KrauseFx/fastlane/blob/master/docs/README.md#extensions).
 
-# Example project
+# Example projects
 
-Take a look at a project with `fastlane` already set up: [fastlane-example](https://github.com/krausefx/fastlane-example)
+See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-foundation), [Product Hunt](https://github.com/fastlane/examples#product-hunt) and [MindNode](https://github.com/fastlane/examples#mindnode) use `fastlane` to automate their iOS submission process.
+
+For all those projects you get all required configuration files, which help you get a sense of how you can use `fastlane`.
+
+Also, check out the [Actions documentation](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) to see a list of available integrations and options.
 
 # Help
 

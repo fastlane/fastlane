@@ -24,7 +24,7 @@ module Fastlane
         archive_path: "-archivePath",
         configuration: "-configuration",
         derivedDataPath: "-derivedDataPath",
-        destination: "-destination",
+        destination_timeout: "-destination-timeout",
         export_archive: "-exportArchive",
         export_format: "-exportFormat",
         export_installer_identity: "-exportInstallerIdentity",
@@ -213,6 +213,8 @@ module Fastlane
             "#{arg} #{value}".strip
           elsif k == :build_settings
             v.map{|setting,value| "#{setting}=\"#{value}\""}.join(' ')
+          elsif k == :destination
+            [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
@@ -402,6 +404,7 @@ module Fastlane
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
           ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"'],
+          ['destination_timeout', 'The timeout for connecting to the simulator, in seconds'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)']
         ]
       end

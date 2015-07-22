@@ -31,6 +31,10 @@ module Fastlane
         "Makes sure a valid push profile is active and creates a new one if needed"
       end
 
+      def self.author
+        "KrauseFx"
+      end
+
       def self.details
         [
           "Additionally to the available options, you can also specify a block that only gets executed if a new",
@@ -51,7 +55,6 @@ module Fastlane
         unless @options
           @options = PEM::Options.available_options
           @options << FastlaneCore::ConfigItem.new(key: :new_profile,
-                                       env_name: "",
                                        description: "Block that is called if there is a new profile", 
                                        optional: true,
                                        is_string: false)

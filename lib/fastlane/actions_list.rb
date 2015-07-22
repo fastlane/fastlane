@@ -14,7 +14,10 @@ module Fastlane
 
         if action < Action
           current << action.description if action.description
-          current << action.author.green if action.author
+
+          authors = Array(action.author || action.authors)
+          current << authors.first.green if authors.count == 1
+          current << "Multiple".green if authors.count > 1
 
           l = (action.description || '').length
         else
@@ -30,8 +33,9 @@ module Fastlane
         rows: rows
       )
       puts table
+      puts "  Total of #{rows.count} actions"
 
-      puts "Get more information for one specific action using `fastlane action [name]`"
+      puts "\nGet more information for one specific action using `fastlane action [name]`\n".green
     end
 
     def self.show_details(filter)
@@ -49,7 +53,10 @@ module Fastlane
           rows << [action.details]
           rows << [' ']
         end
-        rows << ["Created by #{action.author.green}"] if action.author
+
+        authors = Array(action.author || action.authors)
+
+        rows << ["Created by #{authors.join(', ').green}"] if authors.count > 0
 
         puts Terminal::Table.new(
           title: filter.green,
@@ -72,13 +79,13 @@ module Fastlane
         puts "\n"
 
         output = parse_options(action.output, false) if action.output
-        if output
+        if output and output.count > 0
           puts Terminal::Table.new(
             title: filter.green,
             headings: ['Key', 'Description'],
             rows: output
           )
-          puts "Access the output values using `Actions.lane_context[Actions::SharedValues::VARIABLE_NAME]`"
+          puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
           puts ""
         end
 
@@ -99,7 +106,7 @@ module Fastlane
     # Iterates through all available actions and yields from there
     def self.all_actions
       all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
-      all_actions.each do |symbol|        
+      all_actions.sort.each do |symbol|        
         action = Fastlane::Actions.const_get(symbol)
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
         yield action, name

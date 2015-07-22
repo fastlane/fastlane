@@ -6,6 +6,7 @@ default_platform :ios
 
 lane :test do
   File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
+  1
 end
 
 
@@ -22,11 +23,14 @@ platform :ios do
     # nothing going on here
   end
 
+  desc "This action does nothing"
+  desc "but crash"
   lane :crashy do
     raise "my exception"
   end
   
 end
+
 before_all do |lane|
   File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
 end

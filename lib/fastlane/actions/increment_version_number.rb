@@ -16,7 +16,7 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
         begin
-          folder = '.' #Current folder is the default folder
+          folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
 
           command_prefix = [
               'cd',
@@ -35,7 +35,7 @@ module Fastlane
             if Helper.test?
               version_array = [1,0,0]
             else
-              raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
+              raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d+.\d+.\d+/)
               version_array = current_version.split(".").map(&:to_i)
             end
 
@@ -107,7 +107,8 @@ module Fastlane
                                        verify_block: Proc.new do |value|
                                         raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
                                         raise "Could not find Xcode project".red unless File.exists?(value)
-                                       end)
+                                       end,
+                                       optional: true)
         ]
       end
 

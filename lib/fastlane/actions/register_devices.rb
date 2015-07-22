@@ -80,7 +80,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
-                                       description: "optional: Your team ",
+                                       description: "optional: Your team ID",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "CUPERTINO_USERNAME",

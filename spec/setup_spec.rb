@@ -28,7 +28,7 @@ describe Fastlane do
         Fastlane::FastlaneFolder.create_folder!(workspace)
         setup = Fastlane::Setup.new
         expect(setup.run).to eq(true)
-        expect(setup.tools).to eq({:deliver=>true, :snapshot=>true, :xctool=>true, :cocoapods=>true, :sigh=>true})
+        expect(setup.tools).to eq({deliver:true, snapshot:true, xctool:true, cocoapods:true, sigh:true})
         
         content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
         expect(content).to include"# update_fastlane"
@@ -36,6 +36,7 @@ describe Fastlane do
         expect(content).to include"  snapshot"
         expect(content).to include"  deliver"
         expect(content).to include"  xctool"
+        expect(content).to include"ipa(scheme: \"y\")"
       end
 
       after do

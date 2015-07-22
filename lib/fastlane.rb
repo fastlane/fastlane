@@ -1,17 +1,19 @@
 require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/version'
+require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
 require 'fastlane/dependency_checker'
 require 'fastlane/runner'
 require 'fastlane/setup'
+require 'fastlane/lane'
 require 'fastlane/fastlane_folder'
 require 'fastlane/junit_generator'
 require 'fastlane/lane_manager'
 require 'fastlane/action'
-require 'fastlane/actions/actions_helper'
 require 'fastlane/action_collector'
 require 'fastlane/supported_platforms'
 require 'fastlane/configuration_helper'
+require 'fastlane/command_line_handler'
 
 require 'fastlane_core'
 

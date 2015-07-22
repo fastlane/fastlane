@@ -3,7 +3,10 @@
 module Fastlane
   class Setup
     def run
-      raise "Fastlane already set up at path #{folder}".yellow if (FastlaneFolder.setup? and not Helper.is_test?)
+      if (FastlaneFolder.setup? and not Helper.is_test?)
+        Helper.log.info "Fastlane already set up at path #{folder}".yellow
+        return
+      end
 
       show_infos
       response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
@@ -24,7 +27,7 @@ module Fastlane
       rescue Exception => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
         # and restore previous files
-        Helper.log.fatal 'Error occured with the setup program! Reverting changes now!'.red
+        Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
         restore_previous_state
         raise ex
       end
@@ -63,8 +66,10 @@ module Fastlane
     def generate_app_metadata
       Helper.log.info '------------------------------'
       Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
+      
       app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
       apple_id = ask('Your Apple ID (fastlane@krausefx.com): '.yellow)
+
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
       template.gsub!('[[APPLE_ID]]', apple_id)
@@ -96,7 +101,7 @@ module Fastlane
         Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
         Helper.log.info 'Update your `ipa` and `beta_ipa` block of your Deliverfile to go a folder up before building'.yellow
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
-        Helper.log.info 'Please read the above carefully and click Enter to confirm.'.green
+        Helper.log.info 'Please read the above carefully and hit Enter to confirm.'.green
         STDIN.gets unless Helper.is_test?
       end
 
@@ -116,6 +121,14 @@ module Fastlane
 
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
+
+      scheme = ask("Optional: The scheme name of your app: (If you don't need one, just hit Enter.) ").to_s.strip
+      if scheme.length > 0
+        template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
+      else
+        template.gsub!('[[SCHEME]]', "")
+      end
+
 
       template.gsub!('deliver', '# deliver') unless @tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]

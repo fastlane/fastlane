@@ -8,6 +8,7 @@ module Fastlane
       def self.run(params)
         $verbose = true if params[:verbose]
         clean = !params[:noclean]
+        build = !params[:nobuild]
 
         if Helper.test?
           Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
@@ -21,9 +22,9 @@ module Fastlane
         ENV['SNAPSHOT_SKIP_OPEN_SUMMARY'] = "1" # it doesn't make sense to show the HTML page here
 
         begin
-          Dir.chdir(FastlaneFolder.path) do
+          Dir.chdir(params[:snapshot_file_path] || FastlaneFolder.path) do
             Snapshot::SnapshotConfig.shared_instance
-            Snapshot::Runner.new.work(clean: clean)
+            Snapshot::Runner.new.work(clean: clean, build: build)
 
             results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
 
@@ -48,6 +49,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SNAPSHOT_VERBOSE",
                                        description: "Print out the UI Automation output",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :snapshot_file_path,
+                                       env_name: "FL_SNAPSHOT_CONFIG_PATH",
+                                       description: "Specify a path to the directory containing the Snapfile",
+                                       default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
+                                       verify_block: Proc.new do |value|
+                                        raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :nobuild,
+                                       env_name: "FL_SNAPSHOT_NO_BUILD",
+                                       description: "Skip the build process and use a pre-built .app under your build_dir",
                                        is_string: false,
                                        default_value: false)
         ]

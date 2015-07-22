@@ -18,7 +18,7 @@ module Fastlane
       sdk: '--sdk',
       ipa: '--ipa',
       xcconfig: '--xcconfig',
-      xcargs: '--xcargs',
+      xcargs: '--xcargs'
     }
 
     class IpaAction < Action
@@ -27,7 +27,6 @@ module Fastlane
         platform == :ios
       end
 
-      
       def self.run(params)
         # The args we will build with
         build_args = nil
@@ -37,14 +36,14 @@ module Fastlane
 
         # Used to get the final path of the IPA and dSYM
         if dest = params[:destination]
-          absolute_dest_directory = Dir.glob(dest).map(&File.method(:realpath)).first
+          absolute_dest_directory = File.expand_path(dest)
         end
 
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
 
         unless (params[:scheme] rescue nil)
-          Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any outupt, please pass a `scheme`"
+          Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`"
         end
 
         # If no dest directory given, default to current directory
@@ -59,19 +58,42 @@ module Fastlane
         # Joins args into space delimited string
         build_args = build_args.join(' ')
 
-        command = "set -o pipefail && krausefx-ipa build #{build_args} --verbose | xcpretty"
+        core_command = "krausefx-ipa build #{build_args} --verbose | xcpretty"
+        command = "set -o pipefail && #{core_command}"
         Helper.log.debug command
-        Actions.sh command
 
-        # Finds absolute path of IPA and dSYM
-        absolute_ipa_path = find_ipa_file(absolute_dest_directory)
-        absolute_dsym_path = find_dsym_file(absolute_dest_directory)
+        begin
+          Actions.sh command
 
-        # Sets shared values to use after this action is performed
-        Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
-        Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
-        ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
-        ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
+          # Finds absolute path of IPA and dSYM
+          absolute_ipa_path = find_ipa_file(absolute_dest_directory)
+          absolute_dsym_path = find_dsym_file(absolute_dest_directory)
+
+          # Sets shared values to use after this action is performed
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
+          ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
+          ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
+        rescue => ex
+          [
+            "-------------------------------------------------------",
+            "Original Error:",
+            " => " + ex.to_s,
+            "A build error occured. This can have many reasons, usually",
+            "it has something to do with code signing. The `ipa` action",
+            "uses `shenzhen` under the hood: https://github.com/nomad/shenzhen",
+            "For code signing related issues, check out this guide:",
+            "https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md",
+            "The command that was used by fastlane:",
+            core_command,
+            "-------------------------------------------------------"
+          ].each do |txt|
+            Helper.log.error txt.yellow
+          end
+
+          # Raise a custom exception, as the the normal one is useless for the user
+          raise "A build error occured, this is usually related to code signing. Take a look at the error above".red
+        end
       end
 
       def self.params_to_build_args(config)
@@ -87,7 +109,7 @@ module Fastlane
             if k == :clean
               v == true ? '--clean' : '--no-clean'
             elsif k == :archive
-              v == true ? '--archive' : nil
+              v == true ? '--archive' : '--no-archive'
             else
               value = (v.to_s.length > 0 ? "\"#{v}\"" : '')
               "#{ARGS_MAP[k]} #{value}".strip
@@ -118,7 +140,8 @@ module Fastlane
 
       def self.details
         [
-          "More information on the shenzhen project page: https://github.com/nomad/shenzhen"
+          "More information on the shenzhen project page: https://github.com/nomad/shenzhen",
+          "To make code signing work, it is recommended to set a the provisioning profile in the project settings."
         ].join(' ')
       end
 

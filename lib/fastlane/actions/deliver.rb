@@ -12,9 +12,11 @@ module Fastlane
         begin
           ENV['DELIVER_SCREENSHOTS_PATH'] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots if there
           ENV['DELIVER_SKIP_BINARY'] = "1" if config[:metadata_only]
+          ENV['DELIVER_VERSION'] = Actions.lane_context[SharedValues::VERSION_NUMBER].to_s
 
           Dir.chdir(config[:deliver_file_path] || FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
+            return if Helper.is_test?
 
             Deliver::Deliverer.new(nil,
                                    force: config[:force],
@@ -47,7 +49,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :beta,
                                        env_name: "FL_DELIVER_BETA",
-                                       description: "Upload a new version to TestFlight",
+                                       description: "Upload a new version to TestFlight - this will skip metadata upload",
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
@@ -78,7 +80,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
     end
   end

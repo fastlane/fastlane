@@ -22,6 +22,7 @@ describe Fastlane do
             configuration: 'Debug',
             derived_data_path: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
+            destination_timeout: 240,
             export_archive: true,
             export_format: 'ipa',
             export_installer_identity: true,
@@ -49,6 +50,7 @@ describe Fastlane do
           + "-archivePath \"./build/MyApp.xcarchive\" " \
           + "-configuration \"Debug\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination-timeout \"240\" " \
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportInstallerIdentity " \
@@ -72,6 +74,29 @@ describe Fastlane do
           + "install " \
           + "installsrc " \
           + "test " \
+          + "| xcpretty --color --simple"
+      )
+    end
+
+    it "works with a destination list" do
+      result = Fastlane::FastFile.new.parse("lane :test do
+        xcodebuild(
+          destination: [
+            'name=iPhone 5s,OS=8.1',
+            'name=iPhone 4,OS=7.1',
+          ],
+          destination_timeout: 240,
+        )
+      end").runner.execute(:test)
+
+      expect(result).to eq(
+        "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination \"name=iPhone 4,OS=7.1\" " \
+          + "-destination-timeout \"240\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
           + "| xcpretty --color --simple"
       )
     end
@@ -276,6 +301,7 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
           xctest(
             destination: 'name=iPhone 5s,OS=8.1',
+            destination_timeout: 240,
             scheme: 'MyApp',
             workspace: 'MyApp.xcworkspace'
           )
@@ -285,6 +311,7 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination-timeout \"240\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "test " \

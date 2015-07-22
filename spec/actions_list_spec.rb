@@ -22,8 +22,12 @@ describe Fastlane do
           expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
           expect(action.description.length).to be > 5, "Provided description for '#{name}'-action is too short"
           expect(action.description.strip.end_with?'.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
-          expect(action.author.length).to be > 1, "Action '#{name}' must have an author"
           action.is_supported?(nil) # this will raise an exception if the method is not implemented
+
+          expect(action).to be < Fastlane::Action
+
+          authors = Array(action.author || action.authors)
+          expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
 
           if action.available_options
             expect(action.available_options).to be_instance_of(Array), "'available_options' for action '#{name}' must be an array"

@@ -9,7 +9,10 @@
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a>
+  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/boarding">boarding</a>
 </p>
 -------
 
@@ -30,6 +33,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
     <a href="#quick-start">Quick Start</a> &bull;
+    <a href="#examples">Example Setups</a> &bull; 
+    <a href="https://github.com/KrauseFx/fastlane/tree/master/docs">Documentation</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -41,11 +46,11 @@ Why should you have to remember complicated commands and parameters?
 
 Store your configuration in a text file to easily test, builld, and deploy from _any_ computer.
 
-Just edit the ```Fastfile``` to define multiple ```lanes```, or different workflows.
+[Take a look at how Wikipedia and Product Hunt use `fastlane`](https://github.com/fastlane/examples).
 
-Examples are: ```appstore```, ```beta``` and ```test```.
+Define different environments (`lanes`) in your `Fastfile`: Examples are: `appstore`, `beta` and `test`.
 
-You define a ```lane``` like this (more details about the commands in the [Actions](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) documentation):
+You define a `lane` like this (more details about the commands in the [Actions](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) documentation):
 
 ```ruby
 lane :appstore do
@@ -62,28 +67,31 @@ lane :appstore do
 end
 ```
 
-To launch the ```appstore``` lane, just run:
+To launch the `appstore` lane, just run:
 
 ```sh
 fastlane appstore
 ```
 
-Fastlane can do a lot for you to automate tedious and time-consuming parts of your job. 
+`fastlane` can do a lot for you to automate tedious and time-consuming tasks:
 
-- Connect all tools, part of the ```fastlane``` toolchain to work seamlessly together.
-- Define different ```deployment lanes``` for App Store deployment, beta builds or testing.
+- Connect all build related iOS tools into one workflow (both `fastlane` tools and third party tools)
+- Define different `deployment lanes` for App Store deployment, beta builds or testing.
 - Deploy from any computer.
-- [Jenkins Integration](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results.
 - Write your [own actions](https://github.com/KrauseFx/fastlane/blob/master/docs#extensions) (extensions) to extend the functionality of `fastlane`.
-- Store data like the ```Bundle Identifier``` or your ```Apple ID``` once and use it across all tools.
-- Never remember any difficult commands, just ```fastlane```.
-- Easy setup, which helps you getting up and running very fast.
+- Store data like the `Bundle Identifier` or your `Apple ID` once and use it across all tools.
+- Never remember any difficult commands, just `fastlane`.
+- Easy setup, which helps you getting up and running quickly.
 - [Shared context](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#lane-context), which is used to let the different deployment steps communicate with each other.
-- Store **everything** in git. Never lookup the used build commands in the ```Jenkins``` configs.
+- Store **everything** in git. Never again lookup the used build commands in the ```Jenkins``` configs.
 - Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update.
 - Very flexible configuration using a fully customizable `Fastfile`.
-- Once up and running, you have a fully working **Continuous Deployment** process. Just trigger ```fastlane``` and you're good to go.
-- Over 30 built-in integrations available.
+- Once up and running, you have a fully working **Continuous Delivery** process. Just trigger ```fastlane``` and you're good to go.
+- [Jenkins Integration](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results.
+- Automatically generate a markdown documentation of your lanes based on your `Fastfile`.
+- Over 60 built-in integrations available.
+- Support for both iOS and Mac OS apps
+- Full git and mercurial support
 
 ##### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
@@ -93,9 +101,7 @@ Fastlane can do a lot for you to automate tedious and time-consuming parts of yo
 
 I recommend following the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started.
 
-If you are familiar with the command line and Ruby, install `fastlane` yourself:
-
-    sudo gem install fastlane
+    sudo gem install fastlane --verbose
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -114,6 +120,8 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/KrauseFx/fastlane/blob/master/docs).
 
+There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/162d756dfda7b84e97d4) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
+
 ## Available commands
 
 Usually you'll use fastlane by triggering individual lanes:
@@ -122,17 +130,22 @@ Usually you'll use fastlane by triggering individual lanes:
 
 #### Other commands
 
-- `fastlane lanes`: Lists all available lanes
-- `fastlane docs`: Generates a markdown based documentation of all your lanes
 - `fastlane actions`: List all available `fastlane` actions
 - `fastlane action [action_name]`: Shows a more detailed description of an action
+- `fastlane lanes`: Lists all available lanes with description
+- `fastlane list`: Lists all available lanes without description
+- `fastlane docs`: Generates a markdown based documentation of all your lanes
 - `fastlane new_action`: Create a new action (integration) for fastlane  
+
+## Examples
+
+See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-foundation), [Product Hunt](https://github.com/fastlane/examples#product-hunt) and [MindNode](https://github.com/fastlane/examples#mindnode) use `fastlane` to automate their iOS submission process.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 `fastlane` is designed to make your life easier by bringing together the `fastlane` suite of tools under one roof. 
 
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
@@ -140,6 +153,9 @@ Usually you'll use fastlane by triggering individual lanes:
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 
 ## Statistics
 
@@ -147,11 +163,13 @@ Usually you'll use fastlane by triggering individual lanes:
 
 You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`.
 
+To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
+
 ## Credentials
-A detailed description about how ```fastlane``` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
 
 ## Need help?
-- If there is a technical problem with ```fastlane```, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
+- If there is a technical problem with `fastlane`, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
 - I'm available for contract work - drop me an email: fastlane@krausefx.com
 
 ## Special Thanks
@@ -159,6 +177,7 @@ A detailed description about how ```fastlane``` stores your credentials is avail
 Thanks to all contributors for extending and improving the `fastlane` suite:
 
 - [Product Hunt](http://producthunt.com)
+- [MindNode](https://mindnode.com)
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
 - Ash Furrow ([@ashfurrow](https://twitter.com/ashfurrow))
@@ -172,3 +191,5 @@ Check out the project pages of the other tools for more sponsors and contributor
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
+
+> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

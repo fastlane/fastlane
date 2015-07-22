@@ -15,6 +15,7 @@ fastlane action [action_name]:
 - [Modifying Project](#modifying-project)
 - [Developer Portal](#developer-portal)
 - [Using git](#using-git)
+- [Using mercurial](#using-mercurial)
 - [Notifications](#notifications)
 
 ## Building
@@ -37,7 +38,7 @@ carthage
 
 ### [xctool](https://github.com/facebook/xctool)
 
-You can run any xctool action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
+You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
 
 ```ruby
 xctool :test
@@ -66,19 +67,66 @@ snapshot
 
 To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
 
-To skip cleaning the project on every build:
+To skip cleaning the project on every build use ```snapshot(noclean: true)```.
+
+To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
+
+Other options
+
 ```ruby
-snapshot :noclean
+snapshot(
+  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
+  noclean: true, # Skip cleaning
+  verbose: true, # Show output of UIAutomation
+  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+)
 ```
 
-To show the output of `UIAutomation`:
+Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+
+### update_project_provisioning
+
+This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+
+Updated your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action.
+
 ```ruby
-snapshot :verbose
+update_project_provisioning(
+  xcodeproj: "Project.xcodeproj",
+  profile: "./app_store.mobileprovision" # optional if you use sigh
+)
+```
+
+Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) you can use the `filter` option:
+
+```ruby
+update_project_provisioning(
+  xcodeproj: "Project.xcodeproj",
+  profile: "./app_store.mobileprovision", # optional if you use sigh
+  build_configuration_filter: ".*WatchKit Extension.*"
+)
+```
+
+The `build_configuration_filter` is a standard regex.
+
+Since you'll probably not want to commit this change into version control, take a look at how [MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47) uses this technique to temporary set the code signing, then build and upload the `ipa` file.
+
+**[Show Example Usage](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
+
+### update_app_group_identifiers
+Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
+
+```ruby
+update_app_group_identifiers(
+	entitlements_file: '/path/to/entitlements_file.entitlements',
+	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 ipa(
@@ -93,8 +141,7 @@ ipa(
   embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
   identity: "MyIdentity",          # Identity to be used along with --embed
   sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
-  archive: nil,                    # this means 'Do Archive'. Archive project after building.
-  verbose: nil,                    # this means 'Do Verbose'.
+  archive: true                    # this means 'Do Archive'. Archive project after building (the default if not specified).
 )
 ```
 
@@ -106,6 +153,8 @@ The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `Depl
 **Important:**
 
 To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
+
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
 
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
 Use this command if you are supporting multiple versions of Xcode
@@ -127,9 +176,42 @@ resign(
 )
 ```
 
+### `create_keychain`
+
+Create a new keychain, which can then be used to import certificates.
+
+```ruby
+create_keychain(
+  name: "KeychainName",
+  default_keychain: true,
+  unlock: true,
+  timeout: 3600,
+  lock_when_sleeps: true
+)
+```
+
+### `delete_keychain`
+
+Delete a keychain, can be used after creating one with `create_keychain`.
+
+```ruby
+delete_keychain(name: "KeychainName")
+```
+
+### `import_certificate`
+
+Import certificates into the current default keychain. Use `create_keychain` to create a new keychain.
+
+```ruby
+import_certificate certificate_path: "certs/AppleWWDRCA.cer"
+import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV['CERT_PASSWORD']
+```
+
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
 Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
 such as; archive, build, clean, test, export & more.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -190,6 +272,8 @@ More usage examples (assumes the above .env setup is being used):
   xcexport
 ```
 
+See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
+
 ### clean_build_artifacts
 This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 
@@ -198,6 +282,8 @@ Useful if you quickly want to send out a test build by dropping down to the comm
 ```ruby
 clean_build_artifacts
 ```
+
+See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) cleans their build artifacts after building and distributing their app.
 
 ### [frameit](https://github.com/KrauseFx/frameit)
 By default, the device color will be black
@@ -209,6 +295,8 @@ To use white (sorry, silver) device frames
 ```ruby
 frameit :silver
 ```
+
+See how [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) uses `frameit` to not only frame the screenshots, but also add a title and a background around the screenshots. More information available in their [Fastfile](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) and the [screenshots folder](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) ([Framefile.json](https://github.com/fastlane/examples/blob/master/MindNode/screenshots/Framefile.json))
 
 ### dsym_zip
 
@@ -237,6 +325,7 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
   # Run tests in given simulator
   xctest(
     destination: "name=iPhone 5s,OS=8.1",
+    destination_timeout: 120, # increase device/simulator timeout, usually used on slow CI boxes
     reports: [{
       report: 'html',
       output: './build-dir/test-report.html',  # will use XCODE_BUILD_PATH/report, if output is not provided
@@ -257,6 +346,17 @@ gcovr(
   html: true,
   html_details: true,
   output: "./code-coverage/report.html"
+)
+```
+
+### [lcov](http://ltp.sourceforge.net/coverage/lcov.php)
+Generate code coverage reports based on lcov.
+
+```ruby
+lcov(
+      project_name: "yourProjectName",
+      scheme: "yourScheme",
+      output_dir: "cov_reports" # This value is optional. Default is coverage_reports
 )
 ```
 
@@ -291,7 +391,6 @@ Other options
 ```ruby
 deliver(
   force: true,# Set to true to skip PDF verification
-  beta: true, # Upload a new version to TestFlight
   skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
   deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
 )
@@ -301,6 +400,26 @@ If you want to use a different Apple ID for iTunes Connect in `deliver`, just ad
 
 ```ruby
 email "itunes@connect.com"
+```
+
+If you only want to upload a binary without any metadata, use `deliver(beta: true, skip_deploy: true)`
+
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
+
+### TestFlight
+
+To upload a new binary to Apple TestFlight use the `testflight` action:
+
+```ruby
+testflight
+```
+
+This will use [deliver](https://github.com/KrauseFx/deliver) under the hood.
+
+Additionally you can skip the submission of the new binary to the testers to only upload the build:
+
+```ruby
+testflight(skip_deploy: true)
 ```
 
 ### [HockeyApp](http://hockeyapp.net)
@@ -315,6 +434,8 @@ hockey(
 Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.
 
 More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
+
+See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) distributes new builds via Hockey in their [Fastfile](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile).
 
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
@@ -331,6 +452,8 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### AWS S3 Distribution
 
+Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.
+
 Add the `s3` action after the `ipa` step:
 
 ```ruby
@@ -344,13 +467,25 @@ s3(
   access_key: ENV['S3_ACCESS_KEY'],               # Required from user.
   secret_access_key: ENV['S3_SECRET_ACCESS_KEY'], # Required from user.
   bucket: ENV['S3_BUCKET'],                       # Required from user.
-  file: 'AppName.ipa',                            # This would come from IpaAction.
-  dsym: 'AppName.app.dSYM.zip',                   # This would come from IpaAction.
-  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/' # This is actually the default.
+  ipa: 'AppName.ipa',                             # Optional is you use `ipa` to build
+  dsym: 'AppName.app.dSYM.zip',                   # Optional is you use `ipa` to build
+  path: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/', # This is actually the default.
+  upload_metadata: true,                          # Upload version.json, plist and HTML. Set to false to skip uploading of these files.
+  version_file_name: 'app_version.json',          # Name of the file to upload to S3. Defaults to 'version.json'
+  version_template_path: 'path/to/erb'            # Path to an ERB to configure the structure of the version JSON file
 )
 ```
 
 It is recommended to **not** store the AWS access keys in the `Fastfile`.
+
+The uploaded `version.json` file provides an easy way for apps to poll if a new update is available. The JSON looks like:
+
+```json
+{
+    "latestVersion": "<%= full_version %>",
+    "updateUrl": "itms-services://?action=download-manifest&url=<%= url %>"
+}
+```
 
 ### [DeployGate](https://deploygate.com/)
 
@@ -361,13 +496,23 @@ deploygate(
   api_token: '...',
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
-  message: "Build #{Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]}",
+  message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
 )
 ```
 
 If you put `deploygate` after `ipa` action, you don't have to specify IPA file path, as it is extracted from the lane context automatically.
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
+
+### set_changelog
+
+To easily set the changelog of an app on iTunes Connect for all languages 
+
+```ruby
+set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")
+```
+
+You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
 
 ## Modifying Project
 
@@ -385,6 +530,8 @@ increment_build_numer(
   xcodeproj: './path/to/MyApp.xcodeproj' # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
+
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_build_number` action.
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
@@ -409,6 +556,8 @@ increment_version_number(
   xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
 ```
+
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_version_number` action.
 
 ### set_build_number_repository
 ```ruby
@@ -439,6 +588,8 @@ sigh(
 )
 ```
 
+See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `sigh` to automatically retrieve the latest provisioning profile.
+
 ### [PEM](https://github.com/KrauseFx/PEM)
 
 This will generate a new push profile if necessary (the old one is about to expire).
@@ -462,6 +613,8 @@ pem(
 ```
 
 Use the `fastlane action pem` command to view all available options.
+
+[Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
 ### [cert](https://github.com/KrauseFx/cert)
 
@@ -488,15 +641,17 @@ Create new apps on iTunes Connect and Apple Developer Portal. If the app already
 
 ```ruby
 produce(
-  produce_username: 'felix@krausefx.com',
-  produce_app_identifier: 'com.krausefx.app',
-  produce_app_name: 'MyApp',
-  produce_language: 'English',
-  produce_version: '1.0',
-  produce_sku: 123,
-  produce_team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
+  username: 'felix@krausefx.com',
+  app_identifier: 'com.krausefx.app',
+  app_name: 'MyApp',
+  language: 'English',
+  version: '1.0',
+  sku: 123,
+  team_name: 'SunApps GmbH' # Only necessary when in multiple teams.
 )
 ```
+
+[SunApps](https://github.com/fastlane/examples/blob/master/SunApps/Fastfile#L41-L49) uses `produce` to automatically generate new apps for new customers.
 
 ### register_devices
 This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.
@@ -531,12 +686,41 @@ register_devices(
 
 ## Using git
 
+### ensure_git_branch
+This action will check if your git repo is checked out to a specific branch. You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
+
+```ruby
+ensure_git_branch # defaults to `master` branch
+
+ensure_git_branch(
+  branch: 'develop'
+)
+```
+
+### last_git_tag
+
+Simple action to get the latest git tag
+
+```ruby
+last_git_tag
+```
+
+### git_branch
+
+Quickly get the name of the branch you're currently in
+
+```ruby
+git_branch
+```
+
 ### ensure_git_status_clean
 A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
 
 ```ruby
 ensure_git_status_clean
 ```
+
+[Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `ensure_git_status_clean` to make sure, no uncommited changes are deployed by `fastlane.
 
 ### commit_version_bump
 This action will create a "Version Bump" commit in your repo. Useful in conjunction with `increment_build_number`.
@@ -559,6 +743,8 @@ commit_version_bump(
   xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project here
 )
 ```
+
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### add_git_tag
 This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
@@ -588,6 +774,8 @@ add_git_tag(
 )
 ```
 
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
@@ -603,6 +791,8 @@ push_to_git_remote(
   force: true,              # optional, default: false
 )
 ```
+
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
@@ -626,6 +816,71 @@ reset_git_repo(
   ])
 ```
 
+[MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) uses this action to reset temporary changes of the project configuration after successfully building it.
+
+### get_github_release
+
+You can easily receive information about a specific release from GitHub.com
+
+```ruby
+release = get_github_release(url: "KrauseFx/fastlane", version: "1.0.0")
+puts release['name']
+```
+
+To get a list of all available values run `fastlane action get_github_release`.
+
+## Using mercurial
+
+### hg_ensure_clean_status
+Along the same lines as the [`ensure_git_status_clean`](#ensure_git_status_clean) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block.
+
+```ruby
+hg_ensure_clean_status
+```
+
+### hg_commit_version_bump
+The mercurial equivalent of the [`commit_version_bump`](#commit_version_bump) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](#increment_build_number).
+
+It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:
+- All .plist files
+- The `.xcodeproj/project.pbxproj` file
+
+Then commits those files to the repo.
+
+Customise the message with the `:message` option, defaults to "Version Bump"
+
+If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the `ipa` and or `sigh` actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action.
+
+```ruby
+hg_commit_version_bump
+
+hg_commit_version_bump(
+  message: 'Version Bump',                    # create a commit with a custom message
+  xcodeproj: './path/to/MyProject.xcodeproj', # optional, if you have multiple Xcode project files, you must specify your main project here
+)
+```
+
+### hg_add_tag
+A simplified version of git action [`add_git_tag`](#add_git_tag). It adds a given tag to the mercurial repo.
+
+Specify the tag name with the `:tag` option.
+
+```ruby
+hg_add_tag tag: version_number
+```
+
+### hg_push
+The mercurial equivalent of [`push_to_git_remote`](#push_to_git_remote) — pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions.
+
+```ruby
+hg_push # simple version. pushes commits from current branch to default destination
+
+hg_push(
+  destination: 'ssh://hg@repohost.com/owner/repo', # optional
+  force: true,                                     # optional, default: false
+)
+```
+
 ## Notifications
 
 ### [Slack](http://slack.com)
@@ -644,17 +899,27 @@ slack(
     'Build Date' => Time.new.to_s,
     'Built by' => 'Jenkins',
   },
-  default_payloads: [:git_branch, :git_author] # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`.
+  default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`.
+  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existings fields that were created using the `payload` property for instance.
+    thumb_url: 'http://example.com/path/to/thumb.png',
+    fields: [{
+      title: 'My Field',
+      value: 'My Value',
+      short: true
+    }]
+  }
 )
 ```
 
+Take a look at the [example projects](https://github.com/fastlane/examples) of how you can use the slack action, for example the [MindNode configuration](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile).
+
 ### [Mailgun](http://www.mailgun.com)
-Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com). 
+Send email notifications right from `fastlane` using [Mailgun](http://www.mailgun.com).
 
 ```ruby
-ENV['MAILGUN_SANDBOX_DOMAIN'] ||= "MY_SANDBOX_DOMAIN"
 ENV['MAILGUN_SANDBOX_POSTMASTER'] ||= "MY_POSTMASTER"
 ENV['MAILGUN_APIKEY'] = "MY_API_KEY"
+ENV['MAILGUN_APP_LINK'] = "MY_APP_LINK"
 
 mailgun(
   to: "fastlane@krausefx.com",
@@ -665,12 +930,13 @@ mailgun(
 or
 
 mailgun(
-  mailgun_sandbox_domain: "SANDBOX_DOMAIN",
-  mailgun_sandbox_postmaster: "MY_POSTMASTER",
-  mailgun_apikey: "MY_API_KEY",
+  postmaster: "MY_POSTMASTER",
+  apikey: "MY_API_KEY",
   to: "DESTINATION_EMAIL",
   success: true,
-  message: "Mail Body"
+  message: "Mail Body",
+  app_link: "http://www.myapplink.com",
+  ci_build_link: "http://www.mycibuildlink.com"
 )
 ```
 
@@ -702,16 +968,19 @@ Send a message to **topic** with success (:smile:) or failure (:rage:) status.
   )
 ```
 
-### [Hall](https://hall.com/)
-Post a message to a **group**
+
+### [ChatWork](http://www.chatwork.com/)
+Post a message to a **group chat**.
+
+[How to authenticate ChatWork API](http://developer.chatwork.com/ja/authenticate.html)
 
 ```ruby
-  ENV["HALL_GROUP_API_TOKEN"] = "Your Group API token" # Activate an Incoming Webhook integration to get your Group API token
+  ENV["CHATWORK_API_TOKEN"] = "Your API token"
 
-  hall(
+  chatwork(
     message: "App successfully released!",
-    title: "fastlane",
-    picture: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png"
+    roomid: 12345,
+    success: true
   )
 ```
 
@@ -721,6 +990,8 @@ Display a notification using the OS X notification centre. Uses [terminal-notifi
 ```ruby
   notify "Finished driving lane"
 ```
+
+[ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
 
 ### [Testmunk](http://testmunk.com)
 Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
@@ -742,8 +1013,8 @@ If you are using rbenv or rvm, everything should be good to go. However, if you 
 The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:
 
 ```bash
-  export GEM_HOME=~/.gems
-  export PATH=$PATH:~/.gems/bin
+export GEM_HOME=~/.gems
+export PATH=$PATH:~/.gems/bin
 ```
 
 After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
@@ -751,11 +1022,11 @@ After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to cr
 Recommended usage of the `update_fastlane` action is at the top of the `before_all` block, before running any other action:
 
 ```ruby
-  before_all do
-    update_fastlane
+before_all do
+  update_fastlane
 
-    cocoapods
-    increment_build_number
-    ...
-  end
+  cocoapods
+  increment_build_number
+  ...
+end
 ```

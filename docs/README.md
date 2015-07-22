@@ -4,11 +4,15 @@ All of the ```fastlane``` documentation is available in this directory.
 
 Check out the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started. Once you're up and running, check out all the awesome stuff you can do in [Actions.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md).
 
+Check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+
 More advanced settings and tips can be found in [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md).
 
-`Jenkins` setup is in [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
+`Jenkins` setup can be found in [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
 
 For more information about multi platform support check out [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md).
+
+You can also pass parameters to lanes from the command line. Additionally you can trigger other lanes from within your lane. Checkout [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters).
 
 ## Fastfile
 

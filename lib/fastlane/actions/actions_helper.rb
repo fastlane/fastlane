@@ -8,10 +8,7 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
-    def self.executed_actions
-      @executed_actions ||= []
-    end
-
+    # Helper Methods
     def self.git_author
       s = `git log --name-status HEAD^..HEAD`
       s = s.match(/Author:.*<(.*)>/)[1]
@@ -27,6 +24,18 @@ module Fastlane
       nil
     end
 
+    # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
+    def self.git_branch
+      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
+      s = `git rev-parse --abbrev-ref HEAD`
+      return s.to_s.strip if s.to_s.length > 0
+      nil
+    end
+
+
+    def self.executed_actions
+      @executed_actions ||= []
+    end
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
@@ -40,14 +49,16 @@ module Fastlane
 
     # Pass a block which should be tracked. One block = one testcase
     # @param step_name (String) the name of the currently built code (e.g. snapshot, sigh, ...)
+    #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
+      start = Time.now # before the raise block, since `start` is required in the ensure block
       raise 'No block given'.red unless block_given?
 
-      start = Time.now
       error = nil
       exc = nil
 
       begin
+        Helper.log_alert("Step: " + step_name) if step_name
         yield
       rescue => ex
         exc = ex
@@ -55,26 +66,35 @@ module Fastlane
       end
     ensure
       # This is also called, when the block has a return statement
-      duration = Time.now - start
+      if step_name
+        duration = Time.now - start
 
-      executed_actions << {
-        name: step_name,
-        error: error,
-        time: duration
-        # output: captured_output
-      }
+        executed_actions << {
+          name: step_name,
+          error: error,
+          time: duration
+        }
+      end
+
       raise exc if exc
     end
 
     # Execute a shell command
     # This method will output the string and execute it
-    def self.sh(command)
-      sh_no_action(command)
+    # Just an alias for sh_no_action
+    # @param log [boolean] should fastlane print out the executed command
+    def self.sh(command, log: true)
+      sh_no_action(command, log: log)
     end
 
-    def self.sh_no_action(command)
+    def self.sh_no_action(command, log: true)
+      # Set the encoding first, the user might have set it wrong
+      previous_encoding = [Encoding.default_external, Encoding.default_internal]
+      Encoding.default_external = Encoding::UTF_8
+      Encoding.default_internal = Encoding::UTF_8
+
       command = command.join(' ') if command.is_a?(Array) # since it's an array of one element when running from the Fastfile
-      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ')
+      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ') if log
 
       result = ''
       unless Helper.test?
@@ -97,14 +117,11 @@ module Fastlane
       end
 
       result
-    end
-
-    # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
-    def self.git_branch
-      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-      s = `git rev-parse --abbrev-ref HEAD`
-      return s.to_s.strip if s.to_s.length > 0
-      nil
+    rescue => ex
+      raise ex
+    ensure
+      Encoding.default_external = previous_encoding.first
+      Encoding.default_internal = previous_encoding.last
     end
 
     # returns a list of official integrations
@@ -123,7 +140,7 @@ module Fastlane
     def self.load_external_actions(path)
       raise 'You need to pass a valid path' unless File.exist?(path)
 
-      Dir[File.expand_path '*.rb', path].each do |file|
+      Dir[File.expand_path('*.rb', path)].each do |file|
         require file
 
         file_name = File.basename(file).gsub('.rb', '')

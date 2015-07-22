@@ -11,17 +11,18 @@ module Fastlane
 
       output << "# Available Actions"
       
-      all_keys = ff.runner.description_blocks.keys.reject(&:nil?) 
+      all_keys = ff.runner.lanes.keys.reject(&:nil?) 
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
         output << "## #{formatted_platform(platform)}" if platform
 
-        value = ff.runner.description_blocks[platform]
+        value = ff.runner.lanes[platform]
 
         if value
-          value.each do |lane, description|
-            output << render(platform, lane, description)          
+          value.each do |lane_name, lane|
+            next if lane.is_private
+            output << render(platform, lane_name, lane.description.join("\n\n"))          
           end
 
           output << ""
@@ -30,6 +31,7 @@ module Fastlane
         end
       end
 
+      output << "Generate this documentation by running `fastlane docs`"
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
       output << "The documentation of fastlane can be found on [GitHub](https://github.com/KrauseFx/fastlane)"
 
@@ -47,6 +49,9 @@ module Fastlane
         return pl
       end
 
+      # @param platform [String]
+      # @param lane [Fastlane::Lane]
+      # @param description [String]
       def self.render(platform, lane, description)
         full_name = [platform, lane].reject(&:nil?).join(' ')
 
