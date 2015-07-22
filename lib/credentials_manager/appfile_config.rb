@@ -66,23 +66,39 @@ module CredentialsManager
 
     # Setters
 
-    def app_identifier(value)
-      value ||= yield if block_given?
+    def app_identifier(*args, &block)
+      if block_given?
+        value = yield
+      else
+        value = args.shift
+      end
       data[:app_identifier] = value if value
     end
 
-    def apple_id(value)
-      value ||= yield if block_given?
+    def apple_id(*args, &block)
+      if block_given?
+        value = yield
+      else
+        value = args.shift
+      end
       data[:apple_id] = value if value
     end
 
-    def team_id(value)
-      value ||= yield if block_given?
+    def team_id(*args, &block)
+      if block_given?
+        value = yield
+      else
+        value = args.shift
+      end
       data[:team_id] = value if value
     end
 
-    def team_name(value)
-      value ||= yield if block_given?
+    def team_name(*args, &block)
+      if block_given?
+        value = yield
+      else
+        value = args.shift
+      end
       data[:team_name] = value if value
     end
 
@@ -95,7 +111,7 @@ module CredentialsManager
     #             be applied.
     def for_lane(lane_name, &block)
       raise "Configuration for lane '#{lane_name}' is defined multiple times!".red if blocks[lane_name]
-      if ENV["FASTLANE_PLATFORM_NAME"].nil?
+      if ENV["FASTLANE_PLATFORM_NAME"].to_s.strip.empty?
         # No platform specified, assigned configuration by lane name
         blocks[lane_name.to_s] = block
       else
