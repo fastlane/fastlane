@@ -46,7 +46,7 @@ app = Spaceship::Tunes::Application.create!(name: "App Name",
 
 ## AppVersions
 
-<img src="/assets/AppVersions.png" width="500">
+<img src="/assets/docs/AppVersions.png" width="500">
 
 You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
 
@@ -81,6 +81,86 @@ v.description["English"] = "App Description"
 # Push the changes back to the server
 v.save!
 ```
+
+## Build Trains
+
+<img src="/assets/docs/BuildTrains.png" width="700">
+
+- **version number**: Is set via the `CFBundleShortVersionString` property. It's the version number that appears on the App Store.
+- **build number**: Is set via the `CFBundleVersion` property. It's not visible in the App Store. It has to be incrememented before uploading a new build.
+
+A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
+
+```ruby
+# Access the build train via the version number
+train = app.build_trains["0.9.21"]
+
+train.version_string          # => "0.9.21"
+train.testing_enabled         # => false, as testing is enabled for 0.9.20
+
+# Access all builds for a given train
+train.builds.count            # => 1
+build = train.builds.first
+```
+
+## Builds
+
+```ruby
+# continue from the BuildTrains example
+build.build_version           # => "99993"  (the build number)
+build.train_version           # => "0.9.21" (the version number)
+build.install_count           # => 1
+build.crash_count             # => 0
+
+build.testing_status          # => "Internal" or "External" or "Expired" or "Inactive"
+```
+
+You can even submit a build for external beta review
+```ruby
+parameters = {
+  changelog: "Awesome new features",
+  description: "Why would I want to provide that?",
+  feedback_email: "contact@company.com",
+  marketing_url: "http://marketing.com",
+  first_name: "Felix",
+  last_name: "Krause",
+  review_email: "contact@company.com",
+  phone_number: "0123456789",
+
+  # Optional Metadata:
+  privacy_policy_url: nil,
+  review_notes: nil,
+  review_user_name: nil,
+  review_password: nil,
+  encryption: false
+}
+build.submit_for_beta_review!(parameters)
+```
+
+## Processing builds
+
+To also access those builds that are "stuck" at `Processing` at iTunes Connect for a while:
+
+```ruby
+app.all_processing_builds       # => Array of processing builds for this application
+```
+
+## Submit app for App Store Review
+
+```ruby
+submission = app.create_submission
+
+# set app submission information
+submission.content_rights_contains_third_party_content = true
+submission.content_rights_has_rights = true
+submission.add_id_info_uses_idfa = false
+
+# finalize app submission
+submission.complete!
+```
+
+For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_submission.rb).
+
 
 ### License
 

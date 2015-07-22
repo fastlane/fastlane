@@ -212,7 +212,7 @@ app.delete!
 
 ## Example Data
 
-Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/provisioning_profile.rb) for all available attributes.
+Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/portal/provisioning_profile.rb) for all available attributes.
 
 The example data below is a provisioning profile, containing a device, certificate and app. 
 
