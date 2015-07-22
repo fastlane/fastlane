@@ -8,7 +8,7 @@ module Deliver
     def self.upload!(ipa_path, app_id, skip_deploy)
       ItunesTransporter.hide_transporter_output
 
-      app_identifier = IpaFileAnalyser.fetch_app_identifier(ipa_path)
+      app_identifier = FastlaneCore::IpaFileAnalyser.fetch_app_identifier(ipa_path)
       app_identifier ||= ENV["TESTFLIGHT_APP_IDENTITIFER"] || ask("Could not automatically find the app identifier, please enter the app's bundle identifier: ")
       app_id ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId'] rescue nil)
       app_id ||= (FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier) rescue nil)
