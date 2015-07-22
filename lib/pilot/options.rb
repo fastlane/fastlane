@@ -66,13 +66,6 @@ module Pilot
                                      verify_block: proc do |_value|
                                         raise "Please pass a valid email address" unless _value.include?"@"
                                      end),
-        FastlaneCore::ConfigItem.new(key: :group_name,
-                                     short_option: "-g",
-                                     env_name: "PILOT_TESTER_GROUP",
-                                     description: "Group to add the tester to",
-                                     optional: true,
-                                     verify_block: proc do |_value|
-                                     end),
         FastlaneCore::ConfigItem.new(key: :testers_file_path,
                                      short_option: "-c",
                                      env_name: "PILOT_TESTERS_FILE",

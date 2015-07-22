@@ -14,8 +14,7 @@ module Pilot
         else
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
-                                                              last_name: config[:last_name],
-                                                              group: config[:group_name])
+                                                              last_name: config[:last_name])
           Helper.log.info "Successfully invited tester: #{tester.email}".green
         end
         
