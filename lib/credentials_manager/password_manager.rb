@@ -50,18 +50,8 @@ module CredentialsManager
     # This will ask the user, if he wants to re-enter the password
     def password_seems_wrong
       puts "It seems like the username or password for the account '#{self.username}' is wrong.".red
-      reenter = agree("Do you want to re-enter your username and password? (y/n)", true)
-      if reenter
-        remove_from_keychain
-
-        @username = nil
-        @password = nil
-
-        puts "You will have to re-run the recent command to use the new username/password.".yellow
-        return true
-      else
-        return false
-      end
+      puts "Please open the Keychain app, switch to `Passwords` and search for `deliver.`".red
+      puts "You can then either remove the outdated entry or directly update it.".red
     end
 
     private
