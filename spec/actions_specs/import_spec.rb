@@ -38,7 +38,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             import('tmp/asdf')
           end").runner.execute(:test)
-        }.to raise_error(/Could not find Fastfile at path \'\/Users/)
+        }.to raise_error(/Could not find Fastfile at path \'\/(home|Users)/) # /home (travis) # /Users (Mac)
       end
     end
   end
