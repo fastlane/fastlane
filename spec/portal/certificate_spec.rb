@@ -9,6 +9,10 @@ describe Spaceship::Certificate do
       expect(Spaceship::Portal::Certificate.all.count).to eq(3)
     end
 
+    it "inspect works" do
+      expect(Spaceship::Portal::Certificate.all.first.inspect).to include("Portal::Certificate")
+    end
+
     it "parses code signing identities correctly" do
       cert = Spaceship::Portal::Certificate.all.first
 

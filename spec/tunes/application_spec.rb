@@ -5,6 +5,11 @@ describe Spaceship::Application do
   let(:client) { Spaceship::Application.client }
 
   describe "successfully loads and parses all apps" do
+
+    it "inspect works" do
+      expect(Spaceship::Application.all.first.inspect).to include("Tunes::Application")
+    end
+
     it "the number is correct" do
       expect(Spaceship::Application.all.count).to eq(6)
     end

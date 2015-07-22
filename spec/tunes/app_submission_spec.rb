@@ -6,6 +6,7 @@ describe Spaceship::AppSubmission do
   let(:client) { Spaceship::AppSubmission.client }
   let (:app) { Spaceship::Application.all.first }
 
+
   describe "successfully creates a new app submission" do
     it "generates a new app submission from iTunes Connect response" do
       itc_stub_app_submissions

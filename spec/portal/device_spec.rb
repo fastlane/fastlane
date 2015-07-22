@@ -15,6 +15,11 @@ describe Spaceship::Device do
     expect(device.status).to eq('c')
   end
 
+
+  it "inspect works" do
+    expect(subject.first.inspect).to include("Portal::Device")
+  end
+
   describe "#find" do
     it "finds a device by its ID" do
       device = Spaceship::Device.find("AAAAAAAAAA")

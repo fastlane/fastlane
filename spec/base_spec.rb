@@ -11,6 +11,15 @@ describe Spaceship::Base do
       expect(output).to include"B7JBD8LHAA"
       expect(output).to include"The App Name"
     end
+
+    it "prints out references" do
+      Spaceship::Tunes.login
+      app = Spaceship::Application.all.first
+      v = app.live_version
+      output = v.inspect
+      expect(output).to include"Tunes::AppVersion"
+      expect(output).to include"Tunes::Application"
+    end
   end
 
   it "allows modification of values and properly retrieving them" do

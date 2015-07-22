@@ -96,11 +96,11 @@ How fast are tools using `spaceship` compared to web scraping?
 
 ## Apple Developer Portal API
 
-#### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
+##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
 ## iTunes Connect API
 
-#### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
+##### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
 
 ### Spaceship in use
 

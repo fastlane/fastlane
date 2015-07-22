@@ -9,6 +9,10 @@ describe Spaceship::Tunes::Build do
   describe "properly parses the build from the train" do
     let (:app) { Spaceship::Application.all.first }
 
+    it "inspect works" do
+      expect(Spaceship::Application.all.first.build_trains.values.first.builds.first.inspect).to include("Tunes::Build")
+    end
+
     it "filled in all required values" do
       train = app.build_trains.values.first
       build = train.builds.first

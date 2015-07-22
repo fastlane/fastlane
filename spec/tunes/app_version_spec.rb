@@ -7,6 +7,11 @@ describe Spaceship::AppVersion do
   let (:app) { Spaceship::Application.all.first }
 
   describe "successfully loads and parses the app version" do
+
+    it "inspect works" do
+      expect(app.edit_version.inspect).to include("Tunes::AppVersion")
+    end
+
     it "parses the basic version details correctly" do
       version = app.edit_version
 

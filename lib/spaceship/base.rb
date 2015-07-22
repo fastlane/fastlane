@@ -184,13 +184,50 @@ module Spaceship
       @client
     end
 
+    #####################################################
+    # @!group Storing the `attr_accessor`
+    #####################################################
+
+    # From https://stackoverflow.com/questions/2487333/fastest-one-liner-way-to-list-attr-accessors-in-ruby
+    # This will store a list of defined attr_accessors to easily access them when inspecting the values
+    def self.attr_accessor(*vars)
+      @attributes ||= []
+      @attributes.concat vars
+      super(*vars)
+    end
+
+    def self.attributes
+      @attributes ||= []
+      par = []
+
+      par = (self.superclass.attributes || []) unless (self == Base)
+
+      @attributes + par
+    end
+
+    def attributes
+      self.class.attributes
+    end
+
+    #####################################################
+    # @!group Inspect related code
+    #####################################################
+
     def inspect
-      inspectables = instance_variables - [:@client]
-      inspect_vars = inspectables.map do |ivar|
-         val = instance_variable_get(ivar)
-         "#{ivar}=#{val.inspect}"
-      end
-      "\n#<#{self.class.name}\n\t#{inspect_vars.join("\n\t")}>"
+      inspectables = self.attributes
+
+      value = inspectables.map do |k|
+        v = self.send(k).inspect
+        v.gsub!("\n", "\n\t") # to align nested elements
+
+        "\t#{k}=#{v}"
+      end.join(", \n")
+
+      "<#{self.class.name} \n#{value}>"
+    end
+
+    def to_s
+      self.inspect
     end
   end
 end

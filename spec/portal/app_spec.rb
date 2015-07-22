@@ -9,6 +9,10 @@ describe Spaceship::Portal::App do
       expect(Spaceship::Portal::App.all.count).to eq(5)
     end
 
+    it "inspect works" do
+      expect(Spaceship::Portal::App.all.first.inspect).to include("Portal::App")
+    end
+
     it "parses app correctly" do
       app = Spaceship::Portal::App.all.first
 
