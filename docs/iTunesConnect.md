@@ -86,8 +86,10 @@ v.save!
 
 <img src="/assets/docs/BuildTrains.png" width="700">
 
-- **version number**: Is set via the `CFBundleShortVersionString` property. It's the version number that appears on the App Store.
-- **build number**: Is set via the `CFBundleVersion` property. It's not visible in the App Store. It has to be incrememented before uploading a new build.
+To clarify:
+
+- **version number**: Is set via the `CFBundleShortVersionString` property. It's the version number that appears on the App Store. (`0.9.21` on the screenshot)
+- **build number**: Is set via the `CFBundleVersion` property. It's not visible in the App Store. It has to be incrememented before uploading a new build. (`99993` on the screenshot)
 
 A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
 
@@ -101,12 +103,17 @@ train.testing_enabled         # => false, as testing is enabled for 0.9.20
 # Access all builds for a given train
 train.builds.count            # => 1
 build = train.builds.first
+
+# Enable beta testing for a build train
+# This will put the latest build into beta testing mode
+# and turning off beta testing for all other build trains
+train.update_testing_status!(true)
 ```
 
 ## Builds
 
 ```ruby
-# continue from the BuildTrains example
+# Continue from the BuildTrains example
 build.build_version           # => "99993"  (the build number)
 build.train_version           # => "0.9.21" (the version number)
 build.install_count           # => 1
@@ -150,17 +157,49 @@ app.all_processing_builds       # => Array of processing builds for this applica
 ```ruby
 submission = app.create_submission
 
-# set app submission information
+# Set app submission information
 submission.content_rights_contains_third_party_content = true
 submission.content_rights_has_rights = true
 submission.add_id_info_uses_idfa = false
 
-# finalize app submission
+# Finalize app submission
 submission.complete!
 ```
 
 For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_submission.rb).
 
+## Testers
+
+There are 2 types of testers:
+
+- **External testers**: usually not part of your team. You can invite up to 1000/2000 external testers. Before distributing a build to those testers you need to submit your app to beta review.
+- **Internal testers**: Employees that are registered in your iTunes Connect team. They get access to all builds without having to wait for review.
+
+```ruby
+# Find an internal tester based on the email address
+tester = Spaceship::Tunes::Tester::Internal.find("felix@krausefx.com")
+
+# Same for external testers
+tester = Spaceship::Tunes::Tester::External.find("guest@krausefx.com")
+
+# Find all testers that were already added to an application
+testers = Spaceship::Tunes::Tester::External.all_by_app(794902327)
+# Or
+app.external_testers
+
+
+# Creating new external testers
+Spaceship::Tunes::Tester::External.create!(email: "github@krausefx.com",
+                                      first_name: "Felix",
+                                       last_name: "Krause")
+
+# Add all external testers to an application
+app.add_all_testers!
+
+# Only add selected testers to an application
+# This will add the existing tester (if available) or create a new one
+app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last_name: "Krause")
+```
 
 ### License
 
