@@ -81,7 +81,9 @@ To create new screenshots automatically, check out my other open source project 
 
 # TestFlight
 
-To upload a new build to Apple `TestFlight` use the following command:
+**New**: To upload builds to TestFlight, use the new [pilot](https://github.com/fastlane/pilot) tool.
+
+Upload a new build to Apple `TestFlight` use the following command:
 
 ```
 deliver testflight
@@ -95,16 +97,10 @@ Make sure to increase your build number before building and uploading your app.
 
 #### More options:
 
-Specify the `ipa` file to be used: 
+Specify the `ipa` file, the Apple ID and app identifier to be used: 
 
 ```
-deliver testflight ./my_app.ipa
-```
-
-Pass the Apple ID and App ID to be used (optional):
-
-```
-deliver testflight -u felix@krausefx.com -a 862582703
+deliver testflight ./my_app.ipa -u felix@krausefx.com -a 862582703
 ```
 
 To build and upload the ipa in one step, you can use [shenzhen](https://github.com/nomad/shenzhen):
