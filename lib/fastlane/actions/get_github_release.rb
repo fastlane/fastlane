@@ -8,7 +8,25 @@ module Fastlane
       def self.run(params)
         Helper.log.info "Verifying release on GitHub (#{params[:url]}: #{params[:version]})"
         require 'excon'
-        result = JSON.parse(Excon.get("https://api.github.com/repos/#{params[:url]}/releases").body)
+        require 'base64'
+        headers = { 'User-Agent' => 'fastlane-get_github_release' }
+        headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
+        response = Excon.get("https://api.github.com/repos/#{params[:url]}/releases", :headers => headers)
+        case response[:status]
+        when 404
+          Helper.logger.error "Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+          return nil
+        when 401
+          Helper.logger.error "You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.".red
+          return nil
+        else
+          if response[:status] != 200
+            Helper.logger.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+            return nil
+          end
+        end
+        
+        result = JSON.parse(response.body)
         result.each do |current|
           if current['tag_name'] == params[:version]
             # Found it
@@ -96,7 +114,11 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_GET_GITHUB_RELEASE_VERSION",
-                                       description: "The version tag of the release to check")
+                                       description: "The version tag of the release to check"),
+          FastlaneCore::ConfigItem.new(key: :api_token,
+                             env_name: "FL_GET_GITHUB_RELEASE_API_TOKEN",
+                             description: "GitHub Personal Token (required for private repositories)",
+                             optional: true)
         ]
       end
 
