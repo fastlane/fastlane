@@ -10,7 +10,6 @@ lane :release do |options|
   # Fetching all information required for the release
   # 
   tool_name = options[:tool] || File.basename(File.expand_path('..', Dir.pwd))
-  module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
   binary_path = "../../#{tool_name}/bin/#{tool_name}"
 
   github_organisation = "fastlane"
@@ -19,9 +18,12 @@ lane :release do |options|
   # Verifying RubyGems version
   # 
   require "../lib/#{tool_name}/version"
+  module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
   version = module_ref::VERSION
   puts "Deploying #{tool_name} #{version}"
-  raise "Version number #{version} was already deployed" if current_version(tool: tool_name) == version
+  if Gem::Version.new(version) <= Gem::Version.new(current_version(tool: tool_name))
+    raise "Version number #{version} was already deployed"
+  end
 
   # Verifying the --help command
   # 
