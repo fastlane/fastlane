@@ -81,13 +81,16 @@ module Spaceship
         # @param sku (String): A unique ID for your app that is not visible on the App Store.
         # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It 
         #   can't be changed after you submit your first build.
-        def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil)
+        # @param company_name (String): The company name or developer name to display on the App Store for your apps.
+        # It cannot be changed after you create your first app.
+        def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
           client.create_application!(name: name, 
                          primary_language: primary_language, 
                                   version: version, 
                                       sku: sku, 
                                 bundle_id: bundle_id,
-                                bundle_id_suffix: bundle_id_suffix)
+                                bundle_id_suffix: bundle_id_suffix,
+                                company_name: company_name)
         end
       end
 

@@ -45,6 +45,21 @@ def itc_stub_applications
          to_return(:status => 200, :body => itc_read_fixture_file('create_application_success.json'), headers: {'Content-Type' => 'application/json'})
 end
 
+def itc_stub_applications_first_create
+  # Create First Application
+  # Pre-Fill request
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('create_application_prefill_first_request.json'), headers: {'Content-Type' => 'application/json'})
+  # end
+end
+
+def itc_stub_applications_broken_first_create
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => itc_read_fixture_file('create_application_first_broken.json'), headers: {'Content-Type' => 'application/json'})
+end
+
 def itc_stub_broken_create
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/json', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
