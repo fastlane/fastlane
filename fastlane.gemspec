@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'nokogiri', '~> 1.6' # generating JUnit reports for Jenkins
-  spec.add_dependency 'krausefx-shenzhen', '= 0.14.4' # to upload to Hockey and Crashlytics
+  spec.add_dependency 'krausefx-shenzhen', '>= 0.14.4' # to upload to Hockey and Crashlytics
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
   spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
   spec.add_dependency 'xcodeproj', '~> 0.20' # Needed for commit_version_bump action
