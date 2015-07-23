@@ -30,13 +30,9 @@ module Fastlane
         result.each do |current|
           if current['tag_name'] == params[:version]
             # Found it
-            if current['body'].to_s.length > 0
-              Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
-              Helper.log.info "Version is already live on GitHub.com 🚁"
-              return current
-            else
-              raise "No release notes found for #{params[:version]}"
-            end
+            Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
+            Helper.log.info "Version is already live on GitHub.com 🚁"
+            return current
           end 
         end
 
