@@ -102,7 +102,8 @@ module Spaceship
       def setup
         super
 
-        @external_testing_enabled = (self.external_expiry_date || 0) > 0
+        self.external_expiry_date ||= 0
+        @external_testing_enabled = self.external_expiry_date > 0
       end
 
       # This will submit this build for TestFlight beta review
