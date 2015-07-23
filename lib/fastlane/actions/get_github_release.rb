@@ -119,7 +119,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        ["KrauseFx", "czechboy0"]
       end
 
       def self.is_supported?(platform)
