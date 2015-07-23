@@ -1,17 +1,17 @@
 module Fastlane
   module Actions
     module SharedValues
-      SET_GITHUB_RELEASE_CUSTOM_VALUE = :SET_GITHUB_RELEASE_CUSTOM_VALUE
+      SET_GITHUB_RELEASE_HTML_LINK = :SET_GITHUB_RELEASE_HTML_LINK
     end
 
     class SetGithubReleaseAction < Action
       def self.run(params)
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
-        Helper.log.info "Parameter API Token: #{params[:api_token]}"
+
+        Helper.log.info "Repo #{params[:repository_name]}, tag #{params[:tag_name]}."
 
         # sh "shellcommand ./path"
 
-        # Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_CUSTOM_VALUE] = "my_val"
+        # Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = "my_val"
       end
 
 
@@ -82,7 +82,6 @@ module Fastlane
 
       def self.output
         [
-          # output will be: success, html link to the release?
           ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release']
         ]
       end
