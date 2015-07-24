@@ -2,19 +2,56 @@ module Fastlane
   module Actions
     module SharedValues
       SET_GITHUB_RELEASE_HTML_LINK = :SET_GITHUB_RELEASE_HTML_LINK
+      SET_GITHUB_RELEASE_RELEASE_ID = :SET_GITHUB_RELEASE_RELEASE_ID
     end
 
     class SetGithubReleaseAction < Action
       def self.run(params)
 
-        Helper.log.info "Repo #{params[:repository_name]}, tag #{params[:tag_name]}."
+        Helper.log.info "Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".".yellow
 
-        # sh "shellcommand ./path"
+        require 'json'
+        body = {
+          'tag_name' => params[:tag_name],
+          'target_commitish' => params[:commitish],
+          'name' => params[:name],
+          'body' => params[:description],
+          'draft' => params[:is_draft],
+          'prerelease' => params[:is_prerelease]
+        }.to_json
 
-        # Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = "my_val"
+        require 'excon'
+        require 'base64'
+        headers = { 'User-Agent' => 'fastlane-set_github_release' }
+        headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
+        response = Excon.post("https://api.github.com/repos/#{params[:repository_name]}/releases", 
+          :headers => headers,
+          :body => body
+          )
+
+        case response[:status]
+        when 201
+          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub!".green
+          body = JSON.parse(response.body)
+          html_url = body['html_url']
+          release_id = body['id']
+          Helper.log.info "See release at \"#{html_url}\"".yellow
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
+          return html_url
+        when 422
+          Helper.log.error "Release on tag #{params[:tag_name]} already exists!".red
+        when 404
+          Helper.log.error "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+        when 401
+          Helper.log.error "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
+        else
+          if response[:status] != 200
+            Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+          end
+        end
+        return nil
       end
-
-
 
       #####################################################
       # @!group Documentation
@@ -25,15 +62,13 @@ module Fastlane
       end
 
       def self.details
-        # Optional:
-        # this is your change to provide a more detailed description of this action
-        "You can use this action to do cool things"
+        "Creates a new release on GitHub. You must provide your GitHub Personal token, the repository name
+        and tag name. If the tag doesn't exist, one will be created on the commit or branch passed-in as
+        commitish. Out parameters provide the release's id, which can be used for later editing and the 
+        release html link to GitHub."
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :repository_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
@@ -82,7 +117,8 @@ module Fastlane
 
       def self.output
         [
-          ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release']
+          ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release'],
+          ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)']
         ]
       end
 
