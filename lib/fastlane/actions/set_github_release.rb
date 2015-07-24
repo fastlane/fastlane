@@ -42,9 +42,9 @@ module Fastlane
         when 422
           Helper.log.error "Release on tag #{params[:tag_name]} already exists!".red
         when 404
-          Helper.log.error "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+          raise "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
         when 401
-          Helper.log.error "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
+          raise "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
         else
           if response[:status] != 200
             Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
