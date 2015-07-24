@@ -12,7 +12,7 @@ module Fastlane
           user_input = STDIN.gets.chomp.strip
         else
           # Multi line
-          end_tag = paramsp[:multi_line_end_keyword]
+          end_tag = params[:multi_line_end_keyword]
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         end
 
