@@ -71,7 +71,7 @@ end
 ## Shell values
 You can get value from shell commands:
 ```ruby
-app_version = sh("cd .. && agvtool what-marketing-version -terse1 | tr -d '\n'")
+app_version = sh("pod update")
 ```
 
 ## Importing another Fastfile
