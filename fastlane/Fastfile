@@ -42,7 +42,7 @@ lane :release do |options|
       name: [version, title].join(" "),
       tag_name: version,
       description: description,
-      is_draft: true
+      is_draft: false
     )
 
     # Fetch the latest release to accesss all its values
@@ -83,12 +83,12 @@ lane :release do |options|
   slack(
     channel: "releases",
     default_payloads: [],
-    message: "Successfully released [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) #{version} :rocket:",
+    message: "Successfully released [#{tool_name} #{version}](github_release['html_url']) :rocket:",
     payload: {
       "New" => github_release['body']
     }
   )
-  
+
   puts "You can now tweet:".green
   puts "[#{tool_name}] #{github_release['name']} #{github_release['html_url']}"
 end
