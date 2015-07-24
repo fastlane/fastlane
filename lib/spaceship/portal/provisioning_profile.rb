@@ -217,11 +217,24 @@ module Spaceship
             end
           end
 
-          profile = client.create_provisioning_profile!(name,
-                                                self.type,
-                                                app.app_id,
-                                                certificate_parameter,
-                                                devices.map {|d| d.id} )
+          def send_create_request(name, type, app_id, certificate_parameter, devices)
+            tries ||= 5
+            client.create_provisioning_profile!(name, type, app_id, certificate_parameter, devices)
+          rescue => ex 
+            unless (tries -= 1).zero?
+              sleep 3
+              retry
+            end
+
+            raise ex # re-raise the exception
+          end
+
+          profile = send_create_request(name,
+                                        self.type,
+                                        app.app_id,
+                                        certificate_parameter,
+                                        devices.map {|d| d.id} )
+          
           self.new(profile)
         end
 
@@ -326,7 +339,25 @@ module Spaceship
           end
         end
 
-        client.repair_provisioning_profile!(
+        def send_update_request(id, name, distribution_method, app_id, certificates, devices)
+          tries ||= 5
+          client.repair_provisioning_profile!(
+            id,
+            name,
+            distribution_method,
+            app_id,
+            certificates,
+            devices
+          )
+        rescue => ex 
+          unless (tries -= 1).zero?
+            sleep 3
+            retry
+          end
+          raise ex # re-raise the exception
+        end
+
+        send_update_request(
           self.id,
           self.name,
           self.distribution_method,

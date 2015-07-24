@@ -27,7 +27,7 @@ module Spaceship
         url = host + request(:get, self.class.hostname).body.match(/action="(\/WebObjects\/iTunesConnect.woa\/wo\/.*)"/)[1]
         raise "" unless url.length > 0
 
-        File.write(cache_path, url) # TODO
+        File.write(cache_path, url)
         return url
       rescue => ex
         puts ex
