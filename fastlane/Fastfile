@@ -1,8 +1,4 @@
 
-lane :hd do
-  set_github_release
-end
-
 desc "Run bundle install and tests"
 lane :test do
   sh "cd .. && bundle install"
