@@ -64,7 +64,7 @@ describe Spaceship::Application do
 
     describe "#create!" do
       it "works with valid data and defaults to English" do
-        Spaceship::Tunes::Application.create!(name: "My Name", 
+        Spaceship::Tunes::Application.create!(name: "My name",
                                               version: "1.0", 
                                               sku: "SKU123", 
                                               bundle_id: "net.sunapps.123")
@@ -73,7 +73,7 @@ describe Spaceship::Application do
       it "raises an error if something is wrong" do
         itc_stub_broken_create
         expect {
-          Spaceship::Tunes::Application.create!(name: "My Name", 
+          Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0", 
                                                 sku: "SKU123", 
                                                 bundle_id: "net.sunapps.123")
@@ -83,11 +83,32 @@ describe Spaceship::Application do
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
         itc_stub_broken_create_wildcard
         expect {
-          Spaceship::Tunes::Application.create!(name: "My Name", 
+          Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0", 
                                                 sku: "SKU123", 
                                                 bundle_id: "net.sunapps.*")
         }.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+      end
+    end
+
+    describe "#create! first app" do
+      it "works with valid data and defaults to English" do
+        itc_stub_applications_first_create
+        Spaceship::Tunes::Application.create!(name: "My Name",
+                                              version: "1.0",
+                                              sku: "SKU123",
+                                              bundle_id: "net.sunapps.123",
+                                              company_name: "SunApps GmbH")
+      end
+
+      it "raises an error if something is wrong" do
+        itc_stub_applications_broken_first_create
+        expect {
+          Spaceship::Tunes::Application.create!(name: "My Name",
+                                                version: "1.0",
+                                                sku: "SKU123",
+                                                bundle_id: "net.sunapps.123")
+        }.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
       end
     end
 
