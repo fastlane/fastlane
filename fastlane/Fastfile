@@ -44,6 +44,9 @@ lane :release do |options|
       description: description,
       is_draft: true
     )
+
+    # Fetch the latest release to accesss all its values
+    github_release = get_github_release(url: github_url, version: version)
   end
   
   # Verifying the --help command
@@ -71,8 +74,6 @@ lane :release do |options|
   git_pull
   push_to_git_remote
 
-  puts "Found '#{info['name']}'".green
-
   # Actual release
   # 
   sh "gem push ../pkg/#{tool_name}-#{version}.gem"
@@ -84,11 +85,12 @@ lane :release do |options|
     default_payloads: [],
     message: "Successfully released [#{tool_name}](https://github.com/#{github_organisation}/#{tool_name}) #{version} :rocket:",
     payload: {
-      "New" => info['body']
+      "New" => github_release['body']
     }
   )
+  
   puts "You can now tweet:".green
-  puts "[#{tool_name}] #{info['name']} #{info['html_url']}"
+  puts "[#{tool_name}] #{github_release['name']} #{github_release['html_url']}"
 end
 
 
