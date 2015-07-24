@@ -165,6 +165,7 @@ module Fastlane
     def import(path = nil)
       raise "Please pass a path to the `import` action".red unless path
 
+      path = path.dup.gsub("~", Dir.home)
       unless Pathname.new(path).absolute? # unless an absolute path
         path = File.join(File.expand_path('..', @path), path)
       end
