@@ -14,17 +14,38 @@ lane :release do |options|
 
   github_organisation = "fastlane"
   github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
+  github_url = [github_organisation, tool_name].join("/")
 
   # Verifying RubyGems version
   # 
   require "../lib/#{tool_name}/version"
   module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
   version = module_ref::VERSION
+  old_version = current_version(tool: tool_name)
   puts "Deploying #{tool_name} #{version}"
-  if Gem::Version.new(version) <= Gem::Version.new(current_version(tool: tool_name))
+  if Gem::Version.new(version) <= Gem::Version.new(old_version)
     raise "Version number #{version} was already deployed"
   end
 
+  # Preparing GitHub Release
+  # 
+  github_release = get_github_release(url: github_url, version: version)
+  if (github_release || {}).fetch('body', '').length == 0
+    `open https://github.com/#{github_url}/compare/#{old_version}...master`
+
+    title = prompt(text: 'Title: ')
+    description = prompt(text: "Please enter a changelog: ",
+                         multi_line_end_keyword: "END")
+
+    set_github_release(
+      repository_name: github_url,
+      name: [version, title].join(" "),
+      tag_name: version,
+      description: description,
+      is_draft: true
+    )
+  end
+  
   # Verifying the --help command
   # 
   unless no_binary.include?tool_name
@@ -49,14 +70,6 @@ lane :release do |options|
   ensure_git_branch(branch: 'master')
   git_pull
   push_to_git_remote
-  
-  # GitHub verification
-  # 
-  info = get_github_release(url: "#{github_organisation}/#{tool_name}", version: version)
-  unless info
-    `open 'https://github.com/#{github_organisation}/#{tool_name}/releases/new'`
-    raise "No release on GitHub found".red 
-  end
 
   puts "Found '#{info['name']}'".green
 
