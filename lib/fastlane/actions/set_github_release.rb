@@ -79,7 +79,7 @@ module Fastlane
                                           raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: "FL_SET_GITHUB_RELEASE_API_TOKEN",
+                                       env_name: "FL_GITHUB_RELEASE_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        is_string: true,
                                        optional: false),

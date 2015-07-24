@@ -12,6 +12,7 @@ module Fastlane
         headers = { 'User-Agent' => 'fastlane-get_github_release' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
         response = Excon.get("https://api.github.com/repos/#{params[:url]}/releases", :headers => headers)
+
         case response[:status]
         when 404
           Helper.log.error "Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
@@ -112,7 +113,7 @@ module Fastlane
                                        env_name: "FL_GET_GITHUB_RELEASE_VERSION",
                                        description: "The version tag of the release to check"),
           FastlaneCore::ConfigItem.new(key: :api_token,
-                             env_name: "FL_GET_GITHUB_RELEASE_API_TOKEN",
+                             env_name: "FL_GITHUB_RELEASE_API_TOKEN",
                              description: "GitHub Personal Token (required for private repositories)",
                              optional: true)
         ]
