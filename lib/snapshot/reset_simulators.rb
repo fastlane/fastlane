@@ -27,7 +27,13 @@ module Snapshot
         end
       end
 
+      # device_types
+      #  ["iPhone 5", "com.apple.CoreSimulator.SimDeviceType.iPhone-5"],
+      #  ["iPhone 5s", "com.apple.CoreSimulator.SimDeviceType.iPhone-5s"],
+      #  ["iPhone 6", "com.apple.CoreSimulator.SimDeviceType.iPhone-6"],
       device_types.each do |device_type|
+        next if device_type.first.include?"Watch" # we don't want to deal with the Watch right now
+
         puts "Creating #{device_type} for iOS version #{ios_version}"
         command = "xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{ios_version}"
         command_output = `#{command}`
