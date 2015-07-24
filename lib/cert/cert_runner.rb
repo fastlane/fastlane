@@ -36,6 +36,8 @@ module Cert
           Helper.log.info "Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.".green
 
           return path
+        else
+          Helper.log.info "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
       end
 
