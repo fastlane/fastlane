@@ -472,7 +472,18 @@
                                 "errorKeys": null
                             },
                             "ipad": {
-                                "value": null,
+                                "value": {
+                                    "videoAssetToken": null,
+                                    "pictureAssetToken": null,
+                                    "descriptionXML": null,
+                                    "previewFrameTimeCode": "00:05",
+                                    "isPortrait": false,
+                                    "videoUrl": "http://a1713.phobos.apple.com/us/r30/PurpleVideo7/v4/be/38/db/be38db8d-868a-d442-87dc-cb6d630f921e/P37134684_default.m3u8",
+                                    "previewImageUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleVideo5/v4/b7/41/5e/b7415e96-5ad5-6cf5-9323-15122145e53f/Job21976428-61a9-456b-af46-26c1303ae607-91524171-PreviewImage_AppTrailer_quicktime-Time1438426738374.png/500x500bb-80.png",
+                                    "fullSizedPreviewImageUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleVideo5/v4/b7/41/5e/b7415e96-5ad5-6cf5-9323-15122145e53f/Job21976428-61a9-456b-af46-26c1303ae607-91524171-PreviewImage_AppTrailer_quicktime-Time1438426738374.png/900x1200ss-80.png",
+                                    "contentType": null,
+                                    "videoStatus": "Done"
+                                },
                                 "isEditable": false,
                                 "isRequired": false,
                                 "errorKeys": null

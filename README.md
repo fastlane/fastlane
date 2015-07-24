@@ -149,6 +149,8 @@ I won't go into too much technical details about the various API endpoints, but 
  - Managing beta testers
  - Submitting updates to review
  - Manaing app metadata
+- `https://du-itc.itunesconnect.apple.com`:
+ - Upload icons, screenshots, trailers ...
 
 `spaceship` uses all those API points to offer this seamless experience.
 

@@ -5,6 +5,29 @@ module Spaceship
     class ITunesConnectError < StandardError
     end
 
+    attr_reader :du_client
+
+    def initialize
+      super
+
+      @du_client = DUClient.new
+    end
+
+    class << self
+      # trailer preview screenshots are required to have a specific size
+      def video_preview_resolution_for(device, is_portrait)
+        resolutions = {
+            iphone4: [1136, 640],
+            iphone6: [1334, 750],
+            iphone6Plus: [2208, 1242],
+            ipad: [1024, 768]
+        }
+        r = resolutions[device]
+        r = [r[1], r[0]] if is_portrait
+        r
+      end
+    end
+
     #####################################################
     # @!group Init and Login
     #####################################################
@@ -208,6 +231,93 @@ module Spaceship
       end
 
       handle_itc_response(r.body)
+    end
+
+    #####################################################
+    # @!group App Icons
+    #####################################################
+    # Uploads a large icon
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the response
+    def upload_large_icon(app_version, upload_image)
+      raise "app_version is required" unless app_version
+      raise "upload_image is required" unless upload_image
+
+      du_client.upload_large_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads a watch icon
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the response
+    def upload_watch_icon(app_version, upload_image)
+      raise "app_version is required" unless app_version
+      raise "upload_image is required" unless upload_image
+
+      du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads a screenshot
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_image (UploadFile): The image to upload
+    # @param device (FIXME): The target device
+    # @return [JSON] the response
+    def upload_screenshot(app_version, upload_image, device)
+      raise "app_version is required" unless app_version
+      raise "upload_image is required" unless upload_image
+      raise "device is required" unless device
+
+      du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
+    end
+
+    # Uploads the transit app file
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_file (UploadFile): The image to upload
+    # @return [JSON] the response
+    def upload_geojson(app_version, upload_file)
+      raise "app_version is required" unless app_version
+      raise "upload_file is required" unless upload_file
+
+      du_client.upload_geojson(app_version, upload_file, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads the transit app file
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_trailer (UploadFile): The trailer to upload
+    # @return [JSON] the response
+    def upload_trailer(app_version, upload_trailer)
+      raise "app_version is required" unless app_version
+      raise "upload_trailer is required" unless upload_trailer
+
+      du_client.upload_trailer(app_version, upload_trailer, content_provider_id, sso_token_for_video)
+    end
+
+    # Uploads the trailer preview
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_trailer_preview (UploadFile): The trailer preview to upload
+    # @return [JSON] the response
+    def upload_trailer_preview(app_version, upload_trailer_preview)
+      raise "app_version is required" unless app_version
+      raise "upload_trailer_preview is required" unless upload_trailer_preview
+
+      du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image)
+    end
+
+    # Fetches the App Version Reference information from ITC
+    # @return [AppVersionRef] the response
+    def ref_data
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/apps/version/ref')
+      data = parse_response(r, 'data')
+      Spaceship::Tunes::AppVersionRef.factory(data)
+    end
+
+    # Fetches the User Detail information from ITC
+    # @return [UserDetail] the response
+    def user_detail_data
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
+      data = parse_response(r, 'data')
+      Spaceship::Tunes::UserDetail.factory(data)
     end
 
     #####################################################
@@ -417,6 +527,21 @@ module Spaceship
     end
 
     private
+
+    # the contentProviderIr found in the UserDetail instance
+    def content_provider_id
+      user_detail_data.content_provider_id
+    end
+
+    # the ssoTokenForImage found in the AppVersionRef instance
+    def sso_token_for_image
+      ref_data.sso_token_for_image
+    end
+
+    # the ssoTokenForVideo found in the AppVersionRef instance
+    def sso_token_for_video
+      ref_data.sso_token_for_video
+    end
 
     def update_tester_from_app!(tester, app_id, testing)
       url = tester.class.url(app_id)[:update_by_app]

@@ -1,0 +1,9 @@
+{
+  "statusCode" : 400,
+  "errorCodes" : [ "IMG_ALPHA_NOT_ALLOWED" ],
+  "suggestionCode" : "IMG_RESAVE_NO_ALPHA",
+  "nonLocalizedMessage" : "Alpha is not allowed. Please edit the image to remove alpha and re-save it.",
+  "localizedMessage" : "Alpha is not allowed. Please edit the image to remove alpha and re-save it.",
+  "width" : 1024,
+  "height" : 1024
+}
