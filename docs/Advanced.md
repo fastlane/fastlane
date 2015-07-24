@@ -68,6 +68,12 @@ lane :calculate do |options|
 end
 ```
 
+## Shell values
+You can get value from shell commands:
+```ruby
+app_version = sh("cd .. && agvtool what-marketing-version -terse1 | tr -d '\n'")
+```
+
 ## Importing another Fastfile
 
 Within your `Fastfile` you can import another `Fastfile`. 
