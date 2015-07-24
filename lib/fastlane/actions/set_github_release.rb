@@ -62,7 +62,8 @@ module Fastlane
       end
 
       def self.details
-        "Creates a new release on GitHub. You must provide your GitHub Personal token, the repository name
+        "Creates a new release on GitHub. You must provide your GitHub Personal token 
+        (get one from https://github.com/settings/tokens/new), the repository name
         and tag name. If the tag doesn't exist, one will be created on the commit or branch passed-in as
         commitish. Out parameters provide the release's id, which can be used for later editing and the 
         release html link to GitHub."
@@ -87,14 +88,14 @@ module Fastlane
                                        description: "Pass in the tag name",
                                        is_string: true,
                                        optional: false),
-          FastlaneCore::ConfigItem.new(key: :commitish,
-                                       env_name: "FL_SET_GITHUB_RELEASE_COMMITISH",
-                                       description: "If provided tag doesn't exist, a new one will be created on the provided branch/commit",
-                                       is_string: true,
-                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: "FL_SET_GITHUB_RELEASE_NAME",
                                        description: "Name of this release",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :commitish,
+                                       env_name: "FL_SET_GITHUB_RELEASE_COMMITISH",
+                                       description: "If provided tag doesn't exist, a new one will be created on the provided branch/commit",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :description,
@@ -106,12 +107,14 @@ module Fastlane
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_DRAFT",
                                        description: "Whether the release should be marked as draft",
                                        optional: true,
-                                       default_value: false),
+                                       default_value: false,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :is_prerelease,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_PRERELEASE",
                                        description: "Whether the release should be marked as prerelease",
                                        optional: true,
-                                       default_value: false)
+                                       default_value: false,
+                                       is_string: false)
         ]
       end
 
