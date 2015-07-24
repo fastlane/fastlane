@@ -68,6 +68,12 @@ lane :calculate do |options|
 end
 ```
 
+## Shell values
+You can get value from shell commands:
+```ruby
+app_version = sh("pod update")
+```
+
 ## Importing another Fastfile
 
 Within your `Fastfile` you can import another `Fastfile`. 
