@@ -6,7 +6,7 @@ module Fastlane
 
     class GetGithubReleaseAction < Action
       def self.run(params)
-        Helper.log.info "Verifying release on GitHub (#{params[:url]}: #{params[:version]})"
+        Helper.log.info "Getting release on GitHub (#{params[:url]}: #{params[:version]})"
         require 'excon'
         require 'base64'
         headers = { 'User-Agent' => 'fastlane-get_github_release' }
@@ -36,7 +36,7 @@ module Fastlane
           end 
         end
 
-        Helper.log.error "Couldn't find GitHub release #{params[:version]}".yellow
+        Helper.log.info "Couldn't find GitHub release #{params[:version]}".yellow
         return nil
       end
 
