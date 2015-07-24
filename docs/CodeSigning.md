@@ -26,7 +26,7 @@ In your `Fastfile`, add the following between your `sigh` and `ipa` call:
 sigh
 
 # use the UDID of the newly created provisioning profile
-ENV["PROFILE_UDID"] = Actions.lane_context[Actions::SharedValues::SIGH_UDID]
+ENV["PROFILE_UDID"] = lane_context[SharedValues::SIGH_UDID]
 
 ipa(scheme: "Release")
 ```
