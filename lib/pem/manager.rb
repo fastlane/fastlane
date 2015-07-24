@@ -4,6 +4,7 @@ require 'spaceship'
 module PEM
   # Creates the push profile and stores it in the correct location
   class Manager
+
     def self.start
       begin
         password_manager = CredentialsManager::PasswordManager.shared_manager
@@ -67,8 +68,8 @@ module PEM
         Helper.log.info "pem: " + Pathname.new(file).realpath.to_s.green
         return file
 
-      #rescue Exception => exception
-      #  Helper.log.error("#{exception.class}: #{exception.message}".red)
+      rescue Exception => exception
+        Helper.log.error("#{exception.class}: #{exception.message}".red)
       end
     end
   end
