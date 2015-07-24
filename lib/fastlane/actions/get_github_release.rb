@@ -14,14 +14,14 @@ module Fastlane
         response = Excon.get("https://api.github.com/repos/#{params[:url]}/releases", :headers => headers)
         case response[:status]
         when 404
-          Helper.logger.error "Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+          Helper.log.error "Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
           return nil
         when 401
-          Helper.logger.error "You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.".red
+          Helper.log.error "You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.".red
           return nil
         else
           if response[:status] != 200
-            Helper.logger.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+            Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
             return nil
           end
         end
