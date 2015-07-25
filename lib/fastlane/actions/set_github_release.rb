@@ -3,6 +3,7 @@ module Fastlane
     module SharedValues
       SET_GITHUB_RELEASE_HTML_LINK = :SET_GITHUB_RELEASE_HTML_LINK
       SET_GITHUB_RELEASE_RELEASE_ID = :SET_GITHUB_RELEASE_RELEASE_ID
+      SET_GITHUB_RELEASE_JSON = :SET_GITHUB_RELEASE_JSON
     end
 
     class SetGithubReleaseAction < Action
@@ -38,7 +39,8 @@ module Fastlane
           Helper.log.info "See release at \"#{html_url}\"".yellow
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
-          return html_url
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = body
+          return body
         when 422
           Helper.log.error "Release on tag #{params[:tag_name]} already exists!".red
         when 404
@@ -121,7 +123,8 @@ module Fastlane
       def self.output
         [
           ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release'],
-          ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)']
+          ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)'],
+          ['SET_GITHUB_RELEASE_JSON', 'The whole release JSON object']
         ]
       end
 
