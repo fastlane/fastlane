@@ -23,18 +23,18 @@ cache_paths = [
   "/tmp/spaceship_itc_login_url.txt"
 ]
 
+def try_delete(path)
+  File.delete(path) if File.exist?(path)
+rescue Errno::ENOENT => e
+  puts e
+end
+
 RSpec.configure do |config|
   config.before(:each) do
-    begin
-      cache_paths.each { |path| File.delete(path) }
-    rescue Errno::ENOENT
-    end
+    cache_paths.each { |path| try_delete(path) }
   end
 
   config.after(:each) do
-    begin
-      cache_paths.each { |path| File.delete(path) }
-    rescue Errno::ENOENT
-    end
+    cache_paths.each { |path| try_delete(path) }
   end
 end
