@@ -77,7 +77,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
 
-To create new screenshots automatically, check out my other open source project [Snapshot](https://github.com/KrauseFx/snapshot).
+To create new screenshots automatically, check out my other open source project [snapshot](https://github.com/KrauseFx/snapshot).
 
 # TestFlight
 
@@ -163,7 +163,7 @@ screenshots_path "./screenshots"
 ```
 The screenshots folder must include one subfolder per language (see [Available language codes](#available-language-codes)).
 
-The screenshots are ordered alphabetically. The best way to sort them is to prepend a number before the actual screenshot name.
+The screenshots are ordered alphabetically. The best way to sort them is to prepend a number before the actual screenshot name. You can also put Watch screenshots into this folder.
 
 To let the computer create the screenshots for you, checkout [this section of the README](#automatically-create-screenshots).
 
