@@ -80,7 +80,7 @@ lane :release do |options|
   slack(
     channel: "releases",
     default_payloads: [],
-    message: "Successfully released [#{tool_name} #{version}](github_release['html_url']) :rocket:",
+    message: "Successfully released [#{tool_name} #{version}](#{github_release['html_url']}) :rocket:",
     payload: {
       "New" => github_release['body']
     }
