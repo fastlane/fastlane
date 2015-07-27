@@ -218,7 +218,7 @@ module Deliver
 
       price = fetch_value("//x:wholesale_price_tier").last
       unless price
-        Helper.log.info "No initial pricing found, setting the first one.".red unless price
+        Helper.log.info "No initial pricing found, setting the first one."
 
         formatted_date = "2015-01-01"
         pricing = Nokogiri.XML("
@@ -229,7 +229,7 @@ module Deliver
                   <sales_start_date>#{formatted_date}</sales_start_date>
                   <intervals>
                       <interval>
-                          <start_date>#{formatted_date}27</start_date>
+                          <start_date>#{formatted_date}</start_date>
                           <wholesale_price_tier>0</wholesale_price_tier>
                       </interval>
                   </intervals>
