@@ -217,7 +217,33 @@ module Deliver
       raise "Invalid price tier '#{tier}' given, must be 0 to 94".red unless (tier.to_i >= 0 and tier.to_i <= 87)
 
       price = fetch_value("//x:wholesale_price_tier").last
-      raise "No initial pricing found, please set the pricing at least once on iTunes Connect.".red unless price
+      unless price
+        Helper.log.info "No initial pricing found, setting the first one.".red unless price
+
+        formatted_date = "2015-01-01"
+        pricing = Nokogiri.XML("
+          <products>
+              <product>
+                  <territory>WW</territory>
+                  <cleared_for_sale>true</cleared_for_sale>
+                  <sales_start_date>#{formatted_date}</sales_start_date>
+                  <intervals>
+                      <interval>
+                          <start_date>#{formatted_date}27</start_date>
+                          <wholesale_price_tier>0</wholesale_price_tier>
+                      </interval>
+                  </intervals>
+                  <allow_volume_discount>true</allow_volume_discount>
+              </product>
+          </products>")
+        software_metadata = fetch_value("//x:software_metadata").last
+        software_metadata << pricing.root
+
+        # We're done here, now fetch the element again and set the real price tier
+        price = fetch_value("//x:wholesale_price_tier").last
+        raise "Something went wrong creating the new price tier" unless price
+      end
+
       price.content = tier
     end
 

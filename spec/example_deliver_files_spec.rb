@@ -280,7 +280,7 @@ describe Deliver do
               expect(File.exists?@error_path).to eq(true)
             end
 
-            it "Error on unit tests", nower: true do
+            it "Error on unit tests" do
               Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
 
               expect(File.exists?@tests_path).to eq(false)
