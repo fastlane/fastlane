@@ -13,6 +13,7 @@ module Fastlane
         else
           # Multi line
           end_tag = params[:multi_line_end_keyword]
+          Helper.log.info "Submit inputs using \"#{params[:multi_line_end_keyword]}\"".yellow
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         end
 

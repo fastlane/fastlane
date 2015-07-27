@@ -37,16 +37,13 @@ lane :release do |options|
     description = prompt(text: "Please enter a changelog: ",
                          multi_line_end_keyword: "END")
 
-    set_github_release(
+    github_release = set_github_release(
       repository_name: github_url,
       name: [version, title].join(" "),
       tag_name: version,
       description: description,
       is_draft: false
     )
-
-    # Fetch the latest release to accesss all its values
-    github_release = get_github_release(url: github_url, version: version)
   end
   
   # Verifying the --help command
@@ -83,7 +80,7 @@ lane :release do |options|
   slack(
     channel: "releases",
     default_payloads: [],
-    message: "Successfully released [#{tool_name} #{version}](github_release['html_url']) :rocket:",
+    message: "Successfully released [#{tool_name} #{version}](#{github_release['html_url']}) :rocket:",
     payload: {
       "New" => github_release['body']
     }
