@@ -238,8 +238,6 @@ module Deliver
           ##########################
           if page.has_content?"Advertising Identifier"
 
-            binding.pry
-
             first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier][:use_idfa]}']//a").click rescue nil
 
             if perms[:advertising_identifier][:use_idfa]
