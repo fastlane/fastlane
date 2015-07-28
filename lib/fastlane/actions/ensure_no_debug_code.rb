@@ -2,12 +2,15 @@ module Fastlane
   module Actions
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
-        results = sh "grep -R '#{params[:text]}' '#{params[:path]}'"
+        command = "grep -R '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        Helper.log.info command.yellow
+        results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason
         return results if Helper.is_test?
+
         
         # Example Output
-        #   ./fastlane.gemspec:  spec.add_development_dependency 'pry'
-        #   ./Gemfile.lock:    pry (0.10.1)
+        #   ./fastlane.gemspec:  spec.add_development_dependency 'my_word'
+        #   ./Gemfile.lock:    my_word (0.10.1)
 
         found = []
         results.split("\n").each do |current_raw|
@@ -38,7 +41,7 @@ module Fastlane
           "Makes sure the given text is nowhere in the code base. This can be used",
           "to check if there is any debug code still in your code base or if you have",
           "things like // TODO or similar"
-        ].join(" ")
+        ].join("\n")
       end
 
       def self.available_options
@@ -51,14 +54,14 @@ module Fastlane
                                        description: "The directory containing all the source files",
                                        default_value: ".",
                                        verify_block: Proc.new do |value|
-                                        raise "Couldn't find the folder at '#{value}'".red unless File.directory?(value)
+                                        raise "Couldn't find the folder at '#{File.absolute_path(value)}'".red unless File.directory?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :extension,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSION",
-                                       description: "The extension that should be searched for. ",
+                                       description: "The extension that should be searched for",
                                        optional: true,
                                        verify_block: Proc.new do |value|
-                                        raise "Value must not contain a dot.".red if value.include?"."
+                                        value.gsub!(".", "") if value.include?"."
                                        end),
         ]
       end
