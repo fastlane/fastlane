@@ -4,9 +4,9 @@ describe Fastlane do
 
       it "doesn't raise an exception if nothing was found" do
         result = Fastlane::FastFile.new.parse("lane :test do 
-          ensure_no_debug_code(text: 'pry', path: './fastlane/', extension: 'rb')
+          ensure_no_debug_code(text: 'pry', path: '.', extension: 'rb')
         end").runner.execute(:test)
-        expect(result).to eq("grep -R 'pry' './fastlane/'")
+        expect(result).to eq("grep -R 'pry' '#{File.absolute_path("../")}'")
       end
 
     end

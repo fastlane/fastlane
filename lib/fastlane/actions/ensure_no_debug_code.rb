@@ -3,10 +3,10 @@ module Fastlane
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
         command = "grep -R '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        return command if Helper.is_test?
+
         Helper.log.info command.yellow
         results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason
-        return results if Helper.is_test?
-
         
         # Example Output
         #   ./fastlane.gemspec:  spec.add_development_dependency 'my_word'
