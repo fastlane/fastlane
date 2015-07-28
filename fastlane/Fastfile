@@ -45,6 +45,9 @@ lane :release do |options|
       is_draft: false
     )
   end
+
+  # Verifying that no debug code is in the code base
+  ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/")
   
   # Verifying the --help command
   # 
