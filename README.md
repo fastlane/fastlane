@@ -230,6 +230,10 @@ It will show you the `mobileprovision` files like this:
 
 If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/produce), which does exactly that.
 
+## What happens to my Xcode managed profiles?
+
+`sigh` will never touch or use the profiles which are created and managed by Xcode. Instead `sigh` will manage its own set of provisioning profiles.
+
 # Need help?
 - If there is a technical problem with `sigh`, submit an issue.
 - I'm available for contract work - drop me an email: sigh@krausefx.com
