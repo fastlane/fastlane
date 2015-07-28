@@ -21,12 +21,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.2.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.7.2' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.3.0'
   spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
-  spec.add_dependency 'prawn' # generating PDF file for the applied changes
+  spec.add_dependency 'excon' # HTTP client
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -35,5 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
-  spec.add_development_dependency 'codeclimate-test-reporter'
+  spec.add_development_dependency 'coveralls'
 end

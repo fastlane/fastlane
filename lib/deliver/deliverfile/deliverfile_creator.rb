@@ -25,7 +25,7 @@ module Deliver
         if CredentialsManager::PasswordManager.shared_manager.username and CredentialsManager::PasswordManager.shared_manager.password
           identifier = ((CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) rescue '') || '')
           while identifier.length < 3
-            identifier = ask("\nApp Identifier of your app (e.g. at.felixkrause.app_name): ")
+            identifier = ask("\nApp Identifier of your app (e.g. com.krausefx.app_name): ")
           end
 
           self.create_based_on_identifier(deliver_path, identifier, project_name)
@@ -57,16 +57,19 @@ module Deliver
       app = Deliver::App.new(app_identifier: identifier)
       app.set_metadata_directory("/tmp") # we don't want to pollute the current folder
       app.metadata # this will download the latest app metadata
+
+      version_number = app.metadata.fetch_value("//x:version").first["string"] # fetch the latest app version
       
-      file_path = [deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME].join('/')
-      json = generate_deliver_file(app, deliver_path, project_name)
+      file_path = File.join(deliver_path, Deliver::Deliverfile::Deliverfile::FILE_NAME)
+      json = generate_deliver_file(app, deliver_path, project_name, version_number)
       File.write(file_path, json)
 
-      FileUtils.mkdir_p './screenshots/'
+      FileUtils.mkdir_p File.join(deliver_path, 'screenshots')
       begin
         Helper.log.info "Downloading all previously used app screenshots.".green
-        ItunesConnect.new.download_existing_screenshots(app)
-      rescue
+        ItunesConnect.new.download_existing_screenshots(app, deliver_path)
+      rescue Exception => ex
+        Helper.log.error ex
         Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
       end
 
@@ -80,7 +83,7 @@ module Deliver
     private
       # This method takes care of creating a new 'deliver' folder, containg the app metadata 
       # and screenshots folders
-      def self.generate_deliver_file(app, path, project_name)
+      def self.generate_deliver_file(app, path, project_name, version_number)
         FileUtils.mkdir_p path rescue nil # never mind if it's already there
 
         json = create_json_based_on_xml(app, path)
@@ -89,7 +92,6 @@ module Deliver
           folder = File.join(path, "metadata", language)
           FileUtils.mkdir_p(folder)
           value.each do |key, content|
-            next if key == :version_whats_new
             content = content.join("\n") if key == :keywords
             File.write(File.join(folder, "#{key}.txt"), content)
           end
@@ -106,6 +108,7 @@ module Deliver
         deliver.gsub!("[[APP_NAME]]", project_name)
         deliver.gsub!("[[APPLE_ID]]", app.apple_id.to_s)
         deliver.gsub!("[[EMAIL]]", CredentialsManager::PasswordManager.shared_manager.username)
+        deliver.gsub!("[[APP_VERSION]]", version_number)
 
         return deliver
       end

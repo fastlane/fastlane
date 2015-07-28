@@ -16,6 +16,8 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
+      #  Watch
+      IOS_APPLE_WATCH= "iOS-Apple-Watch"
       # Mac
       MAC = "Mac"
     end
@@ -106,6 +108,9 @@ module Deliver
           [1440, 900],
           [2880, 1800],
           [2560, 1600]
+        ],
+        ScreenSize::IOS_APPLE_WATCH=> [
+          [312, 390]
         ]
       }
 

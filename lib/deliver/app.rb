@@ -32,7 +32,7 @@ module Deliver
     # @param app_identifier If you don't pass this, it will automatically be fetched from the Apple API
     #   which means it takes longer. If you **can** pass the app_identifier (e.g. com.facebook.Facebook) do it
     def initialize(apple_id: nil, app_identifier: nil)
-      self.apple_id = (apple_id || '').to_s.gsub('id', '').to_i
+      self.apple_id = apple_id.to_s.gsub('id', '').to_i
       self.app_identifier = app_identifier
       
       if apple_id and not app_identifier
@@ -41,7 +41,14 @@ module Deliver
       elsif app_identifier and not apple_id
         # Fetch the Apple ID based on the given app identifier
         begin
-          self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+          begin
+            self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
+          rescue
+            Helper.log.warn "App doesn't seem to be in the App Store yet or is not available in the US App Store. Using the iTC API instead."
+            # Use the iTunes Connect API instead: make that default in the future
+            self.apple_id = FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier)
+            raise "Couldn't find Apple ID" unless self.apple_id
+          end
         rescue
           unless Helper.is_test?
             Helper.log.info "Could not find Apple ID based on the app identifier in the US App Store. Maybe the app is not yet in the store?".yellow
@@ -126,6 +133,12 @@ module Deliver
       itc.upload_app_icon!(self, path)
     end
 
+    # Uploads a new apple watch app icon to iTunesConnect. This uses a headless browser
+    # which makes this command quite slow.
+    # @param (path) a path to the new apple watch app icon. The image must have the resolution of 1024x1024
+    def upload_apple_watch_app_icon!(path)
+      itc.upload_apple_watch_app_icon!(self, path)
+    end
     #####################################################
     # @!group Destructive/Constructive methods
     #####################################################

@@ -36,13 +36,13 @@ These URLs are shown in the AppStore
 ##### keywords
 An array of keywords
 ```ruby
-keywords({
+keywords(
   "en-US" => ["Keyword1", "Keyword2"]
-})
+)
 ```
 
 ##### screenshots_path
-A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution.
+A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution. Also includes  Watch Support.
 
 ##### skip_pdf
 If set to `true`, no PDF report will be generated before the actual deployment. You can also pass `--force` when calling `deliver`.
@@ -59,6 +59,12 @@ A path to a new app icon, which must be exactly 1024x1024px
 app_icon './AppIcon.png'
 ```
 
+##### apple_watch_app_icon
+A path to a new app icon for the  Watch, which must be exactly 1024x1024px
+```ruby
+apple_watch_app_icon './AppleWatchAppIcon.png'
+```
+
 ##### copyright
 The up to date copyright information.
 ```ruby
@@ -71,15 +77,21 @@ The english name of the category you want to set (e.g. `Business`, `Books`)
 ##### secondary_category
 The english name of the secondary category you want to set
 
+##### primary_subcategories
+The array of english names of the primary sub categories you want to set
+
+##### secondary_subcategories
+The array of english names of the secondary sub categories you want to set
+
 ##### automatic_release
-Should the app be released to all users once Apple approves it? If set to no, you'll have to manually release the update once it got approved.
+Should the app be released to all users once Apple approves it? If set to `false`, you'll have to manually release the update once it got approved.
 
 ##### app_review_information
 Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. Check out the [example](#example-deliverfile).
 
 
 ```ruby
-app_review_information({
+app_review_information(
   first_name: "Felix",
   last_name: "Krause",
   phone_number: "123123",
@@ -87,7 +99,7 @@ app_review_information({
   demo_user: "demoUser",
   demo_password: "demoPass",
   notes: "such notes, very text"
-})
+)
 ```
 
 ##### ratings_config_path
@@ -110,31 +122,43 @@ submit_further_information({
     contains_third_party_content: false,
     has_rights: false
   },
-  advertising_identifier: false
+  advertising_identifier: {
+    use_idfa: false,
+    serve_advertisement: false,
+    attribute_advertisement: false,
+    attribute_actions: false,
+    limit_ad_tracking: false
+  }
 })
 ```
+
+##### More options for TestFlight Builds
+
+You can pass the "What to Test" value using the environment variable `DELIVER_WHAT_TO_TEST`:
+
+`DELIVER_WHAT_TO_TEST="Try the brand new project button" deliver`
+Additional environment variables: `DELIVER_BETA_DESCRIPTION`, `DELIVER_BETA_FEEDBACK_EMAIL`.
 
 The latest commands can always be found inside [deliverer.rb](https://github.com/KrauseFx/deliver/blob/master/lib/deliver/deliverer.rb) in the `ValKey` module.
 
 ## Example Deliverfile
 
 ```ruby
-config_json_folder './deliver'
 screenshots_path "./screenshots"
 
-title({
+title(
   "en-US" => "Your App Name"
-})
+)
 
-# changelog({
+# changelog(
 #   "en-US" => "iPhone 6 (Plus) Support" 
-# })
+# )
 
 copyright "#{Time.now.year} Felix Krause"
 
 automatic_release false
 
-app_review_information({
+app_review_information(
   first_name: "Felix",
   last_name: "Krause",
   phone_number: "123123",
@@ -142,15 +166,17 @@ app_review_information({
   demo_user: "demoUser",
   demo_password: "demoPass",
   notes: "such notes, very text"
-})
+)
 
 primary_category "Business"
-secondary_category "Books"
+secondary_category "Games"
+secondary_subcategories ["Educational", "Puzzle"]
 
 ratings_config_path "~/Downloads/config.json"
 
 price_tier 5
 
+# it is recommended to remove that part and use fastlane instead for building
 ipa do
     system("cd ..; ipa build") # build your project using Shenzhen
     "../fastlane.ipa" # Tell 'deliver' where it can find the finished ipa file

@@ -35,10 +35,13 @@ module Deliver
       SUBMIT_FURTHER_INFORMATION = :submit_further_information # export compliance, content rights and advertising identifier
       PRICE_TIER = :price_tier
       APP_ICON = :app_icon
-      
+      APPLE_WATCH_APP_ICON = :apple_watch_app_icon
+
       COPYRIGHT = :copyright
       PRIMARY_CATEGORY = :primary_category
       SECONDARY_CATEGORY = :secondary_category
+      PRIMARY_SUBCATEGORIES = :primary_subcategories
+      SECONDARY_SUBCATEGORIES = :secondary_subcategories
       
       AUTOMATIC_RELEASE = :automatic_release # should the update go live after approval
       RATINGS_CONFIG_PATH = :ratings_config_path # a path to the configuration for the app's ratings

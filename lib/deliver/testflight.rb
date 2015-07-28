@@ -10,13 +10,14 @@ module Deliver
 
       app_identifier = IpaFileAnalyser.fetch_app_identifier(ipa_path)
       app_identifier ||= ENV["TESTFLIGHT_APP_IDENTITIFER"] || ask("Could not automatically find the app identifier, please enter the app's bundle identifier: ")
-      app_id ||= (Deliver::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId'] rescue nil)
+      app_id ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId'] rescue nil)
+      app_id ||= (FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier) rescue nil)
       app_id ||= ENV["TESTFLIGHT_APPLE_ID"] || ask("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
       strategy = (skip_deploy ? Deliver::IPA_UPLOAD_STRATEGY_JUST_UPLOAD : Deliver::IPA_UPLOAD_STRATEGY_BETA_BUILD)
 
       Helper.log.info "Ready to upload new build to TestFlight (#{app_identifier} - #{app_id})".green
 
-      # Got everything to replaoy
+      # Got everything to ready to deploy
       app = App.new(app_identifier: app_identifier, apple_id: app_id)
       ipa = IpaUploader.new(app, '/tmp/', ipa_path, strategy)
       result = ipa.upload!

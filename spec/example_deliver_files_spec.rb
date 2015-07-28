@@ -9,18 +9,16 @@ describe Deliver do
           }.to raise_exception "Deliverfile not found at path '#{error_path}'".red
         end
 
-        it "raises an error if some key information is missing" do
-          expect {
-            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingAppVersion")
-          }.to raise_exception("You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')".red)
-
-          expect {
-            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
-          }.to raise_exception("You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')".red)
-
+        it "raises an error if the language definition is missing" do
           expect {
             Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingLanguage")
           }.to raise_exception(Deliver::Deliverfile::Deliverfile::DSL::SPECIFY_LANGUAGE_FOR_VALUE.red)
+        end
+
+        it "raises an error if app identifier is missing" do
+          expect {
+            Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileMissingIdentifier")
+          }.to raise_exception("No App Identifier given")
         end
 
         it "throws an exception when block does not return anything" do
@@ -76,9 +74,23 @@ describe Deliver do
             expect(meta.deliver_process.app.metadata.fetch_value("//x:title").first.content).to eq("Overwritten")
           end
 
+          it "uses the fastlane environment ipa path if given for empty Deliverfiles" do
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+            Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt")
+
+            ipa_path = "./spec/fixtures/ipas/Example1.ipa"
+            ENV["IPA_OUTPUT_PATH"] = ipa_path
+
+            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileIpaFromEnv")
+
+            expect(ENV["DELIVER_IPA_PATH"]).to eq(ipa_path) # use this ipa
+
+            ENV["IPA_OUTPUT_PATH"] = nil
+          end
+
           it "Raises an exception when iTunes Transporter results in an error" do
             Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_ipa_error.txt")
-            
+
             expect {
               Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks")
             }.to raise_exception("Return status of iTunes Transporter was 1: ERROR ITMS-9000: \"Redundant Binary Upload. There already exists a binary upload with build '247' for version '1.13.0'\"".red)
@@ -217,9 +229,9 @@ describe Deliver do
               expect(File.exists?@tests_path).to eq(false)
               Deliver::ItunesTransporter.clear_mock_files # we don't even download the app metadata
               Deliver::ItunesTransporter.set_mock_file("spec/responses/transporter/upload_valid.txt") # the ipa file
-              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks", 
-                                force: true, 
-                                is_beta_ipa: true, 
+              deliv = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileCallbacks",
+                                force: true,
+                                is_beta_ipa: true,
                                 skip_deploy: true)
               expect(File.exists?@tests_path).to eq(true)
               expect(File.exists?@success_path).to eq(true)
@@ -287,18 +299,6 @@ describe Deliver do
               }.to raise_exception("Unit tests failed. Got result: 'false'. Need 'true' or 1 to succeed.".red)
             end
           end
-        end
-
-        it "raises an exception if app identifier of ipa does not match the given one" do
-          expect {
-            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongIdentifier")
-          }.to raise_exception("App Identifier of IPA does not match with the given one ('net.sunapps.321' != 'at.felixkrause.iTanky')".red)
-        end
-
-        it "raises an exception if app version of ipa does not match the given one" do
-          expect {
-            meta = Deliver::Deliverer.new("./spec/fixtures/Deliverfiles/DeliverfileWrongVersion")
-          }.to raise_exception("App Version of IPA does not match with the given one (128378973 != 1.0)".red)
         end
       end
     end

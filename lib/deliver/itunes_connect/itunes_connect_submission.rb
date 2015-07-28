@@ -11,53 +11,81 @@ module Deliver
 
         Helper.log.info("Choosing the latest build on iTunesConnect for beta distribution")
 
-        sleep 3
-        click_on "Prerelease"
-        sleep 3
+        require 'excon'
 
-        wait_for_preprocessing
+        # Migrate session
+        cookie_string = page.driver.cookies.collect { |key, cookie| "#{cookie.name}=#{cookie.value}" }.join(";")
+
+        trains_url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/#{app.apple_id}/trains/"
+
+        current_build = nil
+        current_train = nil
+        started = Time.now
 
 
-        # Beta Switches
-        if all(".switcher.ng-binding.checked").count == 0
-          raise "Looks like Beta Testing is not yet enabled for this app. Open '#{current_url}' and enable TestFlight Beta Testing.".red
-        end
-        
-        if all(".bt-version > a").count == 0
-          raise "Couldn't find any builds. Please check the iTunes Conncet page: '#{current_url}'".red
-        end
+        loop do
+          trains = JSON.parse(Excon.get(trains_url, headers: { "Cookie" => cookie_string } ).body)
+          if trains['data']['processingBuilds'].count == 0
+            # Make sure the build was successfully processed
+            latest_build_time = 0
 
-        # We might have to wait until the second part of "Processing" is finished
-        while first("tr > td.bt-internal").text == "Processing"
-          Helper.log.debug "iTC needs some more processing... Waiting even longer..."
-          sleep 10
-          visit current_url
-          sleep 10
-        end
+            trains['data']['trains'].each do |train|
+              train['builds'].each do |build|
+                if build['uploadDate'] > latest_build_time
+                  current_build = build
+                  current_train = train
+                  latest_build_time = build['uploadDate']
+                end
+              end
+            end
 
-        first(".bt-version > a").click
-
-        
-        # Inside the build now, enabling the 'Save' button
-        save_button = wait_for_elements(".formActionButtons.btn-actions > button").first
-
-        if save_button
-          # First, enable the save button
-          evaluate_script("$('.formActionButtons.btn-actions > button').removeAttr('disabled')")
-
-          # Maybe we have a 'What to Test' to fill in
-          to_test = ENV["DELIVER_WHAT_TO_TEST"]
-          if to_test
-            text_area = first('span[ng-show="testinfo.data.details[currentLoc].whatsNew.isEditable"] > * > textarea')
-            text_area.set to_test if text_area
+            # We got the most recent build, let's see if it's ready
+            if current_build['readyToInstall'] == true
+              Helper.log.info "Build is ready 3.2.1...".green
+              break # Success! 
+            end
           end
 
-          save_button.click
-        else
-          raise "Couldn't find the save button, looks like there is an internet connection problem.".red
+          Helper.log.info("Sorry, we have to wait for iTunesConnect, since it's still processing the uploaded ipa file\n" + 
+            "If this takes longer than 45 minutes, you have to re-upload the ipa file again.\n" + 
+            "You can always open the browser page yourself: '#{current_url}/pre/builds'\n" +
+            "Passed time: ~#{((Time.now - started) / 60.0).to_i} minute(s)")
+          sleep 60
+        end
+        
+
+        if not current_train['testing']['value']
+          # Beta testing for latest build is not yet enabled
+          current_train['testing']['value'] = true
+
+          Helper.log.info "Beta Testing is disabled for version #{current_train['versionString']}... enabling it now!".green
+          
+          # Update the only train we modify
+          Excon.post(trains_url, body: {trains: [current_train]}.to_json, headers: { "Cookie" => cookie_string } )
         end
 
-        Helper.log.info "Successfully enabled latest beta build.".green
+        build_url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/#{app.apple_id}/trains/#{current_build['trainVersion']}/builds/#{current_build['buildVersion']}/testInformation"
+        build_info = JSON.parse(Excon.get(build_url, headers: { "Cookie" => cookie_string } ).body)['data']
+
+        Helper.log.info "Setting the following information for this build:".yellow
+        Helper.log.info "DELIVER_WHAT_TO_TEST: '#{ENV['DELIVER_WHAT_TO_TEST']}'"
+        Helper.log.info "DELIVER_BETA_DESCRIPTION: '#{ENV['DELIVER_BETA_DESCRIPTION']}'"
+        Helper.log.info "DELIVER_BETA_FEEDBACK_EMAIL: '#{ENV['DELIVER_BETA_FEEDBACK_EMAIL']}'"
+
+        build_info['details'].each_with_index do |hash, index|
+          build_info['details'][index]['whatsNew']['value'] = ENV["DELIVER_WHAT_TO_TEST"]
+          build_info['details'][index]['description']['value'] ||= ENV["DELIVER_BETA_DESCRIPTION"]
+          build_info['details'][index]['feedbackEmail']['value'] ||= ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
+        end
+        
+        h = Excon.post(build_url, body: build_info.to_json, headers: { "Cookie" => cookie_string } )
+
+        if h.status == 200
+          Helper.log.info "Successfully distributed latest beta build 🚀".green
+        else
+          Helper.log.info h.data
+          Helper.log.info "Some error occured marking the new builds as TestFlight build. Please do it manually on '#{current_url}'.".green
+        end
 
         return true
       rescue => ex

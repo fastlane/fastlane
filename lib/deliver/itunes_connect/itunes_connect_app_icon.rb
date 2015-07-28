@@ -23,7 +23,7 @@ module Deliver
 
         Helper.log.info "Starting upload of new app icon".green
 
-        evaluate_script("$('.appversionicon > .ios7-style-icon').prev().click()") # delete button
+        evaluate_script("$('.appversionicon:not(.watchIcon) > .ios7-style-icon').prev().click()") # delete button
         evaluate_script("$('[style-class=\"appversionicon rounded\"] [itc-launch-filechooser] + input').attr('id', 'deliverFileUploadInput')") # set div
         evaluate_script("URL = webkitURL; URL.createObjectURL = function(){return 'blob:abc'}"); # shim URL
         page.attach_file("deliverFileUploadInput", path) # add file

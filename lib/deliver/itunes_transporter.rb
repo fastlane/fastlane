@@ -57,7 +57,7 @@ module Deliver
         Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
       else
         unless /^[0-9a-zA-Z\.\$\_]*$/ === @password
-          Helper.log.fatal "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters.".red
+          Helper.log.error "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
         end
         Helper.log.fatal "Could not download metadata from iTunes Connect! It's probably related to your password or your internet connection."
       end
@@ -173,14 +173,14 @@ module Deliver
         if not defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
           # General logging for debug purposes
           unless output_done
-            Helper.log.debug "[Transporter Output]: #{$1}"
+            Helper.log.debug "[Transporter]: #{$1}"
           end
         end
       end
 
       def build_download_command(username, password, apple_id, destination = "/tmp")
         [
-          Helper.transporter_path,
+          '"' + Helper.transporter_path + '"',
           "-m lookupMetadata",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
@@ -191,7 +191,7 @@ module Deliver
 
       def build_upload_command(username, password, source = "/tmp")
         [
-          Helper.transporter_path,
+          '"' + Helper.transporter_path + '"',
           "-m upload",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",

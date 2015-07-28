@@ -1,0 +1,204 @@
+<html>
+    <head>
+        <title>deliver - <%= @data['en-US'][:title][:value] rescue @data.values.first[:title][:value] %></title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-16">
+        <style>
+          #app-name {
+              font-size: 42px;
+              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
+              font-weight: 300;
+              margin-top: 22px;
+              margin-left: 25px;
+              margin-right: 25px;
+          }
+
+          #app-urls {
+              margin-left: 25px;
+              font-size: 14px;
+              margin-top: 4px;
+              margin-right: 25px;
+          }
+
+          body {
+              font-family: 'Helvetica Neue', HelveticaNeue;
+          }
+
+          hr {
+            margin-top: 40px;
+            margin-bottom: 40px;
+          }
+
+          .app-url-descr {
+              height:22px;
+              display: inline-block;
+              font-weight: 500;
+          }
+
+          .app-url {
+              color: #0056ba;
+              font-weight: 300;
+              margin-right: 10px;
+          }
+
+          #app-keyword {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+          }
+
+          .cat-headline {
+              font-weight: 700;
+              margin-bottom: 5px;
+          }
+
+
+
+          #app-description {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+          }
+
+          #app-description-text {
+              font-weight: 300;
+          }
+
+          #app-changelog {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+              font-weight: 300;
+          }
+
+          #app-screenshots {
+              margin-left: 15px;
+              margin-right: 15px;
+              margin-top: 22px;
+          }
+
+          .app-keyword-list {
+              font-weight: 300;
+          }
+
+          .app-changelog-list {
+              list-style-type: square;
+              
+              font-weight: 300;
+          }
+
+          ul {
+              margin-top: 6px;
+          }
+
+          .app-screenshot-row {
+              width: 100%;
+              margin-top: 10px;
+              margin-bottom: 10px;
+          }
+
+          .app-screenshot {
+              width: calc(20% - 30px);
+              margin-left: 10px;
+              margin-right: 10px;
+          }
+
+          #app-screenshots .cat-headline {
+              margin-left: 10px;
+              margin-right: 10px;
+          }
+
+          /*for highlighting a changed value*/
+          .modified {
+              color: #0056ba;
+          }
+        </style>
+    </head>
+
+    <%
+      def modified?(val)
+        "modified" if (val and val[:modified] == true)
+      end
+    %>
+    
+    <body>
+      <% @data.each do |language, content| %>
+        <div id="app-name" class="<%= modified?(content[:title]) %>">
+          <%= language %>: <%= content[:title][:value] %>
+        </div>
+
+        <div id="app-urls">
+          <% all_keys = [:support_url, :privacy_url, :software_url] %>
+          <% all_keys.each do |key| %>
+            <% value = content[key][:value] rescue nil %>
+            <% if value %>
+              <div class="app-url-descr <%= modified?(content[key]) %>">
+                <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <div id="app-keyword" class="<%= modified?(content[:keywords]) %>">
+            <div class="cat-headline">Keywords</div>
+            <ul class="app-keyword-list">
+              <% (content[:keywords][:value] rescue []).each do |keyword| %>
+                <li><%= keyword %></li>
+              <% end %>
+            </ul>
+        </div>
+        
+        <div id="app-description" class="<%= modified?(content[:description]) %>">
+             <div class="cat-headline">Description</div>
+             <div id="app-description-text">
+                <%= content[:description][:value].gsub("\n", "<br />") rescue nil %>
+             </div>
+        </div>
+        
+        <div id="app-changelog" class="<%= modified?(content[:version_whats_new]) %>">
+            <div class="cat-headline">Changelog</div>
+            <%= content[:version_whats_new][:value].gsub("\n", "<br />") rescue nil %>
+        </div>
+        
+        <div id="app-screenshots">
+          <div class="cat-headline">Screenshots</div>
+
+          <% if (content[:screenshots] || []).count > 0 %>
+            <% last_size = nil %>
+            <% content[:screenshots].sort{|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+
+              <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
+
+              <% if new_row and last_size != nil %>
+                </div>
+              <% end %>
+
+              <% if new_row %>
+                <h4><%= screenshot.screen_size %></h4>
+                <div class="app-screenshot-row">
+              <% end %>
+              
+              <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>"></a>
+
+              <% last_size = screenshot.screen_size %>
+            <% end %>
+          <% else %>
+            <!-- no screenshots -->
+            <div style="border: 3px solid red; padding: 0px 20px">
+              <h2 style="color: red">No Screenshots Found</h2>
+              <p>
+                deliver couldn't find any screenshots. Due to a bug in iTunes Transporter this will <b>remove</b> the existing screenshots on iTunes Connect.
+              </p>
+              <p>
+                Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
+              </p>
+            </div>
+          <% end %>
+          </div>
+          
+        </div>
+        <hr />
+      <% end # end data %>
+    </body>
+</html>
+
+

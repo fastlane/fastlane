@@ -6,7 +6,7 @@ module Deliver
     class Deliverfile
       module DSL
         MISSING_VALUE_ERROR_MESSAGE = "You have to pass either a value or a block to the given method."
-        SPECIFY_LANGUAGE_FOR_VALUE = "You have to specify the language of the given value. Either set a default language using 'default_language \"en\"' on the top of the file or pass a hash containing the language codes"
+        SPECIFY_LANGUAGE_FOR_VALUE = "You have to specify the language of the given value. Either set a default language using 'default_language \"en-US\"' on the top of the file or pass a hash containing the language codes"
 
         MISSING_APP_IDENTIFIER_MESSAGE = "You have to pass a valid app identifier using the Deliver file. (e.g. 'app_identifier \"net.sunapps.app\"')"
         MISSING_VERSION_NUMBER_MESSAGE = "You have to pass a valid version number using the Deliver file. (e.g. 'version \"1.0\"')"
@@ -20,8 +20,9 @@ module Deliver
           allowed = Deliver::Deliverer.all_available_keys_to_set
           not_translated = [:ipa, :app_identifier, :apple_id, :screenshots_path, :config_json_folder, 
                             :submit_further_information, :copyright, :primary_category, :secondary_category,
+                            :primary_subcategories, :secondary_subcategories,
                             :automatic_release, :app_review_information, :ratings_config_path, :price_tier,
-                            :app_icon]
+                            :app_icon, :apple_watch_app_icon]
 
           if allowed.include?(method_sym)
             value = arguments.first
@@ -107,6 +108,7 @@ module Deliver
         # This will set the email address of the Apple ID to be used
         def email(value)
           value ||= yield if block_given?
+          CredentialsManager::PasswordManager.logout # if it was logged in already (with fastlane)
           CredentialsManager::PasswordManager.shared_manager(value)
         end
 

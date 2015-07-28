@@ -91,6 +91,18 @@ module Deliver
           return publish_production_build(submit_information)
         elsif @publish_strategy == IPA_UPLOAD_STRATEGY_BETA_BUILD
           return publish_beta_build
+        else
+          Helper.log.info "deliver will **not** submit the app for Review or for TestFlight distribution".yellow
+          Helper.log.info "If you want to distribute the binary, don't define `skip_deploy` ".yellow
+
+          if ENV["DELIVER_WHAT_TO_TEST"] or ENV["DELIVER_BETA_DESCRIPTION"] or ENV["DELIVER_BETA_FEEDBACK_EMAIL"]
+            Helper.log.warn "---------------------------------------------------".yellow
+            Helper.log.warn "You provided beta version metadata, but used the ".yellow
+            Helper.log.warn "`skip_deploy` option when running deliver.".yellow
+            Helper.log.warn "You have to remove `skip_deploy` to set a changelog".yellow
+            Helper.log.warn "for TestFlight builds".yellow
+            Helper.log.warn "---------------------------------------------------".yellow
+          end
         end
         return true
       end
@@ -99,7 +111,6 @@ module Deliver
         # Distribute to beta testers
         Helper.log.info "Distributing the latest build to Beta Testers."
         if self.app.itc.put_build_into_beta_testing!(self.app, self.fetch_app_version)
-          Helper.log.info "Successfully distributed a new beta build of your app.".green
           return true
         end
         return false
