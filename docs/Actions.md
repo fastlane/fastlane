@@ -364,7 +364,7 @@ lcov(
 Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
 
 ```
-oclint({
+oclint(
   compile_commands: 'commands.json', # The json compilation database, use xctool reporter 'json-compilation-database'
   select_reqex: /ViewController.m/,  # Select all files matching this reqex
   report_type: 'pmd',                # The type of the report (default: html)
@@ -372,7 +372,21 @@ oclint({
   max_priority_2: 100,               # The max allowed number of priority 2 violations
   max_priority_3: 1000,              # The max allowed number of priority 3 violations
   rc: 'LONG_LINE=200'                # Override the default behavior of rules
-})  
+)  
+```
+
+### `ensure_no_debug_code`
+
+You don't want any debug code to slip into production. You can use the `ensure_no_debug_code` action to make sure no debug code is in your code base before deploying it:
+
+```ruby
+ensure_no_debug_code(text: "// TODO")
+```
+
+```ruby
+ensure_no_debug_code(text: "NSLog",
+                     path: "./lib",
+                extension: "m")
 ```
 
 ## Deploying
