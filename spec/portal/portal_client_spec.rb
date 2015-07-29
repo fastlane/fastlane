@@ -160,7 +160,7 @@ describe Spaceship::Client do
       let(:devices) { subject.devices }
       it 'returns a list of device hashes' do
         expect(devices).to be_instance_of(Array)
-        expect(devices.first.keys).to eq(["deviceId", "name", "deviceNumber", "devicePlatform", "status"])
+        expect(devices.first.keys).to eq(["deviceId", "name", "deviceNumber", "devicePlatform", "status", "model", "deviceClass"])
       end
     end
 

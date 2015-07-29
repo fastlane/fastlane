@@ -94,6 +94,14 @@ end
 
 def adp_stub_devices
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
+    with(body: {deviceClasses: 'iphone', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;'}).
+    to_return(status: 200, body: adp_read_fixture_file('listDevicesiPhone.action.json'), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
+    with(body: {deviceClasses: 'ipod', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;'}).
+    to_return(status: 200, body: adp_read_fixture_file('listDevicesiPod.action.json'), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
     with(body: {teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: {'Content-Type' => 'application/json'})
 
