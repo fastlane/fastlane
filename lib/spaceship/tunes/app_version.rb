@@ -283,6 +283,11 @@ module Spaceship
         super(value)
       end
 
+      def primary_first_sub_category=(value)
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        super(value)
+      end
+
       def primary_second_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
@@ -305,28 +310,28 @@ module Spaceship
 
       private
         # generates the nested data structure to represent screenshots
-        def setup_screenshots(row)
-          screenshots = row.fetch('screenshots', {}).fetch('value', nil)
-          return [] unless screenshots
+      def setup_screenshots(row)
+        screenshots = row.fetch('screenshots', {}).fetch('value', nil)
+        return [] unless screenshots
 
-          result = []
+        result = []
 
-          screenshots.each do |device_type, value|
-            value['value'].each do |screenshot|
-              screenshot = screenshot['value']
-              result << Tunes::AppScreenshot.new({
-                url: screenshot['url'],
-                thumbnail_url: screenshot['thumbNailUrl'],
-                sort_order: screenshot['sortOrder'],
-                original_file_name: screenshot['originalFileName'],
-                device_type: device_type,
-                language: row['language']
-              })
-            end
+        screenshots.each do |device_type, value|
+          value['value'].each do |screenshot|
+            screenshot = screenshot['value']
+            result << Tunes::AppScreenshot.new({
+              url: screenshot['url'],
+              thumbnail_url: screenshot['thumbNailUrl'],
+              sort_order: screenshot['sortOrder'],
+              original_file_name: screenshot['originalFileName'],
+              device_type: device_type,
+              language: row['language']
+            })
           end
-
-          return result
         end
+
+        return result
+      end
     end
   end
 end

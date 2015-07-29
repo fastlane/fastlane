@@ -199,12 +199,6 @@ Style/IfUnlessModifier:
 Style/IndentHash:
   Enabled: false
 
-# Offense count: 21
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentationConsistency:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/LeadingCommentSpace:

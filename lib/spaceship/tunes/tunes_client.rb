@@ -416,35 +416,35 @@ module Spaceship
     end
 
     private 
-      def update_tester_from_app!(tester, app_id, testing)
-        url = tester.class.url(app_id)[:update_by_app]
-        data = {
-          users: [
-            {
-              emailAddress: {
-                value: tester.email
-              }, 
-              firstName: {
-                value: tester.first_name
-              },
-              lastName: {
-                value: tester.last_name
-              },
-              testing: {
-                value: testing
-              }
+    def update_tester_from_app!(tester, app_id, testing)
+      url = tester.class.url(app_id)[:update_by_app]
+      data = {
+        users: [
+          {
+            emailAddress: {
+              value: tester.email
+            }, 
+            firstName: {
+              value: tester.first_name
+            },
+            lastName: {
+              value: tester.last_name
+            },
+            testing: {
+              value: testing
             }
-          ]
-        }
+          }
+        ]
+      }
 
-        r = request(:post) do |req|
-          req.url url
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-          
-        data = parse_response(r, 'data')
-        handle_itc_response(data)
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
       end
+        
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
   end
 end
