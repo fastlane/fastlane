@@ -115,12 +115,6 @@ Style/CaseIndentation:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/ClassCheck:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/ClosingParenthesisIndentation:

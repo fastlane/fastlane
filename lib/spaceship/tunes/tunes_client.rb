@@ -71,7 +71,7 @@ module Spaceship
 
     def handle_itc_response(raw)
       return unless raw
-      return unless raw.kind_of? Hash
+      return unless raw.is_a? Hash
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
  
@@ -84,15 +84,15 @@ module Spaceship
 
       def handle_response_hash(hash)
         errors = []
-        if hash.kind_of? Hash
+        if hash.is_a? Hash
           hash.each do |key, value|
             errors = errors + handle_response_hash(value)
 
-            if key == 'errorKeys' and value.kind_of? Array and value.count > 0
+            if key == 'errorKeys' and value.is_a? Array and value.count > 0
               errors = errors + value
             end
           end
-        elsif hash.kind_of? Array
+        elsif hash.is_a? Array
           hash.each do |value|
             errors = errors + handle_response_hash(value)
           end
