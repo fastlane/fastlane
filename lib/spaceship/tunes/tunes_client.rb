@@ -82,11 +82,11 @@ module Spaceship
         logger.debug("Request was successful")
       end
 
-      def handle_response_hash(hash)
+      handle_response_hash = lambda do |hash|
         errors = []
         if hash.is_a? Hash
           hash.each do |key, value|
-            errors = errors + handle_response_hash(value)
+            errors = errors + handle_response_hash.call(value)
 
             if key == 'errorKeys' and value.is_a? Array and value.count > 0
               errors = errors + value
@@ -94,7 +94,7 @@ module Spaceship
           end
         elsif hash.is_a? Array
           hash.each do |value|
-            errors = errors + handle_response_hash(value)
+            errors = errors + handle_response_hash.call(value)
           end
         else
           # We don't care about simple values
@@ -102,7 +102,7 @@ module Spaceship
         return errors
       end
 
-      errors = handle_response_hash(data)
+      errors = handle_response_hash.call(data)
       errors = errors + data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
 
       # Sometimes there is a different kind of error in the JSON response

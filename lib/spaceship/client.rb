@@ -152,9 +152,22 @@ module Spaceship
       !!@cookie
     end
 
+    def with_retry(tries = 5, &block)
+      begin
+        return block.call
+      rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+        unless (tries -= 1).zero?
+          sleep 3
+          retry
+        end
+
+        raise ex # re-raise the exception
+      end
+    end
+
     private
 
-      # Is called from `parse_response` to store the latest csrf_token (if available)
+    # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
       if response and response.headers
         tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
@@ -209,17 +222,9 @@ module Spaceship
       # Actually sends the request to the remote server
       # Automatically retries the request up to 3 times if something goes wrong
     def send_request(method, url_or_path, params, headers, &block)
-      tries ||= 5
-
-      return @client.send(method, url_or_path, params, headers, &block)
-
-    rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
-      unless (tries -= 1).zero?
-        sleep 3
-        retry
+      with_retry do
+        @client.send(method, url_or_path, params, headers, &block)
       end
-
-      raise ex # re-raise the exception
     end
 
     def parse_response(response, expected_key = nil)

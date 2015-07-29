@@ -13,10 +13,6 @@ Lint/DuplicateMethods:
 Lint/HandleExceptions:
   Enabled: false
 
-# Offense count: 3
-Lint/NestedMethodDefinition:
-  Enabled: false
-
 # Offense count: 11
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false

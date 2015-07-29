@@ -217,29 +217,19 @@ module Spaceship
             end
           end
 
-          def send_create_request(name, type, app_id, certificate_parameter, devices)
-            tries ||= 5
-            client.create_provisioning_profile!(name, type, app_id, certificate_parameter, devices)
-          rescue => ex 
-            unless (tries -= 1).zero?
-              sleep 3
-              retry
-            end
-
-            raise ex # re-raise the exception
+          profile = client.with_retry do
+            client.create_provisioning_profile!(name,
+                                                self.type,
+                                                app.app_id,
+                                                certificate_parameter,
+                                                devices.map {|d| d.id} )
           end
 
-          profile = send_create_request(name,
-                                        self.type,
-                                        app.app_id,
-                                        certificate_parameter,
-                                        devices.map {|d| d.id} )
-          
           self.new(profile)
         end
 
         # @return (Array) Returns all profiles registered for this account
-        #  If you're calling this from a subclass (like AdHoc), this will 
+        #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
         def all
           profiles = client.provisioning_profiles.map do |profile|
@@ -335,36 +325,13 @@ module Spaceship
           elsif self.is_a? InHouse
             self.certificates = [Spaceship::Certificate::InHouse.all.first]
           else
-            self.certificates = [Spaceship::Certificate::Production.all.first]  
+            self.certificates = [Spaceship::Certificate::Production.all.first]
           end
         end
 
-        def send_update_request(id, name, distribution_method, app_id, certificates, devices)
-          tries ||= 5
-          client.repair_provisioning_profile!(
-            id,
-            name,
-            distribution_method,
-            app_id,
-            certificates,
-            devices
-          )
-        rescue => ex 
-          unless (tries -= 1).zero?
-            sleep 3
-            retry
-          end
-          raise ex # re-raise the exception
+        client.with_retry do
+          client.repair_provisioning_profile!(id, name, distribution_method, app.app_id, certificates.map { |c| c.id }, devices.map { |d| d.id })
         end
-
-        send_update_request(
-          self.id,
-          self.name,
-          self.distribution_method,
-          self.app.app_id,
-          self.certificates.map { |c| c.id },
-          self.devices.map { |d| d.id }
-        )
 
         # We need to fetch the provisioning profile again, as the ID changes
         profile = Spaceship::ProvisioningProfile.all.find do |profile|
