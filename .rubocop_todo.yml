@@ -150,31 +150,10 @@ Style/DoubleNegation:
 Style/EmptyElse:
   Enabled: false
 
-# Offense count: 18
-# Cop supports --auto-correct.
-Style/EmptyLines:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundAccessModifier:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundBlockBody:
-  Enabled: false
-
 # Offense count: 12
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundMethodBody:
   Enabled: false
 
 # Offense count: 1

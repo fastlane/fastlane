@@ -177,7 +177,6 @@ describe Spaceship::ProvisioningProfile do
         expect(client).to receive(:repair_provisioning_profile!).with('475ESRP5F3', 'net.sunapps.7 Development', 'limited', '572XTN75U2', ["C8DL7464RQ"], devices).and_return({})
         profile.repair!
       end
-
     end
   end
 

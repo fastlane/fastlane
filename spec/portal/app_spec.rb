@@ -62,9 +62,7 @@ describe Spaceship::Portal::App do
     end
   end
 
-
   describe "Filter app based on app identifier" do
-
     it "works with specific App IDs" do
       app = Spaceship::Portal::App.find("net.sunapps.151")
       expect(app.app_id).to eq("B7JBD8LHAA")

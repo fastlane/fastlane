@@ -13,7 +13,6 @@ describe Spaceship::Tunes::Tester do
   end
 
   describe "Receiving existing testers" do
-
     it "inspect works, by also fetching the parent's attributes" do
       t = Spaceship::Tunes::Tester::Internal.all.first
       expect(t.inspect).to include("Tunes::Tester")

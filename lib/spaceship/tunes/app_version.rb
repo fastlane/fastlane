@@ -127,7 +127,6 @@ module Spaceship
       # @return (Hash) Represents the screenshots of this app version (read-only)
       attr_reader :screenshots
 
-
       attr_mapping({
         'canBetaTest' => :can_beta_test,
         'canPrepareForUpload' => :can_prepare_for_upload,
@@ -232,7 +231,6 @@ module Spaceship
         "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.application.apple_id}/" + (self.is_live? ? "cur" : "")
       end
 
-
       # Private methods
       def setup
         # Properly parse the AppStatus
@@ -246,7 +244,6 @@ module Spaceship
           @screenshots[row['language']] = setup_screenshots(row)
         end
       end
-
 
       # Prefill name, keywords, etc...
       def unfold_languages
@@ -309,6 +306,7 @@ module Spaceship
       end
 
       private
+
         # generates the nested data structure to represent screenshots
       def setup_screenshots(row)
         screenshots = row.fetch('screenshots', {}).fetch('value', nil)

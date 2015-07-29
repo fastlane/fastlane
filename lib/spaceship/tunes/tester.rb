@@ -32,7 +32,6 @@ module Spaceship
       #    }]
       attr_accessor :devices
 
-
       # Information about the most recent beta install
       # @return [Integer] The ID of the most recently installed app
       attr_accessor :latest_install_app_id

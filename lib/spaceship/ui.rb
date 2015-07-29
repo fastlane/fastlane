@@ -4,7 +4,6 @@ paths.each do |file|
   require file
 end
 
-
 module Spaceship
   class Client
     # Public getter for all UI related code

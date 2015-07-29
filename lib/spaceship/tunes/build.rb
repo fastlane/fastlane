@@ -44,7 +44,6 @@ module Spaceship
       #   this is only true after the build was approved by Apple
       attr_accessor :external_testing_enabled
 
-
       # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
 

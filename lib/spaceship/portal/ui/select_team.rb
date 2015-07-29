@@ -57,9 +57,7 @@ module Spaceship
           puts "Couldn't find team with Name '#{team_name}'"
         end
 
-
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
-
 
         # User Selection
         loop do

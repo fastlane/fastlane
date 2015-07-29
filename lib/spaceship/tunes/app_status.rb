@@ -40,7 +40,6 @@ module Spaceship
       # REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
 
-
       # Get the app status matching based on a string (given by iTunes Connect)
       def self.get_from_string(text)
         mapping = {

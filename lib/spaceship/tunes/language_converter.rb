@@ -28,6 +28,7 @@ module Spaceship
         end
 
         private
+
           # Path to the gem to fetch resoures
         def spaceship_gem_path
           if Gem::Specification::find_all_by_name('spaceship').any?

@@ -142,7 +142,6 @@ def adp_stub_certificates
      with(body: {"certificateId"=>"XC5PH8DAAA", "teamId"=>"XXXXXXXXXX", "type"=>"R58UK2EAAA"},
           headers: {'Cookie'=>'myacinfo=abcdef;'}).
      to_return(status: 200, body: adp_read_fixture_file('revokeCertificate.action.json'), headers: {'Content-Type' => 'application/json'})
-
 end
 
 def adp_stub_apps

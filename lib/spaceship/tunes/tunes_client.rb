@@ -120,7 +120,6 @@ module Spaceship
       return data
     end
 
-
     #####################################################
     # @!group Applications
     #####################################################
@@ -415,7 +414,8 @@ module Spaceship
       update_tester_from_app!(tester, app_id, false)
     end
 
-    private 
+    private
+ 
     def update_tester_from_app!(tester, app_id, testing)
       url = tester.class.url(app_id)[:update_by_app]
       data = {

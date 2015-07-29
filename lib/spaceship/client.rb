@@ -5,7 +5,6 @@ require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 
-
 if ENV["DEBUG"]
   require 'openssl'
   # this has to be on top of this file, since the value can't be changed later
@@ -154,6 +153,7 @@ module Spaceship
     end
 
     private
+
       # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
       if response and response.headers
