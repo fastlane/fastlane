@@ -320,9 +320,9 @@ module Spaceship
       #  the repair method will generate a profile with a new ID
       def update!
         unless certificate_valid?
-          if self.is_a? Development
+          if self.kind_of? Development
             self.certificates = [Spaceship::Certificate::Development.all.first]
-          elsif self.is_a? InHouse
+          elsif self.kind_of? InHouse
             self.certificates = [Spaceship::Certificate::InHouse.all.first]
           else
             self.certificates = [Spaceship::Certificate::Production.all.first]
