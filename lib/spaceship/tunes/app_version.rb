@@ -275,11 +275,6 @@ module Spaceship
         super(value)
       end
 
-      def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
       def primary_first_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
