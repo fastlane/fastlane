@@ -204,7 +204,7 @@ module Spaceship
 
           devices = [] if (self == AppStore or self == InHouse) # App Store Profiles MUST NOT have devices
 
-          certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of?Array
+          certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
@@ -330,9 +330,9 @@ module Spaceship
       #  the repair method will generate a profile with a new ID
       def update!
         unless certificate_valid?
-          if self.kind_of?Development
+          if self.kind_of? Development
             self.certificates = [Spaceship::Certificate::Development.all.first]
-          elsif self.kind_of?InHouse
+          elsif self.kind_of? InHouse
             self.certificates = [Spaceship::Certificate::InHouse.all.first]
           else
             self.certificates = [Spaceship::Certificate::Production.all.first]  

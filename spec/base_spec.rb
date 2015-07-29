@@ -8,8 +8,8 @@ describe Spaceship::Base do
     it "contains the relevant data" do
       app = Spaceship::App.all.first
       output = app.inspect
-      expect(output).to include"B7JBD8LHAA"
-      expect(output).to include"The App Name"
+      expect(output).to include "B7JBD8LHAA"
+      expect(output).to include "The App Name"
     end
 
     it "prints out references" do
@@ -17,8 +17,8 @@ describe Spaceship::Base do
       app = Spaceship::Application.all.first
       v = app.live_version
       output = v.inspect
-      expect(output).to include"Tunes::AppVersion"
-      expect(output).to include"Tunes::Application"
+      expect(output).to include "Tunes::AppVersion"
+      expect(output).to include "Tunes::Application"
     end
   end
 

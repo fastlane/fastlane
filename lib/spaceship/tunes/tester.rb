@@ -128,7 +128,7 @@ module Spaceship
             begin
               tester.add_to_app!(app_id)
             rescue => ex
-              if ex.to_s.include?"testerEmailExistsInternal" or ex.to_s.include?"duplicate.email"
+              if ex.to_s.include? "testerEmailExistsInternal" or ex.to_s.include? "duplicate.email"
                 # That's a non-relevant error message by iTC
                 # ignore that
               else

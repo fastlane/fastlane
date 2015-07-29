@@ -266,7 +266,7 @@ module Spaceship
 
       # @return (Bool): Is this certificate a push profile for apps?
       def is_push?
-        self.kind_of?PushCertificate
+        self.kind_of? PushCertificate
       end
     end
   end
