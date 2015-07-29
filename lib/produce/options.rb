@@ -24,7 +24,7 @@ module Produce
                                      env_name: "PRODUCE_APP_NAME",
                                      short_option: "-q",
                                      description: "App Name"),
-        FastlaneCore::ConfigItem.new(key: :version,
+        FastlaneCore::ConfigItem.new(key: :app_version,
                                      short_option: "-z",
                                      env_name: "PRODUCE_VERSION",
                                      description: "Initial version number (e.g. '1.0')"),

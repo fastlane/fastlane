@@ -24,7 +24,7 @@ module Produce
 
         Spaceship::Tunes::Application.create!(name: Produce.config[:app_name], 
                                               primary_language: language,
-                                              version: Produce.config[:version], 
+                                              version: Produce.config[:app_version], 
                                               sku: Produce.config[:sku].to_s, # might be an int
                                               bundle_id: app_identifier, 
                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix])
