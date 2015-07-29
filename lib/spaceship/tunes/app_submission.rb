@@ -9,61 +9,61 @@ module Spaceship
 
       # @return (AppVersion) The version to use for this submission
       attr_accessor :version
-      
+
       # @return (String) The stage of this submission (start, complete)
       attr_accessor :stage
-      
+
       # @return (Boolean) Submitted for Review
       attr_accessor :submitted_for_review
 
       # @return (Boolean) Ad ID Info - Limits ads tracking
       attr_accessor :add_id_info_limits_tracking
-      
+
       # @return (Boolean) Ad ID Info - Serves ads
       attr_accessor :add_id_info_serves_ads
-      
+
       # @return (Boolean) Ad ID Info - Tracks actions
       attr_accessor :add_id_info_tracks_action
-      
+
       # @return (Boolean) Ad ID Info - Tracks installs
       attr_accessor :add_id_info_tracks_install
-      
+
       # @return (Boolean) Ad ID Info - Uses idfa
       attr_accessor :add_id_info_uses_idfa
-      
+
       # @return (Boolean) Content Rights - Contains third party content
       attr_accessor :content_rights_contains_third_party_content
-      
+
       # @return (Boolean) Content Rights - Has rights of content
       attr_accessor :content_rights_has_rights
-            
+
       # @return (Boolean) Export Compliance - Available on French Store
       attr_accessor :export_compliance_available_on_french_store
-      
+
       # @return (@TODO) Export Compliance - CCAT File
       attr_accessor :export_compliance_ccat_file
-      
+
       # @return (Boolean) Export Compliance - Contains proprietary cryptography
       attr_accessor :export_compliance_contains_proprietary_cryptography
-      
+
       # @return (Boolean) Export Compliance - Contains third-party cryptography
       attr_accessor :export_compliance_contains_third_party_cryptography
-      
+
       # @return (Boolean) Export Compliance - Is exempt
       attr_accessor :export_compliance_is_exempt
-      
+
       # @return (Boolean) Export Compliance - Uses encryption
       attr_accessor :export_compliance_uses_encryption
 
       # @return (String) Export Compliance - App type
       attr_accessor :export_compliance_app_type
-      
+
       # @return (Boolean) Export Compliance - Encryption Updated
       attr_accessor :export_compliance_encryption_updated
-      
+
       # @return (Boolean) Export Compliance - Compliance Required
       attr_accessor :export_compliance_compliance_required
-      
+
       # @return (String) Export Compliance - Platform
       attr_accessor :export_compliance_platform
 
@@ -75,11 +75,11 @@ module Spaceship
         'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
         'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
         'adIdInfo.usesIdfa.value' => :add_id_info_uses_idfa,
-        
+
         # Content Rights Section
         'contentRights.containsThirdPartyContent.value' => :content_rights_contains_third_party_content,
         'contentRights.hasRights.value' => :content_rights_has_rights,
-        
+
         # Export Compliance Section
         'exportCompliance.availableOnFrenchStore.value' => :export_compliance_available_on_french_store,
         'exportCompliance.ccatFile.value' => :export_compliance_ccat_file,
@@ -98,7 +98,7 @@ module Spaceship
         # This is used to create a new object based on the server response.
         def factory(attrs)
           orig = attrs.dup
-          
+
           # fill content rights section if iTC returns nil
           if attrs["contentRights"].nil?
             attrs.merge!("contentRights" => {
@@ -110,11 +110,11 @@ module Spaceship
               }
             })
           end
-          
+
           obj = self.new(attrs)
           return obj
         end
-        
+
         # @param application (Spaceship::Tunes::Application) The app this submission is for
         # @param app_id (String) The unique Apple ID of this app
         def create(application, app_id, version)
@@ -127,7 +127,7 @@ module Spaceship
           return self.factory(attrs)
         end
       end
-      
+
       # Save and complete the app submission
       def complete!
         @stage = "complete"

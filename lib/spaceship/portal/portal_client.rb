@@ -13,7 +13,7 @@ module Spaceship
     def api_key
       cache_path = "/tmp/spaceship_api_key.txt"
       begin
-        cached = File.read(cache_path) 
+        cached = File.read(cache_path)
       rescue Errno::ENOENT
       end
       return cached if cached

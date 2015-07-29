@@ -4,7 +4,7 @@ module Spaceship
     class App < PortalBase
 
       # @return (String) The identifier of this app, provided by the Dev Portal
-      # @example 
+      # @example
       #   "RGAWZGXSAA"
       attr_accessor :app_id
 
@@ -14,17 +14,17 @@ module Spaceship
       attr_accessor :name
 
       # @return (String) the supported platform of this app
-      # @example 
+      # @example
       #   "ios"
       attr_accessor :platform
 
       # Prefix provided by the Dev Portal
-      # @example 
+      # @example
       #   "5A997XSHK2"
       attr_accessor :prefix
 
       # @return (String) The bundle_id (app identifier) of your app
-      # @example 
+      # @example
       #   "com.krausefx.app"
       attr_accessor :bundle_id
 
@@ -33,7 +33,7 @@ module Spaceship
 
       # @return (Hash) Feature details
       attr_accessor :features
-      
+
       # @return (Array) List of enabled features
       attr_accessor :enabled_features
 
@@ -45,10 +45,10 @@ module Spaceship
 
       # @return (Fixnum) Number of associated app groups
       attr_accessor :app_groups_count
-      
+
       # @return (Fixnum) Number of associated cloud containers
       attr_accessor :cloud_containers_count
-      
+
       # @return (Fixnum) Number of associated identifiers
       attr_accessor :identifiers_count
 
@@ -81,7 +81,7 @@ module Spaceship
         end
 
         # Creates a new App ID on the Apple Dev Portal
-        # 
+        #
         # if bundle_id ends with '*' then it is a wildcard id otherwise, it is an explicit id
         # @param bundle_id [String] the bundle id (app_identifier) of the app associated with this provisioning profile
         # @param name [String] the name of the App
@@ -113,7 +113,7 @@ module Spaceship
         client.delete_app!(app_id)
         self
       end
-      
+
       # Fetch a specific App ID details based on the bundle_id
       # @return (App) The app you're looking for. This is nil if the app can't be found.
       def details

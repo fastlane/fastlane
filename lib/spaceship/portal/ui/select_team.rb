@@ -8,11 +8,11 @@ module Spaceship
       #   "type"=>"Company/Organization",
       #   "extendedTeamAttributes"=>{},
       #   "teamAgent"=>{
-      #       "personId"=>15534241111, 
-      #       "firstName"=>"Felix", 
-      #       "lastName"=>"Krause", 
-      #       "email"=>"spaceship@krausefx.com", 
-      #       "developerStatus"=>"active", 
+      #       "personId"=>15534241111,
+      #       "firstName"=>"Felix",
+      #       "lastName"=>"Krause",
+      #       "email"=>"spaceship@krausefx.com",
+      #       "developerStatus"=>"active",
       #       "teamMemberId"=>"5Y354CXAAA"},
       #   "memberships"=>
       #    [{"membershipId"=>"HJ5WHYC5CE",

@@ -148,7 +148,7 @@ def adp_stub_apps
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action').
     with(body: {teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;'}).
     to_return(status: 200, body: adp_read_fixture_file('listApps.action.json'), headers: {'Content-Type' => 'application/json'})
-  
+
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/getAppIdDetail.action").
     with(body: {appIdId: "B7JBD8LHAA", teamId: "XXXXXXXXXX"}).
     to_return(status: 200, body: adp_read_fixture_file('getAppIdDetail.action.json'), headers: {'Content-Type' => 'application/json'})

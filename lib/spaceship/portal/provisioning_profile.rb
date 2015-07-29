@@ -16,12 +16,12 @@ module Spaceship
       attr_accessor :uuid
 
       # @return (DateTime) The date and time of when the profile
-      #   expires. 
+      #   expires.
       # @example
       #   #<DateTime: 2015-11-25T22:45:50+00:00 ((2457352j,81950s,0n),+0s,2299161j)>
       attr_accessor :expires
 
-      # @return (String) The profile distribution type. You probably want to 
+      # @return (String) The profile distribution type. You probably want to
       #   use the class type to detect the profile type instead of this string.
       # @example AppStore Profile
       #     "store"
@@ -45,7 +45,7 @@ module Spaceship
       #   "Invalid"
       attr_accessor :status
 
-      # @return (String) The type of the profile (development or distribution). 
+      # @return (String) The type of the profile (development or distribution).
       #   You'll probably not need this value
       # @example Distribution
       #   "iOS Distribution"
@@ -69,7 +69,7 @@ module Spaceship
       # A reference to the app this profile is for.
       # You can then easily access the value directly
       # @return (App) The app this profile is for
-      # 
+      #
       # @example Example Value
       #   <Spaceship::App
       #     @app_id="2UMR2S6PAA"
@@ -80,7 +80,7 @@ module Spaceship
       #     @is_wildcard=false
       #     @dev_push_enabled=false
       #     @prod_push_enabled=false>
-      # 
+      #
       # @example Usage
       #   profile.app.name
       attr_accessor :app
@@ -99,14 +99,14 @@ module Spaceship
       #     @owner_id=nil
       #     @type_display_id="R58UK2EWAA">]
       #  ]
-      # 
+      #
       # @example Usage
       #   profile.certificates.first.id
       attr_accessor :certificates
 
       # @return (Array) A list of devices this profile is enabled for.
       #   This will always be [] for AppStore profiles
-      # 
+      #
       # @example Example Value
       #  <Spaceship::Device
       #    @id="WXQ7V239BE"
@@ -114,7 +114,7 @@ module Spaceship
       #    @udid="ba0ac7d70f7a14c6fa02ef0e02f4fe9c5178e2f7"
       #    @platform="ios"
       #    @status="c">]
-      # 
+      #
       # @example Usage
       #  profile.devices.first.name
       attr_accessor :devices
@@ -204,7 +204,7 @@ module Spaceship
 
           devices = [] if (self == AppStore or self == InHouse) # App Store Profiles MUST NOT have devices
 
-          certificate_parameter = certificate.collect { |c| c.id } if certificate.is_a? Array
+          certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
@@ -307,7 +307,7 @@ module Spaceship
 
       # Repair an existing provisioning profile
       # alias to update!
-      # @return (ProvisioningProfile) A new provisioning profile, as 
+      # @return (ProvisioningProfile) A new provisioning profile, as
       #  the repair method will generate a profile with a new ID
       def repair!
         update!
@@ -316,7 +316,7 @@ module Spaceship
       # Updates the provisioning profile from the local data
       # e.g. after you added new devices to the profile
       # This will also update the code signing identity if necessary
-      # @return (ProvisioningProfile) A new provisioning profile, as 
+      # @return (ProvisioningProfile) A new provisioning profile, as
       #  the repair method will generate a profile with a new ID
       def update!
         unless certificate_valid?
@@ -342,7 +342,7 @@ module Spaceship
       end
 
       # Is the certificate of this profile available?
-      # @return (Bool) is the certificate valid? 
+      # @return (Bool) is the certificate valid?
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
