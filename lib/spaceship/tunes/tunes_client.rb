@@ -238,7 +238,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def submit_testflight_build_for_review!(# Required:
+    def submit_testflight_build_for_review!( # Required:
                                             app_id: nil, 
                                             train: nil, 
                                             build_number: nil, 
