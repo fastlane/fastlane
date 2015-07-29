@@ -29,7 +29,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.email).to eq("felix@sunapps.net")
       expect(t.first_name).to eq("Felix")
       expect(t.last_name).to eq("Krause")
-      expect(t.devices).to eq([{"model"=>"iPhone 6", "os"=>"iOS", "osVersion"=>"8.3", "name"=>nil}])
+      expect(t.devices).to eq([{"model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil}])
     end
 
     it "External Testers" do
@@ -42,7 +42,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.email).to eq("private@krausefx.com")
       expect(t.first_name).to eq("Detlef")
       expect(t.last_name).to eq("Müller")
-      expect(t.devices).to eq([{"model"=>"iPhone 6", "os"=>"iOS", "osVersion"=>"8.3", "name"=>nil}])
+      expect(t.devices).to eq([{"model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil}])
     end
   end
 

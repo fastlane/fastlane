@@ -120,7 +120,7 @@ describe Spaceship::Application do
 
       it "when the app was not rejected" do
         itc_stub_resolution_center_valid
-        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}})
+        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys" => [], "sectionInfoKeys" => [], "sectionWarningKeys" => [], "replyConstraints" => {"minLength" => 1, "maxLength" => 4000}, "appNotes" => {"threads" => []}, "betaNotes" => {"threads" => []}, "appMessages" => {"threads" => []}})
       end
     end
 

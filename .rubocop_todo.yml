@@ -274,12 +274,6 @@ Style/SelfAssignment:
 Style/SignalException:
   Enabled: false
 
-# Offense count: 275
-# Cop supports --auto-correct.
-# Configuration parameters: MultiSpaceAllowedForOperators.
-Style/SpaceAroundOperators:
-  Enabled: false
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Style/SpaceBeforeComment:
