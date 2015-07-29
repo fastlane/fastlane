@@ -1,21 +1,25 @@
 module Fastlane
   module Actions
     module SharedValues
-      XCODE_SERVER_GET_ASSET_CUSTOM_VALUE = :XCODE_SERVER_GET_ASSET_CUSTOM_VALUE
+      XCODE_SERVER_GET_ASSET_ARCHIVE_PATH = :XCODE_SERVER_GET_ASSET_ARCHIVE_PATH
     end
 
     class XcodeServerGetAssetAction < Action
 
       require 'excon'
       require 'json'
+      require 'fileutils'
 
       def self.run(params)
 
-        host = "127.0.0.1"
+        host = "10.99.0.57"
         username = "user"
         password = "pw"
         trustSelfSigned = true
-        bot_name = 'Builda Archiver'
+
+        # TODO: somehow make user tell us the bot to use OR make it a parameter to be passed in (the name of the bot)
+        bot_name = 'neverland-release'
+        target_folder = './xcs_assets'
 
         # setup (not)trusting self signed certificates.
         # it's normal to have a self signed certificate on your Xcode Server
@@ -41,20 +45,41 @@ module Fastlane
         raise "Failed to find any completed integration for Bot with name #{bot_name}" if found_bots.count == 0
 
         # pick the first (latest) one for now
+        # TODO: only take the last successful one? or allow failing tests? warnings?
         integration = integrations.first
 
         # fetch assets for this integration
-        assets = xcs.fetch_assets(integration['_id'])
+        assets_file_path = xcs.fetch_assets(integration['_id'], target_folder, self)
+        asset_entries = Dir.entries(assets_file_path).map { |i| File.join(assets_file_path, i) }
 
-        # TODO: somehow make user tell us the bot to use OR make it a parameter to be passed in (the name of the bot)
-        # require 'pry'; binding.pry
+        Helper.log.info "Successfully downloaded #{asset_entries.count} assets to file #{assets_file_path}!".green
 
-        # sh "shellcommand ./path"
+        # now find the archive, unzip it and return a path to it from the action
+        zipped_archive_path = asset_entries.select { |i| i.end_with?('xcarchive.zip') }.first
 
-        # Actions.lane_context[SharedValues::XCODE_SERVER_GET_ASSET_CUSTOM_VALUE] = "my_val"
+        raise "Could not find xcarchive" if zipped_archive_path == nil
+
+        archive_file_path = File.basename(zipped_archive_path, File.extname(zipped_archive_path))
+        archive_dir_path = File.dirname(zipped_archive_path)
+        archive_path = File.join(archive_dir_path, archive_file_path)
+        sh "unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\""
+
+        # delete everything except for the archive
+        # TODO: make deleting of the other assets an option, default to true
+        files_to_delete = asset_entries.select do |i| 
+          File.extname(i) != 'xcarchive' && ![".", ".."].include?(File.basename(i))
+        end
+
+        files_to_delete.each do |i|
+          FileUtils.rm_rf(i)
+        end
+
+        Actions.lane_context[SharedValues::XCODE_SERVER_GET_ASSET_ARCHIVE_PATH] = archive_path
+        return archive_path
       end
 
       class XcodeServer
+
         def initialize(host, username, password)
           @host = host.start_with?('https://') ? host : "https://#{host}"
           @username = username
@@ -73,29 +98,58 @@ module Fastlane
           integrations = JSON.parse(response.body)['results']
         end
 
-        def fetch_assets(integration_id)
+        def fetch_assets(integration_id, target_folder, action)
           url = url_for_endpoint("/integrations/#{integration_id}/assets")
 
+          # create a temp folder and a file, stream the download into it
+          Dir.mktmpdir do |dir|
 
-          # TODO: create a temp file, stream the download into it, then pull the real name from headers and move+rename it to the destination place
+            temp_file = File.join(dir, "tmp_download.#{rand(1000000)}")
+            f = open(temp_file, 'w')
+            streamer = lambda do |chunk, remaining_bytes, total_bytes|
+              # puts chunk
+              Helper.log.info "Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%".yellow
+              f.write(chunk)
+            end
 
-          
-          f = open('./my_file.zip', 'w')
-          require 'pry'; binding.pry
+            response = Excon.get(url, :response_block => streamer)
+            f.close()
 
-          streamer = lambda do |chunk, remaining_bytes, total_bytes|
-            # puts chunk
-            Helper.log.info "Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%".yellow
-            f.write(chunk)
+            raise "Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}" if response.status != 200
+
+            # unzip it, it's a .tar.gz file
+            out_folder = File.join(dir, "out_#{rand(1000000)}")
+            FileUtils.mkdir_p(out_folder)
+
+            action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"
+
+            # then pull the real name from headers
+            asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].gsub('"', '')
+            asset_foldername = asset_filename.split('.')[0]
+
+            # rename the folder in out_folder to asset_foldername
+            found_folder = Dir.entries(out_folder).select { |item| item != '.' && item != '..' }[0]
+
+            raise "Internal error, couldn't find unzipped folder" if found_folder == nil
+
+            unzipped_folder_temp_name = File.join(out_folder, found_folder)
+            unzipped_folder = File.join(out_folder, asset_foldername)
+
+            # rename to destination name
+            FileUtils.mv(unzipped_folder_temp_name, unzipped_folder)
+
+            target_folder = File.absolute_path(target_folder)
+
+            # create target folder if it doesn't exist
+            FileUtils.mkdir_p(target_folder)
+
+            # and move+rename it to the destination place
+            FileUtils.cp_r(unzipped_folder, target_folder)
+            out = File.join(target_folder, asset_foldername)
+
+            return out
           end
-
-          response = Excon.get(url, :response_block => streamer)
-
-          f.close()
-          require 'pry'; binding.pry
-          
-          raise "Failed to fetch Assets for Integration #{integration_id} from Xcode Server at #{@host}" if response.status != 200
-          # TODO: try some proper download procedure here, it might be a file of 100s of MBs easily
+          return nil
         end
 
         def get_endpoint(endpoint)
@@ -158,29 +212,17 @@ module Fastlane
       end
 
       def self.output
-        # Define the shared values you are going to provide
-        # Example
         [
-          ['XCODE_SERVER_GET_ASSET_CUSTOM_VALUE', 'A description of what this value contains']
+          ['XCODE_SERVER_GET_ASSET_ARCHIVE_PATH', 'Absolute path to the downloaded xcarchive file']
         ]
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["Your GitHub/Twitter Name"]
+        ["czechboy0"]
       end
 
       def self.is_supported?(platform)
-        # you can do things like
-        # 
-        #  true
-        # 
-        #  platform == :ios
-        # 
-        #  [:ios, :mac].include?platform
-        # 
-
-        platform == :ios
+        true
       end
     end
   end
