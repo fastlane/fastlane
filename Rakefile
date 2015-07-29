@@ -3,5 +3,5 @@ require 'rubocop/rake_task'
 
 Dir.glob('tasks/**/*.rake').each(&method(:import))
 
-task :default => :spec
+task default: :spec
 RuboCop::RakeTask.new
