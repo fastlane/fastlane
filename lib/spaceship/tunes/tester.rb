@@ -55,7 +55,7 @@ module Spaceship
         'latestInstalledAppAdamId' => :latest_install_app_id,
         'latestInstalledDate' => :latest_install_date,
         'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number,
+        'latestInstalledShortVersion' => :latest_installed_build_number
       )
 
       class << self

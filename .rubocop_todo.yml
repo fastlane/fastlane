@@ -303,12 +303,6 @@ Style/StringLiterals:
 Style/SymbolProc:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline, SupportedStyles.
-Style/TrailingComma:
-  Enabled: false
-
 # Offense count: 158
 # Cop supports --auto-correct.
 Style/TrailingWhitespace:

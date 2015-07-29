@@ -87,7 +87,7 @@ module Spaceship
         'internalExpiry' => :internal_expiry_date,
         'externalExpiry' => :external_expiry_date,
         'watchKitEnabled' => :watch_kit_enabled,
-        'readyToInstall' => :ready_to_install,
+        'readyToInstall' => :ready_to_install
       )
 
       class << self
