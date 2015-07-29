@@ -330,7 +330,14 @@ module Spaceship
         end
 
         client.with_retry do
-          client.repair_provisioning_profile!(id, name, distribution_method, app.app_id, certificates.map { |c| c.id }, devices.map { |d| d.id })
+          client.repair_provisioning_profile!(
+            id,
+            name,
+            distribution_method,
+            app.app_id,
+            certificates.map { |c| c.id },
+            devices.map { |d| d.id }
+          )
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
