@@ -25,4 +25,3 @@ module Spaceship
   AppSubmission = Spaceship::Tunes::AppSubmission
   Application = Spaceship::Tunes::Application
 end
-
