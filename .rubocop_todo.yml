@@ -13,10 +13,6 @@ Lint/HandleExceptions:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
 
-# Offense count: 3
-Lint/ShadowingOuterLocalVariable:
-  Enabled: false
-
 # Offense count: 7
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:

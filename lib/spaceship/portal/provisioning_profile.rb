@@ -341,8 +341,8 @@ module Spaceship
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
-        profile = Spaceship::ProvisioningProfile.all.find do |profile|
-          profile.name == self.name # we can use the name as it's valid
+        profile = Spaceship::ProvisioningProfile.all.find do |p|
+          p.name == self.name # we can use the name as it's valid
         end
 
         return profile

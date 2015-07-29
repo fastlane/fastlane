@@ -167,7 +167,7 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id)
-      r = request(:post) do |r|
+      req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
         r.params = {
           teamId: team_id,
@@ -176,7 +176,7 @@ module Spaceship
         }
       end
 
-      parse_response(r, 'device')
+      parse_response(req, 'device')
     end
 
     #####################################################
@@ -231,7 +231,7 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles
-      r = request(:post) do |r|
+      req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
@@ -240,7 +240,7 @@ module Spaceship
         }
       end
 
-      parse_response(r, 'provisioningProfiles')
+      parse_response(req, 'provisioningProfiles')
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)
