@@ -8,7 +8,7 @@ module FastlaneCore
       if is_test?
         @@log ||= Logger.new(nil) # don't show any logs when running tests
       else
-        @@log ||= Logger.new(STDOUT)
+        @@log ||= Logger.new($stdout)
       end
 
       @@log.formatter = proc do |severity, datetime, progname, msg|
