@@ -1,0 +1,138 @@
+PATH
+  remote: .
+  specs:
+    attach (0.0.1)
+      fastlane_core (>= 0.9.2)
+      terminal-table
+      xcpretty
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.3.8)
+    babosa (1.0.2)
+    capybara (2.4.4)
+      mime-types (>= 1.16)
+      nokogiri (>= 1.3.3)
+      rack (>= 1.0.0)
+      rack-test (>= 0.5.4)
+      xpath (~> 2.0)
+    cliver (0.3.2)
+    coderay (1.1.0)
+    colored (1.2)
+    commander (4.3.4)
+      highline (~> 1.7.2)
+    coveralls (0.8.2)
+      json (~> 1.8)
+      rest-client (>= 1.6.8, < 2)
+      simplecov (~> 0.10.0)
+      term-ansicolor (~> 1.3)
+      thor (~> 0.19.1)
+    crack (0.4.2)
+      safe_yaml (~> 1.0.0)
+    credentials_manager (0.7.0)
+      colored
+      highline (>= 1.7.1)
+      security
+    diff-lcs (1.2.5)
+    docile (1.1.5)
+    domain_name (0.5.24)
+      unf (>= 0.0.5, < 1.0.0)
+    excon (0.45.4)
+    fastlane_core (0.11.1)
+      babosa
+      capybara (~> 2.4.3)
+      colored
+      commander (>= 4.3.4)
+      credentials_manager (>= 0.7.0)
+      excon (~> 0.45.0)
+      highline (>= 1.7.2)
+      json
+      multi_json
+      phantomjs (~> 1.9.8)
+      poltergeist (~> 1.5.1)
+      rubyzip (~> 1.1.6)
+    highline (1.7.2)
+    http-cookie (1.0.2)
+      domain_name (~> 0.5)
+    json (1.8.3)
+    method_source (0.8.2)
+    mime-types (2.6.1)
+    mini_portile (0.6.2)
+    multi_json (1.11.2)
+    netrc (0.10.3)
+    nokogiri (1.6.6.2)
+      mini_portile (~> 0.6.0)
+    phantomjs (1.9.8.0)
+    poltergeist (1.5.1)
+      capybara (~> 2.1)
+      cliver (~> 0.3.1)
+      multi_json (~> 1.0)
+      websocket-driver (>= 0.2.0)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    rack (1.6.4)
+    rack-test (0.6.3)
+      rack (>= 1.0)
+    rake (10.4.2)
+    rest-client (1.8.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
+    rspec (3.1.0)
+      rspec-core (~> 3.1.0)
+      rspec-expectations (~> 3.1.0)
+      rspec-mocks (~> 3.1.0)
+    rspec-core (3.1.7)
+      rspec-support (~> 3.1.0)
+    rspec-expectations (3.1.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.1.0)
+    rspec-mocks (3.1.3)
+      rspec-support (~> 3.1.0)
+    rspec-support (3.1.2)
+    rubyzip (1.1.7)
+    safe_yaml (1.0.4)
+    security (0.1.3)
+    simplecov (0.10.0)
+      docile (~> 1.1.0)
+      json (~> 1.8)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.0)
+    slop (3.6.0)
+    term-ansicolor (1.3.2)
+      tins (~> 1.0)
+    terminal-table (1.4.5)
+    thor (0.19.1)
+    tins (1.5.4)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.1)
+    webmock (1.19.0)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+    websocket-driver (0.6.2)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.2)
+    xcpretty (0.1.10)
+    xpath (2.0.0)
+      nokogiri (~> 1.3)
+    yard (0.8.7.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  attach!
+  bundler
+  coveralls
+  pry
+  rake
+  rspec (~> 3.1.0)
+  webmock (~> 1.19.0)
+  yard (~> 0.8.7.4)
+
+BUNDLED WITH
+   1.10.5
