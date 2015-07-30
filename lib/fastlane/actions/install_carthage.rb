@@ -24,27 +24,36 @@ module Fastlane
                                        description: "Use SSH for downloading GitHub repositories",
                                        default_value: false,
                                        is_string: false,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                         raise "Please pass a valid use_ssh. Use one of the following: true, false" unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
                                        description: "Add dependencies as Git submodules",
                                        default_value: false,
                                        is_string: false,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                         raise "Please pass a valid use_submodules. Use one of the following: true, false" unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_NO_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
                                        default_value: true,
                                        is_string: false,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: Proc.new do |value|
+                                         raise "Please pass a valid use_binaries. Use one of the following: true, false" unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
                                        default_value: "all",
                                        optional: true,
                                        verify_block: Proc.new do |value|
-                                        raise "Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS" unless ['all', 'iOS', 'Mac', 'watchOS'].include?value
-                                      end),
+                                         raise "Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS" unless ['all', 'iOS', 'Mac', 'watchOS'].include?value
+                                       end),
         ]
       end
 
