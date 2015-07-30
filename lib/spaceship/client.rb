@@ -142,7 +142,7 @@ module Spaceship
         require 'credentials_manager'
         data = CredentialsManager::PasswordManager.shared_manager(user, false)
         user ||= data.username
-        password ||= data.password
+        password = data.password
       end
 
       if user.to_s.strip.empty? or password.strip.to_s.empty?
