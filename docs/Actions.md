@@ -33,7 +33,13 @@ cocoapods # this will run pod install
 This will execute `carthage bootstrap`
 
 ```ruby
-carthage
+carthage(
+  # (optionals)
+  use_ssh: false,         # Use SSH for downloading GitHub repositories.
+  use_submodules: false,  # Add dependencies as Git submodules.
+  use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
+  platform: "all"         # Define which platform to build for
+)
 ```
 
 ### [xctool](https://github.com/facebook/xctool)
@@ -520,7 +526,7 @@ More information about the available options can be found in the [DeployGate Pus
 
 ### set_changelog
 
-To easily set the changelog of an app on iTunes Connect for all languages 
+To easily set the changelog of an app on iTunes Connect for all languages
 
 ```ruby
 set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")
