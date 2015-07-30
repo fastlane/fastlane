@@ -26,6 +26,10 @@ module Spaceship
     # Invalid user credentials were provided
     class InvalidUserCredentialsError < StandardError; end
 
+    # Raised when no user credentials were passed at all
+    class NoUserCredentialsError < StandardError; end
+
+
     class UnexpectedResponse < StandardError; end
 
     # Authenticates with Apple's web services. This method has to be called once
@@ -141,8 +145,8 @@ module Spaceship
         password ||= data.password
       end
 
-      if user.to_s.empty? or password.to_s.empty?
-        raise InvalidUserCredentialsError.new("No login data provided")
+      if user.to_s.strip.empty? or password.strip.to_s.empty?
+        raise NoUserCredentialsError.new("No login data provided")
       end
 
       send_login_request(user, password) # different in subclasses

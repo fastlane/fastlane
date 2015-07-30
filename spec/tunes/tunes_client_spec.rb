@@ -18,6 +18,25 @@ describe Spaceship::TunesClient do
     expect(subject.login_url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1")
   end
 
+  describe '#login' do
+    it 'returns the session cookie' do
+      subject.login(username, password)
+      expect(subject.cookie).to eq('myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw')
+    end
+
+    it 'raises an exception if authentication failed' do
+      expect {
+        subject.login('bad-username', 'bad-password')
+      }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
+    end
+
+    it "raises an exception if no login data is provided at all" do
+      expect {
+        subject.login('', '')
+      }.to raise_exception(Spaceship::Client::NoUserCredentialsError)
+    end
+  end
+
   describe "#send_login_request" do
     it "sets the correct cookies when getting the response" do
       expect(subject.cookie).to eq(nil)

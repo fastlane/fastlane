@@ -20,6 +20,12 @@ def itc_stub_login
          with(:body => {"theAccountName"=>"spaceship@krausefx.com", "theAccountPW"=>"so_secret"},
               :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, :body => "", :headers => {'Set-Cookie' => itc_read_fixture_file('login_cookie_spam.txt') })
+
+  # Failed login attempts
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1").
+         with(:body => {"theAccountName"=>"bad-username", "theAccountPW"=>"bad-password"},
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, :body => "", :headers => {} )
 end
 
 def itc_stub_applications
