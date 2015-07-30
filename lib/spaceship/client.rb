@@ -145,7 +145,7 @@ module Spaceship
         password = data.password
       end
 
-      if user.to_s.strip.empty? or password.strip.to_s.empty?
+      if user.to_s.strip.empty? or password.to_s.strip.empty?
         raise NoUserCredentialsError.new("No login data provided")
       end
 
