@@ -278,7 +278,7 @@ module Spaceship
         provisioningProfileName: name,
         appIdId: app_id,
         distributionType: distribution_method,
-        certificateIds: certificate_ids.first, # we are most of the times only allowed to pass one
+        certificateIds: certificate_ids.join(','),
         deviceIds: device_ids
       })
 
