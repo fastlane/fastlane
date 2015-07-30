@@ -14,7 +14,7 @@ describe Spaceship::Device do
     expect(device.platform).to eq('ios')
     expect(device.status).to eq('c')
     expect(device.model).to eq('iPhone 5 (Model A1428)')
-    expect(device.device_class).to eq('iphone')
+    expect(device.device_type).to eq('iphone')
   end
 
   subject(:all_phones) { Spaceship::Device.all_iphones }
@@ -27,7 +27,7 @@ describe Spaceship::Device do
     expect(device.platform).to eq('ios')
     expect(device.status).to eq('c')
     expect(device.model).to eq('iPhone 5 (Model A1428)')
-    expect(device.device_class).to eq('iphone')
+    expect(device.device_type).to eq('iphone')
   end
 
   subject(:all_ipods) { Spaceship::Device.all_ipod_touches }
@@ -40,7 +40,7 @@ describe Spaceship::Device do
     expect(device.platform).to eq('ios')
     expect(device.status).to eq('c')
     expect(device.model).to eq(nil)
-    expect(device.device_class).to eq('ipod')
+    expect(device.device_type).to eq('ipod')
   end
 
   it "inspect works" do

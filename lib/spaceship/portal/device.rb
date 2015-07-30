@@ -32,14 +32,14 @@ module Spaceship
       #   'iPhone 6', 'iPhone 4 GSM'
       attr_accessor :model
 
-      # @return (String) Device class
+      # @return (String) Device type
       # @example
       #   'pc'     - Apple TV
       #   'watch'  - Apple Watch
       #   'ipad'   - iPad
       #   'iphone' - iPhone
       #   'ipod'   - iPod
-      attr_accessor :device_class
+      attr_accessor :device_type
 
       attr_mapping({
         'deviceId' => :id,
@@ -47,7 +47,7 @@ module Spaceship
         'deviceNumber' => :udid,
         'devicePlatform' => :platform,
         'status' => :status,
-        'deviceClass' => :device_class,
+        'deviceClass' => :device_type,
         'model' => :model
       })
 
