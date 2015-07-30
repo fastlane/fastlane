@@ -20,7 +20,7 @@ module Spaceship
     attr_accessor :cookie
 
     # The logger in which all requests are logged
-    # /tmp/spaceship.log by default
+    # /tmp/spaceship[time].log by default
     attr_accessor :logger
 
     # Invalid user credentials were provided
@@ -71,14 +71,14 @@ module Spaceship
     end
 
     # The logger in which all requests are logged
-    # /tmp/spaceship.log by default
+    # /tmp/spaceship[time].log by default
     def logger
       unless @logger
         if $verbose || ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship.log"
+          path = "/tmp/spaceship#{Time.now.to_i}.log"
           @logger = Logger.new(path)
         end
 
