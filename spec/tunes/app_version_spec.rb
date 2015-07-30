@@ -130,19 +130,19 @@ describe Spaceship::AppVersion do
         expect(version.primary_category).to eq("MZGenre.Weather")
 
         version.primary_first_sub_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
+        expect(version.primary_first_sub_category).to eq("MZGenre.Weather")
 
         version.primary_second_sub_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
+        expect(version.primary_second_sub_category).to eq("MZGenre.Weather")
 
         version.secondary_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
+        expect(version.secondary_category).to eq("MZGenre.Weather")
 
         version.secondary_first_sub_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
+        expect(version.secondary_first_sub_category).to eq("MZGenre.Weather")
 
         version.secondary_second_sub_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
+        expect(version.secondary_second_sub_category).to eq("MZGenre.Weather")
       end
 
       it "doesn't prefix if the prefix is already there" do

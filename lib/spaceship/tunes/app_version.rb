@@ -283,12 +283,12 @@ module Spaceship
         super(value)
       end
 
-      def primary_first_sub_cate=(value)gory
+      def primary_first_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include?"MZGenre"
         super(value)
       end
 
-      def primary_second_sub_cat=(value)egory
+      def primary_second_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include?"MZGenre"
         super(value)
       end
@@ -298,12 +298,12 @@ module Spaceship
         super(value)
       end
 
-      def secondary_first_sub_ca=(value)tegory
+      def secondary_first_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include?"MZGenre"
         super(value)
       end
 
-      def secondary_second_sub_c=(value)ategory
+      def secondary_second_sub_category=(value)
         value = "MZGenre.#{value}" unless value.include?"MZGenre"
         super(value)
       end
