@@ -9,7 +9,7 @@ describe Fastlane do
               use_ssh: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error
+        }.to raise_error("Please pass a valid value for use_ssh. Use one of the following: true, false")
       end
 
       it "raises an error if use_submodules is invalid" do
@@ -19,7 +19,7 @@ describe Fastlane do
               use_submodules: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error
+        }.to raise_error("Please pass a valid value for use_submodules. Use one of the following: true, false")
       end
 
       it "raises an error if use_binaries is invalid" do
@@ -29,7 +29,7 @@ describe Fastlane do
               use_binaries: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error
+        }.to raise_error("Please pass a valid value for use_binaries. Use one of the following: true, false")
       end
 
       it "raises an error if platform is invalid" do
@@ -39,7 +39,7 @@ describe Fastlane do
               platform: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error
+        }.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
       end
 
       it "adds use-ssh flag to command if use_ssh is set to true" do
@@ -49,7 +49,17 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --use-ssh --platform all")
+        expect(result).to include("--use-ssh")
+      end
+
+      it "doesn't add a use-ssh flag to command if use_ssh is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_ssh: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to_not include("--use-ssh")
       end
 
       it "adds use-submodules flag to command if use_submodules is set to true" do
@@ -59,7 +69,17 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --use-submodules --platform all")
+        expect(result).to include("--use-submodules")
+      end
+
+      it "doesn't add a use-submodules flag to command if use_submodules is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_submodules: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to_not include("--use-submodules")
       end
 
       it "adds no-use-binaries flag to command if use_binaries is set to false" do
@@ -69,7 +89,17 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --no-use-binaries --platform all")
+        expect(result).to include("--no-use-binaries")
+      end
+
+      it "doesn't add a no-use-binaries flag to command if use_binaries is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_binaries: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to_not include("--no-use-binaries")
       end
 
       it "sets the platform to iOS" do
@@ -79,7 +109,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --platform iOS")
+        expect(result).to include("--platform iOS")
       end
 
       it "sets the platform to Mac" do
@@ -89,7 +119,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --platform Mac")
+        expect(result).to include("--platform Mac")
       end
 
       it "sets the platform to watchOS" do
@@ -99,7 +129,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("carthage bootstrap --platform watchOS")
+        expect(result).to include("--platform watchOS")
       end
 
       it "works with no parameters" do
