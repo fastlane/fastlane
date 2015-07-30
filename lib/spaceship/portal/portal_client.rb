@@ -83,7 +83,6 @@ module Spaceship
 
     # Is the current session from an Enterprise In House account?
     def in_house?
-      # TODO: move to portal
       return @in_house unless @in_house.nil?
       @in_house = (team_information['type'] == 'In-House')
     end

@@ -111,7 +111,6 @@ attr_accessor :app_icon_original_name
 attr_accessor :watch_app_icon_url
 attr_accessor :watch_app_icon_original_name
 attr_accessor :version_id
-attr_accessor :company_information
 
 ####
 # App Review Information

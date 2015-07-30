@@ -40,7 +40,7 @@ module Spaceship
       # @return (Boolean) Export Compliance - Available on French Store
       attr_accessor :export_compliance_available_on_french_store
       
-      # @return (@TODO) Export Compliance - CCAT File
+      # @return (Not Yet Implemented) Export Compliance - CCAT File
       attr_accessor :export_compliance_ccat_file
       
       # @return (Boolean) Export Compliance - Contains proprietary cryptography

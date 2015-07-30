@@ -139,6 +139,8 @@ module Spaceship
       #####################################################
      
       # Create a new version of your app
+      # Since we have stored the outdated raw_data, we need to refresh this object
+      # otherwise `edit_version` will return nil
       def create_version!(version_number)
         if edit_version
           raise "Cannot create a new version for this app as there already is an `edit_version` available"
@@ -146,9 +148,7 @@ module Spaceship
 
         client.create_version!(apple_id, version_number)
 
-        # Since we have stored the outdated raw_data, we need to refresh this object
-        # otherwise `edit_version` will return nil
-        # TODO: implemented -reload method
+        # Future: implemented -reload method
       end
 
       #####################################################
