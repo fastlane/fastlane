@@ -48,7 +48,7 @@ module Fastlane
         else
           Helper.log.info "Creating the new version: #{version_number}"
           app.create_version!(version_number)
-          app = Spaceship::Application.find(params[:app_identifier]) # TODO: replace with .reload method once available
+          app = Spaceship::Application.find(params[:app_identifier]) # Replace with .reload method once available
           v = app.edit_version
         end
 

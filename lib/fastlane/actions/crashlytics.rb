@@ -1,4 +1,4 @@
-# TODO: Workaround, since crashlytics.rb from shenzhen includes the code for commander.
+# Workaround, since crashlytics.rb from shenzhen includes the code for commander.
 def command(_param)
 end
 

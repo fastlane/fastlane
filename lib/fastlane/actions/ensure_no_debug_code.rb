@@ -40,7 +40,7 @@ module Fastlane
         [
           "Makes sure the given text is nowhere in the code base. This can be used",
           "to check if there is any debug code still in your code base or if you have",
-          "things like // TODO or similar"
+          "things like // TO DO or similar"
         ].join("\n")
       end
 
