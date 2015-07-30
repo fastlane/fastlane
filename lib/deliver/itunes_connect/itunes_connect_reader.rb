@@ -17,6 +17,7 @@ module Deliver
         return Deliver::App::AppStatus::PREPARE_FOR_SUBMISSION if status == 'devRejected' # that's the same thing
         return Deliver::App::AppStatus::WAITING_FOR_REVIEW if status == 'waitingForReview'
         return Deliver::App::AppStatus::READY_FOR_SALE if status == 'readyForSale'
+        return Deliver::App::AppStatus::PENDING_DEVELOPER_RELEASE if status == 'pendingDeveloperRelease'
 
         Helper.log.info "App Status '#{status}' not yet implemented, please submit an issue on GitHub"
         return nil
