@@ -27,7 +27,8 @@ module Produce
                                               version: Produce.config[:app_version], 
                                               sku: Produce.config[:sku].to_s, # might be an int
                                               bundle_id: app_identifier, 
-                                              bundle_id_suffix: Produce.config[:bundle_identifier_suffix])
+                                              bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
+                                              company_name: Produce.config[:company_name])
         application = fetch_application
         raise "Something went wrong when creating the new app - it's not listed in the App's list" unless application
 

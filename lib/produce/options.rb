@@ -41,6 +41,14 @@ module Produce
                                      verify_block: Proc.new do |language|
                                        
                                      end),
+        FastlaneCore::ConfigItem.new(key: :company_name,
+                                     short_option: "-c",
+                                     env_name: "PRODUCE_COMPANY_NAME",
+                                     description: "The name of your comapny. Only required if it's the first app you create",
+                                     optional: true,
+                                     verify_block: Proc.new do |language|
+                                       
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
                                      env_name: "PRODUCE_SKIP_ITC",
