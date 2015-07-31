@@ -1,3 +1,9 @@
+# temporary
+puts "Running rubocop..."
+output = `rubocop`
+puts output
+raise "Rubocop failed" unless output.include? "no offenses detected"
+
 require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
