@@ -33,8 +33,13 @@ cocoapods # this will run pod install
 This will execute `carthage bootstrap`
 
 ```ruby
+carthage
+```
+
+More options are available:
+
+```ruby
 carthage(
-  # (optionals)
   use_ssh: false,         # Use SSH for downloading GitHub repositories.
   use_submodules: false,  # Add dependencies as Git submodules.
   use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist

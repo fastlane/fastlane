@@ -42,6 +42,14 @@ describe Fastlane do
         }.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
       end
 
+      it "default use case" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
       it "adds use-ssh flag to command if use_ssh is set to true" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -49,7 +57,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--use-ssh")
+        expect(result).to eq("carthage bootstrap --use-ssh")
       end
 
       it "doesn't add a use-ssh flag to command if use_ssh is set to false" do
@@ -59,7 +67,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to_not include("--use-ssh")
+        expect(result).to eq("carthage bootstrap")
       end
 
       it "adds use-submodules flag to command if use_submodules is set to true" do
@@ -69,7 +77,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--use-submodules")
+        expect(result).to eq("carthage bootstrap --use-submodules")
       end
 
       it "doesn't add a use-submodules flag to command if use_submodules is set to false" do
@@ -79,7 +87,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to_not include("--use-submodules")
+        expect(result).to eq("carthage bootstrap")
       end
 
       it "adds no-use-binaries flag to command if use_binaries is set to false" do
@@ -89,7 +97,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--no-use-binaries")
+        expect(result).to eq("carthage bootstrap --no-use-binaries")
       end
 
       it "doesn't add a no-use-binaries flag to command if use_binaries is set to true" do
@@ -99,7 +107,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to_not include("--no-use-binaries")
+        expect(result).to eq("carthage bootstrap")
       end
 
       it "sets the platform to iOS" do
@@ -109,7 +117,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--platform iOS")
+        expect(result).to eq("carthage bootstrap --platform iOS")
       end
 
       it "sets the platform to Mac" do
@@ -119,7 +127,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--platform Mac")
+        expect(result).to eq("carthage bootstrap --platform Mac")
       end
 
       it "sets the platform to watchOS" do
@@ -129,7 +137,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include("--platform watchOS")
+        expect(result).to eq("carthage bootstrap --platform watchOS")
       end
 
       it "works with no parameters" do
