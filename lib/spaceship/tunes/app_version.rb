@@ -124,7 +124,6 @@ module Spaceship
       # @return (Hash) Represents the screenshots of this app version (read-only)
       attr_reader :screenshots
 
-
       attr_mapping({
         'canBetaTest' => :can_beta_test,
         'canPrepareForUpload' => :can_prepare_for_upload,
@@ -229,7 +228,6 @@ module Spaceship
         "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.application.apple_id}/" + (self.is_live? ? "cur" : "")
       end
 
-
       # Private methods
       def setup
         # Properly parse the AppStatus
@@ -243,7 +241,6 @@ module Spaceship
           @screenshots[row['language']] = setup_screenshots(row)
         end
       end
-
 
       # Prefill name, keywords, etc...
       def unfold_languages
@@ -271,64 +268,60 @@ module Spaceship
       end
 
       def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
-        super(value)
-      end
-
-      def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include?"MZGenre"
+        value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
       end
 
       private
+
         # generates the nested data structure to represent screenshots
-        def setup_screenshots(row)
-          screenshots = row.fetch('screenshots', {}).fetch('value', nil)
-          return [] unless screenshots
+      def setup_screenshots(row)
+        screenshots = row.fetch('screenshots', {}).fetch('value', nil)
+        return [] unless screenshots
 
-          result = []
+        result = []
 
-          screenshots.each do |device_type, value|
-            value['value'].each do |screenshot|
-              screenshot = screenshot['value']
-              result << Tunes::AppScreenshot.new({
-                url: screenshot['url'],
-                thumbnail_url: screenshot['thumbNailUrl'],
-                sort_order: screenshot['sortOrder'],
-                original_file_name: screenshot['originalFileName'],
-                device_type: device_type,
-                language: row['language']
-              })
-            end
+        screenshots.each do |device_type, value|
+          value['value'].each do |screenshot|
+            screenshot = screenshot['value']
+            result << Tunes::AppScreenshot.new({
+              url: screenshot['url'],
+              thumbnail_url: screenshot['thumbNailUrl'],
+              sort_order: screenshot['sortOrder'],
+              original_file_name: screenshot['originalFileName'],
+              device_type: device_type,
+              language: row['language']
+            })
           end
-
-          return result
         end
+
+        return result
+      end
     end
   end
 end

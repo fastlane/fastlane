@@ -1,9 +1,9 @@
 module Spaceship
   module Tunes
     class Application < TunesBase
-      
+
       # @return (String) The App identifier of this app, provided by iTunes Connect
-      # @example 
+      # @example
       #   "1013943394"
       attr_accessor :apple_id
 
@@ -13,17 +13,17 @@ module Spaceship
       attr_accessor :name
 
       # @return (String) the supported platform of this app
-      # @example 
+      # @example
       #   "ios"
       attr_accessor :platform
 
       # @return (String) The Vendor ID provided by iTunes Connect
-      # @example 
+      # @example
       #   "1435592086"
       attr_accessor :vendor_id
 
       # @return (String) The bundle_id (app identifier) of your app
-      # @example 
+      # @example
       #   "com.krausefx.app"
       attr_accessor :bundle_id
 
@@ -34,7 +34,7 @@ module Spaceship
       attr_accessor :issues_count
 
       # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
-      # @example 
+      # @example
       #   "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0bafaa/pr_source.png/340x340bb-80.png"
       # @example
       #   nil
@@ -50,7 +50,7 @@ module Spaceship
         'issuesCount' => :issues_count,
         'iconUrl' => :app_icon_preview_url
       )
-      
+
       class << self
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
@@ -72,22 +72,22 @@ module Spaceship
         end
 
         # Creates a new application on iTunes Connect
-        # @param name (String): The name of your app as it will appear on the App Store. 
+        # @param name (String): The name of your app as it will appear on the App Store.
         #   This can't be longer than 255 characters.
-        # @param primary_language (String): If localized app information isn't available in an 
+        # @param primary_language (String): If localized app information isn't available in an
         #   App Store territory, the information from your primary language will be used instead.
-        # @param version (String): The version number is shown on the App Store and should 
+        # @param version (String): The version number is shown on the App Store and should
         #   match the one you used in Xcode.
         # @param sku (String): A unique ID for your app that is not visible on the App Store.
-        # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It 
+        # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
         #   can't be changed after you submit your first build.
         # @param company_name (String): The company name or developer name to display on the App Store for your apps.
         # It cannot be changed after you create your first app.
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
-          client.create_application!(name: name, 
-                         primary_language: primary_language, 
-                                  version: version, 
-                                      sku: sku, 
+          client.create_application!(name: name,
+                         primary_language: primary_language,
+                                  version: version,
+                                      sku: sku,
                                 bundle_id: bundle_id,
                                 bundle_id_suffix: bundle_id_suffix,
                                 company_name: company_name)
@@ -99,7 +99,7 @@ module Spaceship
       #####################################################
 
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
-      #  App Store. You can't modify all values there, so be careful. 
+      #  App Store. You can't modify all values there, so be careful.
       def live_version
         v = Spaceship::AppVersion.find(self, self.apple_id, true)
       end
@@ -127,7 +127,7 @@ module Spaceship
         "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
       end
 
-      # @return (Hash) Contains the reason for rejection. 
+      # @return (Hash) Contains the reason for rejection.
       #  if everything is alright, the result will be
       #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
       def resolution_center
@@ -137,7 +137,7 @@ module Spaceship
       #####################################################
       # @!group Modifying
       #####################################################
-     
+
       # Create a new version of your app
       # Since we have stored the outdated raw_data, we need to refresh this object
       # otherwise `edit_version` will return nil
@@ -166,7 +166,7 @@ module Spaceship
       #   Those builds can also be the builds that are stuck on iTC.
       def pre_processing_builds
         data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
-        
+
         data.fetch('processingBuilds', []).collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::ProcessingBuild.factory(attrs)
@@ -177,7 +177,7 @@ module Spaceship
       #   this include pre-processing or standard processing
       def all_processing_builds
         builds = self.pre_processing_builds
-      
+
         self.build_trains.each do |version_number, train|
           train.processing_builds.each do |build|
             builds << build
@@ -203,13 +203,13 @@ module Spaceship
       #####################################################
       # @!group Submit for Review
       #####################################################
-      
+
       def create_submission
         version = self.latest_version
         if version.nil?
           raise "Could not find a valid version to submit for review"
         end
-        
+
         Spaceship::AppSubmission.create(self, self.apple_id, version)
       end
 
@@ -229,7 +229,6 @@ module Spaceship
       # @!group General
       #####################################################
       def setup
-        
       end
 
       #####################################################
@@ -273,8 +272,8 @@ module Spaceship
       def add_external_tester!(email: nil, first_name: nil, last_name: nil)
         raise "Tester is already on #{self.name} betatesters" if find_external_tester(email)
 
-        tester = Tunes::Tester.external.find(email) || Tunes::Tester.external.create!(email: email, 
-                                                                                 first_name: first_name, 
+        tester = Tunes::Tester.external.find(email) || Tunes::Tester.external.create!(email: email,
+                                                                                 first_name: first_name,
                                                                                   last_name: last_name)
         tester.add_to_app!(self.apple_id)
       end

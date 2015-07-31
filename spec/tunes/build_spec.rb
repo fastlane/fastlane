@@ -67,22 +67,22 @@ describe Spaceship::Tunes::Build do
         })
 
         expect(r).to eq({
-          :app_id=>"898536088", 
-          :train=>"0.9.10", 
-          :build_number=>"123123", 
-          :changelog=>"Custom Changelog", 
-          :description=>"No app description provided", 
-          :feedback_email=>"contact@company.com", 
-          :marketing_url=>"http://marketing.com", 
-          :first_name=>"Felix", 
-          :last_name=>"Krause", 
-          :review_email=>"contact@company.com", 
-          :phone_number=>"0123456789", 
-          :privacy_policy_url=>nil, 
-          :review_notes=>nil, 
-          :review_user_name=>nil, 
-          :review_password=>nil, 
-          :encryption=>false})
+          app_id: "898536088",
+          train: "0.9.10",
+          build_number: "123123",
+          changelog: "Custom Changelog",
+          description: "No app description provided",
+          feedback_email: "contact@company.com",
+          marketing_url: "http://marketing.com",
+          first_name: "Felix",
+          last_name: "Krause",
+          review_email: "contact@company.com",
+          phone_number: "0123456789",
+          privacy_policy_url: nil,
+          review_notes: nil,
+          review_user_name: nil,
+          review_password: nil,
+          encryption: false})
       end
     end
   end

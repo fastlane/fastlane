@@ -10,7 +10,7 @@ describe Spaceship do
     before do
       spaceship1.login(username, password)
       spaceship2.login(username, password)
-    end 
+    end
 
     it 'should have 2 separate spaceships' do
       expect(spaceship1).to_not eq(spaceship2)

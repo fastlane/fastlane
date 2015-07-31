@@ -62,7 +62,7 @@ describe Spaceship::Tunes::BuildTrain do
 
       it "properly extracted the processing builds from a train" do
         train = app.build_trains['0.9.10']
-        expect(train.processing_builds.count).to eq(0)  
+        expect(train.processing_builds.count).to eq(0)
       end
     end
 

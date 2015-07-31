@@ -8,11 +8,11 @@ module Spaceship
       #   "type"=>"Company/Organization",
       #   "extendedTeamAttributes"=>{},
       #   "teamAgent"=>{
-      #       "personId"=>15534241111, 
-      #       "firstName"=>"Felix", 
-      #       "lastName"=>"Krause", 
-      #       "email"=>"spaceship@krausefx.com", 
-      #       "developerStatus"=>"active", 
+      #       "personId"=>15534241111,
+      #       "firstName"=>"Felix",
+      #       "lastName"=>"Krause",
+      #       "email"=>"spaceship@krausefx.com",
+      #       "developerStatus"=>"active",
       #       "teamMemberId"=>"5Y354CXAAA"},
       #   "memberships"=>
       #    [{"membershipId"=>"HJ5WHYC5CE",
@@ -57,9 +57,7 @@ module Spaceship
           puts "Couldn't find team with Name '#{team_name}'"
         end
 
-
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
-
 
         # User Selection
         loop do

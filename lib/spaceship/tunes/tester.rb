@@ -3,22 +3,22 @@ module Spaceship
     class Tester < TunesBase
 
       # @return (String) The identifier of this tester, provided by iTunes Connect
-      # @example 
+      # @example
       #   "60f858b4-60a8-428a-963a-f943a3d68d17"
       attr_accessor :tester_id
 
       # @return (String) The email of this tester
-      # @example 
+      # @example
       #   "tester@spaceship.com"
       attr_accessor :email
-      
+
       # @return (String) The first name of this tester
-      # @example 
+      # @example
       #   "Cary"
       attr_accessor :first_name
 
       # @return (String) The last name of this tester
-      # @example 
+      # @example
       #   "Bennett"
       attr_accessor :last_name
 
@@ -31,7 +31,6 @@ module Spaceship
       #      "name": null
       #    }]
       attr_accessor :devices
-
 
       # Information about the most recent beta install
       # @return [Integer] The ID of the most recently installed app
@@ -56,7 +55,7 @@ module Spaceship
         'latestInstalledAppAdamId' => :latest_install_app_id,
         'latestInstalledDate' => :latest_install_date,
         'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number,
+        'latestInstalledShortVersion' => :latest_installed_build_number
       )
 
       class << self
@@ -90,10 +89,10 @@ module Spaceship
         # @param email (String) (required): The email of the new tester
         # @param first_name (String) (optional): The first name of the new tester
         # @param last_name (String) (optional): The last name of the new tester
-        # @example 
+        # @example
         #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett")
         # @return (Tester): The newly created tester
-        def create!(email: nil, first_name: nil, last_name: nil) 
+        def create!(email: nil, first_name: nil, last_name: nil)
           data = client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
@@ -107,7 +106,7 @@ module Spaceship
 
         # @return (Array) Returns all beta testers available for this account filtered by app
         # @param app_id (String) (required): The app id to filter the testers
-        def all_by_app(app_id) 
+        def all_by_app(app_id)
           client.testers_by_app(self, app_id).map { |tester| self.factory(tester) }
         end
 
@@ -128,7 +127,7 @@ module Spaceship
             begin
               tester.add_to_app!(app_id)
             rescue => ex
-              if ex.to_s.include?"testerEmailExistsInternal" or ex.to_s.include?"duplicate.email"
+              if ex.to_s.include? "testerEmailExistsInternal" or ex.to_s.include? "duplicate.email"
                 # That's a non-relevant error message by iTC
                 # ignore that
               else
@@ -146,7 +145,7 @@ module Spaceship
       #####################################################
       # @!group Subclasses
       #####################################################
-      class External < Tester 
+      class External < Tester
         def self.url(app_id = nil)
           {
             index: "ra/users/pre/ext",
@@ -158,7 +157,7 @@ module Spaceship
         end
       end
 
-      class Internal < Tester 
+      class Internal < Tester
         def self.url(app_id = nil)
           {
             index: "ra/users/pre/int",
@@ -171,7 +170,7 @@ module Spaceship
       end
 
       # Delete current tester
-      def delete! 
+      def delete!
         client.delete_tester!(self)
       end
 

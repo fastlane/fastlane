@@ -5,7 +5,6 @@ require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 
-
 if ENV["DEBUG"]
   require 'openssl'
   # this has to be on top of this file, since the value can't be changed later
@@ -28,7 +27,6 @@ module Spaceship
 
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < StandardError; end
-
 
     class UnexpectedResponse < StandardError; end
 
@@ -157,94 +155,98 @@ module Spaceship
       !!@cookie
     end
 
+    def with_retry(tries = 5, &block)
+      return block.call
+    rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+      unless (tries -= 1).zero?
+        sleep 3
+        retry
+      end
+
+      raise ex # re-raise the exception
+    end
+
     private
-      # Is called from `parse_response` to store the latest csrf_token (if available)
-      def store_csrf_tokens(response)
-        if response and response.headers
-          tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
-          if tokens and not tokens.empty?
-            @csrf_tokens = tokens
-          end
+
+    # Is called from `parse_response` to store the latest csrf_token (if available)
+    def store_csrf_tokens(response)
+      if response and response.headers
+        tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
+        if tokens and not tokens.empty?
+          @csrf_tokens = tokens
         end
       end
+    end
 
       # memoize the last csrf tokens from responses
-      def csrf_tokens
-        @csrf_tokens || {}
+    def csrf_tokens
+      @csrf_tokens || {}
+    end
+
+    def request(method, url_or_path = nil, params = nil, headers = {}, &block)
+      if session?
+        headers.merge!({'Cookie' => cookie})
+        headers.merge!(csrf_tokens)
+      end
+      headers.merge!({'User-Agent' => 'spaceship'})
+
+      # Before encoding the parameters, log them
+      log_request(method, url_or_path, params)
+
+      # form-encode the params only if there are params, and the block is not supplied.
+      # this is so that certain requests can be made using the block for more control
+      if method == :post && params && !block_given?
+        params, headers = encode_params(params, headers)
       end
 
-      def request(method, url_or_path = nil, params = nil, headers = {}, &block)
-        if session?
-          headers.merge!({'Cookie' => cookie})
-          headers.merge!(csrf_tokens)
-        end
-        headers.merge!({'User-Agent' => 'spaceship'})
+      response = send_request(method, url_or_path, params, headers, &block)
 
-        # Before encoding the parameters, log them
-        log_request(method, url_or_path, params)
+      log_response(method, url_or_path, response)
 
-        # form-encode the params only if there are params, and the block is not supplied.
-        # this is so that certain requests can be made using the block for more control
-        if method == :post && params && !block_given?
-          params, headers = encode_params(params, headers)
-        end
+      return response
+    end
 
-        response = send_request(method, url_or_path, params, headers, &block)
-
-        log_response(method, url_or_path, response)
-
-        return response
+    def log_request(method, url, params)
+      params_to_log = Hash(params).dup # to also work with nil
+      params_to_log.delete(:accountPassword) # Dev Portal
+      params_to_log.delete(:theAccountPW) # iTC
+      params_to_log = params_to_log.collect do |key, value|
+        "{#{key}: #{value}}"
       end
+      logger.info("#{method.upcase}: #{url} #{params_to_log.join(', ')}")
+    end
 
-      def log_request(method, url, params)
-        params_to_log = Hash(params).dup # to also work with nil
-        params_to_log.delete(:accountPassword) # Dev Portal
-        params_to_log.delete(:theAccountPW) # iTC
-        params_to_log = params_to_log.collect do |key, value|
-          "{#{key}: #{value}}"
-        end
-        logger.info("#{method.upcase}: #{url} #{params_to_log.join(', ')}")
-      end
-
-      def log_response(method, url, response)
-        logger.debug("#{method.upcase}: #{url}: #{response.body}")
-      end
+    def log_response(method, url, response)
+      logger.debug("#{method.upcase}: #{url}: #{response.body}")
+    end
 
       # Actually sends the request to the remote server
       # Automatically retries the request up to 3 times if something goes wrong
-      def send_request(method, url_or_path, params, headers, &block)
-        tries ||= 5
+    def send_request(method, url_or_path, params, headers, &block)
+      with_retry do
+        @client.send(method, url_or_path, params, headers, &block)
+      end
+    end
 
-        return @client.send(method, url_or_path, params, headers, &block)
-
-      rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
-        unless (tries -= 1).zero?
-          sleep 3
-          retry
-        end
-
-        raise ex # re-raise the exception
+    def parse_response(response, expected_key = nil)
+      if expected_key
+        content = response.body[expected_key]
+      else
+        content = response.body
       end
 
-      def parse_response(response, expected_key = nil)
-        if expected_key
-          content = response.body[expected_key]
-        else
-          content = response.body
-        end
-
-        if content == nil
-          raise UnexpectedResponse.new(response.body)
-        else
-          store_csrf_tokens(response)
-          content
-        end
+      if content == nil
+        raise UnexpectedResponse.new(response.body)
+      else
+        store_csrf_tokens(response)
+        content
       end
+    end
 
-      def encode_params(params, headers)
-        params = Faraday::Utils::ParamsHash[params].to_query
-        headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
-        return params, headers
-      end
+    def encode_params(params, headers)
+      params = Faraday::Utils::ParamsHash[params].to_query
+      headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
+      return params, headers
+    end
   end
 end

@@ -13,7 +13,7 @@ module Spaceship
     def api_key
       cache_path = "/tmp/spaceship_api_key.txt"
       begin
-        cached = File.read(cache_path) 
+        cached = File.read(cache_path)
       rescue Errno::ENOENT
       end
       return cached if cached
@@ -86,7 +86,6 @@ module Spaceship
       return @in_house unless @in_house.nil?
       @in_house = (team_information['type'] == 'In-House')
     end
-
 
     #####################################################
     # @!group Apps
@@ -167,7 +166,7 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id)
-      r = request(:post) do |r|
+      req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
         r.params = {
           teamId: team_id,
@@ -176,7 +175,7 @@ module Spaceship
         }
       end
 
-      parse_response(r, 'device')
+      parse_response(req, 'device')
     end
 
     #####################################################
@@ -231,16 +230,16 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles
-      r = request(:post) do |r|
+      req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
           includeInactiveProfiles: true,
-          onlyCountLists: true,
+          onlyCountLists: true
         }
       end
 
-      parse_response(r, 'provisioningProfiles')
+      parse_response(req, 'provisioningProfiles')
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)

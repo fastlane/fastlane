@@ -1,7 +1,7 @@
 module Spaceship
   module Tunes
     # Defines the different states of the app
-    # 
+    #
     # As specified by Apple: https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/ChangingAppStatus.html
     module AppStatus
       # You can edit this version, upload new binaries and more
@@ -23,7 +23,7 @@ module Spaceship
       DEVELOPER_REMOVED_FROM_SALE = "Developer Removed From Sale"
 
       # Developer rejected this version/binary
-      DEVELOPER_REJECTED = "Developer Rejected" 
+      DEVELOPER_REJECTED = "Developer Rejected"
 
       # You have to renew your Apple account to keep using iTunes Connect
       PENDING_CONTRACT = "Pending Contract"
@@ -34,12 +34,11 @@ module Spaceship
 
       # Unused app states
       # PENDING_APPLE_RELASE = "Pending Apple Release"
-      
+
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       # METADATA_REJECTED = "Metadata Rejected"
       # REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
-
 
       # Get the app status matching based on a string (given by iTunes Connect)
       def self.get_from_string(text)
@@ -52,7 +51,7 @@ module Spaceship
           'waitingForReview' => WAITING_FOR_REVIEW
         }
 
-        mapping.each do |k, v| 
+        mapping.each do |k, v|
           return v if k == text
         end
 

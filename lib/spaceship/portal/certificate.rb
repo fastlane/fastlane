@@ -237,7 +237,7 @@ module Spaceship
           end
 
           # ensure csr is a OpenSSL::X509::Request
-          csr = OpenSSL::X509::Request.new(csr) if csr.is_a?(String)
+          csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
           response = client.create_certificate!(type, csr.to_pem, app_id)
@@ -266,7 +266,7 @@ module Spaceship
 
       # @return (Bool): Is this certificate a push profile for apps?
       def is_push?
-        self.kind_of?PushCertificate
+        self.kind_of? PushCertificate
       end
     end
   end

@@ -17,7 +17,7 @@ module Spaceship
     def login_url
       cache_path = "/tmp/spaceship_itc_login_url.txt"
       begin
-        cached = File.read(cache_path) 
+        cached = File.read(cache_path)
       rescue Errno::ENOENT
       end
       return cached if cached
@@ -61,7 +61,7 @@ module Spaceship
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new(response)
         end
-        
+
         return @client
       else
         # User Credentials are wrong
@@ -71,30 +71,30 @@ module Spaceship
 
     def handle_itc_response(raw)
       return unless raw
-      return unless raw.kind_of?Hash
+      return unless raw.kind_of? Hash
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
- 
+
       if data.fetch('sectionErrorKeys', []).count == 0 and
-        data.fetch('sectionInfoKeys', []).count == 0 and 
+        data.fetch('sectionInfoKeys', []).count == 0 and
         data.fetch('sectionWarningKeys', []).count == 0
-        
+
         logger.debug("Request was successful")
       end
 
-      def handle_response_hash(hash)
+      handle_response_hash = lambda do |hash|
         errors = []
-        if hash.kind_of?Hash
+        if hash.kind_of? Hash
           hash.each do |key, value|
-            errors = errors + handle_response_hash(value)
+            errors = errors + handle_response_hash.call(value)
 
-            if key == 'errorKeys' and value.kind_of?Array and value.count > 0
+            if key == 'errorKeys' and value.kind_of? Array and value.count > 0
               errors = errors + value
             end
           end
-        elsif hash.kind_of?Array
+        elsif hash.kind_of? Array
           hash.each do |value|
-            errors = errors + handle_response_hash(value)
+            errors = errors + handle_response_hash.call(value)
           end
         else
           # We don't care about simple values
@@ -102,7 +102,7 @@ module Spaceship
         return errors
       end
 
-      errors = handle_response_hash(data)
+      errors = handle_response_hash.call(data)
       errors = errors + data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
 
       # Sometimes there is a different kind of error in the JSON response
@@ -120,7 +120,6 @@ module Spaceship
       return data
     end
 
-
     #####################################################
     # @!group Applications
     #####################################################
@@ -131,14 +130,14 @@ module Spaceship
     end
 
     # Creates a new application on iTunes Connect
-    # @param name (String): The name of your app as it will appear on the App Store. 
+    # @param name (String): The name of your app as it will appear on the App Store.
     #   This can't be longer than 255 characters.
-    # @param primary_language (String): If localized app information isn't available in an 
+    # @param primary_language (String): If localized app information isn't available in an
     #   App Store territory, the information from your primary language will be used instead.
-    # @param version (String): The version number is shown on the App Store and should 
+    # @param version (String): The version number is shown on the App Store and should
     #   match the one you used in Xcode.
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
-    # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It 
+    # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -160,7 +159,7 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-        
+
       data = parse_response(r, 'data')
       handle_itc_response(data)
     end
@@ -203,7 +202,7 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      
+
       handle_itc_response(r.body)
     end
 
@@ -239,10 +238,10 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def submit_testflight_build_for_review!(# Required:
-                                            app_id: nil, 
-                                            train: nil, 
-                                            build_number: nil, 
+    def submit_testflight_build_for_review!( # Required:
+                                            app_id: nil,
+                                            train: nil,
+                                            build_number: nil,
                                             cancel_other_submissions: false,
 
                                             # Required Metadata:
@@ -271,7 +270,7 @@ module Spaceship
 
       build_info = r.body['data']
       # Now fill in the values provided by the user
-      
+
       # First the localised values:
       build_info['testInfo']['details'].each do |current|
         current['whatsNew']['value'] = changelog
@@ -310,11 +309,11 @@ module Spaceship
         handle_itc_response(r.body)
       end
     end
-    
+
     #####################################################
     # @!group Submit for Review
     #####################################################
-    
+
     def send_app_submission(app_id, data, stage)
       raise "app_id is required" unless app_id
 
@@ -323,7 +322,7 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      
+
       handle_itc_response(r.body)
       parse_response(r, 'data')
     end
@@ -337,20 +336,20 @@ module Spaceship
       parse_response(r, 'data')['testers']
     end
 
-    def testers_by_app(tester, app_id) 
+    def testers_by_app(tester, app_id)
       url = tester.url(app_id)[:index_by_app]
       r = request(:get, url)
       parse_response(r, 'data')['users']
     end
 
-    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil) 
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil)
       url = tester.url[:create]
       raise "Action not provided for this tester type." unless url
 
       tester_data = {
             emailAddress: {
               value: email
-            }, 
+            },
             firstName: {
               value: first_name
             },
@@ -382,7 +381,7 @@ module Spaceship
         {
           emailAddress: {
             value: tester.email
-          }, 
+          },
           firstName: {
             value: tester.first_name
           },
@@ -415,36 +414,37 @@ module Spaceship
       update_tester_from_app!(tester, app_id, false)
     end
 
-    private 
-      def update_tester_from_app!(tester, app_id, testing)
-        url = tester.class.url(app_id)[:update_by_app]
-        data = {
-          users: [
-            {
-              emailAddress: {
-                value: tester.email
-              }, 
-              firstName: {
-                value: tester.first_name
-              },
-              lastName: {
-                value: tester.last_name
-              },
-              testing: {
-                value: testing
-              }
-            }
-          ]
-        }
+    private
 
-        r = request(:post) do |req|
-          req.url url
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-          
-        data = parse_response(r, 'data')
-        handle_itc_response(data)
+    def update_tester_from_app!(tester, app_id, testing)
+      url = tester.class.url(app_id)[:update_by_app]
+      data = {
+        users: [
+          {
+            emailAddress: {
+              value: tester.email
+            },
+            firstName: {
+              value: tester.first_name
+            },
+            lastName: {
+              value: tester.last_name
+            },
+            testing: {
+              value: testing
+            }
+          }
+        ]
+      }
+
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
       end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
   end
 end

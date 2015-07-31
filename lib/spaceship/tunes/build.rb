@@ -6,7 +6,7 @@ module Spaceship
       #####################################################
       # @!group General metadata
       #####################################################
-      
+
       # @return (Spaceship::Tunes::BuildTrain) A reference to the build train this build is contained in
       attr_accessor :build_train
 
@@ -44,11 +44,10 @@ module Spaceship
       #   this is only true after the build was approved by Apple
       attr_accessor :external_testing_enabled
 
-
       # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
 
-      # @return (Bool): 
+      # @return (Bool):
       attr_accessor :ready_to_install
 
       #####################################################
@@ -88,7 +87,7 @@ module Spaceship
         'internalExpiry' => :internal_expiry_date,
         'externalExpiry' => :external_expiry_date,
         'watchKitEnabled' => :watch_kit_enabled,
-        'readyToInstall' => :ready_to_install,
+        'readyToInstall' => :ready_to_install
       )
 
       class << self
@@ -129,9 +128,9 @@ module Spaceship
       def submit_for_beta_review!(metadata)
         # First, enable beta testing for this train (per iTC requirement)
         self.build_train.update_testing_status!(true)
-        
+
         parameters = {
-          app_id: self.build_train.application.apple_id, 
+          app_id: self.build_train.application.apple_id,
           train: self.build_train.version_string,
           build_number: self.build_version,
 
@@ -182,7 +181,7 @@ module Spaceship
 
       # This will cancel the review process for this TestFlight build
       def cancel_beta_review!
-        client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id, 
+        client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id,
                                                      train: self.build_train.version_string,
                                               build_number: self.build_version)
       end

@@ -5,7 +5,6 @@ describe Spaceship::Application do
   let(:client) { Spaceship::Application.client }
 
   describe "successfully loads and parses all apps" do
-
     it "inspect works" do
       expect(Spaceship::Application.all.first.inspect).to include("Tunes::Application")
     end
@@ -65,8 +64,8 @@ describe Spaceship::Application do
     describe "#create!" do
       it "works with valid data and defaults to English" do
         Spaceship::Tunes::Application.create!(name: "My name",
-                                              version: "1.0", 
-                                              sku: "SKU123", 
+                                              version: "1.0",
+                                              sku: "SKU123",
                                               bundle_id: "net.sunapps.123")
       end
 
@@ -74,8 +73,8 @@ describe Spaceship::Application do
         itc_stub_broken_create
         expect {
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0", 
-                                                sku: "SKU123", 
+                                                version: "1.0",
+                                                sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         }.to raise_error "You must choose a primary language. You must choose a primary language."
       end
@@ -84,8 +83,8 @@ describe Spaceship::Application do
         itc_stub_broken_create_wildcard
         expect {
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0", 
-                                                sku: "SKU123", 
+                                                version: "1.0",
+                                                sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
         }.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
       end
@@ -121,7 +120,7 @@ describe Spaceship::Application do
 
       it "when the app was not rejected" do
         itc_stub_resolution_center_valid
-        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}})
+        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys" => [], "sectionInfoKeys" => [], "sectionWarningKeys" => [], "replyConstraints" => {"minLength" => 1, "maxLength" => 4000}, "appNotes" => {"threads" => []}, "betaNotes" => {"threads" => []}, "appMessages" => {"threads" => []}})
       end
     end
 
