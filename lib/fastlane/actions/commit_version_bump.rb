@@ -71,9 +71,9 @@ module Fastlane
         begin
           build_number = Actions.lane_context[Actions::SharedValues::BUILD_NUMBER] 
           
-          message = build_number ? "Version Bump to #{build_number}" : "Version Bump"
+          params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
           
-          Actions.sh("git commit -m '#{message}'")
+          Actions.sh("git commit -m '#{params[:message]}'")
 
           Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
         rescue => ex
@@ -87,6 +87,10 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_COMMIT_BUMP_MESSAGE",
+                                       description: "The commit message when committing the version bump",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
