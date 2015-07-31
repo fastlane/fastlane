@@ -81,7 +81,7 @@ module Fastlane
         output = parse_options(action.output, false) if action.output
         if output and output.count > 0
           puts Terminal::Table.new(
-            title: filter.green,
+            title: [filter, "| Output Variables"].join(" ").green,
             headings: ['Key', 'Description'],
             rows: output
           )
