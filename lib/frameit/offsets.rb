@@ -9,13 +9,13 @@ module Frameit
           case screenshot.screen_size
             when size::IOS_55
               return { 
-                'offset' => '+42+147',
-                'width' => 539
+                'offset' => '+41+146',
+                'width' => 541
               }
             when size::IOS_47
               return {
-                'offset' => '+41+154',
-                'width' => 530
+                'offset' => '+40+153',
+                'width' => 532
               }
             when size::IOS_40
               return {
