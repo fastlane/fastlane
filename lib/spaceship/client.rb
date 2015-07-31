@@ -153,16 +153,14 @@ module Spaceship
     end
 
     def with_retry(tries = 5, &block)
-      begin
-        return block.call
-      rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
-        unless (tries -= 1).zero?
-          sleep 3
-          retry
-        end
-
-        raise ex # re-raise the exception
+      return block.call
+    rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+      unless (tries -= 1).zero?
+        sleep 3
+        retry
       end
+
+      raise ex # re-raise the exception
     end
 
     private
