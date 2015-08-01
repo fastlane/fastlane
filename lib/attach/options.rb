@@ -20,7 +20,7 @@ module Attach
         project = project.first # this will result in nil if no files were found
       end
 
-      @@options ||= [
+      @options ||= [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      # env_name: "PILOT_USERNAME",
