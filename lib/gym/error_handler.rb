@@ -21,6 +21,7 @@ module Gym
           print "       export LC_ALL=en_US.UTF-8"
           print ""
           print "You'll have to restart your shell session after updating the file."
+          print "If you are using zshell or another shell, make sure to edit the correct bash file."
           print "For more information visit this stackoverflow answer:"
           print "http://stackoverflow.com/a/17031697/445598"
         end

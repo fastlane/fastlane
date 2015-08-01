@@ -34,9 +34,9 @@ module Gym
                                      description: "Path the workspace file",
                                      default_value: workspace,
                                      verify_block: proc do |value|
-                                       raise "Workspace file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
-                                       raise "Workspace file invalid" unless File.directory?(value.to_s)
-                                       raise "Workspace file is not a workspace, must end with .xcworkspace" unless value.end_with?(".xcworkspace")
+                                       raise "Workspace file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
+                                       raise "Workspace file invalid".red unless File.directory?(value.to_s)
+                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless value.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -45,19 +45,15 @@ module Gym
                                      description: "Path the project file",
                                      default_value: project,
                                      verify_block: proc do |value|
-                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
-                                       raise "Project file invalid" unless File.directory?(value.to_s)
-                                       raise "Project file is not a project file, must end with .xcodeproj" unless value.end_with?(".xcodeproj")
+                                       raise "Project file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
+                                       raise "Project file invalid".red unless File.directory?(value.to_s)
+                                       raise "Project file is not a project file, must end with .xcodeproj".red unless value.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
                                      env_name: "GYM_SCHEME",
-                                     description: "The project scheme. Make sure it's marked as `Shared`",
-                                     verify_block: proc do |value|
-                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
-                                       raise "Project file invalid" unless File.directory?(value.to_s)
-                                     end),
+                                     description: "The project scheme. Make sure it's marked as `Shared`"),
         FastlaneCore::ConfigItem.new(key: :clean,
                                      short_option: "-c",
                                      env_name: "GYM_CLEAN",
