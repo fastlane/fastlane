@@ -6,6 +6,11 @@ module Gym
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
         case output
+        when /Your build settings specify a provisioning profile with the UUID/
+          print "Invalid code signing settings"
+          print "Your project defines a provisioning profile which doesn't exist on your local machine"
+          print "You can use sigh (https://github.com/KrauseFx/sigh) to download and install the provisioning profile"
+          print "Follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
         when /code signing is required/
           print "Your project settings don't define any code signing settings"
           print "To generate an ipa file you need to enable code signing for your project"
