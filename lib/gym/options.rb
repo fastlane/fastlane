@@ -14,12 +14,14 @@ module Gym
         workspace = workspace.first # this will result in nil if no files were found
       end
 
-      project = Dir["./*.xcodeproj"]
-      if project.count > 1
-        puts "Select Project: "
-        project = choose(*(project))
-      else
-        project = project.first # this will result in nil if no files were found
+      unless workspace
+        project = Dir["./*.xcodeproj"]
+        if project.count > 1
+          puts "Select Project: "
+          project = choose(*(project))
+        else
+          project = project.first # this will result in nil if no files were found
+        end
       end
 
       @options ||= plain_options(project: project, workspace: workspace)
