@@ -103,11 +103,17 @@ module Gym
     # @!group Actually executing the commands
     #####################################################
 
+    # @param command [String] The command to be executed
+    # @param print_all [Boolean] Do we want to print out the command output while building?
+    #   If set to false, nothing will be printed
+    # @param error [Block] A block that's called if an error occurs
+    # @return [String] All the output as string
     def execute_command(command: nil, print_all: false, error: nil)
+      output = []
+
       command = command.join(" ")
       Helper.log.info command.yellow.strip
 
-      output = []
       last_length = 0
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |l|
@@ -125,10 +131,19 @@ module Gym
       end
 
       # Exit status for build command, should be 0 if build succeeded
-      if $?.exitstatus != 0 # rubocop:disable Style/SpecialGlobalVars # disabled, since $CHILD_STATUS just is not the same
+      # Disabled Rubocop, since $CHILD_STATUS just is not the same
+      if $?.exitstatus != 0 # rubocop:disable Style/SpecialGlobalVars
+        output = output.join("\n")
         puts output # the user has the right to see the raw output
         error.call(output)
       end
+    rescue => ex
+      # This could happen when the environment is wrong:
+      # > invalid byte sequence in US-ASCII (ArgumentError)
+      output << ex.to_s
+      output = output.join("\n")
+      puts output
+      error.call(output)
     end
   end
 end
