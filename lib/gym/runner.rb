@@ -113,11 +113,18 @@ module Gym
       Helper.log.info command.yellow.strip
 
       output = []
+      last_length = 0
       PTY.spawn(command) do |stdin, stdout, pid|
         stdin.each do |l|
           line = l.strip # strip so that \n gets removed
-          Helper.log.info line.strip if print_all
-          output << line.strip
+          output << line
+
+          if print_all
+            current_length = line.length
+            spaces = [last_length - current_length, 0].max
+            print (line + " " * spaces + "\r")
+            last_length = current_length
+          end
         end
         Process.wait(pid)
       end
