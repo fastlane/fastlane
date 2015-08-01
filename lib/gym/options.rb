@@ -1,7 +1,7 @@
 require "fastlane_core"
 require "credentials_manager"
 
-module Attach
+module Gym
   class Options
     def self.available_options
       return @options if @options
@@ -28,7 +28,7 @@ module Attach
     # This is needed as these are more complex default values
     # Returns the finished config object
     def self.set_additional_default_values
-      config = Attach.config
+      config = Gym.config
 
       if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
         require 'pry'; binding.pry
@@ -39,7 +39,7 @@ module Attach
       end
 
       if config[:scheme].to_s.length == 0
-        proj_schemes = Attach.project.schemes
+        proj_schemes = Gym.project.schemes
         if proj_schemes.count == 1
           config[:scheme] = proj_schemes.last
         elsif proj_schemes.count > 1

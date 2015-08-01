@@ -1,16 +1,16 @@
 require "json"
-require "attach/version"
-require "attach/manager"
-require "attach/project"
-require "attach/build_command_generator"
-require "attach/package_command_generator"
-require "attach/runner"
-require 'attach/error_handler'
+require "gym/version"
+require "gym/manager"
+require "gym/project"
+require "gym/build_command_generator"
+require "gym/package_command_generator"
+require "gym/runner"
+require 'gym/error_handler'
 
 require "fastlane_core"
 require 'terminal-table'
 
-module Attach
+module Gym
   class << self
     attr_accessor :config
 

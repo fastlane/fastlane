@@ -1,4 +1,4 @@
-module Attach
+module Gym
   # Represents the Xcode project/workspace
   class Project
     # Path to the project/workspace

@@ -1,4 +1,4 @@
-module Attach
+module Gym
   # Responsible for building the fully working xcodebuild command
   class BuildCommandGenerator
     class << self
@@ -18,7 +18,7 @@ module Attach
       end
 
       def options
-        config = Attach.config
+        config = Gym.config
 
         options = []
         options << "-workspace '#{config[:workspace]}'" if config[:workspace]
@@ -31,7 +31,7 @@ module Attach
       end
 
       def actions
-        config = Attach.config
+        config = Gym.config
 
         actions = []
         actions << :clean if config[:clean]
@@ -51,7 +51,7 @@ module Attach
       # The path to set the Derived Data to
       def build_path
         unless @build_path
-          @build_path = "/tmp/attach/#{Time.now.to_i}/"
+          @build_path = "/tmp/gym/#{Time.now.to_i}/"
           FileUtils.mkdir_p @build_path
         end
         @build_path

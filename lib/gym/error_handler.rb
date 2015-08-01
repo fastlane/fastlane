@@ -1,4 +1,4 @@
-module Attach
+module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler
     class << self

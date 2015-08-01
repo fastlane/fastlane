@@ -1,7 +1,7 @@
 require 'pty'
 require 'open3'
 
-module Attach
+module Gym
   class Runner
     def run
       print_summary
@@ -18,7 +18,7 @@ module Attach
     #####################################################
 
     def print_summary
-      config = Attach.config
+      config = Gym.config
       rows = []
       rows << ["Project", config[:project]] if config[:project]
       rows << ["Workspace", config[:workspace]] if config[:workspace]
@@ -100,8 +100,8 @@ module Attach
     # Moves over the binary and dsym file to the output directory
     def move_results
       require 'fileutils'
-      FileUtils.mv(PackageCommandGenerator.ipa_path, Attach.config[:output_directory], force: true)
-      FileUtils.mv(PackageCommandGenerator.dsym_path, Attach.config[:output_directory], force: true) if PackageCommandGenerator.dsym_path
+      FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
+      FileUtils.mv(PackageCommandGenerator.dsym_path, Gym.config[:output_directory], force: true) if PackageCommandGenerator.dsym_path
     end
 
     #####################################################
@@ -123,7 +123,7 @@ module Attach
       end
 
       # Exit status for build command, should be 0 if build succeeded
-      if $CHILD_STATUS.exitstatus != 0
+      if $?.exitstatus != 0
         error.call(output)
       end
     end

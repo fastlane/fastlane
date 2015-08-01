@@ -1,21 +1,21 @@
 # coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "attach/version"
+require "gym/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "attach"
-  spec.version       = Attach::VERSION
+  spec.name          = "gym"
+  spec.version       = Gym::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["attach@krausefx.com"]
-  spec.summary       = Attach::DESCRIPTION
-  spec.description   = Attach::DESCRIPTION
+  spec.email         = ["gym@krausefx.com"]
+  spec.summary       = Gym::DESCRIPTION
+  spec.description   = Gym::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = ">= 2.0.0"
 
-  spec.files = Dir["lib/**/*"] + %w(bin/attach README.md LICENSE)
+  spec.files = Dir["lib/**/*"] + %w(bin/gym README.md LICENSE)
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
