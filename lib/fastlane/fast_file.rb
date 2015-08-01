@@ -171,8 +171,11 @@ module Fastlane
       end
       
       raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
-      
       parse(File.read(path))
+
+      # Check if we can also import local actions which are in the same directory as the Fastfile
+      actions_path = File.join(File.expand_path("..", path), 'actions')
+      Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
     end
 
     #####################################################
