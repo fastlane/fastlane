@@ -24,7 +24,9 @@ module Attach
     end
 
     def app_name
-      build_settings["App Name"]
+      # WRAPPER_NAME: Example.app
+      # WRAPPER_SUFFIX: .app
+      build_settings("WRAPPER_NAME").gsub(build_settings("WRAPPER_SUFFIX"), "")
     end
 
     #####################################################
@@ -34,16 +36,23 @@ module Attach
 
     # Get the build settings for our project
     # this is used to properly get the DerivedData folder
-    def build_settings
-      return @build_settings if @build_settings 
+    # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
+    def build_settings(key)
+      unless @build_settings
+        # We also need to pass the workspace and scheme to this command
+        options = BuildCommandGenerator.options
+        command = "xcrun xcodebuild -showBuildSettings #{options.join(' ')}" 
+        Helper.log.info command.yellow
+        @build_settings = `#{command}`
+      end
 
-      # We also need to pass the workspace and scheme to this command
-      # options = BuildCommandGenerator.new.options
-      # command = "xcrun xcodebuild -showBuildSettings #{options.join(' ')}" 
-      # Helper.log.info command.yellow
-      # require 'pry'; binding.pry
-      # data = `#{command}`
-      # TODO
+      begin
+        result = @build_settings.split("\n").find { |c| c.include?key }
+        result.split(" = ").last
+      rescue => ex
+        Helper.log.error caller.join("\n\t")
+        Helper.log.error "Could not fetch #{key} from project file: #{ex}"
+      end
     end
 
     def raw_info

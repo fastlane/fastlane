@@ -32,7 +32,7 @@ module Attach
 
       # We export it to the temporary folder and move it over to the actual output once it's finished and valid
       def ipa_path
-        File.join(BuildCommandGenerator.build_path, "Example.ipa") # TODO: Replace with real name already
+        File.join(BuildCommandGenerator.build_path, "#{Attach.project.app_name}.ipa")
       end
 
       # The path the the dsym file for this app. Might be nil
