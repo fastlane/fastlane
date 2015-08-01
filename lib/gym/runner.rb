@@ -4,7 +4,6 @@ require 'open3'
 module Gym
   class Runner
     def run
-      print_summary
       build_app
       verify_archive
       package_app
@@ -16,20 +15,6 @@ module Gym
     #####################################################
     # @!group Printing out things
     #####################################################
-
-    def print_summary
-      config = Gym.config
-      rows = []
-      rows << ["Project", config[:project]] if config[:project]
-      rows << ["Workspace", config[:workspace]] if config[:workspace]
-      rows << ["Scheme", config[:scheme]] if config[:scheme]
-
-      puts Terminal::Table.new(
-        title: "Building Application".green,
-        rows: rows
-      )
-      puts ""
-    end
 
     # @param [Array] An array containing all the parts of the command
     def print_command(command, title)
@@ -129,12 +114,12 @@ module Gym
           line = l.strip # strip so that \n gets removed
           output << line
 
-          if print_all
-            current_length = line.length
-            spaces = [last_length - current_length, 0].max
-            print (line + " " * spaces + "\r")
-            last_length = current_length
-          end
+          next unless print_all
+
+          current_length = line.length
+          spaces = [last_length - current_length, 0].max
+          print(line + " " * spaces + "\r")
+          last_length = current_length
         end
         Process.wait(pid)
       end
