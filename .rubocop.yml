@@ -2,3 +2,15 @@ inherit_from: .rubocop_todo.yml
 
 Style/ClassCheck:
   EnforcedStyle: kind_of?
+
+# Offense count: 22
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/AndOr:
+  Enabled: false
+
+# Offense count: 9
+# Cop supports --auto-correct.
+# Configuration parameters: WordRegex.
+Style/WordArray:
+  MinSize: 30

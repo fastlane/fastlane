@@ -58,7 +58,7 @@ module Attach
       end
 
       def archive_path
-        File.join(self.build_path, "Archive.xcarchive")
+        File.join(build_path, "Archive.xcarchive")
       end
     end
   end

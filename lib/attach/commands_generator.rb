@@ -10,11 +10,14 @@ module Attach
 
     FastlaneCore::CommanderGenerator.new.generate(Attach::Options.available_options)
 
-    def self.start
+    # def self.start
     #   FastlaneCore::UpdateChecker.start_looking_for_update("attach")
-      new.run
+    #   new.run
     # ensure
     #   FastlaneCore::UpdateChecker.show_update_status("attach", Attach::VERSION)
+    # end
+    def self.start
+      new.run
     end
 
     def convert_options(options)

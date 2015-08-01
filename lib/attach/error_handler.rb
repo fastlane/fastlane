@@ -36,7 +36,7 @@ module Attach
 
       private
 
-        # Just to make things easier
+      # Just to make things easier
       def print(text)
         Helper.log.error text.red
       end

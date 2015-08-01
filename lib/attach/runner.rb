@@ -57,7 +57,7 @@ module Attach
     # @!group The individual steps
     #####################################################
 
-    # Buids the app and prepares the archive
+    # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command")
