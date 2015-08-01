@@ -133,17 +133,17 @@ module Gym
       # Exit status for build command, should be 0 if build succeeded
       # Disabled Rubocop, since $CHILD_STATUS just is not the same
       if $?.exitstatus != 0 # rubocop:disable Style/SpecialGlobalVars
-        output = output.join("\n")
-        puts output # the user has the right to see the raw output
-        error.call(output)
+        o = output.join("\n")
+        puts o # the user has the right to see the raw output
+        error.call(o)
       end
     rescue => ex
       # This could happen when the environment is wrong:
       # > invalid byte sequence in US-ASCII (ArgumentError)
       output << ex.to_s
-      output = output.join("\n")
-      puts output
-      error.call(output)
+      o = output.join("\n")
+      puts o
+      error.call(o)
     end
   end
 end

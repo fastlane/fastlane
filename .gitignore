@@ -8,3 +8,4 @@ fastlane/report.xml
 # Build
 **/Example.app.dSYM.zip
 **/Example.ipa
+example/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate

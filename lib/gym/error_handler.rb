@@ -30,7 +30,7 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "http://stackoverflow.com/a/17031697/445598"
         end
-        raise "Error building the application"
+        raise "Error building the application - see the log above"
       end
 
       # @param [Array] The output of the errored build (line by line)
