@@ -69,7 +69,7 @@ module Fastlane
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
 
         begin
-          build_number = Actions.lane_context[Actions::SharedValues::BUILD_NUMBER] 
+          build_number = lane_context[SharedValues::BUILD_NUMBER] 
           
           params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
           
