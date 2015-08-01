@@ -5,3 +5,4 @@ Gemfile.lock
 *app.dSYM
 pkg
 example/Example.app.dSYM.zip
+fastlane/report.xml
