@@ -41,8 +41,7 @@ module Gym
     def build_settings(key)
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
-        options = BuildCommandGenerator.options
-        command = "xcrun xcodebuild -showBuildSettings #{options.join(' ')}"
+        command = "xcrun xcodebuild -showBuildSettings #{BuildCommandGenerator.project_path_string}"
         Helper.log.info command.yellow
         @build_settings = `#{command}`
       end
@@ -72,7 +71,9 @@ module Gym
       #     Schemes:
       #         Example
       #         ExampleUITests
-      @raw ||= `xcrun xcodebuild -list`
+
+      # The options are required to specify the path to the project
+      @raw ||= `xcrun xcodebuild -list #{BuildCommandGenerator.project_path_string}`
     end
   end
 end

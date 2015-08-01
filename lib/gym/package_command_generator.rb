@@ -13,10 +13,6 @@ module Gym
       def options
         options = []
 
-        app_path = Dir[BuildCommandGenerator.build_path + "**/*.app"] # TODO: necessary?
-        raise "Could not find app in #{BuildCommandGenerator.build_path}" if app_path.count == 0
-        ErrorHandler.handle_empty_archive unless app_path
-
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "exportFormat ipa"
         options << "-exportPath '#{ipa_path}'"
