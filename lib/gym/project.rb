@@ -9,6 +9,8 @@ module Gym
     def initialize(options)
       self.path = options[:workspace] || options[:project]
       self.is_workspace = (options[:workspace].to_s.length > 0)
+
+      raise "Could not find project at path '#{self.path}'".red unless File.directory?self.path
     end
 
     # Get all available schemes in an array
