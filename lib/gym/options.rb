@@ -31,26 +31,11 @@ module Gym
       config = Gym.config
 
       if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
-        loop do
-          path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
-          if File.directory?path
-            if path.end_with?".xcworkspace"
-              config[:workspace] = path
-              break
-            elsif path.end_with?".xcodeproj"
-              config[:project] = path
-              break
-            else
-              Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
-            end
-          else
-            Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
-          end
-        end
+        choose_project
       end
 
       if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
-        require 'pry'; binding.pry # invalid call here
+        raise "You can only pass either a workspace or a project path, not both".red
       end
 
       Gym.project = Project.new(config)
@@ -119,6 +104,27 @@ module Gym
                                      end)
 
       ]
+    end
+
+    private
+
+    def choose_project
+      loop do
+        path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
+        if File.directory?path
+          if path.end_with?".xcworkspace"
+            config[:workspace] = path
+            break
+          elsif path.end_with?".xcodeproj"
+            config[:project] = path
+            break
+          else
+            Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
+          end
+        else
+          Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
+        end
+      end
     end
   end
 end
