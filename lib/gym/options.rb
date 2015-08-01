@@ -111,11 +111,11 @@ module Gym
     def choose_project
       loop do
         path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
-        if File.directory?path
-          if path.end_with?".xcworkspace"
+        if File.directory? path
+          if path.end_with? ".xcworkspace"
             config[:workspace] = path
             break
-          elsif path.end_with?".xcodeproj"
+          elsif path.end_with? ".xcodeproj"
             config[:project] = path
             break
           else

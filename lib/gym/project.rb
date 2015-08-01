@@ -10,8 +10,8 @@ module Gym
       self.path = options[:workspace] || options[:project]
       self.is_workspace = (options[:workspace].to_s.length > 0)
 
-      if !self.path or !File.directory?self.path
-        raise "Could not find project at path '#{self.path}'".red
+      if !path or !File.directory? path
+        raise "Could not find project at path '#{path}'".red
       end
     end
 
