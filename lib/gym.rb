@@ -7,6 +7,7 @@ require 'gym/package_command_generator'
 require 'gym/runner'
 require 'gym/error_handler'
 require 'gym/options'
+require 'gym/detect_values'
 
 require 'fastlane_core'
 require 'terminal-table'
@@ -19,7 +20,7 @@ module Gym
 
     def config=(value)
       @config = value
-      Options.set_additional_default_values
+      DetectValues.set_additional_default_values
     end
   end
 

@@ -25,41 +25,11 @@ module Gym
       @options ||= plain_options(project: project, workspace: workspace)
     end
 
-    # This is needed as these are more complex default values
-    # Returns the finished config object
-    def self.set_additional_default_values
-      config = Gym.config
-
-      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
-        choose_project
-      end
-
-      if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
-        raise "You can only pass either a workspace or a project path, not both".red
-      end
-
-      Gym.project = Project.new(config)
-
-      if config[:scheme].to_s.length == 0
-        proj_schemes = Gym.project.schemes
-        if proj_schemes.count == 1
-          config[:scheme] = proj_schemes.last
-        elsif proj_schemes.count > 1
-          puts "Select Scheme: "
-          config[:scheme] = choose(*(proj_schemes))
-        else
-          raise "Couldn't find any schemes in this project".red
-        end
-      end
-
-      return config
-    end
-
     def self.plain_options(project: nil, workspace: nil)
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
-                                     # env_name: "PILOT_USERNAME",
+                                     env_name: "GYM_WORKSPACE",
                                      optional: true,
                                      description: "Path the workspace file",
                                      default_value: workspace,
@@ -71,7 +41,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
                                      optional: true,
-                                     # env_name: "PILOT_USERNAME",
+                                     env_name: "GYM_PROJECT",
                                      description: "Path the project file",
                                      default_value: project,
                                      verify_block: proc do |value|
@@ -82,7 +52,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
-                                     # env_name: "PILOT_USERNAME",
+                                     env_name: "GYM_SCHEME",
                                      description: "The project scheme. Make sure it's marked as `Shared`",
                                      verify_block: proc do |value|
                                        raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
@@ -90,13 +60,13 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :clean,
                                      short_option: "-c",
-                                     # env_name: "PILOT_USERNAME",
+                                     env_name: "GYM_CLEAN",
                                      description: "Should the project be cleaned before building it?",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
-                                     # env_name: "PILOT_USERNAME",
+                                     env_name: "GYM_OUTPUT",
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: ".",
                                      verify_block: proc do |value|
@@ -104,27 +74,6 @@ module Gym
                                      end)
 
       ]
-    end
-
-    private
-
-    def choose_project
-      loop do
-        path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
-        if File.directory? path
-          if path.end_with? ".xcworkspace"
-            config[:workspace] = path
-            break
-          elsif path.end_with? ".xcodeproj"
-            config[:project] = path
-            break
-          else
-            Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
-          end
-        else
-          Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
-        end
-      end
     end
   end
 end
