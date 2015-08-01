@@ -82,6 +82,8 @@ private_lane :validate_repo do |options|
   ensure_no_debug_code(text: "TODO", extension: ".rb", path: "./lib/")
   ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/")
 
+  rubocop if rubocop_repos.include?tool_name
+
   # Verifying the --help command
   # 
   binary_path = "../../#{tool_name}/bin/#{tool_name}"
@@ -117,6 +119,11 @@ end
 desc "All repos that don't have a binary to test" 
 private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
+end
+
+desc "All repos that have rubocop enabled" 
+private_lane :rubocop_repos do
+  ['spaceship', 'gym']
 end
 
 desc "Detects the name of the tool based on the current directory" 
