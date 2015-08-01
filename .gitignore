@@ -1,8 +1,10 @@
 .DS_Store
-example/Example.ipa
 Gemfile.lock
 *UserInterfaceState.xcuserstate
-*app.dSYM
 pkg
 example/Example.app.dSYM.zip
 fastlane/report.xml
+
+# Build
+**/Example.app.dSYM.zip
+**/Example.ipa
