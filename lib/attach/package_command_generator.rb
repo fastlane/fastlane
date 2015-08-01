@@ -6,13 +6,12 @@ module Attach
         parts = ["xcodebuild -exportArchive"]
         parts += options
         parts += pipe
-        
+
         parts
       end
 
       def options
         options = []
-
 
         app_path = Dir[BuildCommandGenerator.build_path + "**/*.app"] # TODO: necessary?
         raise "Could not find app in #{BuildCommandGenerator.build_path}" if app_path.count == 0
@@ -21,7 +20,6 @@ module Attach
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "exportFormat ipa"
         options << "-exportPath '#{ipa_path}'"
-
 
         options
       end

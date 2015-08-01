@@ -7,7 +7,7 @@ module Attach
       workspace = Dir["./*.xcworkspace"]
       if workspace.count > 1
         puts "Select Workspace: "
-        workspace = choose *workspace 
+        workspace = choose *workspace
       else
         workspace = workspace.first # this will result in nil if no files were found
       end
@@ -15,7 +15,7 @@ module Attach
       project = Dir["./*.xcodeproj"]
       if project.count > 1
         puts "Select Project: "
-        project = choose *project 
+        project = choose *project
       else
         project = project.first # this will result in nil if no files were found
       end
@@ -28,7 +28,7 @@ module Attach
                                      description: "Path the workspace file",
                                      default_value: workspace,
                                      verify_block: proc do |value|
-                                       raise "Workspace file not found at path '#{File.expand_path(value)}'" unless File.exists?(value.to_s)
+                                       raise "Workspace file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
                                        raise "Workspace file invalid" unless File.directory?(value.to_s)
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
@@ -38,7 +38,7 @@ module Attach
                                      description: "Path the project file",
                                      default_value: project,
                                      verify_block: proc do |value|
-                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exists?(value.to_s)
+                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
                                        raise "Project file invalid" unless File.directory?(value.to_s)
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
@@ -47,7 +47,7 @@ module Attach
                                      # env_name: "PILOT_USERNAME",
                                      description: "The project scheme. Make sure it's marked as `Shared`",
                                      verify_block: proc do |value|
-                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exists?(value.to_s)
+                                       raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
                                        raise "Project file invalid" unless File.directory?(value.to_s)
                                      end),
         FastlaneCore::ConfigItem.new(key: :clean,
@@ -62,8 +62,8 @@ module Attach
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: ".",
                                      verify_block: proc do |value|
-                                      raise "Directory not found at path '#{File.expand_path(value)}'" unless File.directory?(value)
-                                     end),
+                                       raise "Directory not found at path '#{File.expand_path(value)}'" unless File.directory?(value)
+                                     end)
 
       ]
     end

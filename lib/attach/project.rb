@@ -33,7 +33,6 @@ module Attach
     # @!group Raw Access
     #####################################################
 
-
     # Get the build settings for our project
     # this is used to properly get the DerivedData folder
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
@@ -41,13 +40,13 @@ module Attach
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         options = BuildCommandGenerator.options
-        command = "xcrun xcodebuild -showBuildSettings #{options.join(' ')}" 
+        command = "xcrun xcodebuild -showBuildSettings #{options.join(' ')}"
         Helper.log.info command.yellow
         @build_settings = `#{command}`
       end
 
       begin
-        result = @build_settings.split("\n").find { |c| c.include?key }
+        result = @build_settings.split("\n").find { |c| c.include? key }
         result.split(" = ").last
       rescue => ex
         Helper.log.error caller.join("\n\t")

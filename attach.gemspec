@@ -24,10 +24,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastlane_core', '>= 0.9.2' # all shared code and dependencies
   spec.add_dependency 'xcpretty' # pretty xcodebuild output
   spec.add_dependency 'terminal-table' # print out build information
- 
+
   # Development only
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "yard", "~> 0.8.7.4"

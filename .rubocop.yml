@@ -1,0 +1,4 @@
+inherit_from: .rubocop_todo.yml
+
+Style/ClassCheck:
+  EnforcedStyle: kind_of?

@@ -35,10 +35,11 @@ module Attach
       end
 
       private
+
         # Just to make things easier
-        def print(text)
-          Helper.log.error text.red
-        end
+      def print(text)
+        Helper.log.error text.red
+      end
     end
   end
 end
