@@ -71,7 +71,12 @@ module Gym
                                      default_value: ".",
                                      verify_block: proc do |value|
                                        raise "Directory not found at path '#{File.expand_path(value)}'" unless File.directory?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :sdk,
+                                     short_option: "-k",
+                                     env_name: "GYM_SDK",
+                                     description: "The SDK that should be used for building the application",
+                                     optional: true)
 
       ]
     end

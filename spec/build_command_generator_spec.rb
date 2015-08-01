@@ -21,5 +21,22 @@ describe Gym do
         "| xcpretty"
       ])
     end
+
+    it "supports additional parameters" do
+      Gym.config = { project: "./example/Example.xcodeproj", sdk: "9.0" }
+
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+        "set -o pipefail && ",
+        "xcodebuild",
+        "-project './example/Example.xcodeproj'",
+        "-configuration Release",
+        "-scheme 'Example'",
+        "-sdk '9.0'",
+        "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+        :archive,
+        "| xcpretty"
+      ])
+    end
   end
 end

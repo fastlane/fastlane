@@ -20,6 +20,7 @@ module Gym
           print "       export LANGUAGE=en_US.UTF-8"
           print "       export LC_ALL=en_US.UTF-8"
           print ""
+          print "You'll have to restart your shell session after updating the file."
           print "For more information visit this stackoverflow answer:"
           print "http://stackoverflow.com/a/17031697/445598"
         end

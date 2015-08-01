@@ -32,6 +32,7 @@ module Gym
         options << project_path_string
         options << "-configuration Release" # We need `Release` to export the DSYM file as well
         options << "-scheme '#{config[:scheme]}'" if config[:scheme]
+        options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-archivePath '#{archive_path}'"
 
         options
