@@ -4,10 +4,12 @@ require "credentials_manager"
 module Attach
   class Options
     def self.available_options
+      return @options if @options
+
       workspace = Dir["./*.xcworkspace"]
       if workspace.count > 1
         puts "Select Workspace: "
-        workspace = choose *workspace
+        workspace = choose(*(workspace))
       else
         workspace = workspace.first # this will result in nil if no files were found
       end
@@ -15,12 +17,44 @@ module Attach
       project = Dir["./*.xcodeproj"]
       if project.count > 1
         puts "Select Project: "
-        project = choose *project
+        project = choose(*(project))
       else
         project = project.first # this will result in nil if no files were found
       end
 
-      @options ||= [
+      @options ||= plain_options(project: project, workspace: workspace)
+    end
+
+    # This is needed as these are more complex default values
+    # Returns the finished config object
+    def self.set_additional_default_values
+      config = Attach.config
+
+      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
+        require 'pry'; binding.pry
+      end
+
+      if config[:workspace].to_s.length > 0 and config[:project].to_s.lenght > 0
+        require 'pry'; binding.pry # invalid call here
+      end
+
+      if config[:scheme].to_s.length == 0
+        proj_schemes = Attach.project.schemes
+        if proj_schemes.count == 1
+          config[:scheme] = proj_schemes.last
+        elsif proj_schemes.count > 1
+          puts "Select Scheme: "
+          config[:scheme] = choose(*(proj_schemes))
+        else
+          raise "Couldn't find any schemes in this project".red
+        end
+      end
+
+      return config
+    end
+
+    def self.plain_options(project: nil, workspace: nil)
+      [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      # env_name: "PILOT_USERNAME",
@@ -66,34 +100,6 @@ module Attach
                                      end)
 
       ]
-    end
-
-    # This is needed as these are more complex default values
-    # Returns the finished config object
-    def self.set_additional_default_values
-      config = Attach.config
-
-      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
-        require 'pry'; binding.pry
-      end
-
-      if config[:workspace].to_s.length > 0 and config[:project].to_s.lenght > 0
-        require 'pry'; binding.pry # invalid call here
-      end
-
-      if config[:scheme].to_s.length == 0
-        proj_schemes = Attach.project.schemes
-        if proj_schemes.count == 1
-          config[:scheme] = proj_schemes.last
-        elsif proj_schemes.count > 1
-          puts "Select Scheme: "
-          config[:scheme] = choose *proj_schemes
-        else
-          raise "Couldn't find any schemes in this project".red
-        end
-      end
-
-      return config
     end
   end
 end
