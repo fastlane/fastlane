@@ -141,6 +141,7 @@ module Gym
 
       # Exit status for build command, should be 0 if build succeeded
       if $?.exitstatus != 0
+        puts output # the user has the right to see the raw output
         error.call(output)
       end
     end
