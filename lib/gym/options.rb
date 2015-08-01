@@ -76,7 +76,12 @@ module Gym
                                      short_option: "-k",
                                      env_name: "GYM_SDK",
                                      description: "The SDK that should be used for building the application",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :configuration,
+                                     short_option: "-q",
+                                     env_name: "GYM_CONFIGURATION",
+                                     description: "The configuration to use when building the app. Defaults to 'Release'",
+                                     default_value: "Release"),
 
       ]
     end
