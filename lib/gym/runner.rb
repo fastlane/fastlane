@@ -125,7 +125,7 @@ module Gym
       end
 
       # Exit status for build command, should be 0 if build succeeded
-      if $?.exitstatus != 0
+      if $?.exitstatus != 0 # rubocop:disable Style/SpecialGlobalVars # disabled, since $CHILD_STATUS just is not the same
         puts output # the user has the right to see the raw output
         error.call(output)
       end
