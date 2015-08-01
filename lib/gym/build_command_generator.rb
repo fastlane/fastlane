@@ -17,13 +17,20 @@ module Gym
         ["set -o pipefail && "]
       end
 
+      # Path to the project or workspace as parameter
+      def project_path_string
+        config = Gym.config
+        return "-workspace '#{config[:workspace]}'" if config[:workspace]
+        return "-project '#{config[:project]}'" if config[:project]
+        raise "No project/workspace found"
+      end
+
       def options
         config = Gym.config
 
         options = []
-        options << "-workspace '#{config[:workspace]}'" if config[:workspace]
+        options << project_path_string
         options << "-configuration Release" # We need `Release` to export the DSYM file as well
-        options << "-project '#{config[:project]}'" if config[:project]
         options << "-scheme '#{config[:scheme]}'" if config[:scheme]
         options << "-archivePath '#{archive_path}'"
 

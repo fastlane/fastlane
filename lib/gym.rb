@@ -1,13 +1,14 @@
-require "json"
-require "gym/version"
-require "gym/manager"
-require "gym/project"
-require "gym/build_command_generator"
-require "gym/package_command_generator"
-require "gym/runner"
+require 'json'
+require 'gym/version'
+require 'gym/manager'
+require 'gym/project'
+require 'gym/build_command_generator'
+require 'gym/package_command_generator'
+require 'gym/runner'
 require 'gym/error_handler'
+require 'gym/options'
 
-require "fastlane_core"
+require 'fastlane_core'
 require 'terminal-table'
 
 module Gym

@@ -1,7 +1,6 @@
 module Gym
   class Manager
     def work(options)
-      Gym.project = Project.new(options)
       Gym.config = options
 
       print_summary

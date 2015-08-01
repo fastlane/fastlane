@@ -38,6 +38,8 @@ module Gym
         require 'pry'; binding.pry # invalid call here
       end
 
+      Gym.project = Project.new(config)
+
       if config[:scheme].to_s.length == 0
         proj_schemes = Gym.project.schemes
         if proj_schemes.count == 1
@@ -64,6 +66,7 @@ module Gym
                                      verify_block: proc do |value|
                                        raise "Workspace file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
                                        raise "Workspace file invalid" unless File.directory?(value.to_s)
+                                       raise "Workspace file is not a workspace, must end with .xcworkspace" unless value.end_with?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -74,6 +77,7 @@ module Gym
                                      verify_block: proc do |value|
                                        raise "Project file not found at path '#{File.expand_path(value)}'" unless File.exist?(value.to_s)
                                        raise "Project file invalid" unless File.directory?(value.to_s)
+                                       raise "Project file is not a project file, must end with .xcodeproj" unless value.end_with?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",

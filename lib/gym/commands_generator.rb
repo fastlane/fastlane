@@ -1,5 +1,4 @@
 require "commander"
-require "gym/options"
 require "fastlane_core"
 
 HighLine.track_eof = false
