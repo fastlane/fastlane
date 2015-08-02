@@ -69,15 +69,15 @@ module Fastlane
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
 
         begin
-          build_number = lane_context[SharedValues::BUILD_NUMBER] 
-          
+          build_number = Actions.lane_context[SharedValues::BUILD_NUMBER]
+
           params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
-          
+
           Actions.sh("git commit -m '#{params[:message]}'")
 
           Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
         rescue => ex
-          Helper.log.info "Didn't commit any changes.".yellow
+         Helper.log.info "Didn't commit any changes.".yellow
         end
       end
 
