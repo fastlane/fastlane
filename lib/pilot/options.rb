@@ -27,6 +27,7 @@ module Pilot
                                      short_option: "-s",
                                      env_name: "PILOT_SKIP_SUBMISSION",
                                      description: "Skip the distributing action of pilot and only upload the ipa file",
+                                     is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
