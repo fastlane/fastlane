@@ -123,7 +123,7 @@ module FastlaneCore
       return value if option.optional # as this value is not required, just return what we have
       
 
-      if Helper.is_test?
+      if Helper.is_test? or Helper.is_ci?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
