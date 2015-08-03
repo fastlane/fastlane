@@ -7,7 +7,7 @@ module Pilot
       
       package_path = PackageBuilder.new.generate(apple_id: app.apple_id, 
                                                  ipa_path: config[:ipa],
-                                             package_path: "/tmp") # TODO: Config
+                                             package_path: "/tmp")
 
       result = FastlaneCore::ItunesTransporter.new.upload(config[:apple_id], package_path)
       if result
