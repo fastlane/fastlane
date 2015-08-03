@@ -21,7 +21,10 @@ module Gym
       output = raw_info.split("Schemes:").last.split(":").first
       output.split("\n").each do |current|
         current = current.strip
-        results << current if current.length > 0
+
+        next if current.start_with?"Pods-" # we really don't care about CocoaPods schemes
+        next if current.length == 0
+        results << current
       end
 
       results
