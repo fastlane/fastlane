@@ -109,7 +109,7 @@ module Deliver
       @app_identifier ||= (@ipa.fetch_app_identifier rescue nil) # since ipa might be nil
 
       @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
-      @app_version ||= ENV["DELIVER_VERSION"]
+      @app_version ||= ENV["DELIVER_VERSION"] if ENV["DELIVER_VERSION"].to_s.length > 0
       @app_version ||= (@ipa.fetch_app_version rescue nil) # since ipa might be nil
       @app_version ||= (app.get_live_version rescue nil) # pull the latest version from iTunes Connect
     end
