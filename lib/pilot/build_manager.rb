@@ -4,12 +4,12 @@ module Pilot
       start(options)
 
       Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
-      
+
       package_path = PackageBuilder.new.generate(apple_id: app.apple_id, 
                                                  ipa_path: config[:ipa],
                                              package_path: "/tmp")
 
-      result = FastlaneCore::ItunesTransporter.new.upload(config[:apple_id], package_path)
+      result = FastlaneCore::ItunesTransporter.new.upload(app.apple_id, package_path)
       if result
         Helper.log.info "Successfully uploaded the new binary to iTunes Connect"
 
