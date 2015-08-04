@@ -22,7 +22,7 @@ module Gym
       output.split("\n").each do |current|
         current = current.strip
 
-        next if current.start_with?"Pods-" # we really don't care about CocoaPods schemes
+        next if current.start_with? "Pods-" # we really don't care about CocoaPods schemes
         next if current.length == 0
         results << current
       end
@@ -46,7 +46,7 @@ module Gym
     def build_settings(key)
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
-        command = "xcrun xcodebuild -showBuildSettings #{BuildCommandGenerator.project_path_array.join(" ")}"
+        command = "xcrun xcodebuild -showBuildSettings #{BuildCommandGenerator.project_path_array.join(' ')}"
         Helper.log.info command.yellow
         @build_settings = `#{command}`
       end

@@ -27,7 +27,6 @@ module Gym
         proj << "-scheme '#{config[:scheme]}'" if config[:scheme]
         proj << "-project '#{config[:project]}'" if config[:project]
 
-
         return proj if proj.count > 0
         raise "No project/workspace found"
       end

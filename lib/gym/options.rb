@@ -79,7 +79,7 @@ module Gym
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
-                                     default_value: "Release"),
+                                     default_value: "Release")
 
       ]
     end
