@@ -35,7 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CAC1E1981B6A326100A8B23A /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAC1E1981B6A326100A8B23A /* ExampleProductName.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleProductName.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAC1E19C1B6A326100A8B23A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CAC1E19E1B6A326100A8B23A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		CAC1E19F1B6A326100A8B23A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -91,7 +91,7 @@
 		CAC1E1991B6A326100A8B23A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CAC1E1981B6A326100A8B23A /* Example.app */,
+				CAC1E1981B6A326100A8B23A /* ExampleProductName.app */,
 				CAC1E1B11B6A326100A8B23A /* ExampleTests.xctest */,
 				CAC1E1BC1B6A326200A8B23A /* ExampleUITests.xctest */,
 			);
@@ -157,7 +157,7 @@
 			);
 			name = Example;
 			productName = Example;
-			productReference = CAC1E1981B6A326100A8B23A /* Example.app */;
+			productReference = CAC1E1981B6A326100A8B23A /* ExampleProductName.app */;
 			productType = "com.apple.product-type.application";
 		};
 		CAC1E1B01B6A326100A8B23A /* ExampleTests */ = {
@@ -415,7 +415,7 @@
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
 				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
@@ -428,7 +428,7 @@
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
 				PROVISIONING_PROFILE = "";
 			};
 			name = Release;

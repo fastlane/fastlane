@@ -7,7 +7,7 @@ module Gym
     attr_accessor :is_workspace
 
     def initialize(options)
-      self.path = options[:workspace] || options[:project]
+      self.path = File.expand_path(options[:workspace] || options[:project])
       self.is_workspace = (options[:workspace].to_s.length > 0)
 
       if !path or !File.directory? path
