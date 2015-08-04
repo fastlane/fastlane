@@ -115,19 +115,28 @@ module Gym
       Helper.log.info command.yellow.strip
 
       last_length = 0
-      PTY.spawn(command) do |stdin, stdout, pid|
-        stdin.each do |l|
-          line = l.strip # strip so that \n gets removed
-          output << line
+      begin
+        PTY.spawn(command) do |stdin, stdout, pid|
+          stdin.each do |l|
+            line = l.strip # strip so that \n gets removed
+            output << line
 
-          next unless print_all
+            next unless print_all
 
-          current_length = line.length
-          spaces = [last_length - current_length, 0].max
-          print(line + " " * spaces + "\r")
-          last_length = current_length
+            current_length = line.length
+            spaces = [last_length - current_length, 0].max
+            print(line + " " * spaces + "\r")
+            last_length = current_length
+          end
+          Process.wait(pid)
         end
-        Process.wait(pid)
+      rescue => ex
+        # This could happen when the environment is wrong:
+        # > invalid byte sequence in US-ASCII (ArgumentError)
+        output << ex.to_s
+        o = output.join("\n")
+        puts o
+        error.call(o)
       end
 
       # Exit status for build command, should be 0 if build succeeded
@@ -137,13 +146,6 @@ module Gym
         puts o # the user has the right to see the raw output
         error.call(o)
       end
-    rescue => ex
-      # This could happen when the environment is wrong:
-      # > invalid byte sequence in US-ASCII (ArgumentError)
-      output << ex.to_s
-      o = output.join("\n")
-      puts o
-      error.call(o)
     end
   end
 end
