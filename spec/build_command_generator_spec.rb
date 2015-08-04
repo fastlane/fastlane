@@ -14,9 +14,9 @@ describe Gym do
       expect(result).to eq([
         "set -o pipefail && ",
         "xcodebuild",
+        "-scheme 'Example'",
         "-project './example/Example.xcodeproj'",
         "-configuration 'Release'",
-        "-scheme 'Example'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         :archive,
         "| xcpretty"
@@ -31,9 +31,9 @@ describe Gym do
       expect(result).to eq([
         "set -o pipefail && ",
         "xcodebuild",
+        "-scheme 'Example'",
         "-project './example/Example.xcodeproj'",
         "-configuration 'Release'",
-        "-scheme 'Example'",
         "-sdk '9.0'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         :archive,
