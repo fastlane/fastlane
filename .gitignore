@@ -2,10 +2,10 @@
 Gemfile.lock
 *UserInterfaceState.xcuserstate
 pkg
-example/Example.app.dSYM.zip
+**/Example.app.dSYM.zip
 fastlane/report.xml
 
 # Build
 **/Example.app.dSYM.zip
 **/Example.ipa
-example/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+**/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate

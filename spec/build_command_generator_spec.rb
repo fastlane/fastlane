@@ -7,7 +7,7 @@ describe Gym do
     end
 
     it "works with the example project with no additional parameters" do
-      options = { project: "./example/Example.xcodeproj" }
+      options = { project: "./example/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -15,7 +15,7 @@ describe Gym do
         "set -o pipefail && ",
         "xcodebuild",
         "-scheme 'Example'",
-        "-project './example/Example.xcodeproj'",
+        "-project './example/standard/Example.xcodeproj'",
         "-configuration 'Release'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         :archive,
@@ -24,7 +24,7 @@ describe Gym do
     end
 
     it "supports additional parameters" do
-      options = { project: "./example/Example.xcodeproj", sdk: "9.0" }
+      options = { project: "./example/standard/Example.xcodeproj", sdk: "9.0" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -32,7 +32,7 @@ describe Gym do
         "set -o pipefail && ",
         "xcodebuild",
         "-scheme 'Example'",
-        "-project './example/Example.xcodeproj'",
+        "-project './example/standard/Example.xcodeproj'",
         "-configuration 'Release'",
         "-sdk '9.0'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
@@ -42,11 +42,11 @@ describe Gym do
     end
 
     it "#project_path_array" do
-      options = { project: "./example/Example.xcodeproj" }
+      options = { project: "./example/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.project_path_array
-      expect(result).to eq(["-scheme 'Example'", "-project './example/Example.xcodeproj'"])
+      expect(result).to eq(["-scheme 'Example'", "-project './example/standard/Example.xcodeproj'"])
     end
   end
 end

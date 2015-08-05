@@ -8,14 +8,14 @@ describe Gym do
 
     describe "Valid Project" do
       before do
-        options = { project: "./example/Example.xcodeproj" }
+        options = { project: "./example/standard/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         @project = Gym::Project.new(Gym.config)
       end
 
       it "#path" do
-        expect(@project.path).to eq(File.expand_path("./example/Example.xcodeproj"))
+        expect(@project.path).to eq(File.expand_path("./example/standard/Example.xcodeproj"))
       end
 
       it "#is_workspace" do
