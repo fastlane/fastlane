@@ -120,7 +120,7 @@ describe Fastlane do
 
         Fastlane::FastFile.new.parse("lane :test do
           crashlytics({
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
             notifications: true
           })
         end").runner.execute(:test)
@@ -133,7 +133,7 @@ describe Fastlane do
 
         Fastlane::FastFile.new.parse("lane :test do
           crashlytics({
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
             notifications: 'false'
           })
         end").runner.execute(:test)
