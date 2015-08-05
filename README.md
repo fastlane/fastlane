@@ -50,6 +50,24 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 <h5 align="center"><code>gym</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
+# What's gym?
+
+`gym` is a drop-in replacement for [shenzhen](https://github.com/nomad/shenzhen), a tool for building your iOS apps.
+
+[shenzhen](https://github.com/nomad/shenzhen) does both building and distributing iOS apps. Since we now all use [fastlane](https://fastlane.tools) for distributing it makes sense to have *one* tool dedicated for building your app. 
+
+`gym` uses the latest and best APIs to build and sign your application which results in much faster build times compared to `shenzhen`
+
+Advantages of `gym` compared to `shenzhen` and plain `xcodebuild`
+
+- Around 30% faster build times
+- Beautiful inline build output
+- Easy and dynamic configuration using parameters, environment variables, manual inputs or using a `Gymfile`
+- Built-in right into `fastlane`
+- Generate both an `ipa` and a compressed `dSYM` file
+- Manually trigger a build by only running `gym`, never remember any complicated `xcodebuild` commands again
+- `gym` actively helps you resolve common issues like problems with Code Signing, wrongly configured projects and more
+- Automatic verification of inputs, like the available schemes or project files
 
 # Installation
 
@@ -73,6 +91,19 @@ For a list of all available parameters use
 
     gym --help
 
+# Gymfile (optional)
+
+Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
+
+Run `gym init` to create a new configuration file which may contain data like this:
+
+```ruby
+scheme "Example"
+
+sdk "9.0"
+
+output_directory "./build"
+```
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
