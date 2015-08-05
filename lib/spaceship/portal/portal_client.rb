@@ -150,6 +150,41 @@ module Spaceship
     end
 
     #####################################################
+    # @!group App Groups
+    #####################################################
+
+    def app_groups
+      paging do |page_number|
+        r = request(:post, 'account/ios/identifiers/listApplicationGroups.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'applicationGroupList')
+      end
+    end
+
+    def create_app_group!(name, group_id)
+      params = {
+        name: name,
+        identifier: group_id,
+        teamId: team_id
+      }
+
+      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', params)
+      parse_response(r, 'applicationGroup')
+    end
+
+    def delete_app_group!(app_group_id)
+      r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
+        teamId: team_id,
+        applicationGroup: app_group_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
     # @!group Devices
     #####################################################
 

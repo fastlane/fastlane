@@ -19,6 +19,7 @@ module Spaceship
   ProvisioningProfile = Spaceship::Portal::ProvisioningProfile
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
+  AppGroup = Spaceship::Portal::AppGroup
 
   # iTunes Connect
   AppVersion = Spaceship::Tunes::AppVersion
