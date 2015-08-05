@@ -13,7 +13,10 @@
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull; 
-  <a href="https://github.com/KrauseFx/codes">codes</a> 
+  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/boarding">boarding</a>
 </p>
 -------
 
@@ -51,6 +54,21 @@ This gem solves all those problems. It will run completely in the background - y
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
+### Note: Support for UI Tests with Xcode 7
+
+Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you will be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
+
+It's still work in progress and there are some technical difficulties I need to solve. 
+
+As a result, `snapshot` will be completely rewritten from ground up without changing its public API :rocket:
+
+**Why change to UI Tests?**
+
+- UI Automation is deprecated
+- UI Tests will evolve and support even more features in the future
+- UI Tests are much easier to debug
+- UI Tests are written in Swift or Objective C
+- UI Tests can be executed in a much cleaner and better way
 
 -------
 <p align="center">
@@ -324,13 +342,6 @@ end
 ### Skip alpha removal from screenshots
 In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
 
-### Pass Bundle Identifier
-This is only required in case there is a problem automatically detecting it.
-
-```
-SNAPSHOT_APP_IDENTIFIER="com.krausefx.app" snapshot
-```
-
 ### Clear old screenshots
 
 If you add this line in your `Snapfile`, the previously generated screenshots will be deleted before generating new ones:
@@ -355,13 +366,16 @@ You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store using a single command
+- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -505,6 +519,10 @@ When the app dies directly after the application is launched there might be 2 pr
 - The simulator is somehow in a broken state and you need to re-create it. You can use `snapshot reset_simulators` to reset all simulators (this will remove all installed apps)
 - You haven't enabled the correct architectures. Make sure you have the same architectures as in the example project of this repository. 
 
+### Snapshot throws an `Instruments Usage Error: Timed out waiting for device to boot: ...` error 
+
+This can happen when you launch `fastlane` or `snapshot` inside of a tool like `tmux`. Thankfully, Chris Johnsen wrote a fix to help us out, which you can find [here](https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard). Just follow the instructions at his repository, and launching the Simulator from `tmux` will work!
+
 ## Determine language in UI Automation script
 
 To detect the currently used localization in your Javascript file, use the following code:
@@ -520,6 +538,8 @@ var language = result.stdout.substring(0, result.stdout.length - 1);
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
+
+> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
 
 # Contributing
 
