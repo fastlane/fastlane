@@ -233,6 +233,12 @@ pilot import -c ~/Desktop/testers.csv
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
+## Debug information
+
+If you run into any issues you can use the `verbose` mode to get a more detailed output:
+
+    pilot --verbose
+
 ## How is my password stored?
 
 `pilot` uses the [CredentialsManager](https://github.com/fastlane/CredentialsManager) from `fastlane`.
