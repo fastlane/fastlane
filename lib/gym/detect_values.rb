@@ -23,7 +23,7 @@ module Gym
 
       if config[:scheme].to_s.length > 0
         # Verify the scheme is available
-        unless Gym.project.schemes.include?config[:scheme].to_s
+        unless Gym.project.schemes.include?(config[:scheme].to_s)
           Helper.log.error "Couldn't find specified scheme '#{config[:scheme]}'.".red
           config[:scheme] = nil
         end
