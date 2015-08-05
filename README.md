@@ -53,7 +53,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # Installation
 
-    sudo gem install gym
+This tool is still work in progress. You can already try it by cloning the repo and running
+
+    sudo bundle install && sudo rake install
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
