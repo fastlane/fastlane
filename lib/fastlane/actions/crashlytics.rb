@@ -13,7 +13,7 @@ module Fastlane
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'
-        
+
         # can pass groups param either as an Array or a String
         case params[:groups]
         when NilClass
@@ -22,6 +22,24 @@ module Fastlane
           groups = params[:groups].join(',')
         when String
           groups = params[:groups]
+        end
+
+        # Normalized notification to Crashlytics notification parameter requirement
+        # 'YES' or 'NO' - String
+        case params[:notifications]
+          when String
+            if (param[:notifications] == 'YES' || param[:notifications] == 'NO')
+              notifications = params[:notifications]
+            else
+              notifications = 'YES' if params[:notifications] == 'true'
+              notifications = 'NO' if params[:notifications] == 'false'
+            end
+          when TrueClass
+            notifications = 'YES'
+          when FalseClass
+            notifications = 'NO'
+          when NilClass
+            notifications = nil
         end
 
         Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
@@ -33,7 +51,7 @@ module Fastlane
 
         client = Shenzhen::Plugins::Crashlytics::Client.new(params[:crashlytics_path], params[:api_token], params[:build_secret])
 
-        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: params[:notifications])
+        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: notifications)
 
         if response
           Helper.log.info 'Build successfully uploaded to Crashlytics'.green
