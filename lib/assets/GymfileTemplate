@@ -1,0 +1,14 @@
+# For more information about this configuation visit
+# https://github.com/fastlane/gym#gymfile
+
+# In general, you can use the options available
+# gym --help
+
+# Remove the # in front of the line to enable this 
+# particular option
+
+# scheme "Example"
+
+# sdk "9.0"
+
+output_directory "./"

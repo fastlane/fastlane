@@ -91,7 +91,7 @@ For a list of all available parameters use
 
     gym --help
 
-# Gymfile (optional)
+# Gymfile
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
 

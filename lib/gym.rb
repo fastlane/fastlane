@@ -22,6 +22,10 @@ module Gym
       @config = value
       DetectValues.set_additional_default_values
     end
+
+    def gymfile_path
+      File.join(".", "Gymfile")
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
