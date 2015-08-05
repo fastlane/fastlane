@@ -1,7 +1,8 @@
 describe Gym do
   describe Gym::PackageCommandGenerator do
     it "works with the example project with no additional parameters" do
-      Gym.config = { project: "./example/standard/Example.xcodeproj" }
+      options = { project: "./example/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGenerator.generate
       expect(result).to eq([

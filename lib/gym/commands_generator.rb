@@ -41,7 +41,8 @@ module Gym
         c.syntax = "gym"
         c.description = "Just builds your app"
         c.action do |_args, options|
-          config = FastlaneCore::Configuration.create(Gym::Options.available_options, convert_options(options))
+          config = FastlaneCore::Configuration.create(Gym::Options.available_options, 
+                                                      convert_options(options))
           Gym::Manager.new.work(config)
         end
       end
@@ -50,10 +51,10 @@ module Gym
         c.syntax = "gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
-          raise "Gymfile already exists" if File.exists?Gym.gymfile_path
+          raise "Gymfile already exists" if File.exists?Gym.gymfile_name
           template = File.read("#{Helper.gem_path('gym')}/lib/assets/GymfileTemplate")
-          File.write(Gym.gymfile_path, template)
-          Helper.log.info "Successfully created '#{Gym.gymfile_path}'. Open the file using a code editor.".green
+          File.write(Gym.gymfile_name, template)
+          Helper.log.info "Successfully created '#{Gym.gymfile_name}'. Open the file using a code editor.".green
         end
       end
 

@@ -15,6 +15,12 @@ module Gym
       end
 
       Gym.project = Project.new(config)
+
+      # Go into the project's folder
+      Dir.chdir(File.expand_path("..", Gym.project.path)) do
+        config.load_configuration_file(Gym.gymfile_name)
+      end
+
       if config[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless Gym.project.schemes.include?config[:scheme].to_s

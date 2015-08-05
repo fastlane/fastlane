@@ -23,8 +23,8 @@ module Gym
       DetectValues.set_additional_default_values
     end
 
-    def gymfile_path
-      File.join(".", "Gymfile")
+    def gymfile_name
+      "Gymfile"
     end
   end
 
