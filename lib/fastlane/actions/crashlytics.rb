@@ -28,7 +28,7 @@ module Fastlane
         # 'YES' or 'NO' - String
         case params[:notifications]
           when String
-            if (param[:notifications] == 'YES' || param[:notifications] == 'NO')
+            if param[:notifications] == 'YES' || param[:notifications] == 'NO'
               notifications = params[:notifications]
             else
               notifications = 'YES' if params[:notifications] == 'true'
@@ -38,7 +38,7 @@ module Fastlane
             notifications = 'YES'
           when FalseClass
             notifications = 'NO'
-          when NilClass
+          else
             notifications = nil
         end
 
