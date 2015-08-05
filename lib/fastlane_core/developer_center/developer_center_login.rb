@@ -74,7 +74,7 @@ module FastlaneCore
 
       if team_id == nil and team_name == nil
         Helper.log.info "You can store your preferred team using the environment variable `FASTLANE_TEAM_ID` or `FASTLANE_TEAM_NAME`".green
-        Helper.log.info "or in your `Appfile` using `team_id 'Q2CBPJ58CA'` or `team_name 'Felix Krause'`".green # TODO
+        Helper.log.info "or in your `Appfile` using `team_id 'Q2CBPJ58CA'` or `team_name 'Felix Krause'`".green
         Helper.log.info "Your ID belongs to the following teams:".green
       end
       
