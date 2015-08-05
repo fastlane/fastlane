@@ -15,29 +15,22 @@ module FastlaneCore
     # @return [String] The name of the configuration file (not the path). Optional!
     attr_accessor :config_file_name
 
-    # @param config_file_name [String] The name of the configuration file to use (optional)
-    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
-    #   in the configuration file
-    def self.create(available_options, values, config_file_name = nil, block_for_missing = nil)
-      Configuration.new(available_options, values, config_file_name, block_for_missing)
+    def self.create(available_options, values)
+      Configuration.new(available_options, values)
     end
 
     #####################################################
     # @!group Setting up the configuration
     #####################################################
     
-    def initialize(available_options, values, config_file_name = nil, block_for_missing = nil)
+    def initialize(available_options, values)
       self.available_options = available_options || []
       self.values = values || {}
-      self.config_file_name = config_file_name
-      @block_for_missing = block_for_missing
 
       verify_input_types      
       verify_value_exists
       verify_no_duplicates
       verify_default_value_matches_verify_block
-
-      load_configuration_file
     end
 
     def verify_input_types
@@ -87,14 +80,24 @@ module FastlaneCore
       end
     end
 
-    def load_configuration_file
-      return unless self.config_file_name
+    # This method takes care of parsing and using the configuration file as values
+    # Call this once you know where the config file might be located
+    # Take a look at how `gym` uses this method
+    # 
+    # @param config_file_name [String] The name of the configuration file to use (optional)
+    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
+    #   in the configuration file
+    def load_configuration_file(config_file_name = nil, block_for_missing = nil)
+      return unless config_file_name
+
+      self.config_file_name = config_file_name
+
       paths = Dir["./fastlane/#{self.config_file_name}"] + Dir["./#{self.config_file_name}"]
       paths = paths + Dir["./spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
       return if paths.count == 0
 
       path = paths.first
-      ConfigurationFile.new(self, path, @block_for_missing)
+      ConfigurationFile.new(self, path, block_for_missing)
     end
 
     #####################################################

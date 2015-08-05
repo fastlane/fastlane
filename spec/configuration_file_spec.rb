@@ -22,35 +22,41 @@ describe FastlaneCore do
       end
 
       it "fills in the values from a valid config file" do
-        config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileValid')
+        config = FastlaneCore::Configuration.create(options, {})
+        config.load_configuration_file('ConfigFileValid')
         expect(config[:app_identifier]).to eq("com.krausefx.app")
         expect(config[:apple_id]).to eq("from_le_block")
       end
 
-      it "properly raises an exception if verify block doens't match" do
+      it "properly raises an exception if verify block doesn't match" do
         expect {
-          config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileInvalidIdentifier')
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file("ConfigFileInvalidIdentifier")
         }.to raise_error "Invalid identifier 'such invalid'"
       end
 
       it "raises an exception if method is not available" do
         expect {
-          config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileKeyNotHere')
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file("ConfigFileKeyNotHere")
         }.to raise_error (/Could not find option \'not_existent\' in the list of available options.*/)
       end
 
       it "overwrites existing values" do
         # Overwrite
-        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"}, 'ConfigFileValid')
+        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"})
+        config.load_configuration_file('ConfigFileValid')
         expect(config[:app_identifier]).to eq("com.krausefx.app")
 
         # not overwrite
-        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"}, 'ConfigFileEmpty')
+        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"})
+        config.load_configuration_file('ConfigFileEmpty')
         expect(config[:app_identifier]).to eq("detlef.app.super")
       end
 
       it "allows using a custom block to handle special callbacks" do
-        config = FastlaneCore::Configuration.create(options, {}, 'ConfigFileUnhandledBlock', Proc.new do |method_sym, arguments, block|
+        config = FastlaneCore::Configuration.create(options, {})
+        config.load_configuration_file('ConfigFileUnhandledBlock', Proc.new do |method_sym, arguments, block|
           if method_sym == :some_custom_block
             if arguments == ["parameter"]
               expect {
