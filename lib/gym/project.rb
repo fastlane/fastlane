@@ -22,7 +22,6 @@ module Gym
       output.split("\n").each do |current|
         current = current.strip
 
-        next if current.start_with? "Pods-" # we really don't care about CocoaPods schemes
         next if current.length == 0
         results << current
       end
@@ -77,8 +76,18 @@ module Gym
       #         Example
       #         ExampleUITests
 
-      # The options are required to specify the path to the project
-      @raw ||= `xcrun xcodebuild -list #{BuildCommandGenerator.project_path_array.join(" ")}`
+      return @raw if @raw
+
+      # We DO NOT want to pass the workspace, as this would also show
+      # all the CocoaPods schemes which we don't want here
+      containing_path = File.expand_path("..", path)
+      command = "xcrun xcodebuild -list"
+      Helper.log.info command.yellow
+
+      Dir.chdir(containing_path) do
+        @raw = `#{command}`
+      end
+      @raw
     end
   end
 end

@@ -21,8 +21,14 @@ module Gym
         if proj_schemes.count == 1
           config[:scheme] = proj_schemes.last
         elsif proj_schemes.count > 1
-          puts "Select Scheme: "
-          config[:scheme] = choose(*(proj_schemes))
+          if Helper.is_ci?
+            Helper.log.error "Multiple schemes found but you haven't specified one.".red
+            Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
+            raise "Multiple schemes found".red
+          else
+            puts "Select Scheme: "
+            config[:scheme] = choose(*(proj_schemes))
+          end
         else
           raise "Couldn't find any schemes in this project".red
         end

@@ -6,7 +6,7 @@ describe Gym do
       end.to raise_error "Could not find project at path '/tmp/notHere123'".red
     end
 
-    describe "Valid Project" do
+    describe "Valid Standard Project" do
       before do
         options = { project: "./example/standard/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -28,6 +28,19 @@ describe Gym do
 
       it "#app_name" do
         expect(@project.app_name).to eq("ExampleProductName")
+      end
+    end
+
+    describe "Valid CocoaPods Project" do
+      before do
+        options = { workspace: "./example/cocoapods/Example.xcworkspace" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        @workspace = Gym::Project.new(Gym.config)
+      end
+
+      it "#schemes returns all schemes - but not the CocoaPods schemes" do
+        expect(@workspace.schemes).to eq(["Example"])
       end
     end
   end
