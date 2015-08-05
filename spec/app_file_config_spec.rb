@@ -128,5 +128,23 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
       end
     end
+
+    describe "#load_for_lane_configuration_with_specified_platform" do
+      it "overrides Appfile configuration with current platform and specified lane." do
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+        ENV["FASTLANE_LANE_NAME"] = :beta.to_s
+
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:apple_id]).to eq('felix@sunapps.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:app_identifier]).to eq('com.app.beta')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:team_id]).to eq('Q2CBPJ58CC')
+
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+        ENV["FASTLANE_LANE_NAME"] = :enterprise.to_s
+
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:apple_id]).to eq('felix@sunapps.net')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:app_identifier]).to eq('enterprise.com')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:team_id]).to eq('Q2CBPJ58AA')
+      end
+    end
   end
 end

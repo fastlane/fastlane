@@ -39,8 +39,8 @@ module CredentialsManager
       #
       # It is forbidden to specify multiple configuration for the same platform. It will raise an exception.
 
-      # Plaform specified.
       if for_platform_configuration?(blocks)
+        # Plaform specified.
         blocks[ENV["FASTLANE_PLATFORM_NAME"]].call
         inner_block = blocks[ENV["FASTLANE_PLATFORM_NAME"]]
         if for_lane_configuration?(inner_block)
@@ -116,8 +116,14 @@ module CredentialsManager
         blocks[lane_name.to_s] = block
       else
         if ENV["FASTLANE_LANE_NAME"]
-          # Platform and lane name specified, assigned lane configuration per different platforms
-          blocks[ENV["FASTLANE_PLATFORM_NAME"]] = {lane_name.to_s => block } if lane_name.to_s == ENV["FASTLANE_LANE_NAME"]
+          # The for_lane could be formatted as:
+          #   - only {lane_name} (i.e. 'for_lane beta ...')
+          #   - {platform_name} {lane_name} (i.e. 'for_lane "ios beta" ...')
+          #
+          # Either case it is a valid configuration to run the overwriting of the settings.
+          if lane_name.to_s == "#{ENV["FASTLANE_PLATFORM_NAME"]} #{ENV["FASTLANE_LANE_NAME"]}" || lane_name.to_s == ENV["FASTLANE_LANE_NAME"]
+             blocks[ENV["FASTLANE_LANE_NAME"]] = block
+          end
         end
       end
     end
