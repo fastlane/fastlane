@@ -51,7 +51,7 @@ module Fastlane
 
         client = Shenzhen::Plugins::Crashlytics::Client.new(params[:crashlytics_path], params[:api_token], params[:build_secret])
 
-        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: notifications)
+        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: groups, notifications: notifications)
 
         if response
           Helper.log.info 'Build successfully uploaded to Crashlytics'.green
