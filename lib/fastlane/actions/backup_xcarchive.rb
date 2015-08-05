@@ -35,7 +35,7 @@ module Fastlane
           zip_file = File.expand_path(File.join("#{xcarchive_file}.zip"))
 
           # Create zip
-          Actions.sh(%Q[cd #{xcarchive_folder} && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null])
+          Actions.sh(%Q[cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null])
 
           # Moved to its final destination
           FileUtils.mv(zip_file, full_destination)
