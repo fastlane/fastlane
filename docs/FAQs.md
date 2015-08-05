@@ -54,6 +54,6 @@ Now to run this, all you need to do is specify the environment argument when run
 Ex: `fastlane build --env app1` will use `.env.app1`
 Ex: `fastlane build --env app2` will use `.env.app2`
 
-You can also references these environment variables almost anywhere in `fastlane`. I mainly use them in my `Fastfile` to provide different schemes and configurations to build for different environments.
+You can also references these environment variables almost anywhere in `fastlane`. 
 
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
