@@ -112,6 +112,32 @@ describe Fastlane do
           })
         end").runner.execute(:test)
       end
+
+      it "works when using TrueClass variable in place of notifications parameter" do
+        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
+        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+
+        Fastlane::FastFile.new.parse("lane :test do
+          crashlytics({
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            notifications: true
+          })
+        end").runner.execute(:test)
+      end
+
+      it "works when using 'false' String variable in place of notifications parameter" do
+        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
+        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+
+        Fastlane::FastFile.new.parse("lane :test do
+          crashlytics({
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            notifications: 'false'
+          })
+        end").runner.execute(:test)
+      end
     end
   end
 end
