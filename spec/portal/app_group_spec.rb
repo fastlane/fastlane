@@ -56,5 +56,4 @@ describe Spaceship::Portal::AppGroup do
       expect(group.app_group_id).to eq('2GKKV64NUG')
     end
   end
-
 end
