@@ -66,17 +66,17 @@ Enough words, here is some code:
 
 ```ruby
 Spaceship.login
- 
+
 # Create a new app
 app = Spaceship.app.create!(bundle_id: "com.krausefx.app", name: "Spaceship App")
- 
+
 # Use an existing certificate
 cert = Spaceship.certificate.production.all.first
- 
+
 # Create a new provisioning profile
 profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: app.bundle_id,
                                                          certificate: cert)
- 
+
 # Print the name and download the new profile
 puts "Created Profile " + profile.name
 profile.download
@@ -84,7 +84,7 @@ profile.download
 
 ## Speed
 
-How fast are tools using `spaceship` compared to web scraping? 
+How fast are tools using `spaceship` compared to web scraping?
 
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
@@ -116,9 +116,9 @@ You can find the log file here `/tmp/spaceship[time].log`.
 
 ## HTTP Client
 
-Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and extremely improved speed. 
+Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and extremely improved speed.
 
-Advantages of `spaceship` (HTTP client) over web scraping: 
+Advantages of `spaceship` (HTTP client) over web scraping:
 
 - Blazing fast :rocket: 90% faster than previous methods
 - No more overhead by loading images, HTML, JS and CSS files on each page load
@@ -131,18 +131,19 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 I won't go into too much technical details about the various API endpoints, but just to give you an idea:
 
 - `https://idmsa.apple.com`: Used to authenticate to get a valid session
-- `https://developerservices2.apple.com`: 
+- `https://developerservices2.apple.com`:
  - Get a detailed list of all available provisioning profiles
  - This API returns the devices, certificates and app for each of the profiles
  - Register new devices
-- `https://developer.apple.com`: 
- - List all devices, certificates and apps
+- `https://developer.apple.com`:
+ - List all devices, certificates, apps and app groups
  - Create new certificates, provisioning profiles and apps
+ - Disable/enable services on apps and assign them to app groups
  - Delete certificates and apps
  - Repair provisioning profiles
  - Download provisioning profiles
  - Team selection
-- `https://itunesconnect.apple.com`: 
+- `https://itunesconnect.apple.com`:
  - Managing apps
  - Managing beta testers
  - Submitting updates to review
@@ -152,11 +153,11 @@ I won't go into too much technical details about the various API endpoints, but 
 
 ## Magic involved
 
-`spaceship` does a lot of magic to get everything working so neatly: 
+`spaceship` does a lot of magic to get everything working so neatly:
 
 - **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
 - **Local Validation**: When pushing changes back to the Apple Dev Portal `spaceship` will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
-- **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests. 
+- **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
 - **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spaceship` to create hundreds of profiles and then accessing them using `spaceship`.
 - **Session, Cookie and CSRF token**: All the security aspects are handled by `spaceship`.
 - **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
@@ -164,9 +165,9 @@ I won't go into too much technical details about the various API endpoints, but 
 
 # Credits
 
-The initial release was sponsored by [ZeroPush](https://zeropush.com). 
+The initial release was sponsored by [ZeroPush](https://zeropush.com).
 
-`spaceship` was developed by 
+`spaceship` was developed by
 - [@KrauseFx](https://twitter.com/KrauseFx).
 - [@snatchev](https://twitter.com/snatchev/)
 - [@mathcarignani](https://twitter.com/mathcarignani/)

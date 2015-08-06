@@ -33,6 +33,41 @@ end
 app = Spaceship.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
 ```
 
+### App Services
+
+App Services are part of the application, however, they are one of the few things that can be changed about the app once it has been created.
+
+```ruby
+# Find a specific app based on the bundle identifier
+app = Spaceship.app.find("com.krausefx.app")
+
+# Enable HealthKit, but make sure HomeKit is disabled
+app.update_service(Spaceship.app_service.health_kit.on)
+app.update_service(Spaceship.app_service.home_kit.off)
+```
+
+## App Groups
+
+```ruby
+# Fetch all existing app groups
+all_groups = Spaceship.app_group.all
+
+# Find a specific app group, based on the identifier
+group = Spaceship.app_group.find("group.com.example.application")
+
+# Show the names of all the groups
+Spaceship.app_group.all.collect do |group|
+  group.name
+end
+
+# Create a new group
+group = Spaceship.app_group.create!(group_id: "group.com.example.another", name: "Another group")
+
+# Associate an app with this group (overwrites any previous associations)
+# Assumes app contains a fetched app, as described above
+app = app.associate_groups([group])
+```
+
 ## Certificates
 
 ```ruby
