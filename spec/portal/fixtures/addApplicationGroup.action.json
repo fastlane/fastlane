@@ -15,7 +15,7 @@
   "applicationGroup": {
       "name": "Production App Group",
       "prefix": "9J57U9392R",
-      "identifier": "group.tools.fastlane.spaceship",
+      "identifier": "group.tools.fastlane",
       "status": "current",
       "applicationGroup": "NR5BH6N89Z"
   }

@@ -155,7 +155,7 @@ describe Spaceship::Client do
       it 'should make a request create an app group' do
         response = subject.create_app_group!('Production App Group', 'group.tools.fastlane.spaceship')
         expect(response['name']).to eq('Production App Group')
-        expect(response['identifier']).to eq('group.tools.fastlane.spaceship')
+        expect(response['identifier']).to eq('group.tools.fastlane')
       end
     end
 

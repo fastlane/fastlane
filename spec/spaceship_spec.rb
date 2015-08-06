@@ -27,6 +27,10 @@ describe Spaceship do
     expect(Spaceship.app.all.count).to eq(5)
   end
 
+  it "App Group" do
+    expect(Spaceship.app_group.all.count).to eq(2)
+  end
+
   describe Spaceship::Launcher do
     it 'has a client' do
       expect(subject.client).to be_instance_of(Spaceship::PortalClient)
@@ -34,6 +38,7 @@ describe Spaceship do
 
     it 'returns a scoped model class' do
       expect(subject.app).to eq(Spaceship::App)
+      expect(subject.app_group).to eq(Spaceship::AppGroup)
       expect(subject.certificate).to eq(Spaceship::Certificate)
       expect(subject.device).to eq(Spaceship::Device)
       expect(subject.provisioning_profile).to eq(Spaceship::ProvisioningProfile)
