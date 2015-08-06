@@ -188,13 +188,11 @@ module Spaceship
     end
 
     def create_app_group!(name, group_id)
-      params = {
+      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
         name: name,
         identifier: group_id,
         teamId: team_id
-      }
-
-      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', params)
+      })
       parse_response(r, 'applicationGroup')
     end
 
@@ -257,7 +255,7 @@ module Spaceship
         teamId: team_id,
         type: type,
         csrContent: csr,
-        appIdId: app_id  #optional
+        appIdId: app_id #optional
       })
       parse_response(r, 'certRequest')
     end

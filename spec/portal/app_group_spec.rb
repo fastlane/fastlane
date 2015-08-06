@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Spaceship::Portal::AppGroup do
   before { Spaceship.login }
-  let(:client) { Spaceship::Portal::App.client }
+  let(:client) { Spaceship::Portal::AppGroup.client }
 
   describe "successfully loads and parses all app groups" do
     it "the number is correct" do
@@ -45,6 +45,7 @@ describe Spaceship::Portal::AppGroup do
     it 'creates an app group' do
       expect(client).to receive(:create_app_group!).with('Production App Group', 'group.tools.fastlane.spaceship')
       group = Spaceship::Portal::AppGroup.create!(group_id: 'group.tools.fastlane.spaceship', name: 'Production App Group')
+      expect(group.app_group_id).to eq('NR5BH6N89Z')
     end
   end
 
