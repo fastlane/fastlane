@@ -122,6 +122,17 @@ module Spaceship
       details_for_app(app)
     end
 
+    def associate_groups_with_app(app, groups)
+      r = request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
+        teamId: team_id,
+        appIdId: app.app_id,
+        displayId: app.app_id,
+        applicationGroups: groups.map { |g| g.app_group_id }
+      })
+
+      details_for_app(app)
+    end
+
     def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym
       when :explicit

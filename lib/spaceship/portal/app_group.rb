@@ -71,12 +71,6 @@ module Spaceship
         client.delete_app_group!(app_group_id)
         self
       end
-
-      # Assign a new app to the group
-      # @return (App) The detailed app that was just added to the group
-      def associate_app
-        client.associate_app
-      end
     end
   end
 end
