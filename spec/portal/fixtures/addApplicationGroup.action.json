@@ -1,0 +1,23 @@
+{
+    "creationTimestamp": "2015-08-06T11:08:07Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": "cafcbcdb-4c91-4b9b-aab3-f541731c216d",
+    "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/identifiers/addApplicationGroup.action",
+    "responseId": "b9d17c2b-6acd-40b1-964b-882c01e05605",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": true,
+    "pageNumber": null,
+    "pageSize": null,
+    "totalRecords": null,
+    "httpResponseHeaders": null,
+    "applicationGroup": {
+        "name": "Production App Group",
+        "prefix": "9J57U9392R",
+        "identifier": "group.tools.fastlane.spaceship",
+        "status": "current",
+        "applicationGroup": "NR5BH6N89Z"
+    }
+}
