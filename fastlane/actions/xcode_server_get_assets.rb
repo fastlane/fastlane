@@ -50,7 +50,7 @@ module Fastlane
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override
           integration = integrations.select { |i| i['number'] == integration_number_override }.first
-          raise "Specified integration number #{integration_number_override} does not exist." if !integration
+          raise "Specified integration number #{integration_number_override} does not exist.".red if !integration
         else
           integration = integrations.first
         end
