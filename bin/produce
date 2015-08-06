@@ -35,6 +35,60 @@ class ProduceApplication
       end
     end
 
+    command "enable-service" do |c|
+      c.syntax = 'produce enable-service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+      c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
+      c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable-service -a com.example.app --healthkit --homekit --passbook'
+
+      c.option '--app-group', 'Enable App Groups'
+      c.option '--associated-domains', 'Enable Associated Domains'
+      c.option '--data-protection STRING', String, 'Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"'
+      c.option '--healthkit', 'Enable HealthKit'
+      c.option '--homekit', 'Enable HomeKit'
+      c.option '--wireless-conf', 'Enable Wireless Accessory Configuration'
+      c.option '--icloud STRING', String, 'Enable iCloud, suitable values are "legacy" and "cloudkit"'
+      c.option '--inter-app-audio', 'Enable Inter-App-Audio'
+      c.option '--passbook', 'Enable Passbook'
+      c.option '--push-notification', 'Enable Push notification (only enables the service, does not configure certificates)'
+      c.option '--vpn-conf', 'Enable VPN Configuration'
+
+      c.action do |args, options|
+        # Filter the options so that we can still build the configuration
+        allowed_keys = Produce::Options.available_options.collect { |config| config.key }
+        Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
+
+        require 'produce/service'
+        Produce::Service.new.enable(options, args)
+      end
+    end
+
+    command "disable-service" do |c|
+      c.syntax = 'produce disable-service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+      c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
+      c.example 'Disable HealthKit', 'produce disable-service -a com.example.app --healthkit'
+
+      c.option '--app-group', 'Disable App Groups'
+      c.option '--associated-domains', 'Disable Associated Domains'
+      c.option '--data-protection', 'Disable Data Protection'
+      c.option '--healthkit', 'Disable HealthKit'
+      c.option '--homekit', 'Disable HomeKit'
+      c.option '--wireless-conf', 'Disable Wireless Accessory Configuration'
+      c.option '--icloud', 'Disable iCloud'
+      c.option '--inter-app-audio', 'Disable Inter-App-Audio'
+      c.option '--passbook', 'Disable Passbook'
+      c.option '--push-notification', 'Disable Push notifications'
+      c.option '--vpn-conf', 'Disable VPN Configuration'
+
+      c.action do |args, options|
+        # Filter the options so that we can still build the configuration
+        allowed_keys = Produce::Options.available_options.collect { |config| config.key }
+        Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
+
+        require 'produce/service'
+        Produce::Service.new.disable(options, args)
+      end
+    end
+
     default_command :create
 
     run!
