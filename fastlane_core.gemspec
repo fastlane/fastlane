@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'excon', '~> 0.45.0' # Great HTTP Client
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
 
-  spec.add_dependency 'credentials_manager', '>= 0.7.0' # fastlane password manager
+  spec.add_dependency 'credentials_manager', '>= 0.7.1' # fastlane password manager
 
   # Frontend Scripting
   spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
