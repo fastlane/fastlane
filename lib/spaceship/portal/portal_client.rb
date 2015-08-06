@@ -111,6 +111,17 @@ module Spaceship
       parse_response(r, 'appId')
     end
 
+    def update_service_for_app(app, service)
+      request(:post, service.service_uri, {
+        teamId: team_id,
+        displayId: app.app_id,
+        featureType: service.service_id,
+        featureValue: service.value
+      })
+
+      details_for_app(app)
+    end
+
     def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym
       when :explicit

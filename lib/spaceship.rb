@@ -20,6 +20,7 @@ module Spaceship
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
   AppGroup = Spaceship::Portal::AppGroup
+  AppService = Spaceship::Portal::AppService
 
   # iTunes Connect
   AppVersion = Spaceship::Tunes::AppVersion
