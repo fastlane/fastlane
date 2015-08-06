@@ -17,8 +17,8 @@ module Spaceship
       #    "account/ios/identifiers/updateService.action"
       attr_accessor :service_uri
 
-      def initialize(id, value)
-        @service_id = id
+      def initialize(service_id, value)
+        @service_id = service_id
         @value = value
 
         if @service_id == "push"
