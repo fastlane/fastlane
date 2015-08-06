@@ -31,7 +31,8 @@ module Spaceship
         'applicationGroup' => :app_group_id,
         'name' => :name,
         'prefix' => :prefix,
-        'identifier' => :group_id
+        'identifier' => :group_id,
+        'status' => :status
       )
 
       class << self
