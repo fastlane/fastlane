@@ -130,7 +130,7 @@ module Spaceship
 
       # Update a service for the app with given AppService object
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
-      def update(service)
+      def update_service(service)
         app = client.update_service_for_app(self, service)
         self.class.factory(app)
       end
