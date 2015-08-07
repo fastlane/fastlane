@@ -9,8 +9,6 @@ module Produce
     end
 
     def enable(options, args)
-      app = get_app
-
       unless app
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
         return
@@ -23,8 +21,6 @@ module Produce
     end
 
     def disable(options, args)
-      app = get_app
-
       unless app
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
         return
@@ -177,13 +173,15 @@ module Produce
       updated
     end
 
-    def get_app
-        Helper.log.info "Starting login"
-        Spaceship.login(Produce.config[:username], nil)
-        Spaceship.select_team
-        Helper.log.info "Successfully logged in"
+    def app
+      return @app if @app
+      
+      Helper.log.info "Starting login"
+      Spaceship.login(Produce.config[:username], nil)
+      Spaceship.select_team
+      Helper.log.info "Successfully logged in"
 
-        Spaceship.app.find(Produce.config[:app_identifier].to_s)
+      @app ||= Spaceship.app.find(Produce.config[:app_identifier].to_s)
     end
   end
 end
