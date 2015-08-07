@@ -39,7 +39,7 @@ module Produce
                                      description: "Primary Language (e.g. 'English', 'German')",
                                      default_value: "English",
                                      verify_block: Proc.new do |language|
-                                       
+
                                      end),
         FastlaneCore::ConfigItem.new(key: :company_name,
                                      short_option: "-c",
@@ -47,7 +47,7 @@ module Produce
                                      description: "The name of your comapny. Only required if it's the first app you create",
                                      optional: true,
                                      verify_block: Proc.new do |language|
-                                       
+
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
@@ -79,7 +79,22 @@ module Produce
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_NAME"] = value
                                      end),
-        
+        FastlaneCore::ConfigItem.new(key: :group_name,
+                                     short_option: "-n",
+                                     env_name: "PRODUCE_GROUP_NAME",
+                                     description: "The name of the group that is created",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :group_identifier,
+                                     short_option: "-g",
+                                     env_name: "PRODUCE_GROUP_IDENTIFIER",
+                                     description: "The identifier of the group that is created",
+                                     optional: true,
+                                     verify_block: Proc.new do |value|
+                                       
+                                     end)
       ]
     end
   end
