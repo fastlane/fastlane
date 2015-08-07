@@ -16,6 +16,9 @@ module Fastlane
 
     def initialize(platform: nil, name: nil, description: nil, block: nil, is_private: false)
       raise "description must be an array" unless description.kind_of?Array
+      raise "lane name must not contain any spaces".red if name.to_s.include?" "
+      raise "lane name must start with :".red unless name.kind_of?Symbol
+
       
       self.platform = platform
       self.name = name
