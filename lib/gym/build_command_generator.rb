@@ -64,14 +64,20 @@ module Gym
       # The path to set the Derived Data to
       def build_path
         unless @build_path
-          @build_path = "/tmp/gym/#{Time.now.to_i}/"
+          day = Time.now.strftime("%F") # e.g. 2015-08-07
+
+          @build_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
           FileUtils.mkdir_p @build_path
         end
         @build_path
       end
 
       def archive_path
-        File.join(build_path, "Archive.xcarchive")
+        unless @archive_path
+          file_name = [Gym.project.app_name, Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
+          @archive_path = File.join(build_path, file_name.join(" ") + ".xcarchive")
+        end
+        return @archive_path
       end
     end
   end

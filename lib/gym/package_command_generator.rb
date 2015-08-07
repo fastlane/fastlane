@@ -31,7 +31,7 @@ module Gym
 
       # The path the the dsym file for this app. Might be nil
       def dsym_path
-        Dir[BuildCommandGenerator.build_path + "**/*.dSYM"].last
+        Dir[BuildCommandGenerator.archive_path + "/**/*.dsym"].last
       end
     end
   end

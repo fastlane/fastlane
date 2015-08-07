@@ -95,7 +95,7 @@ module Gym
         file_name = File.basename(PackageCommandGenerator.dsym_path)
 
         output = File.expand_path(File.join(Gym.config[:output_directory], Gym.project.app_name + ".app.dSYM.zip"))
-        puts `cd #{containing_directory} && zip -r '#{output}' '#{file_name}'`
+        puts `cd '#{containing_directory}' && zip -r '#{output}' '#{file_name}'`
       end
     end
 
