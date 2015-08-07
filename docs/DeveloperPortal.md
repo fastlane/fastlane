@@ -83,7 +83,8 @@ Spaceship.app_group.all.collect do |group|
 end
 
 # Create a new group
-group = Spaceship.app_group.create!(group_id: "group.com.example.another", name: "Another group")
+group = Spaceship.app_group.create!(group_id: "group.com.example.another", 
+                                        name: "Another group")
 
 # Associate an app with this group (overwrites any previous associations)
 # Assumes app contains a fetched app, as described above
