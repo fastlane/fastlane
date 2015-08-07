@@ -37,11 +37,24 @@ app = Spaceship.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane 
 
 App Services are part of the application, however, they are one of the few things that can be changed about the app once it has been created.
 
-Currently available services include (all assume a `Spaceship.app_service.` prefix)
+Currently available services include (all require the `Spaceship.app_service.` prefix)
 
-```ruby
-app_group.(on|off), associated_domains.(on|off), data_protection.(complete|unless_open|until_first_auth|off), health_kit.(on|off), home_kit.(on|off), wireless_accessory.(on|off), icloud.(on|off), cloud_kit.(xcode5_compatible|cloud_kit), inter_app_audio.(on|off), passbook.(on|off), push_notification.(on|off), vpn_configuration.(on|off)
 ```
+app_group.(on|off)
+associated_domains.(on|off)
+data_protection.(complete|unless_open|until_first_auth|off)
+health_kit.(on|off)
+home_kit.(on|off)
+wireless_accessory.(on|off)
+icloud.(on|off)
+cloud_kit.(xcode5_compatible|cloud_kit)
+inter_app_audio.(on|off)
+passbook.(on|off)
+push_notification.(on|off)
+vpn_configuration.(on|off)
+```
+
+Examples:
 
 ```ruby
 # Find a specific app based on the bundle identifier
@@ -50,6 +63,9 @@ app = Spaceship.app.find("com.krausefx.app")
 # Enable HealthKit, but make sure HomeKit is disabled
 app.update_service(Spaceship.app_service.health_kit.on)
 app.update_service(Spaceship.app_service.home_kit.off)
+app.update_service(Spaceship.app_service.vpn_configuration.on)
+app.update_service(Spaceship.app_service.passbook.off)
+app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
 ```
 
 ## App Groups
