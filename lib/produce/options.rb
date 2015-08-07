@@ -78,22 +78,6 @@ module Produce
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: Proc.new do |value|
                                         ENV["FASTLANE_TEAM_NAME"] = value
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :group_name,
-                                     short_option: "-n",
-                                     env_name: "PRODUCE_GROUP_NAME",
-                                     description: "The name of the group that is created",
-                                     optional: true,
-                                     verify_block: Proc.new do |value|
-
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :group_identifier,
-                                     short_option: "-g",
-                                     env_name: "PRODUCE_GROUP_IDENTIFIER",
-                                     description: "The identifier of the group that is created",
-                                     optional: true,
-                                     verify_block: Proc.new do |value|
-                                       
                                      end)
       ]
     end
