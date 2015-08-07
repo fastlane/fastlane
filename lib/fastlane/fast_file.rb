@@ -183,17 +183,36 @@ module Fastlane
     def import_from_git(url: nil, path: 'fastlane/Fastfile')
       raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
 
-      # Checkout the repo
-      repo_name = url.split("/").last
+      Actions.execute_action('import_from_git') do
 
-      folder = File.join("/tmp", "fl_clones", repo_name, Time.now.to_i.to_s)
+        # Checkout the repo
+        repo_name = url.split("/").last
 
-      # When this fails, we have to clone the git repo
-      Helper.log.info "Cloning remote git repo..."
-      Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
-      Actions.sh("cd '#{folder}' && git checkout HEAD #{path}")
+        folder = File.join("/tmp", "fl_clones", repo_name)
 
-      import(File.join(folder, path))
+        if File.directory?folder
+          Helper.log.info "Using existing git repo..."
+          Actions.sh("git pull")
+        else
+          # When this fails, we have to clone the git repo
+          Helper.log.info "Cloning remote git repo..."
+          Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
+        end
+
+        Actions.sh("cd '#{folder}' && git checkout HEAD '#{path}'")
+
+        # We also want to check out all the local actions of this fastlane setup
+        containing = path.split(File::SEPARATOR)[0..-2]
+        containing = "." if containing.count == 0
+        actions_folder = File.join(containing, "actions")
+        begin
+          Actions.sh("cd '#{folder}' && git checkout HEAD '#{actions_folder}'")
+        rescue => ex
+          # We don't care about a failure here, as local actions are optional
+        end
+
+        import(File.join(folder, path))
+      end
     end
 
     #####################################################
