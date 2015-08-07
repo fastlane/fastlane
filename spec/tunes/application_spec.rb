@@ -125,7 +125,7 @@ describe Spaceship::Application do
     end
 
     describe "#builds" do
-      let (:app) { Spaceship::Application.all.first }
+      let(:app) { Spaceship::Application.all.first }
 
       it "supports block parameter" do
         count = 0

@@ -62,7 +62,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#class.type' do
     it "Returns only valid profile types" do
-      valid = %w|limited adhoc store|
+      valid = %w(limited adhoc store)
       Spaceship::ProvisioningProfile.all.each do |profile|
         expect(valid).to include(profile.class.type)
       end
@@ -137,7 +137,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe "#delete" do
-    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+    let(:profile) { Spaceship::ProvisioningProfile.all.first }
     it "deletes an existing profile" do
       expect(client).to receive(:delete_provisioning_profile!).with(profile.id).and_return({})
       profile.delete!
@@ -145,7 +145,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe "#repair" do
-    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+    let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "repairs an existing profile with added devices" do
       profile.devices = Spaceship::Device.all
@@ -181,7 +181,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe "#update!" do
-    let (:profile) { Spaceship::ProvisioningProfile.all.first }
+    let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "updates an existing profile" do
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], []).and_return({})

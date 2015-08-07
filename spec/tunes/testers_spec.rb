@@ -4,7 +4,7 @@ describe Spaceship::Tunes::Tester do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppSubmission.client }
-  let (:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.first }
 
   it "raises an error when using the base class" do
     expect do

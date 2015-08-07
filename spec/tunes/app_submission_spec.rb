@@ -4,7 +4,7 @@ describe Spaceship::AppSubmission do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppSubmission.client }
-  let (:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.first }
 
   describe "successfully creates a new app submission" do
     it "generates a new app submission from iTunes Connect response" do

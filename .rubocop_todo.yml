@@ -5,19 +5,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 6
-Lint/HandleExceptions:
-  Enabled: false
-
-# Offense count: 11
-Lint/ParenthesesAsGroupedExpression:
-  Enabled: false
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Lint/UnusedBlockArgument:
-  Enabled: false
-
 # Offense count: 20
 Metrics/AbcSize:
   Max: 63
@@ -82,28 +69,12 @@ Style/Documentation:
 Style/DotPosition:
   Enabled: false
 
-# Offense count: 1
-Style/DoubleNegation:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyElse:
-  Enabled: false
-
 # Offense count: 12
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/EmptyLinesAroundClassBody:
   Enabled: false
 
-# Offense count: 1
-# Configuration parameters: AllowedVariables.
-Style/GlobalVars:
-  Enabled: false
-
-# Offense count: 3
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
   Enabled: false
@@ -125,21 +96,10 @@ Style/MultilineOperationIndentation:
 Style/NumericLiterals:
   MinDigits: 14
 
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/PerlBackrefs:
   Enabled: false
-
-# Offense count: 7
-# Configuration parameters: SupportedStyles.
-Style/RaiseArgs:
-  EnforcedStyle: compact
 
 # Offense count: 19
 # Cop supports --auto-correct.
@@ -150,12 +110,6 @@ Style/RedundantReturn:
 # Offense count: 77
 # Cop supports --auto-correct.
 Style/RedundantSelf:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
-Style/RegexpLiteral:
   Enabled: false
 
 # Offense count: 38
@@ -185,23 +139,6 @@ Style/SpaceInsideParens:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/StringLiterals:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoredMethods.
-Style/SymbolProc:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, IgnoreClassMethods, Whitelist.
-Style/TrivialAccessors:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/UnneededPercentQ:
   Enabled: false
 
 # Offense count: 9

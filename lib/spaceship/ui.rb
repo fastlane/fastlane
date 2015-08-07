@@ -15,14 +15,12 @@ module Spaceship
 
     # All User Interface related code lives in this class
     class UserInterface
+      # Access the client this UserInterface object is for
+      attr_reader :client
+
       # Is called by the client to generate one instance of UserInterface
       def initialize(c)
         @client = c
-      end
-
-      # Access the client this UserInterface object is for
-      def client
-        @client
       end
     end
   end

@@ -145,7 +145,7 @@ module Spaceship
       def method_missing(method_sym, *args, &block)
         module_name = method_sym.to_s
         module_name.sub!(/^[a-z\d]/) { $&.upcase }
-        module_name.gsub!(/(?:_|(\/))([a-z\d])/) { $2.upcase }
+        module_name.gsub!(%r{(?:_|(/))([a-z\d])}) { $2.upcase }
         if const_defined?(module_name)
           klass = const_get(module_name)
           klass.set_client(@client)
@@ -154,6 +154,10 @@ module Spaceship
         end
       end
     end
+
+    ##
+    # @return (Spaceship::Client) The current spaceship client used by the model to make requests.
+    attr_reader :client
 
     ##
     # @return (Hash/Array) Holds the raw data we got from Apple's
@@ -177,12 +181,6 @@ module Spaceship
     # This method can be used by subclasses to do additional initialisation
     # using the `raw_data`
     def setup
-    end
-
-    ##
-    # @return (Spaceship::Client) The current spaceship client used by the model to make requests.
-    def client
-      @client
     end
 
     #####################################################

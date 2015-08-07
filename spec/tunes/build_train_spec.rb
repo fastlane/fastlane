@@ -7,7 +7,7 @@ describe Spaceship::Tunes::BuildTrain do
   let(:password) { 'so_secret' }
 
   describe "properly parses the train" do
-    let (:app) { Spaceship::Application.all.first }
+    let(:app) { Spaceship::Application.all.first }
 
     it "inspect works" do
       expect(Spaceship::Application.all.first.build_trains.values.first.inspect).to include("Tunes::BuildTrain")

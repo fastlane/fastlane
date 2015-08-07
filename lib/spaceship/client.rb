@@ -48,7 +48,7 @@ module Spaceship
       if instance.login(user, password)
         instance
       else
-        raise InvalidUserCredentialsError.new
+        raise InvalidUserCredentialsError.new, "Invalid User Credentials"
       end
     end
 
@@ -76,6 +76,7 @@ module Spaceship
     # /tmp/spaceship[time].log by default
     def logger
       unless @logger
+        # rubocop:disable Style/GlobalVars
         if $verbose || ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
@@ -83,6 +84,7 @@ module Spaceship
           path = "/tmp/spaceship#{Time.now.to_i}.log"
           @logger = Logger.new(path)
         end
+        # rubocop:enable Style/GlobalVars
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
           "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
@@ -144,7 +146,7 @@ module Spaceship
       end
 
       if user.to_s.strip.empty? or password.to_s.strip.empty?
-        raise NoUserCredentialsError.new("No login data provided")
+        raise NoUserCredentialsError.new, "No login data provided"
       end
 
       send_login_request(user, password) # different in subclasses
@@ -171,7 +173,7 @@ module Spaceship
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
       if response and response.headers
-        tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
+        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
         if tokens and !tokens.empty?
           @csrf_tokens = tokens
         end
@@ -236,7 +238,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new(response.body)
+        raise UnexpectedResponse.new, response.body
       else
         store_csrf_tokens(response)
         content

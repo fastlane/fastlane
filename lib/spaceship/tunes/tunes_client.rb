@@ -24,7 +24,7 @@ module Spaceship
 
       host = "https://itunesconnect.apple.com"
       begin
-        url = host + request(:get, self.class.hostname).body.match(/action="(\/WebObjects\/iTunesConnect.woa\/wo\/.*)"/)[1]
+        url = host + request(:get, self.class.hostname).body.match(%r{action="(/WebObjects/iTunesConnect.woa/wo/.*)"})[1]
         raise "" unless url.length > 0
 
         File.write(cache_path, url)
@@ -59,13 +59,13 @@ module Spaceship
           @cookie = to_use.join(';')
         rescue
           # User Credentials are wrong
-          raise InvalidUserCredentialsError.new(response)
+          raise InvalidUserCredentialsError.new, response
         end
 
         return @client
       else
         # User Credentials are wrong
-        raise InvalidUserCredentialsError.new(response)
+        raise InvalidUserCredentialsError.new, response
       end
     end
 
@@ -96,8 +96,7 @@ module Spaceship
           hash.each do |value|
             errors += handle_response_hash.call(value)
           end
-        else
-          # We don't care about simple values
+          # else: We don't care about simple values
         end
         return errors
       end
@@ -111,7 +110,7 @@ module Spaceship
       errors << different_error if different_error
 
       if errors.count > 0 # they are separated by `.` by default
-        raise ITunesConnectError.new(errors.join(' '))
+        raise ITunesConnectError.new, errors.join(' ')
       end
 
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']

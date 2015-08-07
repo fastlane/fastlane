@@ -43,7 +43,7 @@ module Spaceship
         return @client
       else
         # User Credentials are wrong
-        raise InvalidUserCredentialsError.new(response)
+        raise InvalidUserCredentialsError.new, response
       end
     end
 
@@ -127,7 +127,7 @@ module Spaceship
         teamId: team_id,
         appIdId: app.app_id,
         displayId: app.app_id,
-        applicationGroups: groups.map { |g| g.app_group_id }
+        applicationGroups: groups.map(&:app_group_id)
       })
 
       details_for_app(app)

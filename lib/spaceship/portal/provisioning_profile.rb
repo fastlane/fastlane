@@ -204,7 +204,7 @@ module Spaceship
 
           devices = [] if self == AppStore || self == InHouse # App Store Profiles MUST NOT have devices
 
-          certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of? Array
+          certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
@@ -222,7 +222,7 @@ module Spaceship
                                                 self.type,
                                                 app.app_id,
                                                 certificate_parameter,
-                                                devices.map {|d| d.id} )
+                                                devices.map(&:id) )
           end
 
           self.new(profile)
@@ -237,9 +237,7 @@ module Spaceship
           end
 
           # filter out the profiles managed by xcode
-          profiles.delete_if do |profile|
-            profile.managed_by_xcode?
-          end
+          profiles.delete_if(&:managed_by_xcode?)
 
           return profiles if self == ProvisioningProfile
 
@@ -335,8 +333,8 @@ module Spaceship
             name,
             distribution_method,
             app.app_id,
-            certificates.map { |c| c.id },
-            devices.map { |d| d.id }
+            certificates.map(&:id),
+            devices.map(&:id)
           )
         end
 
@@ -353,7 +351,7 @@ module Spaceship
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
-          if Spaceship::Certificate.all.collect { |s| s.id }.include?(c.id)
+          if Spaceship::Certificate.all.collect(&:id).include?(c.id)
             return true
           end
         end

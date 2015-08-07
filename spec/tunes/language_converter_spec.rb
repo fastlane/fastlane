@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Spaceship::Tunes::LanguageConverter do
-  let (:klass) { Spaceship::Tunes::LanguageConverter }
+  let(:klass) { Spaceship::Tunes::LanguageConverter }
 
   describe "#from_itc_to_standard" do
     it "works with valid inputs" do
