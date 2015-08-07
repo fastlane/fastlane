@@ -65,7 +65,7 @@ module Gym
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
-                                     env_name: "GYM_OUTPUT",
+                                     env_name: "GYM_OUTPUT_DIRECTORY",
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: ".",
                                      verify_block: proc do |value|
@@ -85,7 +85,17 @@ module Gym
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
-                                     default_value: "Release")
+                                     default_value: "Release"),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_name,
+                                     short_option: "-l",
+                                     env_name: "GYM_PROVISIONING_PROFILE_NAME",
+                                     description: "The name of the provisioning profile to use. It has to match the name exactly. You usually don't need this!",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :codesigning_identity,
+                                     short_option: "-i",
+                                     env_name: "GYM_CODE_SIGNING_IDENTITY",
+                                     description: "The name of the code signing identity to use. It has to match the name exactly. You usually don't need this! e.g. 'iPhone Distribution: SunApps GmbH'",
+                                     optional: true)
 
       ]
     end
