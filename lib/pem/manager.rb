@@ -52,7 +52,7 @@ module PEM
         file = File.new("#{filename_base}.pkey",'w')
         file.write(pkey.to_pem)
         file.close
-        Helper.log.info "Private key: " + Pathname.new(file).realpath.to_s.green
+        Helper.log.info "Private key: ".green + Pathname.new(file).realpath.to_s
       end
 
       if PEM.config[:generate_p12]
@@ -61,13 +61,13 @@ module PEM
         file = File.new("#{filename_base}.p12", 'wb')
         file.write(p12.to_der)
         file.close
-        Helper.log.info "p12 certificate: " + Pathname.new(file).realpath.to_s.green
+        Helper.log.info "p12 certificate: ".green + Pathname.new(file).realpath.to_s
       end
 
       file = File.new("#{filename_base}.pem", 'w')
       file.write(x509_certificate.to_pem + pkey.to_pem)
       file.close
-      Helper.log.info "pem: " + Pathname.new(file).realpath.to_s.green
+      Helper.log.info "PEM: ".green + Pathname.new(file).realpath.to_s
       return file
       end
   end
