@@ -1,2 +1,2 @@
 # this requires fastlane to be checked out in the same folder
-import "../../fastlane/fastlane/Fastfile"
+import_from_git(url: "https://github.com/KrauseFx/fastlane")
