@@ -35,10 +35,10 @@ class ProduceApplication
       end
     end
 
-    command :enable_service do |c|
-      c.syntax = 'produce enable_service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+    command :enable_services do |c|
+      c.syntax = 'produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
       c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
-      c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable-service -a com.example.app --healthkit --homekit --passbook'
+      c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable_services -a com.example.app --healthkit --homekit --passbook'
 
       c.option '--app-group', 'Enable App Groups'
       c.option '--associated-domains', 'Enable Associated Domains'
@@ -62,10 +62,10 @@ class ProduceApplication
       end
     end
 
-    command :disable_service do |c|
-      c.syntax = 'produce disable_service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+    command :disable_services do |c|
+      c.syntax = 'produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
       c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
-      c.example 'Disable HealthKit', 'produce disable-service -a com.example.app --healthkit'
+      c.example 'Disable HealthKit', 'produce disable_services -a com.example.app --healthkit'
 
       c.option '--app-group', 'Disable App Groups'
       c.option '--associated-domains', 'Disable Associated Domains'

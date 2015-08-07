@@ -69,15 +69,40 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # Usage
 
+## Creating a new application
+
     produce
+
+To get a list of all available parameters:
+
+    produce --help
+
+```
+    -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
+    -a, --app_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
+    -b, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*)
+(PRODUCE_APP_IDENTIFIER_SUFFIX)
+    -q, --app_name STRING App Name (PRODUCE_APP_NAME)
+    -z, --app_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
+    -s, --sku            SKU Number (e.g. '1234') (PRODUCE_SKU)
+    -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
+    -c, --company_name STRING The name of your comapny. Only required if it's the first app you create
+(PRODUCE_COMPANY_NAME)
+    -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
+    -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -t, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
+    -l, --team_name STRING The name of your team if you're in multiple teams (PRODUCE_TEAM_NAME)
+```
+
+## Enabling / Disabling Application Services
 
 If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
 
-    produce enable_service --homekit --healthkit
+    produce enable_services --homekit --healthkit
 
 If you want to disable Application Servies for an App ID (iCloud in this case):
 
-    produce disable_service --icloud
+    produce disable_services --icloud
 
 If you want to create a new App Group:
 
@@ -88,10 +113,6 @@ If you want to associate an app with an App Group:
     produce associate_group -a com.krausefx.app group.krausefx
 
 # Parameters
-
-Get the latest list of all available parameters;
-
-    produce --help
 
 ```
     -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
@@ -109,9 +130,9 @@ Get the latest list of all available parameters;
     -v, --version        Display version information
 ```
 
-In addition, the available Application Services that can be enabled/disabled can be seen by executing:
+Get a list of all available options using
 
-    produce enable_service -h
+    produce enable_services --help
 
 ```
     --app-group          Enable App Groups
@@ -127,7 +148,7 @@ In addition, the available Application Services that can be enabled/disabled can
     --vpn-conf           Enable VPN Configuration
 ```
 
-    produce disable_service -h
+    produce disable_services --help
 
 ```
     --app-group          Disable App Groups
