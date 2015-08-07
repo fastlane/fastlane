@@ -17,8 +17,7 @@ lane :release do |options|
   # Verifying RubyGems version
   # 
   require "../lib/#{tool_name}/version"
-  module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
-  version = module_ref::VERSION
+  version = module_ref(tool_name: tool_name)::VERSION
   old_version = current_version(tool: tool_name)
   puts "Deploying #{tool_name} #{version}"
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
@@ -128,5 +127,11 @@ end
 
 desc "Detects the name of the tool based on the current directory" 
 private_lane :detect_tool do
-  File.basename(File.expand_path('..', Dir.pwd))
+  File.basename(File.expand_path('..', Dir.pwd)).downcase
+end
+
+desc "Get a reference to the module of this tool"
+desc "This method can be overwritten by the individual Fastfiles of the tools (e.g. PEM)"
+private_lane :module_ref do |options|
+  Object.const_get(options[:tool_name].split('_').collect(&:capitalize).join)
 end
