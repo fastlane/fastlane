@@ -86,15 +86,15 @@ module Spaceship
         errors = []
         if hash.kind_of? Hash
           hash.each do |key, value|
-            errors = errors + handle_response_hash.call(value)
+            errors += handle_response_hash.call(value)
 
             if key == 'errorKeys' and value.kind_of? Array and value.count > 0
-              errors = errors + value
+              errors += value
             end
           end
         elsif hash.kind_of? Array
           hash.each do |value|
-            errors = errors + handle_response_hash.call(value)
+            errors += handle_response_hash.call(value)
           end
         else
           # We don't care about simple values
@@ -103,7 +103,7 @@ module Spaceship
       end
 
       errors = handle_response_hash.call(data)
-      errors = errors + data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
+      errors += data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}

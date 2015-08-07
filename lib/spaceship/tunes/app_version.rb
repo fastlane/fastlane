@@ -180,9 +180,11 @@ module Spaceship
       end
 
       # @return (Bool) Is that version currently available in the App Store?
+      # rubocop:disable Style/PredicateName
       def is_live?
         is_live
       end
+      # rubocop:enable Style/PredicateName
 
       # Call this method to make sure the given languages are available for this app
       # You should call this method before accessing the name, description and other localized values

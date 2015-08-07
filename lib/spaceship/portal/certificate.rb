@@ -181,8 +181,10 @@ module Spaceship
           end
 
           # Parse the dates
+          # rubocop:disable Style/RescueModifier
           attrs['expirationDate'] = (Time.parse(attrs['expirationDate']) rescue attrs['expirationDate'])
           attrs['dateCreated'] = (Time.parse(attrs['dateCreated']) rescue attrs['dateCreated'])
+          # rubocop:enable Style/RescueModifier
 
           # Here we go
           klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
@@ -265,9 +267,11 @@ module Spaceship
       end
 
       # @return (Bool): Is this certificate a push profile for apps?
+      # rubocop:disable Style/PredicateName
       def is_push?
         self.kind_of? PushCertificate
       end
+      # rubocop:enable Style/PredicateName
     end
   end
 end

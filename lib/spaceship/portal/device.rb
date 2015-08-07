@@ -77,7 +77,7 @@ module Spaceship
         # @return (Device): The newly created device
         def create!(name: nil, udid: nil)
           # Check whether the user has passed in a UDID and a name
-          unless (udid and name)
+          unless udid && name
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 

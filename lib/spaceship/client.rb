@@ -110,9 +110,9 @@ module Spaceship
         page += 1
         current = yield(page)
 
-        results = results + current
+        results += current
 
-        break if ((current || []).count < page_size) # no more results
+        break if (current || []).count < page_size # no more results
       end
 
       return results

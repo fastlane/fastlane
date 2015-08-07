@@ -202,7 +202,7 @@ module Spaceship
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          devices = [] if (self == AppStore or self == InHouse) # App Store Profiles MUST NOT have devices
+          devices = [] if self == AppStore || self == InHouse # App Store Profiles MUST NOT have devices
 
           certificate_parameter = certificate.collect { |c| c.id } if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]

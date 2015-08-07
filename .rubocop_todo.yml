@@ -125,7 +125,6 @@ Style/MultilineOperationIndentation:
 Style/NumericLiterals:
   MinDigits: 14
 
-
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
@@ -135,11 +134,6 @@ Style/PercentLiteralDelimiters:
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/PerlBackrefs:
-  Enabled: false
-
-# Offense count: 3
-# Configuration parameters: NamePrefix, NamePrefixBlacklist.
-Style/PredicateName:
   Enabled: false
 
 # Offense count: 7
@@ -162,15 +156,6 @@ Style/RedundantSelf:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
 Style/RegexpLiteral:
-  Enabled: false
-
-# Offense count: 2
-Style/RescueModifier:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/SelfAssignment:
   Enabled: false
 
 # Offense count: 38

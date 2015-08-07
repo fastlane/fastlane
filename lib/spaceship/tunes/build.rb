@@ -169,7 +169,7 @@ module Spaceship
           end
         end
 
-        if (Time.at(self.internal_expiry_date / 1000) > Time.now)
+        if Time.at(self.internal_expiry_date / 1000) > Time.now
           testing ||= "Inactive"
         else
           testing = "Expired"
