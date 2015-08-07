@@ -47,6 +47,23 @@ module Gym
         when /single\-bundle/
           print "Your project does not contain a single–bundle application or contains multiple products"
           print "Please read the documentation provided by Apple: https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
+        when /no signing identity matches '(.*)'/
+          print "Could not find code signing identity '#{$1}'"
+          print "Make sure the name of the code signing identity is correct"
+          print "and it matches a locally installed code signing identity"
+          print "You can pass the name of the code signing identity using the"
+          print "`codesigning_identity` option"
+        when /no provisioning profile matches '(.*)'/
+          print "Could not find provisioning profile with the name '#{$1}'"
+          print "Make sure the name of the provisioning profile is correct"
+          print "and it matches a locally installed profile"
+          print "You can pass the name of the provisioning profile using the"
+          print "`--provisioning_profile_name` option"
+        when /mismatch between specified provisioning profile and signing identity/
+          print "Mismatch between provisioning profile and code signing identity"
+          print "This means, the specified provisioning profile was not created using"
+          print "the specified certificate."
+          print "Run cert and sigh before gym to make sure to have all signing resources ready"
         end
 
         raise "Error packaging up the application"
