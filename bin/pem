@@ -6,7 +6,6 @@ require 'pem'
 require 'commander'
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
-require 'pem/options'
 require 'pem/manager'
 
 HighLine.track_eof = false

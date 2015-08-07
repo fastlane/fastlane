@@ -69,6 +69,6 @@ module PEM
       file.close
       Helper.log.info "PEM: ".green + Pathname.new(file).realpath.to_s
       return file
-      end
+    end
   end
 end

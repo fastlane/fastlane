@@ -1,6 +1,7 @@
 require 'pem/version'
 require 'pem/dependency_checker'
 require 'pem/manager'
+require 'pem/options'
 
 require 'fastlane_core'
 
