@@ -94,8 +94,13 @@ end
 
 Import from a git repo which you could use as standard Fastlane resource for all your `Fastfile`.
 
+It takes up to two parameters:
+ 
+ 1) the repo address
+ 2) the file path of your Fastfile in your repo (Default to 'fastlane/Fastfile')
+
 ```ruby
-import_git("git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git","fastlane/Fastfile")
+import_git 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git','MyFastlaneFolder/Fastfile'
 
 lane :new_main_lane do
   "such new main lane"
