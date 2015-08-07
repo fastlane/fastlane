@@ -111,6 +111,28 @@ module Spaceship
       parse_response(r, 'appId')
     end
 
+    def update_service_for_app(app, service)
+      request(:post, service.service_uri, {
+        teamId: team_id,
+        displayId: app.app_id,
+        featureType: service.service_id,
+        featureValue: service.value
+      })
+
+      details_for_app(app)
+    end
+
+    def associate_groups_with_app(app, groups)
+      r = request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
+        teamId: team_id,
+        appIdId: app.app_id,
+        displayId: app.app_id,
+        applicationGroups: groups.map { |g| g.app_group_id }
+      })
+
+      details_for_app(app)
+    end
+
     def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym
       when :explicit
@@ -145,6 +167,39 @@ module Spaceship
       r = request(:post, 'account/ios/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
+    # @!group App Groups
+    #####################################################
+
+    def app_groups
+      paging do |page_number|
+        r = request(:post, 'account/ios/identifiers/listApplicationGroups.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'applicationGroupList')
+      end
+    end
+
+    def create_app_group!(name, group_id)
+      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
+        name: name,
+        identifier: group_id,
+        teamId: team_id
+      })
+      parse_response(r, 'applicationGroup')
+    end
+
+    def delete_app_group!(app_group_id)
+      r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
+        teamId: team_id,
+        applicationGroup: app_group_id
       })
       parse_response(r)
     end

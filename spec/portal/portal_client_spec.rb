@@ -98,6 +98,14 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#app_groups' do
+      let(:app_groups) { subject.app_groups }
+      it 'returns a list of apps' do
+        expect(app_groups).to be_instance_of(Array)
+        expect(app_groups.first.keys).to eq(["name", "prefix", "identifier", "status", "applicationGroup"])
+      end
+    end
+
     describe "#team_information" do
       it 'returns all available information' do
         s = subject.team_information
@@ -139,6 +147,21 @@ describe Spaceship::Client do
     describe '#delete_app!' do
       it 'should make a request to delete the app' do
         response = subject.delete_app!('LXD24VUE49')
+        expect(response['resultCode']).to eq(0)
+      end
+    end
+
+    describe '#create_app_group' do
+      it 'should make a request create an app group' do
+        response = subject.create_app_group!('Production App Group', 'group.tools.fastlane.spaceship')
+        expect(response['name']).to eq('Production App Group')
+        expect(response['identifier']).to eq('group.tools.fastlane')
+      end
+    end
+
+    describe '#delete_app_group' do
+      it 'should make a request to delete the app group' do
+        response = subject.delete_app_group!('2GKKV64NUG')
         expect(response['resultCode']).to eq(0)
       end
     end

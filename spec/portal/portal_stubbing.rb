@@ -168,6 +168,21 @@ def adp_stub_apps
     to_return(status: 200, body: adp_read_fixture_file('deleteAppId.action.json'), headers: {'Content-Type' => 'application/json'})
 end
 
+def adp_stub_app_groups
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listApplicationGroups.action').
+    with(body: {teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc'}, headers: {'Cookie' => 'myacinfo=abcdef;'}).
+    to_return(status: 200, body: adp_read_fixture_file('listApplicationGroups.action.json'), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addApplicationGroup.action").
+    with(body: {"name" => "Production App Group", "identifier" => "group.tools.fastlane.spaceship", "teamId" => "XXXXXXXXXX"},
+         headers: {'Cookie' => 'myacinfo=abcdef;'}).
+    to_return(status: 200, body: adp_read_fixture_file('addApplicationGroup.action.json'), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteApplicationGroup.action").
+    with(body: {"applicationGroup" => "2GKKV64NUG", "teamId" => "XXXXXXXXXX"}).
+    to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: {'Content-Type' => 'application/json'})
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
@@ -177,5 +192,6 @@ RSpec.configure do |config|
     adp_stub_devices
     adp_stub_certificates
     adp_stub_apps
+    adp_stub_app_groups
   end
 end

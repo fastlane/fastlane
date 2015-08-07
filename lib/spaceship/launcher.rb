@@ -71,6 +71,11 @@ module Spaceship
       Spaceship::App.set_client(@client)
     end
 
+    # @return (Class) Access the app groups for this spaceship
+    def app_group
+      Spaceship::AppGroup.set_client(@client)
+    end
+
     # @return (Class) Access the devices for this spaceship
     def device
       Spaceship::Device.set_client(@client)

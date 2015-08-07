@@ -120,6 +120,20 @@ module Spaceship
         app = client.details_for_app(self)
         self.class.factory(app)
       end
+
+      # Associate specific groups with this app
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found
+      def associate_groups(groups)
+        app = client.associate_groups_with_app(self, groups)
+        self.class.factory(app)
+      end
+
+      # Update a service for the app with given AppService object
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found
+      def update_service(service)
+        app = client.update_service_for_app(self, service)
+        self.class.factory(app)
+      end
     end
   end
 end
