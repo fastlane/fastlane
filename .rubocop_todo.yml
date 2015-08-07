@@ -18,10 +18,6 @@ Lint/ParenthesesAsGroupedExpression:
 Lint/UnusedBlockArgument:
   Enabled: false
 
-# Offense count: 17
-Lint/UselessAssignment:
-  Enabled: false
-
 # Offense count: 20
 Metrics/AbcSize:
   Max: 63

@@ -123,7 +123,7 @@ module Spaceship
     end
 
     def associate_groups_with_app(app, groups)
-      r = request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
+      request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
         teamId: team_id,
         appIdId: app.app_id,
         displayId: app.app_id,

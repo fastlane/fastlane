@@ -101,7 +101,7 @@ module Spaceship
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
-        v = Spaceship::AppVersion.find(self, self.apple_id, true)
+        Spaceship::AppVersion.find(self, self.apple_id, true)
       end
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
@@ -218,7 +218,7 @@ module Spaceship
         self.builds do |build|
           begin
             build.cancel_beta_review!
-          rescue => ex
+          rescue
             # We really don't care about any errors here
           end
         end

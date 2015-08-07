@@ -57,7 +57,7 @@ module Spaceship
           ]
 
           @cookie = to_use.join(';')
-        rescue => ex
+        rescue
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new(response)
         end
@@ -176,7 +176,7 @@ module Spaceship
 
     def get_resolution_center(app_id)
       r = request(:get, "ra/apps/#{app_id}/resolutionCenter?v=latest")
-      data = parse_response(r, 'data')
+      parse_response(r, 'data')
     end
 
     #####################################################
@@ -214,7 +214,7 @@ module Spaceship
       raise "app_id is required" unless app_id
 
       r = request(:get, "ra/apps/#{app_id}/trains/")
-      data = parse_response(r, 'data')
+      parse_response(r, 'data')
     end
 
     def update_build_trains!(app_id, data)

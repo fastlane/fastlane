@@ -9,3 +9,6 @@ Style/ClassCheck:
 Style/BracesAroundHashParameters:
   Enabled: false
 
+Lint/UselessAssignment:
+  Exclude:
+    - 'spec/**/*'

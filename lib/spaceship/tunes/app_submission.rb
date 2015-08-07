@@ -98,8 +98,6 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          orig = attrs.dup
-
           # fill content rights section if iTC returns nil
           if attrs["contentRights"].nil?
             attrs.merge!("contentRights" => {

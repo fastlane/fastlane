@@ -85,7 +85,7 @@ module Spaceship
         end
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
-          string = "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
+          "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
         end
       end
 
