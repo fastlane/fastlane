@@ -58,7 +58,7 @@ class ProduceApplication
         Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
         require 'produce/service'
-        Produce::Service.new.enable(options, args)
+        Produce::Service.enable(options, args)
       end
     end
 
@@ -85,7 +85,7 @@ class ProduceApplication
         Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
         require 'produce/service'
-        Produce::Service.new.disable(options, args)
+        Produce::Service.disable(options, args)
       end
     end
 
