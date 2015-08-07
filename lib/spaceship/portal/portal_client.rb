@@ -200,7 +200,7 @@ module Spaceship
         teamId: team_id,
         type: type,
         csrContent: csr,
-        appIdId: app_id  #optional
+        appIdId: app_id # optional
       })
       parse_response(r, 'certRequest')
     end
