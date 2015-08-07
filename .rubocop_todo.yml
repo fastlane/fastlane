@@ -120,32 +120,11 @@ Style/IfUnlessModifier:
 Style/MultilineOperationIndentation:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/NilComparison:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: IncludeSemanticChanges.
-Style/NonNilCheck:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Not:
-  Enabled: false
-
 # Offense count: 10
 # Cop supports --auto-correct.
 Style/NumericLiterals:
   MinDigits: 14
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: AllowSafeAssignment.
-Style/ParenthesesAroundCondition:
-  Enabled: false
 
 # Offense count: 5
 # Cop supports --auto-correct.

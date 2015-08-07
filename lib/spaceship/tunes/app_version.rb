@@ -263,7 +263,7 @@ module Spaceship
       end
 
       def supports_apple_watch
-        (super != nil)
+        !super.nil?
       end
 
       def primary_category=(value)

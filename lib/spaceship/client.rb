@@ -172,7 +172,7 @@ module Spaceship
     def store_csrf_tokens(response)
       if response and response.headers
         tokens = response.headers.select { |k, v| %w[csrf csrf_ts].include?(k) }
-        if tokens and not tokens.empty?
+        if tokens and !tokens.empty?
           @csrf_tokens = tokens
         end
       end
@@ -235,7 +235,7 @@ module Spaceship
         content = response.body
       end
 
-      if content == nil
+      if content.nil?
         raise UnexpectedResponse.new(response.body)
       else
         store_csrf_tokens(response)
