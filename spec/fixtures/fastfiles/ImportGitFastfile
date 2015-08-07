@@ -1,5 +1,5 @@
 
-import_git("git@github.com:KrauseFx/fastlane.git","spec/fixtures/fastfiles/ImportFastfile")
+import_git 'git@github.com:KrauseFx/fastlane.git','spec/fixtures/fastfiles/ImportFastfile'
 
 lane :new_main_lane do
   "such new main lane"
