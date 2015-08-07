@@ -178,19 +178,22 @@ module Fastlane
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
     end
 
-    def import_git(git_path = nil, fastfile_path = 'Fastfile')
-      raise "Please pass a path to the `import` action".red unless git_path
+    # @param url [String] The git URL to clone the repository from
+    # @param path [String] The path to the Fastfile
+    def import_from_git(url: nil, path: 'fastlane/Fastfile')
+      raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
 
       # Checkout the repo
-      git_split = git_path.split("/")
+      repo_name = url.split("/").last
 
-      begin
-       Fastlane::Actions.sh("if cd /tmp/#{git_split.last}; then git pull; else git clone #{git_path} /tmp/#{git_split.last}; fi")
-      rescue ex
-        raise "#{ex.message}".red
-      end
+      folder = File.join("/tmp", "fl_clones", repo_name, Time.now.to_i.to_s)
 
-      import("/tmp/#{git_split.last}/#{fastfile_path}")
+      # When this fails, we have to clone the git repo
+      Helper.log.info "Cloning remote git repo..."
+      Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
+      Actions.sh("cd '#{folder}' && git checkout HEAD #{path}")
+
+      import(File.join(folder, path))
     end
 
     #####################################################

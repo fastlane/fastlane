@@ -76,11 +76,11 @@ output = sh("pod update")
 
 ## Importing another Fastfile
 
-Within your `Fastfile` you can import another `Fastfile`. 
+Within your `Fastfile` you can import another `Fastfile` using 2 methods:
 
 ### `import`
 
-Import from a local path
+Import a `Fastfile` from a local path
 
 ```ruby
 import "../GeneralFastfile"
@@ -90,25 +90,19 @@ override_lane :from_general do
 end
 ```
 
-### `import_git`
+### `import_from_git`
 
-Import from a git repo which you could use as standard Fastlane resource for all your `Fastfile`.
+Import from another git repository, which you can use to have one git repo with a default `Fastfile` for all your project
 
-It takes up to two parameters:
- 
- 1) the repo address
- 2) the file path of your Fastfile in your repo (Default to 'fastlane/Fastfile')
 
 ```ruby
-import_git 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git','MyFastlaneFolder/Fastfile'
+import_from_git(url: 'https://github.com/KrauseFx/fastlane')
+# or
+import_from_git(url: 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git',
+               path: 'fastlane/Fastfile')
 
 lane :new_main_lane do
-  "such new main lane"
-end
-
-platform :ios do
-
-
+  ...
 end
 ```
 
