@@ -8,4 +8,4 @@ apple_id "[[APPLE_ID]]" # Your Apple email address
 
 
 # you can even provide different app identifiers, Apple IDs and team names per lane:
-# https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#the-appfile
+# https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md

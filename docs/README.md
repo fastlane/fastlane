@@ -7,6 +7,7 @@
 - [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md) for more advanced settings and tips.
 - [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md) for Jenkins specific help
 - [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
+- [Appfile.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md) describes the `Appfile`
 - [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
 
 ## Fastfile
