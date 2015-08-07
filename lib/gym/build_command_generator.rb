@@ -74,7 +74,7 @@ module Gym
 
       def archive_path
         unless @archive_path
-          file_name = [Gym.project.app_name, Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
+          file_name = [Gym.config[:output_name], Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
           @archive_path = File.join(build_path, file_name.join(" ") + ".xcarchive")
         end
         return @archive_path

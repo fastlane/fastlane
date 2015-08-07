@@ -85,6 +85,7 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     def move_results
       require 'fileutils'
+
       FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
 
       if PackageCommandGenerator.dsym_path
@@ -94,7 +95,7 @@ module Gym
         containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
         file_name = File.basename(PackageCommandGenerator.dsym_path)
 
-        output = File.expand_path(File.join(Gym.config[:output_directory], Gym.project.app_name + ".app.dSYM.zip"))
+        output = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
         puts `cd '#{containing_directory}' && zip -r '#{output}' '#{file_name}'`
       end
     end

@@ -70,6 +70,11 @@ module Gym
                                      verify_block: proc do |value|
                                        raise "Directory not found at path '#{File.expand_path(value)}'" unless File.directory?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :output_name,
+                                     short_option: "-n",
+                                     env_name: "GYM_OUTPUT_NAME",
+                                     description: "The name of the resulting ipa file",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",

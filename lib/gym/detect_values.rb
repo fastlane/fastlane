@@ -23,6 +23,8 @@ module Gym
 
       detect_scheme
 
+      config[:output_name] ||= Gym.project.app_name
+
       return config
     end
 
