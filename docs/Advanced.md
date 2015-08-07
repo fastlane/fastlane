@@ -78,6 +78,10 @@ output = sh("pod update")
 
 Within your `Fastfile` you can import another `Fastfile`. 
 
+### `import`
+
+Import from a local path
+
 ```ruby
 import "../GeneralFastfile"
 
@@ -85,6 +89,25 @@ override_lane :from_general do
   ...
 end
 ```
+
+### `import_git`
+
+Import from a git repo which you could use as standard Fastlane resource for all your `Fastfile`.
+
+```ruby
+import_git("git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git","fastlane/Fastfile")
+
+lane :new_main_lane do
+  "such new main lane"
+end
+
+platform :ios do
+
+
+end
+```
+
+### Note
 
 You should import the other `Fastfile` on the top above your lane declarations. When defining a new lane `fastlane` will make sure to not run into any name conflicts. If you want to overwrite an existing lane (from the imported one), use the `override_lane` keyword. 
 
