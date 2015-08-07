@@ -7,9 +7,11 @@ end
 module Spaceship
   class Client
     # Public getter for all UI related code
+    # rubocop:disable Style/MethodName
     def UI
       UserInterface.new(self)
     end
+    # rubocop:enable Style/MethodName
 
     # All User Interface related code lives in this class
     class UserInterface

@@ -3,7 +3,6 @@ inherit_from: .rubocop_todo.yml
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
-# Offense count: 31
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/BracesAroundHashParameters:
@@ -12,3 +11,8 @@ Style/BracesAroundHashParameters:
 Lint/UselessAssignment:
   Exclude:
     - 'spec/**/*'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/IndentHash:
+  Enabled: false

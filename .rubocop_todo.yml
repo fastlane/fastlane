@@ -114,22 +114,6 @@ Style/GuardClause:
 Style/IfUnlessModifier:
   Enabled: false
 
-# Offense count: 49
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/LeadingCommentSpace:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MethodName:
-  Enabled: false
-
 # Offense count: 74
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.

@@ -130,7 +130,7 @@ module Spaceship
         "4APLUP237T" => ApplePay
       }
 
-      #class methods
+      # Class methods
       class << self
         # Create a new code signing request that can be used to
         # generate a new certificate
