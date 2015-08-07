@@ -5,14 +5,21 @@ module Gym
       # @param [Array] The output of the errored build (line by line)
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
+        # The order of the handling below is import
         case output
         when /Your build settings specify a provisioning profile with the UUID/
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile which doesn't exist on your local machine"
           print "You can use sigh (https://github.com/KrauseFx/sigh) to download and install the provisioning profile"
           print "Follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+        when /Provisioning profile does not match bundle identifier/
+          print "Invalid code signing settings"
+          print "Your project defines a provisioning profile that doesn't match the bundle identifier of your app"
+          print "Make sure you use the correct provisioning profile for this app"
+          print "Take a look at the ouptput above for more information"
+          print "You can follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
         when /code signing is required/
-          print "Your project settings don't define any code signing settings"
+          print "Your project settings define invalid code signing settings"
           print "To generate an ipa file you need to enable code signing for your project"
           print "Additionally make sure you have a code signing identity set"
           print "Follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
