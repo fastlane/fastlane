@@ -37,6 +37,12 @@ app = Spaceship.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane 
 
 App Services are part of the application, however, they are one of the few things that can be changed about the app once it has been created.
 
+Currently available services include (all assume a `Spaceship.app_service.` prefix)
+
+```ruby
+app_group.(on|off), associated_domains.(on|off), data_protection.(complete|unless_open|until_first_auth|off), health_kit.(on|off), home_kit.(on|off), wireless_accessory.(on|off), icloud.(on|off), cloud_kit.(xcode5_compatible|cloud_kit), inter_app_audio.(on|off), passbook.(on|off), push_notification.(on|off), vpn_configuration.(on|off)
+```
+
 ```ruby
 # Find a specific app based on the bundle identifier
 app = Spaceship.app.find("com.krausefx.app")
