@@ -30,8 +30,7 @@ end
 def adp_stub_login
   stub_request(:get, "https://developer.apple.com/membercenter/index.action").
   to_return(status: 200, body: nil,
-    headers: {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=0123abcdef123123&path=%2F%2Fmembercenter%2Findex.action"}
-  )
+    headers: {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=0123abcdef123123&path=%2F%2Fmembercenter%2Findex.action"})
 
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
     with(body: {"accountPassword" => "so_secret", "appIdKey" => "0123abcdef123123", "appleId" => "spaceship@krausefx.com"},

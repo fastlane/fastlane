@@ -178,7 +178,7 @@ module Spaceship
       end
     end
 
-      # memoize the last csrf tokens from responses
+    # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
     end
@@ -220,8 +220,8 @@ module Spaceship
       logger.debug("#{method.upcase}: #{url}: #{response.body}")
     end
 
-      # Actually sends the request to the remote server
-      # Automatically retries the request up to 3 times if something goes wrong
+    # Actually sends the request to the remote server
+    # Automatically retries the request up to 3 times if something goes wrong
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         @client.send(method, url_or_path, params, headers, &block)

@@ -7,7 +7,7 @@ module FaradayMiddleware
     end
 
     define_parser do |body|
-      Plist::parse_xml(body)
+      Plist.parse_xml(body)
     end
   end
 end

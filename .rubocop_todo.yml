@@ -76,21 +76,6 @@ Style/AndOr:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/ClosingParenthesisIndentation:
-  Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/ColonMethodCall:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/CommentIndentation:
-  Enabled: false
-
 # Offense count: 19
 Style/Documentation:
   Enabled: false

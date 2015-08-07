@@ -299,7 +299,7 @@ module Spaceship
 
       private
 
-        # generates the nested data structure to represent screenshots
+      # generates the nested data structure to represent screenshots
       def setup_screenshots(row)
         screenshots = row.fetch('screenshots', {}).fetch('value', nil)
         return [] unless screenshots

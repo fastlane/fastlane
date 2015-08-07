@@ -86,7 +86,7 @@ describe Spaceship::ProvisioningProfile do
   describe '#download' do
     it "downloads an existing provisioning profile" do
       file = Spaceship::ProvisioningProfile.all.first.download
-      xml = Plist::parse_xml(file)
+      xml = Plist.parse_xml(file)
       expect(xml['AppIDName']).to eq("SunApp Setup")
       expect(xml['TeamName']).to eq("SunApps GmbH")
     end
