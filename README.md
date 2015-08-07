@@ -6,12 +6,12 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <b>produce</b> &bull; 
+  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull;
+  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
+  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
+  <b>produce</b> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
@@ -41,11 +41,11 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#how-does-it-work">How does it work?</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -57,6 +57,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Features
 
 - **Create** new apps on both iTunes Connect and the Apple Developer Portal
+- **Modify** Application Services on the Apple Developer Portal
+- **Create** App Groups on the Apple Developer Portal
+- **Associate** apps with App Groups on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
@@ -67,7 +70,23 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 # Usage
 
     produce
-    
+
+If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
+
+    produce enable-service --homekit --healthkit
+
+If you want to disable Application Servies for an App ID (iCloud in this case):
+
+    produce disable-service --icloud
+
+If you want to create a new App Group:
+
+    produce group -g group.krausefx -n "Example App Group"
+
+If you want to associate an app with an App Group:
+
+    produce associate-group -a com.krausefx.app group.krausefx
+
 # Parameters
 
 Get the latest list of all available parameters;
@@ -90,19 +109,55 @@ Get the latest list of all available parameters;
     -v, --version        Display version information
 ```
 
+In addition, the available Application Services that can be enabled/disabled can be seen by executing:
+
+    produce enable-service -h
+
+```
+    --app-group          Enable App Groups
+    --associated-domains Enable Associated Domains
+    --data-protection STRING Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+    --healthkit          Enable HealthKit
+    --homekit            Enable HomeKit
+    --wireless-conf      Enable Wireless Accessory Configuration
+    --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
+    --inter-app-audio    Enable Inter-App-Audio
+    --passbook           Enable Passbook
+    --push-notification  Enable Push notification (only enables the service, does not configure certificates)
+    --vpn-conf           Enable VPN Configuration
+```
+
+    produce disable-service -h
+
+```
+    --app-group          Disable App Groups
+    --associated-domains Disable Associated Domains
+    --data-protection    Disable Data Protection
+    --healthkit          Disable HealthKit
+    --homekit            Disable HomeKit
+    --wireless-conf      Disable Wireless Accessory Configuration
+    --icloud             Disable iCloud
+    --inter-app-audio    Disable Inter-App-Audio
+    --passbook           Disable Passbook
+    --push-notification  Disable Push notifications
+    --vpn-conf           Disable VPN Configuration
+```
+
 ## Environment Variables
 In case you want to pass more information to `produce` using environment variables:
 
 - `PRODUCE_USERNAME` (your iTunes Connect username)
 - `PRODUCE_APP_IDENTIFIER` (the bundle identifier of the new app)
 - `PRODUCE_APP_NAME` (the name of the new app)
+- `PRODUCE_GROUP_IDENTIFIER` (the group identifier of the new app group)
+- `PRODUCE_GROUP_NAME` (the name of the new app group)
 - `PRODUCE_LANGUAGE` (the language you want your app to use, e.g. `English`, `German`)
 - `PRODUCE_VERSION` (the initial app version)
 - `PRODUCE_SKU` (the SKU you want to use, which must be a unique number)
 - `PRODUCE_SKIP_ITC` (should iTunes Connect app be created)
 - `PRODUCE_SKIP_DEVCENTER` (should Apple Developer Portal app be created)
 - `PRODUCE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
-- `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`) 
+- `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
 
 
 ## [`fastlane`](https://github.com/KrauseFx/fastlane) Integration
@@ -150,7 +205,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
