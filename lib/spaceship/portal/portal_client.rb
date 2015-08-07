@@ -135,21 +135,21 @@ module Spaceship
 
     def create_app!(type, name, bundle_id)
       ident_params = case type.to_sym
-      when :explicit
-        {
-          type: 'explicit',
-          explicitIdentifier: bundle_id,
-          appIdentifierString: bundle_id,
-          push: 'on',
-          inAppPurchase: 'on',
-          gameCenter: 'on'
-        }
-      when :wildcard
-        {
-          type: 'wildcard',
-          wildcardIdentifier: bundle_id,
-          appIdentifierString: bundle_id
-        }
+                     when :explicit
+                       {
+                         type: 'explicit',
+                         explicitIdentifier: bundle_id,
+                         appIdentifierString: bundle_id,
+                         push: 'on',
+                         inAppPurchase: 'on',
+                         gameCenter: 'on'
+                       }
+                     when :wildcard
+                       {
+                         type: 'wildcard',
+                         wildcardIdentifier: bundle_id,
+                         appIdentifierString: bundle_id
+                       }
       end
 
       params = {

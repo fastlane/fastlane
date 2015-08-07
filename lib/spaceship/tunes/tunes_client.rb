@@ -242,7 +242,6 @@ module Spaceship
                                             app_id: nil,
                                             train: nil,
                                             build_number: nil,
-                                            cancel_other_submissions: false,
 
                                             # Required Metadata:
                                             changelog: nil,
@@ -256,7 +255,6 @@ module Spaceship
 
                                             # Optional Metadata:
                                             privacy_policy_url: nil,
-                                            review_notes: nil,
                                             review_user_name: nil,
                                             review_password: nil,
                                             encryption: false)

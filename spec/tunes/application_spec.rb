@@ -71,22 +71,22 @@ describe Spaceship::Application do
 
       it "raises an error if something is wrong" do
         itc_stub_broken_create
-        expect {
+        expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        }.to raise_error "You must choose a primary language. You must choose a primary language."
+        end.to raise_error "You must choose a primary language. You must choose a primary language."
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
         itc_stub_broken_create_wildcard
-        expect {
+        expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
-        }.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+        end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
       end
     end
 
@@ -102,12 +102,12 @@ describe Spaceship::Application do
 
       it "raises an error if something is wrong" do
         itc_stub_applications_broken_first_create
-        expect {
+        expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        }.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
+        end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
       end
     end
 
@@ -178,9 +178,9 @@ describe Spaceship::Application do
     describe "Create new version" do
       it "raises an exception if there already is a new version" do
         app = Spaceship::Application.all.first
-        expect {
+        expect do
           app.create_version!('0.1')
-        }.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
+        end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
       end
 
       it "works if there is no `edit_version` already available" do

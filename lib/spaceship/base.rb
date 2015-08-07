@@ -62,10 +62,12 @@ module Spaceship
       ##
       # Sets client and returns self for chaining.
       # @return (Spaceship::Base)
+      # rubocop:disable Style/AccessorMethodName
       def set_client(client)
         self.client = client
         self
       end
+      # rubocop:enable Style/AccessorMethodName
 
       ##
       # Binds attributes getters and setters to underlying data returned from the API.

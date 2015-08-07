@@ -25,15 +25,15 @@ describe Spaceship::TunesClient do
     end
 
     it 'raises an exception if authentication failed' do
-      expect {
+      expect do
         subject.login('bad-username', 'bad-password')
-      }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
+      end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
     end
 
     it "raises an exception if no login data is provided at all" do
-      expect {
+      expect do
         subject.login('', '')
-      }.to raise_exception(Spaceship::Client::NoUserCredentialsError)
+      end.to raise_exception(Spaceship::Client::NoUserCredentialsError)
     end
   end
 
@@ -48,9 +48,9 @@ describe Spaceship::TunesClient do
   describe "#handle_itc_response" do
     it "raises an exception if something goes wrong" do
       data = JSON.parse(itc_read_fixture_file('update_app_version_failed.json'))['data']
-      expect {
+      expect do
         subject.handle_itc_response(data)
-      }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
+      end.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
     end
 
     it "does nothing if everything works as expected and returns the original data" do

@@ -18,11 +18,6 @@ Lint/ParenthesesAsGroupedExpression:
 Lint/UnusedBlockArgument:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Lint/UnusedMethodArgument:
-  Enabled: false
-
 # Offense count: 17
 Lint/UselessAssignment:
   Enabled: false
@@ -60,10 +55,6 @@ Metrics/PerceivedComplexity:
   Max: 18
 
 # Offense count: 1
-Style/AccessorMethodName:
-  Enabled: false
-
-# Offense count: 1
 # Cop supports --auto-correct.
 Style/Alias:
   Enabled: false
@@ -79,24 +70,6 @@ Style/AlignHash:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/AndOr:
   Enabled: false
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-Style/BlockDelimiters:
-  Enabled: false
-
-# Offense count: 31
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/BracesAroundHashParameters:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
-  IndentWhenRelativeTo: end
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.

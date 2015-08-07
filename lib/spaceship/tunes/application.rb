@@ -210,7 +210,7 @@ module Spaceship
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::AppSubmission.create(self, self.apple_id, version)
+        Spaceship::AppSubmission.create(self, version)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application

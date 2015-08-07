@@ -130,9 +130,9 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it 'raises an error if the user wants to create a profile for a non-existing app' do
-      expect {
+      expect do
         Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'notExisting', certificate: certificate)
-      }.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error "Could not find app with bundle id 'notExisting'"
     end
   end
 

@@ -34,9 +34,9 @@ describe Spaceship::AppSubmission do
     it "raises an error when submitting an app that has validation errors" do
       itc_stub_app_submissions_invalid
 
-      expect {
+      expect do
         app.create_submission
-      }.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
+      end.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
     end
 
     it "raises an error when submitting an app that is already in review" do
@@ -46,9 +46,9 @@ describe Spaceship::AppSubmission do
       submission.content_rights_has_rights = true
       submission.add_id_info_uses_idfa = false
 
-      expect {
+      expect do
         submission.complete!
-      }.to raise_exception("Problem processing review submission.")
+      end.to raise_exception("Problem processing review submission.")
       expect(submission.submitted_for_review).to eq(false)
     end
   end

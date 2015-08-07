@@ -7,9 +7,9 @@ describe Spaceship::Tunes::Tester do
   let (:app) { Spaceship::Application.all.first }
 
   it "raises an error when using the base class" do
-    expect {
+    expect do
       Spaceship::Tunes::Tester.all
-    }.to raise_error "You have to use a subclass: Internal or External"
+    end.to raise_error "You have to use a subclass: Internal or External"
   end
 
   describe "Receiving existing testers" do

@@ -36,15 +36,15 @@ describe Spaceship::Client do
     end
 
     it 'raises an exception if authentication failed' do
-      expect {
+      expect do
         subject.login('bad-username', 'bad-password')
-      }.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
+      end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
     end
 
     it "raises an exception if no login data is provided at all" do
-      expect {
+      expect do
         subject.login('', '')
-      }.to raise_exception(Spaceship::Client::NoUserCredentialsError)
+      end.to raise_exception(Spaceship::Client::NoUserCredentialsError)
     end
   end
 
@@ -214,9 +214,9 @@ describe Spaceship::Client do
 
       it "works when the name is already taken" do
         error_text = 'Multiple profiles found with the name &#x27;Test Name 3&#x27;.  Please remove the duplicate profiles and try again.\nThere are no current certificates on this team matching the provided certificate IDs.' # not ", as this would convert the \n
-        expect {
+        expect do
           response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
-        }.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
       end
     end
 

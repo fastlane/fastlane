@@ -79,7 +79,6 @@ describe Spaceship::Tunes::Build do
           review_email: "contact@company.com",
           phone_number: "0123456789",
           privacy_policy_url: nil,
-          review_notes: nil,
           review_user_name: nil,
           review_password: nil,
           encryption: false})

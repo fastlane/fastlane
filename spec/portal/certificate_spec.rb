@@ -100,10 +100,10 @@ describe Spaceship::Certificate do
     end
 
     it 'raises an error if the user wants to create a certificate for a non-existing app' do
-      expect {
+      expect do
         csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
         Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
-      }.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error "Could not find app with bundle id 'notExisting'"
     end
   end
 end

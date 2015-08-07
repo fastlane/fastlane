@@ -34,28 +34,28 @@ describe Spaceship::Device do
     end
 
     it "should fail to create a nil device UDID" do
-      expect {
+      expect do
         Spaceship::Device.create!(name: "Demo Device", udid: nil)
-      }.to raise_error("You cannot create a device without a device_id (UDID) and name")
+      end.to raise_error("You cannot create a device without a device_id (UDID) and name")
     end
 
     it "should fail to create a nil device name" do
-      expect {
+      expect do
         Spaceship::Device.create!(name: nil, udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
-      }.to raise_error("You cannot create a device without a device_id (UDID) and name")
+      end.to raise_error("You cannot create a device without a device_id (UDID) and name")
     end
 
     it "raises an exception if the device ID is already registererd" do
-      expect {
+      expect do
         device = Spaceship::Device.create!(name: "Demo", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
-      }.to raise_error "The device UDID 'e5814abb3b1d92087d48b64f375d8e7694932c39' already exists on this team."
+      end.to raise_error "The device UDID 'e5814abb3b1d92087d48b64f375d8e7694932c39' already exists on this team."
     end
 
     it "raises an exception if the device name is already registererd" do
-      expect {
+      expect do
         # "Personal iPhone" is already taken
         device = Spaceship::Device.create!(name: "Personal iPhone", udid: "asdfasdf")
-      }.to raise_error "The device name 'Personal iPhone' already exists on this team, use different one."
+      end.to raise_error "The device name 'Personal iPhone' already exists on this team, use different one."
     end
   end
 end

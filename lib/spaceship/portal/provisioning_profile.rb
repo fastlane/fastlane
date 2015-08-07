@@ -152,16 +152,16 @@ module Spaceship
           # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
 
           klass = case attrs['distributionMethod']
-          when 'limited'
-            Development
-          when 'store'
-            AppStore
-          when 'adhoc'
-            AdHoc
-          when 'inhouse'
-            InHouse
-          else
-            raise "Can't find class '#{attrs['distributionMethod']}'"
+                  when 'limited'
+                    Development
+                  when 'store'
+                    AppStore
+                  when 'adhoc'
+                    AdHoc
+                  when 'inhouse'
+                    InHouse
+                  else
+                    raise "Can't find class '#{attrs['distributionMethod']}'"
           end
 
           attrs['appId'] = App.factory(attrs['appId'])

@@ -117,8 +117,7 @@ module Spaceship
         end
 
         # @param application (Spaceship::Tunes::Application) The app this submission is for
-        # @param app_id (String) The unique Apple ID of this app
-        def create(application, app_id, version)
+        def create(application, version)
           stage = "start"
           attrs = client.send_app_submission(application.apple_id, version.raw_data, stage)
           attrs.merge!(application: application)
