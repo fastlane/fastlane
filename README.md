@@ -73,11 +73,11 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
 
-    produce enable-service --homekit --healthkit
+    produce enable_service --homekit --healthkit
 
 If you want to disable Application Servies for an App ID (iCloud in this case):
 
-    produce disable-service --icloud
+    produce disable_service --icloud
 
 If you want to create a new App Group:
 
@@ -85,7 +85,7 @@ If you want to create a new App Group:
 
 If you want to associate an app with an App Group:
 
-    produce associate-group -a com.krausefx.app group.krausefx
+    produce associate_group -a com.krausefx.app group.krausefx
 
 # Parameters
 
@@ -111,7 +111,7 @@ Get the latest list of all available parameters;
 
 In addition, the available Application Services that can be enabled/disabled can be seen by executing:
 
-    produce enable-service -h
+    produce enable_service -h
 
 ```
     --app-group          Enable App Groups
@@ -127,7 +127,7 @@ In addition, the available Application Services that can be enabled/disabled can
     --vpn-conf           Enable VPN Configuration
 ```
 
-    produce disable-service -h
+    produce disable_service -h
 
 ```
     --app-group          Disable App Groups

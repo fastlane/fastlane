@@ -35,8 +35,8 @@ class ProduceApplication
       end
     end
 
-    command "enable-service" do |c|
-      c.syntax = 'produce enable-service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+    command :enable_service do |c|
+      c.syntax = 'produce enable_service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
       c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
       c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable-service -a com.example.app --healthkit --homekit --passbook'
 
@@ -62,8 +62,8 @@ class ProduceApplication
       end
     end
 
-    command "disable-service" do |c|
-      c.syntax = 'produce disable-service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+    command :disable_service do |c|
+      c.syntax = 'produce disable_service -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
       c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
       c.example 'Disable HealthKit', 'produce disable-service -a com.example.app --healthkit'
 
@@ -102,8 +102,8 @@ class ProduceApplication
       end
     end
 
-    command "associate-group" do |c|
-      c.syntax = 'produce associate-group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
+    command :associate_group do |c|
+      c.syntax = 'produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
       c.description = 'Associate with a group, which is create if needed or simply located otherwise'
       c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
 
