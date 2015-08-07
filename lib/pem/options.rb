@@ -19,7 +19,7 @@ module PEM
                                      env_name: "PEM_SAVE_PRIVATEKEY",
                                      description: "Set to save the private RSA key in the current directory",
                                      is_string: false,
-                                     default_value: false),
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "PEM_FORCE",
                                      description: "Create a new push certificate, even if the current one is active for 30 more days",

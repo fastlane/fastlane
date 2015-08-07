@@ -24,24 +24,22 @@
     <img src="assets/pem.png">
 </p>
 
-PEM - Maintain your push certificates
+PEM
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/pem/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
 
+###### Automatically generate and renew your push notification profiles
 
-Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a ```pem``` file for your server? 
+Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server? 
 
 ```PEM``` does all that for, just by running ```pem```.
 
 To automate iOS Provisioning profiles you can use [sigh](https://github.com/KrauseFx/sigh).
 
-Felix Krause ([@KrauseFx](https://twitter.com/KrauseFx)) the developer of ```PEM```<br />
-Sebastian Mayr ([@sebmasterkde](https://twitter.com/sebmasterkde)) who implemented the download mechanism of signing certificates<br />
-Alexander Schuch ([@schuchalexander](https://twitter.com/schuchalexander)) who automated the generation of the signing request 
-
+Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
 <p align="center">

@@ -1,8 +1,7 @@
 require 'pem/version'
 require 'pem/dependency_checker'
-require 'pem/developer_center'
-require 'pem/cert_manager'
-require 'pem/signing_request'
+require 'pem/manager'
+require 'pem/options'
 
 require 'fastlane_core'
 
@@ -11,7 +10,7 @@ module PEM
   class << self
     attr_accessor :config
   end
-  
+
   TMP_FOLDER = "/tmp/PEM/"
   FileUtils.mkdir_p TMP_FOLDER
 

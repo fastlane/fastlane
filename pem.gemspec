@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core', '>= 0.7.2' # all shared code and dependencies
+  spec.add_dependency 'spaceship', '>= 0.4.0' # Communicating with the Apple Dev Portal
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -31,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
-  spec.add_development_dependency 'codeclimate-test-reporter'
+  spec.add_development_dependency 'coveralls'
 end
