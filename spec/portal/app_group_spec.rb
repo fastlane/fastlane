@@ -43,9 +43,8 @@ describe Spaceship::Portal::AppGroup do
 
   describe '#create' do
     it 'creates an app group' do
-      expect(client).to receive(:create_app_group!).with('Production App Group', 'group.tools.fastlane')
+      expect(client).to receive(:create_app_group!).with('Production App Group', 'group.tools.fastlane').and_return({})
       group = Spaceship::Portal::AppGroup.create!(group_id: 'group.tools.fastlane', name: 'Production App Group')
-      expect(group.app_group_id).to eq('NR5BH6N89Z')
     end
   end
 
