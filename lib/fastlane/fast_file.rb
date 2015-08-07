@@ -178,6 +178,21 @@ module Fastlane
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
     end
 
+    def import_git(git_path = nil, fastfile_path = 'Fastfile')
+      raise "Please pass a path to the `import` action".red unless git_path
+
+      # Checkout the repo
+      git_split = git_path.split("/")
+
+      begin
+       Fastlane::Actions.sh("if cd /tmp/#{git_split.last}; then git pull; else git clone #{git_path} /tmp/#{git_split.last}; fi")
+      rescue ex
+        raise "#{ex.message}".red
+      end
+
+      import("/tmp/#{git_split.last}/#{fastfile_path}")
+    end
+
     #####################################################
     # @!group Overwriting Ruby methods
     #####################################################
