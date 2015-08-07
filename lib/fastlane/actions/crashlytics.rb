@@ -13,7 +13,7 @@ module Fastlane
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/crashlytics'
-        
+
         # can pass groups param either as an Array or a String
         case params[:groups]
         when NilClass
@@ -24,16 +24,34 @@ module Fastlane
           groups = params[:groups]
         end
 
+        # Normalized notification to Crashlytics notification parameter requirement
+        # 'YES' or 'NO' - String
+        case params[:notifications]
+          when String
+            if params[:notifications] == 'YES' || params[:notifications] == 'NO'
+              notifications = params[:notifications]
+            else
+              notifications = 'YES' if params[:notifications] == 'true'
+              notifications = 'NO' if params[:notifications] == 'false'
+            end
+          when TrueClass
+            notifications = 'YES'
+          when FalseClass
+            notifications = 'NO'
+          else
+            notifications = nil
+        end
+
         Helper.log.info 'Uploading the IPA to Crashlytics. Go for a coffee ☕️.'.green
 
         if Helper.test?
           # Access all values, to do the verify
-          return params[:crashlytics_path], params[:api_token], params[:build_secret], params[:ipa_path], params[:build_secret], params[:ipa_path], params[:notes_path], params[:emails], params[:groups], params[:notifications]
+          return params[:crashlytics_path], params[:api_token], params[:build_secret], params[:ipa_path], params[:build_secret], params[:ipa_path], params[:notes_path], params[:emails], groups, notifications
         end
 
         client = Shenzhen::Plugins::Crashlytics::Client.new(params[:crashlytics_path], params[:api_token], params[:build_secret])
 
-        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: params[:groups], notifications: params[:notifications])
+        response = client.upload_build(params[:ipa_path], file: params[:ipa_path], notes: params[:notes_path], emails: params[:emails], groups: groups, notifications: notifications)
 
         if response
           Helper.log.info 'Build successfully uploaded to Crashlytics'.green
@@ -92,7 +110,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notifications,
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
                                        description: "Crashlytics notification option (true/false)",
-                                       optional: true)
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: Proc.new do |value|
+                                         raise "Crashlytics supported notifications options: TrueClass, FalseClass, 'true', 'false', 'YES', 'NO'".red unless (value.is_a?(TrueClass) || value.is_a?(FalseClass) || value.is_a?(String))
+                                       end)
         ]
       end
 
