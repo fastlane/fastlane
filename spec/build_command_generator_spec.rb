@@ -6,23 +6,6 @@ describe Gym do
       end.to raise_error "Could not find project at path '/notExistent'".red
     end
 
-    it "works with the example project with no additional parameters" do
-      options = { project: "./example/standard/Example.xcodeproj" }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-
-      result = Gym::BuildCommandGenerator.generate
-      expect(result).to eq([
-        "set -o pipefail && ",
-        "xcodebuild",
-        "-scheme 'Example'",
-        "-project './example/standard/Example.xcodeproj'",
-        "-configuration 'Release'",
-        "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-        :archive,
-        "| xcpretty"
-      ])
-    end
-
     it "supports additional parameters" do
       options = { project: "./example/standard/Example.xcodeproj", sdk: "9.0" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -41,12 +24,42 @@ describe Gym do
       ])
     end
 
-    it "#project_path_array" do
-      options = { project: "./example/standard/Example.xcodeproj" }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    describe "Standard Example" do
+      before do
+        options = { project: "./example/standard/Example.xcodeproj" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      end
 
-      result = Gym::BuildCommandGenerator.project_path_array
-      expect(result).to eq(["-scheme 'Example'", "-project './example/standard/Example.xcodeproj'"])
+      it "uses the correct build command with the example project with no additional parameters" do
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+          "set -o pipefail && ",
+          "xcodebuild",
+          "-scheme 'Example'",
+          "-project './example/standard/Example.xcodeproj'",
+          "-configuration 'Release'",
+          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+          :archive,
+          "| xcpretty"
+        ])
+      end
+
+      it "#project_path_array" do
+        result = Gym::BuildCommandGenerator.project_path_array
+        expect(result).to eq(["-scheme 'Example'", "-project './example/standard/Example.xcodeproj'"])
+      end
+
+      it "#build_path" do
+        result = Gym::BuildCommandGenerator.build_path
+        regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
+        expect(result).to match(regex)
+      end
+
+      it "#archive_path" do
+        result = Gym::BuildCommandGenerator.archive_path
+        regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d/ExampleProductName \d\d\d\d\-\d\d\-\d\d \d\d\.\d\d\.\d\d.xcarchive}
+        expect(result).to match(regex)
+      end
     end
   end
 end
