@@ -3,14 +3,29 @@ inherit_from: .rubocop_todo.yml
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
-# Offense count: 22
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
+Style/BracesAroundHashParameters:
   Enabled: false
 
-# Offense count: 9
+Lint/UselessAssignment:
+  Exclude:
+    - 'spec/**/*'
+
 # Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 30
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/IndentHash:
+  Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: exploded
+
+Style/DoubleNegation:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+# Cop supports --auto-correct.
+Lint/UnusedBlockArgument:
+  Enabled: false

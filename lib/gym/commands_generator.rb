@@ -33,7 +33,9 @@ module Gym
       program :help, "GitHub", "https://github.com/fastlane/gym"
       program :help_formatter, :compact
 
+      # rubocop:disable Style/GlobalVars
       global_option("--verbose") { $verbose = true }
+      # rubocop:enable Style/GlobalVars
 
       always_trace!
 

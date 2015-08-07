@@ -21,6 +21,34 @@ module Gym
         config.load_configuration_file(Gym.gymfile_name)
       end
 
+      detect_scheme
+
+      return config
+    end
+
+    def self.choose_project
+      loop do
+        path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
+        if File.directory? path
+          if path.end_with? ".xcworkspace"
+            config[:workspace] = path
+            break
+          elsif path.end_with? ".xcodeproj"
+            config[:project] = path
+            break
+          else
+            Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
+          end
+        else
+          Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
+        end
+      end
+    end
+
+    # Helper Methods
+
+    def self.detect_scheme
+      config = Gym.config
       if config[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless Gym.project.schemes.include?(config[:scheme].to_s)
@@ -44,27 +72,6 @@ module Gym
           end
         else
           raise "Couldn't find any schemes in this project".red
-        end
-      end
-
-      return config
-    end
-
-    def self.choose_project
-      loop do
-        path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
-        if File.directory? path
-          if path.end_with? ".xcworkspace"
-            config[:workspace] = path
-            break
-          elsif path.end_with? ".xcodeproj"
-            config[:project] = path
-            break
-          else
-            Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
-          end
-        else
-          Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
         end
       end
     end
