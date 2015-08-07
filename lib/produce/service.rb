@@ -66,15 +66,14 @@ module Produce
 
         if on
           case options.data_protection
-            when "complete"
-              app.update_service(Spaceship.app_service.data_protection.complete)
-            when "unlessopen"
-              app.update_service(Spaceship.app_service.data_proection.unless_open)
-            when "untilfirstauth"
-              app.update_service(Spaceship.app_service.data_protection.until_first_auth)
-            else
-              raise "Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'".red
-            end
+          when "complete"
+            app.update_service(Spaceship.app_service.data_protection.complete)
+          when "unlessopen"
+            app.update_service(Spaceship.app_service.data_proection.unless_open)
+          when "untilfirstauth"
+            app.update_service(Spaceship.app_service.data_protection.until_first_auth)
+          else
+            raise "Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'".red
           end
         else
           app.update_service(Spaceship.app_service.data_protection.off)
@@ -175,7 +174,7 @@ module Produce
 
     def app
       return @app if @app
-      
+
       Helper.log.info "Starting login"
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
