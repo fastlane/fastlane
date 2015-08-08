@@ -16,7 +16,8 @@
   <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a>
+  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
+  <b>gym</b>
 </p>
 -------
 
@@ -50,7 +51,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # What's gym?
 
-`gym` builds and packages iOS apps for you. 
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+
+`gym` is a drop-in replacement for [shenzhen](https://github.com/nomad/shenzhen), which used deprecated APIs to build your application. 
 
 ### Before `gym`
 
@@ -67,8 +70,10 @@ xcodebuild -exportArchive \
 ### With `gym`
 
 ```
-gym -s BestAppEver
+gym
 ```
+
+### Why `gym`?
 
 `gym` uses the latest and best APIs to build and sign your application which results in much faster build times.
 
@@ -117,7 +122,8 @@ scheme "Example"
 
 sdk "9.0"
 
-output_directory "./build"
+output_directory "./build"    # store the ipa in this folder
+output_name "MyApp"           # the name of the ipa file
 ```
 
 # Tips
