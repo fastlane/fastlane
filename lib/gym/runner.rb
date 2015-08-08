@@ -5,6 +5,7 @@ module Gym
   class Runner
     # @return (String) The path to the resulting ipa
     def run
+      clear_old_files
       build_app
       verify_archive
       package_app
@@ -43,6 +44,12 @@ module Gym
     #####################################################
     # @!group The individual steps
     #####################################################
+
+    def clear_old_files
+      if File.exist? PackageCommandGenerator.ipa_path 
+        File.delete(PackageCommandGenerator.ipa_path)
+      end
+    end
 
     # Builds the app and prepares the archive
     def build_app
