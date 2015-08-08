@@ -22,9 +22,9 @@ module Gym
         current = c.to_s.dup
         next unless current.length > 0
 
-        if current.include? "-" and current.to_s.split(" ").count == 2
+        if current.include? "-" and current.to_s.split(" '").count == 2
           # That's a default parameter, like `-project Name`
-          current.split(" ")
+          current.split(" '")
         else
           current.gsub!("| ", "") # as the | will somehow break the terminal table
           [current, ""]
