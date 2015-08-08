@@ -1,3 +1,6 @@
+require 'thread'
+require 'open3'
+
 module Fastlane
   module Actions
     module SharedValues
@@ -97,13 +100,30 @@ module Fastlane
       result = ''
       unless Helper.test?
         exit_status = nil
-        status = IO.popen(command, err: [:child, :out]) do |io|
-          io.each do |line|
-            Helper.log.info ['[SHELL]', line.strip].join(': ')
-            result << line
+
+        Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
+          # Make sure no action can read from stdin (e.g. request input)
+          stdin.close_write
+
+          # Create a lock which is used below, so that our shell lines don't get interspersed
+          mutex = Mutex.new
+
+          # Capture both stdout and stderr in parallel
+          [stdout, stderr].each do |io|
+            Thread.new do
+              io.each do |line|
+                mutex.synchronize do
+                  Helper.log.info ['[SHELL]', line.strip].join(': ')
+                  result << line
+                end
+              end
+            end
           end
-          io.close
-          exit_status = $?.to_i
+
+          # Wait for all the streams to finish
+          wait_thr.join
+
+          exit_status = wait_thr.value
         end
 
         if exit_status != 0
