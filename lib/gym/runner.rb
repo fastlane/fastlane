@@ -23,7 +23,8 @@ module Gym
         next unless current.length > 0
 
         if current.include? "-" and current.to_s.split(" '").count == 2
-          # That's a default parameter, like `-project Name`
+          # That's a default parameter, like `-project 'Name'`
+          # We use " '" to not split by spaces within the value (e.g. path)
           current.split(" '")
         else
           current.gsub!("| ", "") # as the | will somehow break the terminal table
