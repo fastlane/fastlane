@@ -75,7 +75,10 @@ module Gym
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
                                      description: "The name of the resulting ipa file",
-                                     optional: true),
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       value.gsub!(".ipa", "")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",
