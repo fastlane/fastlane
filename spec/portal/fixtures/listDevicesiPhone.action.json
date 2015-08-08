@@ -11,7 +11,7 @@
   "isAgent": false,
   "pageNumber": 1,
   "pageSize": 100,
-  "totalRecords": 4,
+  "totalRecords": 3,
   "devices": [
     {
       "deviceId": "AAAAAAAAAA",
@@ -30,15 +30,6 @@
       "status": "c",
       "model": "iPhone 6",
       "deviceClass": "iphone"
-    },
-    {
-      "deviceId": "CCCCCCCCCC",
-      "name": "Personal iPhone",
-      "deviceNumber": "97467684eb8dfa3c6d272eac3890dab0d001c706",
-      "devicePlatform": "ios",
-      "status": "c",
-      "model": null,
-      "deviceClass": "ipod"
     },
     {
       "deviceId": "DDDDDDDDDD",

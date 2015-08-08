@@ -27,12 +27,28 @@ module Spaceship
       #   "c"
       attr_accessor :status
 
+      # @return (String) Model (can be nil)
+      # @example
+      #   'iPhone 6', 'iPhone 4 GSM'
+      attr_accessor :model
+
+      # @return (String) Device type
+      # @example
+      #   'pc'     - Apple TV
+      #   'watch'  - Apple Watch
+      #   'ipad'   - iPad
+      #   'iphone' - iPhone
+      #   'ipod'   - iPod
+      attr_accessor :device_type
+
       attr_mapping({
         'deviceId' => :id,
         'name' => :name,
         'deviceNumber' => :udid,
         'devicePlatform' => :platform,
-        'status' => :status
+        'status' => :status,
+        'deviceClass' => :device_type,
+        'model' => :model
       })
 
       class << self
@@ -45,6 +61,31 @@ module Spaceship
         # @return (Array) Returns all devices registered for this account
         def all
           client.devices.map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all Apple TVs registered for this account
+        def all_apple_tvs
+          client.devices_by_class('pc').map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all Watches registered for this account
+        def all_watches
+          client.devices_by_class('watch').map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all iPads registered for this account
+        def all_ipads
+          client.devices_by_class('ipad').map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all iPhones registered for this account
+        def all_iphones
+          client.devices_by_class('iphone').map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all iPods registered for this account
+        def all_ipod_touches
+          client.devices_by_class('ipod').map { |device| self.factory(device) }
         end
 
         # @return (Device) Find a device based on the ID of the device. *Attention*:

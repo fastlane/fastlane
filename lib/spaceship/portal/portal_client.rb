@@ -220,6 +220,19 @@ module Spaceship
       end
     end
 
+    def devices_by_class(deviceClass)
+      paging do |page_number|
+        r = request(:post, 'account/ios/device/listDevices.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
+          deviceClasses: deviceClass
+        })
+        parse_response(r, 'devices')
+      end
+    end
+
     def create_device!(device_name, device_id)
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
