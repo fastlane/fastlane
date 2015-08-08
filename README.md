@@ -58,12 +58,12 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 ### Before `gym`
 
 ```
-xcodebuild clean archive -archivePath build/BestAppEver \
-                         -scheme BestAppEver
+xcodebuild clean archive -archivePath build/MyApp \
+                         -scheme MyApp
 xcodebuild -exportArchive \
            -exportFormat ipa \
-           -archivePath "build/BestAppEver.xcarchive" \
-           -exportPath "build/BestAppEver.ipa" \
+           -archivePath "build/MyApp.xcarchive" \
+           -exportPath "build/MyApp.ipa" \
            -exportProvisioningProfile "ProvisioningProfileName" 
 ```
 
@@ -88,6 +88,7 @@ gym
 :bullettrain_side: | Don't remember any complicated build commands, just `gym`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :floppy_disk:   | Store common build settings in a `Gymfile` 
+:computer: | All archives are stored and accessible in the Xcode Organisier
 
 # Installation
 
