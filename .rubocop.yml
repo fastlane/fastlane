@@ -29,3 +29,7 @@ Lint/HandleExceptions:
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:
   Enabled: false
+
+# Needed for $verbose
+Style/GlobalVars:
+  Enabled: false

@@ -46,7 +46,7 @@ module Gym
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         command = "xcrun xcodebuild -showBuildSettings #{BuildCommandGenerator.project_path_array.join(' ')}"
-        Helper.log.info command.yellow
+        Helper.log.info command.yellow unless Gym.config[:silent]
         @build_settings = `#{command}`
       end
 
@@ -82,7 +82,7 @@ module Gym
       # all the CocoaPods schemes which we don't want here
       containing_path = File.expand_path("..", path)
       command = "xcrun xcodebuild -list"
-      Helper.log.info command.yellow
+      Helper.log.info command.yellow unless Gym.config[:silent]
 
       Dir.chdir(containing_path) do
         @raw = `#{command}`

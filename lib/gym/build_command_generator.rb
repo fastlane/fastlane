@@ -14,7 +14,7 @@ module Gym
       end
 
       def prefix
-        ["set -o pipefail && "]
+        ["set -o pipefail &&"]
       end
 
       # Path to the project or workspace as parameter

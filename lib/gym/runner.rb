@@ -3,6 +3,7 @@ require 'open3'
 
 module Gym
   class Runner
+    # @return (String) The path to the resulting ipa
     def run
       build_app
       verify_archive
@@ -46,17 +47,13 @@ module Gym
     # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
-      print_command(command, "Generated Build Command")
+      print_command(command, "Generated Build Command") if $verbose
       execute_command(command: command, print_all: true, error: proc do |output|
         ErrorHandler.handle_build_error(output)
       end)
 
-      puts Terminal::Table.new(
-        title: "Successfully generated archive".green,
-        rows: [
-          ["Archive", BuildCommandGenerator.archive_path]
-        ]
-      )
+      Helper.log.info("Successfully stored the archive. You can find it in the Xcode Organizer.".green)
+      Helper.log.info("Stored the archive in: ".green + BuildCommandGenerator.archive_path) if $verbose
     end
 
     # Makes sure the archive is there and valid
@@ -68,22 +65,15 @@ module Gym
 
     def package_app
       command = PackageCommandGenerator.generate
-      print_command(command, "Generated Package Command")
+      print_command(command, "Generated Package Command") if $verbose
 
       execute_command(command: command, print_all: false, error: proc do |output|
         ErrorHandler.handle_package_error(output)
       end)
-
-      rows = []
-      rows << ["ipa", PackageCommandGenerator.ipa_path]
-      rows << ["dSYM", PackageCommandGenerator.dsym_path] if PackageCommandGenerator.dsym_path
-      puts Terminal::Table.new(
-        title: "Successfully exported binary".green,
-        rows: rows
-      )
     end
 
     # Moves over the binary and dsym file to the output directory
+    # @return (String) The path to the resulting ipa file
     def move_results
       require 'fileutils'
 
@@ -91,14 +81,26 @@ module Gym
 
       if PackageCommandGenerator.dsym_path
         # Compress and move the dsym file
-        # FileUtils.mv(PackageCommandGenerator.dsym_path, Gym.config[:output_directory], force: true)
-
         containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
         file_name = File.basename(PackageCommandGenerator.dsym_path)
 
-        output = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-        puts `cd '#{containing_directory}' && zip -r '#{output}' '#{file_name}'`
+        output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
+        command = "cd '#{containing_directory}' && zip -r '#{output_path}' '#{file_name}'"
+        Helper.log.info command.yellow unless Gym.config[:silent]
+        command_result = `#{command}`
+        Helper.log.info command_result if $verbose
+
+        puts "" # new line
+
+        Helper.log.info "Successfully exported and compressed dSYM file: ".green
+        Helper.log.info File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.dsym_path))
       end
+
+      ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
+
+      Helper.log.info "Successfully exported and signed ipa file:".green
+      Helper.log.info ipa_path
+      ipa_path
     end
 
     #####################################################
@@ -111,10 +113,13 @@ module Gym
     # @param error [Block] A block that's called if an error occurs
     # @return [String] All the output as string
     def execute_command(command: nil, print_all: false, error: nil)
-      output = []
+      print_all = true if $verbose
 
+      output = []
       command = command.join(" ")
-      Helper.log.info command.yellow.strip
+      Helper.log.info command.yellow.strip unless Gym.config[:silent]
+
+      puts "\n-----\n".cyan if print_all
 
       last_length = 0
       begin
@@ -127,10 +132,11 @@ module Gym
 
             current_length = line.length
             spaces = [last_length - current_length, 0].max
-            print(line + " " * spaces + "\r")
+            print((line + " " * spaces + "\r").cyan)
             last_length = current_length
           end
           Process.wait(pid)
+          puts "-----\n".cyan if print_all
         end
       rescue => ex
         # This could happen when the environment is wrong:

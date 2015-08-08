@@ -12,7 +12,7 @@ describe Gym do
 
       result = Gym::BuildCommandGenerator.generate
       expect(result).to eq([
-        "set -o pipefail && ",
+        "set -o pipefail &&",
         "xcodebuild",
         "-scheme 'Example'",
         "-project './example/standard/Example.xcodeproj'",
@@ -33,7 +33,7 @@ describe Gym do
       it "uses the correct build command with the example project with no additional parameters" do
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
-          "set -o pipefail && ",
+          "set -o pipefail &&",
           "xcodebuild",
           "-scheme 'Example'",
           "-project './example/standard/Example.xcodeproj'",
