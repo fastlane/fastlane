@@ -594,6 +594,21 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
+### add_icon_overlay
+
+This action will apply an overlay on your app icons and overwrite them. This will only look for PNG images.
+
+By default, it'll try to find an asset catalog entry named "AppIcon.appiconset", but you can change it.
+
+```ruby
+add_icon_overlay(overlay_image_path: 'star.png')
+
+add_icon_overlay(
+  overlay_image_path: 'star.png',
+  appiconset_path: 'MyApp/Resources/Images.xcassets/Icon.appiconset'
+)
+```
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
