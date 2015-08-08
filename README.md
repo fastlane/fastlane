@@ -69,6 +69,19 @@ Advantages of `gym` compared to `shenzhen` and plain `xcodebuild`
 - `gym` actively helps you resolve common issues like problems with Code Signing, wrongly configured projects and more
 - Automatic verification of inputs, like the available schemes or project files
 
+----- 
+
+              |  Gym Features
+--------------------------|------------------------------------------------------------
+:rocket:            | `gym` builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
+:checkered_flag: | Beautiful inline build output
+:book:     | Helps you resolving common build errors like code signing issues
+:link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+:open_file_folder: | Automatically generates an `ipa` and a compressed `dSYM` file
+:bullettrain_side: | Don't remember any complicated build commands, just `gym`
+:wrench:  | Easy and dynamic configuration using parameters and environment variables
+:floppy_disk:   | Store common build settings in a `Gymfile` 
+
 # Installation
 
 This tool is still work in progress. You can already try it by cloning the repo and running
