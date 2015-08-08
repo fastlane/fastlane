@@ -15,6 +15,7 @@ module Gym
       end
 
       Gym.project = Project.new(config)
+      detect_provisioning_profile
 
       # Go into the project's folder
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
@@ -28,6 +29,31 @@ module Gym
       return config
     end
 
+    def self.detect_provisioning_profile
+      unless Gym.config[:provisioning_profile_path]
+        Dir.chdir(File.expand_path("..", Gym.project.path)) do
+          profiles = Dir["*.mobileprovision"]
+          if profiles.count == 1
+            profile = File.expand_path(profiles.last)
+          elsif profiles.count > 1
+            puts "Found more than one provisioning profile in the project directory:"
+            profile = choose(*(profiles))
+          end
+
+          Gym.config[:provisioning_profile_path] = profile
+        end
+      end
+
+      if Gym.config[:provisioning_profile_path]
+        FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
+        data = FastlaneCore::ProvisioningProfile.parse(Gym.config[:provisioning_profile_path])
+
+        if data['Name']
+          Helper.log.info "Using provisioning profile with name '#{data['Name']}'...".green if $verbose
+          Gym.config[:provisioning_profile_name] = data['Name']
+        end
+      end
+    end
     def self.choose_project
       loop do
         path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip

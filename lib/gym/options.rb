@@ -52,11 +52,19 @@ module Gym
                                        raise "Project file invalid".red unless File.directory?(value.to_s)
                                        raise "Project file is not a project file, must end with .xcodeproj".red unless value.include?(".xcodeproj")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
+                                     short_option: "-h",
+                                     env_name: "GYM_PROVISIONING_PROFILE_PATH",
+                                     description: "The path to the provisioning profile",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                      raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
                                      env_name: "GYM_SCHEME",
-                                     description: "The project scheme. Make sure it's marked as `Shared`"),
+                                     description: "The project's scheme. Make sure it's marked as `Shared`"),
         FastlaneCore::ConfigItem.new(key: :clean,
                                      short_option: "-c",
                                      env_name: "GYM_CLEAN",
@@ -69,7 +77,7 @@ module Gym
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: ".",
                                      verify_block: proc do |value|
-                                       raise "Directory not found at path '#{File.expand_path(value)}'" unless File.directory?(value)
+                                       raise "Directory not found at path '#{File.expand_path(value)}'".red unless File.directory?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
@@ -98,7 +106,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_name,
                                      short_option: "-l",
                                      env_name: "GYM_PROVISIONING_PROFILE_NAME",
-                                     description: "The name of the provisioning profile to use. It has to match the name exactly. You usually don't need this!",
+                                     description: "The name of the provisioning profile to use. It has to match the name exactly",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :codesigning_identity,
                                      short_option: "-i",
