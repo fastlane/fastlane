@@ -37,7 +37,7 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "http://stackoverflow.com/a/17031697/445598"
         end
-        raise "Error building the application - see the log above"
+        raise "Error building the application - see the log above".red
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -66,7 +66,7 @@ module Gym
           print "Run cert and sigh before gym to make sure to have all signing resources ready"
         end
 
-        raise "Error packaging up the application"
+        raise "Error packaging up the application".red
       end
 
       def handle_empty_archive

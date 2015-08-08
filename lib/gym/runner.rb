@@ -119,7 +119,7 @@ module Gym
       command = command.join(" ")
       Helper.log.info command.yellow.strip unless Gym.config[:silent]
 
-      puts "\n-----\n".cyan if print_all
+      puts "\n-----".cyan if print_all
 
       last_length = 0
       begin
