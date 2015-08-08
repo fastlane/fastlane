@@ -1,0 +1,4 @@
+language: ruby
+osx_image: xcode6.4
+script:
+- bundle exec rspec
