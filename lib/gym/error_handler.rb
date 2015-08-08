@@ -81,6 +81,18 @@ module Gym
         raise "Archive invalid"
       end
 
+      # This method is called to check if there was an error with the execution
+      # That's used since Apple's command line tools sometimes don't return the 
+      # correct return code
+      def is_error?(output)
+        case output
+        when /Codesign check fails/
+          return true
+        end
+
+        false
+      end
+
       private
 
       # Just to make things easier

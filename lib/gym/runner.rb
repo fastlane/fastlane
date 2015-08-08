@@ -156,7 +156,7 @@ module Gym
 
       # Exit status for build command, should be 0 if build succeeded
       # Disabled Rubocop, since $CHILD_STATUS just is not the same
-      if $?.exitstatus != 0 # rubocop:disable Style/SpecialGlobalVars
+      if $?.exitstatus != 0 || ErrorHandler.is_error?(output.join("\n")) # rubocop:disable Style/SpecialGlobalVars
         o = output.join("\n")
         puts o # the user has the right to see the raw output
         error.call(o)
