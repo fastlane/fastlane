@@ -10,8 +10,7 @@ module Fastlane
       def self.run(params)
         archive = params[:archive_path]
         params[:dsym_path] ||= File.join("#{File.basename(archive, '.*')}.app.dSYM.zip")
-        params[:all] ||= false
-
+        
         dsym_folder_path = File.expand_path(File.join(archive, 'dSYMs'))
         zipped_dsym_path = File.expand_path(params[:dsym_path])
 
