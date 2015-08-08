@@ -1,4 +1,8 @@
 language: ruby
 osx_image: xcode6.4
-script:
-- bundle exec rspec
+before_install: gem update --system
+rvm:
+  - 2.0.0
+  - 2.1.6
+  - 2.2.2
+script: bundle exec fastlane test
