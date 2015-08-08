@@ -8,7 +8,7 @@ module Produce
 
       ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
 
-      group_identifier = ask("Group identifier:") unless options.group_identifier
+      group_identifier = options.group_identifier || ask("Group identifier: ")
 
       if app_group_exists? group_identifier
         Helper.log.info "[DevCenter] Group '#{options.group_name} (#{options.group_identifier})' already exists, nothing to do on the Dev Center".green
@@ -22,10 +22,10 @@ module Produce
           group_name = valid_name_for(options.group_name)
         end
 
-        Helper.log.info "Creating new app group '#{group_name}' on the Apple Dev Center".green
+        Helper.log.info "Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center".green
 
         group = Spaceship.app_group.create!(group_id: group_identifier,
-                                          name: group_name)
+                                            name: group_name)
 
         Helper.log.info "Created group #{group.app_group_id}"
 
