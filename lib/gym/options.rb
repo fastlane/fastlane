@@ -6,36 +6,17 @@ module Gym
     def self.available_options
       return @options if @options
 
-      workspace = Dir["./*.xcworkspace"]
-      if workspace.count > 1
-        puts "Select Workspace: "
-        workspace = choose(*(workspace))
-      else
-        workspace = workspace.first # this will result in nil if no files were found
-      end
-
-      unless workspace
-        project = Dir["./*.xcodeproj"]
-        if project.count > 1
-          puts "Select Project: "
-          project = choose(*(project))
-        else
-          project = project.first # this will result in nil if no files were found
-        end
-      end
-
-      @options ||= plain_options(project: project, workspace: workspace)
+      @options = plain_options
     end
 
     # rubocop:disable Metrics/MethodLength
-    def self.plain_options(project: nil, workspace: nil)
+    def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      env_name: "GYM_WORKSPACE",
                                      optional: true,
                                      description: "Path the workspace file",
-                                     default_value: workspace,
                                      verify_block: proc do |value|
                                        raise "Workspace file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
                                        raise "Workspace file invalid".red unless File.directory?(value.to_s)
@@ -46,7 +27,6 @@ module Gym
                                      optional: true,
                                      env_name: "GYM_PROJECT",
                                      description: "Path the project file",
-                                     default_value: project,
                                      verify_block: proc do |value|
                                        raise "Project file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
                                        raise "Project file invalid".red unless File.directory?(value.to_s)

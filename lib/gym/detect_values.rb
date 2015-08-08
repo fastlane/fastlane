@@ -6,9 +6,7 @@ module Gym
     def self.set_additional_default_values
       config = Gym.config
 
-      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
-        choose_project
-      end
+      detect_projects
 
       if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
         raise "You can only pass either a workspace or a project path, not both".red
@@ -28,6 +26,8 @@ module Gym
 
       return config
     end
+
+    # Helper Methods
 
     def self.detect_provisioning_profile
       unless Gym.config[:provisioning_profile_path]
@@ -54,6 +54,29 @@ module Gym
         end
       end
     end
+
+    def self.detect_projects
+      if Gym.config[:workspace].to_s.length == 0
+        workspace = Dir["./*.xcworkspace"]
+        if workspace.count > 1
+          puts "Select Workspace: "
+          Gym.config[:workspace] = choose(*(workspace))
+        else
+          Gym.config[:workspace] = workspace.first # this will result in nil if no files were found
+        end
+      end
+
+      if Gym.config[:workspace].to_s.length == 0 and Gym.config[:project].to_s.length == 0
+        project = Dir["./*.xcodeproj"]
+        if project.count > 1
+          puts "Select Project: "
+          Gym.config[:project] = choose(*(project))
+        else
+          Gym.config[:project] = project.first # this will result in nil if no files were found
+        end
+      end
+    end
+
     def self.choose_project
       loop do
         path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
@@ -72,8 +95,6 @@ module Gym
         end
       end
     end
-
-    # Helper Methods
 
     def self.detect_scheme
       config = Gym.config
