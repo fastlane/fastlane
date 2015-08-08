@@ -37,11 +37,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
+    <a href="#whats-gym">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#resign">Resign</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
@@ -52,32 +50,36 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # What's gym?
 
-`gym` is a drop-in replacement for [shenzhen](https://github.com/nomad/shenzhen), a tool for building your iOS apps.
+`gym` builds and packages iOS apps for you. 
 
-[shenzhen](https://github.com/nomad/shenzhen) does both building and distributing iOS apps. Since we now all use [fastlane](https://fastlane.tools) for distributing it makes sense to have *one* tool dedicated for building your app. 
+### Before `gym`
 
-`gym` uses the latest and best APIs to build and sign your application which results in much faster build times compared to `shenzhen`
+```
+xcodebuild clean archive -archivePath build/BestAppEver \
+                         -scheme BestAppEver
+xcodebuild -exportArchive \
+           -exportFormat ipa \
+           -archivePath "build/BestAppEver.xcarchive" \
+           -exportPath "build/BestAppEver.ipa" \
+           -exportProvisioningProfile "ProvisioningProfileName" 
+```
 
-Advantages of `gym` compared to `shenzhen` and plain `xcodebuild`
+### With `gym`
 
-- Around 30% faster build times
-- Beautiful inline build output
-- Easy and dynamic configuration using parameters, environment variables, manual inputs or using a `Gymfile`
-- Built-in right into `fastlane`
-- Generate both an `ipa` and a compressed `dSYM` file
-- Manually trigger a build by only running `gym`, never remember any complicated `xcodebuild` commands again
-- `gym` actively helps you resolve common issues like problems with Code Signing, wrongly configured projects and more
-- Automatic verification of inputs, like the available schemes or project files
+```
+gym -s BestAppEver
+```
 
------ 
+`gym` uses the latest and best APIs to build and sign your application which results in much faster build times.
 
               |  Gym Features
 --------------------------|------------------------------------------------------------
 :rocket:            | `gym` builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 :checkered_flag: | Beautiful inline build output
 :book:     | Helps you resolving common build errors like code signing issues
+:mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
-:open_file_folder: | Automatically generates an `ipa` and a compressed `dSYM` file
+:package: | Automatically generates an `ipa` and a compressed `dSYM` file
 :bullettrain_side: | Don't remember any complicated build commands, just `gym`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :floppy_disk:   | Store common build settings in a `Gymfile` 
