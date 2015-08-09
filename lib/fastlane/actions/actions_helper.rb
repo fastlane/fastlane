@@ -102,8 +102,8 @@ module Fastlane
         begin
           PTY.spawn(command) do |r, w, pid|
             begin
-              r.each do |line|
-                Helper.log.info ['[SHELL]', line.strip].join(': ')
+              r.each_line do |line|
+                Helper.log << line
                 result << line
               end
             rescue Errno::EIO
