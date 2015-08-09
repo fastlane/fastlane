@@ -14,7 +14,7 @@ module Fastlane
         dsym_folder_path = File.expand_path(File.join(archive, 'dSYMs'))
         zipped_dsym_path = File.expand_path(params[:dsym_path])
 
-        Actions.lane_context[SharedValues::DSYM_ZIP_PATH] = zipped_dsym_path
+        Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = zipped_dsym_path
 
         if params[:all]
           Actions.sh(%Q[cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "#{dsym_folder_path}"/*.dSYM])
