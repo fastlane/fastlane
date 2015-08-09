@@ -109,7 +109,7 @@ module Fastlane
             rescue Errno::EIO
             end
           end
-          exit_status = 0
+          exit_status = $?.to_i
         rescue PTY::ChildExited => e
           exit_status = e.status.to_i
         end
