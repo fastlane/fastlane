@@ -3,17 +3,8 @@ module Fastlane
     class CocoapodsAction < Action
       def self.run(params)
         cmd = []
-        
-        if File.exists?('Gemfile')
-          cmd = ['bundle install']
 
-          cmd << '--verbose' if params[:verbose]
-
-          Actions.sh(cmd.join(' '))
-
-          cmd = ['bundle exec']
-        end
-
+        cmd << ['bundle exec'] if File.exists?('Gemfile')
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
