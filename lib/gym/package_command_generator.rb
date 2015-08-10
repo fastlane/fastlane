@@ -5,7 +5,7 @@ module Gym
   class PackageCommandGenerator
     class << self
       def generate
-        parts = ["/usr/bin/xcrun PackageApplication -v"]
+        parts = ["/usr/bin/xcrun PackageApplication -sdk iphoneos -v"]
         parts += options
         parts += pipe
 
@@ -15,7 +15,7 @@ module Gym
       def options
         options = []
 
-        options << "#{BuildCommandGenerator.archive_path}/Products/Applications/#{app_file_name}"
+        options << "#{app_file_name}"
         options << "-o"
         options << "#{ipa_path}"
 
