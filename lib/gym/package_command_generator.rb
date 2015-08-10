@@ -15,9 +15,9 @@ module Gym
       def options
         options = []
 
-        options << "#{app_file_name}"
+        options << "'#{app_file_name}'"
         options << "-o"
-        options << "#{ipa_path}"
+        options << "'#{ipa_path}'"
 
         if Gym.config[:provisioning_profile_name]
           options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
