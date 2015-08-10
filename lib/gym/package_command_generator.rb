@@ -5,7 +5,7 @@ module Gym
   class PackageCommandGenerator
     class << self
       def generate
-        parts = ["/usr/bin/xcrun PackageApplication -sdk iphoneos -v"]
+        parts = ["/usr/bin/xcrun -sdk iphoneos PackageApplication -v"]
         parts += options
         parts += pipe
 
