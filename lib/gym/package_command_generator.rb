@@ -1,9 +1,11 @@
 module Gym
   # Responsible for building the fully working xcodebuild command
+  #
+  # See: http://stackoverflow.com/a/23683125
   class PackageCommandGenerator
     class << self
       def generate
-        parts = ["xcodebuild -exportArchive"]
+        parts = ["/usr/bin/xcrun PackageApplication -v"]
         parts += options
         parts += pipe
 
@@ -13,16 +15,16 @@ module Gym
       def options
         options = []
 
-        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
-        options << "exportFormat ipa"
-        options << "-exportPath '#{ipa_path}'"
+        options << "#{BuildCommandGenerator.archive_path}/Products/Applications/#{app_file_name}"
+        options << "-o"
+        options << "#{ipa_path}"
 
         if Gym.config[:provisioning_profile_name]
-          options << "-exportProvisioningProfile '#{Gym.config[:provisioning_profile_name]}'"
+          options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
         end
 
         if Gym.config[:codesigning_identity]
-          options << "-exportSigningIdentity '#{Gym.config[:codesigning_identity]}'"
+          options << "--sign '#{Gym.config[:codesigning_identity]}'"
         end
 
         options
@@ -30,6 +32,11 @@ module Gym
 
       def pipe
         [""]
+      end
+
+      # The app file name defined in the `Products/Applications` path.
+      def app_file_name
+        Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").first
       end
 
       # We export it to the temporary folder and move it over to the actual output once it's finished and valid
