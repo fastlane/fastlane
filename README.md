@@ -33,7 +33,7 @@ gym
 [![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
 [![Build Status](https://img.shields.io/travis/fastlane/gym/master.svg?style=flat)](https://travis-ci.org/fastlane/gym)
 
-###### Build your iOS app the right way
+###### Building your app has never been easier
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -76,7 +76,7 @@ gym
 
 ### Why `gym`?
 
-`gym` uses the latest and best APIs to build and sign your application which results in much faster build times.
+`gym` uses the latest APIs to build and sign your application which results in much faster build times.
 
               |  Gym Features
 --------------------------|------------------------------------------------------------
@@ -101,7 +101,7 @@ gym
 
 This tool is still work in progress. You can already try it by cloning the repo and running
 
-    sudo bundle install && sudo rake install
+    sudo gem install gym
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -123,7 +123,7 @@ For a list of all available parameters use
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
 
-Run `gym init` to create a new configuration file which may contain data like this:
+Run `gym init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
@@ -136,11 +136,12 @@ output_name "MyApp"           # the name of the ipa file
 
 # How does it work?
 
-`gym` uses the latest APIs to build and sign your application. The 2 main components are `xcodebuild` and [xcpretty](https://github.com/supermarin/xcpretty).
+`gym` uses the latest APIs to build and sign your application. The 2 main components are 
+
+- `xcodebuild` 
+- [xcpretty](https://github.com/supermarin/xcpretty)
 
 When you run `gym` without the `--silent` mode it will print out every command it executes.
-
-First, `gym` will verify your parameters and make sure the project and its schemes are valid.
 
 To build the archive `gym` uses the following command:
 
