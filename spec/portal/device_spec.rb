@@ -51,11 +51,9 @@ describe Spaceship::Device do
       end.to raise_error "The device UDID 'e5814abb3b1d92087d48b64f375d8e7694932c39' already exists on this team."
     end
 
-    it "raises an exception if the device name is already registererd" do
-      expect do
-        # "Personal iPhone" is already taken
-        device = Spaceship::Device.create!(name: "Personal iPhone", udid: "asdfasdf")
-      end.to raise_error "The device name 'Personal iPhone' already exists on this team, use different one."
+    it "doesn't raise an exception if the device name is already registererd" do
+      expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c").and_return({})
+      device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
     end
   end
 end

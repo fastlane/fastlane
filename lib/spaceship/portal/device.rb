@@ -86,10 +86,7 @@ module Spaceship
             raise "The device UDID '#{udid}' already exists on this team."
           end
 
-          # Find the device by name, raise an exception if it already exists
-          if self.find_by_name(name)
-            raise "The device name '#{name}' already exists on this team, use different one."
-          end
+          # It is valid to have the same name for multiple devices
 
           device = client.create_device!(name, udid)
 
