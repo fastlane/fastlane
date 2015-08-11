@@ -171,6 +171,8 @@ module Fastlane
       end
       
       raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
+      
+      collector.did_launch_action(:import)
       parse(File.read(path))
 
       # Check if we can also import local actions which are in the same directory as the Fastfile
@@ -184,6 +186,7 @@ module Fastlane
       raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
+        collector.did_launch_action(:import_from_git)
 
         # Checkout the repo
         repo_name = url.split("/").last
