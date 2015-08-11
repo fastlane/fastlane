@@ -59,6 +59,16 @@ module Spaceship
         raise "`client` must be implemented in subclasses"
       end
 
+
+
+
+
+
+
+
+
+
+
       ##
       # Sets client and returns self for chaining.
       # @return (Spaceship::Base)
