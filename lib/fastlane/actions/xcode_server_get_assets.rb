@@ -37,7 +37,7 @@ module Fastlane
 
         # match the bot name with a found bot, otherwise fail
         found_bots = bots.select { |bot| bot['name'] == bot_name }
-        raise "Failed to find a Bot with name #{bot_name} on server #{host}".red if found_bots.count == 0
+        raise "Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}".red if found_bots.count == 0
 
         bot = found_bots[0]
 
@@ -45,12 +45,12 @@ module Fastlane
 
         # we have our bot, get finished integrations, sorted from newest to oldest
         integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
-        raise "Failed to find any completed integration for Bot \"#{bot_name}\"".red if !integrations || integrations.count == 0
+        raise "Failed to find any completed integration for Bot \"#{bot_name}\"".red if (integrations || []).count == 0
         
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override
           integration = integrations.select { |i| i['number'] == integration_number_override }.first
-          raise "Specified integration number #{integration_number_override} does not exist.".red if !integration
+          raise "Specified integration number #{integration_number_override} does not exist.".red unless integration
         else
           integration = integrations.first
         end
@@ -61,7 +61,7 @@ module Fastlane
 
         # fetch assets for this integration
         assets_path = xcs.fetch_assets(integration['_id'], target_folder, self)
-        raise "Failed to fetch assets for integration #{ integration['number'] }." if !assets_path
+        raise "Failed to fetch assets for integration #{integration['number']}." unless assets_path
 
         asset_entries = Dir.entries(assets_path).map { |i| File.join(assets_path, i) }
 
@@ -163,7 +163,7 @@ module Fastlane
             # rename the folder in out_folder to asset_foldername
             found_folder = Dir.entries(out_folder).select { |item| item != '.' && item != '..' }[0]
 
-            raise "Internal error, couldn't find unzipped folder".red if found_folder == nil
+            raise "Internal error, couldn't find unzipped folder".red if found_folder.nil?
 
             unzipped_folder_temp_name = File.join(out_folder, found_folder)
             unzipped_folder = File.join(out_folder, asset_foldername)
@@ -187,8 +187,8 @@ module Fastlane
         def headers
           require 'base64'
           headers = { 
-            'User-Agent' => 'fastlane-xcode_server_get_assets', #XCS wants user agent. for some API calls. not for others. sigh.
-            'X-XCSAPIVersion' => 1 #using XCS API version 3, Xcode needs this otherwise it explodes in a 500 error fire
+            'User-Agent' => 'fastlane-xcode_server_get_assets', # XCS wants user agent. for some API calls. not for others. sigh.
+            'X-XCSAPIVersion' => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
           }
 
           if @username && @password 
