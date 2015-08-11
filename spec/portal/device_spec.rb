@@ -4,15 +4,43 @@ describe Spaceship::Device do
   before { Spaceship.login }
   let(:client) { Spaceship::Device.client }
 
-  subject { Spaceship::Device.all }
+  subject(:all_devices) { Spaceship::Device.all }
   it "successfully loads and parses all devices" do
-    expect(subject.count).to eq(4)
-    device = subject.first
+    expect(all_devices.count).to eq(4)
+    device = all_devices.first
     expect(device.id).to eq('AAAAAAAAAA')
     expect(device.name).to eq('Felix\'s iPhone')
     expect(device.udid).to eq('a03b816861e89fac0a4da5884cb9d2f01bd5641e')
     expect(device.platform).to eq('ios')
     expect(device.status).to eq('c')
+    expect(device.model).to eq('iPhone 5 (Model A1428)')
+    expect(device.device_type).to eq('iphone')
+  end
+
+  subject(:all_phones) { Spaceship::Device.all_iphones }
+  it "successfully loads and parses all iPhones" do
+    expect(all_phones.count).to eq(3)
+    device = all_phones.first
+    expect(device.id).to eq('AAAAAAAAAA')
+    expect(device.name).to eq('Felix\'s iPhone')
+    expect(device.udid).to eq('a03b816861e89fac0a4da5884cb9d2f01bd5641e')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('c')
+    expect(device.model).to eq('iPhone 5 (Model A1428)')
+    expect(device.device_type).to eq('iphone')
+  end
+
+  subject(:all_ipods) { Spaceship::Device.all_ipod_touches }
+  it "successfully loads and parses all iPods" do
+    expect(all_ipods.count).to eq(1)
+    device = all_ipods.first
+    expect(device.id).to eq('CCCCCCCCCC')
+    expect(device.name).to eq('Personal iPhone')
+    expect(device.udid).to eq('97467684eb8dfa3c6d272eac3890dab0d001c706')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('c')
+    expect(device.model).to eq(nil)
+    expect(device.device_type).to eq('ipod')
   end
 
   it "inspect works" do
