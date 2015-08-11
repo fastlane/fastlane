@@ -224,7 +224,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Downloads Xcode Bot assets like the `.xcarchive` and logs."
+        "Downloads Xcode Bot assets like the `.xcarchive` and logs"
       end
 
       def self.details
@@ -232,7 +232,7 @@ module Fastlane
           using Xcode 6 and 7. By default this action downloads all assets, unzips them and
           deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded
           assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded
-          assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it."
+          assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it"
       end
 
       def self.available_options        
@@ -282,10 +282,8 @@ module Fastlane
 
       def self.output
         [
-          [
-            'XCODE_SERVER_GET_ASSETS_PATH', 'Absolute path to the downloaded assets folder',
-            'XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH', 'Absolute path to the downloaded xcarchive file'
-          ]
+          ['XCODE_SERVER_GET_ASSETS_PATH', 'Absolute path to the downloaded assets folder'],
+          ['XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH', 'Absolute path to the downloaded xcarchive file']
         ]
       end
 
