@@ -4,3 +4,4 @@ rvm:
   - 2.0.0
   - 2.1.6
   - 2.2.2
+script: bundle exec fastlane test
