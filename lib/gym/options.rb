@@ -92,7 +92,12 @@ module Gym
                                      short_option: "-i",
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. You usually don't need this! e.g. 'iPhone Distribution: SunApps GmbH'",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :destination,
+                                     short_option: "-d",
+                                     env_name: "GYM_DESTINATION",
+                                     description: "Use a custom destination for building the app",
+                                     default_value: "generic/platform=iOS")
 
       ]
     end
