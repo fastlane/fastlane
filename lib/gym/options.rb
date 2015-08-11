@@ -38,7 +38,7 @@ module Gym
                                      description: "The path to the provisioning profile",
                                      optional: true,
                                      verify_block: proc do |value|
-                                      raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                       raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
@@ -92,7 +92,12 @@ module Gym
                                      short_option: "-i",
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. You usually don't need this! e.g. 'iPhone Distribution: SunApps GmbH'",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :destination,
+                                     short_option: "-d",
+                                     env_name: "GYM_DESTINATION",
+                                     description: "Use a custom destination for building the app",
+                                     default_value: "generic/platform=iOS")
 
       ]
     end

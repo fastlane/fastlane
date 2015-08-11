@@ -18,6 +18,7 @@ describe Gym do
         "-project './example/standard/Example.xcodeproj'",
         "-configuration 'Release'",
         "-sdk '9.0'",
+        "-destination 'generic/platform=iOS'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         :archive,
         "| xcpretty"
@@ -38,6 +39,7 @@ describe Gym do
           "-scheme 'Example'",
           "-project './example/standard/Example.xcodeproj'",
           "-configuration 'Release'",
+          "-destination 'generic/platform=iOS'",
           "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
           :archive,
           "| xcpretty"
