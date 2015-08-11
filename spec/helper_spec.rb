@@ -21,13 +21,14 @@ describe FastlaneCore do
     # Mac OS only (to work on Linux)
     if FastlaneCore::Helper.is_mac?
       describe "Xcode Paths" do
+        # Those tests also work when using a beta version of Xcode
         it "#xcode_path" do
           expect(FastlaneCore::Helper.xcode_path[-1]).to eq('/')
-          expect(FastlaneCore::Helper.xcode_path).to eq("/Applications/Xcode.app/Contents/Developer/")
+          expect(FastlaneCore::Helper.xcode_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/})
         end
 
         it "#transporter_path" do
-          expect(FastlaneCore::Helper.transporter_path).to eq("/Applications/Xcode.app/Contents/Developer/../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter")
+          expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/\.\./Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter})
         end
       end
     end
