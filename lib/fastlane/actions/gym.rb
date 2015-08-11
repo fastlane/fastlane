@@ -12,9 +12,9 @@ module Fastlane
         begin
           # FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          Sigh.config = values # we alread have the finished config
+          Gym.config = values # we alread have the finished config
 
-          path = Sigh::Manager.start
+          path = Gym::Manager.new.work
           dsym_path = path.gsub(".ipa", ".app.dSYM.zip")
 
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = path # absolute path
@@ -22,7 +22,7 @@ module Fastlane
 
           return path
         ensure
-          # FastlaneCore::UpdateChecker.show_update_status('gym', Sigh::VERSION)
+          # FastlaneCore::UpdateChecker.show_update_status('gym', Gym::VERSION)
         end
       end
 
