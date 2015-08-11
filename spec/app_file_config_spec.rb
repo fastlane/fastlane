@@ -146,5 +146,13 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:team_id]).to eq('Q2CBPJ58AA')
       end
     end
+
+    describe "Appfile7" do
+      it "supports the old syntax too" do
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+        ENV["FASTLANE_LANE_NAME"] = :beta.to_s
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile7').data[:app_identifier]).to eq('abc.xyz')
+      end
+    end
   end
 end
