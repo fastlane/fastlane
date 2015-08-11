@@ -88,10 +88,10 @@ module Gym
       # That's used since Apple's command line tools sometimes don't return the
       # correct return code
       def error?(output)
-        case output
-        when /Codesign check fails/
-          return true
-        end
+        # case output
+        # when /Codesign check fails/
+        #   return true
+        # end
 
         false
       end

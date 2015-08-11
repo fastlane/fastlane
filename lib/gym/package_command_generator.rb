@@ -3,7 +3,7 @@ module Gym
   class PackageCommandGenerator
     class << self
       def generate
-        parts = ["xcodebuild -exportArchive"]
+        parts = ["/usr/bin/xcrun -sdk iphoneos PackageApplication -v"]
         parts += options
         parts += pipe
 
@@ -13,21 +13,16 @@ module Gym
       def options
         options = []
 
-        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
+        options << "'#{appfile_path}'"
+        options << "-o '#{ipa_path}'"
         options << "exportFormat ipa"
-        options << "-exportPath '#{ipa_path}'"
 
-        if Gym.config[:codesigning_identity] or Gym.config[:codesigning_identity]
-          if Gym.config[:provisioning_profile_name]
-            options << "-exportProvisioningProfile '#{Gym.config[:provisioning_profile_name]}'"
-          end
-          
-          if Gym.config[:codesigning_identity]
-            options << "-exportSigningIdentity '#{Gym.config[:codesigning_identity]}'"
-          end
-        else
-          # Default use case
-          options << "-exportWithOriginalSigningIdentity"
+        if Gym.config[:provisioning_profile_name]
+          options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
+        end
+        
+        if Gym.config[:codesigning_identity]
+          options << "--sign '#{Gym.config[:codesigning_identity]}'"
         end
 
         options
@@ -35,6 +30,10 @@ module Gym
 
       def pipe
         [""]
+      end
+
+      def appfile_path
+        Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").first
       end
 
       # We export it to the temporary folder and move it over to the actual output once it's finished and valid

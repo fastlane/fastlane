@@ -48,19 +48,6 @@ module Gym
         end
       end
 
-      if Gym.config[:provisioning_profile_path].to_s.length == 0 and !Helper.is_test?
-        [
-          "Could not automatically find provisioning profile to use",
-          "Please either put the provisioning profile in the project directory",
-          "or pass the path via the `provisioning_profile_path` option",
-          "Additionally you can pass the name of the profile using",
-          "the `provisioning_profile_name` option.",
-          "If you run `sigh` before `gym` you get all that for free."
-        ].each { |a| Helper.log.error a.red }
-
-        raise "No provisioning profile passed"
-      end
-
       if Gym.config[:provisioning_profile_path]
         FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
         data = FastlaneCore::ProvisioningProfile.parse(Gym.config[:provisioning_profile_path])
