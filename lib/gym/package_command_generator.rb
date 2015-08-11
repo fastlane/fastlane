@@ -17,12 +17,17 @@ module Gym
         options << "exportFormat ipa"
         options << "-exportPath '#{ipa_path}'"
 
-        if Gym.config[:provisioning_profile_name]
-          options << "-exportProvisioningProfile '#{Gym.config[:provisioning_profile_name]}'"
-        end
-
-        if Gym.config[:codesigning_identity]
-          options << "-exportSigningIdentity '#{Gym.config[:codesigning_identity]}'"
+        if Gym.config[:codesigning_identity] or Gym.config[:codesigning_identity]
+          if Gym.config[:provisioning_profile_name]
+            options << "-exportProvisioningProfile '#{Gym.config[:provisioning_profile_name]}'"
+          end
+          
+          if Gym.config[:codesigning_identity]
+            options << "-exportSigningIdentity '#{Gym.config[:codesigning_identity]}'"
+          end
+        else
+          # Default use case
+          options << "-exportWithOriginalSigningIdentity"
         end
 
         options
