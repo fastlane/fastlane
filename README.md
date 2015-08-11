@@ -16,7 +16,8 @@
   <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a>
+  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
+  <a href="https://github.com/fastlane/gym">gym</a>
 </p>
 -------
 
@@ -236,6 +237,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`gym`](https://github.com/fastlane/gym): Building your iOS app has never been easier
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
