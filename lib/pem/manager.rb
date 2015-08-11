@@ -10,16 +10,20 @@ module PEM
       Spaceship.login(password_manager.username, password_manager.password)
       Spaceship.client.select_team
 
-      existing_certificate = Spaceship.certificate.all.detect {|c| c.name == PEM.config[:app_identifier] }
+      existing_certificate = Spaceship.certificate.all.detect { |c| c.name == PEM.config[:app_identifier] }
 
-      if existing_certificate && !PEM.config[:force]
-        Helper.log.info "You already have a push certificate, which is active for more than 30 more days. No need to create a new one".green
-        Helper.log.info "If you still want to create a new one, use the --force option when running PEM.".green
-        return false
-      end
-
-      if existing_certificate && PEM.config[:force]
-        Helper.log.info "You already have an existing push certificate, but a new one will be created since the --force option has been set.".green
+      if existing_certificate
+        remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
+        Helper.log.info "Existing push notification profile '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
+        if remaining_days > 30
+          if PEM.config[:force]
+            Helper.log.info "You already have an existing push certificate, but a new one will be created since the --force option has been set.".green
+          else
+            Helper.log.info "You already have a push certificate, which is active for more than 30 more days. No need to create a new one".green
+            Helper.log.info "If you still want to create a new one, use the --force option when running PEM.".green
+            return false
+          end
+        end
       end
 
       Helper.log.warn "Creating a new push certificate for app '#{PEM.config[:app_identifier]}'."
