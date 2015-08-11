@@ -162,7 +162,8 @@ After building the archive it is being checked by `gym`. If it's valid, it gets 
 xcodebuild -exportArchive -archivePath \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' \
 exportFormat ipa \
--exportPath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \ -exportProvisioningProfile 'Profile Name'
+-exportPath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \
+-exportProvisioningProfile 'Profile Name'
 ```
 
 Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is compressed and moved to the output folder as well.
