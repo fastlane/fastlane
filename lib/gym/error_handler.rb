@@ -69,8 +69,11 @@ module Gym
           print "This means, the specified provisioning profile was not created using"
           print "the specified certificate."
           print "Run cert and sigh before gym to make sure to have all signing resources ready"
+        # insert more specific code signing errors here
+        when /Codesign check fails/
+          print "A general code signing error occurred. Make sure you passed a valid"
+          print "provisioning profile and code signing identity."
         end
-
         raise "Error packaging up the application".red
       end
 

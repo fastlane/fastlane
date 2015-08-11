@@ -12,6 +12,10 @@ module Gym
         raise "You can only pass either a workspace or a project path, not both".red
       end
 
+      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
+        raise "No project/workspace found in the current directory.".red
+      end
+
       Gym.project = Project.new(config)
       detect_provisioning_profile
 

@@ -33,7 +33,7 @@ module Gym
                                        raise "Project file is not a project file, must end with .xcodeproj".red unless value.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
-                                     short_option: "-h",
+                                     short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",
                                      description: "The path to the provisioning profile",
                                      optional: true,
