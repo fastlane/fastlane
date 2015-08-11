@@ -9,14 +9,11 @@ module Gym
 
     FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options)
 
-    # def self.start
-    #   FastlaneCore::UpdateChecker.start_looking_for_update("gym")
-    #   new.run
-    # ensure
-    #   FastlaneCore::UpdateChecker.show_update_status("gym", Gym::VERSION)
-    # end
     def self.start
+      FastlaneCore::UpdateChecker.start_looking_for_update("gym")
       new.run
+    ensure
+      FastlaneCore::UpdateChecker.show_update_status("gym", Gym::VERSION)
     end
 
     def convert_options(options)

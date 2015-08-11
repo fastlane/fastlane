@@ -69,8 +69,11 @@ module Gym
           print "This means, the specified provisioning profile was not created using"
           print "the specified certificate."
           print "Run cert and sigh before gym to make sure to have all signing resources ready"
+        # insert more specific code signing errors here
+        when /Codesign check fails/
+          print "A general code signing error occurred. Make sure you passed a valid"
+          print "provisioning profile and code signing identity."
         end
-
         raise "Error packaging up the application".red
       end
 
@@ -79,18 +82,6 @@ module Gym
         print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
         raise "Archive invalid"
-      end
-
-      # This method is called to check if there was an error with the execution
-      # That's used since Apple's command line tools sometimes don't return the
-      # correct return code
-      def error?(output)
-        case output
-        when /Codesign check fails/
-          return true
-        end
-
-        false
       end
 
       private

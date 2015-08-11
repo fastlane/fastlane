@@ -1,7 +1,5 @@
 module Gym
   # Responsible for building the fully working xcodebuild command
-  #
-  # See: http://stackoverflow.com/a/23683125
   class PackageCommandGenerator
     class << self
       def generate
@@ -15,9 +13,9 @@ module Gym
       def options
         options = []
 
-        options << "'#{app_file_name}'"
-        options << "-o"
-        options << "'#{ipa_path}'"
+        options << "'#{appfile_path}'"
+        options << "-o '#{ipa_path}'"
+        options << "exportFormat ipa"
 
         if Gym.config[:provisioning_profile_name]
           options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
@@ -34,8 +32,7 @@ module Gym
         [""]
       end
 
-      # The app file name defined in the `Products/Applications` path.
-      def app_file_name
+      def appfile_path
         Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").first
       end
 

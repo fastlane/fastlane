@@ -33,9 +33,9 @@ module Gym
                                        raise "Project file is not a project file, must end with .xcodeproj".red unless value.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
-                                     short_option: "-h",
+                                     short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",
-                                     description: "The path to the provisioning profile",
+                                     description: "The path to the provisioning profile (found automatically when located in current folder)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
@@ -97,7 +97,12 @@ module Gym
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
                                      description: "Use a custom destination for building the app",
-                                     default_value: "generic/platform=iOS")
+                                     default_value: "generic/platform=iOS"),
+        FastlaneCore::ConfigItem.new(key: :xcargs,
+                                     short_option: "-x",
+                                     env_name: "GYM_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
+                                     optional: true)
 
       ]
     end

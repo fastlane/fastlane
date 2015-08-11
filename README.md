@@ -31,8 +31,9 @@ gym
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/gym/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
+[![Build Status](https://img.shields.io/travis/fastlane/gym/master.svg?style=flat)](https://travis-ci.org/fastlane/gym)
 
-###### Build your iOS app the right way
+###### Building your app has never been easier
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -51,9 +52,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # What's gym?
 
-`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file :muscle:
 
-`gym` is a drop-in replacement for [shenzhen](https://github.com/nomad/shenzhen), which used deprecated APIs to build your application. 
+`gym` is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
 ### Before `gym`
 
@@ -75,7 +76,7 @@ gym
 
 ### Why `gym`?
 
-`gym` uses the latest and best APIs to build and sign your application which results in much faster build times.
+`gym` uses the latest APIs to build and sign your application which results in much faster build times.
 
               |  Gym Features
 --------------------------|------------------------------------------------------------
@@ -90,11 +91,17 @@ gym
 :floppy_disk:   | Store common build settings in a `Gymfile` 
 :computer: | All archives are stored and accessible in the Xcode Organisier
 
+![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
+
+-----
+
+![/assets/gym.gif](/assets/gym.gif)
+
 # Installation
 
 This tool is still work in progress. You can already try it by cloning the repo and running
 
-    sudo bundle install && sudo rake install
+    sudo gem install gym
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -116,7 +123,7 @@ For a list of all available parameters use
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
 
-Run `gym init` to create a new configuration file which may contain data like this:
+Run `gym init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
@@ -126,6 +133,40 @@ sdk "9.0"
 output_directory "./build"    # store the ipa in this folder
 output_name "MyApp"           # the name of the ipa file
 ```
+
+# How does it work?
+
+`gym` uses the latest APIs to build and sign your application. The 2 main components are 
+
+- `xcodebuild` 
+- [xcpretty](https://github.com/supermarin/xcpretty)
+
+When you run `gym` without the `--silent` mode it will print out every command it executes.
+
+To build the archive `gym` uses the following command:
+
+```
+set -o pipefail && \
+xcodebuild -scheme 'Example' \
+-project './Example.xcodeproj' \
+-configuration 'Release' \
+-destination 'generic/platform=iOS' \
+-archivePath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' \
+archive | xcpretty
+```
+
+
+After building the archive it is being checked by `gym`. If it's valid, it gets packaged up and signed into an `ipa` file
+
+```
+xcodebuild -exportArchive -archivePath \
+'/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' \
+exportFormat ipa \
+-exportPath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \
+-exportProvisioningProfile 'Profile Name'
+```
+
+Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is compressed and moved to the output folder as well.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
