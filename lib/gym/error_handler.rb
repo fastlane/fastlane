@@ -82,9 +82,9 @@ module Gym
       end
 
       # This method is called to check if there was an error with the execution
-      # That's used since Apple's command line tools sometimes don't return the 
+      # That's used since Apple's command line tools sometimes don't return the
       # correct return code
-      def is_error?(output)
+      def error?(output)
         case output
         when /Codesign check fails/
           return true

@@ -38,7 +38,7 @@ module Gym
                                      description: "The path to the provisioning profile",
                                      optional: true,
                                      verify_block: proc do |value|
-                                      raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                       raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
