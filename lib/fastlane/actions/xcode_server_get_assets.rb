@@ -54,7 +54,8 @@ module Fastlane
         else
           integration = integrations.first
         end
-        # TODO: only take a successful one? or allow failing tests? warnings?
+
+        # consider: only taking the last successful one? or allow failing tests? warnings?
 
         Helper.log.info "Using integration #{integration['number']}.".yellow
 
