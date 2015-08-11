@@ -114,22 +114,6 @@ If you want to associate an app with an App Group:
 
 # Parameters
 
-```
-    -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
-    -a, --app_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
-    -b, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*) (PRODUCE_APP_IDENTIFIER_SUFFIX)
-    -a, --app_name STRING App Name (PRODUCE_APP_NAME)
-    -v, --version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
-    -s, --sku            SKU Number (e.g. '1234') (PRODUCE_SKU)
-    -l, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
-    -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
-    -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
-    -t, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
-    -l, --team_name STRING The name of your team if you're in multiple teams (PRODUCE_TEAM_NAME)
-    -h, --help           Display help documentation
-    -v, --version        Display version information
-```
-
 Get a list of all available options using
 
     produce enable_services --help
