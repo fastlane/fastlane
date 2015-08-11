@@ -31,6 +31,7 @@ gym
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/gym/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
+[![Build Status](https://img.shields.io/travis/fastlane/gym/master.svg?style=flat)](https://travis-ci.org/fastlane/gym)
 
 ###### Build your iOS app the right way
 
@@ -91,6 +92,8 @@ gym
 :computer: | All archives are stored and accessible in the Xcode Organisier
 
 ![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
+
+-----
 
 ![/assets/gym.gif](/assets/gym.gif)
 
