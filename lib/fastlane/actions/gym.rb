@@ -12,9 +12,7 @@ module Fastlane
         begin
           # FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          Gym.config = values # we alread have the finished config
-
-          path = Gym::Manager.new.work
+          path = Gym::Manager.new.work(values)
           dsym_path = path.gsub(".ipa", ".app.dSYM.zip")
 
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = path # absolute path
