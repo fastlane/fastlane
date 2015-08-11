@@ -537,6 +537,21 @@ If you put `deploygate` after `ipa` action, you don't have to specify IPA file p
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
 
+### [Xcode Server get assets](https://www.apple.com/uk/support/osxserver/xcodeserver/)
+
+This action retrieves integration assets (`.xcarchive`, logs etc) from your Xcode Server instance over HTTPS.
+
+```ruby
+xcode_server_get_assets(
+    host: '10.99.0.59', # Specify Xcode Server's Host or IP Address
+    bot_name: 'release-1.3.4' # Specify the particular Bot
+  )
+```
+
+This allows you to use Xcode Server for building and testing, which can be useful when your build takes a long time and requires connected iOS devices for testing. This action only requires you specify the `host` and the `bot_name` and it will go and download, unzip and return a path to the downloaded folder. Then you can export an IPA from the archive and upload it with `deliver`.
+
+Run `fastlane action xcode_server_get_assets` for the full list of options.
+
 ### set_changelog
 
 To easily set the changelog of an app on iTunes Connect for all languages
