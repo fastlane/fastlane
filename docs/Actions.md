@@ -20,6 +20,14 @@ fastlane action [action_name]:
 
 ## Building
 
+### [Bundler](http://bundler.io/)
+
+This will install your Gemfile by executing `bundle install`
+
+```ruby
+bundle_install
+```
+
 ### [CocoaPods](http://cocoapods.org)
 
 Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
