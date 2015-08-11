@@ -54,7 +54,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 `gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
 
-`gym` is a drop-in replacement for [shenzhen](https://github.com/nomad/shenzhen), which used deprecated APIs to build your application. 
+`gym` is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
 ### Before `gym`
 
@@ -145,14 +145,23 @@ First, `gym` will verify your parameters and make sure the project and its schem
 To build the archive `gym` uses the following command:
 
 ```
-set -o pipefail && xcodebuild -scheme 'Example' -project './Example.xcodeproj' -configuration 'Release' -destination 'generic/platform=iOS' -archivePath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' archive | xcpretty
+set -o pipefail && \
+xcodebuild -scheme 'Example' \
+-project './Example.xcodeproj' \
+-configuration 'Release' \
+-destination 'generic/platform=iOS' \
+-archivePath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' \
+archive | xcpretty
 ```
 
 
 After building the archive it is being checked by `gym`. If it's valid, it gets packaged up and signed into an `ipa` file
 
 ```
-xcodebuild -exportArchive -archivePath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' exportFormat ipa -exportPath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' -exportProvisioningProfile 'Profile Name'
+xcodebuild -exportArchive -archivePath \
+'/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive' \
+exportFormat ipa \
+-exportPath '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \ -exportProvisioningProfile 'Profile Name'
 ```
 
 Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is compressed and moved to the output folder as well.
