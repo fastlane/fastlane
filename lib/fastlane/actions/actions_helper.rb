@@ -109,7 +109,7 @@ module Fastlane
         end
 
         if exit_status != 0
-          # this will also append the output to the exception (for the Jenkins reports)
+          # this will also append the output to the exception
           raise "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
         end
       else
