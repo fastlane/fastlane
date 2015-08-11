@@ -1,6 +1,8 @@
 module Fastlane
   module Actions
     module SharedValues
+      IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
+      DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
     class GymAction < Action
@@ -8,11 +10,19 @@ module Fastlane
         require 'gym'
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
+          # FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          Gym::Manager.new.work(values)
+          Sigh.config = values # we alread have the finished config
+
+          path = Sigh::Manager.start
+          dsym_path = path.gsub(".ipa", ".app.dSYM.zip")
+
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = path # absolute path
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = dsym_path if File.exist?(dsym_path)
+
+          return path
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('gym', Gym::VERSION)
+          # FastlaneCore::UpdateChecker.show_update_status('gym', Sigh::VERSION)
         end
       end
 
@@ -21,12 +31,11 @@ module Fastlane
       end
 
       def self.author
-        "fabiomassimo"
+        "KrauseFx"
       end
 
       def self.available_options
         require 'gym'
-
         Gym::Options.available_options
       end
 
