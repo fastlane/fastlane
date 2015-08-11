@@ -74,7 +74,8 @@ module Fastlane
 
       rows = []
       actions.each_with_index do |current, i|
-        rows << [i + 1, current[:name], current[:time].to_i]
+        name = current[:name][0..60]
+        rows << [i + 1, name, current[:time].to_i]
       end
 
       puts ""

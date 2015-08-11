@@ -1,4 +1,4 @@
-# TODO: Workaround, since deploygate.rb from shenzhen includes the code for commander
+# Workaround, since deploygate.rb from shenzhen includes the code for commander
 def command(_param)
 end
 

@@ -120,8 +120,14 @@ module Fastlane
 
         #grabs module
         eth = Fastlane::ErbTemplateHelper
+
         # Creates plist from template
-        plist_render = eth.render(eth.load("s3_plist_template"),{
+        if plist_template_path && File.exists?(plist_template_path)
+          plist_template = eth.load_from_path(plist_template_path)
+        else
+          plist_template = eth.load("s3_plist_template")
+        end
+        plist_render = eth.render(plist_template,{
           url: ipa_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
@@ -129,16 +135,25 @@ module Fastlane
         })
 
         # Creates html from template
-        html_render = eth.render(eth.load("s3_html_template"),{
+        if html_template_path && File.exists?(html_template_path)
+          html_template = eth.load_from_path(html_template_path)
+        else
+          html_template = eth.load("s3_html_template")
+        end
+        html_render = eth.render(html_template,{
           url: plist_url,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
         })
 
-
         # Creates version from template
-        version_render = eth.render(eth.load("s3_version_template"),{
+        if version_template_path && File.exists?(version_template_path)
+          version_template = eth.load_from_path(version_template_path)
+        else
+          version_template = eth.load("s3_version_template")
+        end
+        version_render = eth.render(version_template,{
           url: plist_url,
           full_version: full_version
         })

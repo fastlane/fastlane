@@ -172,7 +172,50 @@ module Fastlane
       
       raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
       
+      collector.did_launch_action(:import)
       parse(File.read(path))
+
+      # Check if we can also import local actions which are in the same directory as the Fastfile
+      actions_path = File.join(File.expand_path("..", path), 'actions')
+      Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+    end
+
+    # @param url [String] The git URL to clone the repository from
+    # @param path [String] The path to the Fastfile
+    def import_from_git(url: nil, path: 'fastlane/Fastfile')
+      raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
+
+      Actions.execute_action('import_from_git') do
+        collector.did_launch_action(:import_from_git)
+
+        # Checkout the repo
+        repo_name = url.split("/").last
+
+        folder = File.join("/tmp", "fl_clones", repo_name)
+
+        if File.directory?folder
+          Helper.log.info "Using existing git repo..."
+          Actions.sh("git pull")
+        else
+          # When this fails, we have to clone the git repo
+          Helper.log.info "Cloning remote git repo..."
+          Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
+        end
+
+        Actions.sh("cd '#{folder}' && git checkout HEAD '#{path}'")
+
+        # We also want to check out all the local actions of this fastlane setup
+        containing = path.split(File::SEPARATOR)[0..-2]
+        containing = "." if containing.count == 0
+        actions_folder = File.join(containing, "actions")
+        begin
+          Actions.sh("cd '#{folder}' && git checkout HEAD '#{actions_folder}'")
+        rescue => ex
+          # We don't care about a failure here, as local actions are optional
+        end
+
+        import(File.join(folder, path))
+      end
     end
 
     #####################################################

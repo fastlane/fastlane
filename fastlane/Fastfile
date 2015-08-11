@@ -1,16 +1,14 @@
 
 desc "Run bundle install and tests"
 lane :test do
-  sh "cd .. && bundle install"
-  sh "cd .. && rspec"
+  validate_repo(tool_name: detect_tool)
 end
 
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
   # Fetching all information required for the release
   # 
-  tool_name = options[:tool] || File.basename(File.expand_path('..', Dir.pwd))
-  binary_path = "../../#{tool_name}/bin/#{tool_name}"
+  tool_name = options[:tool] || detect_tool
 
   github_organisation = "fastlane"
   github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
@@ -19,13 +17,21 @@ lane :release do |options|
   # Verifying RubyGems version
   # 
   require "../lib/#{tool_name}/version"
-  module_ref = Object.const_get(tool_name.split('_').collect(&:capitalize).join)
-  version = module_ref::VERSION
+  version = module_ref(tool_name: tool_name)::VERSION
   old_version = current_version(tool: tool_name)
   puts "Deploying #{tool_name} #{version}"
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     raise "Version number #{version} was already deployed"
   end
+
+  validate_repo(tool_name: tool_name)
+
+  # Git verification
+  # 
+  ensure_git_status_clean
+  ensure_git_branch(branch: 'master')
+  git_pull
+  push_to_git_remote
 
   # Preparing GitHub Release
   # 
@@ -45,31 +51,6 @@ lane :release do |options|
       is_draft: false
     )
   end
-  
-  # Verifying the --help command
-  # 
-  unless no_binary.include?tool_name
-    content = sh "#{binary_path} --help"
-    ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
-      raise "--help missing information: '#{current}'" unless content.include?current
-    end
-  end
-
-  # Running ruby things
-  # 
-  sh "cd .. && bundle install"
-  sh "cd .. && rake install"
-
-  # Run the tests
-  # 
-  sh "cd .. && rspec"
-
-  # Git verification
-  # 
-  ensure_git_status_clean
-  ensure_git_branch(branch: 'master')
-  git_pull
-  push_to_git_remote
 
   # Actual release
   # 
@@ -90,6 +71,37 @@ lane :release do |options|
   puts "[#{tool_name}] #{github_release['name']} #{github_release['html_url']}"
 end
 
+desc "Verifies all tests pass and the current state of the repo is valid" 
+private_lane :validate_repo do |options|
+  tool_name = options[:tool_name]
+
+  # Verifying that no debug code is in the code base
+  # 
+  ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/")
+  ensure_no_debug_code(text: "TODO", extension: ".rb", path: "./lib/")
+  ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/")
+
+  rubocop if rubocop_repos.include?tool_name
+
+  # Verifying the --help command
+  # 
+  binary_path = "../../#{tool_name}/bin/#{tool_name}"
+  unless no_binary.include?tool_name
+    content = sh "#{binary_path} --help"
+    ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
+      raise "--help missing information: '#{current}'" unless content.include?current
+    end
+  end
+
+  # Running ruby things
+  # 
+  sh "cd .. && bundle install"
+  sh "cd .. && rake install"
+
+  # Run the tests
+  # 
+  sh "cd .. && rspec"
+end
 
 desc "Get the version number of the last release"
 private_lane :current_version do |options|
@@ -106,4 +118,20 @@ end
 desc "All repos that don't have a binary to test" 
 private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
+end
+
+desc "All repos that have rubocop enabled" 
+private_lane :rubocop_repos do
+  ['spaceship', 'gym']
+end
+
+desc "Detects the name of the tool based on the current directory" 
+private_lane :detect_tool do
+  File.basename(File.expand_path('..', Dir.pwd)).downcase
+end
+
+desc "Get a reference to the module of this tool"
+desc "This method can be overwritten by the individual Fastfiles of the tools (e.g. PEM)"
+private_lane :module_ref do |options|
+  Object.const_get(options[:tool_name].split('_').collect(&:capitalize).join)
 end

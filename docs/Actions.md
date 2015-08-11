@@ -20,6 +20,14 @@ fastlane action [action_name]:
 
 ## Building
 
+### [Bundler](http://bundler.io/)
+
+This will install your Gemfile by executing `bundle install`
+
+```ruby
+bundle_install
+```
+
 ### [CocoaPods](http://cocoapods.org)
 
 Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
@@ -34,6 +42,17 @@ This will execute `carthage bootstrap`
 
 ```ruby
 carthage
+```
+
+More options are available:
+
+```ruby
+carthage(
+  use_ssh: false,         # Use SSH for downloading GitHub repositories.
+  use_submodules: false,  # Add dependencies as Git submodules.
+  use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
+  platform: "all"         # Define which platform to build for
+)
 ```
 
 ### [xctool](https://github.com/facebook/xctool)
@@ -364,7 +383,7 @@ lcov(
 Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
 
 ```
-oclint({
+oclint(
   compile_commands: 'commands.json', # The json compilation database, use xctool reporter 'json-compilation-database'
   select_reqex: /ViewController.m/,  # Select all files matching this reqex
   report_type: 'pmd',                # The type of the report (default: html)
@@ -372,7 +391,21 @@ oclint({
   max_priority_2: 100,               # The max allowed number of priority 2 violations
   max_priority_3: 1000,              # The max allowed number of priority 3 violations
   rc: 'LONG_LINE=200'                # Override the default behavior of rules
-})  
+)  
+```
+
+### `ensure_no_debug_code`
+
+You don't want any debug code to slip into production. You can use the `ensure_no_debug_code` action to make sure no debug code is in your code base before deploying it:
+
+```ruby
+ensure_no_debug_code(text: "// TODO")
+```
+
+```ruby
+ensure_no_debug_code(text: "NSLog",
+                     path: "./lib",
+                extension: "m")
 ```
 
 ## Deploying
@@ -506,7 +539,7 @@ More information about the available options can be found in the [DeployGate Pus
 
 ### set_changelog
 
-To easily set the changelog of an app on iTunes Connect for all languages 
+To easily set the changelog of an app on iTunes Connect for all languages
 
 ```ruby
 set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")
@@ -800,7 +833,7 @@ This action will reset your git repo to a clean state, discarding any uncommitte
 It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:
 
 - You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.
-- You call it with the `:force` option, in which case "you have been warned".
+- You call it with the `force: true` option, in which case "you have been warned".
 
 Also useful for putting in your `error` block, to bring things back to a pristine state (again with the caveat that you have called `ensure_git_status_clean` before)
 

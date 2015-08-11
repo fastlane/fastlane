@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.author
-        "lmirosevic"
+        "KrauseFx"
       end
 
       def self.is_supported?(platform)

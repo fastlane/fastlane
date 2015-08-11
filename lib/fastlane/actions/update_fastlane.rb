@@ -53,7 +53,7 @@ module Fastlane
           return
         end
 
-        #suppress updater output - very noisy
+        # suppress updater output - very noisy
         Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
 
         update_needed.each do |tool_info| 

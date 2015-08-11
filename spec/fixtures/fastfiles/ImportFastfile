@@ -6,7 +6,6 @@ lane :main_lane do
 end
 
 platform :ios do
-
   # override a lane
   override_lane :empty do
     "Overwrite"
@@ -16,5 +15,4 @@ platform :ios do
   lane :extended do
     "extended"
   end
-
 end

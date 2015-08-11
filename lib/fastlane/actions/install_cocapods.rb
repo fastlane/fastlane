@@ -2,8 +2,10 @@ module Fastlane
   module Actions
     class CocoapodsAction < Action
       def self.run(params)
+        cmd = []
 
-        cmd = ['pod install']
+        cmd << ['bundle exec'] if File.exists?('Gemfile')
+        cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
@@ -53,7 +55,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "tadpol"]
+        ["KrauseFx", "tadpol", "birmacher"]
       end
     end
   end

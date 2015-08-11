@@ -46,9 +46,23 @@ describe Fastlane do
       end
 
       it "takes the block and lane name" do
-        @ff.lane "my_name" do
+        @ff.lane :my_name do
 
         end
+      end
+
+      it "raises an error if name contains spaces" do
+        expect { 
+          @ff.lane :"my name" do
+          end
+        }.to raise_error "lane name must not contain any spaces".red
+      end
+
+      it "raises an error if name is not a symbol" do
+        expect { 
+          @ff.lane "string" do
+          end
+        }.to raise_error "lane name must start with :".red
       end
     end
 
@@ -223,6 +237,12 @@ describe Fastlane do
         expect {
           ff.runner.execute(:not_here)
         }.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific".red)
+      end
+
+      it "raises an error if the lane name contains spaces", now: true do
+        expect {
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
+        }.to raise_error "lane name must not contain any spaces".red
       end
 
       it "runs pod install" do

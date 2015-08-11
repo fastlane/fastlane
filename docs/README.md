@@ -1,18 +1,14 @@
 # Documentation
 
-All of the ```fastlane``` documentation is available in this directory. 
-
-Check out the [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started. Once you're up and running, check out all the awesome stuff you can do in [Actions.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md).
-
-Check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
-
-More advanced settings and tips can be found in [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md).
-
-`Jenkins` setup can be found in [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
-
-For more information about multi platform support check out [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md).
-
-You can also pass parameters to lanes from the command line. Additionally you can trigger other lanes from within your lane. Checkout [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters).
+- [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started. 
+- [Actions.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md) for all the built-in integrations
+- [Code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) to show you how to do code signing right.
+- [FAQs](https://github.com/KrauseFx/fastlane/blob/master/docs/FAQs.md) for frequently asked questions
+- [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md) for more advanced settings and tips.
+- [Jenkins.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md) for Jenkins specific help
+- [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
+- [Appfile.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md) describes the `Appfile`
+- [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
 
 ## Fastfile
 
