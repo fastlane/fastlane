@@ -97,7 +97,12 @@ module Gym
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
                                      description: "Use a custom destination for building the app",
-                                     default_value: "generic/platform=iOS")
+                                     default_value: "generic/platform=iOS"),
+        FastlaneCore::ConfigItem.new(key: :xcargs,
+                                     short_option: "-x",
+                                     env_name: "GYM_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
+                                     optional: true)
 
       ]
     end

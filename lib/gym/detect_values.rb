@@ -48,7 +48,7 @@ module Gym
         end
       end
 
-      unless Gym.config[:provisioning_profile_path]
+      if Gym.config[:provisioning_profile_path].to_s.length == 0 and !Helper.is_test?
         [
           "Could not automatically find provisioning profile to use",
           "Please either put the provisioning profile in the project directory",
