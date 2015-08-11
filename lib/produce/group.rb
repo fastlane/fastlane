@@ -8,16 +8,24 @@ module Produce
 
       ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
 
+      group_identifier = options.group_identifier || ask("Group identifier: ")
+
       if app_group_exists? group_identifier
-        Helper.log.info "[DevCenter] Group '#{Produce.config[:group_name]}' already exists, nothing to do on the Dev Center".green
+        Helper.log.info "[DevCenter] Group '#{options.group_name} (#{options.group_identifier})' already exists, nothing to do on the Dev Center".green
         ENV["CREATED_NEW_GROUP_ID"] = nil
         # Nothing to do here
       else
-        group_name = valid_name_for(Produce.config[:group_name])
-        Helper.log.info "Creating new app group '#{group_name}' on the Apple Dev Center".green
+        unless options.group_name
+          group_name = group_identifier.split(".").map(&:capitalize).reverse.join(' ')
+          group_name = valid_name_for(group_name)
+        else
+          group_name = valid_name_for(options.group_name)
+        end
+
+        Helper.log.info "Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center".green
 
         group = Spaceship.app_group.create!(group_id: group_identifier,
-                                          name: group_name)
+                                            name: group_name)
 
         Helper.log.info "Created group #{group.app_group_id}"
 
@@ -65,10 +73,6 @@ module Produce
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
-    end
-
-    def group_identifier
-      Produce.config[:group_identifier].to_s
     end
 
     def app_identifier
