@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pem', '~> 0.7.0'
   spec.add_dependency 'cert', '~> 0.3.0'
   spec.add_dependency 'sigh', '~> 0.10.3'
-  spec.add_dependency 'produce', '~> 0.5.1'
+  spec.add_dependency 'produce', '~> 0.6.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
