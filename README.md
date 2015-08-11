@@ -90,6 +90,10 @@ gym
 :floppy_disk:   | Store common build settings in a `Gymfile` 
 :computer: | All archives are stored and accessible in the Xcode Organisier
 
+![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
+
+![/assets/gym.gif](/assets/gym.gif)
+
 # Installation
 
 This tool is still work in progress. You can already try it by cloning the repo and running
