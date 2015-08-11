@@ -6,10 +6,10 @@ describe Gym do
 
       result = Gym::PackageCommandGenerator.generate
       expect(result).to eq([
-        "/usr/bin/xcrun -sdk iphoneos PackageApplication -v", 
-        "''", 
-        "-o '#{Gym::PackageCommandGenerator.ipa_path}'", 
-        "exportFormat ipa", 
+        "/usr/bin/xcrun -sdk iphoneos PackageApplication -v",
+        "''",
+        "-o '#{Gym::PackageCommandGenerator.ipa_path}'",
+        "exportFormat ipa",
         ""
       ])
     end

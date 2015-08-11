@@ -20,7 +20,7 @@ module Gym
         if Gym.config[:provisioning_profile_name]
           options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
         end
-        
+
         if Gym.config[:codesigning_identity]
           options << "--sign '#{Gym.config[:codesigning_identity]}'"
         end
