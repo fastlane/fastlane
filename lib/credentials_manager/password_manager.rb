@@ -17,11 +17,12 @@ module CredentialsManager
     # @param id_to_use (String) The Apple ID email address which should be used
     # @param ask_if_missing (boolean) true by default: if no credentials are found, should the user be asked?
     def self.shared_manager(id_to_use = nil, ask_if_missing = true)
-      @@instance ||= PasswordManager.new(id_to_use, ask_if_missing)
+      @instance ||= {}
+      @instance[id_to_use] ||= PasswordManager.new(id_to_use, ask_if_missing)
     end
 
     def self.logout
-      @@instance = nil
+      @instance = nil
     end
 
     # A new instance of PasswordManager.
