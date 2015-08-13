@@ -12,14 +12,20 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          values[:provisioning_profile_path] ||= Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
-          path = File.expand_path(Gym::Manager.new.work(values))
-          dsym_path = path.gsub(".ipa", ".app.dSYM.zip")
-
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = path # absolute path
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = dsym_path if File.exist?(dsym_path)
+          if values[:provisioning_profile_path].to_s.length == 0
+            sigh_path = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
+            values[:provisioning_profile_path] = File.expand_path(sigh_path) if sigh_path
+          end
           
-          return path
+          absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
+          absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
+
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if File.exist?(absolute_dsym_path)
+          ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
+          ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if File.exist?(absolute_dsym_path)
+          
+          return absolute_ipa_path
         ensure
           FastlaneCore::UpdateChecker.show_update_status('gym', Gym::VERSION)
         end
