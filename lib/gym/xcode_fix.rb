@@ -29,7 +29,10 @@ module Gym
             command = ["patch #{patched_package_application_path} < #{patch}"]
             print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
 
-            Gym::CommandsExecutor.execute(command: command, print_all: false, error: proc do |output|
+            FastlaneCore::CommandExecutor.execute(command: command, 
+                                                print_all: false, 
+                                            print_command: !Gym.config[:silent], 
+                                                    error: proc do |output|
               ErrorHandler.handle_build_error(output)
             end)
           end

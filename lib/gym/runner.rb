@@ -56,7 +56,10 @@ module Gym
     def build_app
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command") if $verbose
-      Gym::CommandsExecutor.execute(command: command, print_all: true, error: proc do |output|
+      FastlaneCore::CommandExecutor.execute(command: command, 
+                                          print_all: true, 
+                                      print_command: !Gym.config[:silent], 
+                                              error: proc do |output|
         ErrorHandler.handle_build_error(output)
       end)
 
@@ -75,7 +78,10 @@ module Gym
       command = PackageCommandGenerator.generate
       print_command(command, "Generated Package Command") if $verbose
 
-      Gym::CommandsExecutor.execute(command: command, print_all: false, error: proc do |output|
+      FastlaneCore::CommandExecutor.execute(command: command, 
+                                          print_all: false, 
+                                      print_command: !Gym.config[:silent], 
+                                              error: proc do |output|
         ErrorHandler.handle_package_error(output)
       end)
     end
@@ -108,7 +114,10 @@ module Gym
             command_parts << "> /dev/null" unless $verbose
             print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
-            Gym::CommandsExecutor.execute(command: command_parts, print_all: false, error: proc do |output|
+            FastlaneCore::CommandExecutor.execute(command: command_parts, 
+                                                print_all: false, 
+                                            print_command: !Gym.config[:silent], 
+                                                    error: proc do |output|
               ErrorHandler.handle_package_error(output)
             end)
           end
@@ -136,7 +145,7 @@ module Gym
 
         puts "" # new line
 
-        Helper.log.info "Successfully exported and compressed dSYM file:".green
+        Helper.log.info "Successfully exported and compressed dSYM file.".green
       end
 
       ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
