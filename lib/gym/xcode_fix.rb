@@ -15,7 +15,8 @@ module Gym
           # Check current PackageApplication MD5
           require 'digest'
 
-          expected_md5 = File.read("lib/assets/package_application_patches/PackageApplication_MD5")
+          path = File.join(Helper.gem_path("gym"), "lib/assets/package_application_patches/PackageApplication_MD5")
+          expected_md5 = File.read(path)
 
           raise "Found an invalid `PackageApplication` script. This is not supported." unless expected_md5 == Digest::MD5.file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication").hexdigest
 
@@ -23,7 +24,7 @@ module Gym
           FileUtils.copy_file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication", patched_package_application_path)
 
           # Apply patches to PackageApplication4Gym from patches folder
-          Dir["lib/assets/package_application_patches/*.diff"].each do |patch|
+          Dir[File.join(Helper.gem_path("gym"), "lib/assets/package_application_patches/*.diff")].each do |patch|
             Helper.log.info "Applying Package Application patch: #{File.basename(patch)}" unless Gym.config[:silent]
             command = ["patch #{patched_package_application_path} < #{patch}"]
             print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
