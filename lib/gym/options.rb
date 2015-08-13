@@ -18,9 +18,10 @@ module Gym
                                      optional: true,
                                      description: "Path the workspace file",
                                      verify_block: proc do |value|
-                                       raise "Workspace file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
-                                       raise "Workspace file invalid".red unless File.directory?(value.to_s)
-                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless value.include?(".xcworkspace")
+                                       v = File.expand_path(value.to_s)
+                                       raise "Workspace file not found at path '#{v}'".red unless File.exist?(v)
+                                       raise "Workspace file invalid".red unless File.directory?(v)
+                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -28,9 +29,10 @@ module Gym
                                      env_name: "GYM_PROJECT",
                                      description: "Path the project file",
                                      verify_block: proc do |value|
-                                       raise "Project file not found at path '#{File.expand_path(value)}'".red unless File.exist?(value.to_s)
-                                       raise "Project file invalid".red unless File.directory?(value.to_s)
-                                       raise "Project file is not a project file, must end with .xcodeproj".red unless value.include?(".xcodeproj")
+                                       v = File.expand_path(value.to_s)
+                                       raise "Project file not found at path '#{v}'".red unless File.exist?(v)
+                                       raise "Project file invalid".red unless File.directory?(v)
+                                       raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
@@ -83,11 +85,6 @@ module Gym
                                      description: "Hide all information that's not necessary while building",
                                      default_value: false,
                                      is_string: false),
-        FastlaneCore::ConfigItem.new(key: :provisioning_profile_name,
-                                     short_option: "-l",
-                                     env_name: "GYM_PROVISIONING_PROFILE_NAME",
-                                     description: "The name of the provisioning profile to use. It has to match the name exactly",
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :codesigning_identity,
                                      short_option: "-i",
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
@@ -101,7 +98,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
-                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
+                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true)
 
       ]

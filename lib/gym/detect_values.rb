@@ -50,12 +50,6 @@ module Gym
 
       if Gym.config[:provisioning_profile_path]
         FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
-        data = FastlaneCore::ProvisioningProfile.parse(Gym.config[:provisioning_profile_path])
-
-        if data['Name']
-          Helper.log.info "Using provisioning profile with name '#{data['Name']}'...".green if $verbose
-          Gym.config[:provisioning_profile_name] = data['Name']
-        end
       end
     end
 

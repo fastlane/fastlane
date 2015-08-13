@@ -20,7 +20,7 @@ module Gym
 
       puts ""
       puts Terminal::Table.new(
-        title: "Building Application".green,
+        title: "Building Application 🚀".green,
         rows: rows
       )
       puts ""

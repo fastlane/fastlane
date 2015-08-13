@@ -82,14 +82,14 @@ gym
 --------------------------|------------------------------------------------------------
 :rocket:            | `gym` builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 :checkered_flag: | Beautiful inline build output
-:book:     | helps you resolve common build errors like code signing issues
+:book:     | Helps you resolve common build errors like code signing issues
 :mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
 :package: | Automatically generates an `ipa` and a compressed `dSYM` file
 :bullettrain_side: | Don't remember any complicated build commands, just `gym`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :floppy_disk:   | Store common build settings in a `Gymfile` 
-:computer: | All archives are stored and accessible in the Xcode Organisier
+:computer: | All archives are stored and accessible in the Xcode Organizer
 
 ![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
 

@@ -23,8 +23,8 @@ module Gym
         options << "-o '#{ipa_path}'"
         options << "exportFormat ipa"
 
-        if Gym.config[:provisioning_profile_name]
-          options << "--embed '#{Gym.config[:provisioning_profile_name]}'"
+        if Gym.config[:provisioning_profile_path]
+          options << "--embed '#{Gym.config[:provisioning_profile_path]}'"
         end
 
         if Gym.config[:codesigning_identity]
