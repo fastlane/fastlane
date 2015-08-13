@@ -71,6 +71,10 @@ lane :release do |options|
   puts "[#{tool_name}] #{github_release['name']} #{github_release['html_url']}"
 end
 
+error do |lane, exception|
+  slack(channel: "testing", message: exception.to_s)
+end
+
 desc "Verifies all tests pass and the current state of the repo is valid" 
 private_lane :validate_repo do |options|
   tool_name = options[:tool_name]
