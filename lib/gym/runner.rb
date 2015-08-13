@@ -83,6 +83,8 @@ module Gym
     # Determine whether it is a Swift project and, eventually, include all required libraries to copy from Xcode's toolchain directory.
     # Since there's no "xcodebuild" target to do just that, it is done post-build when exporting an archived build.
     def swift_library_fix
+      require 'fileutils'
+
       ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
 
       unless ipa_swift_frameworks.empty?
@@ -93,11 +95,12 @@ module Gym
 
           Dir.mkdir(swift_support)
 
+          developer_dir = `xcode-select --print-path`
+          sdk = Gym.config[:sdk] || 'iphoneos'
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            sdk = Gym.config[:sdk] || 'iphoneos'
-            FileUtils.copy_file("#{xcode}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/#{sdk}/#{framework}", File.join(swift_support, framework))
+            FileUtils.copy_file("#{developer_dir}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/#{sdk}/#{framework}", File.join(swift_support, framework))
           end
 
           # Add "SwiftSupport" to the .ipa archive
