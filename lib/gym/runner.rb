@@ -160,7 +160,7 @@ module Gym
       if status != 0
         o = output.join("\n")
         puts o # the user has the right to see the raw output
-        Helper.log.info "Exited with status: #{status}"
+        Helper.log.info "Exit Status: #{status}"
         error.call(o)
       end
     end
