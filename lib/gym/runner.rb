@@ -80,8 +80,37 @@ module Gym
       end)
     end
 
+    # Determine whether it is a Swift project and, eventually, include all required libraries to copy from Xcode's toolchain directory.
+    # Since there's no "xcodebuild" target to do just that, it is done post-build when exporting an archived build.
     def swift_library_fix
-      SwiftLibraryFixService.fix
+      ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
+
+      unless ipa_swift_frameworks.empty?
+        Dir.mktmpdir do |tmpdir|
+          # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
+          # easily add it to the .ipa later.
+          swift_support = File.join(tmpdir, "SwiftSupport")
+
+          Dir.mkdir(swift_support)
+
+          ipa_swift_frameworks.each do |path|
+            framework = File.basename(path)
+
+            sdk = Gym.config[:sdk] || 'iphoneos'
+            FileUtils.copy_file("#{xcode}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/#{sdk}/#{framework}", File.join(swift_support, framework))
+          end
+
+          # Add "SwiftSupport" to the .ipa archive
+          Dir.chdir(tmpdir) do
+            command = "zip --recurse-paths #{PackageCommandGenerator.ipa_path} SwiftSupport #{'> /dev/null' unless $verbose}"
+            print_command(command, "Fix Swift embedded code if needed") if $verbose
+
+            execute_command(command: command, print_all: false, error: proc do |output|
+                                              ErrorHandler.handle_package_error(output)
+                                            end)
+          end
+        end
+      end
     end
 
     # Moves over the binary and dsym file to the output directory
