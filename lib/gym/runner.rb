@@ -96,11 +96,10 @@ module Gym
           Dir.mkdir(swift_support)
 
           developer_dir = `xcode-select --print-path`.strip
-          sdk = Gym.config[:sdk] || 'iphoneos'
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            FileUtils.copy_file("#{developer_dir}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/#{sdk}/#{framework}", File.join(swift_support, framework))
+            FileUtils.copy_file("#{developer_dir}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
           end
 
           # Add "SwiftSupport" to the .ipa archive
