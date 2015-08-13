@@ -1,5 +1,5 @@
 From 13f2c76fd11b0d861ddf205d4d6ccc0c45a0d4b2 Mon Sep 17 00:00:00 2001
-From: Fabio Milano <fabio@touchwonders.com>
+From: Fabio Milano
 Date: Thu, 13 Aug 2015 15:02:41 +0200
 Subject: [PATCH] Fixed codesign_args
 
