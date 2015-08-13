@@ -58,6 +58,13 @@ describe Fastlane do
         }.to raise_error "lane name must not contain any spaces".red
       end
 
+      it "raises an error if the name is on a black list" do
+        expect { 
+          @ff.lane :run do
+          end
+        }.to raise_error "Name 'run' is already taken"
+      end
+
       it "raises an error if name is not a symbol" do
         expect { 
           @ff.lane "string" do
