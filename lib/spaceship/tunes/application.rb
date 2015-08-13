@@ -167,10 +167,14 @@ module Spaceship
       def pre_processing_builds
         data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
 
-        data.fetch('processingBuilds', []).collect do |attrs|
+        builds = data.fetch('processingBuilds', []).collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::ProcessingBuild.factory(attrs)
         end
+
+        builds.delete_if { |a| a.state == "ITC.apps.betaProcessingStatus.InvalidBinary" }
+
+        builds
       end
 
       # @return [Array] This will return an array of *all* processing builds

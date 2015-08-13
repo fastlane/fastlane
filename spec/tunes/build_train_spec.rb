@@ -30,7 +30,7 @@ describe Spaceship::Tunes::BuildTrain do
 
     it "returns all processing builds" do
       builds = app.all_processing_builds
-      expect(builds.count).to eq(4)
+      expect(builds.count).to eq(3)
 
       b = builds.first
       expect(b.state).to eq('ITC.apps.betaProcessingStatus.Created')
@@ -53,7 +53,7 @@ describe Spaceship::Tunes::BuildTrain do
 
     describe "Processing builds" do
       it "builds that are stuck or pre-processing" do
-        expect(app.pre_processing_builds.count).to eq(4)
+        expect(app.pre_processing_builds.count).to eq(3)
 
         created_and_stucked = app.pre_processing_builds.first
         expect(created_and_stucked.upload_date).to eq(1436381720000)
