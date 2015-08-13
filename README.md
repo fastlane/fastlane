@@ -82,7 +82,7 @@ gym
 --------------------------|------------------------------------------------------------
 :rocket:            | `gym` builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 :checkered_flag: | Beautiful inline build output
-:book:     | helps you resolve common build errors like code signing issues
+:book:     | Helps you resolve common build errors like code signing issues
 :mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
 :package: | Automatically generates an `ipa` and a compressed `dSYM` file
