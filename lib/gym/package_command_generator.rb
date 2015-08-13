@@ -40,7 +40,7 @@ module Gym
 
       def postfix
         # Remove the patched PackageApplication file after the export is finished
-        ["; rm -rf '#{@patched_package_application}'"]
+        ["&& rm '#{@patched_package_application}'"]
       end
 
       def appfile_path
