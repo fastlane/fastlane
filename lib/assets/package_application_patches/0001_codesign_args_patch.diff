@@ -3,6 +3,11 @@ From: Fabio Milano
 Date: Thu, 13 Aug 2015 15:02:41 +0200
 Subject: [PATCH] Fixed codesign_args
 
+Code signatures made in Mavericks and later do not support altering which files are sealed by a code signature.
+The --resource-rules option to codesign isn't supported anymore
+
+See https://developer.apple.com/library/mac/technotes/tn2206/_index.html#//apple_ref/doc/uid/DTS40007919-CH1-TNTAG206
+
 ---
  PackageApplication4Gym | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
