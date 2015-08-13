@@ -33,7 +33,7 @@ module Gym
             print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
 
             Gym::CommandsExecutor.execute(command: command, print_all: false, error: proc do |output|
-              ErrorHandler.handle_build_error(output)
+              ErrorHandler.handle_package_error(output)
             end)
           end
         end
