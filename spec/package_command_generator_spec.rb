@@ -11,7 +11,7 @@ describe Gym do
         "-o '#{Gym::PackageCommandGenerator.ipa_path}'",
         "exportFormat ipa",
         "",
-        "; rm -rf /tmp/PackageApplication4Gym"
+        "; rm -rf '/tmp/PackageApplication4Gym'"
       ])
     end
   end

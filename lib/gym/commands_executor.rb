@@ -1,9 +1,6 @@
 module Gym
+  # Executes commands and takes care of error handling and more
   module CommandsExecutor
-    #####################################################
-    # @!group Actually executing the commands
-    #####################################################
-
     # @param command [String] The command to be executed
     # @param print_all [Boolean] Do we want to print out the command output while building?
     #   If set to false, nothing will be printed
