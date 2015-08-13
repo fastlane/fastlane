@@ -16,6 +16,7 @@ module Gym
       rows << ["Project", config[:project]] if config[:project]
       rows << ["Workspace", config[:workspace]] if config[:workspace]
       rows << ["Scheme", config[:scheme]] if config[:scheme]
+      rows << ["Configuration", config[:configuration]] if config[:configuration]
 
       puts ""
       puts Terminal::Table.new(
