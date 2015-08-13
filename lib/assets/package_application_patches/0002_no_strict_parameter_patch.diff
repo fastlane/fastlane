@@ -3,6 +3,14 @@ From: Fabio Milano
 Date: Thu, 13 Aug 2015 16:03:26 +0200
 Subject: [PATCH] Added no-strict parameter
 
+The command line tool “codesign” has changed in 10.9.5 and 10.10, you need to
+pass “--no-strict” option to the command, (the problem has been reported and
+will be fixed). To workaround the problem, please save a copy and modify
+PackageApplication to pass “—no-strict” to codesign, you can locate PackageApplication
+by running the following:- xcrun -sdk iphoneos -f PackageApplication
+
+See http://stackoverflow.com/questions/26008449/xcodebuild-codesign-vvvv-saysresource-envelope-is-obsolete
+
 ---
  PackageApplication4Gym | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

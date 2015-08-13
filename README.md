@@ -159,11 +159,13 @@ archive | xcpretty
 After building the archive it is being checked by `gym`. If it's valid, it gets packaged up and signed into an `ipa` file.
 
 ```
-/usr/bin/xcrun -sdk iphoneos PackageApplication -v \
+/usr/bin/xcrun /path/to/PackageApplication4Gym -v \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive/Products/Applications/name.app' -o \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \ 
 --sign "identity" --embed "provProfile"
 ```
+
+Note: the official PackageApplication script is replaced by a custom PackageApplication4Gym script. This script is obtained by applying a [set of patches](https://github.com/fastlane/gym/tree/master/lib/assets/package_application_patches) on the fly to fix some known issues in the official Xcode PackageApplication script.
 
 Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is compressed and moved to the output folder as well.
 
