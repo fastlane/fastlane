@@ -136,8 +136,7 @@ module Gym
 
         puts "" # new line
 
-        Helper.log.info "Successfully exported and compressed dSYM file: ".green
-        Helper.log.info File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.dsym_path))
+        Helper.log.info "Successfully exported and compressed dSYM file:".green
       end
 
       ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
