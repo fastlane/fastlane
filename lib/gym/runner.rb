@@ -95,7 +95,7 @@ module Gym
 
           Dir.mkdir(swift_support)
 
-          developer_dir = `xcode-select --print-path`
+          developer_dir = `xcode-select --print-path`.strip
           sdk = Gym.config[:sdk] || 'iphoneos'
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
