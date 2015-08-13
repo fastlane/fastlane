@@ -47,6 +47,20 @@ describe FastlaneCore do
         }.to raise_error "Multiple entries for configuration key 'cert_name' found!".red
       end
 
+      it "raises an error if a a short_option was used twice" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       description: "foo"),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-f",
+                                       description: "bar")
+        ]
+        expect {
+          FastlaneCore::Configuration.create(conflicting_options, {})
+        }.to raise_error "Multiple entries for short_option '-f' found!".red
+      end
+
       it "verifies the default value as well" do
         c = FastlaneCore::ConfigItem.new(key: :output, 
                                   env_name: "SIGH_OUTPUT_PATH", 
