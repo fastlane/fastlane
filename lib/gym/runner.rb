@@ -13,8 +13,6 @@ module Gym
       move_results
     end
 
-    private
-
     #####################################################
     # @!group Printing out things
     #####################################################
@@ -41,6 +39,8 @@ module Gym
         rows: rows.delete_if { |c| c.to_s.empty? }
       )
     end
+
+    private
 
     #####################################################
     # @!group The individual steps
