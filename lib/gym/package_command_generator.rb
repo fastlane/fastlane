@@ -69,13 +69,19 @@ module Gym
         # Remove any previous patched PackageApplication
         FileUtils.rm Dir.glob("/tmp/PackageApplication4Gym")
 
-
         Dir.mktmpdir do |tmpdir|
+          # Check current PackageApplication MD5
+          require 'digest'
+
+          expected_md5 = File.read("lib/assets/package_application_patches/PackageApplication_MD5")
+
+          raise "Found an invalid `PackageApplication` script. This is not supported." unless expected_md5 == Digest::MD5.file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication").hexdigest
+
           # Duplicate PackageApplication script to PackageApplication4Gym
           FileUtils.copy_file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication", File.join(tmpdir, "PackageApplication4Gym"))
 
           # Apply patches to PackageApplication4Gym from patches folder
-          Dir["lib/assets/package_application_patches/*"].each do |patch|
+          Dir["lib/assets/package_application_patches/*.diff"].each do |patch|
             puts "Applying Package Application patch: #{File.basename(patch)}"
             command = "patch #{File.join(tmpdir, "PackageApplication4Gym")} < #{patch}"
             print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
