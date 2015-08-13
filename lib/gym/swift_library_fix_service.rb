@@ -2,13 +2,12 @@ module Gym
   class SwiftLibraryFixService
     class << self
 
+      # Determine whether it is a Swift project and, eventually, include all required libraries to copy from Xcode's toolchain directory.
+      # Since there's no "xcodebuild" target to do just that, it is done post-build when exporting an archived build.
       def fix
-        # Determine whether this is a Swift project and, eventually, the list of libraries to copy from
-        # Xcode's toolchain directory since there's no "xcodebuild" target to do just that (it is done
-        # post-build when exporting an archived build from the "Organizer").
-        @ipa_swift_frameworks = Dir["#{appfile_path}/Frameworks/libswift*"]
+        ipa_swift_frameworks = Dir["#{appfile_path}/Frameworks/libswift*"]
 
-        if not @ipa_swift_frameworks.empty?
+        if not ipa_swift_frameworks.empty?
           Dir.mktmpdir do |tmpdir|
             # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
             # easily add it to the .ipa later.
@@ -16,7 +15,7 @@ module Gym
 
             Dir.mkdir(swift_support)
 
-            @ipa_swift_frameworks.each do |path|
+            ipa_swift_frameworks.each do |path|
               framework = File.basename(path)
 
               sdk = Gym.config[:sdk] || 'iphoneos'
