@@ -387,9 +387,20 @@ module Fastlane
 
     class XctestAction < Action
       def self.run(params)
-        params_hash = params || {}
-        params_hash[:test] = true
-        XcodebuildAction.run(params_hash)
+        begin
+          params_hash = params || {}
+          params_hash[:test] = true
+          XcodebuildAction.run(params_hash)
+        rescue => ex
+          exit_status = $?.exitstatus
+          
+          puts "Exit status2: #{$?}"
+          if exit_status == 65
+            Helper.log.warn "First attempt failed with exit code 65, which might mean that the Simulator was not yet ready (in this case you should see a 'Unable to run app in Simulator' error, printed by Xcode)"
+            Helper.log.warn  "Retrying once more..."
+            XcodebuildAction.run(params_hash)
+          end
+        end
       end
 
       def self.description
