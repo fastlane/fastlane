@@ -7,7 +7,7 @@ module CredentialsManager
         begin
           return self.new.data[key]
         rescue => ex
-          Helper.log.debug ex.to_s
+          puts ex.to_s
           return nil
         end
       end
