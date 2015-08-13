@@ -141,6 +141,33 @@ update_app_group_identifiers(
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
+### [gym](https://github.com/fastlane/gym)
+
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+
+```ruby
+gym(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  # (optionals)
+  silent: true,					   # Hide all information that's not necessary while building
+  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
+  output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+  output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  provisioning_profile_name: 
+  	"my.mobileprovision",     	   # Sign .ipa file with .mobileprovision
+  provisioning_profile_path	:
+  	"path/to/my.mobileprovision",  # The path to the provisioning profile (found automatically when located in current folder)
+  codesigning_identity: 
+  	"MyIdentity",          		   # Identity to be used along with --embed
+  destination: 
+  	"generic/platform=iOS"         # Use a custom destination for building the app
+)
+```
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
@@ -536,6 +563,21 @@ deploygate(
 If you put `deploygate` after `ipa` action, you don't have to specify IPA file path, as it is extracted from the lane context automatically.
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
+
+### [Xcode Server get assets](https://www.apple.com/uk/support/osxserver/xcodeserver/)
+
+This action retrieves integration assets (`.xcarchive`, logs etc) from your Xcode Server instance over HTTPS.
+
+```ruby
+xcode_server_get_assets(
+    host: '10.99.0.59', # Specify Xcode Server's Host or IP Address
+    bot_name: 'release-1.3.4' # Specify the particular Bot
+  )
+```
+
+This allows you to use Xcode Server for building and testing, which can be useful when your build takes a long time and requires connected iOS devices for testing. This action only requires you specify the `host` and the `bot_name` and it will go and download, unzip and return a path to the downloaded folder. Then you can export an IPA from the archive and upload it with `deliver`.
+
+Run `fastlane action xcode_server_get_assets` for the full list of options.
 
 ### set_changelog
 
