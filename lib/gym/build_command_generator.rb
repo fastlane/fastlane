@@ -40,7 +40,7 @@ module Gym
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-archivePath '#{archive_path}'"
-        options << "-xcargs '#{config[:xcargs]}'" if config[:xcargs]
+        options << config[:xcargs] if config[:xcargs]
 
         options
       end

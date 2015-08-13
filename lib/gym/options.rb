@@ -101,7 +101,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
-                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
+                                     description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true)
 
       ]
