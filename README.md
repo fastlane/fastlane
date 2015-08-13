@@ -89,7 +89,7 @@ gym
 :bullettrain_side: | Don't remember any complicated build commands, just `gym`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :floppy_disk:   | Store common build settings in a `Gymfile` 
-:computer: | All archives are stored and accessible in the Xcode Organisier
+:computer: | All archives are stored and accessible in the Xcode Organizer
 
 ![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
 
