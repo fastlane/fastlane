@@ -33,14 +33,14 @@ describe Gym do
 
     describe "Valid CocoaPods Project" do
       before do
-        options = { workspace: "./examples/cocoapods/Example.xcworkspace" }
+        options = { workspace: "./examples/cocoapods/Example.xcworkspace", scheme: "Example" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         @workspace = Gym::Project.new(Gym.config)
       end
 
       it "#schemes returns all schemes - but not the CocoaPods schemes" do
-        expect(@workspace.schemes).to eq(["Example"])
+        expect(@workspace.schemes).to eq(["Example", "HexColors", "Pods-Example"])
       end
     end
   end
