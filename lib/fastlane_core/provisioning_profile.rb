@@ -39,7 +39,6 @@ module FastlaneCore
       end
 
       # Installs a provisioning profile for Xcode to use
-      # @return true
       def install(path)
         Helper.log.info "Installing provisioning profile..."
         profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
@@ -55,9 +54,10 @@ module FastlaneCore
           # copy to Xcode provisioning profile directory
           FileUtils.copy(path, destination)
           unless File.exist?(destination)
-            raise "Failed installation of provisioning profile at location: #{destination}".red
+            raise "Failed installation of provisioning profile at location: '#{destination}'".red
           end
         end
+        
         true
       end
     end
