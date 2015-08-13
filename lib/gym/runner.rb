@@ -109,7 +109,7 @@ module Gym
             print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
             execute_command(command: command_parts, print_all: false, error: proc do |output|
-              ErrorHandler.handle_package_error(output) 
+              ErrorHandler.handle_package_error(output)
             end)
           end
         end
