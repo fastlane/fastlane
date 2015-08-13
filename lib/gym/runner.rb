@@ -9,6 +9,7 @@ module Gym
       build_app
       verify_archive
       package_app
+      swift_library_fix
       move_results
     end
 
@@ -77,6 +78,10 @@ module Gym
       execute_command(command: command, print_all: false, error: proc do |output|
         ErrorHandler.handle_package_error(output)
       end)
+    end
+
+    def swift_library_fix
+      SwiftLibraryFixService.fix
     end
 
     # Moves over the binary and dsym file to the output directory
