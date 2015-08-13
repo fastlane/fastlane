@@ -22,12 +22,12 @@ module Spaceship
       logger.info("GET: " + landing_url)
       headers = @client.get(landing_url).headers
       results = headers['location'].match(/.*appIdKey=(\h+)/)
-      if results.length > 1
+      if (results || []).length > 1
         api_key = results[1]
         File.write(cache_path, api_key)
         return api_key
       else
-        raise "Could not find latest API Key from the Dev Portal"
+        raise "Could not find latest API Key from the Dev Portal - the server might be slow right now"
       end
     end
 
