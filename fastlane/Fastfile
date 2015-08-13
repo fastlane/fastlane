@@ -77,9 +77,10 @@ private_lane :validate_repo do |options|
 
   # Verifying that no debug code is in the code base
   # 
-  ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/")
-  ensure_no_debug_code(text: "TODO", extension: ".rb", path: "./lib/")
-  ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/")
+  ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/") # debugging code
+  ensure_no_debug_code(text: "TODO", extension: ".rb", path: "./lib/") # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/") # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", path: "./lib/") # Merge conflict
 
   rubocop if rubocop_repos.include?tool_name
 
