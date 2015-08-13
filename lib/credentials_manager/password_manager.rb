@@ -18,7 +18,16 @@ module CredentialsManager
     # @param ask_if_missing (boolean) true by default: if no credentials are found, should the user be asked?
     def self.shared_manager(id_to_use = nil, ask_if_missing = true)
       @instance ||= {}
-      @instance[id_to_use] ||= PasswordManager.new(id_to_use, ask_if_missing)
+      return @instance[id_to_use] if @instance[id_to_use]
+      if id_to_use
+        @instance[id_to_use] ||= PasswordManager.new(id_to_use, ask_if_missing)
+      else
+        # No user given, let's see if we have a previously used one
+        return @instance.values.first if @instance.values.count > 0
+
+        # Create a new one
+        @instance[id_to_use] ||= PasswordManager.new(id_to_use, ask_if_missing)
+      end
     end
 
     def self.logout
