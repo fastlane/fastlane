@@ -76,12 +76,25 @@ module Pilot
       def distribute_build(upload_date)
         Helper.log.info "Distributing new build to testers"
         
-        current_build = app.builds.find do |build|
-          build.upload_date == upload_date
+        # We try this multiple times, as it sometimes takes some time
+        # to process the binary
+        10.times do
+          current_build = app.builds.find do |build|
+            build.upload_date == upload_date
+          end
+
+          if current_build
+            current_build.build_train.update_testing_status!(true)
+            return true
+          else
+            Helper.log.info "Binary is not yet available online..."
+            sleep 5
+          end
         end
 
-        # First, enable TestFlight beta testing for this train
-        current_build.build_train.update_testing_status!(true)
+        Helper.log.error "Build is not visible on iTunes Connect any more - couldn't distribute to testers.".red
+        Helper.log.error "You can run `pilot --skip_submission` to only upload the binary without distributing.".red
+        raise "Error distributing the binary"
       end
   end
 end
