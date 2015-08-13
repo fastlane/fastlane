@@ -26,7 +26,6 @@ module FastlaneCore
 
         plist = Plist::parse_xml(`security cms -D -i '#{path}'`)
         if (plist || []).count > 5
-          Helper.log.info("Provisioning profile of app '#{plist['AppIDName']}' with the name '#{plist['Name']}' successfully analysed.".green)
           plist
         else
           Helper.log.error("Error parsing provisioning profile at path '#{path}'".red)
