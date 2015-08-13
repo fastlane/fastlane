@@ -103,6 +103,68 @@ snapshot(
 
 Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
 
+### [gym](https://github.com/fastlane/gym)
+
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+
+```ruby
+gym(scheme: "MyApp", workspace: "MyApp.xcworkspace")
+```
+
+There are many more options available, you can use `gym --help` to get the latest list of available options.
+
+```ruby
+gym(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  silent: true,
+  clean: true,
+  output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+  output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+  sdk: "10.0"                     # use SDK as the name or path of the base SDK when building the project.
+)
+```
+
+Use `gym --help` to get all available options.
+
+The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+### ipa
+
+Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+
+```ruby
+ipa(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  # (optionals)
+  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
+  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+  identity: "MyIdentity",          # Identity to be used along with --embed
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  archive: true                    # this means 'Do Archive'. Archive project after building (the default if not specified).
+)
+```
+
+The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
+
+
+**Important:**
+
+To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
+
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
+
+
 ### update_project_provisioning
 
 This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
@@ -140,67 +202,6 @@ update_app_group_identifiers(
 	entitlements_file: '/path/to/entitlements_file.entitlements',
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
-
-### [gym](https://github.com/fastlane/gym)
-
-`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
-
-```ruby
-gym(
-  workspace: "MyApp.xcworkspace",
-  configuration: "Debug",
-  scheme: "MyApp",
-  # (optionals)
-  silent: true,					   # Hide all information that's not necessary while building
-  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
-  output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
-  output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
-  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
-  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
-  provisioning_profile_name: 
-  	"my.mobileprovision",     	   # Sign .ipa file with .mobileprovision
-  provisioning_profile_path	:
-  	"path/to/my.mobileprovision",  # The path to the provisioning profile (found automatically when located in current folder)
-  codesigning_identity: 
-  	"MyIdentity",          		   # Identity to be used along with --embed
-  destination: 
-  	"generic/platform=iOS"         # Use a custom destination for building the app
-)
-```
-
-### ipa
-
-Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
-
-You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
-
-```ruby
-ipa(
-  workspace: "MyApp.xcworkspace",
-  configuration: "Debug",
-  scheme: "MyApp",
-  # (optionals)
-  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
-  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
-  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
-  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
-  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
-  identity: "MyIdentity",          # Identity to be used along with --embed
-  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
-  archive: true                    # this means 'Do Archive'. Archive project after building (the default if not specified).
-)
-```
-
-The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
-
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
-
-
-**Important:**
-
-To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
-
-See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
 
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
 Use this command if you are supporting multiple versions of Xcode
