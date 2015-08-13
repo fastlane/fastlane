@@ -104,10 +104,11 @@ module Gym
 
           # Add "SwiftSupport" to the .ipa archive
           Dir.chdir(tmpdir) do
-            command = "zip --recurse-paths #{PackageCommandGenerator.ipa_path} SwiftSupport #{'> /dev/null' unless $verbose}"
-            print_command(command, "Fix Swift embedded code if needed") if $verbose
+            command_parts = ["zip --recurse-paths #{PackageCommandGenerator.ipa_path} SwiftSupport"]
+            command_parts << "/dev/null" unless $verbose
+            print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
-            execute_command(command: command, print_all: false, error: proc do |output|
+            execute_command(command: command_parts, print_all: false, error: proc do |output|
                                               ErrorHandler.handle_package_error(output)
                                             end)
           end
