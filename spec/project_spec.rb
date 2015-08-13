@@ -8,14 +8,14 @@ describe Gym do
 
     describe "Valid Standard Project" do
       before do
-        options = { project: "./example/standard/Example.xcodeproj" }
+        options = { project: "./examples/standard/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         @project = Gym::Project.new(Gym.config)
       end
 
       it "#path" do
-        expect(@project.path).to eq(File.expand_path("./example/standard/Example.xcodeproj"))
+        expect(@project.path).to eq(File.expand_path("./examples/standard/Example.xcodeproj"))
       end
 
       it "#is_workspace" do
@@ -33,7 +33,7 @@ describe Gym do
 
     describe "Valid CocoaPods Project" do
       before do
-        options = { workspace: "./example/cocoapods/Example.xcworkspace" }
+        options = { workspace: "./examples/cocoapods/Example.xcworkspace" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         @workspace = Gym::Project.new(Gym.config)

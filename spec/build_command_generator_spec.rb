@@ -7,7 +7,7 @@ describe Gym do
     end
 
     it "supports additional parameters" do
-      options = { project: "./example/standard/Example.xcodeproj", sdk: "9.0" }
+      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -15,7 +15,7 @@ describe Gym do
         "set -o pipefail &&",
         "xcodebuild",
         "-scheme 'Example'",
-        "-project './example/standard/Example.xcodeproj'",
+        "-project './examples/standard/Example.xcodeproj'",
         "-configuration 'Release'",
         "-sdk '9.0'",
         "-destination 'generic/platform=iOS'",
@@ -27,7 +27,7 @@ describe Gym do
 
     describe "Standard Example" do
       before do
-        options = { project: "./example/standard/Example.xcodeproj" }
+        options = { project: "./examples/standard/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       end
 
@@ -37,7 +37,7 @@ describe Gym do
           "set -o pipefail &&",
           "xcodebuild",
           "-scheme 'Example'",
-          "-project './example/standard/Example.xcodeproj'",
+          "-project './examples/standard/Example.xcodeproj'",
           "-configuration 'Release'",
           "-destination 'generic/platform=iOS'",
           "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
@@ -48,7 +48,7 @@ describe Gym do
 
       it "#project_path_array" do
         result = Gym::BuildCommandGenerator.project_path_array
-        expect(result).to eq(["-scheme 'Example'", "-project './example/standard/Example.xcodeproj'"])
+        expect(result).to eq(["-scheme 'Example'", "-project './examples/standard/Example.xcodeproj'"])
       end
 
       it "#build_path" do

@@ -1,7 +1,7 @@
 describe Gym do
   describe "Project with multiple Schemes and Gymfile" do
     before do
-      options = { project: "./example/multipleSchemes/Example.xcodeproj" }
+      options = { project: "./examples/multipleSchemes/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options,
                                                       options)
       @project = Gym::Project.new(Gym.config)
