@@ -141,6 +141,33 @@ update_app_group_identifiers(
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
+### [gym](https://github.com/fastlane/gym)
+
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+
+```ruby
+gym(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  # (optionals)
+  silent: true,					   # Hide all information that's not necessary while building
+  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
+  output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+  output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  provisioning_profile_name: 
+  	"my.mobileprovision",     	   # Sign .ipa file with .mobileprovision
+  provisioning_profile_path	:
+  	"path/to/my.mobileprovision",  # The path to the provisioning profile (found automatically when located in current folder)
+  codesigning_identity: 
+  	"MyIdentity",          		   # Identity to be used along with --embed
+  destination: 
+  	"generic/platform=iOS"         # Use a custom destination for building the app
+)
+```
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
