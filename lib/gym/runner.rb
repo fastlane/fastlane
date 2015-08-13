@@ -108,7 +108,7 @@ module Gym
             command_parts << "> /dev/null" unless $verbose
             print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
-            Gym::CommandsExecutor.execute(command: command, print_all: false, error: proc do |output|
+            Gym::CommandsExecutor.execute(command: command_parts, print_all: false, error: proc do |output|
               ErrorHandler.handle_package_error(output)
             end)
           end
