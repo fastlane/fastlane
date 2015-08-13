@@ -56,12 +56,12 @@ module Gym
     def build_app
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command") if $verbose
-      FastlaneCore::CommandExecutor.execute(command: command, 
-                                          print_all: true, 
-                                      print_command: !Gym.config[:silent], 
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: true,
+                                      print_command: !Gym.config[:silent],
                                               error: proc do |output|
-        ErrorHandler.handle_build_error(output)
-      end)
+                                                ErrorHandler.handle_build_error(output)
+                                              end)
 
       Helper.log.info("Successfully stored the archive. You can find it in the Xcode Organizer.".green)
       Helper.log.info("Stored the archive in: ".green + BuildCommandGenerator.archive_path) if $verbose
@@ -78,12 +78,12 @@ module Gym
       command = PackageCommandGenerator.generate
       print_command(command, "Generated Package Command") if $verbose
 
-      FastlaneCore::CommandExecutor.execute(command: command, 
-                                          print_all: false, 
-                                      print_command: !Gym.config[:silent], 
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: false,
+                                      print_command: !Gym.config[:silent],
                                               error: proc do |output|
-        ErrorHandler.handle_package_error(output)
-      end)
+                                                ErrorHandler.handle_package_error(output)
+                                              end)
     end
 
     # Determine whether it is a Swift project and, eventually, include all required libraries to copy from Xcode's toolchain directory.
@@ -114,12 +114,12 @@ module Gym
             command_parts << "> /dev/null" unless $verbose
             print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
-            FastlaneCore::CommandExecutor.execute(command: command_parts, 
-                                                print_all: false, 
-                                            print_command: !Gym.config[:silent], 
+            FastlaneCore::CommandExecutor.execute(command: command_parts,
+                                                print_all: false,
+                                            print_command: !Gym.config[:silent],
                                                     error: proc do |output|
-              ErrorHandler.handle_package_error(output)
-            end)
+                                                      ErrorHandler.handle_package_error(output)
+                                                    end)
           end
         end
       end
