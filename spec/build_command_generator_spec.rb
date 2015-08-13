@@ -1,3 +1,5 @@
+require "shellwords"
+
 describe Gym do
   describe Gym::BuildCommandGenerator do
     it "raises an exception when project path wasn't found" do
@@ -7,7 +9,11 @@ describe Gym do
     end
 
     it "supports additional parameters" do
-      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0" }
+      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      xcargs = xcargs_hash.map do |k, v|
+        "#{k.to_s.shellescape}=#{v.shellescape}"
+      end.join ' '
+      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -20,6 +26,7 @@ describe Gym do
         "-sdk '9.0'",
         "-destination 'generic/platform=iOS'",
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+        "DEBUG=1 BUNDLE_NAME=Example\\ App",
         :archive,
         "| xcpretty"
       ])
