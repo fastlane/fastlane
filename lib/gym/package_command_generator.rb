@@ -65,9 +65,9 @@ module Gym
 
         # Initialization
         developer_dir = `xcode-select --print-path`.strip
-
+        patched_package_application_path = File.join("/tmp", "PackageApplication4Gym")
         # Remove any previous patched PackageApplication
-        FileUtils.rm Dir.glob("/tmp/PackageApplication4Gym")
+        FileUtils.rm patched_package_application_path
 
         Dir.mktmpdir do |tmpdir|
           # Check current PackageApplication MD5
@@ -78,24 +78,26 @@ module Gym
           raise "Found an invalid `PackageApplication` script. This is not supported." unless expected_md5 == Digest::MD5.file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication").hexdigest
 
           # Duplicate PackageApplication script to PackageApplication4Gym
-          FileUtils.copy_file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication", File.join(tmpdir, "PackageApplication4Gym"))
+          FileUtils.copy_file("#{developer_dir}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication", patched_package_application_path)
 
           # Apply patches to PackageApplication4Gym from patches folder
           Dir["lib/assets/package_application_patches/*.diff"].each do |patch|
             puts "Applying Package Application patch: #{File.basename(patch)}"
-            command = "patch #{File.join(tmpdir, "PackageApplication4Gym")} < #{patch}"
+            command = ["patch #{patched_package_application_path} < #{patch}"]
             print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
 
-            system(command)
+            Gym::CommandsExecutor.execute(command: command, print_all: false, error: proc do |output|
+              ErrorHandler.handle_build_error(output)
+            end)
           end
-
-          # Move patched PackageApplication to Xcode directory
-          FileUtils.copy_file(File.join(tmpdir, "PackageApplication4Gym"), File.join("/tmp", "PackageApplication4Gym"))
         end
+
+        patched_package_application_path
+      end
 
         # Return path to the patched PackageApplication
         File.join("/tmp", "PackageApplication4Gym")
-      end
     end
   end
 end
+
