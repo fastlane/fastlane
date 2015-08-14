@@ -116,11 +116,11 @@ Update your `Fastfile` to contain the following code:
 ```ruby
 lane :beta do
   cert
-  sigh :force
+  sigh(force: true)
 end
 ```
 
-`:force` will make sure to re-generate the provisioning profile on each run.
+`force: true` will make sure to re-generate the provisioning profile on each run.
 This will result in `sigh` always using the correct signing certificate, which is installed on the local machine.
 
 
