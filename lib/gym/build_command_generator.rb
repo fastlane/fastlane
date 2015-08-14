@@ -39,6 +39,7 @@ module Gym
         options << "-configuration '#{config[:configuration]}'" # We need `Release` to export the DSYM file as well
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-destination '#{config[:destination]}'" if config[:destination]
+        options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << "-archivePath '#{archive_path}'"
         options << config[:xcargs] if config[:xcargs]
 

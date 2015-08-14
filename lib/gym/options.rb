@@ -34,14 +34,6 @@ module Gym
                                        raise "Project file invalid".red unless File.directory?(v)
                                        raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
                                      end),
-        FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
-                                     short_option: "-e",
-                                     env_name: "GYM_PROVISIONING_PROFILE_PATH",
-                                     description: "The path to the provisioning profile (found automatically when located in current folder)",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
-                                     end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
@@ -99,7 +91,23 @@ module Gym
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
                                      description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcconfig,
+                                     short_option: "-y",
+                                     env_name: "GYM_XCCONFIG",
+                                     description: "Use an extra XCCONFIG file to build your app",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
+                                     short_option: "-e",
+                                     env_name: "GYM_PROVISIONING_PROFILE_PATH",
+                                     description: "The path to the provisioning profile (optional)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                     end)
 
       ]
     end
