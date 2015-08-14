@@ -70,7 +70,7 @@ module Gym
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
-                                     default_value: "Release"),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :silent,
                                      short_option: "-t",
                                      env_name: "GYM_SILENT",

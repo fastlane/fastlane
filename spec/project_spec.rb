@@ -26,6 +26,10 @@ describe Gym do
         expect(@project.schemes).to eq(["Example"])
       end
 
+      it "#configurations returns all available configurations" do
+        expect(@project.configurations).to eq(["Debug", "Release"])
+      end
+
       it "#app_name" do
         expect(@project.app_name).to eq("ExampleProductName")
       end
@@ -39,8 +43,12 @@ describe Gym do
         @workspace = Gym::Project.new(Gym.config)
       end
 
-      it "#schemes returns all schemes - but not the CocoaPods schemes" do
+      it "#schemes returns all schemes" do
         expect(@workspace.schemes).to eq(["Example", "HexColors", "Pods-Example"])
+      end
+
+      it "#schemes returns all configurations" do
+        expect(@workspace.configurations).to eq([])
       end
     end
   end

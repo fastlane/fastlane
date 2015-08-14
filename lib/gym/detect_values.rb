@@ -25,6 +25,7 @@ module Gym
       end
 
       detect_scheme
+      detect_configuration
 
       config[:output_name] ||= Gym.project.app_name
 
@@ -96,31 +97,66 @@ module Gym
 
     def self.detect_scheme
       config = Gym.config
+      proj_schemes = Gym.project.schemes
+
       if config[:scheme].to_s.length > 0
         # Verify the scheme is available
-        unless Gym.project.schemes.include?(config[:scheme].to_s)
+        unless proj_schemes.include?(config[:scheme].to_s)
           Helper.log.error "Couldn't find specified scheme '#{config[:scheme]}'.".red
           config[:scheme] = nil
         end
       end
 
-      if config[:scheme].to_s.length == 0
-        proj_schemes = Gym.project.schemes
-        if proj_schemes.count == 1
-          config[:scheme] = proj_schemes.last
-        elsif proj_schemes.count > 1
-          if Helper.is_ci?
-            Helper.log.error "Multiple schemes found but you haven't specified one.".red
-            Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-            raise "Multiple schemes found".red
-          else
-            puts "Select Scheme: "
-            config[:scheme] = choose(*(proj_schemes))
-          end
+      return if config[:scheme].to_s.length > 0
+
+      if proj_schemes.count == 1
+        config[:scheme] = proj_schemes.last
+      elsif proj_schemes.count > 1
+        if Helper.is_ci?
+          Helper.log.error "Multiple schemes found but you haven't specified one.".red
+          Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
+          raise "Multiple schemes found".red
         else
-          raise "Couldn't find any schemes in this project".red
+          puts "Select Scheme: "
+          config[:scheme] = choose(*(proj_schemes))
+        end
+      else
+        raise "Couldn't find any schemes in this project".red
+      end
+    end
+
+    # Detects the available configurations (e.g. Debug, Release)
+    def self.detect_configuration
+      config = Gym.config
+      configurations = Gym.project.configurations
+      if config[:configuration]
+        # Verify the configuration is available
+        unless configurations.include?(config[:configuration])
+          Helper.log.error "Couldn't find specified configuration '#{config[:configuration]}'.".red
+          config[:configuration] = nil
+        end
+      end
+
+      # Usually we want `Release`
+      # We prefer `Release` to export the DSYM file as well
+      config[:configuration] ||= "Release" if configurations.include?("Release")
+
+      return if config[:configuration].to_s.length > 0
+      return if configurations.count == 0 # this is an optional value anyway
+
+      if configurations.count == 1
+        config[:configuration] = configurations.last
+      else
+        if Helper.is_ci?
+          Helper.log.error "Multiple configurations found but you haven't specified one.".red
+          Helper.log.error "Since this is a CI, please pass one using the `configuration` option".red
+          raise "Multiple configurations found".red
+        else
+          puts "Select Configuration: "
+          config[:configuration] = choose(*(configurations))
         end
       end
     end
+
   end
 end

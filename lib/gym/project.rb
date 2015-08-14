@@ -29,6 +29,27 @@ module Gym
       results
     end
 
+    # Get all available configurations in an array
+    def configurations
+      results = []
+      splitted = raw_info.split("Configurations:")
+      return [] if splitted.count != 2 # probably a CocoaPods project
+
+      output = splitted.last.split(":").first
+      output.split("\n").each_with_index do |current, index|
+        current = current.strip
+
+        if current.length == 0
+          next if index == 0
+          break # as we want to break on the empty line
+        end
+
+        results << current
+      end
+
+      results
+    end
+
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
@@ -60,7 +81,10 @@ module Gym
     end
 
     def raw_info
-      # e.g.
+      # Examples:
+
+      # Standard:
+      #
       # Information about project "Example":
       #     Targets:
       #         Example
@@ -75,6 +99,15 @@ module Gym
       #     Schemes:
       #         Example
       #         ExampleUITests
+
+      # CococaPods
+      #
+      # Example.xcworkspace
+      # Information about workspace "Example":
+      #     Schemes:
+      #         Example
+      #         HexColors
+      #         Pods-Example
 
       return @raw if @raw
 
