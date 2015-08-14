@@ -129,6 +129,8 @@ module Gym
     def self.detect_configuration
       config = Gym.config
       configurations = Gym.project.configurations
+      return if configurations.count == 0 # this is an optional value anyway
+
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
@@ -142,7 +144,6 @@ module Gym
       config[:configuration] ||= "Release" if configurations.include?("Release")
 
       return if config[:configuration].to_s.length > 0
-      return if configurations.count == 0 # this is an optional value anyway
 
       if configurations.count == 1
         config[:configuration] = configurations.last
