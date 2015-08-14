@@ -58,21 +58,25 @@ lane :release do |options|
 
   # After publishing
   # 
-  slack(
-    channel: "releases",
-    default_payloads: [],
-    message: "Successfully released [#{tool_name} #{version}](#{github_release['html_url']}) :rocket:",
-    payload: {
-      "New" => github_release['body']
-    }
-  )
+  if ENV['SLACK_URL']
+    slack(
+      channel: "releases",
+      default_payloads: [],
+      message: "Successfully released [#{tool_name} #{version}](#{github_release['html_url']}) :rocket:",
+      payload: {
+        "New" => github_release['body']
+      }
+    )
+  end
 
   puts "You can now tweet:".green
   puts "[#{tool_name}] #{github_release['name']} #{github_release['html_url']}"
 end
 
 error do |lane, exception|
-  slack(channel: "testing", message: exception.to_s)
+  if ENV['SLACK_URL']
+    slack(channel: "testing", message: exception.to_s)
+  end
 end
 
 desc "Verifies all tests pass and the current state of the repo is valid" 
