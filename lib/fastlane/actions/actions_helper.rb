@@ -105,7 +105,7 @@ module Fastlane
             result << line
           end
           io.close
-          exit_status = $?.to_i
+          exit_status = $?.exitstatus
         end
 
         if exit_status != 0

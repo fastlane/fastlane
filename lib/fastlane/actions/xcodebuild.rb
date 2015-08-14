@@ -198,7 +198,28 @@ module Fastlane
 
         xcpretty_args = xcpretty_args.join(" ")
 
-        Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
+        # In some cases the simulator is not booting up in time
+        # One way to solve it is to try to rerun it for one more time
+        begin
+          Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
+        rescue => ex
+          exit_status = $?.exitstatus
+
+          raise_error = true
+          if exit_status.eql? 65
+            iphone_simulator_time_out_error = /iPhoneSimulator: Timed out waiting/
+
+            if (iphone_simulator_time_out_error =~ ex.message) != nil
+              raise_error = false
+
+              Helper.log.warn "First attempt failed with iPhone Simulator error: #{iphone_simulator_time_out_error.source}"
+              Helper.log.warn  "Retrying once more..."
+              Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
+            end
+          end
+
+          raise ex if raise_error
+        end
       end
 
       def self.hash_to_args(hash)
