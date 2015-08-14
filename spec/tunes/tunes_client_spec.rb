@@ -21,7 +21,7 @@ describe Spaceship::TunesClient do
   describe '#login' do
     it 'returns the session cookie' do
       subject.login(username, password)
-      expect(subject.cookie).to eq('myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw')
+      expect(subject.cookie).to eq(itc_cookie)
     end
 
     it 'raises an exception if authentication failed' do
@@ -41,7 +41,7 @@ describe Spaceship::TunesClient do
     it "sets the correct cookies when getting the response" do
       expect(subject.cookie).to eq(nil)
       subject.send_login_request(username, password)
-      expect(subject.cookie).to eq('myacinfo=DAWTKN;woinst=3363;wosid=xBJMOVttbAQ1Cwlt8ktafw')
+      expect(subject.cookie).to eq(itc_cookie)
     end
   end
 
