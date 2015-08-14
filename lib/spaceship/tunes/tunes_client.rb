@@ -53,6 +53,7 @@ module Spaceship
           to_use = [
             "myacinfo=" + cooks.match(/myacinfo=(\w+)/)[1],
             "woinst=" + cooks.match(/woinst=(\w+)/)[1],
+            "itctx=" + cooks.match(/itctx=([\w\:]+)/)[1],
             "wosid=" + cooks.match(/wosid=(\w+)/)[1]
           ]
 
