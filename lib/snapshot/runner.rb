@@ -85,7 +85,7 @@ module Snapshot
     end
 
     def udid_for_simulator(name) # fetches the UDID of the simulator type
-      all = `instruments -s`.split("\n")
+      all = Simulators.raw_simulators.split("\n")
       all.each do |current|
         return current.match(/\[(.*)\]/)[1] if current.include?name
       end
@@ -100,12 +100,13 @@ module Snapshot
 
       def com(cmd)
         puts cmd.magenta if $verbose
-        result = `#{cmd} 2>&1` # to now show errors
-        puts result if (result.to_s.length > 0 and $verbose)
+        Open3.popen3("#{cmd} 2>&1") do |stdin, stdout, stderr, wait_thr|
+          result = stdout.read
+          puts result if (result.to_s.length > 0 and $verbose)
+        end
       end
 
       udid = udid_for_simulator(device)
-
 
       com("killall 'iOS Simulator'")
       sleep 3
