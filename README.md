@@ -231,8 +231,7 @@ It will show you the `mobileprovision` files like this:
 If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/produce), which does exactly that.
 
 # Need help?
-- If there is a technical problem with `sigh`, submit an issue.
-- I'm available for contract work - drop me an email: sigh@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
