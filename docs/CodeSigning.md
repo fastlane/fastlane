@@ -4,7 +4,7 @@ There are multiple ways of doing code signing right. Letting Xcode automatically
 
 ### Easy Solution: Static Setting
 
-In your project file set the correct `Provisioning Profile` and use the the `ipa` integration in `fastlane`.
+In your project file set the correct `Provisioning Profile` and use the the `gym` integration in `fastlane`.
 
 **Disadvantages**: As soon as your provisioning profile changes, you'll have to update your project file. Therefore not a long-term solution.
 
@@ -20,7 +20,7 @@ PROVISIONING_PROFILE = "$(PROFILE_UDID)";
 ```
 This allows the Xcode project to use `Automatic` provisioning profiles and enables `fastlane` to set a custom profile.
 
-In your `Fastfile`, add the following between your `sigh` and `ipa` call:
+In your `Fastfile`, add the following between your `sigh` and `gym` call:
 
 ```ruby
 sigh
@@ -28,7 +28,7 @@ sigh
 # use the UDID of the newly created provisioning profile
 ENV["PROFILE_UDID"] = lane_context[SharedValues::SIGH_UDID]
 
-ipa(scheme: "Release")
+gym(scheme: "Release")
 ```
 
 This allows you to also support more complex setups, for example if your app supports app extensions or a Watch App.
