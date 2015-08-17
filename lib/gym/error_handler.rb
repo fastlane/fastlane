@@ -18,11 +18,18 @@ module Gym
           print "Make sure you use the correct provisioning profile for this app"
           print "Take a look at the ouptput above for more information"
           print "You can follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
-        when /provisioning profiles matching the bundle identifier “(.*)”/
+        when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print "You don't have the provisioning profile for '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
           print "You can use sigh (https://github.com/KrauseFx/sigh) to download and install the provisioning profile"
           print "Follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+        when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
+          print "You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine"
+          print "Make sure you have the profile on this computer and it's properly installed"
+          print "You can use sigh (https://github.com/KrauseFx/sigh) to download and install the provisioning profile"
+          print "Follow this guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+
+        # Insert more code signing specific errors here
         when /code signing is required/
           print "Your project settings define invalid code signing settings"
           print "To generate an ipa file you need to enable code signing for your project"

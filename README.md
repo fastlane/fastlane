@@ -119,6 +119,11 @@ For a list of all available parameters use
 
     gym --help
 
+If you run into any issues, use the `verbose` mode to get more information
+
+
+    gym --verbose
+
 # Gymfile
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
@@ -190,8 +195,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 # Need help?
-- If there is a technical problem with `gym`, submit an issue.
-- I'm available for contract work - drop me an email: gym@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

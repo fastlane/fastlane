@@ -6,7 +6,7 @@ module Gym
   class PackageCommandGenerator
     class << self
       def generate
-        @patched_package_application = XcodeFix.patch_package_application
+        @patched_package_application = XcodebuildFixes.patch_package_application
 
         parts = ["/usr/bin/xcrun #{@patched_package_application} -v"]
         parts += options
