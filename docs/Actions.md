@@ -609,6 +609,12 @@ increment_build_numer(
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_build_number` action.
 
+You can also only receive the build number without modifying it
+
+```ruby
+version = get_build_number(xcodepoj: "Project.xcodeproj")
+```
+
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
@@ -634,6 +640,12 @@ increment_version_number(
 ```
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_version_number` action.
+
+You can also only receive the version number without modifying it
+
+```ruby
+version = get_version_number(xcodepoj: "Project.xcodeproj")
+```
 
 ### set_build_number_repository
 ```ruby
