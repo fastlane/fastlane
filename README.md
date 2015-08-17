@@ -130,6 +130,8 @@ scheme "Example"
 
 sdk "9.0"
 
+clean true
+
 output_directory "./build"    # store the ipa in this folder
 output_name "MyApp"           # the name of the ipa file
 ```
