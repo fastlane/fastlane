@@ -20,6 +20,14 @@ fastlane action [action_name]:
 
 ## Building
 
+### [Bundler](http://bundler.io/)
+
+This will install your Gemfile by executing `bundle install`
+
+```ruby
+bundle_install
+```
+
 ### [CocoaPods](http://cocoapods.org)
 
 Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
@@ -95,6 +103,68 @@ snapshot(
 
 Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
 
+### [gym](https://github.com/fastlane/gym)
+
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
+
+```ruby
+gym(scheme: "MyApp", workspace: "MyApp.xcworkspace")
+```
+
+There are many more options available, you can use `gym --help` to get the latest list of available options.
+
+```ruby
+gym(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  silent: true,
+  clean: true,
+  output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+  output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+  sdk: "10.0"                     # use SDK as the name or path of the base SDK when building the project.
+)
+```
+
+Use `gym --help` to get all available options.
+
+The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+### ipa
+
+Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
+
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+
+```ruby
+ipa(
+  workspace: "MyApp.xcworkspace",
+  configuration: "Debug",
+  scheme: "MyApp",
+  # (optionals)
+  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
+  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+  identity: "MyIdentity",          # Identity to be used along with --embed
+  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+  archive: true                    # this means 'Do Archive'. Archive project after building (the default if not specified).
+)
+```
+
+The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
+
+
+**Important:**
+
+To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
+
+See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
+
+
 ### update_project_provisioning
 
 This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
@@ -132,40 +202,6 @@ update_app_group_identifiers(
 	entitlements_file: '/path/to/entitlements_file.entitlements',
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
-
-### ipa
-
-Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
-
-You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
-
-```ruby
-ipa(
-  workspace: "MyApp.xcworkspace",
-  configuration: "Debug",
-  scheme: "MyApp",
-  # (optionals)
-  clean: true,                     # This means 'Do Clean'. Cleans project before building (the default if not specified).
-  destination: "path/to/dir",      # Destination directory. Defaults to current directory.
-  ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
-  xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
-  embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
-  identity: "MyIdentity",          # Identity to be used along with --embed
-  sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
-  archive: true                    # this means 'Do Archive'. Archive project after building (the default if not specified).
-)
-```
-
-The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
-
-The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
-
-
-**Important:**
-
-To also use it in `deliver`, update your `Deliverfile` and remove all code in the `Building and Testing` section, in particular all `ipa` and `beta_ipa` blocks.
-
-See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses the `ipa` action.
 
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
 Use this command if you are supporting multiple versions of Xcode
@@ -529,6 +565,21 @@ If you put `deploygate` after `ipa` action, you don't have to specify IPA file p
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
 
+### [Xcode Server get assets](https://www.apple.com/uk/support/osxserver/xcodeserver/)
+
+This action retrieves integration assets (`.xcarchive`, logs etc) from your Xcode Server instance over HTTPS.
+
+```ruby
+xcode_server_get_assets(
+    host: '10.99.0.59', # Specify Xcode Server's Host or IP Address
+    bot_name: 'release-1.3.4' # Specify the particular Bot
+  )
+```
+
+This allows you to use Xcode Server for building and testing, which can be useful when your build takes a long time and requires connected iOS devices for testing. This action only requires you specify the `host` and the `bot_name` and it will go and download, unzip and return a path to the downloaded folder. Then you can export an IPA from the archive and upload it with `deliver`.
+
+Run `fastlane action xcode_server_get_assets` for the full list of options.
+
 ### set_changelog
 
 To easily set the changelog of an app on iTunes Connect for all languages
@@ -558,6 +609,12 @@ increment_build_numer(
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_build_number` action.
 
+You can also only receive the build number without modifying it
+
+```ruby
+version = get_build_number(xcodepoj: "Project.xcodeproj")
+```
+
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
 This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
 
@@ -583,6 +640,12 @@ increment_version_number(
 ```
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `increment_version_number` action.
+
+You can also only receive the version number without modifying it
+
+```ruby
+version = get_version_number(xcodepoj: "Project.xcodeproj")
+```
 
 ### set_build_number_repository
 ```ruby
@@ -683,9 +746,7 @@ This will register iOS devices with the Developer Portal so that you can include
 
 This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
 
-If you're a member of multiple teams, you don't need to explicitly specify the team ID. In this case the action will try to get the team ID from `ENV['CUPERTINO_TEAM_ID']`, or `ENV['FASTLANE_TEAM_ID']`, in that order. So if you've specified the team ID using the team_id action, this action will automatically pick it up.
-
-The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['CUPERTINO_USERNAME']`.
+The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`.
 
 ```ruby
 # Simply provide a list of devices as a Hash

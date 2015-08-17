@@ -58,6 +58,13 @@ describe Fastlane do
         }.to raise_error "lane name must not contain any spaces".red
       end
 
+      it "raises an error if the name is on a black list" do
+        expect { 
+          @ff.lane :run do
+          end
+        }.to raise_error "Name 'run' is already taken"
+      end
+
       it "raises an error if name is not a symbol" do
         expect { 
           @ff.lane "string" do
@@ -239,7 +246,7 @@ describe Fastlane do
         }.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific".red)
       end
 
-      it "raises an error if the lane name contains spaces", now: true do
+      it "raises an error if the lane name contains spaces" do
         expect {
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
         }.to raise_error "lane name must not contain any spaces".red

@@ -36,7 +36,7 @@ describe Fastlane do
         expect(content).to include"  snapshot"
         expect(content).to include"  deliver"
         expect(content).to include"  xctool"
-        expect(content).to include"ipa(scheme: \"y\")"
+        expect(content).to include"gym(scheme: \"y\")"
       end
 
       after do

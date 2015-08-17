@@ -27,24 +27,24 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
   spec.add_dependency 'xcodeproj', '~> 0.20' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '~> 0.1' # prettify xcodebuild output
-  spec.add_dependency 'cupertino', '>= 1.3.3' # for registering iOS devices with the Apple Developer Center
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
-  spec.add_dependency 'fastlane_core', '~> 0.13.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '~> 0.4.0' # communication layer
-
+  spec.add_dependency 'fastlane_core', '>= 0.13.0' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.7.3' # Password Manager
+  spec.add_dependency 'spaceship', '>= 0.5.1' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '~> 0.13.0'
-  spec.add_dependency 'snapshot', '~> 0.9.2'
-  spec.add_dependency 'frameit', '~> 2.1.0'
-  spec.add_dependency 'pem', '~> 0.7.0'
-  spec.add_dependency 'cert', '~> 0.3.0'
-  spec.add_dependency 'sigh', '~> 0.10.3'
-  spec.add_dependency 'produce', '~> 0.5.1'
+  spec.add_dependency 'deliver', '>= 0.13.0'
+  spec.add_dependency 'snapshot', '>= 0.9.2'
+  spec.add_dependency 'frameit', '>= 2.1.0'
+  spec.add_dependency 'pem', '>= 0.7.1'
+  spec.add_dependency 'cert', '>= 0.3.0'
+  spec.add_dependency 'sigh', '>= 0.10.3'
+  spec.add_dependency 'produce', '>= 0.6.0'
+  spec.add_dependency 'gym', '>= 0.2.0'
 
   # Development only
   spec.add_development_dependency 'bundler'

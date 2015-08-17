@@ -30,7 +30,7 @@ platform :ios do
 
     # increment_build_number
 
-    ipa[[SCHEME]] # Build your app - more options available
+    gym[[SCHEME]] # Build your app - more options available
 
     xctool # run the tests of your app
   end

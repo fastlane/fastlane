@@ -1,10 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
-      DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
-    end
-
     ARGS_MAP = {
       workspace: '-w',
       project: '-p',
@@ -74,17 +69,18 @@ module Fastlane
           Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
           ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
+
+          Helper.log.info "You are using legacy `shenzhen` to build your app".yellow
+          Helper.log.info "It is recommended to upgrade to `gym`".yellow
+          Helper.log.info "https://github.com/fastlane/gym".yellow
         rescue => ex
           [
             "-------------------------------------------------------",
             "Original Error:",
             " => " + ex.to_s,
-            "A build error occured. This can have many reasons, usually",
-            "it has something to do with code signing. The `ipa` action",
-            "uses `shenzhen` under the hood: https://github.com/nomad/shenzhen",
-            "For code signing related issues, check out this guide:",
-            "https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md",
-            "The command that was used by fastlane:",
+            "A build error occured. You are using legacy `shenzhen` for building",
+            "it is recommended to upgrade to `gym`: ",
+            "https://github.com/fastlane/gym",
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|
