@@ -27,13 +27,13 @@ module Gym
 
           # Apply patches to PackageApplication4Gym from patches folder
           Dir[File.join(Helper.gem_path("gym"), "lib/assets/package_application_patches/*.diff")].each do |patch|
-            Helper.log.info "Applying Package Application patch: #{File.basename(patch)}" unless Gym.config[:silent]
+            Helper.log.info "Applying Package Application patch: #{File.basename(patch)}" if $verbose
             command = ["patch #{patched_package_application_path} < #{patch}"]
             Runner.new.print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
 
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: false,
-                                            print_command: !Gym.config[:silent],
+                                            print_command: $verbose,
                                                     error: proc do |output|
                                                       ErrorHandler.handle_package_error(output)
                                                     end)
