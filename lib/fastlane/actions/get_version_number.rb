@@ -61,13 +61,13 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
-                                       env_name: "FL_VERSION_NUMBER_PROJECT",
-                                       description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
-                                       verify_block: Proc.new do |value|
-                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
-                                        raise "Could not find Xcode project".red unless File.exists?(value)
-                                       end,
-                                       optional: true)
+                             env_name: "FL_VERSION_NUMBER_PROJECT",
+                             description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
+                             optional: true,
+                             verify_block: Proc.new do |value|
+                              raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
+                              raise "Could not find Xcode project".red if (not File.exists?(value) and not Helper.is_test?)
+                             end)
         ]
       end
 
