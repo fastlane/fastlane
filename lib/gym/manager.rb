@@ -17,6 +17,7 @@ module Gym
       rows << ["Workspace", config[:workspace]] if config[:workspace]
       rows << ["Scheme", config[:scheme]] if config[:scheme]
       rows << ["Configuration", config[:configuration]] if config[:configuration]
+      rows << ["Xcode path", Gym.xcode_path]
 
       puts ""
       puts Terminal::Table.new(
