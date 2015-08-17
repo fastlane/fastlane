@@ -56,6 +56,12 @@ module Sigh
       Helper.log.info "Fetching profiles..."
       results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
 
+      # if more than one provisionings are found for the given app id then check for the provided name
+      # if a match found then return that. if the name is not provided then return all results.
+      name = Sigh.config[:provisioning_name]
+      short_results = results.select { |p| p.name.eql? name } if name
+      results = short_results if short_results and short_results.count > 0
+
       return results if Sigh.config[:skip_certificate_verification]
 
 
