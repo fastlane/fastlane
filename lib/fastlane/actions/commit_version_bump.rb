@@ -55,7 +55,7 @@ module Fastlane
         raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if git_dirty_files.empty?
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
-        changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)) == Set.new(expected_changed_files.map(&:downcase)))
+        changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)).subset? Set.new(expected_changed_files.map(&:downcase)))
         unless changed_files_as_expected
           unless params[:force]
             raise "Found unexpected uncommited changes in the working directory. Expected these files to have changed: \n#{expected_changed_files.join("\n")}.\nBut found these actual changes: \n#{git_dirty_files.join("\n")}.\nMake sure you have cleaned up the build artifacts and are only left with the changed version files at this stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to bypass this check, and always commit a version bump regardless of the state of the working directory.".red
