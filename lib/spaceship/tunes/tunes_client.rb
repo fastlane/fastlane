@@ -17,11 +17,12 @@ module Spaceship
       # trailer preview screenshots are required to have a specific size
       def video_preview_resolution_for(device, is_portrait)
         resolutions = {
-            iphone4: [1136, 640],
-            iphone6: [1334, 750],
-            iphone6Plus: [2208, 1242],
-            ipad: [1024, 768]
+            'iphone4' => [1136, 640],
+            'iphone6' => [1334, 750],
+            'iphone6Plus' => [2208, 1242],
+            'ipad' => [1024, 768]
         }
+        puts "#{device}: #{resolutions[device]}"
         r = resolutions[device]
         r = [r[1], r[0]] if is_portrait
         r
@@ -261,7 +262,7 @@ module Spaceship
     # Uploads a screenshot
     # @param app_version (AppVersion): The version of your app
     # @param upload_image (UploadFile): The image to upload
-    # @param device (FIXME): The target device
+    # @param device (string): The target device
     # @return [JSON] the response
     def upload_screenshot(app_version, upload_image, device)
       raise "app_version is required" unless app_version

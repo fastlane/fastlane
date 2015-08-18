@@ -81,6 +81,7 @@ module Spaceship
     end
 
     def screenshot_picture_type(device)
+      device = device.to_sym
       raise "Unknown picture type for device: #{device}" unless picture_type_map.key? device
       picture_type_map[device]
     end

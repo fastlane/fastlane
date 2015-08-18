@@ -297,7 +297,7 @@ module Spaceship
       # @param icon_path (String): The path to the screenshot. Use nil to remove it
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
-      # @param device (FIXME): The device for this screenshot
+      # @param device (string): The device for this screenshot
       def upload_screenshot!(screenshot_path, sort_order, language, device)
         raise "sort_order must be positive" unless sort_order > 0
         raise "sort_order must not be > 5" if sort_order > 5
@@ -346,10 +346,10 @@ module Spaceship
       # @param icon_path (String): The path to the screenshot. Use nil to remove it
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
-      # @param device (FIXME): The device for this screenshot
+      # @param device (String): The device for this screenshot
       # @param timestamp (String): The optional timestamp of the screenshot to grab
       def upload_trailer!(trailer_path, language, device, timestamp = "05.00", preview_image_path = nil)
-        raise "No app trailer supported for iphone35" if device == :iphone35
+        raise "No app trailer supported for iphone35" if device == 'iphone35'
 
         device_lang_trailer = trailer_data_for_language_and_device(language, device)
         if trailer_path # adding / replacing trailer / replacing preview
@@ -486,9 +486,8 @@ module Spaceship
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
         devices_details = lang_details[data_field]["value"]
-        device_s = device.to_s
-        raise "Unexpected state: missing device details for #{device_s}" unless devices_details.key? device_s
-        devices_details[device_s]
+        raise "Unexpected state: missing device details for #{device}" unless devices_details.key? device
+        devices_details[device]
       end
 
       def setup_screenshots

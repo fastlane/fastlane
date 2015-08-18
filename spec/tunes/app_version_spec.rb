@@ -261,26 +261,26 @@ describe Spaceship::AppVersion do
 
       it "cannot add a trailer to iphone35" do
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", :iphone35)
+          version.upload_trailer!(ipad_trailer_path, "English", 'iphone35')
         end.to raise_error "No app trailer supported for iphone35"
       end
 
       it "requires timestamp with a specific format" do
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", :ipad, "00:01.000")
+          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "00:01.000")
         end.to raise_error "Invalid timestamp 00:01.000"
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", :ipad, "01.000")
+          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "01.000")
         end.to raise_error "Invalid timestamp 01.000"
       end
 
       it "can add a new trailer" do
         # remove existing
-        version.upload_trailer!(nil, "English", :ipad)
+        version.upload_trailer!(nil, "English", 'ipad')
 
         count = ipad_trailers.count
         expect(count).to eq(0)
-        version.upload_trailer!(ipad_trailer_path, "English", :ipad)
+        version.upload_trailer!(ipad_trailer_path, "English", 'ipad')
         count_after = ipad_trailers.count
         expect(count_after).to eq(count + 1)
         expect(count_after).to eq(count + 1)
@@ -302,7 +302,7 @@ describe Spaceship::AppVersion do
 
         count = ipad_trailers.count
         expect(count).to eq(1)
-        version.upload_trailer!(ipad_trailer_path, "English", :ipad, "06.12")
+        version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "06.12")
         count_after = ipad_trailers.count
         expect(count_after).to eq(count)
         trailer = ipad_trailers[0]
@@ -320,20 +320,20 @@ describe Spaceship::AppVersion do
 
       it "can add a new trailer given a valid externally provided preview screenshot" do
         # remove existing
-        version.upload_trailer!(nil, "English", :ipad)
+        version.upload_trailer!(nil, "English", 'ipad')
 
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", :ipad, '12.34', ipad_external_invalid_trailer_preview_path)
+          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_invalid_trailer_preview_path)
         end.to raise_error "Invalid portrait screenshot resolution for device ipad. Should be [768, 1024]"
       end
 
       it "can add a new trailer given a valid externally provided preview screenshot" do
         # remove existing
-        version.upload_trailer!(nil, "English", :ipad)
+        version.upload_trailer!(nil, "English", 'ipad')
 
         count = ipad_trailers.count
         expect(count).to eq(0)
-        version.upload_trailer!(ipad_trailer_path, "English", :ipad, '12.34', ipad_external_valid_trailer_preview_path)
+        version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_valid_trailer_preview_path)
         count_after = ipad_trailers.count
         expect(count_after).to eq(count + 1)
         trailer = ipad_trailers[0]
@@ -353,7 +353,7 @@ describe Spaceship::AppVersion do
       it "remove the video trailer" do
         count = ipad_trailers.count
         expect(count).to eq(1)
-        version.upload_trailer!(nil, "English", :ipad)
+        version.upload_trailer!(nil, "English", 'ipad')
         count_after = ipad_trailers.count
         expect(count_after).to eq(count - 1)
       end
@@ -396,38 +396,38 @@ describe Spaceship::AppVersion do
       describe "Parameter checks" do
         it "prevents from using negative sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, -1, "English", :iphone4)
+            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4')
           end.to raise_error "sort_order must be positive"
         end
 
         it "prevents from using sort_order 0" do
           expect do
-            version.upload_screenshot!(screenshot_path, 0, "English", :iphone4)
+            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4')
           end.to raise_error "sort_order must be positive"
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", :iphone4)
+            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4')
           end.to raise_error "sort_order must not be > 5"
         end
 
         # not really sure if we want to enforce that
         # it "prevents from letting holes in sort_orders" do
         #  expect do
-        #    version.upload_screenshot!(screenshot_path, 4, "English", :iphone4)
+        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
         #  end.to raise_error "FIXME"
         # end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", :iphone4)
+            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4')
           end.to raise_error "NotALanguage isn't an activated language"
         end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English_CA", :iphone4)
+            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4')
           end.to raise_error "English_CA isn't an activated language"
         end
 
@@ -443,7 +443,7 @@ describe Spaceship::AppVersion do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 3, "English", :iphone4)
+          version.upload_screenshot!(screenshot_path, 3, "English", 'iphone4')
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
@@ -451,19 +451,19 @@ describe Spaceship::AppVersion do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 2, "English", :iphone4)
+          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4')
           expect(version.screenshots["English"].count).to eq(count)
         end
 
         it "can remove existing screenshot" do
           count = version.screenshots["English"].count
-          version.upload_screenshot!(nil, 2, "English", :iphone4)
+          version.upload_screenshot!(nil, 2, "English", 'iphone4')
           expect(version.screenshots["English"].count).to eq(count - 1)
         end
 
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
-            version.upload_screenshot!(nil, 3, "English", :iphone4)
+            version.upload_screenshot!(nil, 3, "English", 'iphone4')
           end.to raise_error "cannot remove screenshot with non existing sort_order"
         end
       end
