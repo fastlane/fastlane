@@ -48,13 +48,13 @@ module Spaceship
         #  - wosid
 
         begin
-          cooks = response['Set-Cookie']
+          re = response['Set-Cookie']
 
           to_use = [
-            "myacinfo=" + cooks.match(/myacinfo=(\w+)/)[1],
-            "woinst=" + cooks.match(/woinst=(\w+)/)[1],
-            "itctx=" + cooks.match(/itctx=([\w\:]+)/)[1],
-            "wosid=" + cooks.match(/wosid=(\w+)/)[1]
+            "myacinfo=" + re.match(/myacinfo=([^;]*)/)[1],
+            "woinst=" + re.match(/woinst=([^;]*)/)[1],
+            "itctx=" + re.match(/itctx=([^;]*)/)[1],
+            "wosid=" + re.match(/wosid=([^;]*)/)[1]
           ]
 
           @cookie = to_use.join(';')
