@@ -126,7 +126,12 @@ module Frameit
         left_space = (background.width / 2.0 - image.width / 2.0).round
         bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
         bottom_space -= 40 if screenshot.is_portrait? # even more for portrait mode
-        bottom_space -= 50 if (screenshot.is_mini? and screenshot.is_portrait?) # super old devices
+
+        if screenshot.is_mini?
+          # Such small devices need special treatment
+          bottom_space -= 50 if screenshot.is_portrait?
+          bottom_space += 65 unless screenshot.is_portrait?
+        end
 
         self.top_space_above_device = background.height - image.height - bottom_space
 
@@ -152,24 +157,39 @@ module Frameit
         keyword = title_images[:keyword]
         title = title_images[:title]
 
-        sum_width = (keyword.width rescue 0) + title.width
+        # sum_width: the width of both labels together including the space inbetween
+        #   is used to calculate the ratio
+        sum_width = title.width
+        sum_width += keyword.width + keyword_padding if keyword
 
-        if keyword
-          sum_width += keyword_padding
+        # Resize the 2 labels if necessary
+        smaller = 1.0 # default
+        ratio = (sum_width + keyword_padding * 2) / image.width.to_f
+        if ratio > 1.0
+          # too large - resizing now
+          smaller = (1.0 / ratio)
+
+          Helper.log.debug "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
+
+          title.resize"#{(smaller * title.width).round}x"
+          keyword.resize"#{(smaller * keyword.width).round}x" if keyword
+          sum_width *= smaller
         end
 
-        top_space = (top_space_above_device / 2.0 - actual_font_size / 2.0).round # centered
-        
+        top_space = (top_space_above_device / 2.0 - (actual_font_size / 2.0 * smaller)).round # centered
         left_space = (image.width / 2.0 - sum_width / 2.0).round
+
+        # First, put the keyword on top of the screenshot, if we have one
         if keyword
           @image = image.composite(keyword, "png") do |c|
             c.compose "Over"
             c.geometry "+#{left_space}+#{top_space}"
           end
 
-          left_space += (keyword.width rescue 0) + keyword_padding
+          left_space += keyword.width + (keyword_padding * smaller)
         end
         
+        # Then, put the title on top of the screenshot next to the keyword
         @image = image.composite(title, "png") do |c|
           c.compose "Over"
           c.geometry "+#{left_space}+#{top_space}"
@@ -181,6 +201,7 @@ module Frameit
         [top_space_above_device / 3.0, @image.width / 30.0].max.round
       end
 
+      # The space between the keyword and the title
       def keyword_padding
         (actual_font_size / 2.0).round
       end
@@ -195,7 +216,8 @@ module Frameit
           title_image = MiniMagick::Image.open(empty_path)
           image_height = actual_font_size * 2 # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
           title_image.combine_options do |i|
-            i.resize "#{max_width}x#{image_height}!" # `!` says it should ignore the ratio
+            # * 2.0 as the text might be larger than the actual image. We're trimming afterwards anyway
+            i.resize "#{max_width * 2.0}x#{image_height}!" # `!` says it should ignore the ratio
           end
 
           current_font = font(key)
