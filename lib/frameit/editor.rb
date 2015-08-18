@@ -126,7 +126,12 @@ module Frameit
         left_space = (background.width / 2.0 - image.width / 2.0).round
         bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
         bottom_space -= 40 if screenshot.is_portrait? # even more for portrait mode
-        bottom_space -= 50 if (screenshot.is_mini? and screenshot.is_portrait?) # super old devices
+
+        if screenshot.is_mini?
+          # Such small devices need special treatment
+          bottom_space -= 50 if screenshot.is_portrait?
+          bottom_space += 65 unless screenshot.is_portrait?
+        end
 
         self.top_space_above_device = background.height - image.height - bottom_space
 
@@ -164,7 +169,7 @@ module Frameit
           # too large - resizing now
           smaller = (1.0 / ratio)
 
-          Helper.log.debug "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}"if $verbose
+          Helper.log.debug "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
 
           title.resize"#{(smaller * title.width).round}x"
           keyword.resize"#{(smaller * keyword.width).round}x" if keyword
