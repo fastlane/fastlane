@@ -24,12 +24,12 @@ module Gym
         current = c.to_s.dup
         next unless current.length > 0
 
-        if current.include? "-" and current.to_s.split(" '").count == 2
+        match_default_parameter = current.match(/(-.*) '(.*)'/)
+        if match_default_parameter
           # That's a default parameter, like `-project 'Name'`
-          # We use " '" to not split by spaces within the value (e.g. path)
-          current.split(" '")
+          match_default_parameter[1, 2]
         else
-          current.gsub!("| ", "") # as the | will somehow break the terminal table
+          current.gsub!("| ", "\| ") # as the | will somehow break the terminal table
           [current, ""]
         end
       end
