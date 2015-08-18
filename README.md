@@ -251,6 +251,15 @@ Some stock images provided by Apple still have a white background instead of a t
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
+## Gray artifacts around text
+
+If you run into any quality issues, like having a border around the font, it usually helps to just re-install `imagemagick`. You can do so by running
+
+```sh
+brew uninstall imagemagick
+brew install imagemagick
+```
+
 ## Uninstall
 - ```sudo gem uninstall frameit```
 - ```rm -rf ~/.frameit```
