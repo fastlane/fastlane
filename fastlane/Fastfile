@@ -1,0 +1,2 @@
+# this requires fastlane to be checked out in the same folder
+import_from_git(url: "https://github.com/krausefx/fastlane/")

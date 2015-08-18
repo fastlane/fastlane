@@ -34,3 +34,4 @@ build/
 .rvmrc
 Gemfile.lock
 screenshots
+fastlane/report.xml
