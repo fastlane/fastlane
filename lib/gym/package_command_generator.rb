@@ -44,7 +44,7 @@ module Gym
       end
 
       def appfile_path
-        Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").first
+        Dir[BuildCommandGenerator.archive_path + "/**/*.app"].last
       end
 
       # We export it to the temporary folder and move it over to the actual output once it's finished and valid
