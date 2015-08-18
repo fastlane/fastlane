@@ -29,7 +29,7 @@ module Gym
           # That's a default parameter, like `-project 'Name'`
           match_default_parameter[1, 2]
         else
-          current.gsub!("| ", "") # as the | will somehow break the terminal table
+          current.gsub!("| ", "\| ") # as the | will somehow break the terminal table
           [current, ""]
         end
       end
