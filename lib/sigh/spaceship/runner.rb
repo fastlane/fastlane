@@ -58,7 +58,8 @@ module Sigh
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
-        results = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
+        filtered = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
+        results = filtered if (filtered || []).count > 0
       end
 
       return results if Sigh.config[:skip_certificate_verification]
