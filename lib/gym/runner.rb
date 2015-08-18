@@ -91,7 +91,8 @@ module Gym
     # @return (String) The path to the resulting ipa file
     def move_results
       require 'fileutils'
-
+      
+      FileUtils.mkdir_p(Gym.config[:output_directory])
       FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
 
       if PackageCommandGenerator.dsym_path

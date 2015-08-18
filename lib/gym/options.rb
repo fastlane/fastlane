@@ -49,10 +49,7 @@ module Gym
                                      short_option: "-o",
                                      env_name: "GYM_OUTPUT_DIRECTORY",
                                      description: "The directory in which the ipa file should be stored in",
-                                     default_value: ".",
-                                     verify_block: proc do |value|
-                                       raise "Directory not found at path '#{File.expand_path(value)}'".red unless File.directory?(value)
-                                     end),
+                                     default_value: "."),
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
