@@ -6,12 +6,9 @@ module Gym
   class PackageCommandGenerator
     class << self
       def generate
-        @patched_package_application = XcodebuildFixes.patch_package_application
-
-        parts = ["/usr/bin/xcrun #{@patched_package_application} -v"]
+        parts = ["/usr/bin/xcrun #{XcodebuildFixes.patch_package_application} -v"]
         parts += options
         parts += pipe
-        parts += postfix
 
         parts
       end
@@ -36,11 +33,6 @@ module Gym
 
       def pipe
         [""]
-      end
-
-      def postfix
-        # Remove the patched PackageApplication file after the export is finished
-        ["&& rm '#{@patched_package_application}'"]
       end
 
       def appfile_path

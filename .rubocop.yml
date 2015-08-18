@@ -33,3 +33,6 @@ Lint/UnusedBlockArgument:
 # Needed for $verbose
 Style/GlobalVars:
   Enabled: false
+
+Style/FileName:
+  Enabled: false

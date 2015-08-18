@@ -11,6 +11,7 @@ module Gym
       package_app
       Gym::XcodebuildFixes.swift_library_fix
       Gym::XcodebuildFixes.watchkit_fix
+      Gym::XcodebuildFixes.clear_patched_package_application
       move_results
     end
 
