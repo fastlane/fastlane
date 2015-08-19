@@ -46,7 +46,7 @@ module Spaceship
         #  - myacinfo
         #  - woinst
         #  - wosid
-
+        #  - itctx
         begin
           re = response['Set-Cookie']
 
@@ -59,14 +59,18 @@ module Spaceship
 
           @cookie = to_use.join(';')
         rescue
-          # User Credentials are wrong
-          raise InvalidUserCredentialsError.new, response
+          raise ITunesConnectError.new, [response.body, response['Set-Cookie']].join("\n")
         end
 
         return @client
       else
-        # User Credentials are wrong
-        raise InvalidUserCredentialsError.new, response
+        if (response.body || "").include?("You have successfully signed out")
+          # User Credentials are wrong
+          raise InvalidUserCredentialsError.new, "Invalid username / password combination"
+        else
+          info = [response.body, response['Set-Cookie']]
+          raise ITunesConnectError.new, info.join("\n")
+        end
       end
     end
 
