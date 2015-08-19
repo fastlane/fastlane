@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         cmd = []
 
-        cmd << ['bundle exec'] if File.exists?('Gemfile')
+        cmd << ['bundle exec'] if File.exists?('Gemfile') && !params[:skip_bundle_exec]
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
@@ -47,6 +47,11 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_ANSI",
                                        description: "Show output with ANSI codes",
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :skip_bundle_exec,
+                                       env_name: "FL_COCOAPODS_SKIP_BUNDLE_EXEC",
+                                       description: "Skips bundle exec even if there is a Gemfile",
+                                       is_string: false,
+                                       default_value: false),
         ]
       end
 
