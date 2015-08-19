@@ -129,7 +129,7 @@ module Gym
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
-      platform = Gym.project.build_settings("PLATFORM_DISPLAY_NAME") || "iOS" # either `iOS` or `OS X`
+      platform = Gym.project.build_settings(key: "PLATFORM_DISPLAY_NAME") || "iOS" # either `iOS` or `OS X`
 
       Gym.config[:destination] = "generic/platform=#{platform}"
     end

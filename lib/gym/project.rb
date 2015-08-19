@@ -53,18 +53,21 @@ module Gym
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
-      name = build_settings("WRAPPER_NAME")
+      name = build_settings(key: "WRAPPER_NAME")
 
-      return name.gsub(build_settings("WRAPPER_SUFFIX"), "") if name
+      return name.gsub(build_settings(key: "WRAPPER_SUFFIX"), "") if name
       nil
     end
 
     def mac?
-      build_settings("PLATFORM_DISPLAY_NAME") == "OS X"
+      !ios?
     end
 
     def ios?
-      build_settings("PLATFORM_DISPLAY_NAME") == "iOS"
+      # Some proects have different values... we have to look for all of them
+      return true if build_settings(key: "PLATFORM_NAME") == "iphoneos"
+      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "iOS"
+      false
     end
 
     #####################################################
@@ -74,7 +77,7 @@ module Gym
     # Get the build settings for our project
     # this is used to properly get the DerivedData folder
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
-    def build_settings(key)
+    def build_settings(key: nil, optional: true)
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         command = "xcrun xcodebuild -showBuildSettings #{BuildCommandGenerator.project_path_array.join(' ')}"
@@ -86,6 +89,8 @@ module Gym
         result = @build_settings.split("\n").find { |c| c.include? key }
         return result.split(" = ").last
       rescue => ex
+        return nil if optional # an optional value, we really don't care if something goes wrong
+
         Helper.log.error caller.join("\n\t")
         Helper.log.error "Could not fetch #{key} from project file: #{ex}"
       end
