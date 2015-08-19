@@ -195,7 +195,7 @@ module Fastlane
 
         if File.directory?folder
           Helper.log.info "Using existing git repo..."
-          Actions.sh("git pull")
+          Actions.sh("cd '#{folder}' && git pull")
         else
           # When this fails, we have to clone the git repo
           Helper.log.info "Cloning remote git repo..."
