@@ -10,7 +10,7 @@ module CredentialsManager
     # @return [String] The password of the currently logged in user
     attr_accessor :password
 
-    HOST = "deliver" # there might be a string appended, if user has multiple accounts
+    HOST = "deliver" # there *is* a string appended
     private_constant :HOST
 
     # A singleton object, which also makes sure, to use the correct Apple ID
