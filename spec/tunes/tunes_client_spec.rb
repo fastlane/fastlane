@@ -5,7 +5,7 @@ describe Spaceship::TunesClient do
     it 'raises an exception if authentication failed' do
       expect do
         subject.login('bad-username', 'bad-password')
-      end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)
+      end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError, "Invalid username and password combination. Used 'bad-username' as the username.")
     end
 
     it "raises an exception if no login data is provided at all" do

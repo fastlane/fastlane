@@ -66,7 +66,7 @@ module Spaceship
       else
         if (response.body || "").include?("You have successfully signed out")
           # User Credentials are wrong
-          raise InvalidUserCredentialsError.new, "Invalid username / password combination"
+          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         else
           info = [response.body, response['Set-Cookie']]
           raise ITunesConnectError.new, info.join("\n")
