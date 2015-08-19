@@ -33,6 +33,14 @@ describe Gym do
       it "#app_name" do
         expect(@project.app_name).to eq("ExampleProductName")
       end
+
+      it "#mac?" do
+        expect(@project.mac?).to eq(false)
+      end
+
+      it "#ios?" do
+        expect(@project.ios?).to eq(true)
+      end
     end
 
     describe "Valid CocoaPods Project" do
@@ -49,6 +57,27 @@ describe Gym do
 
       it "#schemes returns all configurations" do
         expect(@workspace.configurations).to eq([])
+      end
+    end
+
+    describe "Mac Project" do
+      before do
+        options = { project: "./examples/Mac/Mac.xcodeproj" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        @project = Gym::Project.new(Gym.config)
+      end
+
+      it "#mac?" do
+        expect(@project.mac?).to eq(true)
+      end
+
+      it "#ios?" do
+        expect(@project.ios?).to eq(false)
+      end
+
+      it "schemes" do
+        expect(@project.schemes).to eq(["Mac"])
       end
     end
   end

@@ -53,7 +53,18 @@ module Gym
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
-      build_settings("WRAPPER_NAME").gsub(build_settings("WRAPPER_SUFFIX"), "")
+      name = build_settings("WRAPPER_NAME")
+
+      return name.gsub(build_settings("WRAPPER_SUFFIX"), "") if name
+      nil
+    end
+
+    def mac?
+      build_settings("PLATFORM_DISPLAY_NAME") == "OS X"
+    end
+
+    def ios?
+      build_settings("PLATFORM_DISPLAY_NAME") == "iOS"
     end
 
     #####################################################
@@ -73,11 +84,13 @@ module Gym
 
       begin
         result = @build_settings.split("\n").find { |c| c.include? key }
-        result.split(" = ").last
+        return result.split(" = ").last
       rescue => ex
         Helper.log.error caller.join("\n\t")
         Helper.log.error "Could not fetch #{key} from project file: #{ex}"
       end
+
+      nil
     end
 
     def raw_info

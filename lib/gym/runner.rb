@@ -1,5 +1,6 @@
 require 'pty'
 require 'open3'
+require 'fileutils'
 
 module Gym
   class Runner
@@ -8,11 +9,21 @@ module Gym
       clear_old_files
       build_app
       verify_archive
-      package_app
-      Gym::XcodebuildFixes.swift_library_fix
-      Gym::XcodebuildFixes.watchkit_fix
-      Gym::XcodebuildFixes.clear_patched_package_application
-      move_results
+
+      FileUtils.mkdir_p(Gym.config[:output_directory])
+
+      if Gym.project.ios?
+        package_app
+        Gym::XcodebuildFixes.swift_library_fix
+        Gym::XcodebuildFixes.watchkit_fix
+        Gym::XcodebuildFixes.clear_patched_package_application
+
+        compress_and_move_dsym
+        move_ipa
+      elsif Gym.project.mac?
+        compress_and_move_dsym
+        move_mac_app
+      end
     end
 
     #####################################################
@@ -88,34 +99,47 @@ module Gym
                                               end)
     end
 
+    def compress_and_move_dsym
+      return unless PackageCommandGenerator.dsym_path
+
+      # Compress and move the dsym file
+      containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
+      file_name = File.basename(PackageCommandGenerator.dsym_path)
+
+      output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
+      command = "cd '#{containing_directory}' && zip -r '#{output_path}' '#{file_name}'"
+      Helper.log.info command.yellow unless Gym.config[:silent]
+      command_result = `#{command}`
+      Helper.log.info command_result if $verbose
+
+      puts "" # new line
+
+      Helper.log.info "Successfully exported and compressed dSYM file.".green
+    end
+
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting ipa file
-    def move_results
-      require 'fileutils'
-      FileUtils.mkdir_p(Gym.config[:output_directory])
+    def move_ipa
       FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
-
-      if PackageCommandGenerator.dsym_path
-        # Compress and move the dsym file
-        containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
-        file_name = File.basename(PackageCommandGenerator.dsym_path)
-
-        output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-        command = "cd '#{containing_directory}' && zip -r '#{output_path}' '#{file_name}'"
-        Helper.log.info command.yellow unless Gym.config[:silent]
-        command_result = `#{command}`
-        Helper.log.info command_result if $verbose
-
-        puts "" # new line
-
-        Helper.log.info "Successfully exported and compressed dSYM file.".green
-      end
 
       ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
 
       Helper.log.info "Successfully exported and signed ipa file:".green
       Helper.log.info ipa_path
       ipa_path
+    end
+
+    # Move the .app from the archive into the output directory
+    def move_mac_app
+      app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
+      raise "Couldn't find application in '#{BuildCommandGenerator.archive_path}'".red unless app_path
+
+      FileUtils.mv(app_path, Gym.config[:output_directory], force: true)
+      app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
+
+      Helper.log.info "Successfully exported and signed ipa file:".green
+      Helper.log.info app_path
+      app_path
     end
   end
 end

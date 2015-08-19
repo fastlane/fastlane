@@ -83,7 +83,7 @@ module Gym
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
                                      description: "Use a custom destination for building the app",
-                                     default_value: "generic/platform=iOS"),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",

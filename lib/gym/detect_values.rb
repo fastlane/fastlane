@@ -17,6 +17,7 @@ module Gym
       end
 
       Gym.project = Project.new(config)
+      detect_platform
       detect_provisioning_profile
 
       # Go into the project's folder
@@ -123,6 +124,14 @@ module Gym
       else
         raise "Couldn't find any schemes in this project".red
       end
+    end
+
+    # Is it an iOS device or a Mac?
+    def self.detect_platform
+      return if Gym.config[:destination]
+      platform = Gym.project.build_settings("PLATFORM_DISPLAY_NAME") # either `iOS` or `OS X`
+
+      Gym.config[:destination] = "generic/platform=#{platform}"
     end
 
     # Detects the available configurations (e.g. Debug, Release)
