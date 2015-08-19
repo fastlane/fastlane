@@ -47,7 +47,8 @@ module Gym
       def clear_patched_package_application
         if @patched_package_application_path and File.exist?(@patched_package_application_path)
           Helper.log.debug "Removing patched PackageApplication file at path '#{@patched_package_application_path}'" if $verbose
-          File.delete(@patched_package_application_path)
+          # force in the unlikely event that the file was deleted (e.g. by a concurrent job)
+          FileUtils.rm @patched_package_application_path, force: true
         end
       end
     end
