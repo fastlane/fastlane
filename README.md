@@ -90,7 +90,7 @@ gym
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :floppy_disk:   | Store common build settings in a `Gymfile` 
 :outbox_tray: | All archives are stored and accessible in the Xcode Organizer
-:computer: | Support for both iOS and Mac applications
+:computer: | Supports both iOS and Mac applications
 
 ![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
 
