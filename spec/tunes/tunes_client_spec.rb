@@ -30,7 +30,7 @@ describe Spaceship::TunesClient do
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1").
          with(body: {"theAccountName" => "user", "theAccountPW" => "password"},
               headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'spaceship'}).
-         to_return(status: 200, body: 'random Body', headers: {'Set-Cookie': "myacinfo=asdf; That's a big mess;"} )
+         to_return(status: 200, body: 'random Body', headers: {'Set-Cookie' => "myacinfo=asdf; That's a big mess;"} )
 
       # This response doesn't set any header information and is therefore useless
       expect do
