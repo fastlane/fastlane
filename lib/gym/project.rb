@@ -15,6 +15,10 @@ module Gym
       end
     end
 
+    def workspace?
+      self.is_workspace
+    end
+
     # Get all available schemes in an array
     def schemes
       results = []
@@ -60,14 +64,14 @@ module Gym
     end
 
     def mac?
-      !ios?
+      # Some projects have different values... we have to look for all of them
+      return true if build_settings(key: "PLATFORM_NAME") == "macosx"
+      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "OS X"
+      false
     end
 
     def ios?
-      # Some proects have different values... we have to look for all of them
-      return true if build_settings(key: "PLATFORM_NAME") == "iphoneos"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "iOS"
-      false
+      !mac?
     end
 
     #####################################################

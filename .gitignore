@@ -11,3 +11,5 @@ fastlane/report.xml
 **/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
 ExampleProductName.ipa
 ExampleProductName.app.dSYM.zip
+**/*.dSYM.zip
+**/*.app

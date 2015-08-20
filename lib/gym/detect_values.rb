@@ -17,7 +17,6 @@ module Gym
       end
 
       Gym.project = Project.new(config)
-      detect_platform
       detect_provisioning_profile
 
       # Go into the project's folder
@@ -26,6 +25,7 @@ module Gym
       end
 
       detect_scheme
+      detect_platform # we can only do that *after* we have the scheme
       detect_configuration
 
       config[:output_name] ||= Gym.project.app_name

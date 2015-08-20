@@ -124,7 +124,7 @@ module Gym
 
       ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
 
-      Helper.log.info "Successfully exported and signed ipa file:".green
+      Helper.log.info "Successfully exported and signed the ipa file:".green
       Helper.log.info ipa_path
       ipa_path
     end
@@ -137,7 +137,7 @@ module Gym
       FileUtils.mv(app_path, Gym.config[:output_directory], force: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
 
-      Helper.log.info "Successfully exported and signed ipa file:".green
+      Helper.log.info "Successfully exported the .app file:".green
       Helper.log.info app_path
       app_path
     end
