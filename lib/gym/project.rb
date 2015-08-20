@@ -56,7 +56,7 @@ module Gym
       name = build_settings(key: "WRAPPER_NAME")
 
       return name.gsub(build_settings(key: "WRAPPER_SUFFIX"), "") if name
-      nil
+      return "App" # default value
     end
 
     def mac?
