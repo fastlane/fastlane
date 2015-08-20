@@ -17,6 +17,7 @@ fastlane action [action_name]:
 - [Using git](#using-git)
 - [Using mercurial](#using-mercurial)
 - [Notifications](#notifications)
+- [Misc](#misc)
 
 ## Building
 
@@ -1115,4 +1116,28 @@ before_all do
   increment_build_number
   ...
 end
+```
+
+## Misc
+
+### say
+
+To speak out a text
+
+```ruby
+say "I can speak"
+```
+
+### clipboard
+
+You can store a string in the clipboard running
+
+```ruby
+clipboard(value: "https://github.com/KrauseFx/fastlane")
+```
+
+This can be used to store some generated URL or value for easy copy & paste (e.g. the download link):
+
+```ruby
+clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
 ```
