@@ -190,7 +190,7 @@ Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to 
 
 ### Mac
 
-With `frameit` 2.0 is possible to also frame Mac OS X Applications. You have to provide the following:
+With `frameit` 2.0 it's possible to also frame Mac OS X Application screenshots. You have to provide the following:
 
 - The `offset` information so `frameit` knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac
