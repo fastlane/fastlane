@@ -122,7 +122,9 @@ module Gym
           config[:scheme] = choose(*(proj_schemes))
         end
       else
-        raise "Couldn't find any schemes in this project".red
+        Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
+
+        raise "No Schemes found".red
       end
     end
 

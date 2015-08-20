@@ -23,6 +23,7 @@ module Gym
     def schemes
       results = []
       output = raw_info.split("Schemes:").last.split(":").first
+      return results if is_workspace && output.start_with?("There are no schemes in workspace")
       output.split("\n").each do |current|
         current = current.strip
 
