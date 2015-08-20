@@ -24,7 +24,9 @@ module Gym
       results = []
       output = raw_info.split("Schemes:").last.split(":").first
 
-      return results if is_workspace && output.start_with?("There are no schemes in workspace")
+      if raw_info.include?("There are no schemes in workspace") or raw_info.include?("This project contains no schemes")
+        return results
+      end
 
       output.split("\n").each do |current|
         current = current.strip

@@ -123,6 +123,7 @@ module Gym
         end
       else
         Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
+        Helper.log.error "Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use".red
 
         raise "No Schemes found".red
       end
