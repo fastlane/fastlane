@@ -246,8 +246,7 @@ If you run into any issues you can use the `verbose` mode to get a more detailed
 `pilot` uses the [CredentialsManager](https://github.com/fastlane/CredentialsManager) from `fastlane`.
 
 # Need help?
-- If there is a technical problem with `pilot`, submit an issue.
-- I'm available for contract work - drop me an email: pilot@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
