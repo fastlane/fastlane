@@ -1,14 +1,16 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Clipboard Integration" do
-      it "properly stores the value in the clipboard" do
-        str = "Some value: #{Time.now.to_i.to_s}"
+      if FastlaneCore::Helper.is_mac?
+        it "properly stores the value in the clipboard" do
+          str = "Some value: #{Time.now.to_i.to_s}"
 
-        value = Fastlane::FastFile.new.parse("lane :test do
-          clipboard(value: '#{str}')
-        end").runner.execute(:test)
+          value = Fastlane::FastFile.new.parse("lane :test do
+            clipboard(value: '#{str}')
+          end").runner.execute(:test)
 
-        expect(`pbpaste`).to eq(str)
+          expect(`pbpaste`).to eq(str)
+        end
       end
 
       it "raises an error if the value is passed without a hash" do
