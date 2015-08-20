@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      CLIPBOARD_VALUE = :CLIPBOARD_VALUE
-    end
-
     class ClipboardAction < Action
       def self.run(params)
         Helper.log.info "Storing '#{params[:value]}' in the clipboard 🎨"
@@ -24,12 +20,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_CLIPBOARD_VALUE",
                                        description: "The string that should be copied into the clipboard")
-        ]
-      end
-
-      def self.output
-        [
-          ['CLIPBOARD_VALUE', 'The last value that was copied into the clipboard by this action']
         ]
       end
 
