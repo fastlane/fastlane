@@ -136,7 +136,7 @@ module Fastlane
               # This action does not use the new action format
               # Just passing the arguments to this method
             else
-              raise "You have to pass the options for '#{method_sym}' in a different way. Please check out the current documentation on GitHub!".red
+              raise "You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.".red
             end
 
             class_ref.run(arguments)
