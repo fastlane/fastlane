@@ -1,5 +1,3 @@
-require "shellwords"
-
 describe Gym do
   describe Gym::BuildCommandGenerator do
     it "raises an exception when project path wasn't found" do

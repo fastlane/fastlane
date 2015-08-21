@@ -23,7 +23,7 @@ describe Gym do
       result = Gym::PackageCommandGenerator.generate
       expect(result).to eq([
         "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
-        Shellwords.escape("Krause's App"),
+        "Krause\\'s\\ App",
         "-o '#{Gym::PackageCommandGenerator.ipa_path}'",
         "exportFormat ipa",
         ""
