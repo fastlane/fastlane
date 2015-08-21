@@ -29,7 +29,7 @@ module Gym
           Dir.chdir(tmpdir) do
             command_parts = ["zip --recurse-paths #{PackageCommandGenerator.ipa_path} SwiftSupport"]
             command_parts << "> /dev/null" unless $verbose
-            print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
+            Runner.new.print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
             FastlaneCore::CommandExecutor.execute(command: command_parts,
                                                 print_all: false,
