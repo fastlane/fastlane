@@ -142,6 +142,24 @@ output_directory "./build"    # store the ipa in this folder
 output_name "MyApp"           # the name of the ipa file
 ```
 
+# Automating the whole process
+
+`gym` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow. 
+
+Using `fastlane` you can define a configuration like
+
+```ruby
+lane :beta do
+  xctool
+  gym(scheme: "MyApp")
+  crashlytics
+end
+```
+
+You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
+
+For more information visit the [fastlane GitHub page](https://github.com/KrauseFx/fastlane).
+
 # How does it work?
 
 `gym` uses the latest APIs to build and sign your application. The 2 main components are 
