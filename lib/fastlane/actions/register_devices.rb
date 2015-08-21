@@ -13,6 +13,7 @@ module Fastlane
         require 'spaceship'
 
         devices = params[:devices]
+        devices_file = params[:devices_file]
 
         credentials = CredentialsManager::PasswordManager.shared_manager(params[:username])
         Spaceship::Portal.login(credentials.username, credentials.password)
@@ -23,11 +24,17 @@ module Fastlane
             Spaceship::Device.create!(name: k, udid: v)
           end
         elsif devices_file
-          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
+          require 'csv'
 
+          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
           raise 'Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless devices_file.first == ['Device ID', 'Device Name']
 
+          Helper.log.info "Fetching list of currently registered devices..."
+          existing_devices = Spaceship::Device.all
+
           device_objs = devices_file.drop(1).map do |device|
+            next if existing_devices.map(&:udid).include?(device[0])
+
             raise 'Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless device.count == 2
             raise "Passed invalid UDID: #{device[0]} for device: #{device[1]}".red unless UDID_REGEXP =~ device[0]
 
