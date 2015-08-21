@@ -16,7 +16,7 @@ module Gym
       def options
         options = []
 
-        options << "'#{appfile_path}'"
+        options << Shellwords.escape(appfile_path)
         options << "-o '#{ipa_path}'"
         options << "exportFormat ipa"
 
