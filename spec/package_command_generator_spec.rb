@@ -29,6 +29,5 @@ describe Gym do
         ""
       ])
     end
-
   end
 end
