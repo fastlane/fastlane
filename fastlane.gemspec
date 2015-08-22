@@ -42,9 +42,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 2.2.0', '< 3.0.0'
   spec.add_dependency 'pem', '>= 0.7.1', '< 1.0.0'
   spec.add_dependency 'cert', '>= 0.3.0', '< 1.0.0'
-  spec.add_dependency 'sigh', '>= 0.10.4', '< 1.0.0'
+  spec.add_dependency 'sigh', '>= 0.10.5', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.0', '< 1.0.0'
   spec.add_dependency 'gym', '>= 0.4.4', '< 1.0.0'
+  spec.add_dependency 'pilot', '>= 0.1.6', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'

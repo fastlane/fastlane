@@ -14,6 +14,7 @@ module Fastlane
       unless (ff.is_platform_block?lane rescue false) # rescue, because this raises an exception if it can't be found at all
         # maybe the user specified a default platform
         # We'll only do this, if the lane specified isn't a platform, as we want to list all platforms then
+
         platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
       end
 
