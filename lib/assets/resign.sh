@@ -362,13 +362,18 @@ else
 #               checkStatus  -- if this fails it's likely because the keychain-access-groups key does not exist, so we have nothing to update
                 if [[ "$CERTIFICATE" == *Distribution* ]]; then
                     IS_ENTERPRISE_PROFILE=`PlistBuddy -c "Print :ProvisionsAllDevices" "$TEMP_DIR/profile.plist" | tr -d '\n'`
+                    ADHOC_PROVISIONING_DEVICES=`PlistBuddy -c "Print :ProvisionedDevices" "$TEMP_DIR/profile.plist" | tr -d '\n'`
 
                     echo "Assuming Distribution Identity"
                     if [ "$ADJUST_BETA_REPORTS_ACTIVE_FLAG" == "1" ]; then
                         if [ "$IS_ENTERPRISE_PROFILE" == "true" ]; then
                             echo "Ensuring beta-reports-active is not included for Enterprise environment"
-                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements"
-                            checkStatus
+                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements" || true
+#                           checkStatus -- this can fail is beta-reports-active isn't present, which is OK
+                        elif [ -n "$ADHOC_PROVISIONING_DEVICES" ]; then
+                            echo "Ensuring beta-reports-active is not included for Adhoc environment"
+                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements" || true
+#                           checkStatus -- this can fail is beta-reports-active isn't present, which is OK
                         else
                             echo "Ensuring beta-reports-active is present and enabled"
                             # new beta key is only used for Distribution; might not exist yet, if we were building Development
