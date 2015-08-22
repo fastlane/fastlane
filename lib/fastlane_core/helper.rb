@@ -70,8 +70,13 @@ module FastlaneCore
       `xcode-select -p`.gsub("\n", '') + "/"
     end
 
-    # Is the currently running computer a Mac?
+    
     def self.is_mac?
+      self.mac?
+    end
+
+    # Is the currently running computer a Mac?
+    def self.mac?
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
