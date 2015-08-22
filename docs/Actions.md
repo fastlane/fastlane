@@ -439,6 +439,15 @@ ensure_no_debug_code(text: "NSLog",
 
 ## Deploying
 
+### [pilot](https://github.com/fastlane/pilot)
+
+```ruby
+pilot(username: "felix@krausefx.com",
+      app_identifier: "com.krausefx.app")
+```
+
+More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/pilot).
+
 ### [deliver](https://github.com/KrauseFx/deliver)
 ```ruby
 deliver
