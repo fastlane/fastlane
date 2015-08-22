@@ -16,7 +16,8 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:apple_id]).to eq('felix@sunapps.net')
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:team_id]).to eq('Q2CBPJ58CC')
 
-        ENV["FASTLANE_LANE_NAME"] = "ios something"
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+        ENV["FASTLANE_LANE_NAME"] = :something.to_s
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile1').data[:app_identifier]).to eq('platform.com')
       end
     end
@@ -144,6 +145,22 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:apple_id]).to eq('felix@sunapps.net')
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:app_identifier]).to eq('enterprise.com')
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile6').data[:team_id]).to eq('Q2CBPJ58AA')
+      end
+    end
+
+    describe "Appfile8" do
+      it "allows dynamic creation of for_lane blocks" do
+        ENV["FASTLANE_LANE_NAME"] = nil
+        ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:app_identifier]).to eq('*')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:apple_id]).to eq('myAppleId@mail.com')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:team_id]).to eq(nil)
+
+        ENV["FASTLANE_LANE_NAME"] = :lane_name1.to_s
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:app_identifier]).to eq('lane_name1.*')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:apple_id]).to eq('otherAppleId@mail.com')
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:team_id]).to eq('TEAMID')
       end
     end
   end

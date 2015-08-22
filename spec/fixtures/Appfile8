@@ -1,0 +1,15 @@
+app_identifier "*"
+apple_id "myAppleId@mail.com"
+
+for_platform :ios do
+  [
+    :lane_name1,
+    :lane_name2,
+  ].each do |lane_name|
+    for_lane lane_name do
+      app_identifier "#{lane_name}.*"
+      apple_id "otherAppleId@mail.com"
+      team_id "TEAMID"
+    end
+  end
+end
