@@ -32,27 +32,10 @@ module Sigh
     def self.install_profile(profile)
       Helper.log.info "Installing provisioning profile..."
 
-      require 'sigh/profile_analyser'
-      udid = Sigh::ProfileAnalyser.run(profile)
+      udid = FastlaneCore::ProvisioningProfile.parse(profile)
       ENV["SIGH_UDID"] = udid if udid
 
-      profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
-      profile_filename = ENV["SIGH_UDID"] + ".mobileprovision"
-      destination = profile_path + profile_filename
-
-      # If the directory doesn't exist, make it first
-      unless File.directory?(profile_path)
-        FileUtils.mkdir_p(profile_path)
-      end
-
-      # copy to Xcode provisioning profile directory
-      (FileUtils.copy profile, destination rescue nil) # if the directory doesn't exist yet
-
-      if File.exists? destination
-        Helper.log.info "Profile successfully installed".green
-      else
-        raise "Failed installation of provisioning profile at location: #{destination}".red
-      end
+      FastlaneCore::ProvisioningProfile.install(profile)
     end
   end
 end
