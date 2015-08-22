@@ -63,7 +63,6 @@ module Fastlane
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
-            build_configuration.build_settings["CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]"] = "$(SDKROOT)/ResourceRules.plist"
           end
         end
 

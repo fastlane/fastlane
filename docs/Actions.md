@@ -168,32 +168,24 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) before using this action.
 
-Updated your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action.
+Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
-```ruby
-update_project_provisioning(
-  xcodeproj: "Project.xcodeproj",
-  profile: "./app_store.mobileprovision" # optional if you use sigh
-)
-```
-
-Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) you can use the `filter` option:
+Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) and configurations (Debug, Release) you can use the `target_filter` and `build_configuration` options:
 
 ```ruby
 update_project_provisioning(
   xcodeproj: "Project.xcodeproj",
-  profile: "./app_store.mobileprovision", # optional if you use sigh
-  build_configuration_filter: ".*WatchKit Extension.*"
+  profile: "./watch_app_store.mobileprovision", # optional if you use sigh
+  target_filter: ".*WatchKit Extension.*", # matches name or type of a target
+  build_configuration: "Release" #
 )
 ```
 
-The `build_configuration_filter` is a standard regex.
+The `target_filter` and `build_configuration` options use standard regex, so if you want an exact match for a target, use `^MyTargetName$` to prevent a match for the `Pods - MyTargetName` target, for instance.
 
-Since you'll probably not want to commit this change into version control, take a look at how [MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47) uses this technique to temporary set the code signing, then build and upload the `ipa` file.
-
-**[Show Example Usage](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
+**[Example Usage at MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
 
 ### update_app_group_identifiers
 Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
