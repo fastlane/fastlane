@@ -32,7 +32,7 @@ module Sigh
     def self.install_profile(profile)
       Helper.log.info "Installing provisioning profile..."
 
-      udid = FastlaneCore::ProvisioningProfile.parse(profile)
+      udid = FastlaneCore::ProvisioningProfile.uuid(profile)
       ENV["SIGH_UDID"] = udid if udid
 
       FastlaneCore::ProvisioningProfile.install(profile)
