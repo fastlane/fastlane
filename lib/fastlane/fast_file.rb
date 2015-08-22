@@ -192,14 +192,21 @@ module Fastlane
         repo_name = url.split("/").last
 
         folder = File.join("/tmp", "fl_clones", repo_name)
+        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n"
 
         if File.directory?folder
           Helper.log.info "Using existing git repo..."
-          Actions.sh("cd '#{folder}' && git pull")
+          begin
+            Actions.sh("cd '#{folder}' && git pull")
+          rescue => ex
+            # Something went wrong, clear the folder and pull again
+            Actions.sh("rm -rf '#{folder}'")
+            Actions.sh(clone_command)
+          end
         else
           # When this fails, we have to clone the git repo
           Helper.log.info "Cloning remote git repo..."
-          Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
+          Actions.sh(clone_command)
         end
 
         Actions.sh("cd '#{folder}' && git checkout HEAD '#{path}'")
