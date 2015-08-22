@@ -4,6 +4,7 @@ module FastlaneCore
   class CommanderGenerator
     include Commander::Methods
 
+    # Calls the appropriate methods for commander to show the available parameters
     def generate(options)
       short_codes = []
       options.each do |option|
@@ -16,7 +17,14 @@ module FastlaneCore
         raise "-h is already used for the help screen (key #{option.key})".red if short_option == "-h"
         
         short_codes << short_option
-        global_option short_option, "--#{option.key} #{appendix}", type, (option.description + " (#{option.env_name})")
+
+        # Example Call
+        # c.option '-p', '--pattern STRING', String, 'Description'
+
+        flag = "--#{option.key} #{appendix}"
+        description = (option.description + " (#{option.env_name})")
+
+        global_option short_option, flag, type, description
       end
     end
   end
