@@ -32,19 +32,19 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
-  spec.add_dependency 'fastlane_core', '>= 0.14.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.7.3' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.5.3' # communication layer with Apple's web services
+  spec.add_dependency 'fastlane_core', '>= 0.14.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.7.3', '< 1.0.0' # Password Manager
+  spec.add_dependency 'spaceship', '>= 0.5.3', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 0.13.1'
-  spec.add_dependency 'snapshot', '>= 0.9.2'
-  spec.add_dependency 'frameit', '>= 2.2.0'
-  spec.add_dependency 'pem', '>= 0.7.1'
-  spec.add_dependency 'cert', '>= 0.3.0'
-  spec.add_dependency 'sigh', '>= 0.10.4'
-  spec.add_dependency 'produce', '>= 0.6.0'
-  spec.add_dependency 'gym', '>= 0.4.4'
+  spec.add_dependency 'deliver', '>= 0.13.1', '< 1.0.0'
+  spec.add_dependency 'snapshot', '>= 0.9.2', '< 1.0.0'
+  spec.add_dependency 'frameit', '>= 2.2.0', '< 3.0.0'
+  spec.add_dependency 'pem', '>= 0.7.1', '< 1.0.0'
+  spec.add_dependency 'cert', '>= 0.3.0', '< 1.0.0'
+  spec.add_dependency 'sigh', '>= 0.10.4', '< 1.0.0'
+  spec.add_dependency 'produce', '>= 0.6.0', '< 1.0.0'
+  spec.add_dependency 'gym', '>= 0.4.4', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
