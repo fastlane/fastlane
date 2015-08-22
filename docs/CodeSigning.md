@@ -43,7 +43,7 @@ update_project_provisioning(
   xcodeproj: "Project.xcodeproj",
   profile: "./watch_app_store.mobileprovision", # optional if you use sigh
   target_filter: ".*WatchKit Extension.*", # matches name or type of a target
-  build_configuration: "Release" #
+  build_configuration: "Release"
 )
 ```
 

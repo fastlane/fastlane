@@ -172,14 +172,14 @@ You should check out the [code signing guide](https://github.com/KrauseFx/fastla
 
 Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
-Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) and configurations (Debug, Release) you can use the `target_filter` and `build_configuration` options:
+Since you have to use different provisioning profiles for various targets (WatchKit, Extension, etc.) and configurations (Debug, Release) you can use the `target_filter` and `build_configuration` options:
 
 ```ruby
 update_project_provisioning(
   xcodeproj: "Project.xcodeproj",
   profile: "./watch_app_store.mobileprovision", # optional if you use sigh
   target_filter: ".*WatchKit Extension.*", # matches name or type of a target
-  build_configuration: "Release" #
+  build_configuration: "Release"
 )
 ```
 
