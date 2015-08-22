@@ -193,7 +193,11 @@ module Fastlane
         repo_name = url.split("/").last
 
         folder = File.join("/tmp", "fl_clones", repo_name)
-        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n --branch #{branch}"
+        branch_option = ""
+        if branch != 'HEAD'
+          branch_option = "--branch #{branch}"
+        end
+        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
 
         if File.directory?folder
           Helper.log.info "Using existing git repo..."
