@@ -30,8 +30,6 @@ module Deliver
       global_option '--beta', 'Upload a beta build to iTunes Connect. This uses the `beta_ipa` block.'
       global_option '--skip-deploy', 'Skips submission of the build on iTunes Connect. This will only upload the ipa and/or metadata.'
 
-      always_trace!
-
       command :run do |c|
         c.syntax = 'deliver'
         c.description = 'Run a deploy process using the Deliverfile in the current folder'
