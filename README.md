@@ -357,8 +357,7 @@ Apple has a limit of 150 binary uploads per day.
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-- If there is a technical problem with ```deliver```, submit an issue.
-- I'm available for contract work - drop me an email: deliver@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
