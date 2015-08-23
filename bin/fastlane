@@ -22,8 +22,6 @@ class FastlaneApplication
     program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
     program :help_formatter, :compact
 
-    always_trace!
-
     command :run do |c|
       c.syntax = 'fastlane run [lane]'
       c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
