@@ -193,10 +193,10 @@ module Fastlane
         repo_name = url.split("/").last
 
         folder = File.join("/tmp", "fl_clones", repo_name)
+
         branch_option = ""
-        if branch != 'HEAD'
-          branch_option = "--branch #{branch}"
-        end
+        branch_option = "--branch #{branch}" if branch != 'HEAD'
+
         clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
 
         if File.directory?folder
