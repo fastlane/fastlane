@@ -21,8 +21,6 @@ class CertApplication
     program :help, 'GitHub', 'https://github.com/krausefx/cert'
     program :help_formatter, :compact
 
-    always_trace!
-
     FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
 
     command :create do |c|
