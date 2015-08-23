@@ -890,6 +890,14 @@ push_to_git_remote(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### push_git_tags
+
+If you only want to push the tags and nothing else, you can use the `push_git_tags` action:
+
+```ruby
+push_git_tags
+```
+
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
 

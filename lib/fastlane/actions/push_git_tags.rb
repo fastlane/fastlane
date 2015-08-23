@@ -18,7 +18,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Push local tags to the remote."
+        "Push local tags to the remote - this will only push tags"
       end
 
       def self.available_options
