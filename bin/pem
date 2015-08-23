@@ -21,8 +21,6 @@ class PemApplication
     program :help, 'GitHub', 'https://github.com/krausefx/PEM'
     program :help_formatter, :compact
 
-    always_trace!
-
     FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
 
     command :renew do |c|
