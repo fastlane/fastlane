@@ -38,8 +38,6 @@ module Pilot
 
       global_option("--verbose") { $verbose = true }
 
-      always_trace!
-
       command :upload do |c|
         c.syntax = "pilot upload"
         c.description = "Uploads a new binary to Apple TestFlight"
