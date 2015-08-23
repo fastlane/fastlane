@@ -32,8 +32,6 @@ module Gym
 
       global_option("--verbose") { $verbose = true }
 
-      always_trace!
-
       command :build do |c|
         c.syntax = "gym"
         c.description = "Just builds your app"
