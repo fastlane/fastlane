@@ -23,8 +23,6 @@ class SighApplication
     program :help, 'GitHub', 'https://github.com/krausefx/sigh'
     program :help_formatter, :compact
 
-    always_trace!
-
     FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
 
     command :renew do |c|
