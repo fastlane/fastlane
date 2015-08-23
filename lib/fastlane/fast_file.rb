@@ -101,8 +101,11 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
+      method_str = method_sym.to_s
+      method_str.gsub!("?", "") # as a `?` could be at the end of the method name
+
       # First, check if there is a predefined method in the actions folder
-      class_name = method_sym.to_s.fastlane_class + 'Action'
+      class_name = method_str.fastlane_class + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)

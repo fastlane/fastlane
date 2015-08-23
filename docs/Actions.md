@@ -1158,3 +1158,15 @@ This can be used to store some generated URL or value for easy copy & paste (e.g
 ```ruby
 clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
 ```
+
+### is_ci?
+
+Is the current run being executed on a CI system, like Jenkins or Travis?
+
+```ruby
+if is_ci?
+  puts "I'm a computer"
+else
+  say "Hi Human!"
+end
+```
