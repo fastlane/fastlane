@@ -20,8 +20,6 @@ class ProduceApplication
     program :help, 'GitHub', 'https://github.com/krausefx/produce'
     program :help_formatter, :compact
 
-    always_trace!
-
     FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
 
     command :create do |c|

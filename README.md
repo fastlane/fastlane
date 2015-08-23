@@ -215,8 +215,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Need help?
-- If there is a technical problem with `produce`, submit an issue.
-- I'm available for contract work - drop me an email: produce@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
