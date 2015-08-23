@@ -121,12 +121,8 @@ In case you prefer environment variables:
 - ```PEM_SAVE_PRIVATEKEY``` - Set to "1" to save the private RSA key
 
 # How does it work?
-There are 2 actions involved:
 
-- Accessing the ```iOS Dev Center``` to download the latest ```aps_production.cer```. See: [developer_center.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/developer_center.rb).
-- Generating all the necessary profiles and files to prepare the finished ```.pem``` file. See: [cert_manager.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/cert_manager.rb).
-- The ```.certSigningRequest``` file will be generated in [signing_request.rb](https://github.com/KrauseFx/PEM/blob/master/lib/pem/signing_request.rb)
-
+`PEM` uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
 
 ## How is my password stored?
 ```PEM``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
@@ -158,8 +154,7 @@ It will show you the ```pem``` files like this:
 
 
 # Need help?
-- If there is a technical problem with ```PEM```, submit an issue.
-- I'm available for contract work - drop me an email: pem@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
