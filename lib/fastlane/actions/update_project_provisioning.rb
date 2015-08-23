@@ -35,7 +35,7 @@ module Fastlane
         verification = p7.verify([cert], store)
         data = Plist::parse_xml(p7.data)
         
-        target_filter = params[:target_filter]
+        target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
 
         # manipulate project file
@@ -90,31 +90,35 @@ module Fastlane
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(key: :xcodeproj,
-             env_name: "FL_PROJECT_PROVISIONING_PROJECT_PATH",
-             description: "Path to your Xcode project",
-             optional: true,
-             verify_block: Proc.new do |value|
-              raise "Path to xcode project is invalid".red unless File.exists?(value)
-            end),
+                                         env_name: "FL_PROJECT_PROVISIONING_PROJECT_PATH",
+                                         description: "Path to your Xcode project",
+                                         optional: true,
+                                         verify_block: Proc.new do |value|
+                                          raise "Path to xcode project is invalid".red unless File.exists?(value)
+                                         end),
             FastlaneCore::ConfigItem.new(key: :profile,
-             env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
-             description: "Path to provisioning profile (.mobileprovision)",
-             default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
-             verify_block: Proc.new do |value|
-              raise "Path to provisioning profile is invalid".red unless File.exists?(value)
-            end),
+                                         env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
+                                         description: "Path to provisioning profile (.mobileprovision)",
+                                         default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                         verify_block: Proc.new do |value|
+                                          raise "Path to provisioning profile is invalid".red unless File.exists?(value)
+                                         end),
             FastlaneCore::ConfigItem.new(key: :target_filter,
-             env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
-             description: "A filter for the target name. Use a standard regex",
-             optional: true),
+                                         env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
+                                         description: "A filter for the target name. Use a standard regex",
+                                         optional: true),
+            FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
+                                         env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
+                                         description: "Legacy option, use 'target_filter' instead",
+                                         optional: true),
             FastlaneCore::ConfigItem.new(key: :build_configuration,
-             env_name: "FL_PROJECT_PROVISIONING_PROFILE_BUILD_CONFIGURATION",
-             description: "A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified",
-             optional: true),
+                                         env_name: "FL_PROJECT_PROVISIONING_PROFILE_BUILD_CONFIGURATION",
+                                         description: "A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified",
+                                         optional: true),
             FastlaneCore::ConfigItem.new(key: :certificate,
-             env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
-             description: "Path to apple root certificate",
-             default_value: "/tmp/AppleIncRootCertificate.cer")
+                                         env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
+                                         description: "Path to apple root certificate",
+                                         default_value: "/tmp/AppleIncRootCertificate.cer")
           ]
         end
 
