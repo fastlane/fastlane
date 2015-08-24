@@ -6,14 +6,14 @@ module Fastlane
 
     class GetInfoPlistValueAction < Action
       def self.run(params)
-      require "plist"
-      begin
-	     path = File.expand_path(params[:plist_path])
-	     plist = Plist::parse_xml(path)
- 	     Actions.lane_context[SharedValues::INFO_PLIST_VALUE] = plist[params[:param_name]]
- 	     rescue
-	     	Helper.log.info "Unable to find plist file at #{path}".red
- 	     end
+        require "plist"
+        begin
+          path = File.expand_path(params[:plist_path])
+	      plist = Plist::parse_xml(path)
+ 	      Actions.lane_context[SharedValues::INFO_PLIST_VALUE] = plist[params[:param_name]]
+        rescue
+          Helper.log.info "Unable to find plist file at #{path}".red
+ 	    end
       end
 
       def self.description
@@ -22,7 +22,6 @@ module Fastlane
 
       def self.available_options
         [
-        
 		  FastlaneCore::ConfigItem.new(key: :param_name,
                                        env_name: "FL_GET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of parameter",
@@ -31,7 +30,6 @@ module Fastlane
                                        env_name: "FL_GET_INFO_PLIST_PATH",
                                        description: "Path to Info.plist",
                                        optional: false)
-
         ]
       end
 
@@ -46,7 +44,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-         platform == :ios
+	    [:ios, :mac].include?platform
       end
     end
   end

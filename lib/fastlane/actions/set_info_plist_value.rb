@@ -7,16 +7,15 @@ module Fastlane
     class SetInfoPlistValueAction < Action
       def self.run(params)
       require "plist"
-       begin 
-         path = File.expand_path(params[:plist_path])
-	     plist = Plist::parse_xml(path)
-	     plist[params[:param_name]] = params[:param_value]
-	     new_plist = plist.to_plist
-	     File.open(path, 'w') { |file| file.write(new_plist) }
-	     
- 	     rescue
-	     	Helper.log.info "Unable to set value to plist file at #{path}".red
- 	     end
+        begin
+          path = File.expand_path(params[:plist_path])
+	      plist = Plist::parse_xml(path)
+	      plist[params[:param_name]] = params[:param_value]
+	      new_plist = plist.to_plist
+	      File.open(path, 'w') { |file| file.write(new_plist) }
+        rescue
+          Helper.log.info "Unable to set value to plist file at #{path}".red
+        end
 	  end
 
       def self.description
@@ -38,7 +37,6 @@ module Fastlane
                                        env_name: "FL_SET_INFO_PLIST_PATH",
                                        description: "Path to Info.plist",
                                        optional: false)
-
         ]
       end
 
@@ -51,7 +49,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?platform
       end
     end
   end
