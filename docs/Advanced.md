@@ -214,7 +214,7 @@ You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the up
 
 If you use git it is recommended that you keep the `fastlane` configuration files in your repository. You may want to add the following lines to your `.gitignore` file to exclude some generated and temporary files:
 
-```
+```sh
 # fastlane temporary profiling data
 /fastlane/report.xml
 # deliver temporary error output
