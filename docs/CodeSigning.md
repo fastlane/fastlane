@@ -41,12 +41,13 @@ Using the [update_project_provisioning](https://github.com/KrauseFx/fastlane/blo
 ```ruby
 update_project_provisioning(
   xcodeproj: "Project.xcodeproj",
-  profile: "./AppStore.mobileprovision", # optional if you use sigh
-  build_configuration_filter: ".*WatchKit Extension.*"
+  profile: "./watch_app_store.mobileprovision", # optional if you use sigh
+  target_filter: ".*WatchKit Extension.*", # matches name or type of a target
+  build_configuration: "Release"
 )
 ```
 
-As this will modify the project file, you'll have to reset the git changes of the project files after successfully building your application:
+As this will modify the project file, you should either commit the changes if you want to keep them (for your CI service to know how to code sign your app) or you should reset the git changes of the project files after successfully building your application, if you're building locally:
 ```ruby
 ensure_git_status_clean
 sigh
