@@ -8,7 +8,6 @@ describe Fastlane do
       end
 
       context "when there's no custom zip path" do
-
         result = nil
 
         before :each do
@@ -25,12 +24,11 @@ describe Fastlane do
           dsym_folder_path = File.join(root_path, File.join(xcodebuild_archive, 'dSYMs'))
           zipped_dsym_path = File.join(root_path, "#{file_basename}.app.dSYM.zip")
 
-          expect(result).to eq(%Q[cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"])
+          expect(result).to eq(%(cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"))
         end
       end
 
       context "when there's a custom zip path" do
-
         result = nil
 
         before :each do
@@ -52,12 +50,11 @@ describe Fastlane do
           zipped_dsym_path = File.join(root_path, "#{file_basename}.app.dSYM.zip")
 
           # MyApp is hardcoded into tested class so we'll just use that here
-          expect(result).to eq(%Q[cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"])
+          expect(result).to eq(%(cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"))
         end
       end
 
       context "when there's a custom dsym path" do
-
         result = nil
 
         before :each do
@@ -76,7 +73,7 @@ describe Fastlane do
           dsym_folder_path = File.join(root_path, File.join(xcodebuild_archive, 'dSYMs'))
           zipped_dsym_path = File.join(File.join(root_path, 'CustomPath'), "#{file_basename}.app.dSYM.zip")
 
-          expect(result).to eq(%Q[cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"])
+          expect(result).to eq(%(cd "#{dsym_folder_path}" && zip -r "#{zipped_dsym_path}" "MyApp.app.dSYM"))
         end
       end
     end

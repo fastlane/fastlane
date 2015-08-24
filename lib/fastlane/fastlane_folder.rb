@@ -13,7 +13,7 @@ module Fastlane
       return value
     end
 
-    # Does a fastlane configuration already exist? 
+    # Does a fastlane configuration already exist?
     def self.setup?
       return false unless path
       File.exist?(File.join(path, "Fastfile"))

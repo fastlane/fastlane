@@ -2,8 +2,12 @@
 
 module Fastlane
   class Setup
+
+    # the tools that are already enabled
+    attr_reader :tools
+
     def run
-      if (FastlaneFolder.setup? and not Helper.is_test?)
+      if FastlaneFolder.setup? and !Helper.is_test?
         Helper.log.info "Fastlane already set up at path #{folder}".yellow
         return
       end
@@ -66,7 +70,7 @@ module Fastlane
     def generate_app_metadata
       Helper.log.info '------------------------------'
       Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
-      
+
       app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
       apple_id = ask('Your Apple ID (fastlane@krausefx.com): '.yellow)
 
@@ -129,7 +133,6 @@ module Fastlane
         template.gsub!('[[SCHEME]]', "")
       end
 
-
       template.gsub!('deliver', '# deliver') unless @tools[:deliver]
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
@@ -149,10 +152,6 @@ module Fastlane
 
     def folder
       FastlaneFolder.path
-    end
-
-    def tools
-      @tools
     end
 
     def restore_previous_state

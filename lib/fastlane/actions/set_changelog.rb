@@ -25,7 +25,7 @@ module Fastlane
         unless changelog
           path = "./fastlane/changelog.txt"
           Helper.log.info "Looking for changelog in '#{path}'..."
-          if File.exists?path
+          if File.exist? path
             changelog = File.read(path)
           else
             Helper.log.error "Couldn't find changelog.txt"
@@ -85,7 +85,7 @@ module Fastlane
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
                                      default_value: ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
-                                     verify_block: Proc.new do |value|
+                                     verify_block: proc do |value|
                                        CredentialsManager::PasswordManager.shared_manager(value)
                                      end),
           FastlaneCore::ConfigItem.new(key: :version,
@@ -104,7 +104,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
     end
   end

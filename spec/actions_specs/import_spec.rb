@@ -18,27 +18,27 @@ describe Fastlane do
       end
 
       it "raises an exception when no path is given" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             import
           end").runner.execute(:test)
-        }.to raise_error("Please pass a path to the `import` action".red)
+        end.to raise_error("Please pass a path to the `import` action".red)
       end
 
       it "raises an exception when the given path is invalid (absolute)" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             import('/tmp/asdf')
           end").runner.execute(:test)
-        }.to raise_error("Could not find Fastfile at path '/tmp/asdf'".red)
+        end.to raise_error("Could not find Fastfile at path '/tmp/asdf'".red)
       end
 
       it "raises an exception when the given path is invalid (relative)" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             import('tmp/asdf')
           end").runner.execute(:test)
-        }.to raise_error(/Could not find Fastfile at path \'\/(home|Users)/) # /home (travis) # /Users (Mac)
+        end.to raise_error(/Could not find Fastfile at path \'\/(home|Users)/) # /home (travis) # /Users (Mac)
       end
     end
   end

@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     module SharedValues
-      
     end
 
     class FastlaneVersionAction < Action

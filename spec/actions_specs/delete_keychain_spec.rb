@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Delete keychain Integration" do
-
       it "works with keychain name" do
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({

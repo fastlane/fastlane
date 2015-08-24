@@ -6,17 +6,16 @@ module Fastlane
 
     class OclintAction < Action
       def self.run(params)
-
         select_reqex = params[:select_reqex]
-        
+
         compile_commands = params[:compile_commands]
-        raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exists?(compile_commands)
-        
+        raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exist?(compile_commands)
+
         files = JSON.parse(File.read(compile_commands)).map { |compile_command| compile_command['file'] }
         files.uniq!
         files.select! do |file|
           file_ruby = file.gsub('\ ', ' ')
-          File.exists?(file_ruby) and (!select_reqex or file_ruby =~ select_reqex)
+          File.exist?(file_ruby) and (!select_reqex or file_ruby =~ select_reqex)
         end
 
         command_prefix = [
@@ -24,29 +23,27 @@ module Fastlane
           File.expand_path('.').shellescape,
           '&&'
         ].join(' ')
-        
+
         report_type = params[:report_type]
         report_path = params[:report_path] ? params[:report_path] : 'oclint_report.' + report_type
-        
+
         oclint_args = ["-report-type=#{report_type}", "-o=#{report_path}"]
         oclint_args << "-rc=#{params[:rc]}" if params[:rc]
         oclint_args << "-max-priority-1=#{params[:max_priority_1]}" if params[:max_priority_1]
         oclint_args << "-max-priority-2=#{params[:max_priority_2]}" if params[:max_priority_2]
         oclint_args << "-max-priority-3=#{params[:max_priority_3]}" if params[:max_priority_3]
-                
+
         command = [
           command_prefix,
           'oclint',
           oclint_args,
           '"' + files.join('" "') + '"'
         ].join(' ')
-        
+
         Action.sh command
 
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)
       end
-
-
 
       #####################################################
       # @!group Documentation
@@ -108,7 +105,7 @@ module Fastlane
       def self.author
         'HeEAaD'
       end
-      
+
       def self.is_supported?(platform)
         true
       end

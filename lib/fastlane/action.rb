@@ -3,7 +3,6 @@ require 'fastlane/actions/actions_helper'
 module Fastlane
   class Action
     def self.run(params)
-      
     end
 
     # Implement in subclasses
@@ -44,11 +43,11 @@ module Fastlane
     def self.is_supported?(platform)
       # you can do things like
       #  true
-      # 
+      #
       #  platform == :ios
-      # 
-      #  [:ios, :android].include?platform
-      # 
+      #
+      #  [:ios, :android].include? platform
+      #
       raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
     end
 

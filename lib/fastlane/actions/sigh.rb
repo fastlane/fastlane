@@ -16,7 +16,7 @@ module Fastlane
           FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
 
           Sigh.config = values # we already have the finished config
-          
+
           path = Sigh::Manager.start
 
           Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path

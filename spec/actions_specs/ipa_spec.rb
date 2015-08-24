@@ -1,9 +1,8 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "IPA Integration" do
-
       it "works with default setting" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa
         end").runner.execute(:test)
 
@@ -11,8 +10,7 @@ describe Fastlane do
       end
 
       it "works with object argument without clean and archive" do
-
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             workspace: 'Test.xcworkspace',
             project: nil,
@@ -29,8 +27,7 @@ describe Fastlane do
       end
 
       it "works with object argument with clean and archive" do
-
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             workspace: 'Test.xcworkspace',
             project: nil,
@@ -49,8 +46,7 @@ describe Fastlane do
       end
 
       it "works with object argument with all" do
-
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             workspace: 'Test.xcworkspace',
             project: 'Test.xcproject',
@@ -85,7 +81,7 @@ describe Fastlane do
       end
 
       it "respects the clean argument when true" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             clean: true,
           })
@@ -95,7 +91,7 @@ describe Fastlane do
       end
 
       it "respects the clean argument when false" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             clean: false,
           })
@@ -105,7 +101,7 @@ describe Fastlane do
       end
 
       it "respects the archive argument when true" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             archive: true,
           })
@@ -115,7 +111,7 @@ describe Fastlane do
       end
 
       it "respects the archive argument when false" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             archive: false,
           })
@@ -127,7 +123,7 @@ describe Fastlane do
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
         ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           ipa ({
             workspace: 'Test.xcworkspace',
             project: 'Test.xcproject',
@@ -151,7 +147,6 @@ describe Fastlane do
 
         ENV["SIGH_PROFILE_PATH"] = nil
       end
-
     end
   end
 end

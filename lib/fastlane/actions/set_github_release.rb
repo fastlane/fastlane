@@ -8,7 +8,6 @@ module Fastlane
 
     class SetGithubReleaseAction < Action
       def self.run(params)
-
         Helper.log.info "Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".".yellow
 
         require 'json'
@@ -25,10 +24,10 @@ module Fastlane
         require 'base64'
         headers = { 'User-Agent' => 'fastlane-set_github_release' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
-        response = Excon.post("https://api.github.com/repos/#{params[:repository_name]}/releases", 
-          :headers => headers,
-          :body => body
-          )
+        response = Excon.post("https://api.github.com/repos/#{params[:repository_name]}/releases",
+                              headers: headers,
+                              body: body
+                             )
 
         case response[:status]
         when 201
@@ -64,10 +63,10 @@ module Fastlane
       end
 
       def self.details
-        "Creates a new release on GitHub. You must provide your GitHub Personal token 
+        "Creates a new release on GitHub. You must provide your GitHub Personal token
         (get one from https://github.com/settings/tokens/new), the repository name
         and tag name. If the tag doesn't exist, one will be created on the commit or branch passed-in as
-        commitish. Out parameters provide the release's id, which can be used for later editing and the 
+        commitish. Out parameters provide the release's id, which can be used for later editing and the
         release html link to GitHub."
       end
 
@@ -76,9 +75,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :repository_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
                                        description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
-                                       verify_block: Proc.new do |value|
-                                          raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include?"github.com"
-                                          raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
+                                       verify_block: proc do |value|
+                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include? "github.com"
+                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",

@@ -87,7 +87,7 @@ class FastlaneApplication
 
       c.action do |_args, _options|
         path = File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
-        if File.exists?path and not _options.force
+        if File.exist? path and not _options.force
           return unless agree('Found existing ./fastlane/README.md. Do you want to overwrite it? (y/n)', true)
         end
 

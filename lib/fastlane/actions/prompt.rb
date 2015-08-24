@@ -52,7 +52,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :multi_line_end_keyword,
                                        description: "Enable multi-line inputs by providing an end text (e.g. 'END') which will stop the user input",
                                        optional: true,
-                                       is_string: true),
+                                       is_string: true)
         ]
       end
 

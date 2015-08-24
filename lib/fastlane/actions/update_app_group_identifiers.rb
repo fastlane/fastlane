@@ -12,10 +12,10 @@ module Fastlane
         Helper.log.info "New App Group Identifiers: #{params[:app_group_identifiers]}"
 
         entitlements_file = params[:entitlements_file]
-        raise "Could not find entitlements file at path '#{entitlements_file}'".red unless File.exists?(entitlements_file)
+        raise "Could not find entitlements file at path '#{entitlements_file}'".red unless File.exist?(entitlements_file)
 
         # parse entitlements
-        result = Plist::parse_xml(entitlements_file)
+        result = Plist.parse_xml(entitlements_file)
         raise "Entitlements file at '#{entitlements_file}' cannot be parsed.".red unless result
 
         # get app group field
@@ -39,20 +39,20 @@ module Fastlane
 
       def self.available_options
         [
-            FastlaneCore::ConfigItem.new(key: :entitlements_file,
-                                         env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_ENTITLEMENTS_FILE_PATH", # The name of the environment variable
-                                         description: "The path to the entitlement file which contains the app group identifiers", # a short description of this parameter
-                                         verify_block: Proc.new do |value|
-                                           raise "Please pass a path to an entitlements file. ".red unless value.include? ".entitlements"
-                                           raise "Could not find entitlements file".red if (not File.exists?(value) and not Helper.is_test?)
-                                         end),
-            FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
-                                         env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",
-                                         description: "An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']",
-                                         is_string: false,
-                                         verify_block: Proc.new do |value|
-                                           raise "The parameter app_group_identifiers need to be an Array.".red unless value.is_a? Array
-                                         end)
+          FastlaneCore::ConfigItem.new(key: :entitlements_file,
+                                       env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_ENTITLEMENTS_FILE_PATH", # The name of the environment variable
+                                       description: "The path to the entitlement file which contains the app group identifiers", # a short description of this parameter
+                                       verify_block: proc do |value|
+                                         raise "Please pass a path to an entitlements file. ".red unless value.include? ".entitlements"
+                                         raise "Could not find entitlements file".red if !File.exist?(value) and !Helper.is_test?
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
+                                       env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",
+                                       description: "An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']",
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         raise "The parameter app_group_identifiers need to be an Array.".red unless value.kind_of? Array
+                                       end)
         ]
       end
 

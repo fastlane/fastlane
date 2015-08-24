@@ -13,7 +13,7 @@ module Fastlane
       File.read(template_filepath)
     end
 
-    def self.render(template,template_vars_hash)
+    def self.render(template, template_vars_hash)
       Fastlane::ErbalT.new(template_vars_hash).render(template)
     end
 

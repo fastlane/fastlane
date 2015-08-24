@@ -22,12 +22,12 @@ module Fastlane
 
         response = https.request(req)
         case response.code.to_i
-          when 200..299
-            Helper.log.info 'Successfully sent notification to ChatWork right now 📢'.green
-          else
-            require 'json'
-            json = JSON.parse(response.body)
-            raise "HTTP Error: #{response.code} #{json['errors']}".red
+        when 200..299
+          Helper.log.info 'Successfully sent notification to ChatWork right now 📢'.green
+        else
+          require 'json'
+          json = JSON.parse(response.body)
+          raise "HTTP Error: #{response.code} #{json['errors']}".red
         end
       end
 
@@ -40,11 +40,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CHATWORK_API_TOKEN",
                                        description: "ChatWork API Token",
-                                       verify_block: Proc.new do |value|
-                                        unless value.to_s.length > 0
-                                          Helper.log.fatal "Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
-                                          raise 'No CHATWORK_API_TOKEN given.'.red
-                                        end
+                                       verify_block: proc do |value|
+                                         unless value.to_s.length > 0
+                                           Helper.log.fatal "Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
+                                           raise 'No CHATWORK_API_TOKEN given.'.red
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_CHATWORK_MESSAGE",
@@ -59,7 +59,7 @@ module Fastlane
                                        optional: true,
                                        default_value: true,
                                        is_string: false)
-          ]
+        ]
       end
 
       def self.author

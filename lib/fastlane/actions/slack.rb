@@ -69,8 +69,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :slack_url,
                                        env_name: "SLACK_URL",
                                        description: "Create an Incoming WebHook for your Slack group",
-                                       verify_block: Proc.new do |value|
-                                        raise "Invalid URL, must start with https://" unless value.start_with?"https://"
+                                       verify_block: proc do |value|
+                                         raise "Invalid URL, must start with https://" unless value.start_with? "https://"
                                        end),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",
@@ -92,7 +92,7 @@ module Fastlane
                                        description: "Was this build successful? (true/false)",
                                        optional: true,
                                        default_value: true,
-                                       is_string: false),
+                                       is_string: false)
         ]
       end
 
@@ -101,86 +101,89 @@ module Fastlane
       end
 
       private
-        def self.generate_slack_attachments(options)
-          color = (options[:success] ? 'good' : 'danger')
-          should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
 
-          slack_attachment = {
-            fallback: options[:message],
-            text: options[:message],
-            color: color,
-            fields: []
+      def self.generate_slack_attachments(options)
+        color = (options[:success] ? 'good' : 'danger')
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+
+        slack_attachment = {
+          fallback: options[:message],
+          text: options[:message],
+          color: color,
+          fields: []
+        }
+
+        # custom user payloads
+        slack_attachment[:fields] += options[:payload].map do |k, v|
+          {
+            title: k.to_s,
+            value: Slack::Notifier::LinkFormatter.format(v.to_s),
+            short: false
           }
-
-          # custom user payloads
-          slack_attachment[:fields] += options[:payload].map do |k, v|
-            {
-              title: k.to_s,
-              value: Slack::Notifier::LinkFormatter.format(v.to_s),
-              short: false
-            }
-          end
-
-          # lane
-          if should_add_payload[:lane]
-            slack_attachment[:fields] << {
-              title: 'Lane',
-              value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
-              short: true
-            }
-          end
-
-          # test_result
-          if should_add_payload[:test_result]
-            slack_attachment[:fields] << {
-              title: 'Result',
-              value: (options[:success] ? 'Success' : 'Error'),
-              short: true
-            }
-          end
-
-          # git branch
-          if Actions.git_branch && should_add_payload[:git_branch]
-            slack_attachment[:fields] << {
-              title: 'Git Branch',
-              value: Actions.git_branch,
-              short: true
-            }
-          end
-
-          # git_author
-          if Actions.git_author && should_add_payload[:git_author]
-            if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
-              # We only show the git author if the build failed
-            else
-              slack_attachment[:fields] << {
-                title: 'Git Author',
-                value: Actions.git_author,
-                short: true
-              }
-            end
-          end
-
-          # last_git_commit
-          if Actions.last_git_commit && should_add_payload[:last_git_commit]
-            slack_attachment[:fields] << {
-              title: 'Git Commit',
-              value: Actions.last_git_commit,
-              short: false
-            }
-          end
-
-          # merge additional properties
-          deep_merge(slack_attachment, options[:attachment_properties])
         end
 
-        # Adapted from http://stackoverflow.com/a/30225093/158525
-        def self.deep_merge(a, b)
-          merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? 
-                            v1.merge(v2, &merger) : Array === v1 && Array === v2 ? 
-                              v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
-          a.merge(b, &merger)
+        # lane
+        if should_add_payload[:lane]
+          slack_attachment[:fields] << {
+            title: 'Lane',
+            value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
+            short: true
+          }
         end
+
+        # test_result
+        if should_add_payload[:test_result]
+          slack_attachment[:fields] << {
+            title: 'Result',
+            value: (options[:success] ? 'Success' : 'Error'),
+            short: true
+          }
+        end
+
+        # git branch
+        if Actions.git_branch && should_add_payload[:git_branch]
+          slack_attachment[:fields] << {
+            title: 'Git Branch',
+            value: Actions.git_branch,
+            short: true
+          }
+        end
+
+        # git_author
+        if Actions.git_author && should_add_payload[:git_author]
+          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+            # We only show the git author if the build failed
+          else
+            slack_attachment[:fields] << {
+              title: 'Git Author',
+              value: Actions.git_author,
+              short: true
+            }
+          end
+        end
+
+        # last_git_commit
+        if Actions.last_git_commit && should_add_payload[:last_git_commit]
+          slack_attachment[:fields] << {
+            title: 'Git Commit',
+            value: Actions.last_git_commit,
+            short: false
+          }
+        end
+
+        # merge additional properties
+        deep_merge(slack_attachment, options[:attachment_properties])
+      end
+
+      # Adapted from http://stackoverflow.com/a/30225093/158525
+      def self.deep_merge(a, b)
+        merger = proc do |key, v1, v2|
+          Hash === v1 && Hash === v2 ?
+                 v1.merge(v2, &merger) : Array === v1 && Array === v2 ?
+                   v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2
+        end
+        a.merge(b, &merger)
+      end
     end
   end
 end

@@ -7,9 +7,9 @@ module Fastlane
       lane_parameters = {} # the parameters we'll pass to the lane
       platform_lane_info = [] # the part that's responsible for the lane/platform definition
       args.each do |current|
-        if current.include?":" # that's a key/value which we want to pass to the lane
-          key, value = current.split(":")          
-          raise "Please pass values like this: key:value" unless (key.length > 0 and value.length > 0)
+        if current.include? ":" # that's a key/value which we want to pass to the lane
+          key, value = current.split(":")
+          raise "Please pass values like this: key:value" unless key.length > 0 and value.length > 0
           value = convert_value(value)
           Helper.log.debug "Using #{key}: #{value}".green
           lane_parameters[key.to_sym] = value
@@ -32,13 +32,14 @@ module Fastlane
     end
 
     private
-      # Conert into the right data type
-      def self.convert_value(value)
-        return true if (value == 'true' or value == 'yes')
-        return false if (value == 'false' || value == 'no')
-        
-        # Default case:
-        return value
-      end
+
+    # Convert into the right data type
+    def self.convert_value(value)
+      return true if (value == 'true' || value == 'yes')
+      return false if (value == 'false' || value == 'no')
+
+      # Default case:
+      return value
+    end
   end
 end

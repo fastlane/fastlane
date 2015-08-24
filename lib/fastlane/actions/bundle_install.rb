@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class BundleInstallAction < Action
       def self.run(params)
-        if File.exists?('Gemfile')
+        if File.exist?('Gemfile')
           cmd = ['bundle install']
 
           cmd << "--binstubs #{params[:binstubs]}" if params[:binstubs]

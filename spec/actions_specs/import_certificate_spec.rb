@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Import certificate Integration" do
-
       it "works with certificate and password" do
         result = Fastlane::FastFile.new.parse("lane :test do
           import_certificate ({
@@ -34,7 +33,6 @@ describe Fastlane do
         expect(result).to include %(-P \\\"test\\ password\\\")
         expect(result).to include '-T /usr/bin/codesign'
         expect(result).to include '-T /usr/bin/security'
-
       end
 
       it "works with certificate" do

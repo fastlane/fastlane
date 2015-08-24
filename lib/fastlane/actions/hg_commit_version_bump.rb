@@ -101,9 +101,9 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Please pass the path to the project, not the workspace".red if value.include?"workspace"
-                                        raise "Could not find Xcode project".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         raise "Could not find Xcode project".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_FORCE_COMMIT",

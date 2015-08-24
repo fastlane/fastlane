@@ -29,7 +29,6 @@ module Fastlane
       self
     end
 
-
     #####################################################
     # @!group DSL
     #####################################################
@@ -37,7 +36,7 @@ module Fastlane
     # User defines a new lane
     def lane(lane_name, &block)
       raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
-      
+
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
                                  description: desc_collection,
@@ -72,10 +71,10 @@ module Fastlane
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
-    
+
     # User defines a platform block
     def platform(platform_name, &block)
-      SupportedPlatforms.verify!platform_name
+      SupportedPlatforms.verify! platform_name
 
       self.current_platform = platform_name
 
@@ -102,7 +101,7 @@ module Fastlane
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
       method_str = method_sym.to_s
-      method_str.gsub!("?", "") # as a `?` could be at the end of the method name
+      method_str.delete!('?') # as a `?` could be at the end of the method name
 
       # First, check if there is a predefined method in the actions folder
       class_name = method_str.fastlane_class + 'Action'
@@ -139,7 +138,7 @@ module Fastlane
       raise 'No key given'.red unless key
 
       return false if (self.runner.lanes[nil][key.to_sym] rescue false)
-      return true if self.runner.lanes[key.to_sym].kind_of?Hash
+      return true if self.runner.lanes[key.to_sym].kind_of? Hash
 
       raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
     end
@@ -172,9 +171,9 @@ module Fastlane
       unless Pathname.new(path).absolute? # unless an absolute path
         path = File.join(File.expand_path('..', @path), path)
       end
-      
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
-      
+
+      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+
       collector.did_launch_action(:import)
       parse(File.read(path))
 
@@ -202,7 +201,7 @@ module Fastlane
 
         clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
 
-        if File.directory?folder
+        if File.directory? folder
           Helper.log.info "Using existing git repo..."
           begin
             Actions.sh("cd '#{folder}' && git pull")

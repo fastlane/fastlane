@@ -7,7 +7,7 @@ module Fastlane
 
         Helper.log.info command.yellow
         results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason
-        
+
         # Example Output
         #   ./fastlane.gemspec:  spec.add_development_dependency 'my_word'
         #   ./Gemfile.lock:    my_word (0.10.1)
@@ -16,7 +16,7 @@ module Fastlane
         results.split("\n").each do |current_raw|
           current = current_raw.strip
           if params[:extension]
-            if current.include?".#{params[:extension]}:"
+            if current.include? ".#{params[:extension]}:"
               found << current
             end
           else
@@ -53,16 +53,16 @@ module Fastlane
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_PATH",
                                        description: "The directory containing all the source files",
                                        default_value: ".",
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find the folder at '#{File.absolute_path(value)}'".red unless File.directory?(value)
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find the folder at '#{File.absolute_path(value)}'".red unless File.directory?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :extension,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSION",
                                        description: "The extension that should be searched for",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        value.gsub!(".", "") if value.include?"."
-                                       end),
+                                       verify_block: proc do |value|
+                                         value.delete!('.') if value.include? "."
+                                       end)
         ]
       end
 

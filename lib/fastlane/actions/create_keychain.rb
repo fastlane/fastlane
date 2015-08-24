@@ -12,14 +12,14 @@ module Fastlane
         escaped_password = params[:password].shellescape
 
         commands = []
-        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{escaped_name}", log:false)
+        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{escaped_name}", log: false)
 
         if params[:default_keychain]
-          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log:false).strip
-          commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log:false)
+          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
+          commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log: false)
         end
 
-        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_name}", log:false) if params[:unlock]
+        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_name}", log: false) if params[:unlock]
 
         command = "security set-keychain-settings"
         command << " -t #{params[:timeout]}" if params[:timeout]
@@ -27,7 +27,7 @@ module Fastlane
         command << " -u" if params[:lock_after_timeout]
         command << " ~/Library/Keychains/#{escaped_name}"
 
-        commands << Fastlane::Actions.sh(command, log:false)
+        commands << Fastlane::Actions.sh(command, log: false)
         commands
       end
 
@@ -64,7 +64,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :lock_after_timeout,
                                        description: 'Lock keychain after timeout interval',
                                        is_string: false,
-                                       default_value: false),
+                                       default_value: false)
         ]
       end
 

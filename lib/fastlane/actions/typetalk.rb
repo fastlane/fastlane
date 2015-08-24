@@ -7,15 +7,15 @@ module Fastlane
             note_path: nil,
             success: true,
             topicId: nil,
-            typetalk_token: nil,
+            typetalk_token: nil
         }.merge(params || {})
 
-        [:message, :topicId, :typetalk_token].each { |key|
+        [:message, :topicId, :typetalk_token].each do |key|
           raise "No #{key} given.".red unless options[key]
-        }
+        end
 
         emoticon = (options[:success] ? ':smile:' : ':rage:')
-        message = "#{emoticon} #{options[:message].to_s}"
+        message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
         if note_path and File.exist?(note_path)
@@ -44,10 +44,10 @@ module Fastlane
 
       def self.check_response(response)
         case response.code.to_i
-          when 200, 204
-            true
-          else
-            raise "Could not sent Typetalk notification".red
+        when 200, 204
+          true
+        else
+          raise "Could not sent Typetalk notification".red
         end
       end
 

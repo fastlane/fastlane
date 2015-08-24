@@ -10,8 +10,8 @@ module Fastlane
       output << "```"
 
       output << "# Available Actions"
-      
-      all_keys = ff.runner.lanes.keys.reject(&:nil?) 
+
+      all_keys = ff.runner.lanes.keys.reject(&:nil?)
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
@@ -22,7 +22,7 @@ module Fastlane
         if value
           value.each do |lane_name, lane|
             next if lane.is_private
-            output << render(platform, lane_name, lane.description.join("\n\n"))          
+            output << render(platform, lane_name, lane.description.join("\n\n"))
           end
 
           output << ""
@@ -41,27 +41,27 @@ module Fastlane
 
     private
 
-      def self.formatted_platform(pl)
-        pl = pl.to_s
-        return "iOS" if pl == 'ios'
-        return "Mac" if pl == 'mac'
+    def self.formatted_platform(pl)
+      pl = pl.to_s
+      return "iOS" if pl == 'ios'
+      return "Mac" if pl == 'mac'
 
-        return pl
-      end
+      return pl
+    end
 
-      # @param platform [String]
-      # @param lane [Fastlane::Lane]
-      # @param description [String]
-      def self.render(platform, lane, description)
-        full_name = [platform, lane].reject(&:nil?).join(' ')
+    # @param platform [String]
+    # @param lane [Fastlane::Lane]
+    # @param description [String]
+    def self.render(platform, lane, description)
+      full_name = [platform, lane].reject(&:nil?).join(' ')
 
-        output = []
-        output << "### #{full_name}"
-        output << "```"
-        output << "fastlane #{full_name}"
-        output << "```"
-        output << description
-        output
-      end
+      output = []
+      output << "### #{full_name}"
+      output << "```"
+      output << "fastlane #{full_name}"
+      output << "```"
+      output << description
+      output
+    end
   end
 end

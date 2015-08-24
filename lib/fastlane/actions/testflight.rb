@@ -40,7 +40,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        Actions::DeliverAction.is_supported?platform
+        Actions::DeliverAction.is_supported? platform
       end
     end
   end

@@ -1,10 +1,48 @@
-# Custom config file for Rubocop static code analysis
+inherit_from: .rubocop_todo.yml
 
-Metrics/LineLength:
-  Max: 160
+Style/ClassCheck:
+  EnforcedStyle: kind_of?
 
-Metrics/MethodLength:
-  Max: 20
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/BracesAroundHashParameters:
+  Enabled: false
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+Lint/UselessAssignment:
+  Exclude:
+    - 'spec/**/*'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/IndentHash:
+  Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: exploded
+
+Style/DoubleNegation:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+# Cop supports --auto-correct.
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+# Needed for $verbose
+Style/GlobalVars:
+  Enabled: false
+
+Style/FileName:
+  Enabled: false
+
+
+
+# fastlane specifc
+
+# e.g. 
+# def self.is_supported?(platform)
+# we may never use `platform`
+Lint/UnusedMethodArgument:
+  Enabled: false

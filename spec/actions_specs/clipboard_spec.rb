@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Clipboard Integration" do
       if FastlaneCore::Helper.is_mac?
         it "properly stores the value in the clipboard" do
-          str = "Some value: #{Time.now.to_i.to_s}"
+          str = "Some value: #{Time.now.to_i}"
 
           value = Fastlane::FastFile.new.parse("lane :test do
             clipboard(value: '#{str}')

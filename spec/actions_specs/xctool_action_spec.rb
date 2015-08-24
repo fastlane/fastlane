@@ -1,9 +1,8 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "xctool Integration" do
-
       it "works with no parameters" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           xctool
         end").runner.execute(:test)
 
@@ -11,7 +10,7 @@ describe Fastlane do
       end
 
       it "works with default setting" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           xctool 'build test'
         end").runner.execute(:test)
 
@@ -19,7 +18,7 @@ describe Fastlane do
       end
 
       it "works with default setting" do
-        result = Fastlane::FastFile.new.parse('lane :test do 
+        result = Fastlane::FastFile.new.parse('lane :test do
           xctool :test, [
             "--workspace", "\'AwesomeApp.xcworkspace\'",
             "--scheme", "\'Schema Name\'",

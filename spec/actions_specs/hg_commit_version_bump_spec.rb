@@ -46,14 +46,14 @@ describe Fastlane do
         dirty_files = ""
         expected_files = "file1"
 
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
           hg_commit_version_bump ({
             test_dirty_files: '#{dirty_files}',
             test_expected_files: '#{expected_files}',
           })
         end").runner.execute(:test)
-        }.to raise_exception('No file changes picked up. Make sure you run the `increment_build_number` action first.'.red)
+        end.to raise_exception('No file changes picked up. Make sure you run the `increment_build_number` action first.'.red)
       end
     end
   end

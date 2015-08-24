@@ -24,7 +24,7 @@ describe Fastlane do
                   zip: false)
           end").runner.execute(:test)
 
-          expect(File.exists?(File.join(destination_path, xcarchive_file))).to eq(true)
+          expect(File.exist?(File.join(destination_path, xcarchive_file))).to eq(true)
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BACKUP_XCARCHIVE_FILE]).to eq(File.join(destination_path, xcarchive_file))
         end
 
@@ -52,7 +52,7 @@ describe Fastlane do
                   )
           end").runner.execute(:test)
 
-          expect(File.exists?(File.join(destination_path, zip_file))).to eq(true)
+          expect(File.exist?(File.join(destination_path, zip_file))).to eq(true)
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BACKUP_XCARCHIVE_FILE]).to eq(File.join(destination_path, zip_file))
         end
 
