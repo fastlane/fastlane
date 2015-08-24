@@ -72,7 +72,9 @@ module Fastlane
           updated_tool.version > highest_versions[updated_tool.name].version
         end
 
-        unless all_updated_tools.empty?
+        if all_updated_tools.empty?
+          Helper.log.info "All fastlane tools are up-to-date!"
+        else
           Helper.log.info "Cleaning up old versions..."
           cleaner.options[:args] = all_updated_tools.map(&:name)
           cleaner.execute
@@ -80,8 +82,6 @@ module Fastlane
 
           # Set no_update to true so we don't try to update again
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
-        else
-          Helper.log.info "All fastlane tools are up-to-date!"
         end
       end
 

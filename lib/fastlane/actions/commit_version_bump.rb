@@ -77,6 +77,7 @@ module Fastlane
 
           Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
         rescue => ex
+          Helper.log.error ex
           Helper.log.info "Didn't commit any changes.".yellow
         end
       end

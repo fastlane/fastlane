@@ -96,9 +96,11 @@ module Fastlane
       Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ') if log
 
       result = ''
-      unless Helper.test?
+      if Helper.test?
+        result << command # only for the tests
+      else
         exit_status = nil
-        status = IO.popen(command, err: [:child, :out]) do |io|
+        IO.popen(command, err: [:child, :out]) do |io|
           io.each do |line|
             Helper.log.info ['[SHELL]', line.strip].join(': ')
             result << line
@@ -111,8 +113,6 @@ module Fastlane
           # this will also append the output to the exception
           raise "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
         end
-      else
-        result << command # only for the tests
       end
 
       result
@@ -124,11 +124,13 @@ module Fastlane
     end
 
     # returns a list of official integrations
+    # rubocop:disable Style/AccessorMethodName
     def self.get_all_official_actions
       Dir[File.expand_path '*.rb', File.dirname(__FILE__)].collect do |file|
         File.basename(file).gsub('.rb', '').to_sym
       end
     end
+    # rubocop:enable Style/AccessorMethodName
 
     def self.load_default_actions
       Dir[File.expand_path '*.rb', File.dirname(__FILE__)].each do |file|
@@ -145,7 +147,6 @@ module Fastlane
         file_name = File.basename(file).gsub('.rb', '')
 
         class_name = file_name.fastlane_class + 'Action'
-        class_ref = nil
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
 

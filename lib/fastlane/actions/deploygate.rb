@@ -42,17 +42,18 @@ module Fastlane
 
       def self.parse_response(response)
         if response.body && response.body.key?('error')
-          unless response.body['error']
+
+          if response.body['error']
+            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
+            help_message(response)
+            return
+          else
             res = response.body['results']
             url = DEPLOYGATE_URL_BASE + res['path']
 
             Actions.lane_context[SharedValues::DEPLOYGATE_URL] = url
             Actions.lane_context[SharedValues::DEPLOYGATE_REVISION] = res['revision']
             Actions.lane_context[SharedValues::DEPLOYGATE_APP_INFO] = res
-          else
-            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
-            help_message(response)
-            return
           end
         else
           Helper.log.fatal "Error uploading to DeployGate: #{response.body}".red

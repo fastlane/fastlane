@@ -23,9 +23,6 @@ module Fastlane
       end
 
       def self.run(params)
-        # The args we will build with
-        build_args = nil
-
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
@@ -34,6 +31,7 @@ module Fastlane
           absolute_dest_directory = File.expand_path(dest)
         end
 
+        # The args we will build with
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
 

@@ -42,8 +42,6 @@ module Fastlane
         "thiagolioy"
       end
 
-      private
-
       def self.gen_cov(options)
         tmp_cov_file = "/tmp/coverage.info"
         output_dir = options[:output_dir]

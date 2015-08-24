@@ -30,7 +30,7 @@ module Fastlane
         raise "Could not find valid certificate at '#{params[:certificate]}'" unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
-        verification = p7.verify([cert], store)
+        p7.verify([cert], store)
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]

@@ -29,12 +29,12 @@ module Fastlane
 
         result = JSON.parse(response.body)
         result.each do |current|
-          if current['tag_name'] == params[:version]
-            # Found it
-            Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
-            Helper.log.info "Version is already live on GitHub.com 🚁"
-            return current
-          end
+          next unless current['tag_name'] == params[:version]
+          
+          # Found it
+          Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
+          Helper.log.info "Version is already live on GitHub.com 🚁"
+          return current
         end
 
         Helper.log.info "Couldn't find GitHub release #{params[:version]}".yellow

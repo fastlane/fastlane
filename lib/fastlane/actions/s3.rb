@@ -111,10 +111,8 @@ module Fastlane
         plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
 
         html_file_name ||= "index.html"
-        html_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{html_file_name}"
 
         version_file_name ||= "version.json"
-        version_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{version_file_name}"
 
         # grabs module
         eth = Fastlane::ErbTemplateHelper

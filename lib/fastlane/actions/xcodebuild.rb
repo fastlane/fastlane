@@ -1,3 +1,4 @@
+# rubocop:disable all
 module Fastlane
   module Actions
     module SharedValues
@@ -438,3 +439,4 @@ module Fastlane
     end
   end
 end
+# rubocop:enable all

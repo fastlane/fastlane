@@ -19,11 +19,11 @@ module Fastlane
         zipped_features_path = File.expand_path('features.zip')
         Actions.sh(%(zip -r "features" "features/"))
 
-        response = system("#{"curl -H 'Accept: application/vnd.testmunk.v1+json'" \
-            " -F 'file=@#{config[:ipa]}' -F 'autoStart=true'" \
-            " -F 'testcases=@#{zipped_features_path}'" \
-            " -F 'email=#{config[:email]}'" \
-            " https://#{config[:api]}@api.testmunk.com/apps/#{config[:app]}/testruns"}")
+        response = system("curl -H 'Accept: application/vnd.testmunk.v1+json'" +
+            " -F 'file=@#{config[:ipa]}' -F 'autoStart=true'" +
+            " -F 'testcases=@#{zipped_features_path}'" +
+            " -F 'email=#{config[:email]}'" +
+            " https://#{config[:api]}@api.testmunk.com/apps/#{config[:app]}/testruns")
 
         if response
           Helper.log.info 'Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.'.green
