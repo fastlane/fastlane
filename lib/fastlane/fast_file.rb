@@ -110,7 +110,7 @@ module Fastlane
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError => ex
+      rescue NameError
         # Action not found
         # Is there a lane under this name?
         return self.runner.try_switch_to_lane(method_sym, arguments)
@@ -139,7 +139,7 @@ module Fastlane
     def is_platform_block?(key)
       raise 'No key given'.red unless key
 
-      return false if (self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil) rescue false)
+      return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
       return true if self.runner.lanes[key.to_sym].kind_of? Hash
 
       raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red

@@ -21,7 +21,7 @@ module Fastlane
           end
         end
       end
-      result = builder.to_xml.gsub('system_', 'system-').gsub("", ' ') # Jenkins can not parse 'ESC' symbol
+      result = builder.to_xml.gsub('system_', 'system-').tr("") # Jenkins can not parse 'ESC' symbol
 
       File.write(path, result)
 
