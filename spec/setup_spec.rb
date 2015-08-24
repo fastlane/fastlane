@@ -13,7 +13,7 @@ describe Fastlane do
       let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
       before do
         fastlane_folder = File.join(workspace, 'fastlane')
-        FileUtils.rm_rf(workspace) rescue nil
+        FileUtils.rm_rf(workspace) if Directory.exist? workspace
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
         $terminal = HighLine.new # mock user inputs :)

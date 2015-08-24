@@ -41,7 +41,7 @@ module Fastlane
           "profile was created. You can use it to upload the new profile to your server.",
           "Use it like this: ",
           "pem(",
-          "  new_profile: Proc.new do ",
+          "  new_profile: proc do ",
           "    # your upload code",
           "  end",
           ")"
