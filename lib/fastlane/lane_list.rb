@@ -16,19 +16,19 @@ module Fastlane
 
       all_keys.each do |platform|
         next if (ff.runner.lanes[platform] || []).count == 0
+
         plat_text = platform
         plat_text = "general" if platform.to_s.empty?
         output += "\n--------- #{plat_text}---------\n".yellow
 
         value = ff.runner.lanes[platform]
+        next unless value
 
-        if value
-          value.each do |lane_name, lane|
-            next if lane.is_private
+        value.each do |lane_name, lane|
+          next if lane.is_private
 
-            output += "----- fastlane #{lane.pretty_name}".green
-            output += "\n" + lane.description.join("\n") + "\n\n" if lane.description.count > 0
-          end
+          output += "----- fastlane #{lane.pretty_name}".green
+          output += "\n" + lane.description.join("\n") + "\n\n" if lane.description.count > 0
         end
       end
 

@@ -18,17 +18,16 @@ module Fastlane
         output << "## #{formatted_platform(platform)}" if platform
 
         value = ff.runner.lanes[platform]
+        next unless value
 
-        if value
-          value.each do |lane_name, lane|
-            next if lane.is_private
-            output << render(platform, lane_name, lane.description.join("\n\n"))
-          end
-
-          output << ""
-          output << "----"
-          output << ""
+        value.each do |lane_name, lane|
+          next if lane.is_private
+          output << render(platform, lane_name, lane.description.join("\n\n"))
         end
+
+        output << ""
+        output << "----"
+        output << ""
       end
 
       output << "Generate this documentation by running `fastlane docs`"
@@ -39,7 +38,9 @@ module Fastlane
       Helper.log.info "Successfully generated documentation to path '#{File.expand_path(output_path)}'".green
     end
 
-    private
+    #####################################################
+    # @!group Helper
+    #####################################################
 
     def self.formatted_platform(pl)
       pl = pl.to_s

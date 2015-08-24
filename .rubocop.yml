@@ -56,3 +56,7 @@ Lint/UnusedMethodArgument:
 Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - 'spec/**/*'
+
+# We use `is_supported?` everywhere already
+Style/PredicateName:
+  Enabled: false

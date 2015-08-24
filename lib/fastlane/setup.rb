@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/LineLength
-
 module Fastlane
   class Setup
 
@@ -18,6 +16,7 @@ module Fastlane
       response = agree('Do you have everything commited in version control? If not please do so! (y/n)'.yellow, true)
       return unless response
 
+      # rubocop:disable Lint/RescueException
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
         copy_existing_files
@@ -35,6 +34,7 @@ module Fastlane
         restore_previous_state
         raise ex
       end
+      # rubocop:enable Lint/RescueException
     end
 
     def show_infos
@@ -92,14 +92,7 @@ module Fastlane
     end
 
     def ask_to_enable_other_tools
-      unless @tools[:deliver]
-        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
-          Helper.log.info "Loading up 'deliver', this might take a few seconds"
-          require 'deliver'
-          Deliver::DeliverfileCreator.create(folder)
-          @tools[:deliver] = true
-        end
-      else
+      if @tools[:deliver]
         # deliver already enabled
         Helper.log.info '-------------------------------------------------------------------------------------------'
         Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
@@ -107,6 +100,13 @@ module Fastlane
         Helper.log.info "e.g. `system('cd ..; ipa build')`".yellow
         Helper.log.info 'Please read the above carefully and hit Enter to confirm.'.green
         STDIN.gets unless Helper.is_test?
+      else
+        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
+          Helper.log.info "Loading up 'deliver', this might take a few seconds"
+          require 'deliver'
+          Deliver::DeliverfileCreator.create(folder)
+          @tools[:deliver] = true
+        end
       end
 
       unless @tools[:snapshot]

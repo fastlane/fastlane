@@ -100,10 +100,10 @@ module Fastlane
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
 
         # Actually switch lane now
-        current_lane = new_lane
+        self.current_lane = new_lane
         collector.did_launch_action(:lane_switch)
         result = block.call(parameters.first || {}) # to always pass a hash
-        current_lane = original_lane
+        self.current_lane = original_lane
 
         Helper.log.info "Cruising back to lane '#{original_full}' 🚘".green
         return result
@@ -116,9 +116,6 @@ module Fastlane
 
     def execute_action(method_sym, class_ref, arguments)
       collector.did_launch_action(method_sym)
-
-      step_name = class_ref.step_text rescue nil
-      step_name = method_sym.to_s unless step_name
 
       verify_supported_os(method_sym, class_ref)
 

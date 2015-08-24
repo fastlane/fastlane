@@ -156,7 +156,7 @@ module Fastlane
             Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
             raise "Plugin '#{file_name}' is damaged!"
           end
-        rescue NameError => ex
+        rescue NameError
           # Action not found
           Helper.log.error "Could not find '#{class_name}' class defined.".red
           Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'

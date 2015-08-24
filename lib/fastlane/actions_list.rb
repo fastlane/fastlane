@@ -18,8 +18,6 @@ module Fastlane
           authors = Array(action.author || action.authors)
           current << authors.first.green if authors.count == 1
           current << "Multiple".green if authors.count > 1
-
-          l = (action.description || '').length
         else
           Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
           current << "Please update action file".red
@@ -102,7 +100,7 @@ module Fastlane
 
     # Iterates through all available actions and yields from there
     def self.all_actions
-      all_actions = Fastlane::Actions.constants.select {|c| Class === Fastlane::Actions.const_get(c)}
+      all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c) == Class }
       all_actions.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
@@ -110,8 +108,7 @@ module Fastlane
       end
     end
 
-    private
-
+    # Helper:
     def self.parse_options(options, fill_all = true)
       rows = []
       rows << [options] if options.kind_of? String

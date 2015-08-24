@@ -23,7 +23,9 @@ module Fastlane
       @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+        # rubocop:disable Lint/Eval
         eval(data) # this is okay in this case
+        # rubocop:enable Lint/Eval
       end
 
       self
@@ -137,7 +139,7 @@ module Fastlane
     def is_platform_block?(key)
       raise 'No key given'.red unless key
 
-      return false if (self.runner.lanes[nil][key.to_sym] rescue false)
+      return false if (self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil) rescue false)
       return true if self.runner.lanes[key.to_sym].kind_of? Hash
 
       raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
@@ -205,7 +207,7 @@ module Fastlane
           Helper.log.info "Using existing git repo..."
           begin
             Actions.sh("cd '#{folder}' && git pull")
-          rescue => ex
+          rescue
             # Something went wrong, clear the folder and pull again
             Actions.sh("rm -rf '#{folder}'")
             Actions.sh(clone_command)
@@ -224,7 +226,7 @@ module Fastlane
         actions_folder = File.join(containing, "actions")
         begin
           Actions.sh("cd '#{folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue => ex
+        rescue
           # We don't care about a failure here, as local actions are optional
         end
 

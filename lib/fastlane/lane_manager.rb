@@ -57,15 +57,15 @@ module Fastlane
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
 
-      unless error
+      if error
+        Helper.log.fatal 'fastlane finished with errors'.red
+        raise error
+      else
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
-      else
-        Helper.log.fatal 'fastlane finished with errors'.red
-        raise error
       end
     end
 
@@ -100,7 +100,7 @@ module Fastlane
         end
 
         i = $stdin.gets.strip.to_i - 1
-        if i >= 0 and (available[i] rescue nil)
+        if i >= 0 and available[i]
           selection = available[i]
           Helper.log.info "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`".yellow
           platform = selection.split(' ')[0]

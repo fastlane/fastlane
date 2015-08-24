@@ -26,17 +26,15 @@ module Fastlane
         lane = platform_lane_info[0]
       end
 
-      dot_env = options.env rescue nil # we don't really care about this option in tests
+      dot_env = Helper.is_test? ? nil : options.env
 
       Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
     end
 
-    private
-
-    # Convert into the right data type
+    # Helper to convert into the right data type
     def self.convert_value(value)
-      return true if (value == 'true' || value == 'yes')
-      return false if (value == 'false' || value == 'no')
+      return true if value == 'true' || value == 'yes'
+      return false if value == 'false' || value == 'no'
 
       # Default case:
       return value

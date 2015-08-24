@@ -231,7 +231,7 @@ module Fastlane
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
           elsif k == :build_settings
-            v.map {|setting, value| "#{setting}=\"#{value}\""}.join(' ')
+            v.map {|setting, val| "#{setting}=\"#{val}\""}.join(' ')
           elsif k == :destination
             [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0

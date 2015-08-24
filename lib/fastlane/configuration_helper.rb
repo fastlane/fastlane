@@ -1,7 +1,7 @@
 module Fastlane
   class ConfigurationHelper
     def self.parse(action, params)
-      first_element = (action.available_options.first rescue nil) # might also be nil
+      first_element = (action.available_options || []).first
 
       if first_element and first_element.kind_of? FastlaneCore::ConfigItem
         # default use case
