@@ -186,7 +186,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 #### Uploading screenshots to iTC
 
-Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatic :rocket:
+Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatically :rocket:
 
 ### Mac
 
