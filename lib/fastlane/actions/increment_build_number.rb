@@ -38,7 +38,7 @@ module Fastlane
             Actions.sh command
 
             # Store the new number in the shared hash
-            build_number = `#{command_prefix} agvtool what-version`.split("\n").last.to_i
+            build_number = `#{command_prefix} agvtool what-version`.split("\n").last.strip
 
             Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
           end
