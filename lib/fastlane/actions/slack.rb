@@ -1,3 +1,6 @@
+# rubocop:disable Style/CaseEquality
+# rubocop:disable Style/MultilineTernaryOperator
+# rubocop:disable Style/NestedTernaryOperator
 module Fastlane
   module Actions
     class SlackAction < Action
@@ -100,7 +103,9 @@ module Fastlane
         "KrauseFx"
       end
 
-      private
+      #####################################################
+      # @!group Helper
+      #####################################################
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
@@ -187,3 +192,6 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Style/CaseEquality
+# rubocop:enable Style/MultilineTernaryOperator
+# rubocop:enable Style/NestedTernaryOperator

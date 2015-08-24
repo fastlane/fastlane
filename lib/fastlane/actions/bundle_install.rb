@@ -1,6 +1,8 @@
 module Fastlane
   module Actions
     class BundleInstallAction < Action
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         if File.exist?('Gemfile')
           cmd = ['bundle install']
@@ -29,6 +31,8 @@ module Fastlane
           Helper.log.info "No Gemfile found"
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.description
         'This action runs `bundle install` if it founds the Gemfile'

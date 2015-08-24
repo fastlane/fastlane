@@ -1,3 +1,5 @@
+# rubocop:disable Lint/AssignmentInCondition
+# rubocop:disable Style/Next
 module Fastlane
   module Actions
     ARGS_MAP = {
@@ -35,7 +37,7 @@ module Fastlane
         # Maps nice developer build parameters to Shenzhen args
         build_args = params_to_build_args(params)
 
-        unless (params[:scheme] rescue nil)
+        unless params[:scheme]
           Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`"
         end
 
@@ -99,7 +101,7 @@ module Fastlane
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
           v ||= ''
-          if args = ARGS_MAP[k]
+          if ARGS_MAP[k]
             if k == :clean
               v == true ? '--clean' : '--no-clean'
             elsif k == :archive
@@ -211,3 +213,5 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Lint/AssignmentInCondition
+# rubocop:enable Style/Next

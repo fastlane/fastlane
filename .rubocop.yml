@@ -60,3 +60,12 @@ Lint/ParenthesesAsGroupedExpression:
 # We use `is_supported?` everywhere already
 Style/PredicateName:
   Enabled: false
+
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/fastlane/actions/*.rb'
+    - 'bin/fastlane'
+
+AllCops:
+  Exclude:
+    - 'lib/assets/custom_action_template.rb'

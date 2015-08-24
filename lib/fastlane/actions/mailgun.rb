@@ -11,7 +11,6 @@ module Fastlane
       def self.run(options)
         require 'rest_client'
         handle_params_transition(options)
-        handle_exceptions(options)
         mailgunit(options)
       end
 
@@ -85,33 +84,6 @@ module Fastlane
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
         puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow
-      end
-
-      def self.handle_exceptions(options)
-        unless (options[:apikey] rescue nil)
-          Helper.log.fatal "Please add 'ENV[\"MAILGUN_APIKEY\"] = \"a_valid_mailgun_apikey\"' to your Fastfile's `before_all` section.".red
-          raise 'No MAILGUN_APIKEY given.'.red
-        end
-
-        unless (options[:postmaster] rescue nil)
-          Helper.log.fatal "Please add 'ENV[\"MAILGUN_SANDBOX_POSTMASTER\"] = \"a_valid_mailgun_sandbox_postmaster\"' to your Fastfile's `before_all` section.".red
-          raise 'No MAILGUN_SANDBOX_POSTMASTER given.'.red
-        end
-
-        unless (options[:to] rescue nil)
-          Helper.log.fatal "Please provide a valid :to  = \"a_valid_mailgun_to\"".red
-          raise 'No MAILGUN_TO given.'.red
-        end
-
-        unless (options[:message] rescue nil)
-          Helper.log.fatal "Please provide a valid :message  = \"a_valid_mailgun_text\"".red
-          raise 'No MAILGUN_MESSAGE given.'.red
-        end
-
-        unless (options[:app_link] rescue nil)
-          Helper.log.fatal "Please provide a valid :app_link  = \"a_valid_mailgun_app_link\"".red
-          raise 'No MAILGUN_APP_LINK given.'.red
-        end
       end
 
       def self.mailgunit(options)

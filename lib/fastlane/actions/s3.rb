@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/PerceivedComplexity
+# rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
 require 'shenzhen'
@@ -182,7 +184,7 @@ module Fastlane
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
         params.collect do |k, v|
           v ||= ''
-          if args = S3_ARGS_MAP[k]
+          if S3_ARGS_MAP[k]
             value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{S3_ARGS_MAP[k]} #{value}".strip
           end
@@ -356,3 +358,5 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Metrics/PerceivedComplexity
+# rubocop:enable Metrics/AbcSize

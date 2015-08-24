@@ -99,7 +99,8 @@ module Fastlane
         # Maps nice developer param names to CLI arguments
         params.map do |k, v|
           v ||= ""
-          if args = ARGS_MAP[k]
+          args = ARGS_MAP[k]
+          if args
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{args} #{value}".strip
           end

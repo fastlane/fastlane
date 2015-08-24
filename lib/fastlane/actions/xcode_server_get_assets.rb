@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     module SharedValues
@@ -118,7 +119,7 @@ module Fastlane
           response = get_endpoint('/bots')
           raise "You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.".red if response.status == 401
           raise "Failed to fetch Bots from Xcode Server at #{@host}, response: #{response.status}: #{response.body}.".red if response.status != 200
-          bots = JSON.parse(response.body)['results']
+          JSON.parse(response.body)['results']
         end
 
         def fetch_integrations(bot_id)
@@ -294,3 +295,4 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

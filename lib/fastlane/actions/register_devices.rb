@@ -45,6 +45,7 @@ module Fastlane
         end
 
         Helper.log.info "Successfully registered new devices.".green
+        return device_objs
       end
 
       def self.description

@@ -5,7 +5,8 @@ module Fastlane
 
     class TeamIdAction < Action
       def self.run(params)
-        team = (params.first rescue nil)
+        params = nil unless params.kind_of? Array
+        team = (params || []).first
         raise "Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red unless team.to_s.length > 0
 
         Helper.log.info "Setting Team ID to '#{team}' for all build steps"

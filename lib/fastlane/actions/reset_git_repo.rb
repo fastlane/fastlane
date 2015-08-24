@@ -4,7 +4,7 @@ module Fastlane
     class ResetGitRepoAction < Action
       def self.run(params)
         if params[:force] || params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
-          paths = (params[:files] rescue nil)
+          paths = params[:files]
 
           return paths if Helper.is_test?
 

@@ -17,7 +17,7 @@ describe Fastlane do
             subject: 'A valid subject'
             })
           end").runner.execute(:test)
-        end.to raise_exception('No MAILGUN_SANDBOX_POSTMASTER given.'.red)
+        end.to raise_exception("No value found for 'postmaster'")
       end
 
       it "raises an error if no mailgun apikey is given" do
@@ -29,7 +29,7 @@ describe Fastlane do
             message: 'A valid email text'
             })
           end").runner.execute(:test)
-        end.to raise_exception('No MAILGUN_APIKEY given.'.red)
+        end.to raise_exception("No value found for 'apikey'")
       end
 
       it "raises an error if no mailgun to is given" do
@@ -39,7 +39,7 @@ describe Fastlane do
             message: 'A valid email text'
             })
           end").runner.execute(:test)
-        end.to raise_exception('No MAILGUN_TO given.'.red)
+        end.to raise_exception("No value found for 'to'")
       end
 
       it "raises an error if no mailgun message is given" do
@@ -49,7 +49,7 @@ describe Fastlane do
             to: 'valid@gmail.com'
             })
           end").runner.execute(:test)
-        end.to raise_exception('No MAILGUN_MESSAGE given.'.red)
+        end.to raise_exception("No value found for 'message'")
       end
 
       it "raises an error if no mailgun app_link is given" do
@@ -61,7 +61,7 @@ describe Fastlane do
             message: 'A valid email text'
             })
           end").runner.execute(:test)
-        end.to raise_exception('No MAILGUN_APP_LINK given.'.red)
+        end.to raise_exception("No value found for 'app_link'")
       end
     end
   end
