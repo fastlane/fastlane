@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
+  spec.add_dependency 'mini_magick', '~> 4.0.2' # Needed for add_icon_overlay action
 
   spec.add_dependency 'fastlane_core', '>= 0.15.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.7.4', '< 1.0.0' # Password Manager
