@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class RestoreFileAction < Action
-      def self.run params
+      def self.run(params)
         path = params[:path]
         backup_path = "#{path}.back"
         raise "Could not find file '#{backup_path}'" unless File.exist? backup_path
@@ -26,7 +26,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "Original file name you want to restore",
-                                       optional: false),
+                                       optional: false)
         ]
       end
     end

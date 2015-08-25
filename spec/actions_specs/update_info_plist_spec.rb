@@ -15,7 +15,7 @@ describe Fastlane do
       end
 
       it "updates the info plist based on the given properties" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           update_info_plist ({
             xcodeproj: '#{xcodeproj}',
             plist_path: '#{plist_path}',
@@ -28,8 +28,8 @@ describe Fastlane do
       end
 
       it "throws an error when the info plist file does not exist" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
             update_info_plist ({
               xcodeproj: '#{xcodeproj}',
               plist_path: 'NOEXIST-#{plist_path}',
@@ -37,11 +37,11 @@ describe Fastlane do
               display_name: '#{display_name}'
             })
           end").runner.execute(:test)
-        }.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'".red)
+        end.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'".red)
       end
-      
+
       it "returns 'false' if no plist parameters are specified" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           update_info_plist ({
             xcodeproj: '#{xcodeproj}',
             plist_path: 'NOEXIST-#{plist_path}'
@@ -49,13 +49,12 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to eq false
       end
-      
+
       after do
         # Clean up files
         File.delete(File.join(test_path, plist_path))
         FileUtils.rm_rf(xcodeproj)
       end
-
     end
   end
 end

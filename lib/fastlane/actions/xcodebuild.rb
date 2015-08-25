@@ -1,3 +1,4 @@
+# rubocop:disable all
 module Fastlane
   module Actions
     module SharedValues
@@ -43,7 +44,7 @@ module Fastlane
       }
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
 
       def self.run(params)
@@ -65,7 +66,6 @@ module Fastlane
           build_path += "/"
         end
 
-
         if params
           # Operation bools
           archiving = params.key? :archive
@@ -80,7 +80,7 @@ module Fastlane
             params[:export_format] ||= "ipa"
 
             # If not passed, construct export path from env vars
-            if params[:export_path] == nil
+            if params[:export_path].nil?
               ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
               params[:export_path] = "#{build_path}#{ipa_filename}"
             end
@@ -139,7 +139,6 @@ module Fastlane
           if params[:reports]
             # New report options format
             reports = params[:reports].reduce("") do |arguments, report|
-
               report_string = "--report #{report[:report]}"
 
               if report[:output]
@@ -169,7 +168,7 @@ module Fastlane
             # Test report file format
             report_formats = params[:report_formats].map do |format|
               "--report #{format}"
-            end.sort().join(" ")
+            end.sort.join(" ")
 
             xcpretty_args.push report_formats
 
@@ -213,7 +212,7 @@ module Fastlane
               raise_error = false
 
               Helper.log.warn "First attempt failed with iPhone Simulator error: #{iphone_simulator_time_out_error.source}"
-              Helper.log.warn  "Retrying once more..."
+              Helper.log.warn "Retrying once more..."
               Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} | xcpretty #{xcpretty_args}"
             end
           end
@@ -233,7 +232,7 @@ module Fastlane
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
           elsif k == :build_settings
-            v.map{|setting,value| "#{setting}=\"#{value}\""}.join(' ')
+            v.map {|setting, val| "#{setting}=\"#{val}\""}.join(' ')
           elsif k == :destination
             [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0
@@ -251,7 +250,7 @@ module Fastlane
           Helper.log.warn "Multiple workspaces detected."
         end
 
-        if !workspaces.empty?
+        unless workspaces.empty?
           workspace = workspaces.first
           Helper.log.warn "Using workspace \"#{workspace}\""
         end
@@ -299,7 +298,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
 
       def self.available_options
@@ -329,7 +328,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
 
       def self.available_options
@@ -360,7 +359,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
 
       def self.available_options
@@ -402,7 +401,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
     end
 
@@ -431,7 +430,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
 
       def self.author
@@ -440,3 +439,4 @@ module Fastlane
     end
   end
 end
+# rubocop:enable all

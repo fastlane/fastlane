@@ -3,7 +3,6 @@ module Fastlane
     # Pushes commits to the remote hg repo
     class HgPushAction < Action
       def self.run(params)
-
         command = ['hg', 'push']
 
         command << '--force' if params[:force]

@@ -33,7 +33,7 @@ module Fastlane
                                        description: "The path of the Fastfile in the repository",
                                        default_value: 'fastlane/Fastfile',
                                        optional: true)
-      ]
+        ]
       end
 
       def self.authors

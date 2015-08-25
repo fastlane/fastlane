@@ -7,14 +7,14 @@ module Fastlane
 
         return params[:ci_input] if Helper.is_ci?
 
-        unless params[:multi_line_end_keyword]
-          # Standard one line input
-          user_input = STDIN.gets.chomp.strip
-        else
+        if params[:multi_line_end_keyword]
           # Multi line
           end_tag = params[:multi_line_end_keyword]
           Helper.log.info "Submit inputs using \"#{params[:multi_line_end_keyword]}\"".yellow
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
+        else
+          # Standard one line input
+          user_input = STDIN.gets.chomp.strip
         end
 
         user_input = (user_input.downcase == 'y') if params[:boolean]
@@ -52,7 +52,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :multi_line_end_keyword,
                                        description: "Enable multi-line inputs by providing an end text (e.g. 'END') which will stop the user input",
                                        optional: true,
-                                       is_string: true),
+                                       is_string: true)
         ]
       end
 

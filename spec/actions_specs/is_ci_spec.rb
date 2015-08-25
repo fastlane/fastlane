@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "is_ci", now: true do
+    describe "is_ci" do
       it "returns the correct value" do
         result = Fastlane::FastFile.new.parse("lane :test do
           is_ci

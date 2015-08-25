@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     module SharedValues
@@ -12,7 +13,6 @@ module Fastlane
       require 'fileutils'
 
       def self.run(params)
-
         host = params[:host]
         bot_name = params[:bot_name]
         integration_number_override = params[:integration_number]
@@ -46,10 +46,10 @@ module Fastlane
         # we have our bot, get finished integrations, sorted from newest to oldest
         integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
         raise "Failed to find any completed integration for Bot \"#{bot_name}\"".red if (integrations || []).count == 0
-        
+
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override
-          integration = integrations.select { |i| i['number'] == integration_number_override }.first
+          integration = integrations.find { |i| i['number'] == integration_number_override }
           raise "Specified integration number #{integration_number_override} does not exist.".red unless integration
         else
           integration = integrations.first
@@ -68,7 +68,7 @@ module Fastlane
         Helper.log.info "Successfully downloaded #{asset_entries.count} assets to file #{assets_path}!".green
 
         # now find the archive and unzip it
-        zipped_archive_path = asset_entries.select { |i| i.end_with?('xcarchive.zip') }.first
+        zipped_archive_path = asset_entries.find { |i| i.end_with?('xcarchive.zip') }
 
         if zipped_archive_path
 
@@ -77,7 +77,7 @@ module Fastlane
           archive_file_path = File.basename(zipped_archive_path, File.extname(zipped_archive_path))
           archive_dir_path = File.dirname(zipped_archive_path)
           archive_path = File.join(archive_dir_path, archive_file_path)
-          if File.exists?(archive_path)
+          if File.exist?(archive_path)
             # we already have the archive, skip
             Helper.log.info "Archive #{archive_path} already exists, not unzipping again...".yellow
           else
@@ -89,8 +89,8 @@ module Fastlane
           asset_entries = Dir.entries(assets_path).map { |i| File.join(assets_path, i) }
 
           # optionally delete everything except for the archive
-          if !keep_all_assets
-            files_to_delete = asset_entries.select do |i| 
+          unless keep_all_assets
+            files_to_delete = asset_entries.select do |i|
               File.extname(i) != '.xcarchive' && ![".", ".."].include?(File.basename(i))
             end
 
@@ -101,7 +101,7 @@ module Fastlane
 
           Actions.lane_context[SharedValues::XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH] = archive_path
         end
-        
+
         Actions.lane_context[SharedValues::XCODE_SERVER_GET_ASSETS_PATH] = assets_path
 
         return assets_path
@@ -117,22 +117,20 @@ module Fastlane
 
         def fetch_all_bots
           response = get_endpoint('/bots')
-          raise "You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.".red if response.status == 401 
+          raise "You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.".red if response.status == 401
           raise "Failed to fetch Bots from Xcode Server at #{@host}, response: #{response.status}: #{response.body}.".red if response.status != 200
-          bots = JSON.parse(response.body)['results']
+          JSON.parse(response.body)['results']
         end
 
         def fetch_integrations(bot_id)
           response = get_endpoint("/bots/#{bot_id}/integrations?limit=10")
           raise "Failed to fetch Integrations for Bot #{bot_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}".red if response.status != 200
-          integrations = JSON.parse(response.body)['results']
+          JSON.parse(response.body)['results']
         end
 
         def fetch_assets(integration_id, target_folder, action)
-          
           # create a temp folder and a file, stream the download into it
           Dir.mktmpdir do |dir|
-
             temp_file = File.join(dir, "tmp_download.#{rand(1000000)}")
             f = open(temp_file, 'w')
             streamer = lambda do |chunk, remaining_bytes, total_bytes|
@@ -145,7 +143,7 @@ module Fastlane
             end
 
             response = self.get_endpoint("/integrations/#{integration_id}/assets", streamer)
-            f.close()
+            f.close
 
             raise "Integration doesn't have any assets (it probably never ran).".red if response.status == 500
             raise "Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}".red if response.status != 200
@@ -157,7 +155,7 @@ module Fastlane
             action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"
 
             # then pull the real name from headers
-            asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].gsub('"', '')
+            asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].delete('"')
             asset_foldername = asset_filename.split('.')[0]
 
             # rename the folder in out_folder to asset_foldername
@@ -186,33 +184,33 @@ module Fastlane
 
         def headers
           require 'base64'
-          headers = { 
+          headers = {
             'User-Agent' => 'fastlane-xcode_server_get_assets', # XCS wants user agent. for some API calls. not for others. sigh.
             'X-XCSAPIVersion' => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
           }
 
-          if @username && @password 
+          if @username and @password
             userpass = "#{@username}:#{@password}"
             headers['Authorization'] = "Basic #{Base64.strict_encode64(userpass)}"
           end
-          
+
           return headers
         end
 
-        def get_endpoint(endpoint, response_block=nil)
+        def get_endpoint(endpoint, response_block = nil)
           url = url_for_endpoint(endpoint)
           headers = self.headers || {}
 
           if response_block
-            response = Excon.get(url, :response_block => response_block, :headers => headers)
+            response = Excon.get(url, response_block: response_block, headers: headers)
           else
-            response = Excon.get(url, :headers => headers)
+            response = Excon.get(url, headers: headers)
           end
 
           return response
         end
 
-        private 
+        private
 
         def url_for_endpoint(endpoint)
           "#{@host}:20343/api#{endpoint}"
@@ -235,7 +233,7 @@ module Fastlane
           assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it"
       end
 
-      def self.available_options        
+      def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :host,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_HOST",
@@ -297,3 +295,4 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

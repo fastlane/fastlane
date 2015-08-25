@@ -32,16 +32,16 @@ describe Fastlane do
 
       describe "when use action without `backup_file` action" do
         it "should raise error" do
-          expect {
+          expect do
             Fastlane::FastFile.new.parse("lane :test do
               restore_file path: '#{File.join(test_path, file_path)}'
             end").runner.execute(:test)
-          }.to raise_error("Could not find file '#{File.join(test_path, backup_path)}'")
+          end.to raise_error("Could not find file '#{File.join(test_path, backup_path)}'")
         end
       end
 
       after do
-        File.delete(File.join(test_path, backup_path)) if File.exists? File.join(test_path, backup_path)
+        File.delete(File.join(test_path, backup_path)) if File.exist? File.join(test_path, backup_path)
         File.delete(File.join(test_path, file_path))
       end
     end

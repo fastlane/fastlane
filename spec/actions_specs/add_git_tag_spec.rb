@@ -10,7 +10,7 @@ describe Fastlane do
       end
 
       it "generates a tag based on existing context" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag
         end").runner.execute(:test)
 
@@ -21,7 +21,7 @@ describe Fastlane do
         specified_build_number = 42
         grouping = 'grouping'
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
             grouping: '#{grouping}',
             build_number: #{specified_build_number},
@@ -34,7 +34,7 @@ describe Fastlane do
       it "allows you to specify a prefix" do
         prefix = '16309-'
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
             prefix: '#{prefix}',
           })
@@ -46,7 +46,7 @@ describe Fastlane do
       it "allows you to specify your own tag" do
         tag = '2.0.0'
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
             tag: '#{tag}',
           })
@@ -58,7 +58,7 @@ describe Fastlane do
       it "specified tag overrides generate tag" do
         tag = '2.0.0'
 
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
             tag: '#{tag}',
             grouping: 'grouping',
@@ -68,7 +68,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("git tag \"#{tag}\"")
-      end      
+      end
     end
   end
 end

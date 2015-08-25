@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Mercurial Push to Remote Action" do
-
       it "works without passing any options" do
         result = Fastlane::FastFile.new.parse("lane :test do
           hg_push

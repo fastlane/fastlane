@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Team Name Action" do
       it "works as expected" do
         new_val = "abcdef"
-        Fastlane::FastFile.new.parse("lane :test do 
+        Fastlane::FastFile.new.parse("lane :test do
           team_name '#{new_val}'
         end").runner.execute(:test)
 
@@ -13,11 +13,11 @@ describe Fastlane do
       end
 
       it "raises an error if no team Name is given" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
             team_name
           end").runner.execute(:test)
-        }.to raise_error("Please pass your Team Name (e.g. team_name 'Felix Krause')".red)
+        end.to raise_error("Please pass your Team Name (e.g. team_name 'Felix Krause')".red)
       end
     end
   end

@@ -1,3 +1,4 @@
+# rubocop:disable Style/SpaceAroundOperators
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Xcodebuild Integration" do
@@ -75,11 +76,11 @@ describe Fastlane do
           + "installsrc " \
           + "test " \
           + "| xcpretty --color --simple"
-      )
-    end
+        )
+      end
 
-    it "works with a destination list" do
-      result = Fastlane::FastFile.new.parse("lane :test do
+      it "works with a destination list" do
+        result = Fastlane::FastFile.new.parse("lane :test do
         xcodebuild(
           destination: [
             'name=iPhone 5s,OS=8.1',
@@ -89,8 +90,8 @@ describe Fastlane do
         )
       end").runner.execute(:test)
 
-      expect(result).to eq(
-        "set -o pipefail && " \
+        expect(result).to eq(
+          "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination \"name=iPhone 4,OS=7.1\" " \
@@ -98,11 +99,11 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "| xcpretty --color --simple"
-      )
-    end
+        )
+      end
 
-    it "works with build settings" do
-      result = Fastlane::FastFile.new.parse("lane :test do
+      it "works with build settings" do
+        result = Fastlane::FastFile.new.parse("lane :test do
         xcodebuild(
           build_settings: {
             'CODE_SIGN_IDENTITY' => 'iPhone Developer: Josh',
@@ -112,38 +113,38 @@ describe Fastlane do
         )
       end").runner.execute(:test)
 
-      expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
-      expect(result).to include('JOBS="16"')
-      expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
-    end
+        expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
+        expect(result).to include('JOBS="16"')
+        expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
+      end
 
-    it "when archiving, should cache the archive path for a later export step" do
+      it "when archiving, should cache the archive path for a later export step" do
         Fastlane::FastFile.new.parse("lane :test do
-          xcodebuild(
-            archive: true,
-            archive_path: './build/MyApp.xcarchive',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace'
-          )
-        end").runner.execute(:test)
+        xcodebuild(
+          archive: true,
+          archive_path: './build/MyApp.xcarchive',
+          scheme: 'MyApp',
+          workspace: 'MyApp.xcworkspace'
+        )
+      end").runner.execute(:test)
 
         expect(Fastlane::Actions.lane_context[:XCODEBUILD_ARCHIVE]).to eq("./build/MyApp.xcarchive")
-    end
+      end
 
-    it "when exporting, should use the cached archive path from a previous archive step" do
+      it "when exporting, should use the cached archive path from a previous archive step" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          xcodebuild(
-            archive: true,
-            archive_path: './build-dir/MyApp.xcarchive',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace'
-          )
+        xcodebuild(
+          archive: true,
+          archive_path: './build-dir/MyApp.xcarchive',
+          scheme: 'MyApp',
+          workspace: 'MyApp.xcworkspace'
+        )
 
-          xcodebuild(
-            export_archive: true,
-            export_path: './build-dir/MyApp'
-          )
-        end").runner.execute(:test)
+        xcodebuild(
+          export_archive: true,
+          export_path: './build-dir/MyApp'
+        )
+      end").runner.execute(:test)
 
         expect(result).to eq(
           "set -o pipefail && " \
@@ -154,9 +155,9 @@ describe Fastlane do
           + "-exportPath \"./build-dir/MyApp\" " \
           + "| xcpretty --color --simple"
         )
-    end
+      end
 
-    it "when exporting, should cache the ipa path for a later deploy step" do
+      it "when exporting, should cache the ipa path for a later deploy step" do
         Fastlane::FastFile.new.parse("lane :test do
           xcodebuild(
             archive_path: './build-dir/MyApp.xcarchive',
@@ -166,9 +167,9 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(Fastlane::Actions.lane_context[:IPA_OUTPUT_PATH]).to eq("./build-dir/MyApp.ipa")
-    end
+      end
 
-    context "when using environment variables"
+      context "when using environment variables"
       before :each do
         ENV["XCODE_BUILD_PATH"] = "./build-dir/"
         ENV["XCODE_SCHEME"] = "MyApp"
@@ -469,7 +470,7 @@ describe Fastlane do
         )
       end
       it "should detect and use the workspace, when a workspace is present" do
-        allow(Dir).to receive(:glob).with("*.xcworkspace").and_return([ "MyApp.xcworkspace" ])
+        allow(Dir).to receive(:glob).with("*.xcworkspace").and_return(["MyApp.xcworkspace"])
 
         result = Fastlane::FastFile.new.parse("lane :test do
           xcbuild
@@ -487,3 +488,4 @@ describe Fastlane do
     end
   end
 end
+# rubocop:enable Style/SpaceAroundOperators

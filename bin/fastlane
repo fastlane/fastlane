@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# rubocop:disable Metrics/AbcSize
 
 $LOAD_PATH.push File.expand_path('../../lib', __FILE__)
 
@@ -27,10 +28,10 @@ class FastlaneApplication
       c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
-      c.action do |args, _options|
+      c.action do |args, options|
         if Fastlane::FastlaneFolder.path
 
-          Fastlane::CommandLineHandler.handle(args, _options)
+          Fastlane::CommandLineHandler.handle(args, options)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
           Fastlane::Setup.new.run if create
@@ -42,7 +43,7 @@ class FastlaneApplication
       c.syntax = 'fastlane init'
       c.description = 'Helps you setting up fastlane based on your existing tools.'
 
-      c.action do |_args, _options|
+      c.action do |args, options|
         Fastlane::Setup.new.run
       end
     end
@@ -51,7 +52,7 @@ class FastlaneApplication
       c.syntax = 'fastlane new_action'
       c.description = 'Create a new custom action for fastlane.'
 
-      c.action do |_args, _options|
+      c.action do |args, options|
         Fastlane::NewAction.run
       end
     end
@@ -60,7 +61,7 @@ class FastlaneApplication
       c.syntax = 'fastlane lanes'
       c.description = 'Lists all available lanes and shows their description'
 
-      c.action do |_args, _options|
+      c.action do |args, options|
         require 'fastlane/lane_list'
         path = File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile')
         Fastlane::LaneList.output(path)
@@ -70,7 +71,7 @@ class FastlaneApplication
     command :list do |c|
       c.syntax = 'fastlane list'
       c.description = 'Lists all available lanes without description'
-      c.action do |_args, _options|
+      c.action do |args, options|
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
         puts "\nAvailable lanes:".green
         ff.runner.available_lanes.each do |lane|
@@ -85,10 +86,10 @@ class FastlaneApplication
       c.description = 'Generate a markdown based documentation based on the Fastfile'
       c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
 
-      c.action do |_args, _options|
+      c.action do |args, options|
         path = File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
-        if File.exists?path and not _options.force
-          return unless agree('Found existing ./fastlane/README.md. Do you want to overwrite it? (y/n)', true)
+        if File.exist? path and !options.force
+          return nil unless agree('Found existing ./fastlane/README.md. Do you want to overwrite it? (y/n)', true)
         end
 
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
@@ -102,18 +103,18 @@ class FastlaneApplication
       c.syntax = 'fastlane actions'
       c.description = 'Lists all available fastlane actions'
 
-      c.action do |_args, _options|
+      c.action do |args, options|
         require 'fastlane/actions_list'
-        Fastlane::ActionsList.run(_args.first)
+        Fastlane::ActionsList.run(args.first)
       end
     end
 
     command :action do |c|
       c.syntax = 'fastlane action [tool_name]'
       c.description = 'Shows more information for a specific command'
-      c.action do |_args, _options|
+      c.action do |args, options|
         require 'fastlane/actions_list'
-        Fastlane::ActionsList.run(_args.first)
+        Fastlane::ActionsList.run(args.first)
       end
     end
 
@@ -129,3 +130,4 @@ begin
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
 end
+# rubocop:enable Metrics/AbcSize

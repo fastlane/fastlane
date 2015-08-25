@@ -29,7 +29,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :certificate_password,
                                        env_name: "",
                                        description: "Certificate password",
-                                       optional: true),
+                                       optional: true)
         ]
       end
 

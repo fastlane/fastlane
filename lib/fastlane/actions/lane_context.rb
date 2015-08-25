@@ -21,7 +21,7 @@ module Fastlane
         []
       end
 
-      def self.authors        
+      def self.authors
         ["KrauseFx"]
       end
 

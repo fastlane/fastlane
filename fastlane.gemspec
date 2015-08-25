@@ -8,14 +8,14 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = %q{Connect all iOS deployment tools into one streamlined workflow}
-  spec.description   = %q{Connect all iOS deployment tools into one streamlined workflow}
+  spec.summary       = 'Connect all iOS deployment tools into one streamlined workflow'
+  spec.description   = 'Connect all iOS deployment tools into one streamlined workflow'
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ bin/fastlane README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w( bin/fastlane README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
 
-  spec.add_dependency 'fastlane_core', '>= 0.14.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.15.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.7.4', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.5.3', '< 1.0.0' # communication layer with Apple's web services
 
@@ -40,10 +40,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'deliver', '>= 0.13.1', '< 1.0.0'
   spec.add_dependency 'snapshot', '>= 0.9.2', '< 1.0.0'
   spec.add_dependency 'frameit', '>= 2.2.0', '< 3.0.0'
-  spec.add_dependency 'pem', '>= 0.7.1', '< 1.0.0'
-  spec.add_dependency 'cert', '>= 0.3.0', '< 1.0.0'
-  spec.add_dependency 'sigh', '>= 0.10.5', '< 1.0.0'
-  spec.add_dependency 'produce', '>= 0.6.0', '< 1.0.0'
+  spec.add_dependency 'pem', '>= 0.7.2', '< 1.0.0'
+  spec.add_dependency 'cert', '>= 0.3.1', '< 1.0.0'
+  spec.add_dependency 'sigh', '>= 0.10.6', '< 1.0.0'
+  spec.add_dependency 'produce', '>= 0.6.1', '< 1.0.0'
   spec.add_dependency 'gym', '>= 0.4.4', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.1.6', '< 1.0.0'
 

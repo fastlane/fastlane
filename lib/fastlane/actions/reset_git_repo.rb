@@ -4,17 +4,17 @@ module Fastlane
     class ResetGitRepoAction < Action
       def self.run(params)
         if params[:force] || params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
-          paths = (params[:files] rescue nil)
+          paths = params[:files]
 
           return paths if Helper.is_test?
-          
+
           if (paths || []).count == 0
             Actions.sh('git reset --hard HEAD')
             Actions.sh('git clean -qfdx')
             Helper.log.info 'Git repo was reset and cleaned back to a pristine state.'.green
           else
             paths.each do |path|
-              Helper.log.warn("Couldn't find file at path '#{path}'") unless File.exists?(path)
+              Helper.log.warn("Couldn't find file at path '#{path}'") unless File.exist?(path)
               Actions.sh("git checkout -- '#{path}'")
             end
             Helper.log.info "Git cleaned up #{paths.count} files.".green
@@ -43,14 +43,14 @@ module Fastlane
                                        description: "Array of files the changes should be discarded from. If not given, all files will be discarded",
                                        optional: true,
                                        is_string: false,
-                                       verify_block: Proc.new do |value|
-                                        raise "Please pass an array only" unless value.kind_of?Array
+                                       verify_block: proc do |value|
+                                         raise "Please pass an array only" unless value.kind_of? Array
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_RESET_GIT_FORCE",
                                        description: "Skip verifying of previously clean state of repo. Only recommended in combination with `files` option",
                                        is_string: false,
-                                       default_value: false),
+                                       default_value: false)
         ]
       end
 

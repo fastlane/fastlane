@@ -45,6 +45,7 @@ module Fastlane
         end
 
         Helper.log.info "Successfully registered new devices.".green
+        return device_objs
       end
 
       def self.description
@@ -62,8 +63,8 @@ module Fastlane
                                        env_name: "FL_REGISTER_DEVICES_FILE",
                                        description: "Provide a path to the devices to register",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Could not find file '#{value}'".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Could not find file '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
@@ -72,7 +73,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id))
         ]
       end
 

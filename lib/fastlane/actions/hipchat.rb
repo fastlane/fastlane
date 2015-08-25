@@ -16,7 +16,7 @@ module Fastlane
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
-        
+
         the_message = options[:message]
         message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{the_message[0..9999]}</td></tr></table>"
 
@@ -70,14 +70,14 @@ module Fastlane
 
       def self.check_response_code(response, channel)
         case response.code.to_i
-          when 200, 204
-            true
-          when 404
-            raise "Channel `#{channel}` not found".red
-          when 401
-            raise "Access denied for channel `#{channel}`".red
-          else
-            raise "Unexpected #{response.code} for `#{channel}` with response: #{response.body}".red
+        when 200, 204
+          true
+        when 404
+          raise "Channel `#{channel}` not found".red
+        when 401
+          raise "Access denied for channel `#{channel}`".red
+        else
+          raise "Unexpected #{response.code} for `#{channel}` with response: #{response.body}".red
         end
       end
 
@@ -97,11 +97,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "HIPCHAT_API_TOKEN",
                                        description: "Hipchat API Token",
-                                       verify_block: Proc.new do |value|
-                                        unless value.to_s.length > 0
-                                          Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
-                                          raise 'No HIPCHAT_API_TOKEN given.'.red
-                                        end
+                                       verify_block: proc do |value|
+                                         unless value.to_s.length > 0
+                                           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
+                                           raise 'No HIPCHAT_API_TOKEN given.'.red
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_HIPCHAT_SUCCESS",
@@ -112,11 +112,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "HIPCHAT_API_VERSION",
                                        description: "Version of the Hipchat API. Must be 1 or 2",
-                                       verify_block: Proc.new do |value|
-                                        if value.nil? || ![1, 2].include?(value.to_i)
-                                          Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
-                                          raise 'No HIPCHAT_API_VERSION given.'.red
-                                        end
+                                       verify_block: proc do |value|
+                                         if value.nil? || ![1, 2].include?(value.to_i)
+                                           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
+                                           raise 'No HIPCHAT_API_VERSION given.'.red
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :notify_room,
                                        env_name: "HIPCHAT_NOTIFY_ROOM",
@@ -129,7 +129,7 @@ module Fastlane
                                        description: "The host of the HipChat-Server API",
                                        default_value: "api.hipchat.com",
                                        optional: true)
-          ]
+        ]
       end
 
       def self.author

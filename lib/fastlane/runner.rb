@@ -18,12 +18,13 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
     def execute(lane, platform = nil, parameters = nil)
       raise "No lane given" unless lane
 
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
-
 
       lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
 
@@ -32,7 +33,7 @@ module Fastlane
 
       ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
       ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
-      
+
       Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
 
@@ -43,17 +44,16 @@ module Fastlane
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
-
           # Call the platform specific before_all block and then the general one
-          before_all_blocks[current_platform].call(current_lane) if (before_all_blocks[current_platform] and current_platform)
+          before_all_blocks[current_platform].call(current_lane) if before_all_blocks[current_platform] && current_platform
           before_all_blocks[nil].call(current_lane) if before_all_blocks[nil]
-          
+
           return_val = lane_obj.call(parameters || {}) # by default no parameters
-          
+
           # `after_all` is only called if no exception was raised before
           # Call the platform specific before_all block and then the general one
-          after_all_blocks[current_platform].call(current_lane) if (after_all_blocks[current_platform] and current_platform)
-          after_all_blocks[nil].call(current_lane) if (after_all_blocks[nil])
+          after_all_blocks[current_platform].call(current_lane) if after_all_blocks[current_platform] && current_platform
+          after_all_blocks[nil].call(current_lane) if after_all_blocks[nil]
         end
 
         return return_val
@@ -62,19 +62,21 @@ module Fastlane
           # Provide error block exception without colour code
           error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
 
-          error_blocks[current_platform].call(current_lane, error_ex) if (error_blocks[current_platform] and current_platform)
+          error_blocks[current_platform].call(current_lane, error_ex) if error_blocks[current_platform] && current_platform
           error_blocks[nil].call(current_lane, error_ex) if error_blocks[nil]
         end
         raise ex
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/AbcSize
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
     # @return an array of lanes (platform lane_name) to print them out to the user
     def available_lanes(filter_platform = nil)
       all = []
       lanes.each do |platform, platform_lanes|
-        next if (filter_platform and filter_platform.to_s != platform.to_s) # skip actions that don't match
+        next if filter_platform && filter_platform.to_s != platform.to_s # skip actions that don't match
 
         platform_lanes.each do |lane_name, lane|
           all << [platform, lane_name].reject(&:nil?).join(' ') unless lane.is_private
@@ -83,9 +85,9 @@ module Fastlane
       all
     end
 
-    # 
+    #
     # All the methods that are usually called on execution
-    # 
+    #
 
     def try_switch_to_lane(new_lane, parameters)
       block = lanes.fetch(current_platform, {}).fetch(new_lane, nil)
@@ -94,7 +96,7 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
-        raise "Parameters for a lane must always be a hash".red unless (parameters.first || {}).kind_of?Hash
+        raise "Parameters for a lane must always be a hash".red unless (parameters.first || {}).kind_of? Hash
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
@@ -102,10 +104,10 @@ module Fastlane
         Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
 
         # Actually switch lane now
-        current_lane = new_lane
+        self.current_lane = new_lane
         collector.did_launch_action(:lane_switch)
         result = block.call(parameters.first || {}) # to always pass a hash
-        current_lane = original_lane
+        self.current_lane = original_lane
 
         Helper.log.info "Cruising back to lane '#{original_full}' 🚘".green
         return result
@@ -119,9 +121,6 @@ module Fastlane
     def execute_action(method_sym, class_ref, arguments)
       collector.did_launch_action(method_sym)
 
-      step_name = class_ref.step_text rescue nil
-      step_name = method_sym.to_s unless step_name
-
       verify_supported_os(method_sym, class_ref)
 
       begin
@@ -129,11 +128,11 @@ module Fastlane
           Actions.execute_action(class_ref.step_text) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
-            if arguments.count == 0 
+            if arguments.count == 0
               arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
-            elsif arguments.count == 1 and arguments.first.kind_of?Hash
+            elsif arguments.count == 1 and arguments.first.kind_of? Hash
               arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
-            elsif not class_ref.available_options
+            elsif !class_ref.available_options
               # This action does not use the new action format
               # Just passing the arguments to this method
             else
@@ -156,7 +155,7 @@ module Fastlane
           platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
           unless class_ref.is_supported?(platform)
-            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red 
+            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red
           end
         end
       end
@@ -172,7 +171,7 @@ module Fastlane
     end
 
     # Called internally to setup the runner object
-    # 
+    #
 
     # @param lane [Lane] A lane object
     def add_lane(lane, override = false)
@@ -181,7 +180,7 @@ module Fastlane
       if !override and lanes[lane.platform][lane.name]
         raise "Lane '#{lane.name}' was defined multiple times!".red
       end
-      
+
       lanes[lane.platform][lane.name] = lane
     end
 

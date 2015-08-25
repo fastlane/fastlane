@@ -36,19 +36,19 @@ describe Fastlane do
       end
 
       it "raises an exception when xcode project path wasn't found" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(xcodeproj: '/nothere')
           end").runner.execute(:test)
-        }.to raise_error("Could not find Xcode project".red)
+        end.to raise_error("Could not find Xcode project".red)
       end
 
       it "raises an exception when use passes workspace" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
-        }.to raise_error("Please pass the path to the project, not the workspace".red)
+        end.to raise_error("Please pass the path to the project, not the workspace".red)
       end
     end
   end

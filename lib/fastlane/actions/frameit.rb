@@ -9,7 +9,7 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
           color = Frameit::Color::BLACK
-          color = Frameit::Color::SILVER if (config[:white] or config[:silver])
+          color = Frameit::Color::SILVER if config[:white] || config[:silver]
 
           Helper.log.info "Framing screenshots at path #{config[:path]}"
 
@@ -46,11 +46,11 @@ module Fastlane
                                        env_name: "FRAMEIT_FORCE_DEVICE_TYPE",
                                        description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
-                                        unless available.include?value
-                                          raise "Invalid device type '#{value}'. Available values: #{available}".red
-                                        end
+                                       verify_block: proc do |value|
+                                         available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
+                                         unless available.include? value
+                                           raise "Invalid device type '#{value}'. Available values: #{available}".red
+                                         end
                                        end)
         ]
       end
@@ -60,7 +60,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
     end
   end

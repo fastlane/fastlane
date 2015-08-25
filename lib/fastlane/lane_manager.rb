@@ -5,23 +5,29 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      raise 'lane must be a string' unless (lane.is_a?(String) or lane.nil?)
-      raise 'platform must be a string' unless (platform.is_a?(String) or platform.nil?)
-      raise 'parameters must be a hash' unless (parameters.is_a?(Hash) or parameters.nil?)
+      raise 'lane must be a string' unless lane.kind_of?(String) or lane.nil?
+      raise 'platform must be a string' unless platform.kind_of?(String) or platform.nil?
+      raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 
-      unless (ff.is_platform_block?lane rescue false) # rescue, because this raises an exception if it can't be found at all
+      is_platform = false
+      begin
+        is_platform = ff.is_platform_block? lane
+      rescue
+      end
+
+      unless is_platform # rescue, because this raises an exception if it can't be found at all
         # maybe the user specified a default platform
         # We'll only do this, if the lane specified isn't a platform, as we want to list all platforms then
 
         platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
       end
 
-      if not platform and lane
+      if !platform and lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
-        if ff.is_platform_block?lane
+        if ff.is_platform_block? lane
           platform = lane
           lane = nil
         end
@@ -57,15 +63,15 @@ module Fastlane
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
 
-      unless error
+      if error
+        Helper.log.fatal 'fastlane finished with errors'.red
+        raise error
+      else
         if duration > 5
           Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
         else
           Helper.log.info 'fastlane.tools finished successfully 🎉'.green
         end
-      else
-        Helper.log.fatal 'fastlane finished with errors'.red
-        raise error
       end
     end
 
@@ -100,7 +106,7 @@ module Fastlane
         end
 
         i = $stdin.gets.strip.to_i - 1
-        if i >= 0 and (available[i] rescue nil)
+        if i >= 0 and available[i]
           selection = available[i]
           Helper.log.info "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`".yellow
           platform = selection.split(' ')[0]

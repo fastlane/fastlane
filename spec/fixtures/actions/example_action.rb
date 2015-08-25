@@ -6,7 +6,6 @@ module Fastlane
       end
 
       def self.available_options
-
       end
     end
   end

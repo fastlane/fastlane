@@ -12,11 +12,11 @@ describe Fastlane do
 
       it "raises an error if no slack URL is given" do
         ENV.delete 'SLACK_URL'
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
             slack
           end").runner.execute(:test)
-        }.to raise_exception('No SLACK_URL given.'.red)
+        end.to raise_exception('No SLACK_URL given.'.red)
       end
 
       it "works so perfect, like Slack does" do
@@ -33,11 +33,10 @@ describe Fastlane do
           channel: channel,
           payload: {
             'Build Date' => Time.new.to_s,
-            'Built by' => 'Jenkins',
+            'Built by' => 'Jenkins'
           },
           default_payloads: [:lane, :test_result, :git_branch, :git_author]
         })
-
 
         notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
 

@@ -7,7 +7,7 @@ module Fastlane
 
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('pilot') unless Helper.is_test?
-          
+
           values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
 
           Pilot::BuildManager.new.upload(values) # we already have the finished config

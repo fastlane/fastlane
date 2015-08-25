@@ -10,7 +10,7 @@ module Fastlane
       puts "Must be lower case, and use a '_' between words. Do not use '.'".green
       puts "examples: 'testflight', 'upload_to_s3'".green
       name = ask('Name of your action: ')
-      while !name_valid?(name)
+      until name_valid?(name)
         puts 'Name invalid!'
         name = ask('Name of your action: ')
       end

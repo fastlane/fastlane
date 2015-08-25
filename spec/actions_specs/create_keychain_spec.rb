@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Create keychain Integration" do
-
       it "works with name and password" do
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
