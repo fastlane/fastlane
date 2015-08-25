@@ -186,11 +186,11 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 #### Uploading screenshots to iTC
 
-Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatic :rocket:
+Use [deliver](https://github.com/KrauseFx/deliver) to upload all screenshots to iTunes Connect completely automatically :rocket:
 
 ### Mac
 
-With `frameit` 2.0 is possible to also frame Mac OS X Applications. You have to provide the following:
+With `frameit` 2.0 it's possible to also frame Mac OS X Application screenshots. You have to provide the following:
 
 - The `offset` information so `frameit` knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac
@@ -250,6 +250,15 @@ Some stock images provided by Apple still have a white background instead of a t
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+
+## Gray artifacts around text
+
+If you run into any quality issues, like having a border around the font, it usually helps to just re-install `imagemagick`. You can do so by running
+
+```sh
+brew uninstall imagemagick
+brew install imagemagick
+```
 
 ## Uninstall
 - ```sudo gem uninstall frameit```
