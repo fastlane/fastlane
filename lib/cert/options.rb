@@ -18,6 +18,7 @@ module Cert
                                        CredentialsManager::PasswordManager.shared_manager(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
