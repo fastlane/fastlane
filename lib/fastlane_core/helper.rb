@@ -54,8 +54,12 @@ module FastlaneCore
       self.test?
     end
 
-    # @return [boolean] true if building in a known CI environment
     def self.is_ci?
+      ci?
+    end
+
+    # @return [boolean] true if building in a known CI environment
+    def ci?
       # Check for Jenkins, Travis CI, ... environment variables
       ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI'].each do |current|
         return true if ENV.has_key?(current)
@@ -70,7 +74,6 @@ module FastlaneCore
       `xcode-select -p`.gsub("\n", '') + "/"
     end
 
-    
     def self.is_mac?
       self.mac?
     end
