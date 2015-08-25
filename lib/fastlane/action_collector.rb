@@ -32,9 +32,9 @@ module Fastlane
           require 'excon'
           url = HOST_URL + '/did_launch?'
           url += URI.encode_www_form(
-                  steps: launches.to_json,
-                  error: @error
-                )
+            steps: launches.to_json,
+            error: @error
+          )
 
           unless Helper.is_test? # don't send test data
             fork do
@@ -57,13 +57,13 @@ module Fastlane
 
     def is_official?(name)
       return true if name == :lane_switch
-      Actions.get_all_official_actions.include?name
+      Actions.get_all_official_actions.include? name
     end
 
     def did_show_message?
       path = File.join(File.expand_path('~'), '.did_show_opt_info')
 
-      did_show = File.exists?path
+      did_show = File.exist? path
       File.write(path, '1')
       did_show
     end

@@ -42,17 +42,18 @@ module Fastlane
 
       def self.parse_response(response)
         if response.body && response.body.key?('error')
-          unless response.body['error']
+
+          if response.body['error']
+            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
+            help_message(response)
+            return
+          else
             res = response.body['results']
             url = DEPLOYGATE_URL_BASE + res['path']
 
             Actions.lane_context[SharedValues::DEPLOYGATE_URL] = url
             Actions.lane_context[SharedValues::DEPLOYGATE_REVISION] = res['revision']
             Actions.lane_context[SharedValues::DEPLOYGATE_APP_INFO] = res
-          else
-            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
-            help_message(response)
-            return
           end
         else
           Helper.log.fatal "Error uploading to DeployGate: #{response.body}".red
@@ -65,12 +66,12 @@ module Fastlane
       def self.help_message(response)
         message =
           case response.body['message']
-            when 'you are not authenticated'
-              'Invalid API Token specified.'
-            when 'application create error: permit'
-              'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
-            when 'application create error: limit'
-              'Plan limit: You have reached to the limit of current plan or your plan was expired.'
+          when 'you are not authenticated'
+            'Invalid API Token specified.'
+          when 'application create error: permit'
+            'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
+          when 'application create error: limit'
+            'Plan limit: You have reached to the limit of current plan or your plan was expired.'
           end
         Helper.log.error message.red if message
       end
@@ -85,21 +86,21 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "DEPLOYGATE_API_TOKEN",
                                        description: "Deploygate API Token",
-                                       verify_block: Proc.new do |value|
-                                          raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless value.to_s.length > 0
+                                       verify_block: proc do |value|
+                                         raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :user,
                                        env_name: "DEPLOYGATE_USER",
-                                       description: "Target username or organization name", 
-                                       verify_block: Proc.new do |value|
-                                        raise "No User for app given, pass using `user: 'user'`".red unless value.to_s.length > 0
+                                       description: "Target username or organization name",
+                                       verify_block: proc do |value|
+                                         raise "No User for app given, pass using `user: 'user'`".red unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "DEPLOYGATE_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find ipa file at path '#{value}'".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "DEPLOYGATE_MESSAGE",

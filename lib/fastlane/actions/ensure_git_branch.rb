@@ -14,7 +14,6 @@ module Fastlane
         end
       end
 
-
       #####################################################
       # @!group Documentation
       #####################################################
@@ -29,7 +28,7 @@ module Fastlane
                                        env_name: "FL_ENSURE_GIT_BRANCH_NAME",
                                        description: "The branch that should be checked for",
                                        is_string: true,
-                                       default_value: 'master'),
+                                       default_value: 'master')
         ]
       end
 

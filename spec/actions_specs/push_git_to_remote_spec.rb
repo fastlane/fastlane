@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Push To Git Remote Action" do
-
       it "works without passing any options" do
         result = Fastlane::FastFile.new.parse("lane :test do
           push_to_git_remote

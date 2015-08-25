@@ -55,8 +55,8 @@ module Fastlane
                                        env_name: "FL_SNAPSHOT_CONFIG_PATH",
                                        description: "Specify a path to the directory containing the Snapfile",
                                        default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :nobuild,
                                        env_name: "FL_SNAPSHOT_NO_BUILD",

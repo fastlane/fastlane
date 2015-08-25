@@ -14,6 +14,15 @@ describe Fastlane do
       Fastlane::ActionsList.run 'nonExistingHere'
     end
 
+    it "returns all available actions with the type `Class`" do
+      actions = []
+      Fastlane::ActionsList.all_actions do |a|
+        actions << a
+        expect(a.class).to eq(Class)
+      end
+      expect(actions.count).to be > 80
+    end
+
     describe "Actions provide a complete documenation" do
       Fastlane::ActionsList.all_actions do |action, name|
         it "Valid return values for fastlane action '#{name}'" do
@@ -21,7 +30,7 @@ describe Fastlane do
 
           expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
           expect(action.description.length).to be > 5, "Provided description for '#{name}'-action is too short"
-          expect(action.description.strip.end_with?'.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
+          expect(action.description.strip.end_with? '.').to eq(false), "The description of '#{name}' shouldn't end with a `.`"
           action.is_supported?(nil) # this will raise an exception if the method is not implemented
 
           expect(action).to be < Fastlane::Action

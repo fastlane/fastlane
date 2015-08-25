@@ -2,15 +2,15 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "#initialize" do
       it "raises an error if file does not exist" do
-        expect {
+        expect do
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/fastfileNotHere')
-        }.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'".red
+        end.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'".red
       end
 
       it "raises an error if unknow method is called" do
-        expect {
+        expect do
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
-        }.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
       end
     end
 
@@ -20,17 +20,17 @@ describe Fastlane do
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block?'mac').to eq(true)
+        expect(@ff.is_platform_block? 'mac').to eq(true)
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block?'test').to eq(false)
+        expect(@ff.is_platform_block? 'test').to eq(false)
       end
 
       it "raises an exception if key doesn't exist at all" do
-        expect {
-          @ff.is_platform_block?"asdf"
-        }.to raise_error("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action".red)
+        expect do
+          @ff.is_platform_block? "asdf"
+        end.to raise_error("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action".red)
       end
     end
 
@@ -40,36 +40,35 @@ describe Fastlane do
       end
 
       it "raises an error if block is missing" do
-        expect { 
-          @ff.lane("my_name") 
-        }.to raise_exception "You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.".red
+        expect do
+          @ff.lane("my_name")
+        end.to raise_exception "You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.".red
       end
 
       it "takes the block and lane name" do
         @ff.lane :my_name do
-
         end
       end
 
       it "raises an error if name contains spaces" do
-        expect { 
+        expect do
           @ff.lane :"my name" do
           end
-        }.to raise_error "lane name must not contain any spaces".red
+        end.to raise_error "lane name must not contain any spaces".red
       end
 
       it "raises an error if the name is on a black list" do
-        expect { 
+        expect do
           @ff.lane :run do
           end
-        }.to raise_error "Name 'run' is already taken"
+        end.to raise_error "Name 'run' is already taken"
       end
 
       it "raises an error if name is not a symbol" do
-        expect { 
+        expect do
           @ff.lane "string" do
           end
-        }.to raise_error "lane name must start with :".red
+        end.to raise_error "lane name must start with :".red
       end
     end
 
@@ -83,9 +82,9 @@ describe Fastlane do
       it "calls a block for a given platform (mac - beta)" do
         @ff.runner.execute('beta', 'mac')
 
-        expect(File.exists?('/tmp/fastlane/mac_beta.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/before_all_android.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/before_all.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/mac_beta.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("mac beta")
       end
@@ -93,24 +92,24 @@ describe Fastlane do
       it "calls a block for a given platform (android - beta)" do
         @ff.runner.execute('beta', 'android')
 
-        expect(File.exists?('/tmp/fastlane/android_beta.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/before_all_android.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/after_all_android.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/before_all.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/android_beta.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("android beta")
       end
 
       it "calls all error blocks if multiple are given (android - witherror)" do
-        expect {
+        expect do
           @ff.runner.execute('witherror', 'android')
-        }.to raise_error 'my exception'
+        end.to raise_error 'my exception'
 
-        expect(File.exists?('/tmp/fastlane/before_all_android.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/after_all_android.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/android_error.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/error.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/before_all.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/android_error.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/error.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(:android)
       end
@@ -118,21 +117,21 @@ describe Fastlane do
       it "allows calls without a platform (nil - anotherroot)" do
         @ff.runner.execute('anotherroot')
 
-        expect(File.exists?('/tmp/fastlane/before_all_android.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/after_all_android.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/android_error.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/error.txt')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/before_all.txt')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/another_root.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/android_error.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/error.txt')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/another_root.txt')).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("anotherroot")
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(nil)
       end
 
       it "raises an exception if unsupported action is called in unsupported platform" do
-        expect {
+        expect do
           @ff.runner.execute('unsupported_action', 'android')
-        }.to raise_error "Action 'frameit' doesn't support required operating system 'android'.".red
+        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'.".red
       end
     end
 
@@ -143,14 +142,14 @@ describe Fastlane do
 
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
-        expect(File.exists?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/deploy')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/after_all')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
         expect(File.read("/tmp/fastlane/after_all")).to eq("deploy")
 
         ff.runner.execute(:test)
-        expect(File.exists?('/tmp/fastlane/test')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/test')).to eq(true)
       end
 
       describe "supports switching lanes" do
@@ -202,16 +201,16 @@ describe Fastlane do
 
         it "calling a lane that doesn't exist" do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
-          expect {
+          expect do
             ff.runner.execute(:invalid, :ios)
-          }.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
         end
 
         it "raises an exception when not passing a hash" do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
-          expect {
+          expect do
             ff.runner.execute(:invalid_parameters, :ios)
-          }.to raise_error "Parameters for a lane must always be a hash".red
+          end.to raise_error "Parameters for a lane must always be a hash".red
         end
       end
 
@@ -229,31 +228,31 @@ describe Fastlane do
 
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile2')
         ff.runner.execute(:deploy)
-        expect(File.exists?('/tmp/fastlane/before_all_deploy')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/deploy')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/after_all')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/before_all_deploy')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
         expect(File.read("/tmp/fastlane/after_all")).to eq("deploy")
 
         ff.runner.execute(:test)
-        expect(File.exists?('/tmp/fastlane/test')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/test')).to eq(true)
       end
 
       it "raises an error if lane is not available" do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
-        expect {
+        expect do
           ff.runner.execute(:not_here)
-        }.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific".red)
+        end.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific".red)
       end
 
       it "raises an error if the lane name contains spaces" do
-        expect {
+        expect do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
-        }.to raise_error "lane name must not contain any spaces".red
+        end.to raise_error "lane name must not contain any spaces".red
       end
 
       it "runs pod install" do
-        result = Fastlane::FastFile.new.parse("lane :test do 
+        result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
         end").runner.execute(:test)
 
@@ -265,26 +264,26 @@ describe Fastlane do
         FileUtils.mkdir_p('/tmp/fastlane/')
 
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
-        expect {
+        expect do
           ff.runner.execute(:error_causing_lane)
-        }.to raise_exception("divided by 0")
+        end.to raise_exception("divided by 0")
 
-        expect(File.exists?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exists?('/tmp/fastlane/deploy')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/after_all')).to eq(false)
-        expect(File.exists?('/tmp/fastlane/error')).to eq(true)
-        
+        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/deploy')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/after_all')).to eq(false)
+        expect(File.exist?('/tmp/fastlane/error')).to eq(true)
+
         expect(File.read("/tmp/fastlane/error")).to eq("error_causing_lane")
       end
 
-      it "raises an error if one lane is defined multiple times" do 
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+      it "raises an error if one lane is defined multiple times" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
           end
           lane :test do
           end")
-        }.to raise_exception "Lane 'test' was defined multiple times!".red
+        end.to raise_exception "Lane 'test' was defined multiple times!".red
       end
     end
   end

@@ -13,6 +13,7 @@ module Fastlane
         require 'spaceship'
 
         devices = params[:devices]
+        devices_file = params[:devices_file]
 
         credentials = CredentialsManager::PasswordManager.shared_manager(params[:username])
         Spaceship::Portal.login(credentials.username, credentials.password)
@@ -23,11 +24,17 @@ module Fastlane
             Spaceship::Device.create!(name: k, udid: v)
           end
         elsif devices_file
-          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
+          require 'csv'
 
+          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
           raise 'Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless devices_file.first == ['Device ID', 'Device Name']
 
+          Helper.log.info "Fetching list of currently registered devices..."
+          existing_devices = Spaceship::Device.all
+
           device_objs = devices_file.drop(1).map do |device|
+            next if existing_devices.map(&:udid).include?(device[0])
+
             raise 'Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless device.count == 2
             raise "Passed invalid UDID: #{device[0]} for device: #{device[1]}".red unless UDID_REGEXP =~ device[0]
 
@@ -38,6 +45,7 @@ module Fastlane
         end
 
         Helper.log.info "Successfully registered new devices.".green
+        return device_objs
       end
 
       def self.description
@@ -55,8 +63,8 @@ module Fastlane
                                        env_name: "FL_REGISTER_DEVICES_FILE",
                                        description: "Provide a path to the devices to register",
                                        optional: true,
-                                       verify_block: Proc.new do |value|
-                                        raise "Could not find file '#{value}'".red unless File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Could not find file '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
@@ -65,7 +73,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id))
         ]
       end
 

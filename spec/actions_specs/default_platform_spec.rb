@@ -7,19 +7,19 @@ describe Fastlane do
       end
 
       it "raises an error if platform is not supported" do
-        expect {
+        expect do
           Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
-        }.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android]".red)
+        end.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android]".red)
       end
 
       it "raises an error if no platform is given" do
-        expect {
+        expect do
           Fastlane::Actions::DefaultPlatformAction.run([])
-        }.to raise_error("You forgot to pass the default platform".red)
+        end.to raise_error("You forgot to pass the default platform".red)
       end
 
       it "works as expected inside a Fastfile" do
-        Fastlane::FastFile.new.parse("lane :test do 
+        Fastlane::FastFile.new.parse("lane :test do
           default_platform :ios
         end").runner.execute(:test)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DEFAULT_PLATFORM]).to eq(:ios)

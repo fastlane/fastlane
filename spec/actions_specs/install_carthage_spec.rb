@@ -1,45 +1,44 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Carthage Integration" do
-
       it "raises an error if use_ssh is invalid" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage(
               use_ssh: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error("Please pass a valid value for use_ssh. Use one of the following: true, false")
+        end.to raise_error("Please pass a valid value for use_ssh. Use one of the following: true, false")
       end
 
       it "raises an error if use_submodules is invalid" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage(
               use_submodules: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error("Please pass a valid value for use_submodules. Use one of the following: true, false")
+        end.to raise_error("Please pass a valid value for use_submodules. Use one of the following: true, false")
       end
 
       it "raises an error if use_binaries is invalid" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage(
               use_binaries: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error("Please pass a valid value for use_binaries. Use one of the following: true, false")
+        end.to raise_error("Please pass a valid value for use_binaries. Use one of the following: true, false")
       end
 
       it "raises an error if platform is invalid" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage(
               platform: 'thisistest'
             )
           end").runner.execute(:test)
-        }.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
+        end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
       end
 
       it "default use case" do
@@ -141,15 +140,15 @@ describe Fastlane do
       end
 
       it "works with no parameters" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage
           end").runner.execute(:test)
-        }.not_to raise_error
+        end.not_to raise_error
       end
 
       it "works with valid parameters" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             carthage(
               use_ssh: true,
@@ -158,9 +157,8 @@ describe Fastlane do
               platform: 'iOS'
             )
           end").runner.execute(:test)
-        }.not_to raise_error
+        end.not_to raise_error
       end
-
     end
   end
 end

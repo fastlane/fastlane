@@ -19,13 +19,14 @@ module Fastlane
     #
     class XcodeSelectAction < Action
       def self.run(params)
-        xcode_path = (params.first rescue nil)
+        params = nil unless params.kind_of? Array
+        xcode_path = (params || []).first
 
         # Verify that a param was passed in
         raise "Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red unless xcode_path.to_s.length > 0
 
         # Verify that a path to a directory was passed in
-        raise "Path '#{xcode_path}' doesn't exist".red unless Dir.exists?(xcode_path)
+        raise "Path '#{xcode_path}' doesn't exist".red unless Dir.exist?(xcode_path)
 
         Helper.log.info "Setting Xcode version to #{xcode_path} for all build steps"
 
@@ -41,7 +42,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
     end
   end

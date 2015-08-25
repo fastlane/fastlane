@@ -5,8 +5,8 @@ describe Fastlane do
       let(:valid_path) { "/valid/path/to/xcode" }
 
       before(:each) do
-        allow(Dir).to receive(:exists?).with(invalid_path).and_return(false)
-        allow(Dir).to receive(:exists?).with(valid_path).and_return(true)
+        allow(Dir).to receive(:exist?).with(invalid_path).and_return(false)
+        allow(Dir).to receive(:exist?).with(valid_path).and_return(true)
       end
 
       after(:each) do
@@ -14,19 +14,19 @@ describe Fastlane do
       end
 
       it "throws an exception if no params are passed" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             xcode_select
           end").runner.execute(:test)
-        }.to raise_error("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red)
+        end.to raise_error("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red)
       end
 
       it "throws an exception if the Xcode path is not a valid directory" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             xcode_select \"#{invalid_path}\"
           end").runner.execute(:test)
-        }.to raise_error("Path '/path/to/nonexistent/dir' doesn't exist".red)
+        end.to raise_error("Path '/path/to/nonexistent/dir' doesn't exist".red)
       end
 
       it "sets the DEVELOPER_DIR environment variable" do

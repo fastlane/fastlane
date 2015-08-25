@@ -13,10 +13,10 @@ describe Fastlane do
       let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
       before do
         fastlane_folder = File.join(workspace, 'fastlane')
-        FileUtils.rm_rf(workspace) rescue nil
+        FileUtils.rm_rf(workspace) if File.directory? workspace
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
-        $terminal = HighLine.new # mock user inputs :) 
+        $terminal = HighLine.new # mock user inputs :)
         allow($terminal).to receive(:ask).and_return("y\n")
 
         allow(Fastlane::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
@@ -28,15 +28,15 @@ describe Fastlane do
         Fastlane::FastlaneFolder.create_folder!(workspace)
         setup = Fastlane::Setup.new
         expect(setup.run).to eq(true)
-        expect(setup.tools).to eq({deliver:true, snapshot:true, xctool:true, cocoapods:true, sigh:true})
-        
+        expect(setup.tools).to eq({deliver: true, snapshot: true, xctool: true, cocoapods: true, sigh: true})
+
         content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
-        expect(content).to include"# update_fastlane"
-        expect(content).to include"# opt_out_usage"
-        expect(content).to include"  snapshot"
-        expect(content).to include"  deliver"
-        expect(content).to include"  xctool"
-        expect(content).to include"gym(scheme: \"y\")"
+        expect(content).to include "# update_fastlane"
+        expect(content).to include "# opt_out_usage"
+        expect(content).to include "  snapshot"
+        expect(content).to include "  deliver"
+        expect(content).to include "  xctool"
+        expect(content).to include "gym(scheme: \"y\")"
       end
 
       after do

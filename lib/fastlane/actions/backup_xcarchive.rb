@@ -13,7 +13,7 @@ module Fastlane
         base_destination = params[:destination]
         zipped = params[:zip]
         versioned = params[:versioned]
-        
+
         # Prepare destionation folder
         full_destination = base_destination
 
@@ -24,10 +24,10 @@ module Fastlane
           full_destination = File.expand_path(subfolder, base_destination)
         end
 
-        FileUtils.mkdir(full_destination) unless File.exists?(full_destination)
+        FileUtils.mkdir(full_destination) unless File.exist?(full_destination)
 
         # Save archive to destination
-        if zipped 
+        if zipped
           Helper.log.info "Compressing #{xcarchive}"
 
           xcarchive_folder = File.expand_path(File.dirname(xcarchive))
@@ -35,7 +35,7 @@ module Fastlane
           zip_file = File.expand_path(File.join("#{xcarchive_file}.zip"))
 
           # Create zip
-          Actions.sh(%Q[cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null])
+          Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
 
           # Moved to its final destination
           FileUtils.mv(zip_file, full_destination)
@@ -47,7 +47,6 @@ module Fastlane
 
           Actions.lane_context[SharedValues::BACKUP_XCARCHIVE_FILE] = "#{full_destination}/#{File.basename(xcarchive)}"
         end
-
       end
 
       #####################################################
@@ -65,15 +64,15 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find xcarchive file at path '#{value}'".red if !Helper.test? && !File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find xcarchive file at path '#{value}'".red if !Helper.test? && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        description: 'Where your archive will be placed',
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_DESTINATION',
-                                       verify_block: Proc.new do |value|
-                                        raise "Couldn't find the destination folder at '#{value}'".red if !Helper.test? && !File.directory?(value) && !File.exists?(value)
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find the destination folder at '#{value}'".red if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
                                        description: 'Enable compression of the archive. Default value `true`',
@@ -101,9 +100,9 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?platform
+        [:ios, :mac].include? platform
       end
-      
+
     end
   end
 end

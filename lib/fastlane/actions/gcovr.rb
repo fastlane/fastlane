@@ -60,11 +60,11 @@ module Fastlane
         gcovr_args = nil
 
         # Allows for a whole variety of configurations
-        if params.is_a? Hash
+        if params.kind_of? Hash
           params_hash = params
 
           # Check if an output path was given
-          if params_hash.has_key? :output
+          if params_hash.key? :output
             create_output_dir_if_not_exists(params_hash[:output])
           end
 
@@ -87,7 +87,7 @@ module Fastlane
         output_dir = File.dirname(output_path)
 
         # If the output directory doesn't exist, create it
-        unless Dir.exists? output_dir
+        unless Dir.exist? output_dir
           FileUtils.mkpath output_dir
         end
       end
@@ -99,7 +99,8 @@ module Fastlane
         # Maps nice developer param names to CLI arguments
         params.map do |k, v|
           v ||= ""
-          if args = ARGS_MAP[k]
+          args = ARGS_MAP[k]
+          if args
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{args} #{value}".strip
           end

@@ -10,7 +10,7 @@ module Fastlane
 
         platform = params.first.to_sym
 
-        SupportedPlatforms.verify!platform
+        SupportedPlatforms.verify! platform
 
         Actions.lane_context[SharedValues::DEFAULT_PLATFORM] = platform
       end

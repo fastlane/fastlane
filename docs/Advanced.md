@@ -209,3 +209,23 @@ The documentation was moved to [Appfile.md](https://github.com/KrauseFx/fastlane
 ## Skip update check when launching `fastlane`
 
 You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the update check.
+
+## Gitignore
+
+If you use git it is recommended that you keep the `fastlane` configuration files in your repository. You may want to add the following lines to your `.gitignore` file to exclude some generated and temporary files:
+
+```sh
+# fastlane temporary profiling data
+/fastlane/report.xml
+# deliver temporary error output
+/fastlane/Error*.png
+# deliver temporary preview output
+/fastlane/Preview.html
+# snapshot generated screenshots
+/fastlane/screenshots/*/*-portrait.png
+/fastlane/screenshots/*/*-landscape.png
+/fastlane/screenshots/screenshots.html
+# frameit generated screenshots
+/fastlane/screenshots/*/*-portrait_framed.png
+/fastlane/screenshots/*/*-landscape_framed.png
+```

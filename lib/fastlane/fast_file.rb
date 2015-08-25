@@ -23,12 +23,13 @@ module Fastlane
       @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+        # rubocop:disable Lint/Eval
         eval(data) # this is okay in this case
+        # rubocop:enable Lint/Eval
       end
 
       self
     end
-
 
     #####################################################
     # @!group DSL
@@ -37,7 +38,7 @@ module Fastlane
     # User defines a new lane
     def lane(lane_name, &block)
       raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
-      
+
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
                                  description: desc_collection,
@@ -72,10 +73,10 @@ module Fastlane
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
-    
+
     # User defines a platform block
     def platform(platform_name, &block)
-      SupportedPlatforms.verify!platform_name
+      SupportedPlatforms.verify! platform_name
 
       self.current_platform = platform_name
 
@@ -101,12 +102,15 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
+      method_str = method_sym.to_s
+      method_str.delete!('?') # as a `?` could be at the end of the method name
+
       # First, check if there is a predefined method in the actions folder
-      class_name = method_sym.to_s.fastlane_class + 'Action'
+      class_name = method_str.fastlane_class + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError => ex
+      rescue NameError
         # Action not found
         # Is there a lane under this name?
         return self.runner.try_switch_to_lane(method_sym, arguments)
@@ -135,8 +139,8 @@ module Fastlane
     def is_platform_block?(key)
       raise 'No key given'.red unless key
 
-      return false if (self.runner.lanes[nil][key.to_sym] rescue false)
-      return true if self.runner.lanes[key.to_sym].kind_of?Hash
+      return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
+      return true if self.runner.lanes[key.to_sym].kind_of? Hash
 
       raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
     end
@@ -169,9 +173,9 @@ module Fastlane
       unless Pathname.new(path).absolute? # unless an absolute path
         path = File.join(File.expand_path('..', @path), path)
       end
-      
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exists?(path)
-      
+
+      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+
       collector.did_launch_action(:import)
       parse(File.read(path))
 
@@ -181,8 +185,9 @@ module Fastlane
     end
 
     # @param url [String] The git URL to clone the repository from
+    # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, path: 'fastlane/Fastfile')
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
       raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -193,24 +198,35 @@ module Fastlane
 
         folder = File.join("/tmp", "fl_clones", repo_name)
 
-        if File.directory?folder
+        branch_option = ""
+        branch_option = "--branch #{branch}" if branch != 'HEAD'
+
+        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
+
+        if File.directory? folder
           Helper.log.info "Using existing git repo..."
-          Actions.sh("git pull")
+          begin
+            Actions.sh("cd '#{folder}' && git pull")
+          rescue
+            # Something went wrong, clear the folder and pull again
+            Actions.sh("rm -rf '#{folder}'")
+            Actions.sh(clone_command)
+          end
         else
           # When this fails, we have to clone the git repo
           Helper.log.info "Cloning remote git repo..."
-          Actions.sh("git clone '#{url}' '#{folder}' --depth 1 -n")
+          Actions.sh(clone_command)
         end
 
-        Actions.sh("cd '#{folder}' && git checkout HEAD '#{path}'")
+        Actions.sh("cd '#{folder}' && git checkout #{branch} '#{path}'")
 
         # We also want to check out all the local actions of this fastlane setup
         containing = path.split(File::SEPARATOR)[0..-2]
         containing = "." if containing.count == 0
         actions_folder = File.join(containing, "actions")
         begin
-          Actions.sh("cd '#{folder}' && git checkout HEAD '#{actions_folder}'")
-        rescue => ex
+          Actions.sh("cd '#{folder}' && git checkout #{branch} '#{actions_folder}'")
+        rescue
           # We don't care about a failure here, as local actions are optional
         end
 

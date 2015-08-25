@@ -23,51 +23,51 @@ describe Fastlane do
       end
 
       it "throws an error when the entitlements file does not exist" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
           update_app_group_identifiers(
             entitlements_file: 'xyz.#{File.join(test_path, entitlements_path)}',
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        }.to raise_error("Could not find entitlements file at path 'xyz.#{File.join(test_path, entitlements_path)}'".red)
+        end.to raise_error("Could not find entitlements file at path 'xyz.#{File.join(test_path, entitlements_path)}'".red)
       end
 
       it "throws an error when the identifiers are not in an array" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
           update_app_group_identifiers(
             entitlements_file: '#{File.join(test_path, entitlements_path)}',
             app_group_identifiers: '#{new_app_group}'
           )
           end").runner.execute(:test)
-        }.to raise_error('The parameter app_group_identifiers need to be an Array.'.red)
+        end.to raise_error('The parameter app_group_identifiers need to be an Array.'.red)
       end
 
       it "throws an error when the entitlements file is not parsable" do
         File.write(File.join(test_path, entitlements_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>com.apple.security.application-groups</key><array><string>group.com.</array></dict></plist>')
 
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
           update_app_group_identifiers(
             entitlements_file: '#{File.join(test_path, entitlements_path)}',
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        }.to raise_error("Entitlements file at '#{File.join(test_path, entitlements_path)}' cannot be parsed.".red)
+        end.to raise_error("Entitlements file at '#{File.join(test_path, entitlements_path)}' cannot be parsed.".red)
       end
 
       it "throws an error when the entitlements file doesn't contain an app group" do
         File.write(File.join(test_path, entitlements_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict></dict></plist>')
 
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
           update_app_group_identifiers(
             entitlements_file: '#{File.join(test_path, entitlements_path)}',
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        }.to raise_error("No existing App group field specified. Please specify an App Group in the entitlements file.".red)
+        end.to raise_error("No existing App group field specified. Please specify an App Group in the entitlements file.".red)
       end
 
       after do

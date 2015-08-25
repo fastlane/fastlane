@@ -5,8 +5,8 @@ module Fastlane
     class DeleteKeychainAction < Action
       def self.run(params)
         original = Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN]
-        Fastlane::Actions.sh("security default-keychain -s #{original}", log:false) unless original.nil?
-        Fastlane::Actions.sh "security delete-keychain #{params[:name].shellescape}", log:false
+        Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
+        Fastlane::Actions.sh "security delete-keychain #{params[:name].shellescape}", log: false
       end
 
       def self.description
@@ -18,7 +18,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain name",
-                                       optional: false),
+                                       optional: false)
         ]
       end
 

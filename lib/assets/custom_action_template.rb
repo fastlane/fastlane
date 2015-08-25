@@ -44,7 +44,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_[[NAME_UP]]_API_TOKEN", # The name of the environment variable
                                        description: "API Token for [[NAME_CLASS]]", # a short description of this parameter
-                                       verify_block: Proc.new do |value|
+                                       verify_block: proc do |value|
                                           raise "No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`".red unless (value and not value.empty?)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development,
@@ -75,7 +75,7 @@ module Fastlane
         # 
         #  platform == :ios
         # 
-        #  [:ios, :mac].include?platform
+        #  [:ios, :mac].include? platform
         # 
 
         platform == :ios

@@ -6,16 +6,16 @@ module Fastlane
             message: nil,
             note_path: nil,
             success: true,
-            topicId: nil,
-            typetalk_token: nil,
+            topic_id: nil,
+            typetalk_token: nil
         }.merge(params || {})
 
-        [:message, :topicId, :typetalk_token].each { |key|
+        [:message, :topic_id, :typetalk_token].each do |key|
           raise "No #{key} given.".red unless options[key]
-        }
+        end
 
         emoticon = (options[:success] ? ':smile:' : ':rage:')
-        message = "#{emoticon} #{options[:message].to_s}"
+        message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
         if note_path and File.exist?(note_path)
@@ -23,19 +23,19 @@ module Fastlane
           message += "\n\n```\n#{contents}\n```"
         end
 
-        topicId = options[:topicId]
+        topic_id = options[:topic_id]
         typetalk_token = options[:typetalk_token]
 
-        self.post_to_typetalk(message, topicId, typetalk_token)
+        self.post_to_typetalk(message, topic_id, typetalk_token)
 
         Helper.log.info 'Successfully sent Typetalk notification'.green
       end
 
-      def self.post_to_typetalk(message, topicId, typetalk_token)
+      def self.post_to_typetalk(message, topic_id, typetalk_token)
         require 'net/http'
         require 'uri'
 
-        uri = URI.parse("https://typetalk.in/api/v1/topics/#{topicId}")
+        uri = URI.parse("https://typetalk.in/api/v1/topics/#{topic_id}")
         response = Net::HTTP.post_form(uri, {'message' => message,
                                              'typetalkToken' => typetalk_token})
 
@@ -44,10 +44,10 @@ module Fastlane
 
       def self.check_response(response)
         case response.code.to_i
-          when 200, 204
-            true
-          else
-            raise "Could not sent Typetalk notification".red
+        when 200, 204
+          true
+        else
+          raise "Could not sent Typetalk notification".red
         end
       end
 
@@ -59,7 +59,7 @@ module Fastlane
         [
           ['message', 'The message to post'],
           ['note_path', 'Path to an additional note'],
-          ['topicId', 'Typetalk topic id'],
+          ['topic_id', 'Typetalk topic id'],
           ['success', 'Successful build?'],
           ['typetalk_token', 'typetalk token']
         ]

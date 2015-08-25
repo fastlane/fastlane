@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Team ID Action" do
       it "works as expected" do
         new_val = "abcdef"
-        Fastlane::FastFile.new.parse("lane :test do 
+        Fastlane::FastFile.new.parse("lane :test do
           team_id '#{new_val}'
         end").runner.execute(:test)
 
@@ -13,11 +13,11 @@ describe Fastlane do
       end
 
       it "raises an error if no team ID is given" do
-        expect {
-          Fastlane::FastFile.new.parse("lane :test do 
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
             team_id
           end").runner.execute(:test)
-        }.to raise_error("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red)
+        end.to raise_error("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red)
       end
     end
   end

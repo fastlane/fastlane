@@ -22,7 +22,7 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = test_val
 
         Dir.chdir(test_path) do
-          Fastlane::FastFile.new.parse("lane :test do 
+          Fastlane::FastFile.new.parse("lane :test do
             deliver(
               force: true,
               beta: true,
@@ -36,19 +36,19 @@ describe Fastlane do
 
       it "raises an error if deliver_path can't be found" do
         Dir.chdir(test_path) do
-          expect {
-            Fastlane::FastFile.new.parse("lane :test do 
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
               deliver(
                 deliver_file_path: '../nothere'
               )
             end").runner.execute(:test)
-          }.to raise_error("Couldn't find folder '../nothere'. Make sure to pass the path to the directory not the file!".red)
+          end.to raise_error("Couldn't find folder '../nothere'. Make sure to pass the path to the directory not the file!".red)
         end
       end
 
       it "supports the metadata_only option" do
         Dir.chdir(test_path) do
-          Fastlane::FastFile.new.parse("lane :test do 
+          Fastlane::FastFile.new.parse("lane :test do
             deliver(
               metadata_only: true
             )
@@ -62,7 +62,6 @@ describe Fastlane do
         File.delete(@app_file)
         File.delete(@deliver_file)
       end
-
     end
   end
 end

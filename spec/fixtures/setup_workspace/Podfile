@@ -6,6 +6,4 @@ target 'fastlane' do
 end
 
 target 'fastlaneTests' do
-
 end
-

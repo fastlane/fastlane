@@ -21,11 +21,19 @@ module Fastlane
       end
 
       def self.available_options
-        
-      end
-
-      def self.output
-        []
+        [
+          FastlaneCore::ConfigItem.new(key: :url,
+                                       description: "The url of the repository to import the Fastfile from",
+                                       default_value: nil),
+          FastlaneCore::ConfigItem.new(key: :branch,
+                                       description: "The branch to check-out on the repository",
+                                       default_value: 'HEAD',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       description: "The path of the Fastfile in the repository",
+                                       default_value: 'fastlane/Fastfile',
+                                       optional: true)
+        ]
       end
 
       def self.authors

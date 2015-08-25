@@ -17,6 +17,7 @@ fastlane action [action_name]:
 - [Using git](#using-git)
 - [Using mercurial](#using-mercurial)
 - [Notifications](#notifications)
+- [Misc](#misc)
 
 ## Building
 
@@ -167,32 +168,24 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-This integration is **outdated**, you should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) before using this action.
 
-Updated your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action.
+Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
-```ruby
-update_project_provisioning(
-  xcodeproj: "Project.xcodeproj",
-  profile: "./app_store.mobileprovision" # optional if you use sigh
-)
-```
-
-Since you have to use different provisioning profile for various targets (WatchKit, Extension, etc.) you can use the `filter` option:
+Since you have to use different provisioning profiles for various targets (WatchKit, Extension, etc.) and configurations (Debug, Release) you can use the `target_filter` and `build_configuration` options:
 
 ```ruby
 update_project_provisioning(
   xcodeproj: "Project.xcodeproj",
-  profile: "./app_store.mobileprovision", # optional if you use sigh
-  build_configuration_filter: ".*WatchKit Extension.*"
+  profile: "./watch_app_store.mobileprovision", # optional if you use sigh
+  target_filter: ".*WatchKit Extension.*", # matches name or type of a target
+  build_configuration: "Release"
 )
 ```
 
-The `build_configuration_filter` is a standard regex.
+The `target_filter` and `build_configuration` options use standard regex, so if you want an exact match for a target, use `^MyTargetName$` to prevent a match for the `Pods - MyTargetName` target, for instance.
 
-Since you'll probably not want to commit this change into version control, take a look at how [MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47) uses this technique to temporary set the code signing, then build and upload the `ipa` file.
-
-**[Show Example Usage](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
+**[Example Usage at MindNode](https://github.com/fastlane/examples/blob/4fea7d2f16b095e09af409beb4da8a264be2301e/MindNode/Fastfile#L5-L47)**
 
 ### update_app_group_identifiers
 Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
@@ -437,6 +430,15 @@ ensure_no_debug_code(text: "NSLog",
 ```
 
 ## Deploying
+
+### [pilot](https://github.com/fastlane/pilot)
+
+```ruby
+pilot(username: "felix@krausefx.com",
+      app_identifier: "com.krausefx.app")
+```
+
+More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/pilot).
 
 ### [deliver](https://github.com/KrauseFx/deliver)
 ```ruby
@@ -693,7 +695,7 @@ pem(
   force: true, # create a new profile, even if the old one is still valid
   app_identifier: 'net.sunapps.9', # optional app identifier,
   save_private_key: true,
-  new_profile: Proc.new do |profile_path| # this block gets called when a new profile was generated
+  new_profile: proc do |profile_path| # this block gets called when a new profile was generated
     puts profile_path # the absolute path to the new PEM file
     # insert the code to upload the PEM file to the server
   end
@@ -879,6 +881,14 @@ push_to_git_remote(
 ```
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+
+### push_git_tags
+
+If you only want to push the tags and nothing else, you can use the `push_git_tags` action:
+
+```ruby
+push_git_tags
+```
 
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
@@ -1114,5 +1124,41 @@ before_all do
   cocoapods
   increment_build_number
   ...
+end
+```
+
+## Misc
+
+### say
+
+To speak out a text
+
+```ruby
+say "I can speak"
+```
+
+### clipboard
+
+You can store a string in the clipboard running
+
+```ruby
+clipboard(value: "https://github.com/KrauseFx/fastlane")
+```
+
+This can be used to store some generated URL or value for easy copy & paste (e.g. the download link):
+
+```ruby
+clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
+```
+
+### is_ci?
+
+Is the current run being executed on a CI system, like Jenkins or Travis?
+
+```ruby
+if is_ci?
+  puts "I'm a computer"
+else
+  say "Hi Human!"
 end
 ```

@@ -4,7 +4,7 @@ describe Fastlane do
       require 'shellwords'
 
       it "gets the version number of the Xcode project" do
-        Fastlane::FastFile.new.parse("lane :test do 
+        Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '.xcproject')
         end").runner.execute(:test)
 
@@ -12,11 +12,11 @@ describe Fastlane do
       end
 
       it "raises an exception when use passes workspace" do
-        expect {
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
-        }.to raise_error("Please pass the path to the project, not the workspace".red)
+        end.to raise_error("Please pass the path to the project, not the workspace".red)
       end
     end
   end

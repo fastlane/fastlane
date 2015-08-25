@@ -1,10 +1,71 @@
-# Custom config file for Rubocop static code analysis
+inherit_from: .rubocop_todo.yml
 
-Metrics/LineLength:
-  Max: 160
+Style/ClassCheck:
+  EnforcedStyle: kind_of?
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/BracesAroundHashParameters:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'spec/**/*'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/IndentHash:
+  Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: exploded
+
+Style/DoubleNegation:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+# Cop supports --auto-correct.
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+# Needed for $verbose
+Style/GlobalVars:
+  Enabled: false
+
+Style/FileName:
+  Enabled: false
+
+# $? Exit
+Style/SpecialGlobalVars:
+  Enabled: false
+
+
+##################
+# fastlane specifc
+##################
+
+# e.g. 
+# def self.is_supported?(platform)
+# we may never use `platform`
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+# the let(:key) { ... }
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'spec/**/*'
+
+# We use `is_supported?` everywhere already
+Style/PredicateName:
+  Enabled: false
 
 Metrics/MethodLength:
-  Max: 20
+  Exclude:
+    - 'lib/fastlane/actions/*.rb'
+    - 'bin/fastlane'
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+AllCops:
+  Exclude:
+    - 'lib/assets/custom_action_template.rb'
