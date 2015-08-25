@@ -43,8 +43,7 @@ module FastlaneCore
         end
 
         # Exit status for build command, should be 0 if build succeeded
-        # Disabled Rubocop, since $CHILD_STATUS just is not the same
-        status = $?.exitstatus # rubocop:disable Style/SpecialGlobalVars
+        status = $?.exitstatus
         if status != 0
           o = output.join("\n")
           puts o # the user has the right to see the raw output
