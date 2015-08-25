@@ -14,6 +14,15 @@ describe Fastlane do
       Fastlane::ActionsList.run 'nonExistingHere'
     end
 
+    it "returns all available actions with the type `Class`" do
+      actions = []
+      Fastlane::ActionsList.all_actions do |a| 
+        actions << a
+        expect(a.class).to eq(Class)
+      end
+      expect(actions.count).to be > 80
+    end
+
     describe "Actions provide a complete documenation" do
       Fastlane::ActionsList.all_actions do |action, name|
         it "Valid return values for fastlane action '#{name}'" do

@@ -2,8 +2,11 @@ module Fastlane
   class ActionsList
     def self.run(filter)
       require 'terminal-table'
-      print_all unless filter
-      show_details(filter) if filter
+      if filter
+        show_details(filter)
+      else
+        print_all
+      end
     end
 
     def self.print_all
@@ -100,7 +103,7 @@ module Fastlane
 
     # Iterates through all available actions and yields from there
     def self.all_actions
-      all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c) == Class }
+      all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
       all_actions.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
