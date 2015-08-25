@@ -59,7 +59,7 @@ module FastlaneCore
     end
 
     # @return [boolean] true if building in a known CI environment
-    def ci?
+    def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
       ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI'].each do |current|
         return true if ENV.has_key?(current)
