@@ -36,3 +36,7 @@ Style/GlobalVars:
 
 Style/FileName:
   Enabled: false
+
+# $? Exit
+Style/SpecialGlobalVars:
+  Enabled: false
