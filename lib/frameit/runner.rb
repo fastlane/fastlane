@@ -29,7 +29,7 @@ module Frameit
             screenshot.frame!
           rescue => ex
             Helper.log.error ex
-            Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}"
+            Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
           end
         end
       else 

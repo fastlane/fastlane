@@ -18,8 +18,6 @@ class FrameItApplication
     program :help, 'GitHub', 'https://github.com/krausefx/frameit'
     program :help_formatter, :compact
 
-    always_trace!
-
     global_option('--verbose') { $verbose = true }
 
     default_command :black
