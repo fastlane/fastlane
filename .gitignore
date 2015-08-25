@@ -40,3 +40,5 @@ build/
 spec/fixtures/*.itmsp/*.png
 /integration
 Gemfile.lock
+
+fastlane/report.xml
