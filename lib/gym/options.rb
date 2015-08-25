@@ -69,6 +69,7 @@ module Gym
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :silent,
+                                     short_option: "-a",
                                      env_name: "GYM_SILENT",
                                      description: "Hide all information that's not necessary while building",
                                      default_value: false,
