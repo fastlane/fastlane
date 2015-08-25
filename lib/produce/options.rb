@@ -62,7 +62,6 @@ module Produce
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :team_id,
-                                     short_option: "-t",
                                      env_name: "PRODUCE_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
