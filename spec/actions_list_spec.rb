@@ -16,7 +16,7 @@ describe Fastlane do
 
     it "returns all available actions with the type `Class`" do
       actions = []
-      Fastlane::ActionsList.all_actions do |a| 
+      Fastlane::ActionsList.all_actions do |a|
         actions << a
         expect(a.class).to eq(Class)
       end
