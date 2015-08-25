@@ -614,7 +614,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the build number without modifying it
 
 ```ruby
-version = get_build_number(xcodepoj: "Project.xcodeproj")
+version = get_build_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -646,7 +646,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the version number without modifying it
 
 ```ruby
-version = get_version_number(xcodepoj: "Project.xcodeproj")
+version = get_version_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### set_build_number_repository
