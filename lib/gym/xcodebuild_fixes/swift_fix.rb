@@ -27,7 +27,7 @@ module Gym
 
           # Add "SwiftSupport" to the .ipa archive
           Dir.chdir(tmpdir) do
-            command_parts = ["zip --recurse-paths #{PackageCommandGenerator.ipa_path} SwiftSupport"]
+            command_parts = ["zip --recurse-paths '#{PackageCommandGenerator.ipa_path}' SwiftSupport"]
             command_parts << "> /dev/null" unless $verbose
             Runner.new.print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
