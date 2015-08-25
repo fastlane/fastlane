@@ -61,7 +61,6 @@ lane :appstore do
   snapshot
   sigh
   deliver
-  frameit
   sh "./customScript.sh"
 
   slack
@@ -83,7 +82,7 @@ fastlane appstore
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
-:page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs.
+:page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs
 :rocket: | Saves you **hours** for every app udpate you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
