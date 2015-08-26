@@ -1129,6 +1129,23 @@ end
 
 ## Misc
 
+### get_info_plist
+
+Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
+
+```ruby
+identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier')
+puts identifier # => com.krausefx.app
+```
+
+### set_info_plist
+
+Set a value of a plist file. You can use this action to update the bundle identifier of your app
+
+```ruby
+get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier', value: "com.krausefx.app.beta")
+```
+
 ### say
 
 To speak out a text
