@@ -1,2 +1,2 @@
-# this requires fastlane to be checked out in the same folder
+# Fetch and use the latest Fastfile from the fastlane main repository
 import "../../fastlane/fastlane/Fastfile"
