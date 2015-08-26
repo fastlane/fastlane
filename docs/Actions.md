@@ -592,6 +592,25 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
 
+### [artifactory](http://www.jfrog.com/artifactory/)
+
+This allows you to upload your ipa, or any other file you want, to artifactory.
+
+```ruby
+# This example shows the minimum required configuration to upload an artifact 
+ENV['FL_ARTIFACTORY_ENDPOINT'] = 'https://artifactory.example.com/artifactory/'
+ENV['FL_ARTIFACTORY_USERNAME'] = 'username'
+ENV['FL_ARTIFACTORY_PASSWORD'] = 'password'
+
+artifactory(
+  file: 'example.ipa',                                # File to upload
+  repo: 'mobile_artifacts',                           # Artifactory repo
+  repo_path: '/ios/appname/example-major.minor.ipa'   # Path to place the artifact including its filename
+)
+```
+
+To get a list of all available parameters run ```fastlane action artifactory```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
