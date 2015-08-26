@@ -9,11 +9,11 @@ module Fastlane
         require "plist"
         begin
           path = File.expand_path(params[:plist_path])
-	      plist = Plist::parse_xml(path)
- 	      Actions.lane_context[SharedValues::INFO_PLIST_VALUE] = plist[params[:param_name]]
+          plist = Plist::parse_xml(path)
+          Actions.lane_context[SharedValues::GET_INFO_PLIST_VALUE_CUSTOM_VALUE] = plist[params[:param_name]]
         rescue
           Helper.log.info "Unable to find plist file at #{path}".red
- 	    end
+        end
       end
 
       def self.description
@@ -22,7 +22,7 @@ module Fastlane
 
       def self.available_options
         [
-		  FastlaneCore::ConfigItem.new(key: :param_name,
+          FastlaneCore::ConfigItem.new(key: :param_name,
                                        env_name: "FL_GET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of parameter",
                                        optional: false),
@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-	    [:ios, :mac].include?platform
+        [:ios, :mac].include?platform
       end
     end
   end
