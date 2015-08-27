@@ -38,8 +38,8 @@ module FastlaneCore
       fill_in "accountpassword", with: password
 
       begin
-        (wait_for_elements(".enabled").first.click rescue nil) # Login Button
-        wait_for_elements('.ng-scope')
+        page.evaluate_script "appleConnectForm.submit()"
+        sleep 7
         
         if page.has_content?"My Apps"
           # Everything looks good
