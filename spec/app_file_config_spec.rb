@@ -86,7 +86,6 @@ describe CredentialsManager do
       end
     end
 
-
     describe "#load_default_configuration_no_lane_or_configuration_found" do
       it "loads Appfile default values for current platform and lane if no override is found" do
         ENV["FASTLANE_LANE_NAME"] = :this_is_not_something_you_find_in_the_app_file.to_s

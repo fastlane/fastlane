@@ -4,5 +4,4 @@ require 'credentials_manager/password_manager'
 require 'colored'
 
 module CredentialsManager
-  
 end

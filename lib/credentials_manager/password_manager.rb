@@ -35,14 +35,13 @@ module CredentialsManager
     end
 
     # A new instance of PasswordManager.
-    # 
+    #
     # This already check the Keychain if there is a username and password stored.
     # If that's not the case, it will ask for login data via stdin
     # @param id_to_use (String) Apple ID (e.g. user@apple.com) which should be used for this upload.
     #  if given, only the password will be asked/loaded.
     # @param ask_if_missing (boolean) true by default: if no credentials are found, should the user be asked?
     def initialize(id_to_use = nil, ask_if_missing = true)
-      
       self.username ||= id_to_use || ENV["DELIVER_USER"] || AppfileConfig.try_fetch_value(:apple_id) || load_from_keychain[0]
       self.password ||= ENV["DELIVER_PASSWORD"] || load_from_keychain[1]
 
@@ -65,56 +64,55 @@ module CredentialsManager
     end
 
     private
-      def ask_for_login
-        puts "-------------------------------------------------------------------------------------".green
-        puts "The login information you enter will be stored in your Mac OS Keychain".green
-        puts "More information about that on GitHub: https://github.com/fastlane/CredentialsManager".green
-        puts "-------------------------------------------------------------------------------------".green
 
-        username_was_there = self.username
+    def ask_for_login
+      puts "-------------------------------------------------------------------------------------".green
+      puts "The login information you enter will be stored in your Mac OS Keychain".green
+      puts "More information about that on GitHub: https://github.com/fastlane/CredentialsManager".green
+      puts "-------------------------------------------------------------------------------------".green
 
-        while (self.username || '').length == 0
-          self.username = ask("Username: ")
+      username_was_there = self.username
+
+      self.username = ask("Username: ") while (self.username || '').length == 0
+
+      self.password ||= load_from_keychain[1] # maybe there was already something stored in the keychain
+
+      if (self.password || '').length > 0
+        return true
+      else
+        while (self.password || '').length == 0
+          text = "Password: "
+          text = "Password (for #{self.username}): " if username_was_there
+          self.password = ask(text) { |q| q.echo = "*" }
         end
 
-        self.password ||= load_from_keychain[1] # maybe there was already something stored in the keychain
-
-        if (self.password || '').length > 0
-          return true
-        else
-          while (self.password || '').length == 0
-            text = "Password: "
-            text = "Password (for #{self.username}): " if username_was_there
-            self.password = ask(text) { |q| q.echo = "*" }
-          end
-
-          # Now we store this information in the keychain
-          # Example usage taken from https://github.com/nomad/cupertino/blob/master/lib/cupertino/provisioning_portal/commands/login.rb
-          unless ENV["FASTLANE_DONT_STORE_PASSWORD"]
-            if Security::InternetPassword.add(hostname, self.username, self.password)
-              return true
-            else
-              puts "Could not store password in keychain".red
-              return false
-            end
+        # Now we store this information in the keychain
+        # Example usage taken from https://github.com/nomad/cupertino/blob/master/lib/cupertino/provisioning_portal/commands/login.rb
+        unless ENV["FASTLANE_DONT_STORE_PASSWORD"]
+          if Security::InternetPassword.add(hostname, self.username, self.password)
+            return true
+          else
+            puts "Could not store password in keychain".red
+            return false
           end
         end
       end
+    end
 
-      def remove_from_keychain
-        puts "Removing keychain item: #{hostname}".yellow
-        Security::InternetPassword.delete(:server => hostname)
-      end
-    
-      def load_from_keychain
-        pass = Security::InternetPassword.find(:server => hostname)
-        
-        return [pass.attributes['acct'], pass.password] if pass
-        return [nil, nil]
-      end
+    def remove_from_keychain
+      puts "Removing keychain item: #{hostname}".yellow
+      Security::InternetPassword.delete(server: hostname)
+    end
 
-      def hostname
-        [HOST, self.username].join('.')
-      end
+    def load_from_keychain
+      pass = Security::InternetPassword.find(server: hostname)
+
+      return [pass.attributes['acct'], pass.password] if pass
+      return [nil, nil]
+    end
+
+    def hostname
+      [HOST, self.username].join('.')
+    end
   end
 end

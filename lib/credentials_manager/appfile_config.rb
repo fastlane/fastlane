@@ -16,19 +16,21 @@ module CredentialsManager
 
     def self.default_path
       ["./fastlane/Appfile", "./Appfile"].each do |current|
-        return current if File.exists?current
+        return current if File.exist? current
       end
       nil
     end
 
     def initialize(path = nil)
-      path ||= self.class.default_path      
+      path ||= self.class.default_path
 
-      raise "Could not find Appfile at path '#{path}'".red unless File.exists?(path)
+      raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
 
       full_path = File.expand_path(path)
       Dir.chdir(File.expand_path('..', path)) do
+        # rubocop:disable Lint/Eval
         eval(File.read(full_path))
+        # rubocop:enable Lint/Eval
       end
     end
 
@@ -38,7 +40,7 @@ module CredentialsManager
 
     # Setters
 
-    def app_identifier(*args, &block)
+    def app_identifier(*args, &_block)
       if block_given?
         value = yield
       else
@@ -47,7 +49,7 @@ module CredentialsManager
       data[:app_identifier] = value if value
     end
 
-    def apple_id(*args, &block)
+    def apple_id(*args, &_block)
       if block_given?
         value = yield
       else
@@ -56,7 +58,7 @@ module CredentialsManager
       data[:apple_id] = value if value
     end
 
-    def team_id(*args, &block)
+    def team_id(*args, &_block)
       if block_given?
         value = yield
       else
@@ -65,7 +67,7 @@ module CredentialsManager
       data[:team_id] = value if value
     end
 
-    def team_name(*args, &block)
+    def team_name(*args, &_block)
       if block_given?
         value = yield
       else
