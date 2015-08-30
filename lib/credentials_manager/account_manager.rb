@@ -31,7 +31,7 @@ module CredentialsManager
     # @param force: if false the user is asked before it gets deleted
     def invalid_credentials(force: false)
       puts "The login credentials for '#{user}' seem to be wrong".red
-      if force || agree("Do you want to re-enter your password?")
+      if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts "Removing Keychain entry for user '#{user}'...".yellow
         remove_from_keychain
         ask_for_login
