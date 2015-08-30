@@ -10,7 +10,9 @@ module FastlaneCore
       self.config = config
       @block_for_missing = block_for_missing
 
+      # rubocop:disable Lint/Eval
       eval(File.read(path))
+      # rubocop:enable Lint/Eval
     end
 
     def method_missing(method_sym, *arguments, &block)

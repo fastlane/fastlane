@@ -48,15 +48,6 @@ module FastlaneCore
       defined?SpecHelper
     end
 
-    # Use Helper.test? instead
-    def self.is_test?
-      self.test?
-    end
-
-    def self.is_ci?
-      ci?
-    end
-
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
@@ -66,20 +57,31 @@ module FastlaneCore
       return false
     end
 
-    # @return the full path to the Xcode developer tools of the currently
-    #  running system
-    def self.xcode_path
-      return "" if self.is_test? and !self.is_mac?
-      `xcode-select -p`.delete("\n") + "/"
+    # Is the currently running computer a Mac?
+    def self.mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
+    end
+
+    # Use Helper.test? and Helper.ci? instead (legacy calls)
+    # rubocop:disable Style/PredicateName
+    def self.is_test?
+      self.test?
+    end
+
+    def self.is_ci?
+      ci?
     end
 
     def self.is_mac?
       self.mac?
     end
+    # rubocop:enable Style/PredicateName
 
-    # Is the currently running computer a Mac?
-    def self.mac?
-      (/darwin/ =~ RUBY_PLATFORM) != nil
+    # @return the full path to the Xcode developer tools of the currently
+    #  running system
+    def self.xcode_path
+      return "" if self.is_test? and !self.is_mac?
+      `xcode-select -p`.delete("\n") + "/"
     end
 
     # @return the full path to the iTMSTransporter executable

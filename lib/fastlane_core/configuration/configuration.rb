@@ -69,13 +69,13 @@ module FastlaneCore
     # Verifies the default value is also valid
     def verify_default_value_matches_verify_block
       @available_options.each do |item|
-        if item.verify_block and item.default_value
-          begin
-            item.verify_block.call(item.default_value)
-          rescue => ex
-            Helper.log.fatal ex
-            raise "Invalid default value for #{item.key}, doesn't match verify_block".red
-          end
+        next unless item.verify_block && item.default_value
+
+        begin
+          item.verify_block.call(item.default_value)
+        rescue => ex
+          Helper.log.fatal ex
+          raise "Invalid default value for #{item.key}, doesn't match verify_block".red
         end
       end
     end
@@ -139,7 +139,7 @@ module FastlaneCore
         # Also store this value to use it from now on
         begin
           set(key, value)
-        rescue Exception => ex
+        rescue => ex
           puts ex
           value = nil
         end

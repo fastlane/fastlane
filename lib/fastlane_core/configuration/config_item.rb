@@ -35,13 +35,13 @@ module FastlaneCore
 
     # This will raise an exception if the value is not valid
     def verify!(value)
-      raise "Invalid value '#{value}' for option '#{self}'".red unless is_valid? value
+      raise "Invalid value '#{value}' for option '#{self}'".red unless valid? value
       true
     end
 
     # Make sure, the value is valid (based on the verify block)
     # Returns false if that's not the case
-    def is_valid?(value)
+    def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value
         if @is_string
@@ -51,7 +51,7 @@ module FastlaneCore
         if @verify_block
           begin
             @verify_block.call(value)
-          rescue Exception => ex
+          rescue => ex
             Helper.log.fatal "Error setting value '#{value}' for option '#{@key}'".red
             raise ex
           end

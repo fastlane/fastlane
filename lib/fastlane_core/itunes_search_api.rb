@@ -33,8 +33,6 @@ module FastlaneCore
       self.fetch(id)['bundleId']
     end
 
-    private
-
     def self.fetch_url(url)
       response = JSON.parse(open(url).read)
       return nil if response['resultCount'] == 0

@@ -41,7 +41,9 @@ module FastlaneCore
 
       def snap
         path = File.expand_path("Error#{Time.now.to_i}.png")
+        # rubocop:disable Lint/Debugger
         save_screenshot(path, full: true)
+        # rubocop:enable Lint/Debugger
         system("open '#{path}'") unless ENV['SIGH_DISABLE_OPEN_ERROR']
       end
 

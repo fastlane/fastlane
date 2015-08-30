@@ -20,22 +20,22 @@ module FastlaneCore
     def self.fetch_info_plist_file(path)
       Zip::File.open(path) do |zipfile|
         zipfile.each do |file|
-          if file.name.include? '.plist' and !['.bundle', '.framework'].any? { |a| file.name.include? a }
-            # We can not be completely sure, that's the correct plist file, so we have to try
-            begin
-              # The XML file has to be properly unpacked first
-              tmp_path = "/tmp/deploytmp.plist"
-              File.write(tmp_path, zipfile.read(file))
-              system("plutil -convert xml1 #{tmp_path}")
-              result = Plist.parse_xml(tmp_path)
-              File.delete(tmp_path)
+          next unless file.name.include? '.plist' and !['.bundle', '.framework'].any? { |a| file.name.include? a }
 
-              if result['CFBundleIdentifier'] or result['CFBundleVersion']
-                return result
-              end
-            rescue
-              # We don't really care, look for another XML file
+          # We can not be completely sure, that's the correct plist file, so we have to try
+          begin
+            # The XML file has to be properly unpacked first
+            tmp_path = "/tmp/deploytmp.plist"
+            File.write(tmp_path, zipfile.read(file))
+            system("plutil -convert xml1 #{tmp_path}")
+            result = Plist.parse_xml(tmp_path)
+            File.delete(tmp_path)
+
+            if result['CFBundleIdentifier'] or result['CFBundleVersion']
+              return result
             end
+          rescue
+            # We don't really care, look for another XML file
           end
         end
       end

@@ -41,31 +41,15 @@ Style/FileName:
 Style/SpecialGlobalVars:
   Enabled: false
 
-
-##################
-# fastlane specifc
-##################
-
-# e.g. 
-# def self.is_supported?(platform)
-# we may never use `platform`
-Lint/UnusedMethodArgument:
-  Enabled: false
-
 # the let(:key) { ... }
 Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - 'spec/**/*'
 
-# We use `is_supported?` everywhere already
-Style/PredicateName:
+Style/ClassVars:
   Enabled: false
-
-Metrics/MethodLength:
-  Exclude:
-    - 'lib/fastlane/actions/*.rb'
-    - 'bin/fastlane'
 
 AllCops:
   Exclude:
-    - 'lib/assets/custom_action_template.rb'
+    # Legacy code that gets removed soon
+    - 'lib/fastlane_core/itunes_connect/*'
