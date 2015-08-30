@@ -15,7 +15,7 @@ module FastlaneCore
 
     def method_missing(method_sym, *arguments, &block)
       # First, check if the key is actually available
-      if self.config.all_keys.include?method_sym
+      if self.config.all_keys.include? method_sym
         value = arguments.first || (block.call if block_given?) # this is either a block or a value
         if value
           self.config[method_sym] = value

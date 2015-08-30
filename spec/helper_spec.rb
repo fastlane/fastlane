@@ -1,6 +1,5 @@
 describe FastlaneCore do
   describe FastlaneCore::Helper do
-    
     describe "#is_ci?" do
       it "returns false when not building in a known CI environment" do
         stub_const('ENV', {})
@@ -32,6 +31,5 @@ describe FastlaneCore do
         end
       end
     end
-    
   end
 end

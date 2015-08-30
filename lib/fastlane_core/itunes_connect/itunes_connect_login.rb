@@ -1,15 +1,15 @@
-module FastlaneCore  
+module FastlaneCore
   # Login code
   class ItunesConnect
     # Loggs in a user with the given login data on the iTC Frontend.
     # You don't need to pass a username and password. It will
     # Automatically be fetched using the {CredentialsManager::PasswordManager}.
-    # This method will also automatically be called when triggering other 
+    # This method will also automatically be called when triggering other
     # actions like {#open_app_page}
     # @param user (String) (optional) The username/email address
     # @param password (String) (optional) The password
     # @return (bool) true if everything worked fine
-    # @raise [ItunesConnectGeneralError] General error while executing 
+    # @raise [ItunesConnectGeneralError] General error while executing
     #  this action
     # @raise [ItunesConnectLoginError] Login data is wrong
     def login(user = nil, password = nil)
@@ -22,8 +22,8 @@ module FastlaneCore
       raise "Could not open iTunesConnect" unless result['status'] == 'success'
 
       sleep 3
-      
-      if page.has_content?"My Apps"
+
+      if page.has_content? "My Apps"
         # Already logged in
         return true
       end
@@ -40,13 +40,13 @@ module FastlaneCore
       begin
         page.evaluate_script "appleConnectForm.submit()"
         sleep 7
-        
-        if page.has_content?"My Apps"
+
+        if page.has_content? "My Apps"
           # Everything looks good
         else
           visit current_url # iTC sometimes is super buggy, try reloading the site
           sleep 3
-          unless page.has_content?"My Apps"
+          unless page.has_content? "My Apps"
             raise ItunesConnectLoginError.new("Looks like your login data was correct, but you do not have access to the apps.".red)
           end
         end

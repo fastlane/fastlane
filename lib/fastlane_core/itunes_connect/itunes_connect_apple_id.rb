@@ -1,4 +1,4 @@
-module FastlaneCore  
+module FastlaneCore
   # Find the Apple ID based on the App Identifier
   class ItunesConnect
     LIST_APPLE_IDS_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary"

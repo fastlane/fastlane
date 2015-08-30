@@ -16,5 +16,4 @@ require 'colored'
 require 'commander'
 
 module FastlaneCore
-
 end

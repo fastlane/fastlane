@@ -2,7 +2,6 @@ require 'logger'
 
 module FastlaneCore
   module Helper
-
     # Logging happens using this method
     def self.log
       if is_test?
@@ -62,7 +61,7 @@ module FastlaneCore
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
       ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI'].each do |current|
-        return true if ENV.has_key?(current)
+        return true if ENV.key?(current)
       end
       return false
     end
@@ -70,8 +69,8 @@ module FastlaneCore
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? and not self.is_mac?
-      `xcode-select -p`.gsub("\n", '') + "/"
+      return "" if self.is_test? and !self.is_mac?
+      `xcode-select -p`.delete("\n") + "/"
     end
 
     def self.is_mac?
@@ -92,19 +91,19 @@ module FastlaneCore
         "../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter"
       ].each do |path|
         result = File.join(self.xcode_path, path)
-        return result if File.exists?(result)
+        return result if File.exist?(result)
       end
       raise "Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.".red
     end
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @@enabled ||= File.directory?"./fastlane"
+      @@enabled ||= File.directory? "./fastlane"
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)
     def self.gem_path(gem_name)
-      if not Helper.is_test? and Gem::Specification::find_all_by_name(gem_name).any?
+      if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
         return './'

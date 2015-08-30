@@ -24,7 +24,7 @@ module FastlaneCore
       def parse(path)
         require 'plist'
 
-        plist = Plist::parse_xml(`security cms -D -i '#{path}'`)
+        plist = Plist.parse_xml(`security cms -D -i '#{path}'`)
         if (plist || []).count > 5
           plist
         else
@@ -57,7 +57,7 @@ module FastlaneCore
             raise "Failed installation of provisioning profile at location: '#{destination}'".red
           end
         end
-        
+
         true
       end
     end

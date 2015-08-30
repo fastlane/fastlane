@@ -1,6 +1,5 @@
 require 'fastlane_core/update_checker'
 
-
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
     let (:name) { 'deliver' }

@@ -11,7 +11,7 @@ module FastlaneCore
       return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
       @start_time = Time.now
-      
+
       Thread.new do
         begin
           server_results[gem_name] = fetch_latest(gem_name)
@@ -34,7 +34,7 @@ module FastlaneCore
         begin
           finished_running(gem_name)
         rescue
-           # we don't want to show a stack trace if something goes wrong
+          # we don't want to show a stack trace if something goes wrong
         end
       end
 

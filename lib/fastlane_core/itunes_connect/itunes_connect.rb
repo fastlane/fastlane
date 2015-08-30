@@ -3,7 +3,6 @@ require 'capybara/poltergeist'
 require 'credentials_manager/password_manager'
 require 'phantomjs/poltergeist' # this will download and store phantomjs
 
-
 require 'fastlane_core/itunes_connect/itunes_connect_helper.rb'
 require 'fastlane_core/itunes_connect/itunes_connect_login.rb'
 require 'fastlane_core/itunes_connect/itunes_connect_apple_id.rb'
@@ -11,11 +10,11 @@ require 'fastlane_core/itunes_connect/itunes_connect_apple_id.rb'
 module FastlaneCore
   # Everything that can't be achived using the {FastlaneCore::ItunesTransporter}
   # will be scripted using the iTunesConnect frontend.
-  # 
+  #
   # Every method you call here, might take a time
   class ItunesConnect
     # This error occurs only if there is something wrong with the given login data
-    class ItunesConnectLoginError < StandardError 
+    class ItunesConnectLoginError < StandardError
     end
 
     # This error can occur for many reaons. It is
@@ -32,12 +31,12 @@ module FastlaneCore
     BUTTON_STRING_SUBMIT_FOR_REVIEW = "Submit for Review"
 
     WAITING_FOR_REVIEW = "Waiting For Review"
-    
+
     def initialize
       super
 
       return if Helper.is_test?
-      
+
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist
       Capybara.javascript_driver = :poltergeist

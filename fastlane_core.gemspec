@@ -8,14 +8,14 @@ Gem::Specification.new do |spec|
   spec.version       = FastlaneCore::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlanecore@krausefx.com"]
-  spec.summary       = %q{Contains all shared code/dependencies of the fastlane.tools}
-  spec.description   = %q{Contains all shared code/dependencies of the fastlane.tools}
+  spec.summary       = 'Contains all shared code/dependencies of the fastlane.tools'
+  spec.description   = 'Contains all shared code/dependencies of the fastlane.tools'
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w( README.md LICENSE )
 
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
