@@ -185,8 +185,16 @@ module Deliver
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-apple_id #{apple_id}",
-          "-destination '#{destination}'"
+          "-destination '#{destination}'",
+          "-subitemtype None"
         ].join(' ')
+
+        # The subitemtype defines that we don't want to download in-app purchases and gamecenter things
+        # Allowed values:
+        # - GameCenterLeaderboard
+        # - GameCenterAchievement
+        # - InAppPurchase
+        # - None
       end
 
       def build_upload_command(username, password, source = "/tmp")
