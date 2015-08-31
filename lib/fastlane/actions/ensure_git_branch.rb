@@ -7,10 +7,11 @@ module Fastlane
     class EnsureGitBranchAction < Action
       def self.run(params)
         branch = params[:branch]
-        if Actions.git_branch != branch
-          raise "Git is not on the `#{branch}` branch, but on `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.".red
+        branch_expr = /#{branch}/
+        if Actions.git_branch =~ branch_expr
+          Helper.log.info "Git branch match `#{branch}`, all good! 💪".green
         else
-          Helper.log.info "Git branch is `#{branch}`, all good! 💪".green
+          raise "Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.".red
         end
       end
 
@@ -26,7 +27,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :branch,
                                        env_name: "FL_ENSURE_GIT_BRANCH_NAME",
-                                       description: "The branch that should be checked for",
+                                       description: "The branch that should be checked for. String that can be either the full name of the branch or a regex to match",
                                        is_string: true,
                                        default_value: 'master')
         ]
@@ -37,7 +38,7 @@ module Fastlane
       end
 
       def self.author
-        'dbachrach'
+        ['dbachrach', 'Liquidsoul']
       end
 
       def self.is_supported?(platform)
