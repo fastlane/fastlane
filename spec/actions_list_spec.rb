@@ -38,6 +38,10 @@ describe Fastlane do
           authors = Array(action.author || action.authors)
           expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
 
+          authors.each do |author|
+            expect(author).to_not start_with("@")
+          end
+
           if action.available_options
             expect(action.available_options).to be_instance_of(Array), "'available_options' for action '#{name}' must be an array"
           end
