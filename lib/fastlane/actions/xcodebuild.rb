@@ -290,7 +290,7 @@ module Fastlane
       end
 
       def self.description
-        "Builds the project using `xcodebuild`"
+        "Archives the project using `xcodebuild`"
       end
 
       def self.author
@@ -351,7 +351,7 @@ module Fastlane
       end
 
       def self.description
-        "Builds the project using `xcodebuild`"
+        "Cleans the project using `xcodebuild`"
       end
 
       def self.author
@@ -382,7 +382,7 @@ module Fastlane
       end
 
       def self.description
-        "Builds the project using `xcodebuild`"
+        "Exports the project using `xcodebuild`"
       end
 
       def self.author
