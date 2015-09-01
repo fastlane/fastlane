@@ -567,7 +567,7 @@ If you put `deploygate` after `ipa` action, you don't have to specify IPA file p
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
 
-### [Xcode Server get assets](https://www.apple.com/uk/support/osxserver/xcodeserver/)
+### [Xcode Server](https://www.apple.com/uk/support/osxserver/xcodeserver/)
 
 This action retrieves integration assets (`.xcarchive`, logs etc) from your Xcode Server instance over HTTPS.
 
@@ -591,6 +591,22 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 ```
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
+
+### [GitHub Releases](https://github.com)
+
+This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc. 
+
+```ruby
+github_release = set_github_release(
+  repository_name: "krausefx/fastlane",
+  api_token: ENV['GITHUB_TOKEN']
+  name: "Super New actions",
+  tag_name: "v1.22.0",
+  description: File.read("changelog"),
+  commitish: "master",
+  upload_assets: ["example_integration.ipa", "./pkg/built.gem"]
+)
+```
 
 ## Modifying Project
 
