@@ -44,6 +44,8 @@ module FastlaneCore
     def verify_value_exists
       # Make sure the given value keys exist
       @values.each do |key, value|
+        next if key == :trace # special treatment
+
         option = option_for_key(key)
         if option
           option.verify!(value) # Call the verify block for it too
