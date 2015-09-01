@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/AbcSize
+
 module Fastlane
   module Actions
     module SharedValues
@@ -79,12 +81,11 @@ module Fastlane
       end
 
       def self.upload(asset_path, upload_url_template, api_token)
-
         # if it's a directory, zip it first in a temp directory, because we can only upload binary files
         absolute_path = File.absolute_path(asset_path)
 
         # check that the asset even exists
-        raise "Asset #{absolute_path} doesn't exist" unless File.exists?(absolute_path)
+        raise "Asset #{absolute_path} doesn't exist" unless File.exist?(absolute_path)
 
         name = File.basename(absolute_path)
         response = nil
@@ -160,8 +161,7 @@ module Fastlane
         (get one from https://github.com/settings/tokens/new), the repository name
         and tag name. If the tag doesn't exist, one will be created on the commit or branch passed-in as
         commitish. Out parameters provide the release's id, which can be used for later editing and the
-        release html link to GitHub."
-        "You can also specify a list of assets to be uploaded to the release with the upload_assets parameter."
+        release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter."
       end
 
       def self.available_options
@@ -216,8 +216,8 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "upload_assets must be an Array of paths to assets" unless value.is_a? Array
-                                       end),
+                                         raise "upload_assets must be an Array of paths to assets" unless value.kind_of? Array
+                                       end)
         ]
       end
 
