@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
 
-  spec.add_dependency 'fastlane_core', '>= 0.15.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.15.2', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.7.4', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.5.3', '< 1.0.0' # communication layer with Apple's web services
 
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'deliver', '>= 0.13.2', '< 1.0.0'
   spec.add_dependency 'snapshot', '>= 0.9.2', '< 1.0.0'
   spec.add_dependency 'frameit', '>= 2.2.0', '< 3.0.0'
-  spec.add_dependency 'pem', '>= 0.7.2', '< 1.0.0'
+  spec.add_dependency 'pem', '>= 0.7.3', '< 1.0.0'
   spec.add_dependency 'cert', '>= 0.3.1', '< 1.0.0'
   spec.add_dependency 'sigh', '>= 0.10.6', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.1', '< 1.0.0'
