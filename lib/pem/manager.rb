@@ -4,13 +4,14 @@ require 'spaceship'
 module PEM
   # Creates the push profile and stores it in the correct location
   class Manager
-
     def self.start
       password_manager = CredentialsManager::PasswordManager.shared_manager
       Spaceship.login(password_manager.username, password_manager.password)
       Spaceship.client.select_team
 
-      existing_certificate = Spaceship.certificate.all.detect { |c| c.name == PEM.config[:app_identifier] }
+      existing_certificate = certificate.all.detect do |c| 
+        c.name == PEM.config[:app_identifier]
+      end
 
       if existing_certificate
         remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
@@ -31,11 +32,7 @@ module PEM
       csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
       begin
-        if PEM.config[:development]
-          cert = Spaceship.certificate.development_push.create!(csr: csr, bundle_id: PEM.config[:app_identifier])
-        else
-          cert = Spaceship.certificate.production_push.create!(csr: csr, bundle_id: PEM.config[:app_identifier])
-        end
+        cert = certificate.create!(csr: csr, bundle_id: PEM.config[:app_identifier])
       rescue => ex
         if ex.to_s.include?"You already have a current"
           # That's the most common failure probably
@@ -60,7 +57,6 @@ module PEM
       end
 
       if PEM.config[:generate_p12]
-        certificate_type = (PEM.config[:development] ? 'development' : 'production')
         p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
         file = File.new("#{filename_base}.p12", 'wb')
         file.write(p12.to_der)
@@ -73,6 +69,14 @@ module PEM
       file.close
       Helper.log.info "PEM: ".green + Pathname.new(file).realpath.to_s
       return file
+    end
+
+    def self.certificate
+      if PEM.config[:development]
+        Spaceship.certificate.development_push
+      else
+        Spaceship.certificate.production_push
+      end
     end
   end
 end
