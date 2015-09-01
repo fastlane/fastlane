@@ -135,7 +135,7 @@ Slather is available at https://github.com/venmo/slather
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["@mattdelves"]
+        ["mattdelves"]
       end
 
       def self.is_supported?(platform)
