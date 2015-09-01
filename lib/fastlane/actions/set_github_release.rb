@@ -153,7 +153,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This will create a new release on GitHub from given metadata and upload assets for it"
+        "This will create a new release on GitHub and upload assets for it"
       end
 
       def self.details
