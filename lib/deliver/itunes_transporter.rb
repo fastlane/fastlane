@@ -198,16 +198,19 @@ module Deliver
       end
 
       def build_upload_command(username, password, source = "/tmp")
-        [
+        parts = [
           '"' + Helper.transporter_path + '"',
           "-m upload",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-f '#{source}'",
           ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-          "-t 'Signiant'",
           "-k 100000"
-        ].join(' ')
+        ]
+
+        parts << "-t 'Signiant'" unless parts.join(" ").include?"-t"
+
+        parts.join(' ')
       end
 
       def escaped_password(password)
