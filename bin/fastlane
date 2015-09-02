@@ -103,9 +103,11 @@ class FastlaneApplication
       c.syntax = 'fastlane actions'
       c.description = 'Lists all available fastlane actions'
 
+      c.option '--platform STRING', String, 'Only show actions available on the given platform'
+
       c.action do |args, options|
         require 'fastlane/actions_list'
-        Fastlane::ActionsList.run(args.first)
+        Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
       end
     end
 
@@ -114,7 +116,7 @@ class FastlaneApplication
       c.description = 'Shows more information for a specific command'
       c.action do |args, options|
         require 'fastlane/actions_list'
-        Fastlane::ActionsList.run(args.first)
+        Fastlane::ActionsList.run(filter: args.first)
       end
     end
 

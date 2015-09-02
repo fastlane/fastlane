@@ -1,17 +1,17 @@
 module Fastlane
   class ActionsList
-    def self.run(filter)
+    def self.run(filter: nil, platform: nil)
       require 'terminal-table'
       if filter
-        show_details(filter)
+        show_details(filter: filter)
       else
-        print_all
+        print_all(platform: platform)
       end
     end
 
-    def self.print_all
+    def self.print_all(platform: nil)
       rows = []
-      all_actions do |action, name|
+      all_actions(platform) do |action, name|
         current = []
         current << name.yellow
 
@@ -34,12 +34,13 @@ module Fastlane
         rows: rows
       )
       puts table
+      puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
 
       puts "\nGet more information for one specific action using `fastlane action [name]`\n".green
     end
 
-    def self.show_details(filter)
+    def self.show_details(filter: nil)
       puts "Loading documentation for #{filter}:".green
 
       puts ""
@@ -102,10 +103,13 @@ module Fastlane
     end
 
     # Iterates through all available actions and yields from there
-    def self.all_actions
+    def self.all_actions(platform = nil)
       all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
       all_actions.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
+
+        next if platform && !action.is_supported?(platform.to_sym)
+
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
         yield action, name
       end
