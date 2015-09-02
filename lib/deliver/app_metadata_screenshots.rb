@@ -158,6 +158,31 @@ module Deliver
           }, use_framed)
         end
       end
+
+      # Legacy: 
+      # We also want to support the "legacy" language format (ja-JP instead of just ja)
+      FastlaneCore::Languages::ALL_LANGUAGES_LEGACY.each do |language|
+        full_path = File.join(path, language)
+        if File.directory?(full_path)
+
+          if FastlaneCore::Languages::ALL_LANGUAGES.include?language
+            # We're all good, this language code is still supported
+          else
+            # This language code was changed - need to modify that
+            short_code = language.match(/(\w\w)\-.*/)
+            if short_code and short_code.length == 2
+              Helper.log.info "Using language code #{short_code[1]} instead of #{language}"
+              language = short_code[1]
+            end
+          end
+
+          found = true
+          set_screenshots_for_each_language({
+            language => full_path
+          }, use_framed)
+        end
+      end
+
       return found
     end
   end

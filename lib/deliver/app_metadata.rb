@@ -310,21 +310,21 @@ module Deliver
 
         # Run through all the locales given by the 'user'
         new_value.each do |language, value|
-          create_locale_if_not_exists(language)
-
-          locale = fetch_value("//x:locale[@name='#{language}']").first
-
+          # First, check if this is the legacy locale notation
           unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
             # Check if we need to support legacy language codes
             short_code = language.match(/(\w\w)\-.*/)
             if short_code and short_code.length == 2 and FastlaneCore::Languages::ALL_LANGUAGES.include?short_code[1]
-              puts "updating from #{language} to #{short_code[1]}"
               language = short_code[1]
             else
               raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})")
             end
           end
 
+
+          create_locale_if_not_exists(language)
+
+          locale = fetch_value("//x:locale[@name='#{language}']").first
 
           field = locale.search(xpath_name).first
 
