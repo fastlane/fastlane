@@ -203,7 +203,7 @@ module Fastlane
                         git remote add origin #{url} && \
                         git config core.sparsecheckout true"
 
-        if not File.directory? clone_folder
+        if !File.directory? clone_folder
           Helper.log.info "Repo not yet created, initializing it..."
           Actions.sh(init_command)
         else
