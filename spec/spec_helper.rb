@@ -24,17 +24,15 @@ cache_paths = [
 ]
 
 def try_delete(path)
-  File.delete(path) if File.exist?(path)
-rescue Errno::ENOENT => e
-  puts e
+  FileUtils.rm_f path if File.exist? path
 end
 
 RSpec.configure do |config|
   config.before(:each) do
-    cache_paths.each { |path| try_delete(path) }
+    cache_paths.each { |path| try_delete path }
   end
 
   config.after(:each) do
-    cache_paths.each { |path| try_delete(path) }
+    cache_paths.each { |path| try_delete path }
   end
 end
