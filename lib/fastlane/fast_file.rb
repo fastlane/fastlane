@@ -196,41 +196,53 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        folder = File.join("/tmp", "fl_clones", repo_name)
+        clone_folder = File.join("/tmp", "fl_clones", repo_name)
 
-        branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
+        init_command = "git init #{clone_folder} && \
+                        cd #{clone_folder} && \
+                        git remote add origin #{url} && \
+                        git config core.sparsecheckout true"
 
-        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
-
-        if File.directory? folder
-          Helper.log.info "Using existing git repo..."
-          begin
-            Actions.sh("cd '#{folder}' && git pull")
-          rescue
-            # Something went wrong, clear the folder and pull again
-            Actions.sh("rm -rf '#{folder}'")
-            Actions.sh(clone_command)
-          end
+        if not File.directory? clone_folder
+          Helper.log.info "Repo not yet created, initializing it..."
+          Actions.sh(init_command)
         else
-          # When this fails, we have to clone the git repo
-          Helper.log.info "Cloning remote git repo..."
-          Actions.sh(clone_command)
+          # for legacy support we need to check if the existing repo was setup for sparse-checkout
+          is_sparsecheckout_enabled = Actions.sh("cd #{clone_folder} && git config core.sparsecheckout").strip
+          if is_sparsecheckout_enabled != "true"
+            Helper.log.info "Repo was not created with sparse-checkout. Deleting the current one..."
+            Actions.sh("rm -rf '#{clone_folder}'")
+            Helper.log.info "Initializing the repo..."
+            Actions.sh(init_command)
+          end
         end
 
-        Actions.sh("cd '#{folder}' && git checkout #{branch} '#{path}'")
+        # setup sparse-checkout file
+        sparse_checkout_file_path = File.join(clone_folder, '.git/info/sparse-checkout')
+        
+        if File.exist? sparse_checkout_file_path
+          # delete existing sparse-checkout file
+          Actions.sh("rm -f #{sparse_checkout_file_path}")
+        end
 
-        # We also want to check out all the local actions of this fastlane setup
         containing = path.split(File::SEPARATOR)[0..-2]
         containing = "." if containing.count == 0
         actions_folder = File.join(containing, "actions")
-        begin
-          Actions.sh("cd '#{folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue
-          # We don't care about a failure here, as local actions are optional
-        end
 
-        import(File.join(folder, path))
+        sparse_checkout_file = File.new(sparse_checkout_file_path, 'w')
+        sparse_checkout_file.write([path, actions_folder].join("\n"))
+        sparse_checkout_file.close()
+
+        # Fetch latest updates from remote
+        Actions.sh("cd '#{clone_folder}' && git fetch --all")
+
+        # We need to fetch the origin/HEAD if the user wants to use the remote's default branch
+        Actions.sh("cd '#{clone_folder}' && git remote set-head origin --auto") unless branch != 'HEAD'
+
+        # checkout the branch
+        Actions.sh("cd '#{clone_folder}' && git checkout #{branch}")
+
+        import(File.join(clone_folder, path))
       end
     end
 
