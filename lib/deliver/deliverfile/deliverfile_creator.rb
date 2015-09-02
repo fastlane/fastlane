@@ -77,7 +77,7 @@ module Deliver
       FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
       File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
       
-      Helper.log.info "Successfully created new Deliverfile at '#{file_path}'".green
+      Helper.log.info "Successfully created new Deliverfile".green
     end
 
     private
@@ -98,7 +98,7 @@ module Deliver
           Helper.log.info "Successfully downloaded existing metadata for language #{language}"
         end
         
-        puts "Successfully created new configuration files at '#{File.join(path, 'metadata')}'".green
+        puts "Successfully created new configuration files.".green
 
         gem_path = Helper.gem_path('deliver')
 
