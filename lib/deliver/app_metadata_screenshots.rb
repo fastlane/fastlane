@@ -150,7 +150,7 @@ module Deliver
 
       found = false
       FastlaneCore::Languages::ALL_LANGUAGES.each do |language|
-        full_path = path + "/#{language}"
+        full_path = File.join(path, language)
         if File.directory?(full_path)
           found = true
           set_screenshots_for_each_language({

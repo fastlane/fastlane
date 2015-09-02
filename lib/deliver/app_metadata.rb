@@ -193,6 +193,10 @@ module Deliver
       update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
+        next unless information
+        next unless information[language]
+        next unless information[language][:keywords]
+        
         if not information[language][:keywords] or keywords.sort != information[language][:keywords][:value].sort
           field.children.remove # remove old keywords
 
@@ -310,7 +314,16 @@ module Deliver
 
           locale = fetch_value("//x:locale[@name='#{language}']").first
 
-          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
+          unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
+            # Check if we need to support legacy language codes
+            short_code = language.match(/(\w\w)\-.*/)
+            if short_code and short_code.length == 2 and FastlaneCore::Languages::ALL_LANGUAGES.include?short_code[1]
+              puts "updating from #{language} to #{short_code[1]}"
+              language = short_code[1]
+            else
+              raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})")
+            end
+          end
 
 
           field = locale.search(xpath_name).first
@@ -351,7 +364,6 @@ module Deliver
 
       # Cleans up the package of stuff we do not want to modify/upload
       def clean_package
-
         # Remove the live version (if it exists)
         versions = fetch_value("//x:version")
         while versions.count > 1
@@ -367,6 +379,16 @@ module Deliver
         fetch_value("//x:in_app_purchases").remove
 
         fetch_value("//x:software_screenshots").remove
+
+        # Change the Chinese locale
+        # Radar 22548000
+        # from zh-Hans to cmn-Hans
+        chinese = []
+        chinese << fetch_value("//x:locale[@name='zh-Hant']").last
+        chinese << fetch_value("//x:locale[@name='zh-Hans']").last
+        chinese.each do |entry|
+          entry["name"] = entry["name"].gsub("zh", "cmn") if entry && entry["name"]
+        end
       end
 
       # This will fill in all information we got (from the downloaded metadata.xml file) into self.information
