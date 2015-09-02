@@ -219,7 +219,7 @@ module Fastlane
 
         # setup sparse-checkout file
         sparse_checkout_file_path = File.join(clone_folder, '.git/info/sparse-checkout')
-        
+
         if File.exist? sparse_checkout_file_path
           # delete existing sparse-checkout file
           Actions.sh("rm -f #{sparse_checkout_file_path}")
@@ -231,7 +231,7 @@ module Fastlane
 
         sparse_checkout_file = File.new(sparse_checkout_file_path, 'w')
         sparse_checkout_file.write([path, actions_folder].join("\n"))
-        sparse_checkout_file.close()
+        sparse_checkout_file.close
 
         # Fetch latest updates from remote
         Actions.sh("cd '#{clone_folder}' && git fetch --all")
