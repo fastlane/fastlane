@@ -608,6 +608,23 @@ github_release = set_github_release(
 )
 ```
 
+### [artifactory](http://www.jfrog.com/artifactory/)
+
+This allows you to upload your ipa, or any other file you want, to artifactory.
+
+```ruby
+artifactory(
+  username: "username",
+  password: "password",
+  endpoint: "https://artifactory.example.com/artifactory/",
+  file: 'example.ipa',                                # File to upload
+  repo: 'mobile_artifacts',                           # Artifactory repo
+  repo_path: '/ios/appname/example-major.minor.ipa'   # Path to place the artifact including its filename
+)
+```
+
+To get a list of all available parameters run `fastlane action artifactory`
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
