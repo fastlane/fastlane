@@ -40,3 +40,6 @@ Style/FileName:
 # $? Exit
 Style/SpecialGlobalVars:
   Enabled: false
+
+Style/ExtraSpacing:
+  Enabled: false

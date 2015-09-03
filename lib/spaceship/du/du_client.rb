@@ -70,6 +70,7 @@ module Spaceship
     end
 
     def picture_type_map
+      # rubocop:enable Style/ExtraSpacing
       {
         watch:        "MZPFT.SortedN27ScreenShot",
         ipad:         "MZPFT.SortedTabletScreenShot",
