@@ -37,14 +37,15 @@ describe Fastlane do
         end.to raise_error
       end
 
-      it "requires proj" do
+      it "Missing value" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             slather({
-              build_directory: 'foo/bar'
+              build_directory: 'foo/bar',
+              input_format: ''
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error "No value found for 'scheme'"
       end
     end
   end
