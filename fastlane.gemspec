@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'artifactory', '~> 2.0' # Needed for artifactory action
   spec.add_dependency 'slather', '~> 1.8' # Needed for artifactory action
 
-  spec.add_dependency 'fastlane_core', '>= 0.15.2', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.15.3', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.7.4', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.5.3', '< 1.0.0' # communication layer with Apple's web services
 
