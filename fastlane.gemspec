@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
   spec.add_dependency 'artifactory', '~> 2.0' # Needed for artifactory action
+  spec.add_dependency 'slather', '~> 1.8' # Needed for artifactory action
 
   spec.add_dependency 'fastlane_core', '>= 0.15.2', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.7.4', '< 1.0.0' # Password Manager
