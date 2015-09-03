@@ -378,6 +378,19 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
   )
 ```
 
+### [slather](https://github.com/venmo/slather)
+
+> Generate test coverage reports for Xcode projects & hook it into CI.
+
+```ruby
+slather(
+  build_directory: 'foo',
+  input_format: 'bah',
+  scheme: 'Foo',
+  proj: 'foo.xcodeproj'
+)
+```
+
 ### [gcovr](http://gcovr.com/)
 Generate summarized code coverage reports.
 
