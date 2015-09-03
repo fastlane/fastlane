@@ -22,7 +22,7 @@ module Spaceship
             'iphone6Plus' => [2208, 1242],
             'ipad' => [1024, 768]
         }
-        puts "#{device}: #{resolutions[device]}"
+        # puts "#{device}: #{resolutions[device]}"
         r = resolutions[device]
         r = [r[1], r[0]] if is_portrait
         r

@@ -107,7 +107,7 @@ describe Spaceship::AppVersion do
         expect(v.screenshots["English"].count).to eq(8)
 
         # 2 iPhone 6 Plus Screenshots
-        expect(v.screenshots["English"].find_all { |s| s.device_type == 'iphone6Plus' }.count).to eq(2)
+        expect(v.screenshots["English"].count { |s| s.device_type == 'iphone6Plus' }).to eq(2)
       end
     end
 
@@ -127,7 +127,7 @@ describe Spaceship::AppVersion do
 
         expect(v.trailers["English"].count).to eq(1)
 
-        expect(v.trailers["English"].find_all { |s| s.device_type == "iphone6Plus" }.count).to eq(0)
+        expect(v.trailers["English"].count { |s| s.device_type == "iphone6Plus" }).to eq(0)
       end
     end
   end
@@ -252,7 +252,7 @@ describe Spaceship::AppVersion do
       end
 
       def trailers(device)
-        version.trailers["English"].find_all { |s| s.device_type == device }
+        version.trailers["English"].select { |s| s.device_type == device }
       end
 
       def ipad_trailers
