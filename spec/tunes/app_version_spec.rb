@@ -348,7 +348,7 @@ describe Spaceship::AppVersion do
         expect(trailer.language).to eq("English")
       end
 
-      # TODO: can we detect trailer source change ?
+      # IDEA: can we detect trailer source change ?
 
       it "remove the video trailer" do
         count = ipad_trailers.count

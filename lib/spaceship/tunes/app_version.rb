@@ -359,7 +359,7 @@ module Spaceship
             check_preview_screenshot_resolution(preview_image_path, device)
             video_preview_path = preview_image_path
           else
-            # TODO: optimization, we could avoid fetching the screenshot if the timestamp hasn't changed
+            # IDEA: optimization, we could avoid fetching the screenshot if the timestamp hasn't changed
             video_preview_resolution = video_preview_resolution_for(device, trailer_path)
             video_preview_path = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
           end
@@ -482,7 +482,7 @@ module Spaceship
         raise "#{device} isn't a valid device name" unless DeviceType.exists?(device)
 
         languages = raw_data_details.select {|d| d["language"] == language}
-        # TODO: better error for non existing language
+        # IDEA: better error for non existing language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
         devices_details = lang_details[data_field]["value"]
