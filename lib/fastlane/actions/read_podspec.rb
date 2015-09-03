@@ -6,7 +6,7 @@ module Fastlane
 
     class ReadPodspecAction < Action
       def self.run(params)
-        path = params[:path] || Dir['*.podspec*'].first
+        path = params[:path]
 
         # will fail if cocoapods is not installed
         require 'cocoapods-core'
@@ -38,10 +38,10 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_READ_PODSPEC_PATH",
-                                       description: "(Optional) Path to the podspec to be read",
-                                       optional: true,
+                                       description: "Path to the podspec to be read",
+                                       default_value: Dir['*.podspec*'].first,
                                        verify_block: proc do |value|
-                                         raise "File #{value} not found".red unless File.exist?(spec_path)
+                                         raise "File #{value} not found".red unless File.exist?(value)
                                        end)
         ]
       end
