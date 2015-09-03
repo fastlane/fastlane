@@ -1212,3 +1212,19 @@ else
   say "Hi Human!"
 end
 ```
+
+### read_podspec
+
+Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
+
+```ruby
+spec = read_podspec
+version = spec['version']
+puts "Using Version #{version}"
+```
+
+This will find the first podspec in the folder. You can also pass in the specific podspec path.
+
+```ruby
+spec = read_podspec(path: "./XcodeServerSDK.podspec")
+```
