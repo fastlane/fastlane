@@ -9,7 +9,7 @@ module Fastlane
       args.each do |current|
         if current.include? ":" # that's a key/value which we want to pass to the lane
           key, value = current.split(":")
-          raise "Please pass values like this: key:value" unless key.length > 0 and value.length > 0
+          raise "Please pass values like this: key:value" unless key.length > 0
           value = convert_value(value)
           Helper.log.debug "Using #{key}: #{value}".green
           lane_parameters[key.to_sym] = value
