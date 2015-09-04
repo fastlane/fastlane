@@ -40,20 +40,20 @@ module CredentialsManager
 
     # Setters
 
-    def app_identifier(*args, &_block)
-      setter(:app_identifier, *args, &_block)
+    def app_identifier(*args, &block)
+      setter(:app_identifier, *args, &block)
     end
 
-    def apple_id(*args, &_block)
-      setter(:apple_id, *args, &_block)
+    def apple_id(*args, &block)
+      setter(:apple_id, *args, &block)
     end
 
-    def team_id(*args, &_block)
-      setter(:team_id, *args, &_block)
+    def team_id(*args, &block)
+      setter(:team_id, *args, &block)
     end
 
-    def team_name(*args, &_block)
-      setter(:team_name, *args, &_block)
+    def team_name(*args, &block)
+      setter(:team_name, *args, &block)
     end
 
     # Override Appfile configuration for a specific lane.
