@@ -56,6 +56,29 @@ To pull the changes of all repos, go to the `countdown` directory and run
 rake pull
 ```
 
+# Developing
+
+When working on something, directly edit the Ruby files in the project folders. Make sure to switch to 2 spaces in your text editor.
+
+To run the modified version of the tool, run the following in the project directory
+
+```
+./bin/[tool_name]
+```
+
+# Running tests
+
+In the directory of one project, run the tests using
+
+`rake test`
+
+This will do a few things:
+
+- Runs the tests (you can run them via `rspec` too)
+- Makes sure no debug code (like `pry`) is still there
+- The `--help` command works as expected
+
+The tests are executed using `fastlane` :rocket:
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
