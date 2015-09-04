@@ -1,42 +1,6 @@
-inherit_from: .rubocop_todo.yml
 
-Style/ClassCheck:
-  EnforcedStyle: kind_of?
+##################
+# All rules specific to this repo
+##################
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/BracesAroundHashParameters:
-  Enabled: false
-
-Lint/UselessAssignment:
-  Exclude:
-    - 'spec/**/*'
-
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
-  Enabled: false
-
-Style/RaiseArgs:
-  EnforcedStyle: exploded
-
-Style/DoubleNegation:
-  Enabled: false
-
-Lint/HandleExceptions:
-  Enabled: false
-
-# Cop supports --auto-correct.
-Lint/UnusedBlockArgument:
-  Enabled: false
-
-# Needed for $verbose
-Style/GlobalVars:
-  Enabled: false
-
-Style/FileName:
-  Enabled: false
-
-# $? Exit
-Style/SpecialGlobalVars:
-  Enabled: false
+inherit_from: .rubocop_general.yml
