@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "download", now: true do
+    describe "download" do
       before do
         stub_request(:get, "https://google.com/remoteFile.json").
           to_return(status: 200, body: {status: :ok}.to_json, headers: {})
