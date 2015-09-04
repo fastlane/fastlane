@@ -14,6 +14,7 @@ task :bootstrap do
   box "You are up and running"
 end
 
+desc "Clones all the repositories. Use `bootstrap` if you want to clone + install all gems"
 task :clone do
 	(GEMS + RAILS).each do |repo|
 		if File.directory?repo
@@ -24,22 +25,30 @@ task :clone do
 	end
 end
 
+desc "Run `bundle install` for all the gems."
 task :bundle do
 	GEMS.each do |repo|
 		sh "cd #{repo} && bundle install"
 	end
 end
 
+desc "Run `bundle install` and `rake install` for all the gems."
+task :install => :bundle do
+	GEMS.each do |repo|
+		sh "cd #{repo} && rake install"
+	end
+end
+
+desc "Pulls the latest changes from all the gems repos"
 task :pull do
 	(GEMS + RAILS).each do |repo|
 		sh "cd #{repo} && git pull"
 	end		
 end
 
-task :install => :bundle do
-	GEMS.each do |repo|
-		sh "cd #{repo} && rake install"
-	end		
+desc "Fetches the latest rubocop config from the fastlane main repo"
+task :fetch_rubocop do
+
 end
 
 def box(str)
