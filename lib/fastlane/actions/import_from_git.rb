@@ -37,7 +37,7 @@ module Fastlane
       end
 
       def self.authors
-        ["fabiomassimo", "KrauseFx"]
+        ["fabiomassimo", "KrauseFx", "Liquidsoul"]
       end
 
       def self.is_supported?(platform)
