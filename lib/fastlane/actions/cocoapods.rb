@@ -4,6 +4,8 @@ module Fastlane
       def self.run(params)
         cmd = []
 
+        cmd << ["cd '#{File.dirname(params[:podfile])}' &&"] unless params[:podfile].nil?
+
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
         cmd << ['pod install']
 
@@ -57,7 +59,15 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_USE_BUNDLE_EXEC",
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :podfile,
+                                       env_name: "FL_COCOAPODS_PODFILE",
+                                       description: "Explicitly specify the path to the Cocoapods' Podfile",
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         raise "Could not find Podfile".red unless File.exist?(value) || Helper.test?
+                                       end)
         ]
       end
 
