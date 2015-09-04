@@ -20,8 +20,6 @@ module Fastlane
         # Actions.lane_context[SharedValues::[[NAME_UP]]_CUSTOM_VALUE] = "my_val"
       end
 
-
-
       #####################################################
       # @!group Documentation
       #####################################################
