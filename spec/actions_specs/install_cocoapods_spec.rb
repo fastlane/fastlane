@@ -28,6 +28,16 @@ describe Fastlane do
 
         expect(result).to eq("pod install --no-integrate")
       end
+
+      it "adds no-repo-update to command if repo_update is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            repo_update: false
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod install --no-repo-update")
+      end
     end
   end
 end
