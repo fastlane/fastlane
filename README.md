@@ -45,6 +45,7 @@ git clone https://github.com/fastlane/countdown
 Clone all `fastlane` repos and install development dependencies
 
 ```
+cd countdown
 rake bootstrap
 ```
 
