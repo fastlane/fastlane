@@ -18,6 +18,8 @@ module Fastlane
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
 
+        from = options[:from]
+
         message = options[:message]
         if message_format == "html"
           message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{message[0..9999]}</td></tr></table>"
@@ -29,7 +31,7 @@ module Fastlane
             raise 'HipChat private message not working with API V1 please use API V2 instead'.red
           else
             uri = URI.parse("https://#{api_host}/v1/rooms/message")
-            response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
+            response = Net::HTTP.post_form(uri, { 'from' => from,
                                                   'auth_token' => api_token,
                                                   'color' => color,
                                                   'message_format' => message_format,
@@ -55,7 +57,7 @@ module Fastlane
             check_response_code(response, channel)
           else
             uri = URI.parse("https://#{api_host}/v2/room/#{channel}/notification")
-            response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
+            response = Net::HTTP.post_form(uri, { 'from' => from,
                                                   'auth_token' => api_token,
                                                   'color' => color,
                                                   'message_format' => message_format,
@@ -142,7 +144,12 @@ module Fastlane
                                            Helper.log.fatal "Please specify the message format as either 'html' or 'text'.".red
                                            raise 'Unrecognized message_format.'.red
                                          end
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :from,
+                                       env_name: "FL_HIPCHAT_FROM",
+                                       description: "Name the message will appear be sent from",
+                                       default_value: "fastlane",
+                                       optional: true)
         ]
       end
 
