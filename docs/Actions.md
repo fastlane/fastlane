@@ -1159,7 +1159,7 @@ puts identifier # => com.krausefx.app
 Set a value of a plist file. You can use this action to update the bundle identifier of your app
 
 ```ruby
-get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier', value: "com.krausefx.app.beta")
+set_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier', value: "com.krausefx.app.beta")
 ```
 
 ### say
