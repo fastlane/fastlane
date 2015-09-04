@@ -1,11 +1,20 @@
 
 GEMS = %w[fastlane fastlane_core deliver snapshot frameit pem sigh produce cert codes gym pilot credentials_manager spaceship]
 RAILS = %w[boarding refresher enhancer]
-task :bootstrap => [:init, :install] do	
-	box "You are up and running"
+
+desc "Setup the fastlane development environment"
+task :bootstrap do	
+	if system('which bundle')
+    Rake::Task[:clone].invoke
+    Rake::Task[:install].invoke
+  else
+    raise "Please install bundler using `sudo gem install bundler`"
+  end
+
+  box "You are up and running"
 end
 
-task :init do
+task :clone do
 	(GEMS + RAILS).each do |repo|
 		if File.directory?repo
 			sh "cd #{repo} && git pull"
@@ -35,7 +44,7 @@ end
 
 def box(str)
 	l = str.length + 4
-	puts "=" * l
+	puts "\n=" * l
 	puts "| " + str + " |"
 	puts "=" * l
 end
