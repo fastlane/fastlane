@@ -40,6 +40,15 @@ Style/FileName:
 Style/SpecialGlobalVars:
   Enabled: false
 
+# the let(:key) { ... } should be allowed in tests
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'spec/**/*'
+
+
+
+
+
 ##################
 # TODO
 ##################
