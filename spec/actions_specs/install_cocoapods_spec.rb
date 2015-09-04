@@ -49,6 +49,16 @@ describe Fastlane do
         expect(result).to eq("pod install --silent")
       end
 
+      it "adds verbose to command if verbose is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            verbose: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod install --verbose")
+      end
+
       it "adds no-ansi to command if ansi is set to false" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(

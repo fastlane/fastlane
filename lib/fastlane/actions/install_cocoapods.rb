@@ -43,6 +43,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_COCOAPODS_VERBOSE",
                                        description: "Show more debugging information",
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :ansi,
                                        env_name: "FL_COCOAPODS_ANSI",
