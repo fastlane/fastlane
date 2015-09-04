@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/KrauseFx/fastlane">
-    <img src="https://raw.githubusercontent.com/KrauseFx/fastlane/master/assets/fastlane_text.png" width="150" />
+    <img src="https://raw.githubusercontent.com/KrauseFx/fastlane/master/assets/fastlane_text.png" />
     <br />
     countdown
   </a>
@@ -49,6 +49,8 @@ rake bootstrap
 ```
 
 Before working on something, make sure to have pulled the latest changes
+
+To pull the changes of all repos, go to the `countdown` directory and run
 
 ```
 rake pull
