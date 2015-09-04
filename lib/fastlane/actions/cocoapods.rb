@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "tadpol", "birmacher"]
+        ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
       end
     end
   end
