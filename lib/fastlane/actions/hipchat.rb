@@ -13,12 +13,15 @@ module Fastlane
         api_host = options[:api_host]
 
         notify_room = (options[:notify_room] ? 'true' : 'false')
+        message_format = options[:message_format]
 
         channel = options[:channel]
         color = (options[:success] ? 'green' : 'red')
 
-        the_message = options[:message]
-        message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{the_message[0..9999]}</td></tr></table>"
+        message = options[:message]
+        if message_format == "html"
+          message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{message[0..9999]}</td></tr></table>"
+        end
 
         if api_version.to_i == 1
           ########## running on V1 ##########
@@ -29,7 +32,7 @@ module Fastlane
             response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
                                                   'auth_token' => api_token,
                                                   'color' => color,
-                                                  'message_format' => 'html',
+                                                  'message_format' => message_format,
                                                   'room_id' => channel,
                                                   'message' => message,
                                                   'notify' => notify_room })
@@ -40,7 +43,7 @@ module Fastlane
           ########## running on V2 ##########
           if user?(channel)
             channel.slice!(0)
-            params = { 'message' => message, 'message_format' => 'html' }
+            params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
@@ -55,7 +58,7 @@ module Fastlane
             response = Net::HTTP.post_form(uri, { 'from' => 'fastlane',
                                                   'auth_token' => api_token,
                                                   'color' => color,
-                                                  'message_format' => 'html',
+                                                  'message_format' => message_format,
                                                   'message' => message,
                                                   'notify' => notify_room })
 
@@ -128,7 +131,18 @@ module Fastlane
                                        env_name: "HIPCHAT_API_HOST",
                                        description: "The host of the HipChat-Server API",
                                        default_value: "api.hipchat.com",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :message_format,
+                                       env_name: "FL_HIPCHAT_MESSAGE_FORMAT",
+                                       description: "Format of the message to post. Must be either 'html' or 'text'",
+                                       default_value: "html",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         unless ["html", "text"].include?(value.to_s)
+                                           Helper.log.fatal "Please specify the message format as either 'html' or 'text'.".red
+                                           raise 'Unrecognized message_format.'.red
+                                         end
+                                       end)
         ]
       end
 

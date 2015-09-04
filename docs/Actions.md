@@ -1091,6 +1091,7 @@ Send a message to **room** (by default) or a direct message to **@username** wit
 
   hipchat(
     message: "App successfully released!",
+    message_format: "html or text",
     channel: "Room or @username",
     success: true
   )
