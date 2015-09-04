@@ -1176,6 +1176,22 @@ end
 
 ## Misc
 
+### download
+
+Download a file from a remote server (e.g. JSON file)
+
+```ruby
+data = download(url: "https://host.com/api.json")
+
+# Print information
+puts data["users"].first["name"]
+
+# Iterate
+data["users"].each do |user|
+  puts user["name"]
+end
+```
+
 ### get_info_plist
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
