@@ -46,12 +46,12 @@ Clone all `fastlane` repos and install development dependencies
 
 ```
 cd countdown
-rake bootstrap
+[sudo] rake bootstrap
 ```
 
-Before working on something, make sure to have pulled the latest changes
+If you don't use [rbenv](https://github.com/sstephenson/rbenv) or [rvm](https://rvm.io/) you might need to run `sudo rake bootstrap` to not run into a permission error.
 
-To pull the changes of all repos, go to the `countdown` directory and run
+Before working on something, make sure to have pulled the latest changes. To pull the changes of all repos, go to the `countdown` directory and run
 
 ```
 rake pull
