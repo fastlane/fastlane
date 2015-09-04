@@ -18,6 +18,16 @@ describe Fastlane do
 
         expect(result).to eq("pod install --no-clean")
       end
+
+      it "adds no-integrate to command if integrate is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            integrate: false
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod install --no-integrate")
+      end
     end
   end
 end
