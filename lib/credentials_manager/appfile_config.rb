@@ -41,39 +41,19 @@ module CredentialsManager
     # Setters
 
     def app_identifier(*args, &_block)
-      if block_given?
-        value = yield
-      else
-        value = args.shift
-      end
-      data[:app_identifier] = value if value
+      setter(:app_identifier, *args, &_block)
     end
 
     def apple_id(*args, &_block)
-      if block_given?
-        value = yield
-      else
-        value = args.shift
-      end
-      data[:apple_id] = value if value
+      setter(:apple_id, *args, &_block)
     end
 
     def team_id(*args, &_block)
-      if block_given?
-        value = yield
-      else
-        value = args.shift
-      end
-      data[:team_id] = value if value
+      setter(:team_id, *args, &_block)
     end
 
     def team_name(*args, &_block)
-      if block_given?
-        value = yield
-      else
-        value = args.shift
-      end
-      data[:team_name] = value if value
+      setter(:team_name, *args, &_block)
     end
 
     # Override Appfile configuration for a specific lane.
@@ -110,6 +90,17 @@ module CredentialsManager
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
         block.call
       end
+    end
+
+    private
+
+    def setter(key, *args, &_block)
+      if block_given?
+        value = yield
+      else
+        value = args.shift
+      end
+      data[key] = value if value
     end
   end
 end
