@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/KrauseFx/fastlane">
-    <img src="https://raw.githubusercontent.com/KrauseFx/fastlane/master/assets/fastlane_text.png" />
+    <img src="https://raw.githubusercontent.com/KrauseFx/fastlane/master/assets/fastlane_text.png" width=400 />
     <br />
     countdown
   </a>
