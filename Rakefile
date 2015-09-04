@@ -1,6 +1,9 @@
 
 GEMS = %w[fastlane fastlane_core deliver snapshot frameit pem sigh produce cert codes gym pilot credentials_manager spaceship]
 RAILS = %w[boarding refresher enhancer]
+task :bootstrap => [:init, :install] do	
+	box "You are up and running"
+end
 
 task :init do
 	(GEMS + RAILS).each do |repo|
@@ -28,4 +31,11 @@ task :install => :bundle do
 	GEMS.each do |repo|
 		sh "cd #{repo} && rake install"
 	end		
+end
+
+def box(str)
+	l = str.length + 4
+	puts "=" * l
+	puts "| " + str + " |"
+	puts "=" * l
 end
