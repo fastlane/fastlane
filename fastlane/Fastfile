@@ -118,9 +118,8 @@ end
 
 desc "Get the version number of the last release"
 private_lane :current_version do |options|
-  require 'open-uri'
   puts "Checking the latest version on RubyGems"
-  JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
+  download(url: "https://rubygems.org/api/v1/gems/#{options[:tool]}.json")["version"]
 end
 
 desc "All repos that are still on github.com/KrauseFx"
