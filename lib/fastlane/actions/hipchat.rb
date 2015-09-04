@@ -138,7 +138,7 @@ module Fastlane
                                        default_value: "html",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         if !["html", "text"].include?(value.to_s)
+                                         unless ["html", "text"].include?(value.to_s)
                                            Helper.log.fatal "Please specify the message format as either 'html' or 'text'.".red
                                            raise 'Unrecognized message_format.'.red
                                          end
