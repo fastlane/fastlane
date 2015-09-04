@@ -80,6 +80,16 @@ This will do a few things:
 
 The tests are executed using `fastlane` :rocket:
 
+# rubocop validation
+
+The `fastlane` repos use [rubocop](https://github.com/bbatsov/rubocop) to validate the code style.
+
+The style validation is automatically done when running `rake test`.
+
+To sync the latest `rubocop` rules to all repos, run `rake fetch_rubocop` in the `countdown` directory. Use `rake rubocop` to fetch the latest config and run the rubocop validation for all repos.
+
+The configuration is always directly taken from the local `fastlane` repository..
+
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
 

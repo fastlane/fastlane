@@ -48,12 +48,44 @@ end
 
 desc "Fetches the latest rubocop config from the fastlane main repo"
 task :fetch_rubocop do
+	fl_path = "./fastlane/.rubocop_general.yml"
+	raise "Could not find rubocop configuration in fastlane repository" unless File.exist?(fl_path)
+	rubocop_file = File.read(fl_path)
 
+	GEMS.each do |repo|
+		next if repo == 'fastlane' # we don't want to overwrite the main repo's config
+
+		path = File.join(repo, ".rubocop_general.yml")
+		if File.exist?(path)
+			# we only want to store the file for repos we use rubocop in
+			if File.read(path) != rubocop_file
+				File.write(path, rubocop_file)
+				puts "+ Updated rubocop file #{path}"
+			else
+				puts "- File #{path} unchanged"
+			end
+		end
+	end
+end
+
+desc "Fetch the latest rubocop config and apply&test it for all gems"
+task :rubocop => :fetch_rubocop do
+	GEMS.each do |repo|
+		path = File.join(repo, ".rubocop_general.yml")
+		if File.exist?(path)
+			begin
+				sh "cd #{repo} && rubocop"
+			rescue => ex
+				box "Validation for #{repo} failed"
+			end
+		end
+	end
 end
 
 def box(str)
 	l = str.length + 4
-	puts "\n=" * l
+	puts ""
+	puts "=" * l
 	puts "| " + str + " |"
 	puts "=" * l
 end
