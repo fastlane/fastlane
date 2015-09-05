@@ -4,7 +4,14 @@ module Fastlane
       def self.run(params)
         cmd = []
 
-        cmd << ["cd '#{File.dirname(params[:podfile])}' &&"] unless params[:podfile].nil?
+        unless params[:podfile].nil?
+          if params[:podfile].end_with?('Podfile')
+            podfile_folder = File.dirname(params[:podfile])
+          else
+            podfile_folder = params[:podfile]
+          end
+          cmd << ["cd '#{podfile_folder}' &&"]
+        end
 
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
         cmd << ['pod install']
@@ -62,7 +69,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :podfile,
                                        env_name: "FL_COCOAPODS_PODFILE",
-                                       description: "Explicitly specify the path to the Cocoapods' Podfile",
+                                       description: "Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file",
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|

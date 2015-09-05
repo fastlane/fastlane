@@ -78,6 +78,16 @@ describe Fastlane do
 
         expect(result).to eq("cd 'Project' && pod install")
       end
+
+      it "changes directory if podfile is set to a directory" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            podfile: 'Project'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("cd 'Project' && pod install")
+      end
     end
   end
 end
