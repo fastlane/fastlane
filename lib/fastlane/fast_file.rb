@@ -196,20 +196,20 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        folder = File.join("/tmp", "fl_clones", repo_name)
+        clone_folder = File.join("/tmp", "fl_clones", repo_name)
 
         branch_option = ""
         branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-        clone_command = "git clone '#{url}' '#{folder}' --depth 1 -n #{branch_option}"
+        clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        if File.directory? folder
+        if File.directory? clone_folder
           Helper.log.info "Using existing git repo..."
           begin
-            Actions.sh("cd '#{folder}' && git pull")
+            Actions.sh("cd '#{clone_folder}' && git pull")
           rescue
-            # Something went wrong, clear the folder and pull again
-            Actions.sh("rm -rf '#{folder}'")
+            # Something went wrong, clear the clone_folder and pull again
+            Actions.sh("rm -rf '#{clone_folder}'")
             Actions.sh(clone_command)
           end
         else
@@ -218,19 +218,19 @@ module Fastlane
           Actions.sh(clone_command)
         end
 
-        Actions.sh("cd '#{folder}' && git checkout #{branch} '#{path}'")
+        Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
 
         # We also want to check out all the local actions of this fastlane setup
         containing = path.split(File::SEPARATOR)[0..-2]
         containing = "." if containing.count == 0
         actions_folder = File.join(containing, "actions")
         begin
-          Actions.sh("cd '#{folder}' && git checkout #{branch} '#{actions_folder}'")
+          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
         rescue
           # We don't care about a failure here, as local actions are optional
         end
 
-        import(File.join(folder, path))
+        import(File.join(clone_folder, path))
       end
     end
 
