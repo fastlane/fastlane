@@ -52,7 +52,7 @@ module Fastlane
           Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
         else
           raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
-          end
+        end
       end
 
       def self.description
