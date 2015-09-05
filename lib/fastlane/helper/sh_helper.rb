@@ -30,6 +30,7 @@ module Fastlane
               end
             rescue Errno::EIO
             end
+            Process.wait(pid)
           end
           exit_status = $?.to_i
         rescue PTY::ChildExited => e
