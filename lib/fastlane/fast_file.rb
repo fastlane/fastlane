@@ -203,20 +203,14 @@ module Fastlane
 
         clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        if File.directory? clone_folder
-          Helper.log.info "Using existing git repo..."
-          begin
-            Actions.sh("cd '#{clone_folder}' && git pull")
-          rescue
-            # Something went wrong, clear the clone_folder and pull again
-            Actions.sh("rm -rf '#{clone_folder}'")
-            Actions.sh(clone_command)
-          end
-        else
-          # When this fails, we have to clone the git repo
-          Helper.log.info "Cloning remote git repo..."
-          Actions.sh(clone_command)
+        if Dir.exist? clone_folder
+          # We want to re-clone if the folder already exists
+          Helper.log.info "Deleting existing git repo..."
+          Actions.sh("rm -rf '#{clone_folder}'")
         end
+
+        Helper.log.info "Cloning remote git repo..."
+        Actions.sh(clone_command)
 
         Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
 
