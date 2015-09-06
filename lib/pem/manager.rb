@@ -9,7 +9,7 @@ module PEM
       Spaceship.login(password_manager.username, password_manager.password)
       Spaceship.client.select_team
 
-      existing_certificate = certificate.all.detect do |c| 
+      existing_certificate = certificate.all.detect do |c|
         c.name == PEM.config[:app_identifier]
       end
 
@@ -50,25 +50,22 @@ module PEM
       filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
       if PEM.config[:save_private_key]
-        file = File.new("#{filename_base}.pkey",'w')
-        file.write(pkey.to_pem)
-        file.close
-        Helper.log.info "Private key: ".green + Pathname.new(file).realpath.to_s
+        private_key_path = File.join(PEM.config[:output_path], "#{filename_base}.pkey")
+        File.write(private_key_path, pkey.to_pem)
+        Helper.log.info "Private key: ".green + Pathname.new(private_key_path).realpath.to_s
       end
 
       if PEM.config[:generate_p12]
+        p12_cert_path = File.join(PEM.config[:output_path], "#{filename_base}.p12")
         p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
-        file = File.new("#{filename_base}.p12", 'wb')
-        file.write(p12.to_der)
-        file.close
-        Helper.log.info "p12 certificate: ".green + Pathname.new(file).realpath.to_s
+        File.write(p12_cert_path, p12.to_der)
+        Helper.log.info "p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s
       end
 
-      file = File.new("#{filename_base}.pem", 'w')
-      file.write(x509_certificate.to_pem + pkey.to_pem)
-      file.close
-      Helper.log.info "PEM: ".green + Pathname.new(file).realpath.to_s
-      return file
+      x509_cert_path = File.join(PEM.config[:output_path], "#{filename_base}.pem")
+      File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
+      Helper.log.info "PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s
+      return x509_cert_path
     end
 
     def self.certificate

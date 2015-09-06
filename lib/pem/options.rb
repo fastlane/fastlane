@@ -12,12 +12,12 @@ module PEM
         FastlaneCore::ConfigItem.new(key: :generate_p12,
                                      env_name: "PEM_GENERATE_P12_FILE",
                                      description: "Generate a p12 file additionally to a PEM file",
-                                     is_string: false, 
+                                     is_string: false,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :save_private_key,
                                      short_option: "-s",
                                      env_name: "PEM_SAVE_PRIVATEKEY",
-                                     description: "Set to save the private RSA key in the current directory",
+                                     description: "Set to save the private RSA key",
                                      is_string: false,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :force,
@@ -55,7 +55,12 @@ module PEM
                                      short_option: "-o",
                                      env_name: "PEM_FILE_NAME",
                                      description: "The file name of the generated .pem file",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :output_path,
+                                     # short_option: "-o",
+                                     env_name: "PEM_OUTPUT_PATH",
+                                     description: "The path to a directory in which all certificates and private keys should be stored",
+                                     default_value: ".")
       ]
     end
   end
