@@ -14,14 +14,15 @@ module Fastlane
         Helper.log.info "Will also upload assets #{params[:upload_assets]}.".yellow if params[:upload_assets]
 
         require 'json'
-        body = {
+        body_obj = {
           'tag_name' => params[:tag_name],
-          'target_commitish' => params[:commitish],
           'name' => params[:name],
           'body' => params[:description],
           'draft' => params[:is_draft],
           'prerelease' => params[:is_prerelease]
-        }.to_json
+        }
+        body_obj['target_commitish'] = params[:commitish] if params[:commitish]
+        body = body_obj.to_json
 
         repo_name = params[:repository_name]
         api_token = params[:api_token]
