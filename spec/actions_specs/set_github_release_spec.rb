@@ -3,7 +3,7 @@ describe Fastlane do
     describe "set_github_release" do
       it "sends and receives the right content from GitHub" do
         stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-        with(body: "{\"tag_name\":\"tag33\",\"target_commitish\":\"test\",\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"draft\":\"false\",\"prerelease\":\"false\"}",
+        with(body: "{\"tag_name\":\"tag33\",\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"draft\":\"false\",\"prerelease\":\"false\",\"target_commitish\":\"test\"}",
           headers: {'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-set_github_release'}).
         to_return(status: 201, body: File.read("./spec/fixtures/requests/github_create_release_response.json"), headers: {})
 
@@ -27,7 +27,7 @@ describe Fastlane do
 
       it "returns nil if status code != 201" do
         stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-        with(body: "{\"tag_name\":\"tag33\",\"target_commitish\":\"test\",\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"draft\":\"false\",\"prerelease\":\"false\"}",
+        with(body: "{\"tag_name\":\"tag33\",\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"draft\":\"false\",\"prerelease\":\"false\",\"target_commitish\":\"test\"}",
           headers: {'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-set_github_release'}).
         to_return(status: 422, headers: {})
 
