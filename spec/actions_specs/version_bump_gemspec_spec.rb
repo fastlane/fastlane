@@ -100,7 +100,7 @@ describe Fastlane do
 
       it "gets the version from a gemspec file" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          version_get_gemspec(path: './fastlane/spec/fixtures/gemspecs/1PasswordExtension.podspec')
+          version_get_gemspec(path: './fastlane/spec/fixtures/gemspecs/1PasswordExtensionPodspec')
         end").runner.execute(:test)
 
         expect(result).to eq('1.5.1')
@@ -109,7 +109,7 @@ describe Fastlane do
 
     describe "version_bump_gemspec" do
       before do
-        @gemspec_path = './fastlane/spec/fixtures/gemspecs/1PasswordExtension.podspec'
+        @gemspec_path = './fastlane/spec/fixtures/gemspecs/1PasswordExtensionPodspec'
       end
 
       it "raises an exception when no path is given" do
