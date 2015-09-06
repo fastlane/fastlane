@@ -27,12 +27,8 @@ module Fastlane
       def parse(gemspec_content)
         @gemspec_content = gemspec_content
         @version_match = @version_regex.match(@gemspec_content)
-        raise "Could not find version in gemspec content '#{@gemspec_content}'".red unless !@version_match.nil?
+        raise "Could not find version in gemspec content '#{@gemspec_content}'".red if @version_match.nil?
         @version_value = @version_match[:value]
-      end
-
-      def version_value
-        @version_value
       end
 
       def bump_version(bump_type)
@@ -67,8 +63,7 @@ module Fastlane
 
     class VersionGetGemspecAction < Action
       def self.run(params)
-        gemspec_path = params[:path] rescue nil
-        raise "Please pass a path to the `version_get_gemspec` action".red if gemspec_path.nil?
+        gemspec_path = params[:path]
 
         raise "Could not find gemspec file at path '#{gemspec_path}'".red unless File.exist? gemspec_path
 
@@ -90,7 +85,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_VERSION_GEMSPEC_PATH",
                                        description: "You must specify the path to the gemspec file",
-                                       default_value: nil)
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a path to the `version_get_gemspec` action".red if value.length == 0
+                                       end)
         ]
       end
 
@@ -111,8 +109,7 @@ module Fastlane
 
     class VersionBumpGemspecAction < Action
       def self.run(params)
-        gemspec_path = params[:path] rescue nil
-        raise "Please pass a path to the `version_bump_gemspec` action".red if gemspec_path.nil?
+        gemspec_path = params[:path]
 
         raise "Could not find gemspec file at path #{gemspec_path}".red unless File.exist? gemspec_path
 
@@ -141,7 +138,7 @@ module Fastlane
         [
           "You can use this action to manipulate any 'version' variable contained in a ruby file.",
           "For example, you can use it to bump the version of a cocoapods' podspec file."
-          ].join("\n")
+        ].join("\n")
       end
 
       def self.available_options
@@ -149,7 +146,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_VERSION_BUMP_GEMSPEC_PATH",
                                        description: "You must specify the path to the gemspec file to update",
-                                       default_value: nil),
+                                       verify_block: proc do |value|
+                                         raise "Please pass a path to the `version_bump_gemspec` action".red if value.length == 0
+                                       end),
           FastlaneCore::ConfigItem.new(key: :bump_type,
                                        env_name: "FL_VERSION_BUMP_GEMSPEC_BUMP_TYPE",
                                        description: "The type of this version bump. Available: patch, minor, major",
