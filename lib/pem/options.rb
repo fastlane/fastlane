@@ -57,7 +57,7 @@ module PEM
                                      description: "The file name of the generated .pem file",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :output_path,
-                                     # short_option: "-o",
+                                     short_option: "-l",
                                      env_name: "PEM_OUTPUT_PATH",
                                      description: "The path to a directory in which all certificates and private keys should be stored",
                                      default_value: ".")
