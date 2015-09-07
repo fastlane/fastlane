@@ -162,7 +162,7 @@ module Spaceship
                     InHouse
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
-          end
+                  end
 
           attrs['appId'] = App.factory(attrs['appId'])
           attrs['devices'].map! { |device| Device.factory(device) }

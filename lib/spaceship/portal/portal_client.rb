@@ -150,7 +150,7 @@ module Spaceship
                          wildcardIdentifier: bundle_id,
                          appIdentifierString: bundle_id
                        }
-      end
+                     end
 
       params = {
         appIdName: name,
