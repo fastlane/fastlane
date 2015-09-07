@@ -199,6 +199,11 @@ module Snapshot
     def parse_test_line(line)
       if line =~ /.*Target failed to run.*/
         return :retry
+      elsif line.include?"segmentation fault" # a new bug introduced with Xcode 7
+        return :retry
+      elsif line.include?"Timed out waiting" # a new bug introduced with Xcode 7
+        `killall "iOS Simulator"`
+        return :retry
       elsif line.include?"Screenshot captured"
         return :screenshot
       elsif line.include? "Instruments wants permission to analyze other processes"
