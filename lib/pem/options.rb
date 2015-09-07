@@ -34,10 +34,7 @@ module PEM
                                      short_option: "-u",
                                      env_name: "PEM_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
-                                     verify_block: Proc.new do |value|
-                                       CredentialsManager::PasswordManager.shared_manager(value)
-                                     end),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id))
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "PEM_TEAM_ID",
