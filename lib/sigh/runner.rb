@@ -7,7 +7,7 @@ module Sigh
     # Uses the spaceship to create or download a provisioning profile
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
-      Helper.log.info "Starting login"
+      Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
@@ -72,7 +72,7 @@ module Sigh
           file = Tempfile.new('cert')
           file.write(cert.download_raw)
           file.close
-          installed = true if FastlaneCore::CertChecker.is_installed?(file.path)
+          installed = true if FastlaneCore::CertChecker.installed?(file.path)
         end
         installed
       end
