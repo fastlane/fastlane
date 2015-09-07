@@ -188,5 +188,14 @@ describe CredentialsManager do
         ENV.delete("DELIVER_USER")
       end
     end
+
+    describe "No Appfile" do
+      it "prefills information from the environment variable" do
+        env_name = "User@#{Time.now.to_i}"
+        ENV["DELIVER_USER"] = env_name
+        expect(CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)).to eq(env_name)
+        ENV.delete("DELIVER_USER")
+      end
+    end
   end
 end

@@ -3,13 +3,11 @@ module CredentialsManager
   class AppfileConfig
 
     def self.try_fetch_value(key)
-      if self.default_path
-        begin
-          return self.new.data[key]
-        rescue => ex
-          puts ex.to_s
-          return nil
-        end
+      begin
+        return self.new.data[key]
+      rescue => ex
+        puts ex.to_s
+        return nil
       end
       nil
     end
@@ -22,15 +20,19 @@ module CredentialsManager
     end
 
     def initialize(path = nil)
+      if path
+        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
+      end
+
       path ||= self.class.default_path
 
-      raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
-
-      full_path = File.expand_path(path)
-      Dir.chdir(File.expand_path('..', path)) do
-        # rubocop:disable Lint/Eval
-        eval(File.read(full_path))
-        # rubocop:enable Lint/Eval
+      if path and File.exist?(path) # it might not exist, we still want to use the default values
+        full_path = File.expand_path(path)
+        Dir.chdir(File.expand_path('..', path)) do
+          # rubocop:disable Lint/Eval
+          eval(File.read(full_path))
+          # rubocop:enable Lint/Eval
+        end
       end
 
       fallback_to_default_values
