@@ -1,6 +1,6 @@
 require 'pty'
 require 'shellwords'
-require 'credentials_manager/password_manager'
+require 'credentials_manager/account_manager'
 
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
@@ -30,10 +30,11 @@ module FastlaneCore
 
     # Returns a new instance of the iTunesTransporter.
     # If no username or password given, it will be taken from
-    # the #{CredentialsManager::PasswordManager}
+    # the #{CredentialsManager::AccountManager}
     def initialize(user = nil, password = nil)
-      @user = (user || CredentialsManager::PasswordManager.shared_manager.username)
-      @password = (password || CredentialsManager::PasswordManager.shared_manager.password)
+      data = CredentialsManager::AccountManager.new(user: user, password: password)
+      @user = data.user
+      @password = data.password
     end
 
     # Downloads the latest version of the app metadata package from iTC.
@@ -146,7 +147,10 @@ module FastlaneCore
         if $1.include? "Your Apple ID or password was entered incorrectly" or
            $1.include? "This Apple ID has been locked for security reasons"
 
-          CredentialsManager::PasswordManager.shared_manager.password_seems_wrong unless Helper.is_test?
+          unless Helper.is_test?
+            CredentialsManager::AccountManager.new(user: @user).invalid_credentials
+            Helper.log.fatal "Please run this tool again to apply the new password"
+          end
         elsif $1.include? "Redundant Binary Upload. There already exists a binary upload with build"
           Helper.log.fatal $1
           Helper.log.fatal "You have to change the build number of your app to upload your ipa file"
