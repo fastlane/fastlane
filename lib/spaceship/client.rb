@@ -76,7 +76,6 @@ module Spaceship
     # /tmp/spaceship[time].log by default
     def logger
       unless @logger
-        # rubocop:disable Style/GlobalVars
         if $verbose || ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
@@ -84,7 +83,6 @@ module Spaceship
           path = "/tmp/spaceship#{Time.now.to_i}.log"
           @logger = Logger.new(path)
         end
-        # rubocop:enable Style/GlobalVars
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
           "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"

@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ClassLength
 module Spaceship
   class TunesClient < Spaceship::Client
 
@@ -450,3 +451,4 @@ module Spaceship
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
