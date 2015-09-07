@@ -5,9 +5,10 @@ module PEM
   # Creates the push profile and stores it in the correct location
   class Manager
     def self.start
-      password_manager = CredentialsManager::PasswordManager.shared_manager
-      Spaceship.login(password_manager.username, password_manager.password)
+      Helper.log.info "Starting login with user '#{PEM.config[:username]}'"
+      Spaceship.login(PEM.config[:username], nil)
       Spaceship.client.select_team
+      Helper.log.info "Successfully logged in"
 
       existing_certificate = certificate.all.detect do |c|
         c.name == PEM.config[:app_identifier]
