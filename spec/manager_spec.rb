@@ -34,6 +34,9 @@ describe PEM do
       FileUtils.rm_r("tmp")
       File.delete("production_com.krausefx.app.pem")
       File.delete("production_com.krausefx.app.pkey")
+
+      ENV.delete("DELIVER_USER")
+      ENV.delete("DELIVER_PASSWORD")
     end
   end
 end
