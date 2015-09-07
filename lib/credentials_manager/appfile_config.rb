@@ -32,6 +32,12 @@ module CredentialsManager
         eval(File.read(full_path))
         # rubocop:enable Lint/Eval
       end
+
+      fallback_to_default_values
+    end
+
+    def fallback_to_default_values
+      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"]
     end
 
     def data
