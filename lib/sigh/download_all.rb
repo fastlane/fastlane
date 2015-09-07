@@ -2,7 +2,7 @@ module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
     def download_all
-      Helper.log.info "Starting login"
+      Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
