@@ -115,10 +115,10 @@ module Snapshot
     # This has to be done after parsing the Snapfile (iOS version)
     def set_default_simulators
       self.devices ||= [
-        "iPhone 6 (#{self.ios_version} Simulator)",
-        "iPhone 6 Plus (#{self.ios_version} Simulator)",
-        "iPhone 5 (#{self.ios_version} Simulator)",
-        "iPhone 4s (#{self.ios_version} Simulator)"
+        "iPhone 6" + version_suffix(self.ios_version),
+        "iPhone 6 Plus" + version_suffix(self.ios_version),
+        "iPhone 5" + version_suffix(self.ios_version),
+        "iPhone 4s" + version_suffix(self.ios_version),
       ]
     end
 
@@ -128,12 +128,12 @@ module Snapshot
 
       actual_devices = []
       self.devices.each do |current|
-        current += " (#{self.ios_version} Simulator)" unless current.include?"Simulator"
+        current += version_suffix(self.ios_version) unless current.include? " ("
 
-        unless Simulators.available_devices.include?current
-          raise "Device '#{current}' not found. Available device types: #{Simulators.available_devices}".red
-        else
+        if Simulators.available_devices.include? current
           actual_devices << current
+        else
+          raise "Device '#{current}' not found. Available device types: #{Simulators.available_devices}".red
         end
       end
       self.devices = actual_devices
@@ -217,6 +217,16 @@ module Snapshot
         end
       rescue => ex
         raise "Could not fetch available schemes: #{ex}".red
+      end
+    end
+
+    def version_suffix version
+      # Xcode 6 and before: "iPhone 5 (8.0 Simulator)"
+      # Xcode 7 and later: "iPhone 6 (9.0)"
+      if LatestIosVersion.version.to_i >= 9
+        " (#{version})"
+      else
+        " (#{version} Simulator)"
       end
     end
   end
