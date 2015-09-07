@@ -9,7 +9,9 @@ module Pilot
                                                  ipa_path: config[:ipa],
                                              package_path: "/tmp")
 
-      result = FastlaneCore::ItunesTransporter.new.upload(app.apple_id, package_path)
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      result = transporter.upload(app.apple_id, package_path)
+
       if result
         Helper.log.info "Successfully uploaded the new binary to iTunes Connect"
 
