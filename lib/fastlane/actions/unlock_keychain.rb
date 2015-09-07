@@ -44,15 +44,13 @@ module Fastlane
         possible_locations << "~/Library/Keychains/#{@keychain_path}"
         possible_locations << "~/Library/Keychains/#{@keychain_path}.keychain"
 
-        for location in possible_locations
+        possible_locations.each do |location|
           expaded_location = File.expand_path(location)
           if File.exist?(expaded_location)
             @keychain_path = expaded_location
             return true
           end
         end
-
-        return false
       end
 
       #####################################################
@@ -70,8 +68,8 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_UNLOCK_KEYCHAIN_PATH", # The name of the environment variable
-                                       description: "Path to the Keychain file", # a short description of this parameter
+                                       env_name: "FL_UNLOCK_KEYCHAIN_PATH",
+                                       description: "Path to the Keychain file",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",
@@ -80,8 +78,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
                                        env_name: "FL_UNLOCK_KEYCHAIN_ADD_TO_SEARCH_LIST",
                                        description: "Add to keychain search list",
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: true) # the default value if the user didn't provide one
+                                       is_string: false,
+                                       default_value: true)
 
         ]
       end
