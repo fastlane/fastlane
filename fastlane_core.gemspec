@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1' # needed for parsing provisioning profiles
 
-  spec.add_dependency 'credentials_manager', '>= 0.7.2' # fastlane password manager
+  spec.add_dependency 'credentials_manager', '>= 0.8.0', '< 1.0.0' # fastlane password manager
 
   # Frontend Scripting
   spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
