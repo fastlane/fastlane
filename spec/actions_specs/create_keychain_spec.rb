@@ -1,20 +1,124 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Unlock keychain Integration" do
+    describe "Create keychain Integration" do
 
-      it "works with path and password and existing keychain" do
-        expanded_path = File.expand_path("~/Library/Keychains/login.keychain")
-
+      it "works with name and password" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          unlock_keychain ({
-            path: '#{expanded_path}',
+          create_keychain ({
+            name: 'test.keychain',
             password: 'testpassword',
           })
         end").runner.execute(:test)
 
         expect(result.size).to eq 2
-        expect(result[0]).to eq "security unlock-keychain -p testpassword #{expanded_path}"
-        expect(result[1]).to eq "security set-keychain-settings #{expanded_path}"
+        expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
+
+        expect(result[1]).to start_with 'security set-keychain-settings'
+        expect(result[1]).to include '-t 300'
+        expect(result[1]).to_not include '-l'
+        expect(result[1]).to_not include '-u'
+        expect(result[1]).to include '~/Library/Keychains/test.keychain'
+      end
+
+      it "works with name and password that contain spaces or `\"`" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: '\"test password\"',
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 2
+        expect(result[0]).to eq %(security create-keychain -p \\\"test\\ password\\\" test.keychain)
+      end
+
+      it "works with keychain-settings and name and password" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: 'testpassword',
+            timeout: 600,
+            lock_when_sleeps: true,
+            lock_after_timeout: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 2
+        expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
+
+        expect(result[1]).to start_with 'security set-keychain-settings'
+        expect(result[1]).to include '-t 600'
+        expect(result[1]).to include '-l'
+        expect(result[1]).to include '-u'
+        expect(result[1]).to include '~/Library/Keychains/test.keychain'
+      end
+
+      it "works with default_keychain and name and password" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: 'testpassword',
+            default_keychain: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 3
+        expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
+
+        expect(result[1]).to eq 'security default-keychain -s test.keychain'
+
+        expect(result[2]).to start_with 'security set-keychain-settings'
+        expect(result[2]).to include '-t 300'
+        expect(result[2]).to_not include '-l'
+        expect(result[2]).to_not include '-u'
+        expect(result[2]).to include '~/Library/Keychains/test.keychain'
+      end
+
+      it "works with unlock and name and password" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: 'testpassword',
+            unlock: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 3
+        expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
+
+        expect(result[1]).to eq 'security unlock-keychain -p testpassword test.keychain'
+
+        expect(result[2]).to start_with 'security set-keychain-settings'
+        expect(result[2]).to include '-t 300'
+        expect(result[2]).to_not include '-l'
+        expect(result[2]).to_not include '-u'
+        expect(result[2]).to include '~/Library/Keychains/test.keychain'
+      end
+
+      it "works with all params" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: 'testpassword',
+            default_keychain: true,
+            unlock: true,
+            timeout: 600,
+            lock_when_sleeps: true,
+            lock_after_timeout: true,
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq 4
+        expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
+
+        expect(result[1]).to eq 'security default-keychain -s test.keychain'
+        expect(result[2]).to eq 'security unlock-keychain -p testpassword test.keychain'
+
+        expect(result[3]).to start_with 'security set-keychain-settings'
+        expect(result[3]).to include '-t 600'
+        expect(result[3]).to include '-l'
+        expect(result[3]).to include '-u'
+        expect(result[3]).to include '~/Library/Keychains/test.keychain'
       end
     end
   end
