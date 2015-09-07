@@ -2,19 +2,19 @@ module Fastlane
   module Actions
     class UnlockKeychainAction < Action
       def self.run(params)
-        @keychain_path = params[:path]
+        keychain_path = self.expand_keychain_path(params[:path])
         add_to_search_list = params[:add_to_search_list]
 
-        if !keychainfile_exists?
-          raise "Could not find the keychain file: #{@keychain_path}".red
+        if keychain_path.empty?
+          raise "Could not find the keychain file: #{keychain_path}".red
         end
 
         # add to search list if not already added
         if add_to_search_list
-          add_keychain_to_search_list
+          add_keychain_to_search_list(keychain_path)
         end
 
-        escaped_path = @keychain_path.shellescape
+        escaped_path = keychain_path.shellescape
         escaped_password = params[:password].shellescape
 
         commands = []
@@ -24,33 +24,34 @@ module Fastlane
         commands
       end
 
-      def self.add_keychain_to_search_list
-        escaped_path = @keychain_path.shellescape
+      def self.add_keychain_to_search_list(keychain_path)
+        escaped_path = keychain_path.shellescape
 
         result = Fastlane::Actions.sh("security list-keychains", log: false)
 
         # add the keychain to the keychains list
-        # the basic strategy is to open the keychain file it with Keychain Access
-        if !result.include?(@keychain_path)
+        # the basic strategy is to open the keychain file with Keychain Access
+        unless result.include?(keychain_path)
           commands = []
           commands << Fastlane::Actions.sh("open #{escaped_path}")
           commands
         end
       end
 
-      def self.keychainfile_exists?
+      def self.expand_keychain_path(keychain_path)
         possible_locations = []
-        possible_locations << @keychain_path
-        possible_locations << "~/Library/Keychains/#{@keychain_path}"
-        possible_locations << "~/Library/Keychains/#{@keychain_path}.keychain"
+        possible_locations << keychain_path
+        possible_locations << "~/Library/Keychains/#{keychain_path}"
+        possible_locations << "~/Library/Keychains/#{keychain_path}.keychain"
 
         possible_locations.each do |location|
-          expaded_location = File.expand_path(location)
-          if File.exist?(expaded_location)
-            @keychain_path = expaded_location
-            return true
+          expanded_location = File.expand_path(location)
+          if File.exist?(expanded_location)
+            return expanded_location
           end
         end
+
+        return ""
       end
 
       #####################################################
@@ -62,7 +63,7 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the give keychain file and it adds it to the keychain search list."
+        "Unlocks the give keychain file and adds it to the keychain search list."
       end
 
       def self.available_options
