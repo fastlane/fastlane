@@ -8,7 +8,7 @@ module Cert
     end
 
     def run
-      Helper.log.info "Starting login"
+      Helper.log.info "Starting login with user '#{Cert.config[:username]}'"
       Spaceship.login(Cert.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
