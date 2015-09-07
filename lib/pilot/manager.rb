@@ -40,6 +40,7 @@ module Pilot
 
       if config[:app_identifier]
         @app ||= Spaceship::Application.find(config[:app_identifier])
+        raise "Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}'".red unless @app
         app_id ||= @app.apple_id
       end
 
