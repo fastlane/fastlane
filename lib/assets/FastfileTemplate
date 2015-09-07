@@ -27,6 +27,7 @@ platform :ios do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
 
     cocoapods
+    carthage
 
     # increment_build_number
 

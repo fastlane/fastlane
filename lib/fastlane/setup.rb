@@ -88,6 +88,7 @@ module Fastlane
       @tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
       @tools[:xctool] = File.exist?(File.join(File.expand_path('..', folder), '.xctool-args'))
       @tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
+      @tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
       @tools[:sigh] = false
     end
 
@@ -137,7 +138,8 @@ module Fastlane
       template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
       template.gsub!('sigh', '# sigh') unless @tools[:sigh]
       template.gsub!('xctool', '# xctool') unless @tools[:xctool]
-      template.gsub!('cocoapods', '# cocoapods') unless @tools[:cocoapods]
+      template.gsub!('cocoapods', '') unless @tools[:cocoapods]
+      template.gsub!('carthage', '') unless @tools[:carthage]
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
       @tools.each do |key, value|
