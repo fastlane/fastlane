@@ -170,5 +170,23 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile8').data[:team_id]).to eq('TEAMID')
       end
     end
+
+    describe "Appfile9" do
+      it "falls back to environment variable `FASTLANE_USER` for the username" do
+        env_name = "User@#{Time.now.to_i}"
+        ENV["FASTLANE_USER"] = env_name
+        ENV["DELIVER_USER"] = "This shouldn't be the value, as fastlane is more important"
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile9').data[:apple_id]).to eq(env_name)
+        ENV.delete("FASTLANE_USER")
+        ENV.delete("DELIVER_USER")
+      end
+
+      it "falls back to environment variable `DELIVER_USER` for the username" do
+        env_name = "User@#{Time.now.to_i}"
+        ENV["DELIVER_USER"] = env_name
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile9').data[:apple_id]).to eq(env_name)
+        ENV.delete("DELIVER_USER")
+      end
+    end
   end
 end
