@@ -175,7 +175,7 @@ module Produce
     def app
       return @app if @app
 
-      Helper.log.info "Starting login"
+      Helper.log.info "Starting login with user '#{Produce.config[:username]}'"
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
