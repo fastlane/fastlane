@@ -9,10 +9,7 @@ module Produce
                                      short_option: "-u",
                                      env_name: "PRODUCE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
-                                     verify_block: Proc.new do |value|
-                                       CredentialsManager::PasswordManager.shared_manager(value)
-                                     end),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
