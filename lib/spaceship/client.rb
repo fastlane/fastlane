@@ -140,7 +140,7 @@ module Spaceship
     def login(user = nil, password = nil)
       if user.to_s.empty? or password.to_s.empty?
         require 'credentials_manager'
-        data = CredentialsManager::PasswordManager.shared_manager(user, false)
+        data = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= data.username
         password = data.password
       end
