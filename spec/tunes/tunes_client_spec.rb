@@ -8,12 +8,6 @@ describe Spaceship::TunesClient do
       end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError, "Invalid username and password combination. Used 'bad-username' as the username.")
     end
 
-    it "raises an exception if no login data is provided at all" do
-      expect do
-        subject.login('', '')
-      end.to raise_exception(Spaceship::Client::NoUserCredentialsError, "No login data provided")
-    end
-
     it "raises a different exception if the server doesn't respond with any cookies" do
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1").
          with(body: {"theAccountName" => "user", "theAccountPW" => "password"},
