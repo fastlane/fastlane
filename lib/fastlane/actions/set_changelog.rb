@@ -84,10 +84,7 @@ module Fastlane
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: ENV["DELIVER_USER"] || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id),
-                                     verify_block: proc do |value|
-                                       CredentialsManager::PasswordManager.shared_manager(value)
-                                     end),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_SET_CHANGELOG_VERSION",
                                        description: "The version number to create/update",
