@@ -22,6 +22,11 @@ describe CredentialsManager do
           expect(CredentialsManager::PasswordManager.new.password).to eq(password)
         end
       end
+
+      after do
+        ENV.delete("DELIVER_USER")
+        ENV.delete("DELIVER_PASSWORD")
+      end
     end
   end
 end
