@@ -1,5 +1,5 @@
 require 'plist'
-require 'sigh/spaceship/runner'
+require 'sigh/runner'
 
 module Sigh
   class Manager
