@@ -22,10 +22,15 @@ module Snapshot
 
       output.split("\n").each do |current|
         # Example: "iPhone 5 (8.1 Simulator) [C49ECC4A-5A3D-44B6-B9BF-4E25BC326400]"
+        # Example: "iPhone 6 (9.0) [072E4EA2-861F-44CD-AB77-FB1FE07E541C]"
+        
+        match = current.match /((.+?) \(.+?\)) \[.+?\]/
+        next if match.nil?
+        
         if name_only
-          result << current.split(' (').first if current.include?"Simulator"
+          result << match[2]
         else
-          result << current.split(' [').first if current.include?"Simulator"
+          result << match[1]
         end
       end
 
