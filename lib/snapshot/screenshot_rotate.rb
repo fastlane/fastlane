@@ -5,7 +5,7 @@ module Snapshot
   class ScreenshotRotate
     # @param (String) The path in which the screenshots are located in
     def run(path)
-      Helper.log.debug "Going to rotate screenshots from generated png files"
+      Helper.log.debug "Rotating the screenshots (if necessary)"
       rotate(path)
     end
 
