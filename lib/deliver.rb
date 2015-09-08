@@ -20,9 +20,13 @@ require 'spaceship'
 require 'fastlane_core'
 
 module Deliver
-  class << self
-    attr_accessor :username
-  end
+	class << self
+		attr_accessor :username
 
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+		def username
+			@username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+		end
+	end
+
+	Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 end

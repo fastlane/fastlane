@@ -13,6 +13,7 @@ require 'webmock/rspec'
 # Own mocking code
 require 'mocking/webmocking'
 require 'mocking/transporter_mocking'
+require 'mocking/spaceship_mocking'
 
 
 ENV["DELIVER_USER"] = "DELIVERUSER"

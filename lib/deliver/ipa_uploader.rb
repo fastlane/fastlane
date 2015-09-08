@@ -36,12 +36,12 @@ module Deliver
 
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def fetch_app_identifier
-      return IpaFileAnalyser.fetch_app_identifier(@ipa_file.path)
+      return FastlaneCore::IpaFileAnalyser.fetch_app_identifier(@ipa_file.path)
     end
 
     # Fetches the app version from the given ipa file.
     def fetch_app_version
-      return IpaFileAnalyser.fetch_app_version(@ipa_file.path)
+      return FastlaneCore::IpaFileAnalyser.fetch_app_version(@ipa_file.path)
     end
 
 

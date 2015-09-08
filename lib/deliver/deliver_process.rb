@@ -361,6 +361,8 @@ module Deliver
     end
 
     def additional_itc_information
+      return if Helper.test?
+      
       k = Deliverer::ValKey
       d = @deploy_information
       v = app.spaceship_ref.edit_version

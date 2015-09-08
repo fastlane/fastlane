@@ -3,6 +3,7 @@ WebMock.disable_net_connect!(:allow => 'codeclimate.com')
 # iTunes Lookup API
 RSpec.configure do |config|
   config.before(:each) do
+    stub_spaceship
 
     # iTunes Lookup API by Apple ID
     ["invalid", "", 0, '284882215'].each do |current|
