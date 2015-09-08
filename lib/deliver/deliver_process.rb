@@ -26,6 +26,8 @@ module Deliver
 
     def run
       begin
+        Spaceship::Tunes.login(Deliver.username)
+
         fetch_information_from_ipa_file
         pre_load_default_values
 

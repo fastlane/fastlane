@@ -52,7 +52,7 @@ module Deliver
       end
 
       def run_deliver(options)
-        set_username(options.username)
+        set_username(options.username, false)
 
         path = (Deliver::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
@@ -63,6 +63,7 @@ module Deliver
           else
             Deliver::Helper.log.warn("No Deliverfile found at path '#{deliver_path}'.")
             if agree("Do you want to create a new Deliverfile at the current directory? (y/n)", true)
+              set_username(options.username)
               Deliver::DeliverfileCreator.create(enclosed_directory)
             end
           end
@@ -115,15 +116,16 @@ module Deliver
         end
       end
 
-      def set_username(username)
-        user = username
-        user ||= ENV["DELIVER_USERNAME"]
-        user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-        CredentialsManager::PasswordManager.shared_manager(user) if user
-
-        Helper.log.info "Login to iTunes Connect"
-        Spaceship::Tunes.login(user, CredentialsManager::PasswordManager.shared_manager(user).password)
-        Helper.log.info "Login successful"
+      # Temporary: replace this once switching to the new config manager
+      # @param login: Should the login method of spaceship be called? This is true by default
+      #   it's not used when a Deliverfile is used for the deployment
+      def set_username(username, login = true)
+        Deliver.username = username || CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+        
+        if login
+          Deliver.username ||= CredentialsManager::AccountManager.new.user
+          Spaceship::Tunes.login(Deliver.username) if login
+        end
       end
 
       def determine_ipa

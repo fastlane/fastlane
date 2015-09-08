@@ -299,7 +299,7 @@ module Deliver
       # @return (Deliver::ItunesTransporter) The iTunesTransporter which is
       #  used to upload/download the app metadata.
       def transporter
-        @transporter ||= ItunesTransporter.new
+        @transporter ||= ItunesTransporter.new(Deliver.username)
       end
 
       def update_localized_value(xpath_name, new_value)
