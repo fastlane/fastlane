@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-  spec.add_dependency 'fastlane_core', '>= 0.7.2' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.16.1', '< 1.0.0' # all shared code and dependencies
   
 
   # Development only

@@ -26,6 +26,8 @@ class SnapshotApplication
     global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
     global_option('--verbose', 'Shows more output including all output printed by Instruments.') { $verbose = true }
 
+    always_trace!
+
     command :run do |c|
       c.syntax = 'snapshot'
       c.description = 'Take new screenshots based on the Snapfile.'
