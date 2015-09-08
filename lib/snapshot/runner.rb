@@ -109,11 +109,12 @@ module Snapshot
       udid = udid_for_simulator(device)
 
       com("killall 'iOS Simulator'")
+      com("killall 'Simulator'")
       sleep 3
       com("xcrun simctl boot '#{udid}'")
-      com("xcrun simctl uninstall booted '#{app_identifier}'")
+      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
       sleep 3
-      com("xcrun simctl install booted '#{@app_path.shellescape}'")
+      com("xcrun simctl install '#{udid}' #{@app_path.shellescape}")
       com("xcrun simctl shutdown booted")
     end
 
