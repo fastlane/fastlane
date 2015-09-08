@@ -230,6 +230,26 @@ create_keychain(
 )
 ```
 
+### `unlock_keychain`
+
+Unlock an existing keychain and add it to the keychain search list.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret"
+)
+```
+
+If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
+
+```ruby
+unlock_keychain(
+  path: "KeychainName",
+  password: "mysecret"
+)
+```
+
 ### `delete_keychain`
 
 Delete a keychain, can be used after creating one with `create_keychain`.
@@ -1091,7 +1111,7 @@ Send a message to **room** (by default) or a direct message to **@username** wit
 
   hipchat(
     message: "App successfully released!",
-    message_format: "html or text",
+    message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
     success: true
   )
@@ -1175,6 +1195,22 @@ end
 ```
 
 ## Misc
+
+### download
+
+Download a file from a remote server (e.g. JSON file)
+
+```ruby
+data = download(url: "https://host.com/api.json")
+
+# Print information
+puts data["users"].first["name"]
+
+# Iterate
+data["users"].each do |user|
+  puts user["name"]
+end
+```
 
 ### get_info_plist
 

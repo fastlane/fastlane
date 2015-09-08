@@ -100,7 +100,7 @@ private_lane :validate_repo do |options|
   # 
   binary_path = "../../#{tool_name}/bin/#{tool_name}"
   unless no_binary.include?tool_name
-    content = sh "#{binary_path} --help"
+    content = `#{binary_path} --help` # not using `sh` here as it doesn't go out of the help screen
     ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
       raise "--help missing information: '#{current}'" unless content.include?current
     end
@@ -118,9 +118,8 @@ end
 
 desc "Get the version number of the last release"
 private_lane :current_version do |options|
-  require 'open-uri'
   puts "Checking the latest version on RubyGems"
-  JSON.parse(open("https://rubygems.org/api/v1/gems/#{options[:tool]}.json").read)["version"]
+  download(url: "https://rubygems.org/api/v1/gems/#{options[:tool]}.json")["version"]
 end
 
 desc "All repos that are still on github.com/KrauseFx"
@@ -135,7 +134,7 @@ end
 
 desc "All repos that have rubocop enabled" 
 private_lane :rubocop_repos do
-  ['fastlane', 'spaceship', 'gym', 'fastlane_core']
+  ['fastlane', 'spaceship', 'gym', 'fastlane_core', 'credentials_manager', 'codes']
 end
 
 desc "Detects the name of the tool based on the current directory" 

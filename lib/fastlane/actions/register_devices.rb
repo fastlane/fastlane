@@ -15,8 +15,8 @@ module Fastlane
         devices = params[:devices]
         devices_file = params[:devices_file]
 
-        credentials = CredentialsManager::PasswordManager.shared_manager(params[:username])
-        Spaceship::Portal.login(credentials.username, credentials.password)
+        credentials = CredentialsManager::AccountManager.new(user: params[:username])
+        Spaceship::Portal.login(credentials.user, credentials.password)
 
         if devices
           device_objs = devices.map do |k, v|

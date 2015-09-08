@@ -4,6 +4,15 @@ module Fastlane
       def self.run(params)
         cmd = []
 
+        unless params[:podfile].nil?
+          if params[:podfile].end_with?('Podfile')
+            podfile_folder = File.dirname(params[:podfile])
+          else
+            podfile_folder = params[:podfile]
+          end
+          cmd << ["cd '#{podfile_folder}' &&"]
+        end
+
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
         cmd << ['pod install']
 
@@ -26,32 +35,46 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "FL_COCOAPODS_CLEAN",
                                        description: "Remove SCM directories",
+                                       is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :integrate,
                                        env_name: "FL_COCOAPODS_INTEGRATE",
                                        description: "Integrate the Pods libraries into the Xcode project(s)",
+                                       is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :repo_update,
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Run `pod repo update` before install",
+                                       is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Show nothing",
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_COCOAPODS_VERBOSE",
                                        description: "Show more debugging information",
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :ansi,
                                        env_name: "FL_COCOAPODS_ANSI",
                                        description: "Show output with ANSI codes",
+                                       is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                        env_name: "FL_COCOAPODS_USE_BUNDLE_EXEC",
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :podfile,
+                                       env_name: "FL_COCOAPODS_PODFILE",
+                                       description: "Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file",
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         raise "Could not find Podfile".red unless File.exist?(value) || Helper.test?
+                                       end)
         ]
       end
 
@@ -60,7 +83,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "tadpol", "birmacher"]
+        ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
       end
     end
   end
