@@ -51,7 +51,7 @@ module Snapshot
         break if errors.any? && ENV["SNAPSHOT_BREAK_ON_FIRST_ERROR"]
       end
 
-      `killall "iOS Simulator"` # close the simulator after the script is finished
+      kill_simulator # close the simulator after the script is finished
 
       return unless take_snapshots
 
@@ -108,8 +108,7 @@ module Snapshot
 
       udid = udid_for_simulator(device)
 
-      com("killall 'iOS Simulator'")
-      com("killall 'Simulator'")
+      kill_simulator
       sleep 3
       com("xcrun simctl boot '#{udid}'")
       com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
@@ -220,6 +219,11 @@ module Snapshot
       elsif line.include?"__NSPlaceholderDictionary initWithObjects:forKeys:count:]: attempt to insert nil object"
         raise "Looks like something is wrong with the used app. Make sure the build was successful."
       end
+    end
+
+    def kill_simulator
+      `killall "iOS Simulator"`
+      `killall "Simulator"`
     end
 
     def copy_screenshots(language)
