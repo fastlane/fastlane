@@ -2,6 +2,10 @@
 GEMS = %w[fastlane fastlane_core deliver snapshot frameit pem sigh produce cert codes gym pilot credentials_manager spaceship]
 RAILS = %w[boarding refresher enhancer]
 
+#####################################################
+# @!group Everything to be executed in the root folder containing all fastlane repos
+#####################################################
+
 desc "Setup the fastlane development environment"
 task :bootstrap do	
 	if system('which bundle')
@@ -36,6 +40,18 @@ desc "Run `bundle install` and `rake install` for all the gems."
 task :install => :bundle do
 	GEMS.each do |repo|
 		sh "cd #{repo} && rake install"
+	end
+end
+
+
+desc "Show the un-commited changes from all repos"
+task :diff do
+	(GEMS + RAILS).each do |repo|
+		output = `cd #{repo} && git diff --stat` # not using `sh` as it gets you into its own view
+		if (output || "").length > 0
+			box repo
+			puts output
+		end
 	end
 end
 
@@ -81,6 +97,31 @@ task :rubocop => :fetch_rubocop do
 		end
 	end
 end
+
+desc "Print out the # of unreleased commits"
+task :unreleased do
+	GEMS.each do |repo|
+		Dir.chdir(repo) do
+			`git pull --tags`
+
+			last_tag = `git describe --abbrev=0 --tags`.strip
+			output = `git log #{last_tag}..HEAD --oneline`.strip
+
+			if output.length > 0
+				box "#{repo}: #{output.split("\n").count} Commits"
+				output.split("\n").each do |line|
+					puts "\t" + line.split(" ", 1).last # we don't care about the commit ID
+				end
+
+				puts "\nhttps://github.com/KrauseFx/#{repo}/compare/#{last_tag}...master"
+			end
+		end
+	end
+end
+
+#####################################################
+# @!group Helper Methods
+#####################################################
 
 def box(str)
 	l = str.length + 4
