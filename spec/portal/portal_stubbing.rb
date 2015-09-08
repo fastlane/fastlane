@@ -30,15 +30,15 @@ end
 def adp_stub_login
   stub_request(:get, "https://developer.apple.com/membercenter/index.action").
   to_return(status: 200, body: nil,
-    headers: {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=0123abcdef123123&path=%2F%2Fmembercenter%2Findex.action"})
+    headers: {'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa&path=%2F%2Fmembercenter%2Findex.action"})
 
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
-    with(body: {"accountPassword" => "so_secret", "appIdKey" => "0123abcdef123123", "appleId" => "spaceship@krausefx.com"},
+    with(body: {"accountPassword" => "so_secret", "appIdKey" => "aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa", "appleId" => "spaceship@krausefx.com"},
          headers: {'Content-Type' => 'application/x-www-form-urlencoded'}).
     to_return(status: 200, body: "", headers: {'Set-Cookie' => "myacinfo=abcdef;" })
 
   stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
-    with(body: {"accountPassword" => "bad-password", "appIdKey" => "0123abcdef123123", "appleId" => "bad-username"}).
+    with(body: {"accountPassword" => "bad-password", "appIdKey" => "aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa", "appleId" => "bad-username"}).
     to_return(status: 200, body: "", headers: {})
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
