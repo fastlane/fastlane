@@ -1113,6 +1113,7 @@ Send a message to **room** (by default) or a direct message to **@username** wit
     message: "App successfully released!",
     message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
+    from: "sender name", defaults to "fastlane"
     success: true
   )
 ```
