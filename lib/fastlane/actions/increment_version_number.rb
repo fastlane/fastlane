@@ -67,7 +67,8 @@ module Fastlane
           Actions.sh command
           Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
         end
-        next_version_number
+        
+        return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
         Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
         raise ex
