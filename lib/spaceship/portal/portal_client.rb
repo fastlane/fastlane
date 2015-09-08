@@ -24,7 +24,7 @@ module Spaceship
       results = headers['location'].match(/.*appIdKey=(\h+)/)
       if (results || []).length > 1
         api_key = results[1]
-        File.write(cache_path, api_key)
+        File.write(cache_path, api_key) if api_key.length == 64
         return api_key
       else
         raise "Could not find latest API Key from the Dev Portal - the server might be slow right now"
