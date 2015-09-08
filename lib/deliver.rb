@@ -13,7 +13,6 @@ require 'deliver/ipa_uploader'
 require 'deliver/html_generator'
 require 'deliver/deliver_process'
 require 'deliver/dependency_checker'
-require 'deliver/ipa_file_analyser'
 require 'deliver/testflight'
 require 'deliver/commands_generator'
 

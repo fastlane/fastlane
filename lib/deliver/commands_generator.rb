@@ -26,8 +26,6 @@ module Deliver
       program :help, 'GitHub', 'https://github.com/krausefx/deliver'
       program :help_formatter, :compact
 
-      always_trace!
-
       global_option '-f', '--force', 'Runs a deployment without verifying any information (PDF file). This can be used for build servers.'
       global_option '--beta', 'Upload a beta build to iTunes Connect. This uses the `beta_ipa` block.'
       global_option '--skip-deploy', 'Skips submission of the build on iTunes Connect. This will only upload the ipa and/or metadata.'

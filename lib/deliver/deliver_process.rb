@@ -365,15 +365,25 @@ module Deliver
 
       v.copyright = d[k::COPYRIGHT] if d[k::COPYRIGHT]
       v.release_on_approval = d[k::AUTOMATIC_RELEASE] if d[k::AUTOMATIC_RELEASE]
-      v.review_first_name = d[k::APP_REVIEW_INFORMATION][:first_name] if d[k::APP_REVIEW_INFORMATION][:first_name]
-      v.review_last_name = d[k::APP_REVIEW_INFORMATION][:last_name] if d[k::APP_REVIEW_INFORMATION][:last_name]
-      v.review_phone_number = d[k::APP_REVIEW_INFORMATION][:phone_number] if d[k::APP_REVIEW_INFORMATION][:phone_number]
-      v.review_email = d[k::APP_REVIEW_INFORMATION][:email_address] if d[k::APP_REVIEW_INFORMATION][:email_address]
-      v.review_demo_user = d[k::APP_REVIEW_INFORMATION][:demo_user] if d[k::APP_REVIEW_INFORMATION][:demo_user]
-      v.review_demo_password = d[k::APP_REVIEW_INFORMATION][:demo_password] if d[k::APP_REVIEW_INFORMATION][:demo_password]
-      v.review_notes = d[k::APP_REVIEW_INFORMATION][:notes] if d[k::APP_REVIEW_INFORMATION][:notes]
 
-      v.save!
+      if d[k::APP_REVIEW_INFORMATION]
+        v.review_first_name = d[k::APP_REVIEW_INFORMATION][:first_name] if d[k::APP_REVIEW_INFORMATION][:first_name]
+        v.review_last_name = d[k::APP_REVIEW_INFORMATION][:last_name] if d[k::APP_REVIEW_INFORMATION][:last_name]
+        v.review_phone_number = d[k::APP_REVIEW_INFORMATION][:phone_number] if d[k::APP_REVIEW_INFORMATION][:phone_number]
+        v.review_email = d[k::APP_REVIEW_INFORMATION][:email_address] if d[k::APP_REVIEW_INFORMATION][:email_address]
+        v.review_demo_user = d[k::APP_REVIEW_INFORMATION][:demo_user] if d[k::APP_REVIEW_INFORMATION][:demo_user]
+        v.review_demo_password = d[k::APP_REVIEW_INFORMATION][:demo_password] if d[k::APP_REVIEW_INFORMATION][:demo_password]
+        v.review_notes = d[k::APP_REVIEW_INFORMATION][:notes] if d[k::APP_REVIEW_INFORMATION][:notes]
+      end
+
+      begin
+        v.save!
+      rescue Spaceship::TunesClient::ITunesConnectNoChangesError
+        # We don't care about this
+      end
+
+      # Old code still using web scraping
+
       # Categories
       primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
       secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
