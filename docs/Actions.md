@@ -1279,3 +1279,21 @@ This will find the first podspec in the folder. You can also pass in the specifi
 ```ruby
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
 ```
+
+### prompt
+
+You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
+This action also supports multi-line inputs using the `multi_line_end_keyword` option.
+
+```ruby
+changelog = prompt(text: "Changelog: ")
+```
+
+```ruby
+changelog = prompt(
+  text: "Changelog: ",
+  multi_line_end_keyword: "END"
+)
+
+hockey(notes: changelog)
+```
