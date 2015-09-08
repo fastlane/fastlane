@@ -230,6 +230,27 @@ create_keychain(
 )
 ```
 
+### `unlock_keychain`
+
+Unlock existing keychain and add it to the keychain search list.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret"
+)
+```
+
+If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with suffix.
+
+```ruby
+unlock_keychain(
+  path: "KeychainName",
+  password: "mysecret"
+)
+```
+
+
 ### `delete_keychain`
 
 Delete a keychain, can be used after creating one with `create_keychain`.
