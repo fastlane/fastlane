@@ -193,6 +193,10 @@ module Deliver
       update_localized_value('keywords', hash) do |field, keywords, language|
         raise AppMetadataParameterError.new("Parameter needs to be a hash (each language) with an array of keywords in it (given: #{hash})") unless keywords.kind_of?Array
 
+        next unless information
+        next unless information[language]
+        next unless information[language][:keywords]
+        
         if not information[language][:keywords] or keywords.sort != information[language][:keywords][:value].sort
           field.children.remove # remove old keywords
 
@@ -217,7 +221,33 @@ module Deliver
       raise "Invalid price tier '#{tier}' given, must be 0 to 94".red unless (tier.to_i >= 0 and tier.to_i <= 87)
 
       price = fetch_value("//x:wholesale_price_tier").last
-      raise "No initial pricing found, please set the pricing at least once on iTunes Connect.".red unless price
+      unless price
+        Helper.log.info "No initial pricing found, setting the first one."
+
+        formatted_date = "2015-01-01"
+        pricing = Nokogiri.XML("
+          <products>
+              <product>
+                  <territory>WW</territory>
+                  <cleared_for_sale>true</cleared_for_sale>
+                  <sales_start_date>#{formatted_date}</sales_start_date>
+                  <intervals>
+                      <interval>
+                          <start_date>#{formatted_date}</start_date>
+                          <wholesale_price_tier>0</wholesale_price_tier>
+                      </interval>
+                  </intervals>
+                  <allow_volume_discount>true</allow_volume_discount>
+              </product>
+          </products>")
+        software_metadata = fetch_value("//x:software_metadata").last
+        software_metadata << pricing.root
+
+        # We're done here, now fetch the element again and set the real price tier
+        price = fetch_value("//x:wholesale_price_tier").last
+        raise "Something went wrong creating the new price tier" unless price
+      end
+
       price.content = tier
     end
 
@@ -280,12 +310,21 @@ module Deliver
 
         # Run through all the locales given by the 'user'
         new_value.each do |language, value|
+          # First, check if this is the legacy locale notation
+          unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
+            # Check if we need to support legacy language codes
+            short_code = language.match(/(\w\w)\-.*/)
+            if short_code and short_code.length == 2 and FastlaneCore::Languages::ALL_LANGUAGES.include?short_code[1]
+              language = short_code[1]
+            else
+              raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})")
+            end
+          end
+
+
           create_locale_if_not_exists(language)
 
           locale = fetch_value("//x:locale[@name='#{language}']").first
-
-          raise AppMetadataParameterError.new("#{INVALID_LANGUAGE_ERROR} (#{language})") unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
-
 
           field = locale.search(xpath_name).first
 
@@ -325,7 +364,6 @@ module Deliver
 
       # Cleans up the package of stuff we do not want to modify/upload
       def clean_package
-
         # Remove the live version (if it exists)
         versions = fetch_value("//x:version")
         while versions.count > 1
@@ -341,6 +379,16 @@ module Deliver
         fetch_value("//x:in_app_purchases").remove
 
         fetch_value("//x:software_screenshots").remove
+
+        # Change the Chinese locale
+        # Radar 22548000
+        # from zh-Hans to cmn-Hans
+        chinese = []
+        chinese << fetch_value("//x:locale[@name='zh-Hant']").last
+        chinese << fetch_value("//x:locale[@name='zh-Hans']").last
+        chinese.each do |entry|
+          entry["name"] = entry["name"].gsub("zh", "cmn") if entry && entry["name"]
+        end
       end
 
       # This will fill in all information we got (from the downloaded metadata.xml file) into self.information

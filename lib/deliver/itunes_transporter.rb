@@ -187,21 +187,32 @@ module Deliver
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-apple_id #{apple_id}",
-          "-destination '#{destination}'"
+          "-destination '#{destination}'",
+          "-subitemtype None"
         ].join(' ')
+
+        # The subitemtype defines that we don't want to download in-app purchases and gamecenter things
+        # Allowed values:
+        # - GameCenterLeaderboard
+        # - GameCenterAchievement
+        # - InAppPurchase
+        # - None
       end
 
       def build_upload_command(username, password, source = "/tmp")
-        [
+        parts = [
           '"' + Helper.transporter_path + '"',
           "-m upload",
           "-u \"#{username}\"",
           "-p '#{escaped_password(password)}'",
           "-f '#{source}'",
           ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-          "-t 'Signiant'",
           "-k 100000"
-        ].join(' ')
+        ]
+
+        parts << "-t 'Signiant'" unless parts.join(" ").include?"-t"
+
+        parts.join(' ')
       end
 
       def escaped_password(password)

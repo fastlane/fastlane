@@ -174,7 +174,7 @@ module Deliver
         wait_for_elements(".radiostyle")
         sleep 3
         
-        if page.has_content?"Content Rights"
+        if (page.has_content?"Content Rights") || (page.has_content?"Export") || (page.has_content?"Advertising Identifier")
           # Looks good.. just a few more steps
 
           perms ||= {
@@ -203,7 +203,7 @@ module Deliver
           # Export Compliance #
           #####################
           if page.has_content?"Export"
-            
+
             if not perms[:export_compliance][:encryption_updated] and perms[:export_compliance][:cryptography_enabled]
               raise "encryption_updated must be enabled if cryptography_enabled is enabled!"
             end
@@ -221,6 +221,7 @@ module Deliver
           # Content Rights #
           ##################
           if page.has_content?"Content Rights"
+
             if not perms[:third_party_content][:contains_third_party_content] and perms[:third_party_content][:has_rights]
               raise "contains_third_party_content must be enabled if has_rights is enabled".red
             end
@@ -236,6 +237,7 @@ module Deliver
           # Advertising Identifier #
           ##########################
           if page.has_content?"Advertising Identifier"
+
             first(:xpath, "#{basic}.adIdInfo.usesIdfa.value' and @radio-value='#{perms[:advertising_identifier][:use_idfa]}']//a").click rescue nil
 
             if perms[:advertising_identifier][:use_idfa]

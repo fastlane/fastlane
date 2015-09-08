@@ -121,10 +121,11 @@ describe Deliver do
             metadata = deliv.deliver_process.app.metadata
 
             expect(deliv.deliver_process.deploy_information[:keywords]['pt-BR']).to eq(["banese", "banco", "sergipe", "finanças"])
-            expect(metadata.information['pt-BR'][:keywords][:value]).to eq(["banese", "banco", "sergipe", "finanças"])
+
             expect(metadata.information['pt-BR'][:description][:value]).to eq("only description")
             expect(metadata.information['pt-BR'][:support_url][:value]).to eq("something")
             expect(metadata.information['pt-BR'][:version_whats_new][:value]).to eq("what's new?")
+            # expect(metadata.information['pt-BR'][:keywords][:value]).to eq(["banese", "banco", "sergipe", "finanças"])
             expect(deliv.deliver_process.deploy_information[:changelog]['pt-BR']).to eq("what's new?")
           end
 
@@ -280,7 +281,7 @@ describe Deliver do
               expect(File.exists?@error_path).to eq(true)
             end
 
-            it "Error on unit tests", nower: true do
+            it "Error on unit tests" do
               Deliver::ItunesTransporter.clear_mock_files # since we don't even download the metadata
 
               expect(File.exists?@tests_path).to eq(false)

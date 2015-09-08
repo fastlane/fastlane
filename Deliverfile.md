@@ -122,7 +122,13 @@ submit_further_information({
     contains_third_party_content: false,
     has_rights: false
   },
-  advertising_identifier: false
+  advertising_identifier: {
+    use_idfa: false,
+    serve_advertisement: false,
+    attribute_advertisement: false,
+    attribute_actions: false,
+    limit_ad_tracking: false
+  }
 })
 ```
 
