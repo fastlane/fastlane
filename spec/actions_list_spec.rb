@@ -1,4 +1,4 @@
-require 'fastlane/actions_list'
+require 'fastlane/documentation/actions_list'
 
 describe Fastlane do
   describe "Action List" do
