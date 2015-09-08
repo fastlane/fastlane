@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the give keychain file and adds it to the keychain search list."
+        "Unlocks the give keychain file and adds it to the keychain search list"
       end
 
       def self.available_options
@@ -90,7 +90,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        true
       end
     end
   end

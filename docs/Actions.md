@@ -232,7 +232,7 @@ create_keychain(
 
 ### `unlock_keychain`
 
-Unlock existing keychain and add it to the keychain search list.
+Unlock an existing keychain and add it to the keychain search list.
 
 ```ruby
 unlock_keychain(
@@ -241,7 +241,7 @@ unlock_keychain(
 )
 ```
 
-If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with suffix.
+If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
 
 ```ruby
 unlock_keychain(
@@ -249,7 +249,6 @@ unlock_keychain(
   password: "mysecret"
 )
 ```
-
 
 ### `delete_keychain`
 
