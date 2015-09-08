@@ -1,5 +1,7 @@
 # Contributing to `fastlane` and its tools
 
+To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https://github.com/fastlane/countdown) repo. It will help you set up the development environment within minutes.
+
 ## New Issues
 
 Before submitting a new issue, do the following:
