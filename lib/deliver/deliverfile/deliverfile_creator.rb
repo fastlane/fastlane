@@ -64,14 +64,7 @@ module Deliver
       json = generate_deliver_file(app, deliver_path, project_name, version_number)
       File.write(file_path, json)
 
-      FileUtils.mkdir_p File.join(deliver_path, 'screenshots')
-      begin
-        Helper.log.info "Downloading all previously used app screenshots.".green
-        ItunesConnect.new.download_existing_screenshots(app, deliver_path)
-      rescue Exception => ex
-        Helper.log.error ex
-        Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
-      end
+      Deliver::DownloadScreenshots.run(app, deliver_path)
 
       # Add a README to the screenshots folder
       FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
