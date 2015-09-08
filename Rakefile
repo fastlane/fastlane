@@ -41,6 +41,8 @@ end
 
 desc "Pulls the latest changes from all the gems repos"
 task :pull do
+	sh "git pull" # the countdown repo itself
+	
 	(GEMS + RAILS).each do |repo|
 		sh "cd #{repo} && git pull"
 	end		
