@@ -31,7 +31,7 @@ bundle_install
 
 ### [CocoaPods](http://cocoapods.org)
 
-Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
+If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
 
 ```ruby
 cocoapods # this will run pod install
