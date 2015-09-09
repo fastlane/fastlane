@@ -6,10 +6,9 @@ module Gym
       def swift_library_fix
         require 'fileutils'
 
-        ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
         Helper.log.info "Checking for Swift framework" if $verbose
+        return unless system %(unzip -l '#{PackageCommandGenerator.ipa_path}' "#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*" > /dev/null)
 
-        return if ipa_swift_frameworks.empty?
         Helper.log.info "Packaging up the Swift Framework as the current app is a Swift app" if $verbose
 
         Dir.mktmpdir do |tmpdir|
