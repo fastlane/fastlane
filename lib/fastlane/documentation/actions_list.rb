@@ -77,8 +77,8 @@ module Fastlane
             headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
-          required_count = action.available_options.count do |o| 
-            if o.kind_of?FastlaneCore::ConfigItem
+          required_count = action.available_options.count do |o|
+            if o.kind_of?(FastlaneCore::ConfigItem)
               o.optional == false
             else
               false
