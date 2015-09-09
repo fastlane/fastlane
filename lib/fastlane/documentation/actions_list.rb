@@ -91,6 +91,15 @@ module Fastlane
           puts ""
         end
 
+        if action.return_value
+          puts Terminal::Table.new(
+            title: "Return Value".green,
+            headings: [],
+            rows: [[action.return_value]]
+          )
+          puts ""
+        end
+
         puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
         puts "\n"
 
