@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/MethodLength
 module Fastlane
   class ActionsList
     def self.run(filter: nil, platform: nil)
@@ -75,7 +77,14 @@ module Fastlane
             headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
-          required_count = action.available_options.count { |o| o.optional == false }
+          required_count = action.available_options.count do |o| 
+            if o.kind_of?FastlaneCore::ConfigItem
+              o.optional == false
+            else
+              false
+            end
+          end
+
           if required_count > 0
             puts "#{required_count} of the available parameters are required".magenta
             puts "They are marked using an asterix *".magenta
@@ -156,3 +165,5 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/MethodLength
