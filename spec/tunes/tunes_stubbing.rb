@@ -178,7 +178,20 @@ end
 def itc_stub_valid_update
   # Called from the specs to simulate valid server responses
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/save/898536088?v=").
-         to_return(status: 200, body: itc_read_fixture_file('update_app_version_success.json'), headers: {'Content-Type' => 'application/json'})
+         to_return(status: 200, body: itc_read_fixture_file("update_app_version_success.json"),
+                   headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_app_version_ref
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/ref").
+    to_return(status: 200, body: itc_read_fixture_file("app_version_ref.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_user_detail
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/detail").
+    to_return(status: 200, body: itc_read_fixture_file("user_detail.json"),
+              headers: { "Content-Type" => "application/json" })
 end
 
 WebMock.disable_net_connect!
@@ -191,5 +204,7 @@ RSpec.configure do |config|
     itc_stub_build_trains
     itc_stub_testers
     itc_stub_testflight
+    itc_stub_app_version_ref
+    itc_stub_user_detail
   end
 end

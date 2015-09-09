@@ -4,5 +4,3 @@
 ##################
 
 inherit_from: .rubocop_general.yml
-
-
