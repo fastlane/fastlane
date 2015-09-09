@@ -75,6 +75,11 @@ module Fastlane
             headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
+          required_count = action.available_options.count { |o| o.optional == false }
+          if required_count > 0
+            puts "#{required_count} of the available parameters are required".magenta
+            puts "They are marked using an asterix *".magenta
+          end
         else
           puts "No available options".yellow
         end
@@ -132,8 +137,13 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            rows << [current.key.to_s.yellow, current.description, current.env_name]
+            key_name = (current.optional ? "" : "* ") + current.key.to_s
+            description = current.description + (current.default_value ? " (default: '#{current.default_value}')" : "")
+
+            rows << [key_name.yellow, description, current.env_name]
+
           elsif current.kind_of? Array
+            # Legacy actions that don't use the new config manager
             raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
