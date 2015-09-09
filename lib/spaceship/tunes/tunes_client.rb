@@ -6,6 +6,12 @@ module Spaceship
     class ITunesConnectError < StandardError
     end
 
+    # ITunesConnectNoChangesError is thrown when the only error is that there were no changes
+    #   usually those errors are irrelevant
+    class ITunesConnectNoChangesError < ITunesConnectError
+
+    end
+
     #####################################################
     # @!group Init and Login
     #####################################################
@@ -116,7 +122,12 @@ module Spaceship
       errors << different_error if different_error
 
       if errors.count > 0 # they are separated by `.` by default
-        raise ITunesConnectError.new, errors.join(' ')
+        if errors.count == 1 and errors.first == "You haven't made any changes."
+          # This is a special error for which we throw a separate exception
+          raise ITunesConnectNoChangesError.new, errors.first
+        else
+          raise ITunesConnectError.new, errors.join(' ')
+        end
       end
 
       puts data['sectionInfoKeys'] if data['sectionInfoKeys']
