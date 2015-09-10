@@ -94,11 +94,11 @@ private_lane :validate_repo do |options|
   ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/") # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", path: "./lib/") # Merge conflict
 
-  rubocop if rubocop_repos.include?tool_name
+  rubocop if File.exist?("../.rubocop.yml") # some project don't yet use rubocop
 
   # Verifying the --help command
   # 
-  binary_path = "../../#{tool_name}/bin/#{tool_name}"
+  binary_path = File.join("..", "bin", tool_name)
   unless no_binary.include?tool_name
     content = sh "#{binary_path} --help" # not using `sh` here as it doesn't go out of the help screen
     ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
@@ -130,11 +130,6 @@ end
 desc "All repos that don't have a binary to test" 
 private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
-end
-
-desc "All repos that have rubocop enabled" 
-private_lane :rubocop_repos do
-  ['fastlane', 'spaceship', 'gym', 'fastlane_core', 'credentials_manager', 'codes', 'pilot']
 end
 
 desc "Detects the name of the tool based on the current directory" 
