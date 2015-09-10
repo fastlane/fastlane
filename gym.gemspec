@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency "bundler"
-  spec.add_development_dependency "fastlane", "~> 1.15.0" # yes, we use fastlane for testing
+  spec.add_development_dependency "fastlane", ">= 1.25.0" # yes, we use fastlane for testing
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rspec", "~> 3.1.0"
