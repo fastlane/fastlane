@@ -9,7 +9,6 @@ module Gym
       @options = plain_options
     end
 
-    # rubocop:disable Metrics/MethodLength
     def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -108,6 +107,5 @@ module Gym
 
       ]
     end
-    # rubocop:enable Metrics/MethodLength
   end
 end
