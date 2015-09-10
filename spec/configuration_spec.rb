@@ -21,7 +21,7 @@ describe FastlaneCore do
 
       it "raises an error if the option of a given value is not available" do
         expect do
-          FastlaneCore::Configuration.create([], {cert_name: "value"})
+          FastlaneCore::Configuration.create([], { cert_name: "value" })
         end.to raise_error "Could not find option 'cert_name' in the list of available options: ".red
       end
 

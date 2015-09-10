@@ -44,12 +44,12 @@ describe FastlaneCore do
 
       it "overwrites existing values" do
         # Overwrite
-        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"})
+        config = FastlaneCore::Configuration.create(options, { app_identifier: "detlef.app.super" })
         config.load_configuration_file('ConfigFileValid')
         expect(config[:app_identifier]).to eq("com.krausefx.app")
 
         # not overwrite
-        config = FastlaneCore::Configuration.create(options, {app_identifier: "detlef.app.super"})
+        config = FastlaneCore::Configuration.create(options, { app_identifier: "detlef.app.super" })
         config.load_configuration_file('ConfigFileEmpty')
         expect(config[:app_identifier]).to eq("detlef.app.super")
       end
