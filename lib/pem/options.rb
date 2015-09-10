@@ -41,8 +41,8 @@ module PEM
                                      env_name: "PEM_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :p12_password,
                                      short_option: "-p",

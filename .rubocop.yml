@@ -1,0 +1,26 @@
+
+##################
+# All rules specific to this repo
+##################
+
+inherit_from: .rubocop_general.yml
+
+Style/ClassVars:
+  Enabled: false
+
+AllCops:
+  Exclude:
+    # Legacy code that gets removed soon
+    - 'lib/fastlane_core/itunes_connect/*'
+
+
+
+##################
+# TODO
+##################
+
+Style/Documentation:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
