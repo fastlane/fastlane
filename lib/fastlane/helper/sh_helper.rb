@@ -28,7 +28,7 @@ module Fastlane
             result << line
           end
           io.close
-          exit_status = $?.exit_status
+          exit_status = $?.exitstatus
         end
 
         if exit_status != 0
