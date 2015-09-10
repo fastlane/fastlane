@@ -8,15 +8,15 @@ Gem::Specification.new do |spec|
   spec.version       = Cert::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["cert@krausefx.com"]
-  spec.summary       = %q{Create new iOS code signing certificates}
-  spec.description   = %q{Create new iOS code signing certificates}
+  spec.summary       = 'Create new iOS code signing certificates'
+  spec.description   = 'Create new iOS code signing certificates'
   spec.homepage      = "https://fastlane.tools"
 
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ bin/cert README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w( bin/cert README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})

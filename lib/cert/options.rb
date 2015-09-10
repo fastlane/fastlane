@@ -19,8 +19,8 @@ module Cert
                                      env_name: "CERT_TEAM_ID",
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
@@ -32,16 +32,16 @@ module Cert
                                      env_name: "CERT_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
                                      optional: true,
-                                     verify_block: Proc.new do |value|
-                                        raise "Keychain not found at path '#{value}'".red unless File.exists?value
+                                     verify_block: proc do |value|
+                                       raise "Keychain not found at path '#{value}'".red unless File.exist? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :signing_request_path,
                                      short_option: "-s",
                                      env_name: "CERT_SIGNING_REQUEST_PATH",
                                      description: "Path to a signing request file (optional)",
                                      optional: true,
-                                     verify_block: Proc.new do |value|
-                                        raise "File not found at path '#{value}'".red unless File.exists?value
+                                     verify_block: proc do |value|
+                                       raise "File not found at path '#{value}'".red unless File.exist? value
                                      end)
       ]
     end
