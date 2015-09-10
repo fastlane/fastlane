@@ -70,7 +70,7 @@ class SighApplication
     command :manage do |c|
       c.syntax = 'sigh manage'
       c.description = 'Manage installed provisioning profiles on your system.'
-      
+
       c.option '-e', '--clean_expired', 'Remove all expired provisioning profiles.'
 
       c.option '-p', '--clean_pattern STRING', String, 'Remove any provisioning profiles that matches the regular expression.'
@@ -85,7 +85,6 @@ class SighApplication
 
     run!
   end
-
 end
 
 begin

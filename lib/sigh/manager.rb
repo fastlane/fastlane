@@ -15,7 +15,11 @@ module Sigh
       end
 
       output = File.join(Sigh.config[:output_path].gsub("~", ENV["HOME"]), file_name)
-      (FileUtils.mv(path, output) rescue nil) # in case it already exists
+      begin
+        FileUtils.mv(path, output)
+      rescue
+        # in case it already exists
+      end
 
       install_profile(output) unless Sigh.config[:skip_install]
 

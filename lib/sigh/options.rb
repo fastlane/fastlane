@@ -42,8 +42,8 @@ module Sigh
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -51,8 +51,8 @@ module Sigh
                                      description: "The name of your team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_NAME"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
@@ -64,8 +64,8 @@ module Sigh
                                      env_name: "SIGH_OUTPUT_PATH",
                                      description: "Directory in which the profile should be stored",
                                      default_value: ".",
-                                     verify_block: Proc.new do |value|
-                                       raise "Could not find output directory '#{value}'".red unless File.exists?(value)
+                                     verify_block: proc do |value|
+                                       raise "Could not find output directory '#{value}'".red unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :cert_id,
                                      short_option: "-i",
@@ -82,8 +82,8 @@ module Sigh
                                      env_name: "SIGH_PROFILE_FILE_NAME",
                                      optional: true,
                                      description: "Filename to use for the generated provisioning profile (must include .mobileprovision)",
-                                     verify_block: Proc.new do |value|
-                                       raise "The output name must end with .mobileprovision".red unless value.end_with?".mobileprovision"
+                                     verify_block: proc do |value|
+                                       raise "The output name must end with .mobileprovision".red unless value.end_with? ".mobileprovision"
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_fetch_profiles,
                                      env_name: "SIGH_SKIP_FETCH_PROFILES",
@@ -96,7 +96,7 @@ module Sigh
                                      env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
                                      description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine",
                                      is_string: false,
-                                     default_value: false),
+                                     default_value: false)
       ]
     end
   end

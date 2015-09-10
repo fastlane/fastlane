@@ -93,7 +93,7 @@ module Sigh
     end
 
     def validate_provisioning_file(provisioning_profile)
-      raise "Provisioning profile file could not be found or is not a .mobileprovision file (#{provisioning_profile})".red unless File.exists?(provisioning_profile) && provisioning_profile.end_with?('.mobileprovision')
+      raise "Provisioning profile file could not be found or is not a .mobileprovision file (#{provisioning_profile})".red unless File.exist?(provisioning_profile) && provisioning_profile.end_with?('.mobileprovision')
     end
 
     def print_available_identities
@@ -110,7 +110,11 @@ module Sigh
       available = `security find-identity -v -p codesigning`
       ids = []
       available.split("\n").each do |current|
-        (ids << current.match(/.*\"(.*)\"/)[1]) rescue nil # the last line does not match
+        begin
+          (ids << current.match(/.*\"(.*)\"/)[1])
+        rescue
+          nil
+        end # the last line does not match
       end
 
       ids

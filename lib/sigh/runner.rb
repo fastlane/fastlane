@@ -54,7 +54,7 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       Helper.log.info "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all { |a| a.valid? }
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
@@ -63,7 +63,6 @@ module Sigh
       end
 
       return results if Sigh.config[:skip_certificate_verification]
-
 
       return results.find_all do |a|
         # Also make sure we have the certificate installed on the local machine
@@ -98,8 +97,8 @@ module Sigh
       profile
     end
 
-
     # Certificate to use based on the current distribution mode
+    # rubocop:disable Metrics/AbcSize
     def certificate_to_use
       if profile_type == Spaceship.provisioning_profile.Development
         certificates = Spaceship.certificate.development.all
@@ -122,11 +121,12 @@ module Sigh
         true
       end
 
-      if certificates.count > 1 and not Sigh.config[:development]
+      if certificates.count > 1 and !Sigh.config[:development]
         Helper.log.info "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options.".yellow
         Helper.log.info "Available Code Signing Identities for current filters:".green
         certificates.each do |c|
-          Helper.log.info ("\t- Name: " + c.owner_name + " - ID: " + c.id + " - Expires: " + c.expires.strftime("%d/%m/%Y")).green
+          str = ["\t- Name:", c.owner_name, "- ID:", c.id + "- Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          Helper.log.info str.green
         end
       end
 
@@ -141,15 +141,16 @@ module Sigh
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
       return certificates.first
     end
+    # rubocop:enable Metrics/AbcSize
 
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       Helper.log.info "Downloading provisioning profile...".yellow
       profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
-      profile_name += '.mobileprovision' unless profile_name.include?'mobileprovision'
+      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
 
       output_path = File.join('/tmp', profile_name)
-      dataWritten = File.open(output_path, "wb") do |f|
+      File.open(output_path, "wb") do |f|
         f.write(profile.download)
       end
 

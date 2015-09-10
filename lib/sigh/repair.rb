@@ -7,7 +7,7 @@ module Sigh
       Helper.log.info "Successfully logged in"
 
       # Select all 'Invalid' or 'Expired' provisioning profiles
-      broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile| 
+      broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile|
         (profile.status == "Invalid" or profile.status == "Expired")
       end
 

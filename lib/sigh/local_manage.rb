@@ -26,20 +26,21 @@ module Sigh
       # copy to Xcode provisioning profile directory
       FileUtils.copy profile, destination
 
-      if File.exists? destination
+      if File.exist? destination
         Helper.log.info "Profile installed at \"#{destination}\""
       else
         raise "Failed installation of provisioning profile at location: #{destination}".red
       end
     end
 
-    def self.get_inputs(options, args)
+    def self.get_inputs(options, _args)
       clean_expired = options.clean_expired
       clean_pattern = /#{options.clean_pattern}/ if options.clean_pattern
-      command = (clean_expired != nil || clean_pattern != nil) ? CLEANUP : LIST
+      command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
       return command, clean_expired, clean_pattern
     end
 
+    # rubocop:disable Metrics/AbcSize
     def self.list_profiles
       profiles = load_profiles
 
@@ -63,7 +64,7 @@ module Sigh
           Helper.log.info profile["Name"].yellow
         end
       end
-      
+
       profiles_expired = profiles.select { |profile| profile["ExpirationDate"] < now }
       if profiles_expired.count > 0
         Helper.log.info ""
@@ -72,7 +73,7 @@ module Sigh
           Helper.log.info profile["Name"].red
         end
       end
-      
+
       Helper.log.info ""
       Helper.log.info "Summary"
       Helper.log.info "#{profiles.count} installed profiles"
@@ -82,11 +83,12 @@ module Sigh
 
       Helper.log.info "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
     end
+    # rubocop:enable Metrics/AbcSize
 
     def self.cleanup_profiles(expired = false, pattern = nil)
       now = DateTime.now
 
-      profiles = load_profiles.select { |profile| (expired && profile["ExpirationDate"] < now) || (pattern != nil && profile["Name"] =~ pattern) }
+      profiles = load_profiles.select { |profile| (expired && profile["ExpirationDate"] < now) || (!pattern.nil? && profile["Name"] =~ pattern) }
 
       Helper.log.info "The following provisioning profiles are either expired or matches your pattern:"
       profiles.each do |profile|
@@ -108,12 +110,12 @@ module Sigh
 
       profiles = []
       profile_paths.each do |profile_path|
-        profile = Plist::parse_xml(`security cms -D -i '#{profile_path}'`)
+        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}'`)
         profile['Path'] = profile_path
         profiles << profile
       end
 
-      profiles = profiles.sort_by {|profile| profile["Name"].downcase}
+      profiles = profiles.sort_by { |profile| profile["Name"].downcase }
 
       return profiles
     end
