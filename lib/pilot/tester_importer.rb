@@ -20,7 +20,7 @@ module Pilot
           next
         end
 
-        first_name, last_name, email = row        
+        first_name, last_name, email = row
 
         unless email
           Helper.log.error "No email found in row: #{row}".red
@@ -35,10 +35,9 @@ module Pilot
         begin
           tester_manager.add_tester(config)
           imported_tester_count += 1
-        rescue => ex
+        rescue
           # do nothing, move on to the next row
         end
-
       end
 
       Helper.log.info "Successfully imported #{imported_tester_count} testers from #{file}".green

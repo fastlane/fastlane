@@ -3,7 +3,6 @@ require "fastlane_core"
 module Pilot
   class TesterExporter < Manager
     def export_testers(options)
-
       raise "Export file path is required".red unless options[:testers_file_path]
 
       start(options)
@@ -14,11 +13,9 @@ module Pilot
       file = config[:testers_file_path]
 
       CSV.open(file, "w") do |csv|
-
         csv << ['First', 'Last', 'Email', 'Devices', 'Groups', 'Installed Version', 'Install Date']
 
         testers.each do |tester|
-
           groups = tester.raw_data.get("groups")
 
           group_names = ""
@@ -32,7 +29,6 @@ module Pilot
 
         Helper.log.info "Successfully exported CSV to #{file}".green
       end
-
     end
   end
 end

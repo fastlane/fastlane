@@ -17,7 +17,7 @@ module Pilot
                                                               last_name: config[:last_name])
           Helper.log.info "Successfully invited tester: #{tester.email}".green
         end
-        
+
         app_filter = (config[:apple_id] || config[:app_identifier])
         if app_filter
           begin
@@ -43,14 +43,14 @@ module Pilot
       tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
       raise "Tester #{config[:email]} not found".red unless tester
-      
+
       describe_tester(tester)
       return tester
     end
 
     def remove_tester(options)
       start(options)
-      
+
       tester = Spaceship::Tunes::Tester::External.find(config[:email])
       tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
 
@@ -73,64 +73,64 @@ module Pilot
 
     private
 
-      def list(all_testers, title)
-        rows = []
-        all_testers.each do |tester|
-          rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count]
-        end
-
-        puts Terminal::Table.new(
-          title: title.green,
-          headings: ["First", "Last", "Email", "Devices"],
-          rows: rows
-        )
+    def list(all_testers, title)
+      rows = []
+      all_testers.each do |tester|
+        rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count]
       end
 
-      # Print out all the details of a specific tester
-      def describe_tester(tester)
-        return unless tester
+      puts Terminal::Table.new(
+        title: title.green,
+        headings: ["First", "Last", "Email", "Devices"],
+        rows: rows
+      )
+    end
 
-        rows = []
+    # Print out all the details of a specific tester
+    def describe_tester(tester)
+      return unless tester
 
-        rows << ["First name", tester.first_name]
-        rows << ["Last name", tester.last_name]
-        rows << ["Email", tester.email]
+      rows = []
 
-        groups = tester.raw_data.get("groups")
+      rows << ["First name", tester.first_name]
+      rows << ["Last name", tester.last_name]
+      rows << ["Email", tester.email]
 
-        if groups && groups.length > 0
-          group_names = groups.map { |group| group["name"]["value"] }
-          rows << ["Groups", group_names.join(', ')]
-        end
+      groups = tester.raw_data.get("groups")
 
-        if tester.latest_install_date
-          latest_installed_version = tester.latest_installed_version_number
-          latest_installed_short_version = tester.latest_installed_build_number
-          pretty_date = Time.at((tester.latest_install_date / 1000)).strftime("%m/%d/%y %H:%M")
+      if groups && groups.length > 0
+        group_names = groups.map { |group| group["name"]["value"] }
+        rows << ["Groups", group_names.join(', ')]
+      end
 
-          rows << ["Latest Version", "#{latest_installed_version} (#{latest_installed_short_version})"]
-          rows << ["Latest Install Date", pretty_date]
-        end
+      if tester.latest_install_date
+        latest_installed_version = tester.latest_installed_version_number
+        latest_installed_short_version = tester.latest_installed_build_number
+        pretty_date = Time.at((tester.latest_install_date / 1000)).strftime("%m/%d/%y %H:%M")
 
-        if tester.devices.length == 0
-          rows << ["Devices", "No devices"]
-        else
-          rows << ["#{tester.devices.count} Devices", ""]
-          tester.devices.each do |device|
-            current = "\u2022 #{device['model']}, iOS #{device['osVersion']}"
+        rows << ["Latest Version", "#{latest_installed_version} (#{latest_installed_short_version})"]
+        rows << ["Latest Install Date", pretty_date]
+      end
 
-            if rows.last[1].length == 0
-              rows.last[1] = current
-            else
-              rows << ["", current]
-            end
+      if tester.devices.length == 0
+        rows << ["Devices", "No devices"]
+      else
+        rows << ["#{tester.devices.count} Devices", ""]
+        tester.devices.each do |device|
+          current = "\u2022 #{device['model']}, iOS #{device['osVersion']}"
+
+          if rows.last[1].length == 0
+            rows.last[1] = current
+          else
+            rows << ["", current]
           end
         end
-
-        puts Terminal::Table.new(
-          title: tester.email.green,
-          rows: rows
-        )
       end
+
+      puts Terminal::Table.new(
+        title: tester.email.green,
+        rows: rows
+      )
+    end
   end
 end
