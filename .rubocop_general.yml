@@ -54,3 +54,23 @@ Metrics/MethodLength:
 # Both string notations are okay
 Style/StringLiterals:
   Enabled: false
+
+# The %w might be confusing for new users
+Style/WordArray:
+  MinSize: 19
+
+# Not a good thing
+Style/RedundantSelf:
+  Enabled: false
+
+# raise and fail are both okay
+Style/SignalException:
+  Enabled: false
+
+# Better too much 'return' than one missing
+Style/RedundantReturn:
+  Enabled: false
+
+
+
+

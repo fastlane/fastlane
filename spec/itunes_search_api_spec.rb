@@ -51,14 +51,14 @@ describe FastlaneCore do
       response = FastlaneCore::ItunesSearchApi.fetch_by_identifier("com.facebook.Facebook")
       expect(response['kind']).to eq('software')
       expect(response['supportedDevices'].count).to be > 8
-      expect(response['trackId']).to eq(284882215)
+      expect(response['trackId']).to eq(284_882_215)
     end
 
     it "can find country specific object" do
-      response = FastlaneCore::ItunesSearchApi.fetch(338986109, 'FR')
+      response = FastlaneCore::ItunesSearchApi.fetch(338_986_109, 'FR')
       expect(response['kind']).to eq('software')
       expect(response['supportedDevices'].count).to be > 8
-      expect(response['trackId']).to eq(338986109)
+      expect(response['trackId']).to eq(338_986_109)
     end
   end
 end
