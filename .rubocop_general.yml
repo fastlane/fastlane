@@ -47,9 +47,9 @@ Lint/ParenthesesAsGroupedExpression:
 
 # options.rb might be large, we know that
 Metrics/MethodLength:
+  Max: 54
   Exclude:
     - 'lib/*/options.rb'
-
 
 
 
@@ -74,11 +74,6 @@ Metrics/CyclomaticComplexity:
 # Configuration parameters: AllowURI, URISchemes.
 Metrics/LineLength:
   Max: 372
-
-# Offense count: 35
-# Configuration parameters: CountComments.
-Metrics/MethodLength:
-  Max: 54
 
 # Offense count: 5
 # Configuration parameters: CountKeywordArgs.
