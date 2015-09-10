@@ -25,8 +25,8 @@ module Pilot
             group_names = names.join(';')
           end
 
-          install_version = Pilot::TesterUtil.full_version(tester) || ""
-          pretty_date = Pilot::TesterUtil.pretty_install_date(tester) || ""
+          install_version = TesterUtil.full_version(tester) || ""
+          pretty_date = TesterUtil.pretty_install_date(tester) || ""
 
           csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, pretty_date]
         end

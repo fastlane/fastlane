@@ -105,8 +105,8 @@ module Pilot
       end
 
       if tester.latest_install_date
-        rows << ["Latest Version", Pilot::TesterUtil.full_version(tester)]
-        rows << ["Latest Install Date", Pilot::TesterUtil.pretty_install_date(tester)]
+        rows << ["Latest Version", TesterUtil.full_version(tester)]
+        rows << ["Latest Install Date", TesterUtil.pretty_install_date(tester)]
       end
 
       if tester.devices.length == 0
