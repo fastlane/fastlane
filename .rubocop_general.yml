@@ -45,6 +45,10 @@ Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - 'spec/**/*'
 
+# options.rb might be large, we know that
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/*/options.rb'
 
 
 
