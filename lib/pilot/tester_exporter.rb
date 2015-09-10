@@ -1,4 +1,5 @@
 require "fastlane_core"
+require "pilot/tester_util"
 
 module Pilot
   class TesterExporter < Manager
@@ -24,19 +25,10 @@ module Pilot
             group_names = names.join(';')
           end
 
-          install_version = ""
-          install_date = ""
+          install_version = Pilot::TesterUtil.full_version(tester) || ""
+          pretty_date = Pilot::TesterUtil.pretty_install_date(tester) || ""
 
-          latest_installed_date = tester.latest_install_date
-          if latest_installed_date
-            install_date = Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
-
-            latest_installed_version = tester.latest_installed_version_number
-            latest_installed_short_version = tester.latest_installed_build_number
-            install_version = "#{latest_installed_version} (#{latest_installed_short_version})"
-          end
-
-          csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, install_date]
+          csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, pretty_date]
         end
 
         Helper.log.info "Successfully exported CSV to #{file}".green

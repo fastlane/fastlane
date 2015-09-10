@@ -1,4 +1,5 @@
 require "fastlane_core"
+require "pilot/tester_util"
 
 module Pilot
   class TesterManager < Manager
@@ -104,12 +105,8 @@ module Pilot
       end
 
       if tester.latest_install_date
-        latest_installed_version = tester.latest_installed_version_number
-        latest_installed_short_version = tester.latest_installed_build_number
-        pretty_date = Time.at((tester.latest_install_date / 1000)).strftime("%m/%d/%y %H:%M")
-
-        rows << ["Latest Version", "#{latest_installed_version} (#{latest_installed_short_version})"]
-        rows << ["Latest Install Date", pretty_date]
+        rows << ["Latest Version", Pilot::TesterUtil.full_version(tester)]
+        rows << ["Latest Install Date", Pilot::TesterUtil.pretty_install_date(tester)]
       end
 
       if tester.devices.length == 0
