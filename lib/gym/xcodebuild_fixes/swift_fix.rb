@@ -1,3 +1,5 @@
+require 'zip'
+
 module Gym
   class XcodebuildFixes
     class << self
@@ -6,10 +8,8 @@ module Gym
       def swift_library_fix
         require 'fileutils'
 
-        ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
-        Helper.log.info "Checking for Swift framework" if $verbose
+        return if check_for_swift PackageCommandGenerator
 
-        return if ipa_swift_frameworks.empty?
         Helper.log.info "Packaging up the Swift Framework as the current app is a Swift app" if $verbose
 
         Dir.mktmpdir do |tmpdir|
@@ -39,6 +39,27 @@ module Gym
                                                     end)
           end
         end
+      end
+
+      # @param the PackageCommandGenerator
+      # @return true if swift
+      def check_for_swift(pcg)
+        Helper.log.info "Checking for Swift framework" if $verbose
+        default_swift_libs = "#{pcg.appfile_path}/Frameworks/libswift.*" # note the extra ., this is a string representation of a regexp
+        zip_entries_matching(pcg.ipa_path, /#{default_swift_libs}/).count > 0
+      end
+
+      # return the entries (files or directories) in the zip matching the pattern
+      # @param zipfile a zipfile
+      # @return the files or directories matching the pattern
+      def zip_entries_matching(zipfile, file_pattern)
+        files = []
+        Zip::File.open(zipfile) do |zip_file|
+          zip_file.each do |entry|
+            files << entry.name if entry.name.match file_pattern
+          end
+        end
+        files
       end
     end
   end
