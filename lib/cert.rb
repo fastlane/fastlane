@@ -1,7 +1,6 @@
 require 'cert/version'
 require 'cert/dependency_checker'
 require 'cert/cert_runner'
-require 'cert/signing_request'
 require 'cert/keychain_importer'
 
 require 'fastlane_core'
@@ -12,7 +11,7 @@ module Cert
   class << self
     attr_accessor :config
   end
-  
+
   TMP_FOLDER = "/tmp/cert/"
   FileUtils.mkdir_p TMP_FOLDER
 
