@@ -32,7 +32,7 @@ module Fastlane
 
         case response[:status]
         when 201
-          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub!".green
+          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub".green
           body = JSON.parse(response.body)
           html_url = body['html_url']
           release_id = body['id']
