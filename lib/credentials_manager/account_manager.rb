@@ -23,7 +23,7 @@ module CredentialsManager
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
       end
-      ask_for_login if @password.to_s.length == 0
+      ask_for_login while @password.to_s.length == 0
       return @password
     end
 
@@ -46,7 +46,12 @@ module CredentialsManager
       puts "More information about it on GitHub: https://github.com/fastlane/CredentialsManager".green
       puts "-------------------------------------------------------------------------------------".green
 
-      @user = ask("Username: ") while @user.to_s.length == 0
+      if @user.to_s.length == 0
+        @user = ask("Username: ") while @user.to_s.length == 0
+        # we return here, as only the username was asked for now, we'll get called for the pw again anyway
+        return
+      end
+
       while @password.to_s.length == 0
         @password = ask("Password (for #{@user}): ") { |q| q.echo = "*" }
       end
