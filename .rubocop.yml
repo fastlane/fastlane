@@ -83,20 +83,8 @@ Style/Documentation:
 Style/DotPosition:
   Enabled: false
 
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
   Enabled: false
 
 # Offense count: 74

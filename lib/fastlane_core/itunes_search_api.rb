@@ -4,7 +4,6 @@ module FastlaneCore
   # A wrapper around the Apple iTunes Search API to access app information like
   # the app identifier of an app.
   class ItunesSearchApi
-
     # Fetch all information you can get from a specific AppleID of an app
     # @param id (int) The AppleID of the given app. This usually consists of 9 digits.
     # @param country (string) The optional ISO-2A country code

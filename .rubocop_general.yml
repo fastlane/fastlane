@@ -71,6 +71,8 @@ Style/SignalException:
 Style/RedundantReturn:
   Enabled: false
 
-
+# Having if in the same line might not always be good
+Style/IfUnlessModifier:
+  Enabled: false
 
 

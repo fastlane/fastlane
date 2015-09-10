@@ -209,6 +209,5 @@ module FastlaneCore
     def escaped_password(password)
       Shellwords.escape(password)
     end
-
   end
 end

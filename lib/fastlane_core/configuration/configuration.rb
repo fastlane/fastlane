@@ -4,7 +4,6 @@ require 'fastlane_core/configuration/configuration_file'
 
 module FastlaneCore
   class Configuration
-
     attr_accessor :available_options
 
     attr_accessor :values

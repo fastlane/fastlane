@@ -2,7 +2,6 @@ require 'zip'
 
 module FastlaneCore
   class IpaFileAnalyser
-
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def self.fetch_app_identifier(path)
       plist = IpaFileAnalyser.fetch_info_plist_file(path)
