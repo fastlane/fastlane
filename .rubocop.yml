@@ -19,82 +19,9 @@ AllCops:
 # TODO
 ##################
 
-# Offense count: 20
-Metrics/AbcSize:
-  Max: 63
-
-# Offense count: 7
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 320
-
-# Offense count: 4
-Metrics/CyclomaticComplexity:
-  Max: 17
-
-# Offense count: 489
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 372
-
-# Offense count: 35
-# Configuration parameters: CountComments.
-Metrics/MethodLength:
-  Max: 54
-
-# Offense count: 5
-# Configuration parameters: CountKeywordArgs.
-Metrics/ParameterLists:
-  Max: 17
-
-# Offense count: 3
-Metrics/PerceivedComplexity:
-  Max: 18
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Alias:
-  Enabled: false
-
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
-  Enabled: false
-
-# Offense count: 22
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/ClassAndModuleChildren:
-  Enabled: false
-
-# Offense count: 19
 Style/Documentation:
   Enabled: false
 
-# Offense count: 112
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/DotPosition:
-  Enabled: false
-
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Enabled: false
-
-# Offense count: 74
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
 Style/PerlBackrefs:
   Enabled: false
 
