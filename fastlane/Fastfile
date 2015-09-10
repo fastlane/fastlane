@@ -134,7 +134,7 @@ end
 
 desc "All repos that have rubocop enabled" 
 private_lane :rubocop_repos do
-  ['fastlane', 'spaceship', 'gym', 'fastlane_core', 'credentials_manager', 'codes']
+  ['fastlane', 'spaceship', 'gym', 'fastlane_core', 'credentials_manager', 'codes', 'pilot']
 end
 
 desc "Detects the name of the tool based on the current directory" 
