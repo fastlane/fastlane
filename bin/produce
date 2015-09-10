@@ -52,7 +52,7 @@ class ProduceApplication
 
       c.action do |args, options|
         # Filter the options so that we can still build the configuration
-        allowed_keys = Produce::Options.available_options.collect { |config| config.key }
+        allowed_keys = Produce::Options.available_options.collect(&:key)
         Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
         require 'produce/service'
@@ -79,7 +79,7 @@ class ProduceApplication
 
       c.action do |args, options|
         # Filter the options so that we can still build the configuration
-        allowed_keys = Produce::Options.available_options.collect { |config| config.key }
+        allowed_keys = Produce::Options.available_options.collect(&:key)
         Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
         require 'produce/service'
@@ -96,7 +96,7 @@ class ProduceApplication
       c.option '-g', '--group_identifier STRING', String, 'Group identifier for the group (PRODUCE_GROUP_IDENTIFIER)'
 
       c.action do |args, options|
-        allowed_keys = Produce::Options.available_options.collect { |config| config.key }
+        allowed_keys = Produce::Options.available_options.collect(&:key)
         Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
         require 'produce/group'

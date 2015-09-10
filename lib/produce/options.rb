@@ -36,16 +36,14 @@ module Produce
                                      env_name: "PRODUCE_LANGUAGE",
                                      description: "Primary Language (e.g. 'English', 'German')",
                                      default_value: "English",
-                                     verify_block: Proc.new do |language|
-
+                                     verify_block: proc do |language|
                                      end),
         FastlaneCore::ConfigItem.new(key: :company_name,
                                      short_option: "-c",
                                      env_name: "PRODUCE_COMPANY_NAME",
                                      description: "The name of your comapny. Only required if it's the first app you create",
                                      optional: true,
-                                     verify_block: Proc.new do |language|
-
+                                     verify_block: proc do |language|
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
@@ -65,8 +63,8 @@ module Produce
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_ID"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -74,8 +72,8 @@ module Produce
                                      description: "The name of your team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                     verify_block: Proc.new do |value|
-                                        ENV["FASTLANE_TEAM_NAME"] = value
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value
                                      end)
       ]
     end

@@ -8,7 +8,7 @@ module Produce
       self.new.disable(options, args)
     end
 
-    def enable(options, args)
+    def enable(options, _args)
       unless app
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
         return
@@ -20,7 +20,7 @@ module Produce
       Helper.log.info "Done! Enabled #{enabled} services.".green
     end
 
-    def disable(options, args)
+    def disable(options, _args)
       unless app
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
         return
@@ -34,8 +34,8 @@ module Produce
 
     def valid_services_for(options)
       allowed_keys = [:app_group, :associated_domains, :data_protection, :healthkit, :homekit,
-        :wireless_conf, :icloud, :inter_app_audio, :passbook, :push_notification, :vpn_conf]
-        options.__hash__.select { |key, value| allowed_keys.include? key }
+                      :wireless_conf, :icloud, :inter_app_audio, :passbook, :push_notification, :vpn_conf]
+      options.__hash__.select { |key, value| allowed_keys.include? key }
     end
 
     def update(on, app, options)

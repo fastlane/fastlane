@@ -3,7 +3,7 @@ require 'babosa'
 
 module Produce
   class Group
-    def create(options, args)
+    def create(options, _args)
       login
 
       ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
@@ -39,16 +39,16 @@ module Produce
       return true
     end
 
-    def associate(options, args)
+    def associate(_options, args)
       login
 
       if !app_exists?
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the groups".red
       else
         app = Spaceship.app.find(app_identifier)
-        raise "Something went wrong when fetching the app - it's not listed in the apps list" unless app != nil
+        raise "Something went wrong when fetching the app - it's not listed in the apps list" if app.nil?
 
-        new_groups = Array.new
+        new_groups = []
 
         Helper.log.info "Validating groups before association"
 
@@ -79,7 +79,7 @@ module Produce
       Produce.config[:app_identifier].to_s
     end
 
-    def app_group_exists? (identifier)
+    def app_group_exists?(identifier)
       Spaceship.app_group.find(identifier) != nil
     end
 

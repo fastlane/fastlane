@@ -3,7 +3,6 @@ require 'babosa'
 
 module Produce
   class DeveloperCenter
-
     def run
       login
       create_new_app
@@ -19,12 +18,12 @@ module Produce
       else
         app_name = valid_name_for(Produce.config[:app_name])
         Helper.log.info "Creating new app '#{app_name}' on the Apple Dev Center".green
-        
+
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name)
 
         Helper.log.info "Created app #{app.app_id}"
-        
+
         raise "Something went wrong when creating the new app - it's not listed in the apps list" unless app_exists?
 
         ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
@@ -45,13 +44,14 @@ module Produce
     end
 
     private
-      def app_exists?
-        Spaceship.app.find(app_identifier) != nil
-      end
 
-      def login
-        Spaceship.login(Produce.config[:username], nil)
-        Spaceship.select_team
-      end
+    def app_exists?
+      Spaceship.app.find(app_identifier) != nil
+    end
+
+    def login
+      Spaceship.login(Produce.config[:username], nil)
+      Spaceship.select_team
+    end
   end
 end
