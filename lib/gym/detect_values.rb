@@ -170,6 +170,5 @@ module Gym
         end
       end
     end
-
   end
 end
