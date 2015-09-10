@@ -2,7 +2,6 @@ module Spaceship
   module Tunes
     # Represents an image hosted on iTunes Connect. Used for icons, screenshots, etc
     class AppImage < TunesBase
-
       attr_accessor :asset_token
 
       attr_accessor :thumbnail_url
@@ -46,7 +45,6 @@ module Spaceship
           self.send("#{k}=", v)
         end
       end
-
     end
   end
 end

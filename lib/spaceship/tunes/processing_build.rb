@@ -2,7 +2,6 @@ module Spaceship
   module Tunes
     # Represents a build which doesn't have a version number yet and is either processing or is stuck
     class ProcessingBuild < Build
-
       # @return [String] The state of this build
       # @example
       #   ITC.apps.betaProcessingStatus.InvalidBinary

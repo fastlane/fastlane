@@ -2,6 +2,7 @@ module Spaceship
   module Tunes
     # Represents an editable version of an iTunes Connect Application
     # This can either be the live or the edit version retrieved via the app
+    # rubocop:disable Metrics/ClassLength
     class AppVersion < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
@@ -259,7 +260,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_large_icon(self, upload_image)
 
-        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name})
+        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
       end
 
       # Uploads or removes the watch icon
@@ -272,7 +273,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_watch_icon(self, upload_image)
 
-        @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name})
+        @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
       end
 
       # Uploads or removes the transit app file
@@ -303,7 +304,7 @@ module Spaceship
         raise "sort_order must not be > 5" if sort_order > 5
         # this will also check both language and device parameters
         device_lang_screenshots = screenshots_data_for_language_and_device(language, device)["value"]
-        existing_sort_orders = device_lang_screenshots.map {|s| s["value"]["sortOrder"]}
+        existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
           upload_file = UploadFile.from_path screenshot_path
           screenshot_data = client.upload_screenshot(self, upload_file, device)
@@ -481,7 +482,7 @@ module Spaceship
       def container_data_for_language_and_device(data_field, language, device)
         raise "#{device} isn't a valid device name" unless DeviceType.exists?(device)
 
-        languages = raw_data_details.select {|d| d["language"] == language}
+        languages = raw_data_details.select { |d| d["language"] == language }
         # IDEA: better error for non existing language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
@@ -566,5 +567,6 @@ module Spaceship
         raw_data["details"]["value"]
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

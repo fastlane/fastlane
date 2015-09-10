@@ -1,6 +1,5 @@
 module Spaceship
   class PortalClient < Spaceship::Client
-
     #####################################################
     # @!group Init and Login
     #####################################################
@@ -274,7 +273,7 @@ module Spaceship
     end
 
     def download_certificate(certificate_id, type)
-      {type: type, certificate_id: certificate_id}.each { |k, v| raise "#{k} must not be nil" if v.nil? }
+      { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
       r = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
         teamId: team_id,

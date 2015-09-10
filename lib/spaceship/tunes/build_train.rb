@@ -3,7 +3,6 @@ module Spaceship
     # Represents a build train of builds from iTunes Connect
     # A build train is all builds for a given version number with different build numbers
     class BuildTrain < TunesBase
-
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this train is for
       attr_accessor :application

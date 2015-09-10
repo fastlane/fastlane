@@ -2,7 +2,6 @@ module Spaceship
   module Portal
     # Represents an App ID from the Developer Portal
     class App < PortalBase
-
       # @return (String) The identifier of this app, provided by the Dev Portal
       # @example
       #   "RGAWZGXSAA"

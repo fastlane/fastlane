@@ -1,7 +1,6 @@
 module Spaceship
   module Tunes
     class UserDetail < TunesBase
-
       attr_accessor :content_provider_id
 
       attr_mapping(

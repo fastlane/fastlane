@@ -27,7 +27,8 @@ module Spaceship
       def get(*keys)
         lookup(keys)
       end
-      alias [] get
+
+      alias_method :[], :get
 
       def set(keys, value)
         last = keys.pop

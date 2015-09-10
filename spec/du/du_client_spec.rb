@@ -6,7 +6,7 @@ describe Spaceship::DUClient, :du do
   let(:client) { Spaceship::AppVersion.client }
   let(:app) { Spaceship::Application.all.first }
   let(:contentProviderId) { "1234567" }
-  let(:ssoTokenForImage) {"sso token for image"}
+  let(:ssoTokenForImage) { "sso token for image" }
   let(:version) { app.edit_version }
 
   subject { Spaceship::DUClient.new }
@@ -41,7 +41,7 @@ describe Spaceship::DUClient, :du do
 
       data = subject.upload_geojson(version, valid_geojson, contentProviderId, ssoTokenForImage)
       expect(data['token']).to eq('Purple1/v4/45/50/9d/45509d39-6a5d-7f55-f919-0fbc7436be61/pr_source.geojson')
-      expect(data['dsId']).to eq(1206675732)
+      expect(data['dsId']).to eq(1_206_675_732)
       expect(data['type']).to eq('SMGameCenterAvatarImageType.SOURCE')
     end
 

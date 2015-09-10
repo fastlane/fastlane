@@ -186,10 +186,10 @@ module Spaceship
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
       if session?
-        headers.merge!({'Cookie' => cookie})
+        headers.merge!({ 'Cookie' => cookie })
         headers.merge!(csrf_tokens)
       end
-      headers.merge!({'User-Agent' => 'spaceship'})
+      headers.merge!({ 'User-Agent' => 'spaceship' })
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)
@@ -246,7 +246,7 @@ module Spaceship
 
     def encode_params(params, headers)
       params = Faraday::Utils::ParamsHash[params].to_query
-      headers = {'Content-Type' => 'application/x-www-form-urlencoded'}.merge(headers)
+      headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }.merge(headers)
       return params, headers
     end
   end

@@ -56,7 +56,7 @@ describe Spaceship::Tunes::BuildTrain do
         expect(app.pre_processing_builds.count).to eq(3)
 
         created_and_stucked = app.pre_processing_builds.first
-        expect(created_and_stucked.upload_date).to eq(1436381720000)
+        expect(created_and_stucked.upload_date).to eq(1_436_381_720_000)
         expect(created_and_stucked.state).to eq("ITC.apps.betaProcessingStatus.Created")
       end
 

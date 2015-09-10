@@ -2,7 +2,6 @@ module Spaceship
   module Tunes
     # Represents a build which is inside the build train
     class Build < TunesBase
-
       #####################################################
       # @!group General metadata
       #####################################################

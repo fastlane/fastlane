@@ -1,6 +1,6 @@
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
-
     # ITunesConnectError is only thrown when iTunes Connect raises an exception
     class ITunesConnectError < StandardError
     end
@@ -112,8 +112,8 @@ module Spaceship
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
-        data.fetch('sectionInfoKeys', []).count == 0 and
-        data.fetch('sectionWarningKeys', []).count == 0
+         data.fetch('sectionInfoKeys', []).count == 0 and
+         data.fetch('sectionWarningKeys', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -230,7 +230,7 @@ module Spaceship
 
       v_text = (is_live ? 'live' : nil)
 
-      r = request(:get, "ra/apps/version/#{app_id}", {v: v_text})
+      r = request(:get, "ra/apps/version/#{app_id}", { v: v_text })
       parse_response(r, 'data')
     end
 
@@ -367,6 +367,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # rubocop:disable Metrics/AbcSize
     def submit_testflight_build_for_review!( # Required:
                                             app_id: nil,
                                             train: nil,
@@ -436,6 +437,7 @@ module Spaceship
         handle_itc_response(r.body)
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     #####################################################
     # @!group Submit for Review
@@ -589,4 +591,5 @@ module Spaceship
       handle_itc_response(data)
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

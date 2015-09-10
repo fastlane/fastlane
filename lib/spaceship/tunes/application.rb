@@ -1,7 +1,6 @@
 module Spaceship
   module Tunes
     class Application < TunesBase
-
       # @return (String) The App identifier of this app, provided by iTunes Connect
       # @example
       #   "1013943394"

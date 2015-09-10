@@ -2,7 +2,6 @@ module Spaceship
   module Tunes
     # Represents a geo json
     class TransitAppFile < TunesBase
-
       attr_accessor :asset_token
 
       attr_accessor :name

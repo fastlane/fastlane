@@ -6,7 +6,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '.factory' do
     it 'should instantiate a subclass and pass the client' do
-      propro = Spaceship::ProvisioningProfile.factory({'distributionMethod' => 'store', 'appId' => {}, 'devices' => [{}], 'certificates' => []})
+      propro = Spaceship::ProvisioningProfile.factory({ 'distributionMethod' => 'store', 'appId' => {}, 'devices' => [{}], 'certificates' => [] })
       expect(propro).to be_instance_of(Spaceship::ProvisioningProfile::AdHoc)
       expect(propro.client).to eq(client)
     end
@@ -125,7 +125,7 @@ describe Spaceship::ProvisioningProfile do
                                                                     '2UMR2S6PAA',
                                                                     "XC5PH8DAAA",
                                                                     []).
-                        and_return({})
+        and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 

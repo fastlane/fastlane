@@ -2,7 +2,6 @@ module Spaceship
   module Tunes
     # Represents a preview video hosted on iTunes Connect. Used for icons, screenshots, etc
     class AppTrailer < TunesBase
-
       attr_accessor :video_asset_token
 
       attr_accessor :picture_asset_token
@@ -66,7 +65,6 @@ module Spaceship
           self.send("#{k}=", v)
         end
       end
-
     end
   end
 end

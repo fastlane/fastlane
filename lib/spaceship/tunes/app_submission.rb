@@ -141,7 +141,6 @@ module Spaceship
       def setup
         @submitted_for_review = false
       end
-
     end
   end
 end
