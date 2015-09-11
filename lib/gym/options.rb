@@ -4,7 +4,6 @@ require "credentials_manager"
 module Gym
   class Options
     def self.available_options
-        puts "HIT"
       return @options if @options
 
       @options = plain_options
