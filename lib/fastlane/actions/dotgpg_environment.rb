@@ -6,7 +6,7 @@ module Fastlane
     class DotgpgEnvironmentAction < Action
       def self.run(options)
         require 'dotgpg/environment'
-        
+
         if options[:dotgpg_file]
           dotgpg_file = options[:dotgpg_file]
         end
@@ -29,7 +29,7 @@ module Fastlane
                                        default_value: "dotgpg/secrets.gpg",
                                        optional: true,
                                        verify_block: proc do |value|
-                                          # validation is done in the action
+                                         # validation is done in the action
                                        end)
         ]
       end
