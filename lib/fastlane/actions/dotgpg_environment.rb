@@ -26,8 +26,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dotgpg_file,
                                        env_name: "DOTGPG_FILE",
                                        description: "Path to your DSYM file",
-                                       default_value: "dotgpg/secrets.gpg",
-                                       optional: true,
+                                       default_value: Dir["dotgpg/*.gpg"].last,
+                                       optional: false,
                                        verify_block: proc do |value|
                                          # validation is done in the action
                                        end)
@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        true
       end
     end
   end
