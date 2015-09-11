@@ -9,33 +9,12 @@ module Deliver
       self.apple_id = apple_id.to_s.gsub('id', '').to_i
       self.app_identifier = app_identifier
       
-      if apple_id and not app_identifier
-        # Fetch the app identifier based on the given Apple ID
-        self.app_identifier = FastlaneCore::ItunesSearchApi.fetch_bundle_identifier(apple_id)
-      elsif app_identifier and not apple_id
-        # Fetch the Apple ID based on the given app identifier
-        begin
-          begin
-            self.apple_id = FastlaneCore::ItunesSearchApi.fetch_by_identifier(app_identifier)['trackId']
-          rescue
-            Helper.log.warn "App doesn't seem to be in the App Store yet or is not available in the US App Store. Using the iTC API instead."
-            # Use the iTunes Connect API instead: make that default in the future
-            self.apple_id = FastlaneCore::ItunesConnect.new.find_apple_id(app_identifier)
-            raise "Couldn't find Apple ID" unless self.apple_id
-          end
-        rescue
-          unless Helper.is_test?
-            Helper.log.info "Could not find Apple ID based on the app identifier in the US App Store. Maybe the app is not yet in the store?".yellow
-            Helper.log.info "You can provide the Apple ID of your app using `apple_id '974739333'` in your `Deliverfile`".green
+      app_ref = Spaceship::Tunes::Application.find(self.app_identifier || self.apple_id) # the order is important
+      raise "Could not find app (#{apple_id} #{app_identifier})" unless app_ref
+      self.apple_id = app_ref.apple_id
+      self.app_identifier = app_ref.bundle_id
 
-            while ((self.apple_id || '').to_s.length == 0) || ((self.apple_id || 0).to_i == 0)
-              self.apple_id = ask("\nApple ID of your app (e.g. 284882215): ")
-            end
-          else
-            raise "Please pass a valid Apple ID using 'apple_id'".red
-          end
-        end
-      end
+      @ref = app_ref # since we have it already, why not store it? :) 
     end
 
     def to_s
@@ -45,11 +24,6 @@ module Deliver
     #####################################################
     # @!group Interacting with iTunesConnect
     #####################################################
-
-    # The iTC handler which is used to interact with the iTunesConnect backend
-    def itc
-      @itc ||= Deliver::ItunesConnect.new
-    end
 
     # Reference to the spaceship app object
     def spaceship_ref
@@ -116,6 +90,7 @@ module Deliver
     def upload_apple_watch_app_icon!(path)
       itc.upload_apple_watch_app_icon!(self, path)
     end
+
     #####################################################
     # @!group Destructive/Constructive methods
     #####################################################
