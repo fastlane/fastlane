@@ -1213,6 +1213,24 @@ data["users"].each do |user|
 end
 ```
 
+### version_get_podspec
+
+To receive the current version number from your `.podspec` file use
+
+```ruby
+version = version_get_podspec(path: "TSMessages.podspec")
+```
+
+### version_bump_podspec
+
+To increment the version number of your `.podspec` use
+
+```ruby
+version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
+# or
+version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
+```
+
 ### get_info_plist
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
