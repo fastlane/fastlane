@@ -1,5 +1,11 @@
 module Deliver
-  class AppMetadata
+  # Extension for metadata.rb, all screenshot related code is here
+  class Metadata
+    class AppMetadataTooManyScreenshotsError < StandardError
+    end
+
+    MAXIMUM_NUMBER_OF_SCREENSHOTS = 5
+
     #####################################################
     # @!group Screenshot related
     #####################################################
@@ -9,10 +15,8 @@ module Deliver
     def clear_all_screenshots(language)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
-      update_localized_value('software_screenshots', {language => {}}) do |field, useless, language|
-        field.children.remove # remove all the screenshots
-      end
-      information[language][:screenshots] = []
+      # binding.pry
+      
       true
     end
 
@@ -24,43 +28,22 @@ module Deliver
     def add_screenshot(language, app_screenshot)
       raise AppMetadataParameterError.new(INVALID_LANGUAGE_ERROR) unless FastlaneCore::Languages::ALL_LANGUAGES.include?language
 
-      create_locale_if_not_exists(language)
+      screenshots = app.edit_version.screenshots
+      
+      # actually add the new screenshot
+      # index starts with 1
+      lang = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(language) # de-DE => German
 
-      # Fetch the 'software_screenshots' node (array) for the specific locale
-      locales = self.fetch_value("//x:locale[@name='#{language}']")
+      existing = screenshots[lang].count { |s| s.device_type == app_screenshot.device_type }
 
-      screenshots = self.fetch_value("//x:locale[@name='#{language}']/x:software_screenshots").first
+      index = existing + 1 # because it starts with 1... wtf
 
-      if not screenshots or screenshots.children.count == 0
-        screenshots.remove if screenshots
+      Helper.log.info "Uploading '#{app_screenshot.path}' for language #{lang} of type #{app_screenshot.device_type} index #{index}"
+      version.upload_screenshot!(app_screenshot.path, index, lang, app_screenshot.device_type)
 
-        # First screenshot ever
-        screenshots = Nokogiri::XML::Node.new('software_screenshots', @data)
-        locales.first << screenshots
-
-        node_set = Nokogiri::XML::NodeSet.new(@data)
-        node_set << app_screenshot.create_xml_node(@data, 1)
-        screenshots.children = node_set
-      else
-        # There is already at least one screenshot
-        next_index = 1
-        screenshots.children.each do |screen|
-          if screen['display_target'] == app_screenshot.screen_size
-            next_index += 1
-          end
-        end
-
-        if next_index > MAXIMUM_NUMBER_OF_SCREENSHOTS
-          raise AppMetadataTooManyScreenshotsError.new("Only #{MAXIMUM_NUMBER_OF_SCREENSHOTS} screenshots are allowed per language per device type (#{app_screenshot.screen_size})")
-        end
-
-        # Ready for storing the screenshot into the metadata.xml now
-        screenshots.children.after(app_screenshot.create_xml_node(@data, next_index))
+      if index > MAXIMUM_NUMBER_OF_SCREENSHOTS
+        raise AppMetadataTooManyScreenshotsError.new("Only #{MAXIMUM_NUMBER_OF_SCREENSHOTS} screenshots are allowed per language per device type (#{app_screenshot.screen_size})")
       end
-
-      information[language][:screenshots] << app_screenshot
-
-      app_screenshot.store_file_inside_package(@package_path)
     end
 
     # This method will clear all screenshots and set the new ones you pass
@@ -152,30 +135,6 @@ module Deliver
       FastlaneCore::Languages::ALL_LANGUAGES.each do |language|
         full_path = File.join(path, language)
         if File.directory?(full_path)
-          found = true
-          set_screenshots_for_each_language({
-            language => full_path
-          }, use_framed)
-        end
-      end
-
-      # Legacy: 
-      # We also want to support the "legacy" language format (ja-JP instead of just ja)
-      FastlaneCore::Languages::ALL_LANGUAGES_LEGACY.each do |language|
-        full_path = File.join(path, language)
-        if File.directory?(full_path)
-
-          if FastlaneCore::Languages::ALL_LANGUAGES.include?language
-            # We're all good, this language code is still supported
-          else
-            # This language code was changed - need to modify that
-            short_code = language.match(/(\w\w)\-.*/)
-            if short_code and short_code.length == 2
-              Helper.log.info "Using language code #{short_code[1]} instead of #{language}"
-              language = short_code[1]
-            end
-          end
-
           found = true
           set_screenshots_for_each_language({
             language => full_path

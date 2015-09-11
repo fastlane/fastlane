@@ -63,13 +63,10 @@ module Deliver
       load_metadata_from_config_json_folder # the json file generated from the quick start # deprecated
       load_metadata_folder # this is the new way of defining app metadata
       set_app_metadata
-      set_screenshots
-
-      verify_pdf_file
-
       additional_itc_information # e.g. copyright, age rating
-
-      trigger_metadata_upload
+      
+      set_screenshots
+      # verify_html_file
     end
 
     #####################################################
@@ -113,7 +110,7 @@ module Deliver
       @app_version ||= @deploy_information[Deliverer::ValKey::APP_VERSION]
       @app_version ||= ENV["DELIVER_VERSION"] if ENV["DELIVER_VERSION"].to_s.length > 0
       @app_version ||= (@ipa.fetch_app_version rescue nil) # since ipa might be nil
-      @app_version ||= (app.get_live_version rescue nil) # pull the latest version from iTunes Connect
+      @app_version ||= (app.live_version_number rescue nil) # pull the latest version from iTunes Connect
     end
 
     #####################################################
@@ -148,7 +145,7 @@ module Deliver
 
       @checked_for_ready = true
 
-      @ready = (app.get_app_status == Spaceship::Tunes::AppStatus::READY_FOR_SALE)
+      @ready = (app.app_status == Spaceship::Tunes::AppStatus::READY_FOR_SALE)
     end
 
     #####################################################
@@ -271,17 +268,26 @@ module Deliver
     end
 
     def set_app_metadata
-      app.metadata.update_title(@deploy_information[Deliverer::ValKey::TITLE]) if @deploy_information[Deliverer::ValKey::TITLE]
-      app.metadata.update_description(@deploy_information[Deliverer::ValKey::DESCRIPTION]) if @deploy_information[Deliverer::ValKey::DESCRIPTION]
+      app.metadata.update_localised_value(:name, @deploy_information[Deliverer::ValKey::TITLE])
+      app.metadata.update_localised_value(:description, @deploy_information[Deliverer::ValKey::DESCRIPTION])
 
-      app.metadata.update_support_url(@deploy_information[Deliverer::ValKey::SUPPORT_URL]) if @deploy_information[Deliverer::ValKey::SUPPORT_URL]
-      app.metadata.update_changelog(@deploy_information[Deliverer::ValKey::CHANGELOG]) if @deploy_information[Deliverer::ValKey::CHANGELOG]
-      app.metadata.update_marketing_url(@deploy_information[Deliverer::ValKey::MARKETING_URL]) if @deploy_information[Deliverer::ValKey::MARKETING_URL]
-      app.metadata.update_privacy_url(@deploy_information[Deliverer::ValKey::PRIVACY_URL]) if @deploy_information[Deliverer::ValKey::PRIVACY_URL]
+      app.metadata.update_localised_value(:support_url, @deploy_information[Deliverer::ValKey::SUPPORT_URL])
+      app.metadata.update_localised_value(:marketing_url, @deploy_information[Deliverer::ValKey::MARKETING_URL])
+      app.metadata.update_localised_value(:privacy_url, @deploy_information[Deliverer::ValKey::PRIVACY_URL])
+      app.metadata.update_localised_value(:keywords, @deploy_information[Deliverer::ValKey::KEYWORDS])
+      
+      if app.can_set_changelog?
+        app.metadata.update_localised_value(:release_notes, @deploy_information[Deliverer::ValKey::CHANGELOG])
+      end
 
-      app.metadata.update_keywords(@deploy_information[Deliverer::ValKey::KEYWORDS]) if @deploy_information[Deliverer::ValKey::KEYWORDS]
+      # TODO
+      # app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER])
+      Helper.log.info "Updating app metadata"
 
-      app.metadata.update_price_tier(@deploy_information[Deliverer::ValKey::PRICE_TIER]) if @deploy_information[Deliverer::ValKey::PRICE_TIER]
+      begin
+        app.edit_version.save!
+      rescue Spaceship::TunesClient::ITunesConnectNoChangesError # we really couldn't care less
+      end
     end
 
     def screenshots_path
@@ -303,6 +309,7 @@ module Deliver
       if screens_path
         # Not using Snapfile. Not a good user.
         if not app.metadata.set_all_screenshots_from_path(screens_path, use_framed_screenshots?)
+          binding.pry
           # This path does not contain folders for each language
           if screens_path.kind_of?String
             if @deploy_information[Deliverer::ValKey::DEFAULT_LANGUAGE]
@@ -313,8 +320,14 @@ module Deliver
               screens_path = nil
             end
           end
+          binding.pry
           app.metadata.set_screenshots_for_each_language(screens_path, use_framed_screenshots?) if screens_path
         end
+      end
+
+      begin
+        app.metadata.version.save!
+      rescue Spaceship::TunesClient::ITunesConnectNoChangesError # we really couldn't care less
       end
     end
 
@@ -325,7 +338,7 @@ module Deliver
       return Dir[screenshots_path + "**/Framefile.json"].count > 0
     end
 
-    def verify_pdf_file
+    def verify_html_file
       if @deploy_information[Deliverer::ValKey::SKIP_PDF]
         Helper.log.debug "PDF verify was skipped"
       else
@@ -349,11 +362,6 @@ module Deliver
           end
         end
       end
-    end
-
-    def trigger_metadata_upload
-      result = app.metadata.upload!
-      raise "Error uploading app metadata".red unless result == true
     end
 
     def itc
@@ -380,29 +388,33 @@ module Deliver
         v.review_notes = d[k::APP_REVIEW_INFORMATION][:notes] if d[k::APP_REVIEW_INFORMATION][:notes]
       end
 
-      begin
-        v.save!
-      rescue Spaceship::TunesClient::ITunesConnectNoChangesError
-        # We don't care about this
+      # Categories
+      v.primary_category = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
+      v.secondary_category = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
+
+      # Sub Categories
+      if (cats = @deploy_information[Deliverer::ValKey::PRIMARY_SUBCATEGORIES])
+        v.primary_first_sub_category = cats.first
+        v.primary_second_sub_category = cats.last if cats.count > 1
       end
 
-      # Old code still using web scraping
+      if (cats = @deploy_information[Deliverer::ValKey::SECONDARY_SUBCATEGORIES])
+        v.secondary_first_sub_category = cats.first
+        v.secondary_second_sub_category = cats.last if cats.count > 1
+      end
 
-      # Categories
-      primary = @deploy_information[Deliverer::ValKey::PRIMARY_CATEGORY]
-      secondary = @deploy_information[Deliverer::ValKey::SECONDARY_CATEGORY]
-      primary_subcategories = @deploy_information[Deliverer::ValKey::PRIMARY_SUBCATEGORIES]
-      secondary_subcategories = @deploy_information[Deliverer::ValKey::SECONDARY_SUBCATEGORIES]
-      itc.set_categories!(app, primary, secondary, primary_subcategories, secondary_subcategories) if (primary or secondary)
+      # Resources Upload
+      v.upload_large_icon!(@deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
+      v.upload_watch_icon!(@deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]) if @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]
 
-      # App Rating
-      itc.set_app_rating!(app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
+      begin
+        v.save!
+      rescue Spaceship::TunesClient::ITunesConnectNoChangesError # We don't care about this
+      end
 
-      # App Icon
-      itc.upload_app_icon!(app, @deploy_information[Deliverer::ValKey::APP_ICON]) if @deploy_information[Deliverer::ValKey::APP_ICON]
-
-      # Apple Watch App Icon
-      itc.upload_apple_watch_app_icon!(app, @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]) if @deploy_information[Deliverer::ValKey::APPLE_WATCH_APP_ICON]
+      # Old code still using web scraping # TODO
+      # # App Rating
+      # itc.set_app_rating!(app, @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]) if @deploy_information[Deliverer::ValKey::RATINGS_CONFIG_PATH]
     end
 
     def trigger_ipa_upload

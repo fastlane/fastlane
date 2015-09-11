@@ -270,25 +270,6 @@ All available commands with a short description can be found in [Deliverfile.md]
 - Upload the latest screenshots to your server
 
 For further actions, check out [fastlane](https://github.com/KrauseFx/fastlane)
-    
-#### Use the exposed Ruby classes
-Some examples:
-```ruby
-require 'deliver'
-
-app = Deliver::App.new(app_identifier: 'com.krausefx.app')
-
-app.get_app_status # => Waiting for Review
-app.create_new_version!("1.4")
-app.metadata.update_title("en-US" => "iPhone App Title")
-app.metadata.set_all_screenshots_from_path("./screenshots")
-app.upload_metadata!
-app.itc.submit_for_review!(app)
-
-FastlaneCore::ItunesSearchApi.fetch_by_identifier("net.sunapps.15") # => Fetches public metadata
-```
-This project is well documented, check it out on [RubyDoc](http://www.rubydoc.info/github/KrauseFx/deliver/frames).
-
 
 # Credentials
 

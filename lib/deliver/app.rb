@@ -30,65 +30,33 @@ module Deliver
       @ref ||= Spaceship::Tunes::Application.find(self.app_identifier)
     end
 
+    # A reference to the spaceship object for this app/version
+    # @param refresh Force refresh
+    def edit_version(refresh: false)
+      @edit = nil if refresh
+      @edit ||= spaceship_ref.edit_version
+    end
+
+    def metadata
+      @metadata ||= Metadata.new(self)
+    end
+
     # This method fetches the current app status from iTunesConnect.
     # This method may take some time to execute, since it uses frontend scripting under the hood.
     # @return the current App Status defined at {Spaceship::Tunes::AppStatus}, like "Waiting For Review"
-    def get_app_status
+    def app_status
       spaceship_ref.latest_version.app_status
     end
 
     # This method fetches the app version of the latest published version
     # @return the currently active app version, which in production
-    def get_live_version
+    def live_version_number
       spaceship_ref.latest_version.version
     end
 
-    #####################################################
-    # @!group Updating the App Metadata
-    #####################################################
-
-    # Use this method to change the default download location for the metadata packages
-    def set_metadata_directory(dir)
-      raise "Can not change metadata directory after accessing metadata of an app" if @metadata
-      @metadata_dir = dir
-    end
-
-    # @return the path to the directy in which the itmsp files will be downloaded
-    def get_metadata_directory
-      return @metadata_dir if @metadata_dir 
-      return "./spec/fixtures/packages/" if Helper.is_test?
-      return "./"
-    end
-
-    # Access to update the metadata of this app
-    # 
-    # The first time accessing this, will take some time, since it's downloading
-    # the latest version from iTC.
-    # 
-    # Don't forget to call {#upload_metadata!} once you are finished
-    # @return [Deliver::AppMetadata] the latest metadata of this app
-    def metadata
-      @metadata ||= Deliver::AppMetadata.new(self, get_metadata_directory)
-    end
-
-    # Was the app metadata already downloaded?
-    def metadata_downloaded?
-      @metadata != nil
-    end
-
-
-    # Uploads a new app icon to iTunesConnect. This uses a headless browser
-    # which makes this command quite slow.
-    # @param (path) a path to the new app icon. The image must have the resolution of 1024x1024
-    def upload_app_icon!(path)
-      itc.upload_app_icon!(self, path)
-    end
-
-    # Uploads a new apple watch app icon to iTunesConnect. This uses a headless browser
-    # which makes this command quite slow.
-    # @param (path) a path to the new apple watch app icon. The image must have the resolution of 1024x1024
-    def upload_apple_watch_app_icon!(path)
-      itc.upload_apple_watch_app_icon!(self, path)
+    def can_set_changelog?
+      # initial version's live version is ready for submission instead of being live
+      spaceship_ref.live_version.app_status != Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION
     end
 
     #####################################################
@@ -101,7 +69,7 @@ module Deliver
     # @param version_number (String) the version number as string for 
     # the new version that should be created
     def create_new_version!(version_number)
-      if (v = spaceship_ref.edit_version)
+      if (v = spaceship_ref.edit_version) # fix: sometimes this is nil for some reason
         if v.version != version_number
           # Version is already there, make sure it matches the one we want to create
           Helper.log.info "Changing existing version number from '#{v.version}' to '#{version_number}'"
@@ -110,20 +78,10 @@ module Deliver
         end
       else
         # No version created yet, creating it now
+        require 'pry'
+        binding.pry
         spaceship_ref.create_version!(version_number)
       end
-    end
-
-    # This method has to be called, after modifying the values of .metadata.
-    # It will take care of uploading all changes to Apple.
-    # This method might take a few minutes to run
-    # @return [bool] true on success
-    # @raise [Deliver::TransporterTransferError]
-    # @raise [Deliver::TransporterInputError]
-    def upload_metadata!
-      raise "You first have to modify the metadata using app.metadata.setDescription" unless @metadata
-      
-      self.metadata.upload!
     end
   end
 end

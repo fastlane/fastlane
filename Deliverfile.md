@@ -94,7 +94,7 @@ Contact information for the app review team. Available options: `first_name`, `l
 app_review_information(
   first_name: "Felix",
   last_name: "Krause",
-  phone_number: "123123",
+  phone_number: "+43 123123123",
   email_address: "github@krausefx.com",
   demo_user: "demoUser",
   demo_password: "demoPass",

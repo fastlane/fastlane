@@ -57,8 +57,18 @@ module Deliver
       return node
     end
 
-    def name_for_xml_node
-      'software_screenshot'
+    # The iTC API requires a different notation for the device
+    def device_type
+      matching = {
+        ScreenSize::IOS_35 => "iphone35",
+        ScreenSize::IOS_40 => "iphone4",
+        ScreenSize::IOS_47 => "iphone6",
+        ScreenSize::IOS_55 => "iphone6Plus",
+        ScreenSize::IOS_IPAD => "ipad",
+        ScreenSize::MAC => "mac",
+        ScreenSize::IOS_APPLE_WATCH => "Watch"
+      }
+      return matching[self.screen_size]
     end
 
     # Validates the given screenshots (size and format)
