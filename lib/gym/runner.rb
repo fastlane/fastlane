@@ -6,6 +6,7 @@ module Gym
   class Runner
     # @return (String) The path to the resulting ipa
     def run
+      clear_old_files
       build_app
       verify_archive
 
@@ -13,6 +14,7 @@ module Gym
 
       if Gym.project.ios?
         package_app
+        fix_package
         compress_and_move_dsym
         move_ipa
       elsif Gym.project.mac?
@@ -53,6 +55,20 @@ module Gym
     #####################################################
     # @!group The individual steps
     #####################################################
+
+    def clear_old_files
+      return unless Gym.pre_7?
+      if File.exist? PackageCommandGenerator.ipa_path
+        File.delete(PackageCommandGenerator.ipa_path)
+      end
+    end
+
+    def fix_package
+      return unless Gym.pre_7?
+      Gym::XcodebuildFixes.swift_library_fix
+      Gym::XcodebuildFixes.watchkit_fix
+      Gym::XcodebuildFixes.clear_patched_package_application
+    end
 
     # Builds the app and prepares the archive
     def build_app
@@ -109,7 +125,7 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting ipa file
     def move_ipa
-      ipa_path = Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
+      ipa_path = find_archive_path
 
       FileUtils.mv(ipa_path, Gym.config[:output_directory], force: true)
 
@@ -131,6 +147,16 @@ module Gym
       Helper.log.info "Successfully exported the .app file:".green
       Helper.log.info app_path
       app_path
+    end
+
+    private
+
+    def find_archive_path
+      if Gym.pre_7?
+        BuildCommandGenerator.archive_path
+      else
+        Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
+      end
     end
   end
 end
