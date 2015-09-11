@@ -5,20 +5,20 @@ module Fastlane
 
     class DotgpgEnvironmentAction < Action
       def self.run(options)
-        require 'dotgpg/environment'
-
-        if options[:dotgpg_file]
-          dotgpg_file = options[:dotgpg_file]
+        begin
+          Gem::Specification.find_by_name('dotgpg')
+        rescue Gem::LoadError
+          raise "You have to install the `dotgpg` using `sudo gem install dotgpg` to use this action".red
         end
 
-        raise "Dotgpg file '#{File.expand_path(dotgpg_file)}' not found".red if dotgpg_file && !File.exist?(dotgpg_file)
+        require 'dotgpg/environment'
 
-        Helper.log.info "Reading secrets from #{dotgpg_file}"
-        Dotgpg::Environment.new(dotgpg_file).apply
+        Helper.log.info "Reading secrets from #{options[:dotgpg_file]}"
+        Dotgpg::Environment.new(options[:dotgpg_file]).apply
       end
 
       def self.description
-        "Reads in production secrets set in a dotgpg file and puts them in ENV."
+        "Reads in production secrets set in a dotgpg file and puts them in ENV"
       end
 
       def self.details
@@ -29,11 +29,11 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :dotgpg_file,
                                        env_name: "DOTGPG_FILE",
-                                       description: "Path to your DSYM file",
+                                       description: "Path to your gpg file",
                                        default_value: Dir["dotgpg/*.gpg"].last,
                                        optional: false,
                                        verify_block: proc do |value|
-                                         # validation is done in the action
+                                         raise "Dotgpg file '#{File.expand_path(value)}' not found".red unless File.exist?(value)
                                        end)
         ]
       end
