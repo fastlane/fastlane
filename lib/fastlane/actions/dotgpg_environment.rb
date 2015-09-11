@@ -18,7 +18,11 @@ module Fastlane
       end
 
       def self.description
-        "Reads in production secrets set in a dotgpg file and puts them in ENV. More information at https://github.com/ConradIrwin/dotgpg"
+        "Reads in production secrets set in a dotgpg file and puts them in ENV."
+      end
+
+      def self.details
+        "More information about dotgpg can be found at https://github.com/ConradIrwin/dotgpg"
       end
 
       def self.available_options
