@@ -81,6 +81,20 @@ This will do a few things:
 
 The tests are executed using `fastlane` :rocket:
 
+# Running the local code
+
+Run your local copy using
+
+```
+./bin/[gem]
+```
+
+or install the local copy (might require `sudo`)
+
+```
+bundle install && rake install
+```
+
 # rubocop validation
 
 The `fastlane` repos use [rubocop](https://github.com/bbatsov/rubocop) to validate the code style.
