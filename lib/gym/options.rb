@@ -4,6 +4,7 @@ require "credentials_manager"
 module Gym
   class Options
     def self.available_options
+        puts "HIT"
       return @options if @options
 
       @options = plain_options
@@ -49,6 +50,11 @@ module Gym
                                      env_name: "GYM_OUTPUT_DIRECTORY",
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: "."),
+        FastlaneCore::ConfigItem.new(key: :archive_path,
+                                     short_option: "-b",
+                                     env_name: "GYM_ARCHIVE_PATH",
+                                     description: "The directory in which the archive file should be stored in",
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
