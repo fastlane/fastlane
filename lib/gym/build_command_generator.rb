@@ -83,7 +83,6 @@ module Gym
         end
         return @archive_path
       end
-
     end
   end
 end
