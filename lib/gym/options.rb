@@ -53,7 +53,7 @@ module Gym
                                      short_option: "-b",
                                      env_name: "GYM_ARCHIVE_PATH",
                                      description: "The directory in which the archive file should be stored in",
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
