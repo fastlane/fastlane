@@ -20,16 +20,15 @@ module Pilot
     def app
       @apple_id ||= fetch_app_id
 
-      unless (@app ||= Spaceship::Application.find(@apple_id))
+      @app ||= Spaceship::Application.find(@apple_id)
+      unless @app
         raise "Could not find app with #{(config[:apple_id] || config[:app_identifier])}"
       end
       return @app
     end
 
-    # Access the current configuration 
-    def config
-      @config
-    end
+    # Access the current configuration
+    attr_reader :config
 
     # Config Related
     ################

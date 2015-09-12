@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/AbcSize
 require "commander"
 require "pilot/options"
 require "fastlane_core"
@@ -23,8 +25,8 @@ module Pilot
       o
     end
 
-    def handle_email(config, _args)
-      config[:email] ||= _args.first
+    def handle_email(config, args)
+      config[:email] ||= args.first
       config[:email] ||= ask("Email address of the tester: ".yellow)
     end
 
@@ -41,7 +43,7 @@ module Pilot
       command :upload do |c|
         c.syntax = "pilot upload"
         c.description = "Uploads a new binary to Apple TestFlight"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.upload(config)
         end
@@ -50,7 +52,7 @@ module Pilot
       command :builds do |c|
         c.syntax = "pilot builds"
         c.description = "Lists all builds for given application"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.list(config)
         end
@@ -59,9 +61,9 @@ module Pilot
       command :add do |c|
         c.syntax = "pilot add"
         c.description = "Adds a new external tester to a specific app (if given). This will also add an existing tester to an app."
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, _args)
+          handle_email(config, args)
           Pilot::TesterManager.new.add_tester(config)
         end
       end
@@ -69,7 +71,7 @@ module Pilot
       command :list do |c|
         c.syntax = "pilot list"
         c.description = "Lists all registered testers, both internal and external"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterManager.new.list_testers(config)
         end
@@ -78,9 +80,9 @@ module Pilot
       command :find do |c|
         c.syntax = "pilot find"
         c.description = "Find a tester (internal or external) by their email address"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, _args)
+          handle_email(config, args)
           Pilot::TesterManager.new.find_tester(config)
         end
       end
@@ -88,9 +90,9 @@ module Pilot
       command :remove do |c|
         c.syntax = "pilot remove"
         c.description = "Remove an external tester by their email address"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, _args)
+          handle_email(config, args)
           Pilot::TesterManager.new.remove_tester(config)
         end
       end
@@ -98,7 +100,7 @@ module Pilot
       command :export do |c|
         c.syntax = "pilot export"
         c.description = "Exports all external testers to a CSV file"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterExporter.new.export_testers(config)
         end
@@ -107,7 +109,7 @@ module Pilot
       command :import do |c|
         c.syntax = "pilot import"
         c.description = "Create external testers from a CSV file"
-        c.action do |_args, options|
+        c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterImporter.new.import_testers(config)
         end
@@ -119,3 +121,5 @@ module Pilot
     end
   end
 end
+# rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/AbcSize
