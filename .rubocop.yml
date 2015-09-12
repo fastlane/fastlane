@@ -4,3 +4,15 @@
 ##################
 
 inherit_from: .rubocop_general.yml
+
+
+
+##################
+# TODO
+##################
+
+Style/Documentation:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
