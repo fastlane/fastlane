@@ -7,7 +7,6 @@ module Spaceship
     # monkey patched
     # move this to spaceship
     class Tester < TunesBase
-
       def full_version
         return nil unless latest_install_date
         latest_installed_version = latest_installed_version_number
