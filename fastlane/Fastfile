@@ -134,7 +134,7 @@ end
 
 desc "Detects the name of the tool based on the current directory" 
 private_lane :detect_tool do
-  Dir["*.gemspec"].last.split(".").first
+  Dir["../*.gemspec"].last.match(/(\w+).gemspec/)[1]
 end
 
 desc "Get a reference to the module of this tool"
