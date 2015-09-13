@@ -8,11 +8,11 @@ Make sure it's structured like this:
 
 ```ruby
 module Fastlane
-	module Helper
-		class PodspecHelper
-			...
-		end
-	end
+  module Helper
+    class PodspecHelper
+      ...
+    end
+  end
 end
 ```
 
