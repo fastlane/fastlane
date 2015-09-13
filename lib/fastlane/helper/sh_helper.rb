@@ -21,24 +21,19 @@ module Fastlane
       if Helper.test?
         result << command # only for the tests
       else
-        begin
-          PTY.spawn(command) do |r, w, pid|
-            begin
-              r.each_line do |line|
-                Helper.log.info ['[SHELL]', line.strip].join(': ')
-                result << line
-              end
-            rescue Errno::EIO
-            end
-            Process.wait(pid)
+        exit_status = nil
+        IO.popen(command, err: [:child, :out]) do |io|
+          io.each do |line|
+            Helper.log.info ['[SHELL]', line.strip].join(': ')
+            result << line
           end
-          exit_status = $?.to_i
-        rescue PTY::ChildExited => e
-          exit_status = e.status.to_i
+          io.close
+          exit_status = $?.exitstatus
         end
 
         if exit_status != 0
-          raise "Exit status of command '#{command}' was #{exit_status} instead of 0.\n#{result}"
+          # this will also append the output to the exception
+          raise "Exit status of command '#{command}' was #{exit_status} instead of 0. \n#{result}"
         end
       end
 

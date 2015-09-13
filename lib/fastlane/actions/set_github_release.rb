@@ -32,7 +32,7 @@ module Fastlane
 
         case response[:status]
         when 201
-          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub!".green
+          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub".green
           body = JSON.parse(response.body)
           html_url = body['html_url']
           release_id = body['id']
@@ -228,6 +228,13 @@ module Fastlane
           ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)'],
           ['SET_GITHUB_RELEASE_JSON', 'The whole release JSON object']
         ]
+      end
+
+      def self.return_value
+        [
+          "A hash containing all relevant information of this release",
+          "Access things like 'html_url', 'tag_name', 'name', 'body'"
+        ].join("\n")
       end
 
       def self.authors

@@ -88,4 +88,3 @@ module Fastlane
     end
   end
 end
-#  vim: set et sw=2 ts=2 :

@@ -61,6 +61,10 @@ module Fastlane
         ]
       end
 
+      def self.return_value
+        # If you method provides a return value, you can describe here what it does
+      end
+
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["Your GitHub/Twitter Name"]

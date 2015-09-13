@@ -1,5 +1,7 @@
 # Contributing to `fastlane`
 
+To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https://github.com/fastlane/countdown) repo. It will help you set up the development environment within minutes.
+
 1. Create an issue to discuss about your idea.
 2. Fork it (https://github.com/KrauseFx/fastlane/fork).
 3. Create your feature branch (`git checkout -b my-new-feature`).

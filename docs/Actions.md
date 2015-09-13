@@ -31,7 +31,7 @@ bundle_install
 
 ### [CocoaPods](http://cocoapods.org)
 
-Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
+If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
 
 ```ruby
 cocoapods # this will run pod install
@@ -1113,6 +1113,7 @@ Send a message to **room** (by default) or a direct message to **@username** wit
     message: "App successfully released!",
     message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
+    from: "sender name", defaults to "fastlane"
     success: true
   )
 ```
@@ -1212,6 +1213,24 @@ data["users"].each do |user|
 end
 ```
 
+### version_get_podspec
+
+To receive the current version number from your `.podspec` file use
+
+```ruby
+version = version_get_podspec(path: "TSMessages.podspec")
+```
+
+### version_bump_podspec
+
+To increment the version number of your `.podspec` use
+
+```ruby
+version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
+# or
+version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
+```
+
 ### get_info_plist
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
@@ -1277,4 +1296,22 @@ This will find the first podspec in the folder. You can also pass in the specifi
 
 ```ruby
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
+```
+
+### prompt
+
+You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
+This action also supports multi-line inputs using the `multi_line_end_keyword` option.
+
+```ruby
+changelog = prompt(text: "Changelog: ")
+```
+
+```ruby
+changelog = prompt(
+  text: "Changelog: ",
+  multi_line_end_keyword: "END"
+)
+
+hockey(notes: changelog)
 ```

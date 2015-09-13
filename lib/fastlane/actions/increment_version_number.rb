@@ -68,6 +68,7 @@ module Fastlane
           Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
         end
 
+        return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
         Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
         raise ex
@@ -82,7 +83,7 @@ module Fastlane
           "This action will increment the version number. ",
           "You first have to set up your Xcode project, if you haven't done it already:",
           "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
-        ].join(' ')
+        ].join("\n")
       end
 
       def self.available_options

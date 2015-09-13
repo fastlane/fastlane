@@ -1,4 +1,4 @@
-require 'fastlane/actions_list'
+require 'fastlane/documentation/actions_list'
 
 describe Fastlane do
   describe "Action List" do
@@ -57,7 +57,7 @@ describe Fastlane do
       end
     end
 
-    it "allows filtering of the platforms", now: true do
+    it "allows filtering of the platforms" do
       count = 0
       Fastlane::ActionsList.all_actions("nothing special") { count += 1 }
       expect(count).to be > 40

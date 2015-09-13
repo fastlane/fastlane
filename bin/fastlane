@@ -94,7 +94,7 @@ class FastlaneApplication
 
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
 
-        require 'fastlane/docs_generator'
+        require 'fastlane/documentation/docs_generator'
         Fastlane::DocsGenerator.run(path, ff)
       end
     end
@@ -106,7 +106,7 @@ class FastlaneApplication
       c.option '--platform STRING', String, 'Only show actions available on the given platform'
 
       c.action do |args, options|
-        require 'fastlane/actions_list'
+        require 'fastlane/documentation/actions_list'
         Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
       end
     end
@@ -115,7 +115,7 @@ class FastlaneApplication
       c.syntax = 'fastlane action [tool_name]'
       c.description = 'Shows more information for a specific command'
       c.action do |args, options|
-        require 'fastlane/actions_list'
+        require 'fastlane/documentation/actions_list'
         Fastlane::ActionsList.run(filter: args.first)
       end
     end

@@ -1,4 +1,4 @@
-require 'fastlane/docs_generator'
+require 'fastlane/documentation/docs_generator'
 
 describe Fastlane do
   describe Fastlane::DocsGenerator do

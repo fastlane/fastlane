@@ -26,9 +26,9 @@ module Fastlane
       end
 
       def self.connect_to_artifactory(params)
-        keys = [:endpoint, :username, :password, :ssl_pem_file, :ssl_verify, :proxy_username, :proxy_password, :proxy_address, :proxy_port]
-        keys.each do |key|
-          config[key] = params[key] if params[key]
+        config_keys = [:endpoint, :username, :password, :ssl_pem_file, :ssl_verify, :proxy_username, :proxy_password, :proxy_address, :proxy_port]
+        config = params.values.select do |key|
+          config_keys.include? key
         end
         Artifactory::Client.new(config)
       end
