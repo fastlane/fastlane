@@ -35,6 +35,22 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.4.3/)
       end
 
+      it "prefers a custom version number over a boring version bump" do
+        Fastlane::FastFile.new.parse("lane :test do
+          increment_version_number(version_number: '1.77.3', bump_type: 'major')
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.77.3/)
+      end
+
+      it "returns the new version as return value" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          increment_version_number(bump_type: 'major')
+        end").runner.execute(:test)
+
+        expect(result).to eq(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER])
+      end
+
       it "raises an exception when xcode project path wasn't found" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

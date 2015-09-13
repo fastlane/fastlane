@@ -32,6 +32,11 @@ module Fastlane
       nil
     end
 
+    def self.return_value
+      # Describes what this method returns
+      nil
+    end
+
     def self.author
       nil
     end

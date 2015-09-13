@@ -1,17 +1,17 @@
-require 'fastlane/actions_list'
+require 'fastlane/documentation/actions_list'
 
 describe Fastlane do
   describe "Action List" do
     it "doesn't throw an exception" do
-      Fastlane::ActionsList.run nil
+      Fastlane::ActionsList.run(filter: nil)
     end
 
     it "doesn't throw an exception with filter" do
-      Fastlane::ActionsList.run 'deliver'
+      Fastlane::ActionsList.run(filter: 'deliver')
     end
 
     it "shows all available actions if action can't be found" do
-      Fastlane::ActionsList.run 'nonExistingHere'
+      Fastlane::ActionsList.run(filter: 'nonExistingHere')
     end
 
     it "returns all available actions with the type `Class`" do
@@ -38,6 +38,10 @@ describe Fastlane do
           authors = Array(action.author || action.authors)
           expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
 
+          authors.each do |author|
+            expect(author).to_not start_with("@")
+          end
+
           if action.available_options
             expect(action.available_options).to be_instance_of(Array), "'available_options' for action '#{name}' must be an array"
           end
@@ -53,10 +57,17 @@ describe Fastlane do
       end
     end
 
+    it "allows filtering of the platforms" do
+      count = 0
+      Fastlane::ActionsList.all_actions("nothing special") { count += 1 }
+      expect(count).to be > 40
+      expect(count).to be < 80
+    end
+
     describe "Provide action details" do
       Fastlane::ActionsList.all_actions do |action, name|
         it "Shows the details for action '#{name}'" do
-          Fastlane::ActionsList.show_details(name)
+          Fastlane::ActionsList.show_details(filter: name)
         end
       end
     end

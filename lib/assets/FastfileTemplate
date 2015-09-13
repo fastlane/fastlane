@@ -22,12 +22,10 @@ default_platform :ios
 
 
 platform :ios do
-
   before_all do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
-
     cocoapods
-
+    carthage
     # increment_build_number
 
     gym[[SCHEME]] # Build your app - more options available
@@ -69,7 +67,6 @@ platform :ios do
     #   message: "Successfully deployed new App Update."
     # )
   end
-
 
   error do |lane, exception|
     # slack(

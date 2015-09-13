@@ -4,7 +4,7 @@ module Fastlane
       # rubocop:disable Metrics/CyclomaticComplexity
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
-        if File.exist?('Gemfile')
+        if gemfile_exists?(params)
           cmd = ['bundle install']
 
           cmd << "--binstubs #{params[:binstubs]}" if params[:binstubs]
@@ -34,8 +34,19 @@ module Fastlane
       # rubocop:enable Metrics/CyclomaticComplexity
       # rubocop:enable Metrics/PerceivedComplexity
 
+      def self.gemfile_exists?(params)
+        possible_gemfiles = ['Gemfile', 'gemfile']
+        possible_gemfiles.insert(0, params[:gemfile]) if params[:gemfile]
+        possible_gemfiles.each do |gemfile|
+          gemfile = File.absolute_path(gemfile)
+          return true if File.exist? gemfile
+          Helper.log.info "Gemfile not found at: '#{gemfile}'"
+        end
+        return false
+      end
+
       def self.description
-        'This action runs `bundle install` if it founds the Gemfile'
+        'This action runs `bundle install` (if available)'
       end
 
       def self.is_supported?(platform)
@@ -43,7 +54,7 @@ module Fastlane
       end
 
       def self.author
-        ["birmacher"]
+        ["birmacher", "koglinjg"]
       end
 
       def self.available_options

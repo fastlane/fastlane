@@ -20,8 +20,6 @@ module Fastlane
         # Actions.lane_context[SharedValues::[[NAME_UP]]_CUSTOM_VALUE] = "my_val"
       end
 
-
-
       #####################################################
       # @!group Documentation
       #####################################################
@@ -61,6 +59,10 @@ module Fastlane
         [
           ['[[NAME_UP]]_CUSTOM_VALUE', 'A description of what this value contains']
         ]
+      end
+
+      def self.return_value
+        # If you method provides a return value, you can describe here what it does
       end
 
       def self.authors

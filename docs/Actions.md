@@ -31,7 +31,7 @@ bundle_install
 
 ### [CocoaPods](http://cocoapods.org)
 
-Everyone using [CocoaPods](http://cocoapods.org) will probably want to run a ```pod install``` before running tests and building the app.
+If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
 
 ```ruby
 cocoapods # this will run pod install
@@ -230,6 +230,26 @@ create_keychain(
 )
 ```
 
+### `unlock_keychain`
+
+Unlock an existing keychain and add it to the keychain search list.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret"
+)
+```
+
+If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
+
+```ruby
+unlock_keychain(
+  path: "KeychainName",
+  password: "mysecret"
+)
+```
+
 ### `delete_keychain`
 
 Delete a keychain, can be used after creating one with `create_keychain`.
@@ -376,6 +396,19 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
       output: './build-dir/test-report.xml'
     }]
   )
+```
+
+### [slather](https://github.com/venmo/slather)
+
+> Generate test coverage reports for Xcode projects & hook it into CI.
+
+```ruby
+slather(
+  build_directory: 'foo',
+  input_format: 'bah',
+  scheme: 'Foo',
+  proj: 'foo.xcodeproj'
+)
 ```
 
 ### [gcovr](http://gcovr.com/)
@@ -567,7 +600,7 @@ If you put `deploygate` after `ipa` action, you don't have to specify IPA file p
 
 More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
 
-### [Xcode Server get assets](https://www.apple.com/uk/support/osxserver/xcodeserver/)
+### [Xcode Server](https://www.apple.com/uk/support/osxserver/xcodeserver/)
 
 This action retrieves integration assets (`.xcarchive`, logs etc) from your Xcode Server instance over HTTPS.
 
@@ -592,6 +625,39 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
 
+### [GitHub Releases](https://github.com)
+
+This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc. 
+
+```ruby
+github_release = set_github_release(
+  repository_name: "krausefx/fastlane",
+  api_token: ENV['GITHUB_TOKEN']
+  name: "Super New actions",
+  tag_name: "v1.22.0",
+  description: File.read("changelog"),
+  commitish: "master",
+  upload_assets: ["example_integration.ipa", "./pkg/built.gem"]
+)
+```
+
+### [artifactory](http://www.jfrog.com/artifactory/)
+
+This allows you to upload your ipa, or any other file you want, to artifactory.
+
+```ruby
+artifactory(
+  username: "username",
+  password: "password",
+  endpoint: "https://artifactory.example.com/artifactory/",
+  file: 'example.ipa',                                # File to upload
+  repo: 'mobile_artifacts',                           # Artifactory repo
+  repo_path: '/ios/appname/example-major.minor.ipa'   # Path to place the artifact including its filename
+)
+```
+
+To get a list of all available parameters run `fastlane action artifactory`
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -614,7 +680,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the build number without modifying it
 
 ```ruby
-version = get_build_number(xcodepoj: "Project.xcodeproj")
+version = get_build_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -646,7 +712,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the version number without modifying it
 
 ```ruby
-version = get_version_number(xcodepoj: "Project.xcodeproj")
+version = get_version_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### set_build_number_repository
@@ -1045,7 +1111,9 @@ Send a message to **room** (by default) or a direct message to **@username** wit
 
   hipchat(
     message: "App successfully released!",
+    message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
+    from: "sender name", defaults to "fastlane"
     success: true
   )
 ```
@@ -1129,6 +1197,57 @@ end
 
 ## Misc
 
+### download
+
+Download a file from a remote server (e.g. JSON file)
+
+```ruby
+data = download(url: "https://host.com/api.json")
+
+# Print information
+puts data["users"].first["name"]
+
+# Iterate
+data["users"].each do |user|
+  puts user["name"]
+end
+```
+
+### version_get_podspec
+
+To receive the current version number from your `.podspec` file use
+
+```ruby
+version = version_get_podspec(path: "TSMessages.podspec")
+```
+
+### version_bump_podspec
+
+To increment the version number of your `.podspec` use
+
+```ruby
+version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
+# or
+version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
+```
+
+### get_info_plist
+
+Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
+
+```ruby
+identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier')
+puts identifier # => com.krausefx.app
+```
+
+### set_info_plist
+
+Set a value of a plist file. You can use this action to update the bundle identifier of your app
+
+```ruby
+set_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier', value: "com.krausefx.app.beta")
+```
+
 ### say
 
 To speak out a text
@@ -1161,4 +1280,38 @@ if is_ci?
 else
   say "Hi Human!"
 end
+```
+
+### read_podspec
+
+Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
+
+```ruby
+spec = read_podspec
+version = spec['version']
+puts "Using Version #{version}"
+```
+
+This will find the first podspec in the folder. You can also pass in the specific podspec path.
+
+```ruby
+spec = read_podspec(path: "./XcodeServerSDK.podspec")
+```
+
+### prompt
+
+You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
+This action also supports multi-line inputs using the `multi_line_end_keyword` option.
+
+```ruby
+changelog = prompt(text: "Changelog: ")
+```
+
+```ruby
+changelog = prompt(
+  text: "Changelog: ",
+  multi_line_end_keyword: "END"
+)
+
+hockey(notes: changelog)
 ```

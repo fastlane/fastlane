@@ -61,7 +61,6 @@ lane :appstore do
   snapshot
   sigh
   deliver
-  frameit
   sh "./customScript.sh"
 
   slack
@@ -74,27 +73,27 @@ To launch the `appstore` lane, just run:
 fastlane appstore
 ```
 
-`fastlane` can do a lot for you to automate tedious and time-consuming tasks:
+              |  fastlane
+--------------------------|------------------------------------------------------------
+:sparkles: | Connect all iOS build tools into one workflow (both `fastlane` tools and third party tools)
+:monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
+:ship: | Deploy from any computer, including a CI-server
+:wrench: | Extend and customise the functionality 
+:thought_balloon: | Never remember any difficult commands, just `fastlane`
+:tophat: | Easy setup assistant to get started in a few minutes
+:email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
+:page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs
+:rocket: | Saves you **hours** for every app udpate you release
+:pencil2: | Very flexible configuration using a fully customisable `Fastfile`
+:mountain_cableway: | Implement a fully working Continuous Delivery process
+:ghost: | [Jenkins Integration](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results
+:book: | Automatically generate a markdown documentation of your lane config
+:hatching_chick: | Over 90 built-in integrations available
+:computer: | Support for both iOS and Mac OS apps
+:octocat: | Full git and mercurial support
 
-- Connect all build related iOS tools into one workflow (both `fastlane` tools and third party tools)
-- Define different `deployment lanes` for App Store deployment, beta builds or testing.
-- Deploy from any computer.
-- Write your [own actions](https://github.com/KrauseFx/fastlane/blob/master/docs#extensions) (extensions) to extend the functionality of `fastlane`.
-- Store data like the `Bundle Identifier` or your `Apple ID` once and use it across all tools.
-- Never remember any difficult commands, just `fastlane`.
-- Easy setup, which helps you getting up and running quickly.
-- [Shared context](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#lane-context), which is used to let the different deployment steps communicate with each other.
-- Store **everything** in git. Never again lookup the used build commands in the ```Jenkins``` configs.
-- Saves you **hours** of preparing app submission, uploading screenshots and deploying the app for each update.
-- Very flexible configuration using a fully customizable `Fastfile`.
-- Once up and running, you have a fully working **Continuous Delivery** process. Just trigger ```fastlane``` and you're good to go.
-- [Jenkins Integration](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results.
-- Automatically generate a markdown documentation of your lanes based on your `Fastfile`.
-- Over 60 built-in integrations available.
-- Support for both iOS and Mac OS apps
-- Full git and mercurial support
 
-##### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
+###### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 

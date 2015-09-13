@@ -1,17 +1,19 @@
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/MethodLength
 module Fastlane
   class ActionsList
-    def self.run(filter)
+    def self.run(filter: nil, platform: nil)
       require 'terminal-table'
       if filter
-        show_details(filter)
+        show_details(filter: filter)
       else
-        print_all
+        print_all(platform: platform)
       end
     end
 
-    def self.print_all
+    def self.print_all(platform: nil)
       rows = []
-      all_actions do |action, name|
+      all_actions(platform) do |action, name|
         current = []
         current << name.yellow
 
@@ -34,12 +36,13 @@ module Fastlane
         rows: rows
       )
       puts table
+      puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
 
       puts "\nGet more information for one specific action using `fastlane action [name]`\n".green
     end
 
-    def self.show_details(filter)
+    def self.show_details(filter: nil)
       puts "Loading documentation for #{filter}:".green
 
       puts ""
@@ -74,6 +77,18 @@ module Fastlane
             headings: ['Key', 'Description', 'Env Var'],
             rows: options
           )
+          required_count = action.available_options.count do |o|
+            if o.kind_of?(FastlaneCore::ConfigItem)
+              o.optional == false
+            else
+              false
+            end
+          end
+
+          if required_count > 0
+            puts "#{required_count} of the available parameters are required".magenta
+            puts "They are marked using an asterix *".magenta
+          end
         else
           puts "No available options".yellow
         end
@@ -90,6 +105,15 @@ module Fastlane
           puts ""
         end
 
+        if action.return_value
+          puts Terminal::Table.new(
+            title: "Return Value".green,
+            headings: [],
+            rows: [[action.return_value]]
+          )
+          puts ""
+        end
+
         puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
         puts "\n"
 
@@ -102,10 +126,13 @@ module Fastlane
     end
 
     # Iterates through all available actions and yields from there
-    def self.all_actions
+    def self.all_actions(platform = nil)
       all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
       all_actions.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
+
+        next if platform && !action.is_supported?(platform.to_sym)
+
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
         yield action, name
       end
@@ -119,8 +146,13 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            rows << [current.key.to_s.yellow, current.description, current.env_name]
+            key_name = (current.optional ? "" : "* ") + current.key.to_s
+            description = current.description + (current.default_value ? " (default: '#{current.default_value}')" : "")
+
+            rows << [key_name.yellow, description, current.env_name]
+
           elsif current.kind_of? Array
+            # Legacy actions that don't use the new config manager
             raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
@@ -133,3 +165,5 @@ module Fastlane
     end
   end
 end
+# rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/MethodLength
