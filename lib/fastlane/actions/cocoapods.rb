@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     class CocoapodsAction < Action
       def self.run(params)
+        Actions.verify_gem!('cocoapods')
         cmd = []
 
         unless params[:podfile].nil?

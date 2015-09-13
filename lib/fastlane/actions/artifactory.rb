@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     class ArtifactoryAction < Action
       def self.run(params)
+        Actions.verify_gem!('artifactory')
+
         require 'artifactory'
         file_path = File.absolute_path(params[:file])
         if File.exist? file_path

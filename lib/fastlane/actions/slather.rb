@@ -6,6 +6,8 @@ module Fastlane
 
     class SlatherAction < Action
       def self.run(params)
+        Actions.verify_gem!('slather')
+
         command = "slather coverage "
         command += " --build-directory #{params[:build_directory]}"
         command += " --input-format #{params[:input_format]}" if params[:input_format]
