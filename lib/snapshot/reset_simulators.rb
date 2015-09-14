@@ -1,6 +1,6 @@
 module Snapshot
   class ResetSimulators
-    def self.clear_everything!(ios_version)
+    def self.clear_everything!(ios_versions)
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       # !! Warning: This script will remove all your existing simulators !!
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -35,8 +35,10 @@ module Snapshot
       all_device_types.each do |device_type|
         next if device_type.join(' ').include?"Watch" # we don't want to deal with the Watch right now
 
-        puts "Creating #{device_type} for iOS version #{ios_version}"
-        `xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{ios_version}`
+        ios_versions.each do |ios_version|
+          puts "Creating #{device_type} for iOS version #{ios_version}"
+          `xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{ios_version}`
+        end
       end
     end
   end
