@@ -69,13 +69,13 @@ class SnapshotApplication
     command :reset_simulators do |c|
       c.syntax = 'snapshot reset_simulators'
       c.description = "This will remove all your existing simulators and re-create new ones"
-      c.option '-i', '--ios String', String, 'The iOS Version you want to use'
+      c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
 
       c.action do |args, options|
-        version = options.ios || Snapshot::LatestIosVersion.version
+        versions = options.ios.split(',') || [ Snapshot::LatestIosVersion.version ]
         require 'snapshot/reset_simulators'
 
-        Snapshot::ResetSimulators.clear_everything!(version)
+        Snapshot::ResetSimulators.clear_everything!(versions)
       end
     end
 
