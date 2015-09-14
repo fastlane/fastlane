@@ -17,6 +17,7 @@ module Gym
       rows << ["Workspace", config[:workspace]] if config[:workspace]
       rows << ["Scheme", config[:scheme]] if config[:scheme]
       rows << ["Configuration", config[:configuration]] if config[:configuration]
+      rows << ["Archive Path", config[:archive_path]] if config[:archive_path]
       rows << ["Platform", Gym.project.ios? ? "iOS" : "Mac"]
       rows << ["Xcode Path", Gym.xcode_path.gsub("/Contents/Developer", "")]
 
