@@ -11,6 +11,7 @@ module Gym
         return if check_for_swift PackageCommandGenerator
 
         Helper.log.info "Packaging up the Swift Framework as the current app is a Swift app" if $verbose
+        ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
 
         Dir.mktmpdir do |tmpdir|
           # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
