@@ -7,9 +7,9 @@ module Fastlane
     class ReadPodspecAction < Action
       def self.run(params)
         Actions.verify_gem!('cocoapods')
-        
+
         path = params[:path]
-        
+
         require 'cocoapods-core'
         spec = Pod::Spec.from_file(path).to_hash
 
