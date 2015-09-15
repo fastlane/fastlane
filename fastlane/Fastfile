@@ -38,6 +38,8 @@ lane :release do |options|
 
   # Verifying RubyGems version
   #
+  validate_repo(tool_name: tool_name)
+
   require "../lib/#{tool_name}/version"
   version = module_ref(tool_name: tool_name)::VERSION
   old_version = current_version(tool: tool_name)
@@ -45,8 +47,6 @@ lane :release do |options|
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     raise "Version number #{version} was already deployed"
   end
-
-  validate_repo(tool_name: tool_name)
 
   # Git verification
   #
