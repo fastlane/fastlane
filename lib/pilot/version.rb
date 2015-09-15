@@ -1,4 +1,4 @@
 module Pilot
-  VERSION = "0.1.7"
+  VERSION = "0.2.0"
   DESCRIPTION = "The best way to manage your TestFlight testers and builds from your terminal"
 end
