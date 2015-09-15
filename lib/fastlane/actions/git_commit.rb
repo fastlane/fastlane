@@ -24,7 +24,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file you want to commit",
                                        verify_block: proc do |value|
-                                          raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used")
@@ -32,7 +32,6 @@ module Fastlane
       end
 
       def self.output
-        
       end
 
       def self.return_value
