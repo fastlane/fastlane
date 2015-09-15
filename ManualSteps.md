@@ -1,6 +1,6 @@
 # [cert](https://github.com/KrauseFx/cert)
 
-#### To create a new signing request and a provisioning profile you have to do the following steps on the Apple Developer Portal
+#### To create a new certificate and a provisioning profile you have to do the following steps on the Apple Developer Portal
 
 ![assets/manual/Step1.png](assets/manual/Step1.png)
 ![assets/manual/Step2.png](assets/manual/Step2.png)
@@ -16,4 +16,4 @@
 ![assets/manual/Step12.png](assets/manual/Step12.png)
 
 
-#### Yes, you have to follow all those steps just to create a provisiong profile
+#### Yes, you have to follow all those steps to create a provisiong profile with its certificate
