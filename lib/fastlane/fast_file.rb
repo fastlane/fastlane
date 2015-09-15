@@ -23,9 +23,19 @@ module Fastlane
       @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
-        # rubocop:disable Lint/Eval
-        eval(data) # this is okay in this case
-        # rubocop:enable Lint/Eval
+        begin
+          # rubocop:disable Lint/Eval
+          eval(data) # this is okay in this case
+          # rubocop:enable Lint/Eval
+        rescue SyntaxError => ex
+          if ex.to_s.include?"‘"
+            Helper.log.fatal ex
+            raise "Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your Fastfile".red
+          else
+            line = ex.to_s.match(%r{\(eval\):(\d+)})[1]
+            raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
+          end
+        end
       end
 
       self

@@ -238,6 +238,18 @@ describe Fastlane do
         expect(File.exist?('/tmp/fastlane/test')).to eq(true)
       end
 
+      it "properly shows an error message when the user uses invalid quotation" do
+        expect do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidQuotation')
+        end.to raise_error("Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your Fastfile".red)
+      end
+
+      it "properly shows an error message when there is a syntax error in the Fastfile" do
+        expect do
+          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSytnaxError')
+        end.to raise_error("Syntax error in your Fastfile on line 17: (eval):17: syntax error, unexpected keyword_end, expecting ')'".red)
+      end
+
       it "raises an error if lane is not available" do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         expect do
