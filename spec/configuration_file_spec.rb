@@ -54,6 +54,22 @@ describe FastlaneCore do
         expect(config[:app_identifier]).to eq("detlef.app.super")
       end
 
+      describe "Handling invalid broken configuration files" do
+        it "properly shows an error message when the user uses invalid quotation" do
+          config = FastlaneCore::Configuration.create(options, {})
+          expect do
+            config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
+          end.to raise_error("Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your configuration file".red)
+        end
+
+        it "properly shows an error message when there is a syntax error in the Fastfile" do
+          config = FastlaneCore::Configuration.create(options, {})
+          expect do
+            config.load_configuration_file('./spec/fixtures/ConfigSytnaxError')
+          end.to raise_error(/Syntax error in your configuration file .* on line 15/)
+        end
+      end
+
       it "allows using a custom block to handle special callbacks" do
         config = FastlaneCore::Configuration.create(options, {})
         config.load_configuration_file('ConfigFileUnhandledBlock', proc do |method_sym, arguments, block|
