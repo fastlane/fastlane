@@ -141,7 +141,7 @@ end
 desc "e.g. KrauseFx/fastlane"
 private_lane :github_url do |options|
   github_organisation = "fastlane"
-  github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
+  github_organisation = "KrauseFx" if krausefx_repos.include?options[:tool]
   
   [github_organisation, options[:tool]].join("/")
 end
