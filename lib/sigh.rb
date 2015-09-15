@@ -1,6 +1,8 @@
 require 'sigh/version'
 require 'sigh/dependency_checker'
 require 'sigh/resign'
+require 'sigh/manager'
+
 require 'fastlane_core'
 
 module Sigh
