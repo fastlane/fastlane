@@ -34,7 +34,7 @@ module Pilot
 
       builds = app.all_processing_builds + app.builds
       # sort by upload_date
-      builds.sort! {|a,b| a.upload_date <=> b.upload_date }
+      builds.sort! {|a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
       puts Terminal::Table.new(
