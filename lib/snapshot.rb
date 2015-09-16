@@ -18,10 +18,10 @@ module Snapshot
   Snapshot::DependencyChecker.check_dependencies
 
   def self.xcode_version
-  	`xcodebuild -version`.match(/Xcode (.*)/)[1]
+		`xcodebuild -version`.match(/Xcode (.*)/)[1]
   end
 
   def self.min_xcode7?
-  	xcode_version.split(".").first.to_i >= 7
+		xcode_version.split(".").first.to_i >= 7
   end
 end
