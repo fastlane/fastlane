@@ -8,7 +8,6 @@ module Gym
           Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
         end
 
-
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
         parts += pipe
