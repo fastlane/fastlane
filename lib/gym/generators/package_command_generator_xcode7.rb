@@ -3,6 +3,12 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
+        if Gym.config[:provisioning_profile_path]
+          Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
+          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
+        end
+
+
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
         parts += pipe
@@ -15,7 +21,7 @@ module Gym
       def options
         options = []
 
-        options << "-exportOptionsPlist #{config_path}"
+        options << "-exportOptionsPlist '#{config_path}'"
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "-exportPath '#{BuildCommandGenerator.build_path}'" # we move it once the binary is finished
 
@@ -27,7 +33,7 @@ module Gym
       end
 
       def ipa_path
-        File.join(BuildCommandGenerator.build_path, "#{Gym.config[:output_name]}.ipa")
+        raise "You can't just access the path to the ipa in Xcode 7"
       end
 
       # The path the the dsym file for this app. Might be nil
@@ -35,12 +41,13 @@ module Gym
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
       end
 
-      private
-
+      # The path the config file we use to sign our app
       def config_path
         @config_path ||= "/tmp/gym_config_#{Time.now.to_i}.plist"
         return @config_path
       end
+
+      private
 
       def config_content
         require 'plist'
