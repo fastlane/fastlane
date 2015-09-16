@@ -29,5 +29,25 @@ describe Gym do
         ""
       ])
     end
+
+    it "supports passing a path to a provisioning profile" do
+      # Profile Installation
+      expect(FastlaneCore::ProvisioningProfile).to receive(:install).with("./spec/fixtures/dummy.mobileprovision")
+      options = {
+        project: "./examples/standard/Example.xcodeproj",
+        provisioning_profile_path: "./spec/fixtures/dummy.mobileprovision"
+      }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGenerator.generate
+      expect(result).to eq([
+        "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+        "''",
+        "-o '#{Gym::PackageCommandGenerator.ipa_path}'",
+        "exportFormat ipa",
+        "--embed './spec/fixtures/dummy.mobileprovision'",
+        ""
+      ])
+    end
   end
 end
