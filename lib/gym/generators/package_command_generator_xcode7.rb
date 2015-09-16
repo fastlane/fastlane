@@ -32,7 +32,7 @@ module Gym
       end
 
       def ipa_path
-        raise "You can't just access the path to the ipa in Xcode 7"
+        File.join(BuildCommandGenerator.build_path, "#{Gym.config[:output_name]}.ipa")
       end
 
       # The path the the dsym file for this app. Might be nil

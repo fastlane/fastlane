@@ -125,11 +125,9 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting ipa file
     def move_ipa
-      ipa_path = find_archive_path
+      FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
 
-      FileUtils.mv(ipa_path, Gym.config[:output_directory], force: true)
-
-      ipa_path = File.join(Gym.config[:output_directory], File.basename(ipa_path))
+      ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
 
       Helper.log.info "Successfully exported and signed the ipa file:".green
       Helper.log.info ipa_path
