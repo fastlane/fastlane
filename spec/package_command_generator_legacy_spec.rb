@@ -1,9 +1,5 @@
-require 'gym/xcodebuild_fixes/swift_fix'
-require 'gym/xcodebuild_fixes/watchkit_fix'
-require 'gym/xcodebuild_fixes/package_application_fix'
-
 describe Gym do
-  describe Gym::PackageCommandGeneratorLegacy, now: true do
+  describe Gym::PackageCommandGeneratorLegacy do
     it "works with the example project with no additional parameters" do
       options = { project: "./examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
