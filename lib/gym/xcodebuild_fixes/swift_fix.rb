@@ -23,7 +23,7 @@ module Gym
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            FileUtils.copy_file("#{Gym.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
+            FileUtils.copy_file("#{Xcode.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
           end
 
           # Add "SwiftSupport" to the .ipa archive

@@ -18,7 +18,7 @@ module Gym
           expected_md5 = File.read(path)
 
           # If that location changes, search it using xcrun --sdk iphoneos -f PackageApplication
-          package_application_path = "#{Gym.xcode_path}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication"
+          package_application_path = "#{Xcode.xcode_path}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication"
 
           raise "Unable to patch the `PackageApplication` script bundled in XCode. This is not supported." unless expected_md5 == Digest::MD5.file(package_application_path).hexdigest
 

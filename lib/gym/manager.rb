@@ -19,7 +19,7 @@ module Gym
       rows << ["Configuration", config[:configuration]] if config[:configuration]
       rows << ["Archive Path", config[:archive_path]] if config[:archive_path]
       rows << ["Platform", Gym.project.ios? ? "iOS" : "Mac"]
-      rows << ["Xcode Path", Gym.xcode_path.gsub("/Contents/Developer", "")]
+      rows << ["Xcode Path", Xcode.xcode_path.gsub("/Contents/Developer", "")]
 
       puts ""
       puts Terminal::Table.new(

@@ -13,7 +13,7 @@ module Gym
           Dir.mkdir(watchkit_support)
 
           # Copy WK from Xcode into WatchKitSupport
-          FileUtils.copy_file("#{Gym.xcode_path}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+          FileUtils.copy_file("#{Xcode.xcode_path}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
 
           # Add "WatchKitSupport" to the .ipa archive
           Dir.chdir(tmpdir) do

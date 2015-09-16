@@ -57,14 +57,14 @@ module Gym
     #####################################################
 
     def clear_old_files
-      return unless Gym.pre_7?
-      if File.exist? PackageCommandGenerator.ipa_path
+      return unless Xcode.pre_7?
+      if File.exist?(PackageCommandGenerator.ipa_path)
         File.delete(PackageCommandGenerator.ipa_path)
       end
     end
 
     def fix_package
-      return unless Gym.pre_7?
+      return unless Xcode.pre_7?
       Gym::XcodebuildFixes.swift_library_fix
       Gym::XcodebuildFixes.watchkit_fix
       Gym::XcodebuildFixes.clear_patched_package_application
@@ -119,7 +119,7 @@ module Gym
 
       puts "" # new line
 
-      Helper.log.info "Successfully exported and compressed dSYM file.".green
+      Helper.log.info "Successfully exported and compressed dSYM file".green
     end
 
     # Moves over the binary and dsym file to the output directory
@@ -152,7 +152,7 @@ module Gym
     private
 
     def find_archive_path
-      if Gym.pre_7?
+      if Xcode.pre_7?
         BuildCommandGenerator.archive_path
       else
         Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
