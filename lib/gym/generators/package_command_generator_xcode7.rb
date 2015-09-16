@@ -1,28 +1,13 @@
 module Gym
   # Responsible for building the fully working xcodebuild command
   class PackageCommandGeneratorXcode7
-    @config_content = %(<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>method</key>
-  <string>app-store</string>
-  <key>uploadSymbols</key>
-  <true/>
-  <key>uploadBitcode</key>
-  <false/>
-</dict>
-</plist>
-)
-    @config_path = '/tmp/config.plist'
-
     class << self
       def generate
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
         parts += pipe
 
-        File.write(@config_path, @config_content) # overwrite everytime. Could be optimized
+        File.write(config_path, config_content) # overwrite everytime. Could be optimized
 
         parts
       end
@@ -30,7 +15,7 @@ module Gym
       def options
         options = []
 
-        options << "-exportOptionsPlist #{@config_path}"
+        options << "-exportOptionsPlist #{config_path}"
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "-exportPath '#{BuildCommandGenerator.build_path}'" # we move it once the binary is finished
 
@@ -48,6 +33,25 @@ module Gym
       # The path the the dsym file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
+      end
+
+      private
+
+      def config_path
+        @config_path ||= "/tmp/gym_config_#{Time.now.to_i}.plist"
+        return @config_path
+      end
+
+      def config_content
+        require 'plist'
+        symbols = (Gym.config[:skip_symbols] ? false : true)
+        bitcode = (Gym.config[:upload_bitcode] ? true : false)
+
+        {
+          method: 'app-store',
+          uploadSymbols: symbols,
+          uploadBitcode: bitcode
+        }.to_plist
       end
     end
   end
