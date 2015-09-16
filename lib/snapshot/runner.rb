@@ -100,9 +100,12 @@ module Snapshot
 
       def com(cmd)
         puts cmd.magenta if $verbose
-        Open3.popen3("#{cmd} 2>&1") do |stdin, stdout, stderr, wait_thr|
-          result = stdout.read
-          puts result if (result.to_s.length > 0 and $verbose)
+
+        IO.popen("#{cmd} 2>&1", err: [:child, :out]) do |io|
+          io.each do |line|
+            puts line if (line.to_s.length > 0 and $verbose)
+          end
+          io.close
         end
       end
 
@@ -111,9 +114,10 @@ module Snapshot
       kill_simulator
       sleep 3
       com("xcrun simctl boot '#{udid}'")
-      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'")
+
+      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'") unless Snapshot.min_xcode7?
       sleep 3
-      com("xcrun simctl install '#{udid}' #{@app_path.shellescape}")
+      com("xcrun simctl install '#{udid}' #{@app_path.shellescape}") unless Snapshot.min_xcode7?
       com("xcrun simctl shutdown booted")
     end
 
