@@ -71,8 +71,6 @@ As a result, `snapshot` will be completely rewritten from ground up without chan
 - UI Tests are written in Swift or Objective C
 - UI Tests can be executed in a much cleaner and better way
 
-A note to the new release of Xcode 7: `snapshot` has some issues with the GM, please use Xcode 6 for UI Automation until this is resolved.
-
 -------
 <p align="center">
     <a href="#features">Features</a> &bull; 
