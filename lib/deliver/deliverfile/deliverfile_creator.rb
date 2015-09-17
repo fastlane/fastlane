@@ -1,6 +1,5 @@
 require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
-require 'deliver/itunes_connect/itunes_connect'
 
 module Deliver
   # Helps new user quickly adopt Deliver
