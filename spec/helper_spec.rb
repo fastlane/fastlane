@@ -31,7 +31,7 @@ describe FastlaneCore do
         end
 
         it "#xcode_version" do
-          expect(FastlaneCore::Helper.xcode_version).to match(%r{^\d[\.\d]+$})
+          expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
         end
       end
     end
