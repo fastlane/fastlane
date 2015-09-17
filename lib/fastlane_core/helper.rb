@@ -77,11 +77,28 @@ module FastlaneCore
     end
     # rubocop:enable Style/PredicateName
 
+    # All Xcode Related things
+    #
+
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
       return "" if self.is_test? and !self.is_mac?
       `xcode-select -p`.delete("\n") + "/"
+    end
+
+    # @return The version of the currently used Xcode installation (e.g. "7.0")
+    def self.xcode_version
+      return @xcode_version if @xcode_version
+
+      begin
+        output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
+        @xcode_version = output.split("\n").first.split(' ')[1]
+      rescue => ex
+        Helper.log.error ex
+        Helper.log.error "Error detecting currently used Xcode installation".red
+      end
+      @xcode_version
     end
 
     # @return the full path to the iTMSTransporter executable
