@@ -127,7 +127,7 @@ If you run into any issues, use the `verbose` mode to get more information
 
 To pass boolean parameters make sure to use `gym` like this:
 
-    gym --upload_bitcode true --skip_symbols true
+    gym --upload_bitcode true --upload_symbols true
 
 
 # Gymfile

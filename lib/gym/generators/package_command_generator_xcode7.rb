@@ -50,7 +50,7 @@ module Gym
 
       def config_content
         require 'plist'
-        symbols = (Gym.config[:skip_symbols] ? false : true)
+        symbols = (Gym.config[:upload_symbols] ? true : false)
         bitcode = (Gym.config[:upload_bitcode] ? true : false)
 
         {

@@ -101,10 +101,10 @@ module Gym
                                      verify_block: proc do |value|
                                        raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :skip_symbols,
+        FastlaneCore::ConfigItem.new(key: :upload_symbols,
                                      short_option: "-m",
-                                     env_name: "GYM_SKIP_SYMBOLS",
-                                     description: "Should the ipa file *not* include symbols?",
+                                     env_name: "GYM_UPLOAD_SYMBOLS",
+                                     description: "Should the ipa file include symbols?",
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :upload_bitcode,
                                      short_option: "-z",
