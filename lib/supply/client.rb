@@ -87,6 +87,54 @@ module Supply
       end
     end
 
+    # Returns the listing for the given language filled with the current values if it already exists
+    def listing_for_language(language)
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.listings.get,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name,
+            'language' => language
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error? && result.status != 404
+
+      if result.status == 404
+        return Listing.new(self, language) # create a new empty listing
+      else
+        return Listing.new(self, language, result.data)
+      end
+    end
+
+    # Updates or creates the listing for the specified language
+    def update_listing_for_language(language: nil, title: nil, short_description: nil, full_description: nil, video: nil)
+      ensure_active_edit!
+
+      listing = {
+        'language' => language,
+        'title' => title,
+        'fullDescription' => full_description,
+        'shortDescription' => short_description,
+        'video' => video
+      }
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.listings.update,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name,
+            'language' => language
+          },
+        body_object: listing,
+        authorization: auth_client
+      )
+      raise result.error_message if result.error?
+    end
+
     # Aborts the current edit deleting all pending changes
     def abort_current_edit
       ensure_active_edit!
@@ -102,9 +150,29 @@ module Supply
 
       raise result.error_message if result.error?
 
-      current_edit = nil
-      current_package_name = nil
+      self.current_edit = nil
+      self.current_package_name = nil
     end
+
+    # Commits the current edit saving all pending changes on Google Play
+    def commit_current_edit!
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.commit,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error?
+
+      self.current_edit = nil
+      self.current_package_name = nil
+    end
+
     private
 
     def ensure_active_edit!

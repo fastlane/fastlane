@@ -14,7 +14,7 @@ module Supply
       # FastlaneCore::UpdateChecker.start_looking_for_update("supply")
       new.run
     ensure
-      puts 'hi'
+      puts 'Finished'
       # FastlaneCore::UpdateChecker.show_update_status("supply", Supply::VERSION)
     end
 

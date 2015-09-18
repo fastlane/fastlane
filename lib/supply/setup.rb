@@ -1,12 +1,12 @@
 module Supply
   class Setup
     def perform_download
-      api.begin_edit(package_name: Supply.config[:package_name])
+      client.begin_edit(package_name: Supply.config[:package_name])
 
-      api.listings.each do |listing|
+      client.listings.each do |listing|
         store_metadata(listing)
       end
-      api.abort_current_edit
+      client.abort_current_edit
 
       Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
     end
@@ -15,7 +15,7 @@ module Supply
       containing = File.join(metadata_path, listing.language)
       FileUtils.mkdir_p(containing)
 
-      %w(title short_description full_description video).each do |key|
+      Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(containing, "#{key}.txt")
         Helper.log.info "Writing to #{path}..."
         File.write(path, listing.send(key))
@@ -30,11 +30,9 @@ module Supply
       @metadata_path ||= "metadata" unless Helper.fastlane_enabled?
     end
 
-    private
-
-    def api
-      @api ||= Client.new(path_to_key: Supply.config[:key],
-                               issuer: Supply.config[:issuer])
+    def client
+      @client ||= Client.new(path_to_key: Supply.config[:key],
+                                   issuer: Supply.config[:issuer])
     end
   end
 end

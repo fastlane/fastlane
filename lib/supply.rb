@@ -3,6 +3,7 @@ require 'supply/version'
 require 'supply/options'
 require 'supply/client'
 require 'supply/listing'
+require 'supply/uploader'
 
 require 'fastlane_core'
 
@@ -11,6 +12,8 @@ module Supply
   class << self
     attr_accessor :config
   end
+
+  AVAILABLE_METADATA_FIELDS = %w(title short_description full_description video)
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 end
