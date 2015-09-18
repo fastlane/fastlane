@@ -190,6 +190,42 @@ module Supply
       raise result.error_message if result.error?
     end
 
+    def upload_apk_to_track(path_to_apk, track)
+      ensure_active_edit!
+
+      apk = Google::APIClient::UploadIO.new(File.expand_path(path_to_apk), 'application/vnd.android.package-archive')
+      result_upload = api_client.execute(
+        api_method: android_publisher.edits.apks.upload,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name,
+            'uploadType' => 'media'
+          },
+        media: apk,
+        authorization: auth_client
+      )
+
+      raise result_upload.error_message if result_upload.error?
+
+      track_body = {
+        'track' => track,
+        'userFraction' => 1,
+        'versionCodes' => [result_upload.data.versionCode]
+      }
+
+      result_update = api_client.execute(
+        api_method: android_publisher.edits.tracks.update,
+        parameters:
+          {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name,
+            'track' => track
+          },
+        body_object: track_body,
+        authorization: auth_client)
+
+      raise result_update.error_message if result_update.error?
+    end
 
 
     private

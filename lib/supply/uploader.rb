@@ -29,7 +29,12 @@ module Supply
     end
 
     def upload_binary
-      puts "no binary..."
+      if Supply.config[:apk]
+        Helper.log.info "Preparing apk at path '#{Supply.config[:apk]}' for upload..."
+        client.upload_apk_to_track(Supply.config[:apk], Supply.config[:track])
+      else
+        Helper.log.info "No apk file found, you can pass the path to your apk using the `apk` option"
+      end
     end
 
     private

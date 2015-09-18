@@ -47,7 +47,8 @@ module Supply
                                      default_value: Dir["*.apk"].first,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Could not find apk file at path '#{value}'".red unless File.directory? value
+                                       raise "Could not find apk file at path '#{value}'".red unless File.exist?(value)
+                                       raise "apk file is not an apk".red unless value.end_with?(value)
                                      end)
       ]
     end
