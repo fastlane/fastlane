@@ -50,8 +50,8 @@ module Gym
 
       def config_content
         require 'plist'
-        symbols = (Gym.config[:upload_symbols] ? true : false)
-        bitcode = (Gym.config[:upload_bitcode] ? true : false)
+        symbols = (Gym.config[:include_symbols] ? true : false)
+        bitcode = (Gym.config[:include_bitcode] ? true : false)
 
         {
           method: 'app-store',
