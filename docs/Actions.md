@@ -427,9 +427,9 @@ Generate code coverage reports based on lcov.
 
 ```ruby
 lcov(
-      project_name: "yourProjectName",
-      scheme: "yourScheme",
-      output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+  project_name: "yourProjectName",
+  scheme: "yourScheme",
+  output_dir: "cov_reports" # This value is optional. Default is coverage_reports
 )
 ```
 
