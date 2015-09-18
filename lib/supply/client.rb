@@ -13,6 +13,11 @@ module Supply
     # Package name of the currently edited element
     attr_accessor :current_package_name
 
+    #####################################################
+    # @!group Login
+    #####################################################
+
+
     # Initializes the auth_client and api_client using the specified information
     # @param path_to_key: The path to your p12 file
     # @param issuer: Email addresss for oauth
@@ -47,6 +52,10 @@ module Supply
       self.android_publisher = api_client.discovered_api('androidpublisher', 'v2')
     end
 
+    #####################################################
+    # @!group Handling the edit lifecycle
+    #####################################################
+
     # Begin modifying a certain package
     def begin_edit(package_name: nil)
       raise "You currently have an active edit" if @current_edit
@@ -65,6 +74,48 @@ module Supply
 
       self.current_package_name = package_name
     end
+
+    # Aborts the current edit deleting all pending changes
+    def abort_current_edit
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.delete,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error?
+
+      self.current_edit = nil
+      self.current_package_name = nil
+    end
+
+    # Commits the current edit saving all pending changes on Google Play
+    def commit_current_edit!
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.commit,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error?
+
+      self.current_edit = nil
+      self.current_package_name = nil
+    end
+
+    #####################################################
+    # @!group Getting data
+    #####################################################
 
     # Get a list of all languages - returns the list
     # make sure to have an active edit
@@ -110,6 +161,10 @@ module Supply
       end
     end
 
+    #####################################################
+    # @!group Modifying data
+    #####################################################
+
     # Updates or creates the listing for the specified language
     def update_listing_for_language(language: nil, title: nil, short_description: nil, full_description: nil, video: nil)
       ensure_active_edit!
@@ -135,43 +190,7 @@ module Supply
       raise result.error_message if result.error?
     end
 
-    # Aborts the current edit deleting all pending changes
-    def abort_current_edit
-      ensure_active_edit!
 
-      result = api_client.execute(
-        api_method: android_publisher.edits.delete,
-        parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name
-        },
-        authorization: auth_client
-      )
-
-      raise result.error_message if result.error?
-
-      self.current_edit = nil
-      self.current_package_name = nil
-    end
-
-    # Commits the current edit saving all pending changes on Google Play
-    def commit_current_edit!
-      ensure_active_edit!
-
-      result = api_client.execute(
-        api_method: android_publisher.edits.commit,
-        parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name
-        },
-        authorization: auth_client
-      )
-
-      raise result.error_message if result.error?
-
-      self.current_edit = nil
-      self.current_package_name = nil
-    end
 
     private
 
