@@ -40,14 +40,14 @@ Gem::Specification.new do |spec|
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 0.13.4', '< 1.0.0'
-  spec.add_dependency 'snapshot', '>= 0.9.3', '< 1.0.0'
-  spec.add_dependency 'frameit', '>= 2.2.0', '< 3.0.0'
+  spec.add_dependency 'snapshot', '>= 0.10.0', '< 1.0.0'
+  spec.add_dependency 'frameit', '>= 2.2.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 0.8.0', '< 1.0.0'
   spec.add_dependency 'cert', '>= 0.3.2', '< 1.0.0'
   spec.add_dependency 'sigh', '>= 0.10.7', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
   spec.add_dependency 'gym', '>= 0.6.2', '< 1.0.0'
-  spec.add_dependency 'pilot', '>= 0.1.7', '< 1.0.0'
+  spec.add_dependency 'pilot', '>= 0.2.0', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
