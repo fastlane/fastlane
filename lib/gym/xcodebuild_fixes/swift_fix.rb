@@ -1,3 +1,7 @@
+# encoding: utf-8
+# from http://stackoverflow.com/a/9857493/445598
+# because of 
+# `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 require 'zip'
 
 module Gym
@@ -23,7 +27,7 @@ module Gym
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            FileUtils.copy_file("#{Gym.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
+            FileUtils.copy_file("#{Xcode.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
           end
 
           # Add "SwiftSupport" to the .ipa archive

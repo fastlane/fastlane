@@ -1,3 +1,7 @@
+require 'gym/xcodebuild_fixes/swift_fix'
+require 'gym/xcodebuild_fixes/watchkit_fix'
+require 'gym/xcodebuild_fixes/package_application_fix'
+
 describe Gym do
   describe Gym::XcodebuildFixes do
     class FakePackageCommandGenerator

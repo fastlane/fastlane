@@ -125,6 +125,11 @@ If you run into any issues, use the `verbose` mode to get more information
 
     gym --verbose
 
+To pass boolean parameters make sure to use `gym` like this:
+
+    gym --upload_bitcode true --upload_symbols true
+
+
 # Gymfile
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
