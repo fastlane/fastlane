@@ -1,18 +1,12 @@
 module Supply
   class Setup
-    attr_accessor :api
-
-    def initialize
-      self.api = Client.new(path_to_key: Supply.config[:key],
-                                 issuer: Supply.config[:issuer])
-    end
-
     def perform_download
       api.begin_edit(package_name: Supply.config[:package_name])
 
       api.listings.each do |listing|
         store_metadata(listing)
       end
+      api.abort_current_edit
 
       Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
     end
@@ -34,6 +28,13 @@ module Supply
       @metadata_path ||= Supply.config[:metadata_path]
       @metadata_path ||= "fastlane/metadata/android" if Helper.fastlane_enabled?
       @metadata_path ||= "metadata" unless Helper.fastlane_enabled?
+    end
+
+    private
+
+    def api
+      @api ||= Client.new(path_to_key: Supply.config[:key],
+                               issuer: Supply.config[:issuer])
     end
   end
 end

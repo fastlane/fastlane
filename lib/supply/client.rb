@@ -87,6 +87,24 @@ module Supply
       end
     end
 
+    # Aborts the current edit deleting all pending changes
+    def abort_current_edit
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.delete,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error?
+
+      current_edit = nil
+      current_package_name = nil
+    end
     private
 
     def ensure_active_edit!

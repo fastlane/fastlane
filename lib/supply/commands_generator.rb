@@ -35,8 +35,7 @@ module Supply
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_gymfile
 
-          supplier = Supply::Supplier.new
-          supplier.perform_upload
+          Supply::Uploader.new.perform_upload
         end
       end
 
@@ -48,8 +47,7 @@ module Supply
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_gymfile
 
-          supplier = Supply::Setup.new
-          supplier.perform_download
+          Supply::Setup.new.perform_download
         end
       end
 
