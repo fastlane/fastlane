@@ -13,14 +13,18 @@ module Supply
       all = api.listings.each do |listing|
         store_metadata(listing)
       end
+
+      Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
     end
 
     def store_metadata(listing)
-      path = File.join(metadata_path, listing.language)
-      FileUtils.mkdir_p(path)
+      containing = File.join(metadata_path, listing.language)
+      FileUtils.mkdir_p(containing)
 
       %w|title short_description full_description video|.each do |key|
-        File.write(File.join(path, "#{key}.txt"), listing.send(key))
+        path = File.join(containing, "#{key}.txt")
+        Helper.log.info "Writing to #{path}..."
+        File.write(path, listing.send(key))
       end
     end
 
