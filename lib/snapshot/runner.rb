@@ -112,13 +112,17 @@ module Snapshot
       udid = udid_for_simulator(device)
 
       kill_simulator
-      sleep 3
-      com("xcrun simctl boot '#{udid}'")
 
-      com("xcrun simctl uninstall '#{udid}' '#{app_identifier}'") unless Snapshot.min_xcode7?
-      sleep 3
-      com("xcrun simctl install '#{udid}' #{@app_path.shellescape}") unless Snapshot.min_xcode7?
-      com("xcrun simctl shutdown booted")
+      if Snapshot.min_xcode7?
+        clean_old_traces
+        com("xcrun instruments -w '#{udid}' -t 'Blank' -l 1 -D '#{TRACE_DIR}/trace'")
+      else
+        com("xcrun simctl boot '#{udid}'")
+      end
+
+      com("xcrun simctl uninstall booted '#{app_identifier}'")
+      com("xcrun simctl install booted #{@app_path.shellescape}")
+      com("xcrun simctl shutdown booted") unless Snapshot.min_xcode7?
     end
 
     def run_tests(device, language, locale)
