@@ -13,5 +13,20 @@ describe Gym do
         ""
       ])
     end
+
+    it "generates a valid plist file we need" do
+      options = { project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+      require 'plist'
+      expect(Plist.parse_xml(config_path)).to eq({
+        'method' => "app-store",
+        'uploadBitcode' => false,
+        'uploadSymbols' => true
+      })
+    end
   end
 end
