@@ -1,0 +1,16 @@
+
+##################
+# All rules specific to this repo
+##################
+
+inherit_from: .rubocop_general.yml
+
+Style/ClassVars:
+  Enabled: false
+
+##################
+# TODO
+##################
+
+Style/Documentation:
+  Enabled: false

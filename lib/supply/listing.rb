@@ -1,6 +1,5 @@
 module Supply
   class Listing
-
     attr_reader :language
 
     attr_accessor :title

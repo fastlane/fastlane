@@ -1,9 +1,9 @@
 require 'google/api_client'
 
 module Supply
-	class Client
+  class Client
     # Connecting with Google
-		attr_accessor :auth_client
+    attr_accessor :auth_client
     attr_accessor :api_client
     attr_accessor :android_publisher
 
@@ -23,17 +23,17 @@ module Supply
       key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), passphrase)
 
       begin
-	      self.auth_client = Signet::OAuth2::Client.new(
-	        token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-	        audience: 'https://accounts.google.com/o/oauth2/token',
-	        scope: 'https://www.googleapis.com/auth/androidpublisher',
-	        issuer: issuer,
-	        signing_key: key
-	      )
-	    rescue => ex
-	    	Helper.log.fatal ex
-	    	raise "Authentification unsuccessful, make sure to pass a valid key file".red
-	    end
+        self.auth_client = Signet::OAuth2::Client.new(
+          token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
+          audience: 'https://accounts.google.com/o/oauth2/token',
+          scope: 'https://www.googleapis.com/auth/androidpublisher',
+          issuer: issuer,
+          signing_key: key
+        )
+      rescue => ex
+        Helper.log.fatal ex
+        raise "Authentification unsuccessful, make sure to pass a valid key file".red
+      end
 
       Helper.log.debug "Fetching a new access token from Google..."
 
@@ -92,5 +92,5 @@ module Supply
     def ensure_active_edit!
       raise "You need to have an active edit, make sure to call `begin_edit`" unless @current_edit
     end
-	end
+  end
 end
