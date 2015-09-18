@@ -18,7 +18,7 @@ lane :bump do |options|
   puts "Local Version: #{local_version}"
 
   bump_type ||= 'minor' if prompt(text: "New Feature?", boolean: true)
-  bump_type ||= 'patch' if bump_type == nil && prompt(text: "Bugfix/Improvements?", boolean: true)
+  bump_type ||= 'patch' if bump_type.nil? && prompt(text: "Bugfix/Improvements?", boolean: true)
 
   if bump_type
     version_bump_podspec(path: path, bump_type: bump_type)
@@ -141,8 +141,8 @@ end
 desc "e.g. KrauseFx/fastlane"
 private_lane :github_url do |options|
   github_organisation = "fastlane"
-  github_organisation = "KrauseFx" if krausefx_repos.include?options[:tool]
-  
+  github_organisation = "KrauseFx" if krausefx_repos.include? options[:tool]
+
   [github_organisation, options[:tool]].join("/")
 end
 
