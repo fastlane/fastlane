@@ -15,6 +15,7 @@ module Gym
         generator.appfile_path
       end
 
+      # The path in which the ipa file will be available after executing the command
       def ipa_path
         generator.ipa_path
       end

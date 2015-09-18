@@ -22,7 +22,7 @@ module Gym
 
         options << "-exportOptionsPlist '#{config_path}'"
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
-        options << "-exportPath '#{BuildCommandGenerator.build_path}'" # we move it once the binary is finished
+        options << "-exportPath '#{temporary_output_path}'"
 
         options
       end
@@ -31,8 +31,19 @@ module Gym
         [""]
       end
 
+      # We export the ipa into this directory, as we can't specify the ipa file directly
+      def temporary_output_path
+        @temporary_output_path ||= File.join("/tmp", Time.now.to_i.to_s)
+      end
+
       def ipa_path
-        File.join(BuildCommandGenerator.build_path, "#{Gym.config[:output_name]}.ipa")
+        unless @ipa_path
+          path = Dir[File.join(temporary_output_path, "*.ipa")].last
+
+          @ipa_path = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
+          FileUtils.mv(path, @ipa_path)
+        end
+        @ipa_path
       end
 
       # The path the the dsym file for this app. Might be nil
