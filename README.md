@@ -116,6 +116,10 @@ That's all you need to build your application. If you want more control, here ar
 
     gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 
+If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
+
+    DEVELOPER_DIR=/Applications/Xcode6.2.app gym
+
 For a list of all available parameters use
 
     gym --help
