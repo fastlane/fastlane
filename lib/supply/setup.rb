@@ -5,7 +5,10 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
+
+        store_screenshots(listing.language)
       end
+
       client.abort_current_edit
 
       Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
@@ -19,6 +22,26 @@ module Supply
         path = File.join(containing, "#{key}.txt")
         Helper.log.info "Writing to #{path}..."
         File.write(path, listing.send(key))
+      end
+    end
+
+    def store_screenshots(language)
+      Supply::SCREENSHOT_TYPES.each do |image_type|
+        urls = client.fetch_screenshots(image_type: image_type,
+                                           language: language)
+
+        urls.each_with_index do |url, index|
+          if image_type.include?("Screenshots")
+            FileUtils.mkdir_p(File.join(metadata_path, language, image_type))
+            path = File.join(metadata_path, language, image_type, "#{index}.png")
+          else
+            path = File.join(metadata_path, language, "#{image_type}.png")
+          end
+
+          Helper.log.info "Writing to #{path}..."
+
+          File.write(path, Net::HTTP.get(URI(url)))
+        end
       end
     end
 

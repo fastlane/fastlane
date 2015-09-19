@@ -1,4 +1,5 @@
 require 'google/api_client'
+require 'net/http'
 
 module Supply
   class Client
@@ -16,7 +17,6 @@ module Supply
     #####################################################
     # @!group Login
     #####################################################
-
 
     # Initializes the auth_client and api_client using the specified information
     # @param path_to_key: The path to your p12 file
@@ -82,13 +82,13 @@ module Supply
       result = api_client.execute(
         api_method: android_publisher.edits.delete,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name
         },
         authorization: auth_client
       )
 
-      raise result.error_message if result.error?
+      raise result.error_message.red if result.error?
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -101,13 +101,13 @@ module Supply
       result = api_client.execute(
         api_method: android_publisher.edits.commit,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name
         },
         authorization: auth_client
       )
 
-      raise result.error_message if result.error?
+      raise result.error_message.red if result.error?
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -125,13 +125,13 @@ module Supply
       result = api_client.execute(
         api_method: android_publisher.edits.listings.list,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name
         },
         authorization: auth_client
       )
 
-      raise result.error_message if result.error? && result.status != 404
+      raise result.error_message.red if result.error? && result.status != 404
 
       return result.data.listings.collect do |row|
         Listing.new(self, row.language, row)
@@ -145,14 +145,14 @@ module Supply
       result = api_client.execute(
         api_method: android_publisher.edits.listings.get,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name,
-            'language' => language
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'language' => language
         },
         authorization: auth_client
       )
 
-      raise result.error_message if result.error? && result.status != 404
+      raise result.error_message.red if result.error? && result.status != 404
 
       if result.status == 404
         return Listing.new(self, language) # create a new empty listing
@@ -180,14 +180,14 @@ module Supply
       result = api_client.execute(
         api_method: android_publisher.edits.listings.update,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name,
-            'language' => language
-          },
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'language' => language
+        },
         body_object: listing,
         authorization: auth_client
       )
-      raise result.error_message if result.error?
+      raise result.error_message.red if result.error?
     end
 
     def upload_apk_to_track(path_to_apk, track)
@@ -197,15 +197,15 @@ module Supply
       result_upload = api_client.execute(
         api_method: android_publisher.edits.apks.upload,
         parameters: {
-            'editId' => current_edit.data.id,
-            'packageName' => current_package_name,
-            'uploadType' => 'media'
-          },
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'uploadType' => 'media'
+        },
         media: apk,
         authorization: auth_client
       )
 
-      raise result_upload.error_message if result_upload.error?
+      raise result_upload.error_message.red if result_upload.error?
 
       track_body = {
         'track' => track,
@@ -224,7 +224,30 @@ module Supply
         body_object: track_body,
         authorization: auth_client)
 
-      raise result_update.error_message if result_update.error?
+      raise result_update.error_message.red if result_update.error?
+    end
+
+    #####################################################
+    # @!group Screenshots
+    #####################################################
+
+    def fetch_screenshots(image_type: nil, language: nil)
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.images.list,
+        parameters: {
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'language' => language,
+          'imageType' => image_type
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message.red if result.error?
+
+      result.data.images.collect(&:url)
     end
 
 
