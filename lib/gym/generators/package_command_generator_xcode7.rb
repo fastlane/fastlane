@@ -74,11 +74,6 @@ module Gym
           Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
           Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
         end
-
-        if Gym.config[:codesigning_identity]
-          Helper.log.info "You're using Xcode 7, the `codesigning_identity` value will be ignored".yellow
-          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
-        end
       end
     end
   end
