@@ -61,14 +61,15 @@ module Gym
 
       def config_content
         require 'plist'
-        symbols = (Gym.config[:include_symbols] ? true : false)
-        bitcode = (Gym.config[:include_bitcode] ? true : false)
 
-        {
-          method: 'app-store',
-          uploadSymbols: symbols,
-          uploadBitcode: bitcode
-        }.to_plist
+        hash = { method: Gym.config[:export_method] }
+
+        if Gym.config[:export_method] == 'app-store'
+          hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false)
+          hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false)
+        end
+
+        hash.to_plist
       end
     end
   end

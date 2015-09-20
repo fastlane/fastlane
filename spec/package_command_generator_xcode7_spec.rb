@@ -29,6 +29,19 @@ describe Gym do
       })
     end
 
+    it "doesn't store bitcode/symbols information for non app-store builds" do
+      options = { project: "./examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+      require 'plist'
+      expect(Plist.parse_xml(config_path)).to eq({
+        'method' => "ad-hoc"
+      })
+    end
+
     it "uses a temporary folder to store the resulting ipa file" do
       options = { project: "./examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
