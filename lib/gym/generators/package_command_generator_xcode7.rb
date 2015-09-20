@@ -38,7 +38,7 @@ module Gym
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
 
           @ipa_path = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.mv(path, @ipa_path)
+          FileUtils.mv(path, @ipa_path) if File.expand_path(path) != File.expand_path(@ipa_path)
         end
         @ipa_path
       end
