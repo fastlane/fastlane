@@ -3,10 +3,7 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
-        if Gym.config[:provisioning_profile_path]
-          Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
-          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
-        end
+        print_legacy_information
 
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
@@ -70,6 +67,18 @@ module Gym
         end
 
         hash.to_plist
+      end
+
+      def print_legacy_information
+        if Gym.config[:provisioning_profile_path]
+          Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
+          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
+        end
+
+        if Gym.config[:codesigning_identity]
+          Helper.log.info "You're using Xcode 7, the `codesigning_identity` value will be ignored".yellow
+          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
+        end
       end
     end
   end
