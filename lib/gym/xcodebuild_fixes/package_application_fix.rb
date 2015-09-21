@@ -7,8 +7,8 @@ module Gym
 
         # Initialization
         @patched_package_application_path = File.join("/tmp", "PackageApplication4Gym")
-        # Remove any previous patched PackageApplication
-        FileUtils.rm @patched_package_application_path if File.exist?(@patched_package_application_path)
+
+        return if File.exist?(@patched_package_application_path)
 
         Dir.mktmpdir do |tmpdir|
           # Check current PackageApplication MD5
@@ -41,15 +41,6 @@ module Gym
         end
 
         return @patched_package_application_path # Return path to the patched PackageApplication
-      end
-
-      # Remove the patched script after it was used
-      def clear_patched_package_application
-        if @patched_package_application_path and File.exist?(@patched_package_application_path)
-          Helper.log.debug "Removing patched PackageApplication file at path '#{@patched_package_application_path}'" if $verbose
-          # force in the unlikely event that the file was deleted (e.g. by a concurrent job)
-          FileUtils.rm @patched_package_application_path, force: true
-        end
       end
     end
   end

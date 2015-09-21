@@ -67,7 +67,6 @@ module Gym
       return unless Xcode.pre_7?
       Gym::XcodebuildFixes.swift_library_fix
       Gym::XcodebuildFixes.watchkit_fix
-      Gym::XcodebuildFixes.clear_patched_package_application
     end
 
     # Builds the app and prepares the archive
