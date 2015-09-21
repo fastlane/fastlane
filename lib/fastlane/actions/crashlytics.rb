@@ -7,6 +7,15 @@ module Fastlane
         params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
         params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
 
+        if params[:notes]
+          # We need to store it in a file, because the crashlytics CLI says so
+          Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
+
+          notes_path = File.join("/tmp", "#{Time.now.to_i}_changelog.txt")
+          File.write(notes_path, params[:notes])
+          params[:notes_path] = notes_path # we can only set it *after* writing the file there
+        end
+
         command = []
         command << File.join(params[:crashlytics_path], 'submit')
         command << params[:api_token]
@@ -16,7 +25,7 @@ module Fastlane
         command << "-notesPath '#{params[:notes_path]}'" if params[:notes_path]
         command << "-groupAliases '#{params[:groups]}'" if params[:groups]
         command << "-notifications #{(params[:notifications] ? 'YES' : 'NO')}"
-        
+
         Helper.log.debug command.join(" ") if $verbose
         Actions.sh command.join(" ")
 
@@ -53,7 +62,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
@@ -64,28 +73,35 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "Path '#{value}' not found".red unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :notes,
+                                       env_name: "CRASHLYTICS_NOTES",
+                                       description: "The release notes as string - uses :notes_path under the hood",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :groups,
                                        env_name: "CRASHLYTICS_GROUPS",
-                                       description: "The groups used for distribution",
+                                       description: "The groups used for distribution, separated by commas",
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :emails,
                                        env_name: "CRASHLYTICS_EMAILS",
-                                       description: "Pass email addresses, separated by commas",
-                                       optional: true),
+                                       description: "Pass email addresses of testers, separated by commas",
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :notifications,
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
                                        description: "Crashlytics notification option (true/false)",
-                                       optional: true,
-                                       is_string: false,
-                                       verify_block: proc do |value|
-                                         raise "Crashlytics supported notifications options: TrueClass, FalseClass, 'true', 'false', 'YES', 'NO'".red unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass) || value.kind_of?(String)
-                                       end)
+                                       default_value: true,
+                                       is_string: false)
         ]
       end
 
+      def self.is_supported?(platform)
+        [:ios, :mac].include?(platform)
+      end
+
       def self.author
-        "pedrogimenez"
+        ["KrauseFx", "pedrogimenez"]
       end
     end
   end

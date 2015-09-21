@@ -542,7 +542,7 @@ crashlytics(
   ipa_path: './app.ipa'
 )
 ```
-Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
+Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
