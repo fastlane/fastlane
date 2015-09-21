@@ -8,7 +8,7 @@ module Gym
         # Initialization
         @patched_package_application_path = File.join("/tmp", "PackageApplication4Gym")
 
-        return if File.exist?(@patched_package_application_path)
+        return @patched_package_application_path if File.exist?(@patched_package_application_path)
 
         Dir.mktmpdir do |tmpdir|
           # Check current PackageApplication MD5
