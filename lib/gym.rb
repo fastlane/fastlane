@@ -29,7 +29,6 @@ module Gym
     end
 
     def init_libs
-      return unless Xcode.pre_7?
       # Import all the fixes
       require 'gym/xcodebuild_fixes/swift_fix'
       require 'gym/xcodebuild_fixes/watchkit_fix'
