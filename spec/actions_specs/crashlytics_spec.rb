@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Crashlytics Integration", now: true do
+    describe "Crashlytics Integration" do
       before :each do
         ENV.delete "CRASHLYTICS_API_TOKEN"
         ENV.delete "CRASHLYTICS_BUILD_SECRET"
