@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'cert', '>= 0.3.2', '< 1.0.0'
   spec.add_dependency 'sigh', '>= 0.10.7', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
-  spec.add_dependency 'gym', '>= 0.6.2', '< 1.0.0'
+  spec.add_dependency 'gym', '>= 0.7.2', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.2.0', '< 1.0.0'
 
   # Development only
