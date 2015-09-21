@@ -230,6 +230,7 @@ module Snapshot
     end
 
     def kill_simulator
+      `xcrun simctl shutdown booted`
       `killall "iOS Simulator"`
       `killall "Simulator"`
     end
