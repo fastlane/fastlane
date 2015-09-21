@@ -18,8 +18,8 @@ module Fastlane
           'tag_name' => params[:tag_name],
           'name' => params[:name],
           'body' => params[:description],
-          'draft' => params[:is_draft],
-          'prerelease' => params[:is_prerelease]
+          'draft' => params[:is_draft].to_s,
+          'prerelease' => params[:is_prerelease].to_s
         }
         body_obj['target_commitish'] = params[:commitish] if params[:commitish]
         body = body_obj.to_json
