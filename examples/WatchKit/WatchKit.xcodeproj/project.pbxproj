@@ -445,9 +445,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = WatchKit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.WatchKit;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -456,9 +457,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = WatchKit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.WatchKit;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -534,6 +536,7 @@
 				CA461FED1B84738C0037A37B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CA46200F1B8473930037A37B /* Build configuration list for PBXNativeTarget "WatchKit WatchKit 1 App" */ = {
 			isa = XCConfigurationList;
@@ -542,6 +545,7 @@
 				CA4620111B8473930037A37B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CA4620121B8473930037A37B /* Build configuration list for PBXNativeTarget "WatchKit WatchKit 1 Extension" */ = {
 			isa = XCConfigurationList;
@@ -550,6 +554,7 @@
 				CA4620141B8473930037A37B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

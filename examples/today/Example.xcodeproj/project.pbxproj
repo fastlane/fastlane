@@ -411,12 +411,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: SunApps GmbH (5A997XSHK2)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
-				PROVISIONING_PROFILE = "067a4fdf-f03d-4fb8-8dc9-f9dfb6dbd";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -424,12 +424,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: SunApps GmbH (5A997XSHK2)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
-				PROVISIONING_PROFILE = "067a4fdf-f03d-4fb8-8dc9-f9dfb6dbd";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

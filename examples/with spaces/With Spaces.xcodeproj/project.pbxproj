@@ -362,9 +362,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = "With Spaces/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "675dcbd2-06a8-4a38-91a9-33ad0faf22b1";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -375,9 +375,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = "With Spaces/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sunapps.9;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "675dcbd2-06a8-4a38-91a9-33ad0faf22b1";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
@@ -443,6 +443,7 @@
 				CAB109241B7A641500F53B5F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
