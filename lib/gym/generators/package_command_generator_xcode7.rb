@@ -3,10 +3,7 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
-        if Gym.config[:provisioning_profile_path]
-          Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
-          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
-        end
+        print_legacy_information
 
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
@@ -41,7 +38,7 @@ module Gym
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
 
           @ipa_path = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.mv(path, @ipa_path)
+          FileUtils.mv(path, @ipa_path) if File.expand_path(path) != File.expand_path(@ipa_path)
         end
         @ipa_path
       end
@@ -61,14 +58,22 @@ module Gym
 
       def config_content
         require 'plist'
-        symbols = (Gym.config[:include_symbols] ? true : false)
-        bitcode = (Gym.config[:include_bitcode] ? true : false)
 
-        {
-          method: 'app-store',
-          uploadSymbols: symbols,
-          uploadBitcode: bitcode
-        }.to_plist
+        hash = { method: Gym.config[:export_method] }
+
+        if Gym.config[:export_method] == 'app-store'
+          hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false)
+          hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false)
+        end
+
+        hash.to_plist
+      end
+
+      def print_legacy_information
+        if Gym.config[:provisioning_profile_path]
+          Helper.log.info "You're using Xcode 7, the `provisioning_profile_path` value will be ignored".yellow
+          Helper.log.info "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md".yellow
+        end
       end
     end
   end

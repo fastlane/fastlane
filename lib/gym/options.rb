@@ -113,6 +113,16 @@ module Gym
                                      description: "Should the ipa include bitcode?",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :export_method,
+                                     short_option: "-j",
+                                     env_name: "GYM_EXPORT_METHOD",
+                                     description: "How should gym export the archive?",
+                                     default_value: "app-store",
+                                     is_string: true,
+                                     verify_block: proc do |value|
+                                       av = %w(app-store ad-hoc package enterprise development developer-id)
+                                       raise "Unsupported export_method, must be: #{av}" unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",

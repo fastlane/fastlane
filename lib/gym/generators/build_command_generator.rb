@@ -57,7 +57,9 @@ module Gym
       end
 
       def suffix
-        []
+        suffix = []
+        suffix << "CODE_SIGN_IDENTITY='#{Gym.config[:codesigning_identity]}'" if Gym.config[:codesigning_identity]
+        suffix
       end
 
       def pipe

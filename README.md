@@ -190,8 +190,24 @@ xcodebuild -scheme 'Example' \
 archive | xcpretty
 ```
 
-
 After building the archive it is being checked by `gym`. If it's valid, it gets packaged up and signed into an `ipa` file.
+
+`gym` automatically chooses a different packaging method depending on the version of Xcode you're using.
+
+### Xcode 7 and above
+
+```
+/usr/bin/xcrun xcodebuild -exportArchive \
+-exportOptionsPlist '/tmp/gym_config_1442852529.plist' \
+-archivePath '/Users/fkrause/Library/Developer/Xcode/Archives/2015-09-21/App 2015-09-21 09.21.56.xcarchive' \
+-exportPath '/tmp/1442852529'
+```
+
+`gym` makes use of the new Xcode 7 API which allows us to specify the export options using a `plist` file. You can find more information about the available options by running `xcodebuild --help`.
+
+Using this method there are no workarounds for WatchKit or Swift required, as it uses the same technique Xcode uses when exporting your binary.
+
+### Xcode 6 and below
 
 ```
 /usr/bin/xcrun /path/to/PackageApplication4Gym -v \
