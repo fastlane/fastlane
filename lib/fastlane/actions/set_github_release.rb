@@ -18,8 +18,8 @@ module Fastlane
           'tag_name' => params[:tag_name],
           'name' => params[:name],
           'body' => params[:description],
-          'draft' => params[:is_draft].to_s,
-          'prerelease' => params[:is_prerelease].to_s
+          'draft' => !!params[:is_draft],
+          'prerelease' => !!params[:is_prerelease]
         }
         body_obj['target_commitish'] = params[:commitish] if params[:commitish]
         body = body_obj.to_json
@@ -43,7 +43,6 @@ module Fastlane
 
           assets = params[:upload_assets]
           if assets && assets.count > 0
-
             # upload assets
             self.upload_assets(assets, body['upload_url'], api_token)
 
@@ -62,10 +61,13 @@ module Fastlane
             return body
           end
         when 422
+          Helper.log.error response.body
           Helper.log.error "Release on tag #{params[:tag_name]} already exists!".red
         when 404
+          Helper.log.error response.body
           raise "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
         when 401
+          Helper.log.error response.body
           raise "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
         else
           if response[:status] != 200
