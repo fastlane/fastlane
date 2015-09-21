@@ -61,6 +61,18 @@ module FastlaneCore
       true
     end
 
+    # Returns an updated value type (if necessary)
+    def auto_convert_value(value)
+      # Special treatment if the user specififed true, false or YES, NO
+      if %w(YES yes true).include?(value)
+        value = true
+      elsif %w(NO no false).include?(value)
+        value = false
+      end
+
+      return value
+    end
+
     def to_s
       [@key, @description].join(": ")
     end

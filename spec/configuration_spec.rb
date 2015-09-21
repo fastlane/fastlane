@@ -98,6 +98,26 @@ describe FastlaneCore do
         ENV.delete("FL_TEST")
       end
 
+      it "auto converts booleans as strings to booleans" do
+        c = [
+          FastlaneCore::ConfigItem.new(key: :true_value),
+          FastlaneCore::ConfigItem.new(key: :true_value2),
+          FastlaneCore::ConfigItem.new(key: :false_value),
+          FastlaneCore::ConfigItem.new(key: :false_value2)
+        ]
+        config = FastlaneCore::Configuration.create(c, {
+          true_value: "true",
+          true_value2: "YES",
+          false_value: "false",
+          false_value2: "NO"
+        })
+
+        expect(config[:true_value]).to eq(true)
+        expect(config[:true_value2]).to eq(true)
+        expect(config[:false_value]).to eq(false)
+        expect(config[:false_value2]).to eq(false)
+      end
+
       describe "Use a valid Configuration Manager" do
         before do
           @options = [

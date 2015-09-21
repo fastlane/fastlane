@@ -107,12 +107,14 @@ module FastlaneCore
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     def fetch(key)
-      raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of? Symbol
+      raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?(Symbol)
 
       option = option_for_key(key)
       raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect(&:key).join(', ')}".red unless option
 
       value = @values[key]
+
+      value = option.auto_convert_value(value)
 
       # `if value == nil` instead of ||= because false is also a valid value
       if value.nil? and option.env_name and ENV[option.env_name]
