@@ -28,7 +28,11 @@ module Gym
 
       # The generator we need to use for the currently used Xcode version
       def generator
-        Xcode.pre_7? ? PackageCommandGeneratorLegacy : PackageCommandGeneratorXcode7
+        if Xcode.pre_7? and !Gym.config[:use_legacy_build_api]
+          PackageCommandGeneratorLegacy
+        else
+          PackageCommandGeneratorXcode7
+        end
       end
     end
   end

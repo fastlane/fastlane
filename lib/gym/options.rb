@@ -1,6 +1,7 @@
 require "fastlane_core"
 require "credentials_manager"
 
+# rubocop:disable Metrics/AbcSize
 module Gym
   class Options
     def self.available_options
@@ -113,6 +114,16 @@ module Gym
                                      description: "Should the ipa include bitcode?",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
+                                     env_name: "GYM_USE_LEGACY_BUILD_API",
+                                     description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
+                                     default_value: false,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       if value
+                                         Helper.log.info "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816".red
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
@@ -136,3 +147,4 @@ module Gym
     end
   end
 end
+# rubocop:enable Metrics/AbcSize
