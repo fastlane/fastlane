@@ -131,6 +131,16 @@ Use `gym --help` to get all available options.
 
 The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
+### verify_xcode
+
+Verifies that the Xcode installation is properly signed by Apple. This is relevant after recent [attacks targeting Xcode](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/).
+
+Add this action to your `appstore` lane. Keep in mind this action might take several minutes to be completed.
+
+```ruby
+verify_xcode
+```
+
 ### ipa
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
