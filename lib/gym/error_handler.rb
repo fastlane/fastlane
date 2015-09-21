@@ -80,6 +80,10 @@ module Gym
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
           print "provisioning profile and code signing identity."
+        when /expected one of \{\}/
+          print "It seems like you ran into this radar"
+          print "https://openradar.appspot.com/radar?id=4952000420642816"
+          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
         raise "Error packaging up the application".red
       end
