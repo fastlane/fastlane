@@ -63,11 +63,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload file to Nexus"
-      end
-
-      def self.details
-        "Upload file to Nexus"
+        "Upload a file to Sonatype Nexus platform"
       end
 
       def self.available_options
@@ -122,22 +118,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :proxy_username,
                                        env_name: "FL_NEXUS_PROXY_USERNAME",
                                        description: "Proxy username",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_NEXUS_PROXY_PASSWORD",
                                        description: "Proxy password",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,
                                        env_name: "FL_NEXUS_PROXY_ADDRESS",
                                        description: "Proxy address",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_port,
                                        env_name: "FL_NEXUS_PROXY_PORT",
                                        description: "Proxy port",
-                                       default_value: nil,
                                        optional: true)
         ]
       end

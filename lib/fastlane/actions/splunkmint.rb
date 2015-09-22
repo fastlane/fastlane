@@ -72,11 +72,7 @@ module Fastlane
       def self.description
         "Upload dSYM file to Splunk MINT"
       end
-
-      def self.details
-        "Upload dSYM file to Splunk MINT"
-      end
-
+      
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :dsym,
