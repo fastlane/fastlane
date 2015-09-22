@@ -24,20 +24,24 @@ module Fastlane
 
         Helper.log.info "Successfully verified the code signature".green
 
+
         # Check 2/2
-
-        Helper.log.info "Verifying the signature of Xcode...".green
+        # More information https://developer.apple.com/news/?id=09222015a
+        Helper.log.info "Verifying Xcode using GateKeeper..."
         Helper.log.info "This will take up to a few minutes, now is a great time to go for a coffee ☕...".green
-        command = "codesign --verify --deep --verbose '#{params[:xcode_path]}'"
 
-        must_includes = [
-          "valid on disk",
-          "satisfies its Designated Requirement"
-        ]
+        command = "spctl --assess --verbose '#{params[:xcode_path]}'"
+        must_includes = ['accepted']
 
-        verify(command: command, must_includes: must_includes, params: params)
+        output = verify(command: command, must_includes: must_includes, params: params)
 
-        Helper.log.info "Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧".green
+        if output.include?"source=Mac App Store" or output.include?"source=Apple" or output.include?"source=Apple System"
+          Helper.log.info "Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧".green
+        else
+          show_and_raise_error("Invalid Download Source of Xcode")
+        end
+
+        true
       end
 
       def self.verify(command: nil, must_includes: nil, params: nil)
@@ -50,12 +54,18 @@ module Fastlane
         end
 
         if errors.count > 0
-          Helper.log.fatal "Attention: Your Xcode Installation might be hacked.".red
-          Helper.log.fatal "This might be a false alarm, if so, please submit an issue on GitHub".red
-          Helper.log.fatal "The following information couldn't be found:".red
-          Helper.log.fatal errors.join("\n").yellow
-          raise "The Xcode installation at path '#{params[:xcode_path]}' might be compromised."
+          show_and_raise_error(errors.join("\n"))
         end
+
+        return output
+      end
+
+      def show_and_raise_error(error)
+        Helper.log.fatal "Attention: Your Xcode Installation might be hacked.".red
+        Helper.log.fatal "This might be a false alarm, if so, please submit an issue on GitHub".red
+        Helper.log.fatal "The following information couldn't be found:".red
+        Helper.log.fatal error.yellow
+        raise "The Xcode installation at path '#{params[:xcode_path]}' might be compromised."
       end
 
       #####################################################
