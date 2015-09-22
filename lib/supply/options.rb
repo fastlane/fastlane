@@ -31,7 +31,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :key,
                                      env_name: "SUPPLY_KEY",
                                      description: "The p12 File used to authenticate with Google",
-                                     default_value: Dir["*.p12"].first,
+                                     default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
                                      verify_block: proc do |value|
                                        raise "Could not find p12 file at path '#{File.expand_path(value)}'".red unless File.exist?(File.expand_path(value))
                                      end),
