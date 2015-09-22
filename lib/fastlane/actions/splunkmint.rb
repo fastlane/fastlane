@@ -30,20 +30,18 @@ module Fastlane
       end
 
       def self.dsym_path(params)
-        expanded_file_path = nil
         file_path = params[:dsym]
-        file_path = Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] || ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] unless file_path
-        file_path = Actions.lane_context[SharedValues::DSYM_ZIP_PATH] || ENV[SharedValues::DSYM_ZIP_PATH.to_s] unless file_path
+        file_path ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] || ENV[SharedValues::DSYM_OUTPUT_PATH.to_s]
+        file_path ||= Actions.lane_context[SharedValues::DSYM_ZIP_PATH] || ENV[SharedValues::DSYM_ZIP_PATH.to_s]
 
         if file_path
           expanded_file_path = File.expand_path(file_path)
-
           raise "Couldn't find file at path '#{expanded_file_path}'".red unless File.exist?(expanded_file_path)
+          
+          return expanded_file_path
         else
           raise "Couldn't find any dSYM file".red
         end
-
-        expanded_file_path
       end
 
       def self.upload_options(params)
@@ -102,22 +100,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :proxy_username,
                                        env_name: "FL_SPLUNKMINT_PROXY_USERNAME",
                                        description: "Proxy username",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_SPLUNKMINT_PROXY_PASSWORD",
                                        description: "Proxy password",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,
                                        env_name: "FL_SPLUNKMINT_PROXY_ADDRESS",
                                        description: "Proxy address",
-                                       default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_port,
                                        env_name: "FL_SPLUNKMINT_PROXY_PORT",
                                        description: "Proxy port",
-                                       default_value: nil,
                                        optional: true)
         ]
       end

@@ -396,17 +396,7 @@ splunkmint(
 )
 ```
 
-It also can read the dSYM.zip path from ```ENV['DSYM_OUTPUT_PATH']``` and ```ENV['DSYM_ZIP_PATH']```. If you use ```gym``` or ```dsym_zip``` it will use the path shared by those actions.
-
-```ruby
-splunkmint(
-	api_key: "43564d3a",
-	api_token: "e05456234c4869fb7e0b61"
-)
-```
-
-To get a list of all available parameters run `fastlane action splunkmint `
-
+If you use `gym` the `dsym` parameter is optional.
 
 ## Testing
 
