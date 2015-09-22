@@ -206,7 +206,7 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        clone_folder = File.join("/tmp", "fl_clones_#{Time.now.to_i}", repo_name)
+        clone_folder = File.join("/tmp", "fl_clones_#{Time.now.to_f}", repo_name)
 
         branch_option = ""
         branch_option = "--branch #{branch}" if branch != 'HEAD'
