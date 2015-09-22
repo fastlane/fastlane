@@ -37,7 +37,7 @@ module Fastlane
         if file_path
           expanded_file_path = File.expand_path(file_path)
           raise "Couldn't find file at path '#{expanded_file_path}'".red unless File.exist?(expanded_file_path)
-          
+
           return expanded_file_path
         else
           raise "Couldn't find any dSYM file".red
@@ -121,7 +121,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include?(platform)
       end
     end
   end
