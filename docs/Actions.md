@@ -668,6 +668,24 @@ artifactory(
 
 To get a list of all available parameters run `fastlane action artifactory`
 
+### [nexus_upload](http://www.sonatype.com/nexus/)
+
+This allows you to upload your ipa, or any other file you want, to Nexus.
+
+```ruby
+nexus_upload(file: "/path/to/file.ipa", 
+            repo_id: "artefacts", 
+            repo_group_id: "com.fastlane", 
+            repo_project_name: "ipa",
+            repo_project_version: "1.13",
+            endpoint: "http://localhost:8081",
+            username: "admin",
+            password: "admin123")
+
+```
+
+To get a list of all available parameters run `fastlane action nexus_upload`
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
