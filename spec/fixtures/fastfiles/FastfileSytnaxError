@@ -13,5 +13,5 @@
 
 
 lane :beta do
-	sigh(app_identifier: "hi"
+  sigh(app_identifier: "hi"
 end

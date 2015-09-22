@@ -21,7 +21,7 @@ describe Fastlane do
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
-            derived_data_path: '/derived/data/path',
+            derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
             export_archive: true,
@@ -50,6 +50,7 @@ describe Fastlane do
           + "-arch \"architecture\" " \
           + "-archivePath \"./build/MyApp.xcarchive\" " \
           + "-configuration \"Debug\" " \
+          + "-derivedDataPath \"/derived/data/path\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
           + "-exportArchive " \

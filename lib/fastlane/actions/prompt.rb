@@ -14,7 +14,7 @@ module Fastlane
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         else
           # Standard one line input
-          user_input = STDIN.gets.chomp.strip
+          user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
         end
 
         user_input = (user_input.downcase == 'y') if params[:boolean]
