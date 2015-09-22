@@ -3,7 +3,7 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
-        print_legacy_information
+        print_legacy_information unless Helper.fastlane_enabled?
 
         parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
         parts += options
