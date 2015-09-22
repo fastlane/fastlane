@@ -384,6 +384,20 @@ dsym_zip(
 )
 ```
 
+### splunkmint
+
+Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbolication.
+
+```ruby
+splunkmint(
+	dsym: "My.app.dSYM.zip", 
+	api_key: "43564d3a",
+	api_token: "e05456234c4869fb7e0b61"
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
+
 ## Testing
 
 ### xctest
@@ -667,6 +681,23 @@ artifactory(
 ```
 
 To get a list of all available parameters run `fastlane action artifactory`
+
+### [nexus_upload](http://www.sonatype.com/nexus/)
+
+Upload your ipa, or any other file you want, to Sonatype Nexus platform.
+
+```ruby
+nexus_upload(
+  file: "/path/to/file.ipa", 
+  repo_id: "artefacts", 
+  repo_group_id: "com.fastlane", 
+  repo_project_name: "ipa",
+  repo_project_version: "1.13",
+  endpoint: "http://localhost:8081",
+  username: "admin",
+  password: "admin123"
+)
+```
 
 ## Modifying Project
 

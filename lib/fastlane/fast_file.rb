@@ -206,18 +206,13 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        clone_folder = File.join("/tmp", "fl_clones", repo_name)
+        tmp_path = File.join("/tmp", "fl_clones_#{Time.now.to_i}")
+        clone_folder = File.join(tmp_path, repo_name)
 
         branch_option = ""
         branch_option = "--branch #{branch}" if branch != 'HEAD'
 
         clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
-        if Dir.exist? clone_folder
-          # We want to re-clone if the folder already exists
-          Helper.log.info "Deleting existing git repo..."
-          Actions.sh("rm -rf '#{clone_folder}'")
-        end
 
         Helper.log.info "Cloning remote git repo..."
         Actions.sh(clone_command)
@@ -235,6 +230,12 @@ module Fastlane
         end
 
         import(File.join(clone_folder, path))
+
+        if Dir.exist?(clone_folder)
+          # We want to re-clone if the folder already exists
+          Helper.log.info "Clearing the git repo..."
+          Actions.sh("rm -rf '#{tmp_path}'")
+        end
       end
     end
 
