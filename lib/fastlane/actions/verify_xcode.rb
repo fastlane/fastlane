@@ -24,7 +24,6 @@ module Fastlane
 
         Helper.log.info "Successfully verified the code signature".green
 
-
         # Check 2/2
         # More information https://developer.apple.com/news/?id=09222015a
         Helper.log.info "Verifying Xcode using GateKeeper..."
@@ -35,7 +34,7 @@ module Fastlane
 
         output = verify(command: command, must_includes: must_includes, params: params)
 
-        if output.include?"source=Mac App Store" or output.include?"source=Apple" or output.include?"source=Apple System"
+        if output.include?("source=Mac App Store") or output.include?("source=Apple") or output.include?("source=Apple System")
           Helper.log.info "Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧".green
         else
           show_and_raise_error("Invalid Download Source of Xcode")
