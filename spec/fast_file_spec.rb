@@ -241,7 +241,7 @@ describe Fastlane do
       it "properly shows an error message when the user uses invalid quotation" do
         expect do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidQuotation')
-        end.to raise_error("Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your Fastfile".red)
+        end.to raise_error("Invalid quotation: You used the invalid quote \u2018 instead of '. Make sure to use a good text editor like Sublime Text to edit your Fastfile".force_encoding("utf-8").red)
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
