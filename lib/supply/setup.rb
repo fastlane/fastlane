@@ -1,12 +1,17 @@
 module Supply
   class Setup
     def perform_download
+      if File.exist?(metadata_path)
+        Helper.log.info "Metadata already exists at path '#{metadata_path}'".yellow
+        return
+      end
+
       client.begin_edit(package_name: Supply.config[:package_name])
 
       client.listings.each do |listing|
         store_metadata(listing)
-
-        store_screenshots(listing.language)
+        create_screenshots_folder(listing)
+        download_images(listing)
       end
 
       client.abort_current_edit
@@ -25,23 +30,27 @@ module Supply
       end
     end
 
-    def store_screenshots(language)
-      Supply::SCREENSHOT_TYPES.each do |image_type|
-        urls = client.fetch_screenshots(image_type: image_type,
-                                           language: language)
+    def download_images(listing)
+      # We cannot download existing screenshots as they are compressed
+      # But we can at least download the images
+      require 'net/http'
 
-        urls.each_with_index do |url, index|
-          if image_type.include?("Screenshots")
-            FileUtils.mkdir_p(File.join(metadata_path, language, image_type))
-            path = File.join(metadata_path, language, image_type, "#{index}.png")
-          else
-            path = File.join(metadata_path, language, "#{image_type}.png")
-          end
+      IMAGES_TYPES.each do |image_type|
+        url = client.fetch_images(image_type: image_type, language: listing.language).last
+        next unless url
 
-          Helper.log.info "Writing to #{path}..."
+        Helper.log.info "Downloading #{image_type} for #{listing.language}..."
+        path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
+        File.write(path, Net::HTTP.get(URI.parse(url)))
+      end
+    end
 
-          File.write(path, Net::HTTP.get(URI(url)))
-        end
+    def create_screenshots_folder(listing)
+      containing = File.join(metadata_path, listing.language)
+
+      FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
+      Supply::SCREENSHOT_TYPES.each do |screenshot_type|
+        FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
       end
     end
 
@@ -55,7 +64,7 @@ module Supply
 
     def client
       @client ||= Client.new(path_to_key: Supply.config[:key],
-                                   issuer: Supply.config[:issuer])
+                                  issuer: Supply.config[:issuer])
     end
   end
 end

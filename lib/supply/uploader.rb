@@ -3,28 +3,60 @@ module Supply
     def perform_upload
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      # Metadata
-      load_local_metadata
+      Dir.foreach(metadata_path) do |language|
+        next if language.start_with?('.') # e.g. . or .. or hidden folders
 
-      # pkg
-      upload_binary
+        listing = client.listing_for_language(language)
 
-      Helper.log.info "Uploading changes to Google Play..."
+        upload_metadata(language, listing)
+        upload_images(language)
+        upload_screenshots(language)        
+      end
+
+      # upload_binary
+
+      Helper.log.info "Uploading all changes to Google Play..."
       client.commit_current_edit!
       Helper.log.info "Successfully finished the upload to Google Play".green
     end
 
-    def load_local_metadata
-      Dir.foreach(metadata_path) do |language|
-        next if language.start_with?('.') # e.g. . or .. or hidden folders
-        Helper.log.info "Loading metadata for language '#{language}'..."
+    def upload_metadata(language, listing)
+      Helper.log.info "Loading metadata for language '#{language}'..."
 
-        listing = client.listing_for_language(language)
-        Supply::AVAILABLE_METADATA_FIELDS.each do |key|
-          path = File.join(metadata_path, language, "#{key}.txt")
-          listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
+      Supply::AVAILABLE_METADATA_FIELDS.each do |key|
+        path = File.join(metadata_path, language, "#{key}.txt")
+        listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
+      end
+      listing.save
+    end
+
+    def upload_images(language)
+      Supply::IMAGES_TYPES.each do |image_type|
+        search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, image_type) + ".#{IMAGE_FILE_EXTENSIONS}"
+        path = Dir.glob(search, File::FNM_CASEFOLD).last
+        next unless path
+
+        Helper.log.info "Uploading image file #{path}..."
+        client.upload_image(image_path: File.expand_path(path),
+                            image_type: image_type,
+                              language: language)
+      end
+    end
+
+    def upload_screenshots(language)
+      Supply::SCREENSHOT_TYPES.each do |screenshot_type|
+        search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, screenshot_type, "*.#{IMAGE_FILE_EXTENSIONS}")
+        paths = Dir.glob(search, File::FNM_CASEFOLD)
+        next unless paths.count > 0
+
+        client.clear_screenshots(image_type: screenshot_type, language: language)
+
+        paths.each do |path|
+          Helper.log.info "Uploading screenshot #{path}..."
+          client.upload_image(image_path: File.expand_path(path),
+                              image_type: screenshot_type,
+                                language: language)
         end
-        listing.save
       end
     end
 

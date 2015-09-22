@@ -14,6 +14,11 @@ module Supply
   end
 
   AVAILABLE_METADATA_FIELDS = %w(title short_description full_description video)
+  IMAGES_TYPES = %w(featureGraphic icon promoGraphic tvBanner)
+  SCREENSHOT_TYPES = %w(phoneScreenshots sevenInchScreenshots tenInchScreenshots tvScreenshots wearScreenshots)
+
+  IMAGES_FOLDER_NAME = "images"
+  IMAGE_FILE_EXTENSIONS = "{png,jpg,jpeg}"
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 end

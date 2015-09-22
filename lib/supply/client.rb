@@ -231,7 +231,7 @@ module Supply
     # @!group Screenshots
     #####################################################
 
-    def fetch_screenshots(image_type: nil, language: nil)
+    def fetch_images(image_type: nil, language: nil)
       ensure_active_edit!
 
       result = api_client.execute(
@@ -250,6 +250,43 @@ module Supply
       result.data.images.collect(&:url)
     end
 
+    # @param image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    def upload_image(image_path: nil, image_type: nil, language: nil)
+      ensure_active_edit!
+
+      image = Google::APIClient::UploadIO.new(image_path, 'image/*')
+      result = api_client.execute(
+        api_method: android_publisher.edits.images.upload,
+        parameters: {
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'language' => language,
+          'imageType' => image_type,
+          'uploadType' => 'media'
+        },
+        media: image,
+        authorization: auth_client
+      )
+
+      raise result.error_message.red if result.error?
+    end
+
+    def clear_screenshots(image_type: nil, language: nil)
+      ensure_active_edit!
+
+      result = @api_client.execute(
+        api_method: @android_publisher.edits.images.deleteall,
+        parameters: {
+            'editId' => current_edit.data.id,
+            'packageName' => current_package_name,
+            'language' => language,
+            'imageType' => image_type
+          },
+        authorization: auth_client
+      )
+
+      raise result.error_message if result.error?
+    end
 
     private
 
