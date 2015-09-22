@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     class NexusUploadAction < Action
       def self.run(params)
         command = []
