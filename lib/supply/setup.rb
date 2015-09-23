@@ -36,7 +36,7 @@ module Supply
       require 'net/http'
 
       IMAGES_TYPES.each do |image_type|
-        next if ['featureGraphic'].include?(image_type) # we don't get all files in full resolution :(op
+        next if ['featureGraphic'].include?(image_type) # we don't get all files in full resolution :(
 
         url = client.fetch_images(image_type: image_type, language: listing.language).last
         next unless url
@@ -62,7 +62,7 @@ module Supply
       @metadata_path ||= Supply.config[:metadata_path]
       @metadata_path ||= "fastlane/metadata/android" if Helper.fastlane_enabled?
       @metadata_path ||= "metadata" unless Helper.fastlane_enabled?
-      
+
       return @metadata_path
     end
 
