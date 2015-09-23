@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
 
   spec.add_dependency 'fastlane_core', '>= 0.17.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.8.1', '< 1.0.0' # Password Manager
+  spec.add_dependency 'credentials_manager', '>= 0.8.2', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.6.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'cert', '>= 0.3.2', '< 1.0.0'
   spec.add_dependency 'sigh', '>= 0.10.7', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
-  spec.add_dependency 'gym', '>= 0.7.2', '< 1.0.0'
+  spec.add_dependency 'gym', '>= 0.7.3', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.2.0', '< 1.0.0'
 
   # Development only
