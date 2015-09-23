@@ -8,12 +8,11 @@ RAILS = %w[boarding refresher enhancer]
 
 desc "Setup the fastlane development environment"
 task :bootstrap do	
-	if system('which bundle')
-    Rake::Task[:clone].invoke
-    Rake::Task[:install].invoke
-  else
-    raise "Please install bundler using `sudo gem install bundler`"
-  end
+	unless system('which bundle')
+		system('gem install bundler')
+	end
+  Rake::Task[:clone].invoke
+  Rake::Task[:install].invoke
 
   box "You are up and running"
 end
@@ -96,6 +95,8 @@ task :rubocop => :fetch_rubocop do
 			rescue => ex
 				box "Validation for #{repo} failed"
 			end
+		else
+			box "No rubocop for #{repo}..."
 		end
 	end
 end
