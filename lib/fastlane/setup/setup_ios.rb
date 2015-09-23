@@ -1,6 +1,5 @@
 module Fastlane
-  class Setup
-
+  class SetupIos < Setup
     # the tools that are already enabled
     attr_reader :tools
 
@@ -13,7 +12,7 @@ module Fastlane
       show_infos
       response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
       return unless response
-      response = agree('Do you have everything commited in version control? If not please do so! (y/n)'.yellow, true)
+      response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
       return unless response
 
       # rubocop:disable Lint/RescueException
@@ -23,7 +22,7 @@ module Fastlane
         generate_app_metadata
         detect_installed_tools # after copying the existing files
         ask_to_enable_other_tools
-        FileUtils.mkdir(File.join(folder, 'actions'))
+        FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
         generate_fastfile
         show_analytics
         Helper.log.info 'Successfully finished setting up fastlane'.green
@@ -43,13 +42,6 @@ module Fastlane
       Helper.log.info "into the subfolder `fastlane`.\n".green
       Helper.log.info "fastlane will check what tools you're already using and set up".green
       Helper.log.info 'the tool automatically for you. Have fun! '.green
-    end
-
-    def show_analytics
-      Helper.log.info "fastlane will send the number of errors for each action to"
-      Helper.log.info "https://github.com/fastlane/enhancer to detect integration issues"
-      Helper.log.info "No sensitive/private information will be uploaded"
-      Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
 
     def files_to_copy
