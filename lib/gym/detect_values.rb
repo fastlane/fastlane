@@ -30,6 +30,9 @@ module Gym
 
       config[:output_name] ||= Gym.project.app_name
 
+      # we do it here, since the value is optional and should be pre-filled by fastlane if necessary
+      config[:export_method] ||= "app-store"
+
       return config
     end
 

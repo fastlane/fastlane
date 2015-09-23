@@ -132,8 +132,8 @@ module Gym
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
                                      description: "How should gym export the archive?",
-                                     default_value: "app-store",
                                      is_string: true,
+                                     optional: true,
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
                                        raise "Unsupported export_method, must be: #{av}" unless av.include?(value)
