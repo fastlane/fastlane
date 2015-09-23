@@ -57,13 +57,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'rubocop', '~> 0.29'
-
-  # Weak dependencies only needed for certain actions
-  # These are not in the list of real dependencies, as only
-  # a small subset of users need these
-  # They still have to be here, to pass the tests
-  spec.add_development_dependency 'artifactory', '~> 2.0' # Needed for artifactory action
-  spec.add_development_dependency 'slather', '~> 1.8' # Test Coverage reports
-  spec.add_development_dependency 'cocoapods', '~> 0.38.2' # cocoapods integration
-  spec.add_development_dependency 'aws-sdk', '~> 0.1.0' # cocoapods integration
 end

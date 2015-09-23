@@ -15,7 +15,7 @@ module Fastlane
         print_gem_error "gem '#{gem_name}'"
         print_gem_error "and run `bundle install`"
 
-        raise "You have to install the `#{gem_name}`".red
+        raise "You have to install the `#{gem_name}`".red unless Helper.is_test?
       end
       true
     end
