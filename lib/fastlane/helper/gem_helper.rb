@@ -6,7 +6,7 @@ module Fastlane
       begin
         Gem::Specification.find_by_name(gem_name)
       rescue Gem::LoadError
-        raise "You have to install the `#{gem_name}` using `sudo gem install #{gem_name}` to use this action".red
+        raise "You have to install the `#{gem_name}` using `sudo gem install #{gem_name}` to use this action. If you use a `Gemfile` add '#{gem_name}' to it".red
       end
       true
     end
