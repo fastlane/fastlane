@@ -86,6 +86,7 @@ module Fastlane
         if params[:settings]
           expected_changed_files << 'Settings.bundle/Root.plist'
         end
+
         # get the absolute paths to the files
         git_add_paths = expected_changed_files.map do |path|
           File.expand_path(File.join(repo_pathname, path))
