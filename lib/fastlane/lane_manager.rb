@@ -127,7 +127,7 @@ module Fastlane
     def self.load_dot_env(env)
       require 'dotenv'
 
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
       env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
