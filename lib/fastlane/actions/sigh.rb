@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       SIGH_PROFILE_PATH = :SIGH_PROFILE_PATH
+      SIGH_PROFILE_PATHS = :SIGH_PROFILE_PATHS
       SIGH_UDID = :SIGH_UDID
     end
 
@@ -20,6 +21,8 @@ module Fastlane
           path = Sigh::Manager.start
 
           Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
           Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
 
           return ENV["SIGH_UDID"] # return the UDID of the new profile
@@ -34,6 +37,10 @@ module Fastlane
 
       def self.author
         "KrauseFx"
+      end
+
+      def self.return_value
+        "The UDID of the profile sigh just fetched/generated"
       end
 
       def self.available_options
