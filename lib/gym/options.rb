@@ -1,7 +1,6 @@
 require "fastlane_core"
 require "credentials_manager"
 
-# rubocop:disable Metrics/AbcSize
 module Gym
   class Options
     def self.available_options
@@ -147,4 +146,3 @@ module Gym
     end
   end
 end
-# rubocop:enable Metrics/AbcSize
