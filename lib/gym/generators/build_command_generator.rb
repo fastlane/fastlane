@@ -63,7 +63,7 @@ module Gym
       end
 
       def pipe
-        ["| xcpretty"]
+        ["| tee 'xcodebuild-#{Gym.config[:scheme]}.log' | xcpretty"]
       end
 
       # The path to set the Derived Data to

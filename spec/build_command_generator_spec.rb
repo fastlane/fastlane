@@ -26,7 +26,7 @@ describe Gym do
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         "DEBUG=1 BUNDLE_NAME=Example\\ App",
         :archive,
-        "| xcpretty"
+        "| tee 'xcodebuild-Example.log' | xcpretty"
       ])
     end
 
@@ -47,7 +47,7 @@ describe Gym do
           "-destination 'generic/platform=iOS'",
           "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
           :archive,
-          "| xcpretty"
+          "| tee 'xcodebuild-Example.log' | xcpretty"
         ])
       end
 
