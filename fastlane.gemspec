@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '~> 1.6' # generating JUnit reports for Jenkins
   spec.add_dependency 'krausefx-shenzhen', '>= 0.14.5' # to upload to Hockey and Crashlytics and build the app
   spec.add_dependency 'slack-notifier', '~> 1.0' # Slack notifications
-  spec.add_dependency 'aws-sdk', '~> 1.0' # Upload ipa files to S3
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 1.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.1.11' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
@@ -35,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
 
   spec.add_dependency 'fastlane_core', '>= 0.17.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.8.1', '< 1.0.0' # Password Manager
+  spec.add_dependency 'credentials_manager', '>= 0.8.2', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.6.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
@@ -44,9 +43,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 2.2.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 0.8.0', '< 1.0.0'
   spec.add_dependency 'cert', '>= 0.3.2', '< 1.0.0'
-  spec.add_dependency 'sigh', '>= 0.10.7', '< 1.0.0'
+  spec.add_dependency 'sigh', '>= 0.10.8', '< 1.0.0'
   spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
-  spec.add_dependency 'gym', '>= 0.7.2', '< 1.0.0'
+  spec.add_dependency 'gym', '>= 0.8.1', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.2.0', '< 1.0.0'
 
   # Development only
@@ -58,12 +57,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'rubocop', '~> 0.29'
-
-  # Weak dependencies only needed for certain actions
-  # These are not in the list of real dependencies, as only
-  # a small subset of users need these
-  # They still have to be here, to pass the tests
-  spec.add_development_dependency 'artifactory', '~> 2.0' # Needed for artifactory action
-  spec.add_development_dependency 'slather', '~> 1.8' # Test Coverage reports
-  spec.add_development_dependency 'cocoapods', '~> 0.38.2' # cocoapods integration
 end
