@@ -133,6 +133,7 @@ To pass boolean parameters make sure to use `gym` like this:
 
     gym --include_bitcode true --include_symbols true
 
+To access the raw `xcodebuild` output open `~/Library/Logs` and search for files starting with `xcodebuild`
 
 # Gymfile
 

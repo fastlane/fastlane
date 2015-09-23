@@ -7,6 +7,8 @@ describe Gym do
     end
 
     it "supports additional parameters" do
+      log_path = File.expand_path("~/Library/Logs/xcodebuild-ExampleProductName-Example.log")
+
       xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       xcargs = xcargs_hash.map do |k, v|
         "#{k.to_s.shellescape}=#{v.shellescape}"
@@ -26,7 +28,7 @@ describe Gym do
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         "DEBUG=1 BUNDLE_NAME=Example\\ App",
         :archive,
-        "| tee 'xcodebuild-Example.log' | xcpretty"
+        "| tee '#{log_path}' | xcpretty"
       ])
     end
 
@@ -37,6 +39,8 @@ describe Gym do
       end
 
       it "uses the correct build command with the example project with no additional parameters" do
+        log_path = File.expand_path("~/Library/Logs/xcodebuild-ExampleProductName-Example.log")
+
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
           "set -o pipefail &&",
@@ -47,7 +51,7 @@ describe Gym do
           "-destination 'generic/platform=iOS'",
           "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
           :archive,
-          "| tee 'xcodebuild-Example.log' | xcpretty"
+          "| tee '#{log_path}' | xcpretty"
         ])
       end
 

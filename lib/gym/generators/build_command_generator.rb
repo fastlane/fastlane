@@ -63,7 +63,12 @@ module Gym
       end
 
       def pipe
-        ["| tee 'xcodebuild-#{Gym.config[:scheme]}.log' | xcpretty"]
+        ["| tee '#{xcodebuild_log_path}' | xcpretty"]
+      end
+
+      def xcodebuild_log_path
+        file_name = "xcodebuild-#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
+        return File.expand_path("~/Library/Logs/#{file_name}")
       end
 
       # The path to set the Derived Data to
