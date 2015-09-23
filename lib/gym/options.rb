@@ -62,6 +62,11 @@ module Gym
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :buildlog_path,
+                                     short_option: "-l",
+                                     env_name: "GYM_BUILDLOG_PATH",
+                                     description: "The directory were to store the build log",
+                                     default_value: "~/Library/Logs/gym"),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",
