@@ -17,6 +17,11 @@ module Gym
       rows << ["Workspace", config[:workspace]] if config[:workspace]
       rows << ["Scheme", config[:scheme]] if config[:scheme]
       rows << ["Configuration", config[:configuration]] if config[:configuration]
+
+      if PackageCommandGenerator.generator == PackageCommandGeneratorXcode7
+        rows << ["Export Method", config[:export_method]]
+      end
+
       rows << ["Archive Path", config[:archive_path]] if config[:archive_path]
       rows << ["Platform", Gym.project.ios? ? "iOS" : "Mac"]
       rows << ["Xcode Path", Xcode.xcode_path.gsub("/Contents/Developer", "")]
