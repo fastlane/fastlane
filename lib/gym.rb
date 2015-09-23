@@ -25,7 +25,7 @@ module Gym
       @config = value
       DetectValues.set_additional_default_values
       @cache = {}
-    end    
+    end
 
     def gymfile_name
       "Gymfile"
