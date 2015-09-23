@@ -30,17 +30,17 @@ module Gym
 
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
-        @temporary_output_path ||= File.join("/tmp", Time.now.to_i.to_s)
+        Gym.cache[:temporary_output_path] ||= File.join("/tmp", Time.now.to_i.to_s)
       end
 
       def ipa_path
-        unless @ipa_path
+        unless Gym.cache[:ipa_path]
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
 
-          @ipa_path = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.mv(path, @ipa_path) if File.expand_path(path).downcase != File.expand_path(@ipa_path).downcase
+          Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
+          FileUtils.mv(path, Gym.cache[:ipa_path]) if File.expand_path(path).downcase != File.expand_path(Gym.cache[:ipa_path]).downcase
         end
-        @ipa_path
+        Gym.cache[:ipa_path]
       end
 
       # The path the the dsym file for this app. Might be nil
@@ -50,8 +50,8 @@ module Gym
 
       # The path the config file we use to sign our app
       def config_path
-        @config_path ||= "/tmp/gym_config_#{Time.now.to_i}.plist"
-        return @config_path
+        Gym.cache[:config_path] ||= "/tmp/gym_config_#{Time.now.to_i}.plist"
+        return Gym.cache[:config_path]
       end
 
       private

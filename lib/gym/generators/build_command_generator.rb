@@ -76,22 +76,22 @@ module Gym
 
       # The path to set the Derived Data to
       def build_path
-        unless @build_path
+        unless Gym.cache[:build_path]
           day = Time.now.strftime("%F") # e.g. 2015-08-07
 
-          @build_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-          FileUtils.mkdir_p @build_path
+          Gym.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
+          FileUtils.mkdir_p Gym.cache[:build_path]
         end
-        @build_path
+        Gym.cache[:build_path]
       end
 
       def archive_path
-        @archive_path ||= Gym.config[:archive_path]
-        unless @archive_path
+        Gym.cache[:archive_path] ||= Gym.config[:archive_path]
+        unless Gym.cache[:archive_path]
           file_name = [Gym.config[:output_name], Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
-          @archive_path = File.join(build_path, file_name.join(" ") + ".xcarchive")
+          Gym.cache[:archive_path] = File.join(build_path, file_name.join(" ") + ".xcarchive")
         end
-        return @archive_path
+        return Gym.cache[:archive_path]
       end
     end
   end

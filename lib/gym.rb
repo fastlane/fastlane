@@ -19,10 +19,13 @@ module Gym
 
     attr_accessor :project
 
+    attr_accessor :cache
+
     def config=(value)
       @config = value
       DetectValues.set_additional_default_values
-    end
+      @cache = {}
+    end    
 
     def gymfile_name
       "Gymfile"
