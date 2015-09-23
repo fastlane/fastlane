@@ -6,9 +6,22 @@ module Fastlane
       begin
         Gem::Specification.find_by_name(gem_name)
       rescue Gem::LoadError
-        raise "You have to install the `#{gem_name}` using `sudo gem install #{gem_name}` to use this action. If you use a `Gemfile` add '#{gem_name}' to it".red
+        print_gem_error "Could not find gem '#{gem_name}'"
+        print_gem_error ""
+        print_gem_error "If you installed fastlane using `sudo gem install fastlane` run"
+        print_gem_error "`sudo gem install #{gem_name}` to install the missing gem"
+        print_gem_error ""
+        print_gem_error "If you use a Gemfile add this to your Gemfile:"
+        print_gem_error "gem '#{gem_name}'"
+        print_gem_error "and run `bundle install`"
+
+        raise "You have to install the `#{gem_name}`".red
       end
       true
+    end
+
+    def self.print_gem_error(str)
+      Helper.log.error str.red
     end
   end
 end
