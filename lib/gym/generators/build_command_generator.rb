@@ -67,8 +67,11 @@ module Gym
       end
 
       def xcodebuild_log_path
-        file_name = "xcodebuild-#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
-        return File.expand_path("~/Library/Logs/#{file_name}")
+        file_name = "#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
+        containing = File.expand_path("~/Library/Logs/gym")
+        FileUtils.mkdir_p(containing)
+
+        return File.join(containing, file_name)
       end
 
       # The path to set the Derived Data to

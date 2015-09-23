@@ -7,7 +7,7 @@ describe Gym do
     end
 
     it "supports additional parameters" do
-      log_path = File.expand_path("~/Library/Logs/xcodebuild-ExampleProductName-Example.log")
+      log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
 
       xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       xcargs = xcargs_hash.map do |k, v|
@@ -39,7 +39,7 @@ describe Gym do
       end
 
       it "uses the correct build command with the example project with no additional parameters" do
-        log_path = File.expand_path("~/Library/Logs/xcodebuild-ExampleProductName-Example.log")
+        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
