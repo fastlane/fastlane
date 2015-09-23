@@ -14,7 +14,7 @@ module Sigh
         file_name = File.basename(path)
       end
 
-      output = File.join(Sigh.config[:output_path].gsub("~", ENV["HOME"]), file_name)
+      output = File.join(File.expand_path(Sigh.config[:output_path]), file_name)
       begin
         FileUtils.mv(path, output)
       rescue

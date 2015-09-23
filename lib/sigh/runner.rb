@@ -36,6 +36,12 @@ module Sigh
 
       raise "Something went wrong fetching the latest profile".red unless profile
 
+      if profile_type == Spaceship.provisioning_profile.in_house
+        ENV["SIGH_PROFILE_ENTERPRISE"] = "1"
+      else
+        ENV.delete("SIGH_PROFILE_ENTERPRISE")
+      end
+
       return download_profile(profile)
     end
 
