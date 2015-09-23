@@ -83,6 +83,9 @@ module Fastlane
           end
         end
 
+        if params[:settings]
+          expected_changed_files << 'Settings.bundle/Root.plist'
+        end
         # get the absolute paths to the files
         git_add_paths = expected_changed_files.map do |path|
           File.expand_path(File.join(repo_pathname, path))
@@ -126,6 +129,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_FORCE_COMMIT",
                                        description: "Forces the commit, even if other files than the ones containing the version number have been modified",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :settings,
+                                       env_name: "FL_COMMIT_INCLUDE_SETTINGS",
+                                       description: "Include Settings.bundle/Root.plist with version bump",
                                        optional: true,
                                        default_value: false,
                                        is_string: false)
