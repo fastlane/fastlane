@@ -71,6 +71,18 @@ describe Gym do
         regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d/ExampleProductName \d\d\d\d\-\d\d\-\d\d \d\d\.\d\d\.\d\d.xcarchive}
         expect(result).to match(regex)
       end
+
+      it "#buildlog_path is used when provided" do
+        options = { project: "./examples/standard/Example.xcodeproj", buildlog_path: "/tmp/my/path" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        result = Gym::BuildCommandGenerator.xcodebuild_log_path
+        expect(result).to include("/tmp/my/path")
+      end
+
+      it "#buildlog_path is not used when not provided" do
+        result = Gym::BuildCommandGenerator.xcodebuild_log_path
+        expect(result.to_s).to include("Library/Logs/gym")
+      end
     end
   end
 end
