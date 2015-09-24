@@ -15,6 +15,9 @@ module Deliver
       containing = Helper.fastlane_enabled? ? './fastlane' : '.'
       options[:screenshots_path] ||= File.join(containing, 'screenshots')
       options[:metadata_folder] ||= File.join(containing, 'metadata')
+
+      FileUtils.mkdir_p(options[:screenshots_path])
+      FileUtils.mkdir_p(options[:metadata_folder])
     end
   end
 end
