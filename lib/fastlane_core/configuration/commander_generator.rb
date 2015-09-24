@@ -20,7 +20,7 @@ module FastlaneCore
         raise "-h is already used for the help screen (key #{option.key})".red if short_option == "-h"
         raise "-t is already used for the trace screen (key #{option.key})".red if short_option == "-t"
 
-        short_codes << short_option
+        short_codes << short_option if short_option
 
         # Example Call
         # c.option '-p', '--pattern STRING', String, 'Description'
