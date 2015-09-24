@@ -5,11 +5,6 @@ module Spaceship
     class ITunesConnectError < StandardError
     end
 
-    # ITunesConnectNoChangesError is thrown when the only error is that there were no changes
-    #   usually those errors are irrelevant
-    class ITunesConnectNoChangesError < ITunesConnectError
-    end
-
     attr_reader :du_client
 
     def initialize
@@ -147,8 +142,7 @@ module Spaceship
 
       if errors.count > 0 # they are separated by `.` by default
         if errors.count == 1 and errors.first == "You haven't made any changes."
-          # This is a special error for which we throw a separate exception
-          raise ITunesConnectNoChangesError.new, errors.first
+          # This is a special error which we really don't care about
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
