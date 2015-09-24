@@ -5,7 +5,7 @@ module Deliver
     def initialize(options)
       self.options = options
       login
-      self.options = Deliver::DetectValues.new.run(self.options)
+      Deliver::DetectValues.new.run!(self.options)
     end
 
     def login
@@ -32,7 +32,8 @@ module Deliver
     end
 
     def upload_metadata
-      UploadMetadata.new.run(options)
+      # UploadMetadata.new.run(options)
+      UploadScreenshots.new.run(options)
     end
   end
 end

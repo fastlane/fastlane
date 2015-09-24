@@ -29,6 +29,20 @@ module Deliver
                                        raise "Could not find ipa file at path '#{value}'" unless File.exist? value
                                        raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
                                      end),
+        FastlaneCore::ConfigItem.new(key: :metadata_folder,
+                                     short_option: '-m',
+                                     description: "Path to the folder containing the metadata files",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "Could not find folder at path '#{value}'" unless File.directory?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :screenshots_folder,
+                                     short_option: '-f',
+                                     description: "Path to the folder containing the screenshots",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "Could not find folder at path '#{value}'" unless File.directory?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_metadata,
                                      description: "Only upload the build - no metadata",
                                      is_string: false,
