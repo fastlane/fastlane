@@ -172,6 +172,7 @@ module Spaceship
         # @param is_live (Boolean) Is that the version that's live in the App Store?
         def find(application, app_id, is_live = false)
           attrs = client.app_version(app_id, is_live)
+          return nil unless attrs
           attrs.merge!(application: application)
           attrs.merge!(is_live: is_live)
 

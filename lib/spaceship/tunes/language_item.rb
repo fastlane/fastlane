@@ -11,6 +11,8 @@ module Spaceship
       end
 
       def [](key)
+        require 'pry'
+        binding.pry
         get_lang(key)[identifier]['value']
       end
 

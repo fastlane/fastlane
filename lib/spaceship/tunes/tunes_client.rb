@@ -141,7 +141,7 @@ module Spaceship
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary')
+      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
       parse_response(r, 'data')['summaries']
     end
 
@@ -202,9 +202,17 @@ module Spaceship
     def app_version(app_id, is_live)
       raise "app_id is required" unless app_id
 
-      v_text = (is_live ? 'live' : nil)
+      # First we need to fetch the IDs for the edit / live version
+      r = request(:get, "ra/apps/#{app_id}/overview")
+      platforms = parse_response(r, 'data')['platforms']
 
-      r = request(:get, "ra/apps/version/#{app_id}", {v: v_text})
+      platforms = platforms.first # TODO: that won't work for mac apps
+
+      version = platforms[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
+      return nil unless version
+      version_id = version['id']
+
+      r = request(:get, "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}")
       parse_response(r, 'data')
     end
 

@@ -109,9 +109,10 @@ module Spaceship
         # Apple's server will respond with the same version if there is only one, for both v=live and v=
         # That's why we have to check in the app_summary.json request if there are 2 versions or just one
         # if there is only one version, we'll return nil
-        if raw_data['versions'].count == 1
-          return nil # only live version, user should create a new version
-        end
+        # if raw_data['versions'].count == 1
+        #   return nil # only live version, user should create a new version
+        # end
+        # TODO: Fix
 
         Spaceship::AppVersion.find(self, self.apple_id, false)
       end
