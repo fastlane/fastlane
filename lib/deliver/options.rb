@@ -36,7 +36,7 @@ module Deliver
                                      verify_block: proc do |value|
                                        raise "Could not find folder at path '#{value}'" unless File.directory?(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :screenshots_folder,
+        FastlaneCore::ConfigItem.new(key: :screenshots_path,
                                      short_option: '-f',
                                      description: "Path to the folder containing the screenshots",
                                      optional: true,

@@ -36,7 +36,7 @@ module Deliver
 
     def collect_screenshots(options)
       screenshots = []
-      Dir.glob(File.join(options[:screenshots_folder], "*")) do |lng_folder|
+      Dir.glob(File.join(options[:screenshots_path], "*")) do |lng_folder|
         lng = File.basename(lng_folder)
         language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(lng) # de-DE => German
 
