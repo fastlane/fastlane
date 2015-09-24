@@ -4,6 +4,8 @@ module Deliver
     LOCALISED_VALUES = [:description, :name, :keywords]
 
     def run(options)
+      load_from_filesystem(options)
+
       app = options[:app]
 
       v = app.edit_version || app.live_version # TODO: get changes from work macbook here
@@ -24,9 +26,24 @@ module Deliver
         end
       end
 
-      Helper.log.info "Uploading new metadata (name, description, etc....)"
+      Helper.log.info "Uploading metadata to iTunes Connect"
       v.save!
       Helper.log.info "Successfully uploaded initial set of metadata to iTunes Connect".green
+    end
+
+    # Loads the metadata files and stores them into the options object
+    def load_from_filesystem(options)
+      Dir.glob(File.join(options[:metadata_folder], "*")).each do |lng_folder|
+        lng = File.basename(lng_folder)
+
+        LOCALISED_VALUES.each do |key|
+          path = File.join(lng_folder, "#{key}.txt")
+          next unless File.exist?(path)
+          Helper.log.info "Loading '#{path}'..."
+          options[key] ||= {}
+          options[key][lng] = File.read(path) # we can use the `lng`, it will be converted later
+        end
+      end
     end
   end
 end
