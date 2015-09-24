@@ -15,6 +15,7 @@ require 'pry'
 
 module Deliver
 	class << self
+    
 	end
 
 	Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

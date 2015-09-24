@@ -1,7 +1,7 @@
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
-    TO_UPDATE = [:description, :name, :keywords]
+    LOCALISED_VALUES = [:description, :name, :keywords]
 
     def run(options)
       app = options[:app]
@@ -9,7 +9,7 @@ module Deliver
       v = app.edit_version || app.live_version # TODO: get changes from work macbook here
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
 
-      TO_UPDATE.each do |key|
+      LOCALISED_VALUES.each do |key|
         value = options[key]
         next unless value
 
