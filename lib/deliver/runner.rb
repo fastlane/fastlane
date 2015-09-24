@@ -48,19 +48,18 @@ module Deliver
 
     def validate_html(screenshots)
       html_path = HtmlGenerator.new.render(options, screenshots, '.')
-      # unless options[:force]
-        puts "----------------------------------------------------------------------------"
-        puts "Verifying the upload via the HTML file can be disabled by either adding"
-        puts "'skip_pdf true' to your Deliverfile or using the flag --force."
-        puts "----------------------------------------------------------------------------"
+      return if options[:force]
+      puts "----------------------------------------------------------------------------"
+      puts "Verifying the upload via the HTML file can be disabled by either adding"
+      puts "'skip_pdf true' to your Deliverfile or using the flag --force."
+      puts "----------------------------------------------------------------------------"
 
-        system("open '#{html_path}'")
-        okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
+      system("open '#{html_path}'")
+      okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
 
-        unless okay
-          raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
-        end
-      # end
+      unless okay
+        raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
+      end
     end
   end
 end

@@ -47,6 +47,10 @@ module Deliver
                                      description: "Only upload the build - no metadata",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :force,
+                                     description: "Skip the HTML file verification",
+                                     is_string: false,
+                                     default_value: false),
 
         # App Metadata
         FastlaneCore::ConfigItem.new(key: :description,
