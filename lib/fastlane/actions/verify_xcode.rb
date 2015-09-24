@@ -29,7 +29,7 @@ module Fastlane
         Helper.log.info "Verifying Xcode using GateKeeper..."
         Helper.log.info "This will take up to a few minutes, now is a great time to go for a coffee ☕...".green
 
-        command = "spctl --assess --verbose '#{params[:xcode_path]}'"
+        command = "/usr/sbin/spctl --assess --verbose '#{params[:xcode_path]}'"
         must_includes = ['accepted']
 
         output = verify(command: command, must_includes: must_includes, params: params)
