@@ -58,6 +58,20 @@ module Deliver
       return matching[self.screen_size]
     end
 
+    # Nice name
+    def formatted_name
+      matching = {
+        ScreenSize::IOS_35 => "iPhone 4",
+        ScreenSize::IOS_40 => "iPhone 5",
+        ScreenSize::IOS_47 => "iPhone 6",
+        ScreenSize::IOS_55 => "iPhone 6 Plus",
+        ScreenSize::IOS_IPAD => "iPad",
+        ScreenSize::MAC => "Mac",
+        ScreenSize::IOS_APPLE_WATCH => "Watch"
+      }
+      return matching[self.screen_size]
+    end
+
     # Validates the given screenshots (size and format)
     def is_valid?
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
