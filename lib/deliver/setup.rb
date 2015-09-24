@@ -35,6 +35,7 @@ module Deliver
       gem_path = Helper.gem_path('deliver')
       deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
       deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
+      deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
 
       return deliver
     end
