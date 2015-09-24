@@ -1,10 +1,10 @@
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
-    LOCALISED_VALUES = [:description, :name, :keywords]
 
     def run(options)
       load_from_filesystem(options)
+    LOCALISED_VALUES = [:description, :name, :keywords, :release_notes, :privacy_url, :support_url, :marketing_url]
 
       app = options[:app]
 

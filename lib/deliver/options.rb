@@ -60,7 +60,23 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :release_notes,
+                                     description: "Metadata: Localised release notes for this version",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :privacy_url,
+                                     description: "Metadata: Localised privacy url",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :support_url,
+                                     description: "Metadata: Localised support url",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :marketing_url,
+                                     description: "Metadata: Localised marketing url",
+                                     optional: true,
+                                     is_string: false),
       ]
     end
   end
