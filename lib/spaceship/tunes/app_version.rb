@@ -100,9 +100,6 @@ module Spaceship
       # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
       attr_accessor :languages
 
-      # @return (Hash) A hash representing the app name in all languages
-      attr_reader :name
-
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
@@ -111,9 +108,6 @@ module Spaceship
 
       # @return (Hash) The changelog
       attr_reader :release_notes
-
-      # @return (Hash) A hash representing the keywords in all languages
-      attr_reader :privacy_url
 
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :support_url
@@ -169,12 +163,12 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this version is for
         # @param app_id (String) The unique Apple ID of this app
-        # @param is_live (Boolean) Is that the version that's live in the App Store?
-        def find(application, app_id, is_live = false)
-          attrs = client.app_version(app_id, is_live)
+        # @param version_id (String)
+        def find(application, app_id, version_id)
+          attrs = client.app_version(app_id, version_id)
           return nil unless attrs
           attrs.merge!(application: application)
-          attrs.merge!(is_live: is_live)
+          attrs.merge!(version_id: version_id)
 
           return self.factory(attrs)
         end
@@ -247,10 +241,8 @@ module Spaceship
       # Prefill name, keywords, etc...
       def unfold_languages
         {
-          name: :name,
           keywords: :keywords,
           description: :description,
-          privacyURL: :privacy_url,
           supportURL: :support_url,
           marketingURL: :marketing_url,
           releaseNotes: :release_notes

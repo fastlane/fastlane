@@ -55,7 +55,7 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          self.new(attrs)
+          return self.new(attrs)
         end
 
         # @return (Array) Returns all apps available for this account
@@ -133,6 +133,12 @@ module Spaceship
       #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
       def resolution_center
         client.get_resolution_center(apple_id)
+      end
+
+      def details
+        attrs = client.app_details(apple_id)
+        attrs.merge!(application: self)
+        Tunes::AppDetails.factory(attrs)
       end
 
       #####################################################

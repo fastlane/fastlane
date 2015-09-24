@@ -145,6 +145,21 @@ module Spaceship
       parse_response(r, 'data')['summaries']
     end
 
+    def app_details(app_id)
+      r = request(:get, "ra/apps/#{app_id}/details")
+      parse_response(r, 'data')
+    end
+
+    def update_app_details!(app_id, data)
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/details"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body)
+    end
+
     # Creates a new application on iTunes Connect
     # @param name (String): The name of your app as it will appear on the App Store.
     #   This can't be longer than 255 characters.

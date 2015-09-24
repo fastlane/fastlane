@@ -72,7 +72,7 @@ v.version           # => "0.9.14"
 v.copyright = "#{Time.now.year} Felix Krause"
 
 # Get a list of available languages for this app
-v.name.keys         # => ["German", "English"]
+v.description.languages # => ["German", "English"]
 
 # Update localised app metadata
 v.name["English"] = "New Title"
