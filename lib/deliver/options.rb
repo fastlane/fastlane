@@ -26,8 +26,8 @@ module Deliver
                                      description: "Path to your ipa file",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       raise "Could not find ipa file at path '#{value}'" unless File.exist? value
-                                       raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
+                                       raise "Could not find ipa file at path '#{value}'".red unless File.exist?(value)
+                                       raise "'#{value}' doesn't seem to be an ipa file".red unless value.end_with?(".ipa")
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_folder,
                                      short_option: '-m',
@@ -47,6 +47,25 @@ module Deliver
                                      default_value: false),
 
         # App Metadata
+        # Non Localised
+        FastlaneCore::ConfigItem.new(key: :app_icon,
+                                     description: "Metadata: The path to the app icon",
+                                     optional: true,
+                                     short_option: "-l",
+                                     verify_block: proc do |value|
+                                       raise "Could not find png file at path '#{value}'".red unless File.exist?(value)
+                                       raise "'#{value}' doesn't seem to be a png file".red unless value.end_with?(".png")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
+                                     description: "Metadata: The path to the Apple Watch app icon",
+                                     optional: true,
+                                     short_option: "-q",
+                                     verify_block: proc do |value|
+                                       raise "Could not find png file at path '#{value}'".red unless File.exist?(value)
+                                       raise "'#{value}' doesn't seem to be a png file".red unless value.end_with?(".png")
+                                     end),
+
+        # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
                                      optional: true,

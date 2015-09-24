@@ -6,6 +6,7 @@ require 'deliver/detect_values'
 require 'deliver/runner'
 require 'deliver/upload_metadata'
 require 'deliver/upload_screenshots'
+require 'deliver/upload_assets'
 require 'deliver/app_screenshot'
 require 'deliver/html_generator'
 

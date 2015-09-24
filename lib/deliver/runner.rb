@@ -17,6 +17,8 @@ module Deliver
     def run
       upload_metadata unless options[:skip_metadata]
       # upload_binary if options[:ipa]
+
+      Helper.log.info "Finished the upload to iTunes Connect".green
     end
 
     def upload_binary
@@ -42,6 +44,7 @@ module Deliver
       # Commit
       UploadMetadata.new.upload(options)
       UploadScreenshots.new.upload(options, screenshots)
+      UploadAssets.new.upload(options) # e.g. app icon
     end
 
     private
