@@ -1,6 +1,0 @@
-version '3.0'
-
-app_identifier 'net.sunapps.1'
-apple_id '794902327'
-
-screenshots_path("./spec/fixtures/screenshots")

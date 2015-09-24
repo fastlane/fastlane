@@ -1,6 +1,0 @@
-ipa "./spec/fixtures/ipas/Example1.ipa"
-
-unit_tests do
-  File.write('/tmp/deliver_unit_tests.txt', Time.now.to_i)
-  false
-end

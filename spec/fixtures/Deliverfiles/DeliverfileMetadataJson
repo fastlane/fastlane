@@ -1,6 +1,0 @@
-app_identifier "net.sunapps.54"
-apple_id 794902327
-
-version '1.2' # you can pass this if you want to verify the version number with the ipa file
-
-config_json_folder './spec/fixtures/Deliverfiles/metadata.json'

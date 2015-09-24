@@ -1,9 +1,0 @@
-ipa do
-  File.write("/tmp/deliver_ipa.txt", Time.now)
-  "./spec/fixtures/ipas/Example1.ipa" # that's a valid ipa file
-end
-
-beta_ipa do
-  File.write("/tmp/deliver_beta_ipa.txt", Time.now)
-  nil # we're doing nothing here
-end

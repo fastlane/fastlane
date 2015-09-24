@@ -1,5 +1,0 @@
-default_language 'de-DE'
-
-app_identifier "net.sunapps.321"
-
-ipa "./spec/fixtures/ipas/Example1.ipa"

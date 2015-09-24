@@ -1,7 +1,0 @@
-default_language 'de-DE'
-
-app_identifier 'net.sunapps.54'
-apple_id 'id878567776'
-version '1.0'
-
-screenshots_path '/tmp/notHere'
