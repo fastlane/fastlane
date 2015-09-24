@@ -1,4 +1,4 @@
-Developer Portal API
+iTunes Connect API
 ====================
 
 # Usage
