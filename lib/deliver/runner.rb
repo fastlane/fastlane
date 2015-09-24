@@ -3,14 +3,20 @@ module Deliver
     attr_accessor :options
 
     def initialize(options)
-      login(options)
-      self.options = Deliver::DetectValues.new.run(options)
+      self.options = options
+      login
+      self.options = Deliver::DetectValues.new.run(self.options)
     end
 
-    def login(options)
+    def login
       Helper.log.info "Login to iTunes Connect (#{options[:username]})"
       Spaceship::Tunes.login(options[:username])
       Helper.log.info "Login successful"
+    end
+
+    def run
+      upload_metadata unless options[:skip_metadata]
+      # upload_binary if options[:ipa]
     end
 
     def upload_binary

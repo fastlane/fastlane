@@ -37,7 +37,38 @@ module Deliver
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
           options.load_configuration_file("Deliverfile")
-          Deliver::Manager.new.run(options)          
+          Deliver::Runner.new(options).run
+        end
+      end
+
+      command :init do |c|
+        c.syntax = 'deliver init'
+        c.description = 'Create the initial `deliver` configuration based on an existing app'
+        c.action do |args, options|
+          if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
+            Helper.log.info "You already got a running deliver setup in this directory".yellow
+            return
+          end
+
+          require 'deliver/setup'
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
+          Deliver::Runner.new(options) # to login...
+          Deliver::Setup.new.run(options)
+        end
+      end
+
+      command :download_screenshots do |c|
+        c.syntax = 'deliver download_screenshots'
+        c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
+
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          Deliver::Runner.new(options) # to login...
+
+          path = (FastlaneCore::Helper.fastlane_enabled?? './fastlane' : '.')
+
+          Deliver::DownloadScreenshots.run(options, path)
         end
       end
 
