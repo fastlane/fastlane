@@ -10,6 +10,7 @@ require 'fastlane_core/ipa_file_analyser'
 require 'fastlane_core/itunes_transporter'
 require 'fastlane_core/provisioning_profile'
 require 'fastlane_core/command_executor'
+require 'fastlane_core/ipa_upload_package_builder'
 
 # Third Party code
 require 'colored'
