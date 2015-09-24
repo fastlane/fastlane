@@ -9,14 +9,12 @@ require 'deliver/upload_metadata'
 require 'spaceship'
 require 'fastlane_core'
 
-
 # TODO
 require 'pry'
 
 module Deliver
-	class << self
-    
-	end
+  class << self
+  end
 
-	Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 end

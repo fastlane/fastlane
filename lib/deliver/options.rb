@@ -46,7 +46,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false)
       ]
     end
   end

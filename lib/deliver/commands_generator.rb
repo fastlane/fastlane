@@ -8,13 +8,11 @@ module Deliver
     include Commander::Methods
 
     def self.start
-      begin
-        # FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
-        # Deliver::DependencyChecker.check_dependencies
-        self.new.run
-      ensure
-        # FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
-      end
+      # FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
+      # Deliver::DependencyChecker.check_dependencies
+      self.new.run
+    ensure
+      # FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
     def run
@@ -66,7 +64,7 @@ module Deliver
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options) # to login...
 
-          path = (FastlaneCore::Helper.fastlane_enabled?? './fastlane' : '.')
+          path = (FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.')
 
           Deliver::DownloadScreenshots.run(options, path)
         end
@@ -76,6 +74,5 @@ module Deliver
 
       run!
     end
-    
   end
 end

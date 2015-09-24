@@ -4,7 +4,6 @@ Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 # This module is only used to check the environment is currently a testing env
 # Needs to be above the `require 'deliver'`
 module SpecHelper
-  
 end
 
 require 'deliver'
@@ -15,12 +14,9 @@ require 'mocking/webmocking'
 require 'mocking/transporter_mocking'
 require 'mocking/spaceship_mocking'
 
-
 ENV["DELIVER_USER"] = "DELIVERUSER"
 ENV["DELIVER_PASSWORD"] = "DELIVERPASS"
 ENV["DELIVER_HTML_EXPORT_PATH"] = "/tmp" # to not pollute the working directory
-
-
 
 RSpec.configure do |config|
   config.after(:each) do |test|

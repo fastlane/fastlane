@@ -19,18 +19,18 @@ module Deliver
       # Add a README to the screenshots folder
       FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
       File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
-      
+
       Helper.log.info "Successfully created new Deliverfile at path '#{file_path}'".green
     end
 
     private
 
-    # This method takes care of creating a new 'deliver' folder, containg the app metadata 
+    # This method takes care of creating a new 'deliver' folder, containg the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
       generate_metadata_files(v, deliver_path)
-      
+
       # Generate the final Deliverfile here
       gem_path = Helper.gem_path('deliver')
       deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")

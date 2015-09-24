@@ -20,7 +20,7 @@ module Deliver
 
         value.each do |lng, value|
           language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(lng) # de-DE => German
-          value = value.join(" ") if value.kind_of?Array # e.g. keywords
+          value = value.join(" ") if value.kind_of? Array # e.g. keywords
           v.send(key)[language] = value
         end
       end
