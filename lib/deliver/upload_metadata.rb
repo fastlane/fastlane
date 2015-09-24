@@ -1,15 +1,16 @@
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
-
-    def run(options)
-      load_from_filesystem(options)
     LOCALISED_VALUES = [:description, :name, :keywords, :release_notes, :privacy_url, :support_url, :marketing_url]
 
+    # Make sure to call `load_from_filesystem` before calling upload
+    def upload(options)
       app = options[:app]
 
       v = app.edit_version || app.live_version # TODO: get changes from work macbook here
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
+
+      # TODO: Create new language
 
       LOCALISED_VALUES.each do |key|
         value = options[key]
@@ -39,6 +40,7 @@ module Deliver
         LOCALISED_VALUES.each do |key|
           path = File.join(lng_folder, "#{key}.txt")
           next unless File.exist?(path)
+
           Helper.log.info "Loading '#{path}'..."
           options[key] ||= {}
           options[key][lng] = File.read(path) # we can use the `lng`, it will be converted later

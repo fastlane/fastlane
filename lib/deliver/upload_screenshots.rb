@@ -3,7 +3,7 @@ module Deliver
   class UploadScreenshots
     LOCALISED_VALUES = [:description, :name, :keywords]
 
-    def run(options)
+    def upload(options, screenshots)
       app = options[:app]
 
       v = app.edit_version || app.live_version # TODO: get changes from work macbook here
@@ -13,25 +13,42 @@ module Deliver
 
       du = Spaceship::Tunes.client.du_client
 
-      Dir.glob(File.join(options[:screenshots_folder], "*")) do |lng_folder|
-        lng = File.basename(lng_folder)
-        language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(lng) # de-DE => German
+      indized = {} # per language and device type
+      screenshots.each do |screenshot|
 
-        indized = {} # per language
+        indized[screenshot.language] ||= {}
+        indized[screenshot.language][screenshot.device_type] ||= 0
+        indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
 
-        Dir.glob(File.join(lng_folder, '*.png')).each do |path|
-          Helper.log.info "Uploading '#{path}'"
-          device_type = AppScreenshot.new(path).device_type
+        index = indized[screenshot.language][screenshot.device_type]
 
-          indized[device_type] ||= 0
-          indized[device_type] += 1 # we actually start with 1... wtf iTC
-          v.upload_screenshot!(path, indized[device_type], language, device_type)
-        end
-      end
+        Helper.log.info "Uploading '#{screenshot.path}'..."
+        v.upload_screenshot!(screenshot.path, 
+                            index, 
+                            screenshot.language, 
+                            screenshot.device_type)
+      end      
       
       Helper.log.info "Saving changes"
       v.save!
       Helper.log.info "Successfully uploaded screenshots to iTunes Connect".green
+    end
+
+    def collect_screenshots(options)
+      screenshots = []
+      Dir.glob(File.join(options[:screenshots_folder], "*")) do |lng_folder|
+        lng = File.basename(lng_folder)
+        language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(lng) # de-DE => German
+
+        files = Dir.glob(File.join(lng_folder, '*.png'))
+        next if files.count == 0
+
+        files.each do |path|
+          screenshots << AppScreenshot.new(path, language)
+        end
+      end
+
+      return screenshots
     end
   end
 end

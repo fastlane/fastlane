@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>deliver - <%= @data['en-US'][:title][:value] rescue @data.values.first[:title][:value] %></title>
+        <title>deliver - <%= @app.name %></title>
         <meta http-equiv="content-type" content="text/html; charset=UTF-16">
         <style>
           #app-name {
@@ -106,65 +106,54 @@
               margin-left: 10px;
               margin-right: 10px;
           }
-
-          /*for highlighting a changed value*/
-          .modified {
-              color: #0056ba;
-          }
         </style>
     </head>
-
-    <%
-      def modified?(val)
-        "modified" if (val and val[:modified] == true)
-      end
-    %>
     
     <body>
-      <% @data.each do |language, content| %>
-        <div id="app-name" class="<%= modified?(content[:title]) %>">
-          <%= language %>: <%= content[:title][:value] %>
+      <% @version.name.languages.each do |language| %>
+        <div id="app-name">
+          <%= language %>: <%= @version.name[language] %>
         </div>
 
         <div id="app-urls">
-          <% all_keys = [:support_url, :privacy_url, :software_url] %>
+          <% all_keys = [:support_url, :privacy_url, :marketing_url] %>
           <% all_keys.each do |key| %>
-            <% value = content[key][:value] rescue nil %>
+            <% value = @version.send(key)[language] %>
             <% if value %>
-              <div class="app-url-descr <%= modified?(content[key]) %>">
+              <div class="app-url-descr">
                 <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
               </div>
             <% end %>
           <% end %>
         </div>
         
-        <div id="app-keyword" class="<%= modified?(content[:keywords]) %>">
+        <div id="app-keyword">
             <div class="cat-headline">Keywords</div>
             <ul class="app-keyword-list">
-              <% (content[:keywords][:value] rescue []).each do |keyword| %>
+              <% @version.keywords[language].split(" ").each do |keyword| %>
                 <li><%= keyword %></li>
               <% end %>
             </ul>
         </div>
         
-        <div id="app-description" class="<%= modified?(content[:description]) %>">
+        <div id="app-description">
              <div class="cat-headline">Description</div>
              <div id="app-description-text">
-                <%= content[:description][:value].gsub("\n", "<br />") rescue nil %>
+                <%= (@version.description[language] || '').gsub("\n", "<br />") %>
              </div>
         </div>
         
-        <div id="app-changelog" class="<%= modified?(content[:version_whats_new]) %>">
+        <div id="app-changelog">
             <div class="cat-headline">Changelog</div>
-            <%= content[:version_whats_new][:value].gsub("\n", "<br />") rescue nil %>
+            <%= (@version.release_notes[language] || '').gsub("\n", "<br />") %>
         </div>
         
-        <div id="app-screenshots">
+                <div id="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
-          <% if (content[:screenshots] || []).count > 0 %>
+          <% if @screenshots.count > 0 %>
             <% last_size = nil %>
-            <% content[:screenshots].sort{|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+            <% @screenshots.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
 
               <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
 
@@ -186,19 +175,15 @@
             <div style="border: 3px solid red; padding: 0px 20px">
               <h2 style="color: red">No Screenshots Found</h2>
               <p>
-                deliver couldn't find any screenshots. Due to a bug in iTunes Transporter this will <b>remove</b> the existing screenshots on iTunes Connect.
-              </p>
+                deliver couldn't find any screenshots. 
               <p>
                 Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
               </p>
             </div>
           <% end %>
           </div>
-          
-        </div>
+        
         <hr />
       <% end # end data %>
     </body>
 </html>
-
-

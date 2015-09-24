@@ -32,8 +32,35 @@ module Deliver
     end
 
     def upload_metadata
-      # UploadMetadata.new.run(options)
-      UploadScreenshots.new.run(options)
+      # First, collect all the things for the HTML Report
+      screenshots = UploadScreenshots.new.collect_screenshots(options)
+      UploadMetadata.new.load_from_filesystem(options)
+
+      # Validate
+      validate_html(screenshots)
+
+      # Commit
+      UploadMetadata.new.upload(options)
+      UploadScreenshots.new.upload(options, screenshots)
+    end
+
+    private
+
+    def validate_html(screenshots)
+      html_path = HtmlGenerator.new.render(options, screenshots, '.')
+      # unless options[:force]
+        puts "----------------------------------------------------------------------------"
+        puts "Verifying the upload via the HTML file can be disabled by either adding"
+        puts "'skip_pdf true' to your Deliverfile or using the flag --force."
+        puts "----------------------------------------------------------------------------"
+
+        system("open '#{html_path}'")
+        okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
+
+        unless okay
+          raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
+        end
+      # end
     end
   end
 end

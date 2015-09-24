@@ -28,11 +28,15 @@ module Deliver
 
     attr_accessor :path
 
+    attr_accessor :language
+
     # @param path (String) path to the screenshot file
+    # @param path (String) Language of this screenshot (e.g. English)
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
     #  will automatically be calculated when you don't set it.
-    def initialize(path, screen_size = nil)
+    def initialize(path, language, screen_size = nil)
       self.path = path
+      self.language = language
       screen_size ||= self.class.calculate_screen_size(path)
 
       self.screen_size = screen_size
