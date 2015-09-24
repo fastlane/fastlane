@@ -1,31 +1,22 @@
 require 'json'
 require 'deliver/version'
-require 'deliver/app'
-require 'deliver/metadata_item'
-require 'deliver/app_screenshot'
-require 'deliver/itunes_transporter'
-require 'deliver/metadata'
-require 'deliver/metadata_screenshots'
-require 'deliver/deliverfile/deliverfile'
-require 'deliver/deliverfile/deliverfile_creator'
-require 'deliver/deliverer'
-require 'deliver/ipa_uploader'
-require 'deliver/html_generator'
-require 'deliver/deliver_process'
-require 'deliver/dependency_checker'
-require 'deliver/testflight'
+require 'deliver/options'
 require 'deliver/commands_generator'
+require 'deliver/detect_values'
+require 'deliver/runner'
+require 'deliver/manager'
+require 'deliver/upload_metadata'
 
 require 'spaceship'
 require 'fastlane_core'
 
+
+# TODO
+require 'pry'
+
 module Deliver
 	class << self
-		attr_accessor :username
-
-		def username
-			@username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-		end
+		
 	end
 
 	Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
