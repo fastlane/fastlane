@@ -41,15 +41,36 @@ module Deliver
     end
 
     def generate_metadata_files(v, deliver_path)
-      UploadMetadata::LOCALISED_VERSION_VALUES.each do |key|
-        v.description.languages.each do |language|
-          content = v.send(key)[language]
+      app_details = v.application.details
+      containing = File.join(deliver_path, 'metadata')
 
-          resulting_path = File.join(deliver_path, 'metadata', language, "#{key}.txt")
+      # All the localised metadata
+      (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
+        v.description.languages.each do |language|
+          if UploadMetadata::LOCALISED_VERSION_VALUES.include?(key)
+            content = v.send(key)[language]
+          else
+            content = app_details.send(key)[language]
+          end
+
+          resulting_path = File.join(containing, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
           Helper.log.debug "Writing to '#{resulting_path}'"
         end
+      end
+
+      # All non-localised metadata
+      (UploadMetadata::NON_LOCALISED_VERSION_VALUES + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
+        if UploadMetadata::NON_LOCALISED_VERSION_VALUES.include?(key)
+          content = v.send(key)
+        else
+          content = app_details.send(key)
+        end
+
+        resulting_path = File.join(containing, "#{key}.txt")
+        File.write(resulting_path, content)
+        Helper.log.debug "Writing to '#{resulting_path}'"
       end
 
       puts "Successfully created new configuration files.".green

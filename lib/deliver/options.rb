@@ -68,6 +68,14 @@ module Deliver
                                      description: "Metadata: The copyright notice",
                                      optional: true,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :primary_category,
+                                     description: "Metadata: The english name of the primary category(e.g. `Business`, `Books`)",
+                                     optional: true,
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :secondary_category,
+                                     description: "Metadata: The english name of the secondary category(e.g. `Business`, `Books`)",
+                                     optional: true,
+                                     is_string: true),
 
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,

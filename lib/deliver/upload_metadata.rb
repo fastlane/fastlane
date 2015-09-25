@@ -1,9 +1,17 @@
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
+    # All the localised values attached to the version
     LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url]
+
+    # Everything attached to the version but not being localised
     NON_LOCALISED_VERSION_VALUES = [:copyright]
+
+    # Localised app details values
     LOCALISED_APP_VALUES = [:name, :privacy_url]
+
+    # Non localized app details values
+    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category]
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
