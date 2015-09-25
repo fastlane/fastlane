@@ -20,19 +20,6 @@ module Spaceship
       # @return (Bool) Is that the version that's currently available in the App Store?
       attr_accessor :is_live
 
-      # Categories (e.g. MZGenre.Business)
-      attr_accessor :primary_category
-
-      attr_accessor :primary_first_sub_category
-
-      attr_accessor :primary_second_sub_category
-
-      attr_accessor :secondary_category
-
-      attr_accessor :secondary_first_sub_category
-
-      attr_accessor :secondary_second_sub_category
-
       # @return (String) App Status (e.g. 'readyForSale'). You should use `app_status` instead
       attr_accessor :raw_status
 
@@ -127,13 +114,7 @@ module Spaceship
         'details.value' => :languages,
         'largeAppIcon.value.originalFileName' => :app_icon_original_name,
         'largeAppIcon.value.url' => :app_icon_url,
-        'primaryCategory.value' => :primary_category,
-        'primaryFirstSubCategory.value' => :primary_first_sub_category,
-        'primarySecondSubCategory.value' => :primary_second_sub_category,
         'releaseOnApproval.value' => :release_on_approval,
-        'secondaryCategory.value' => :secondary_category,
-        'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
-        'secondarySecondSubCategory.value' => :secondary_second_sub_category,
         'status' => :raw_status,
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
@@ -259,36 +240,6 @@ module Spaceship
 
       def supports_apple_watch
         !super.nil?
-      end
-
-      def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
       end
 
       private

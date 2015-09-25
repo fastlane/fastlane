@@ -143,7 +143,6 @@ attr_reader :name
 attr_reader :keywords
 attr_reader :description
 attr_reader :release_notes
-attr_reader :privacy_url
 attr_reader :support_url
 attr_reader :marketing_url
 attr_reader :screenshots
