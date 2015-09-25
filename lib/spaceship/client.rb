@@ -18,6 +18,9 @@ module Spaceship
     attr_reader :client
     attr_accessor :cookie
 
+    # The user that is currently logged in
+    attr_accessor :user
+
     # The logger in which all requests are logged
     # /tmp/spaceship[time].log by default
     attr_accessor :logger
@@ -148,6 +151,7 @@ module Spaceship
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
+      self.user = user
       send_login_request(user, password) # different in subclasses
     end
 
