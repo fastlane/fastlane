@@ -186,7 +186,7 @@ module Spaceship
       data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
       data['companyName']['value'] = company_name if company_name
       data['newApp']['appType'] = app_type
-      
+
       data['initialPlatform'] = app_type
       data['enabledPlatformsForCreation']['value'] = [app_type]
 

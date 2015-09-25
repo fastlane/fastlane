@@ -66,7 +66,7 @@ module Spaceship
       end
 
       # Custom Setters
-      # 
+      #
       def primary_category=(value)
         value = "MZGenre.#{value}" unless value.include? "MZGenre"
         super(value)
