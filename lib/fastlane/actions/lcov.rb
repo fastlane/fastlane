@@ -33,7 +33,14 @@ module Fastlane
                                        description: "The output directory that coverage data will be stored. If not passed will use coverage_reports as default value",
                                        optional: true,
                                        is_string: true,
-                                       default_value: "coverage_reports")
+                                       default_value: "coverage_reports"),
+
+          FastlaneCore::ConfigItem.new(key: :output_dir,
+                                       env_name: "FL_LCOV_ARCH",
+                                       description: "The build arch where will search .gcda files. Default is i386",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: "i386")
 
         ]
       end
@@ -63,9 +70,10 @@ module Fastlane
       def self.derived_data_dir(options)
         pn = options[:project_name]
         sc = options[:scheme]
+        arch = options[:arch]
 
         initial_path = "#{Dir.home}/Library/Developer/Xcode/DerivedData/"
-        end_path = "/Build/Intermediates/#{pn}.build/Debug-iphonesimulator/#{sc}.build/Objects-normal/i386/"
+        end_path = "/Build/Intermediates/#{pn}.build/Debug-iphonesimulator/#{sc}.build/Objects-normal/#{arch}/"
 
         match = find_project_dir(pn, initial_path)
 
