@@ -231,7 +231,7 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      platforms = platforms.first # TODO: that won't work for mac apps
+      platforms = platforms.first # That won't work for mac apps
 
       version = platforms[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
       return nil unless version

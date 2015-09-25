@@ -11,8 +11,6 @@ require 'spaceship/portal/spaceship'
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
 
-require 'pry'
-
 # To support legacy code
 module Spaceship
   # Dev Portal

@@ -101,17 +101,25 @@ module Spaceship
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
+        if raw_data['versions'].count == 1
+          v = raw_data['versions'].last
+          if ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
+            return nil
+          end
+        end
+
         Spaceship::AppVersion.find(self, self.apple_id, true)
       end
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
       def edit_version
-        # That's why we have to check in the app_summary.json request if there are 2 versions or just one
-        # if there is only one version, we'll return nil
-        # if raw_data['versions'].count == 1
-        #   return nil # only live version, user should create a new version
-        # end
-        # TODO: Fix
+        if raw_data['versions'].count == 1
+          v = raw_data['versions'].last
+
+          unless ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
+            return nil # only live version, user should create a new version
+          end
+        end
 
         Spaceship::AppVersion.find(self, self.apple_id, false)
       end
