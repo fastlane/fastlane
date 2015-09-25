@@ -35,7 +35,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: "coverage_reports"),
 
-          FastlaneCore::ConfigItem.new(key: :output_dir,
+          FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_LCOV_ARCH",
                                        description: "The build arch where will search .gcda files. Default is i386",
                                        optional: true,
