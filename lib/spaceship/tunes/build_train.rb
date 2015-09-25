@@ -85,7 +85,7 @@ module Spaceship
         result = client.update_build_trains!(application.apple_id, testing_type, data)
         self.internal_testing_enabled = new_value if testing_type == 'internal'
         self.external_testing_enabled = new_value if testing_type == 'external'
-        
+
         result
       end
     end
