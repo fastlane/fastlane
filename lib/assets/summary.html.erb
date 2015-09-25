@@ -155,7 +155,8 @@
 
           <% if @screenshots.count > 0 %>
             <% last_size = nil %>
-            <% @screenshots.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+            <% sc = @screenshots.find_all { |s| s.language == language } %>
+            <% sc.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
 
               <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
 
