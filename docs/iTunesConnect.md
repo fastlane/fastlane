@@ -175,7 +175,7 @@ build = train.builds.first
 # Enable beta testing for a build train
 # This will put the latest build into beta testing mode
 # and turning off beta testing for all other build trains
-train.update_testing_status!(true)
+train.update_testing_status!(true, 'internal')
 ```
 
 ## Builds

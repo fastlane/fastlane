@@ -131,7 +131,7 @@ module Spaceship
       #  }
       def submit_for_beta_review!(metadata)
         # First, enable beta testing for this train (per iTC requirement)
-        self.build_train.update_testing_status!(true)
+        self.build_train.update_testing_status!(true, 'external')
 
         parameters = {
           app_id: self.build_train.application.apple_id,

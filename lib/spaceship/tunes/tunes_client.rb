@@ -255,18 +255,18 @@ module Spaceship
     # @!group Build Trains
     #####################################################
 
-    def build_trains(app_id)
+    # @param (testing_type) internal or external
+    def build_trains(app_id, testing_type)
       raise "app_id is required" unless app_id
-
-      r = request(:get, "ra/apps/#{app_id}/trains/")
+      r = request(:get, "ra/apps/#{app_id}/trains/?testingType=#{testing_type}")
       parse_response(r, 'data')
     end
 
-    def update_build_trains!(app_id, data)
+    def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/trains/"
+        req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end

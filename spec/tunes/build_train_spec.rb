@@ -73,7 +73,7 @@ describe Spaceship::Tunes::BuildTrain do
         expect(train1.testing_enabled).to eq(false)
         expect(train2.testing_enabled).to eq(true)
 
-        train1.update_testing_status!(true)
+        train1.update_testing_status!(true, 'internal')
 
         expect(train1.testing_enabled).to eq(true)
       end
