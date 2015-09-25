@@ -44,6 +44,15 @@ app = Spaceship::Tunes::Application.create!(name: "App Name",
                                        bundle_id: "com.krausefx.app")
 ```
 
+To update non version specific details, use the following code
+
+```ruby
+details = app.details
+details.name['en-US'] = "App Name"
+details.privacy_url['en-US'] = "https://fastlane.tools"
+details.save!
+```
+
 ## AppVersions
 
 <img src="/assets/docs/AppVersions.png" width="500">
@@ -72,10 +81,9 @@ v.version           # => "0.9.14"
 v.copyright = "#{Time.now.year} Felix Krause"
 
 # Get a list of available languages for this app
-v.name.keys         # => ["German", "English"]
+v.description.languages # => ["German", "English"]
 
 # Update localised app metadata
-v.name["English"] = "New Title"
 v.description["English"] = "App Description"
 
 # Push the changes back to the server
@@ -130,11 +138,9 @@ attr_accessor :review_notes
 ####
 
 attr_accessor :languages
-attr_reader :name
 attr_reader :keywords
 attr_reader :description
 attr_reader :release_notes
-attr_reader :privacy_url
 attr_reader :support_url
 attr_reader :marketing_url
 attr_reader :screenshots
@@ -167,7 +173,7 @@ build = train.builds.first
 # Enable beta testing for a build train
 # This will put the latest build into beta testing mode
 # and turning off beta testing for all other build trains
-train.update_testing_status!(true)
+train.update_testing_status!(true, 'internal')
 ```
 
 ## Builds
@@ -196,7 +202,6 @@ parameters = {
 
   # Optional Metadata:
   privacy_policy_url: nil,
-  review_notes: nil,
   review_user_name: nil,
   review_password: nil,
   encryption: false

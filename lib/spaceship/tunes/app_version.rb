@@ -20,19 +20,6 @@ module Spaceship
       # @return (Bool) Is that the version that's currently available in the App Store?
       attr_accessor :is_live
 
-      # Categories (e.g. MZGenre.Business)
-      attr_accessor :primary_category
-
-      attr_accessor :primary_first_sub_category
-
-      attr_accessor :primary_second_sub_category
-
-      attr_accessor :secondary_category
-
-      attr_accessor :secondary_first_sub_category
-
-      attr_accessor :secondary_second_sub_category
-
       # @return (String) App Status (e.g. 'readyForSale'). You should use `app_status` instead
       attr_accessor :raw_status
 
@@ -100,9 +87,6 @@ module Spaceship
       # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
       attr_accessor :languages
 
-      # @return (Hash) A hash representing the app name in all languages
-      attr_reader :name
-
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
@@ -111,9 +95,6 @@ module Spaceship
 
       # @return (Hash) The changelog
       attr_reader :release_notes
-
-      # @return (Hash) A hash representing the keywords in all languages
-      attr_reader :privacy_url
 
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :support_url
@@ -133,13 +114,7 @@ module Spaceship
         'details.value' => :languages,
         'largeAppIcon.value.originalFileName' => :app_icon_original_name,
         'largeAppIcon.value.url' => :app_icon_url,
-        'primaryCategory.value' => :primary_category,
-        'primaryFirstSubCategory.value' => :primary_first_sub_category,
-        'primarySecondSubCategory.value' => :primary_second_sub_category,
         'releaseOnApproval.value' => :release_on_approval,
-        'secondaryCategory.value' => :secondary_category,
-        'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
-        'secondarySecondSubCategory.value' => :secondary_second_sub_category,
         'status' => :raw_status,
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
@@ -169,9 +144,10 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this version is for
         # @param app_id (String) The unique Apple ID of this app
-        # @param is_live (Boolean) Is that the version that's live in the App Store?
-        def find(application, app_id, is_live = false)
+        # @param is_live (Boolean)
+        def find(application, app_id, is_live)
           attrs = client.app_version(app_id, is_live)
+          return nil unless attrs
           attrs.merge!(application: application)
           attrs.merge!(is_live: is_live)
 
@@ -226,7 +202,9 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.application.apple_id}/" + (self.is_live? ? "cur" : "")
+        url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/"
+        url += "deliverable" if self.is_live?
+        return url
       end
 
       # Private methods
@@ -246,10 +224,8 @@ module Spaceship
       # Prefill name, keywords, etc...
       def unfold_languages
         {
-          name: :name,
           keywords: :keywords,
           description: :description,
-          privacyURL: :privacy_url,
           supportURL: :support_url,
           marketingURL: :marketing_url,
           releaseNotes: :release_notes
@@ -266,36 +242,6 @@ module Spaceship
 
       def supports_apple_watch
         !super.nil?
-      end
-
-      def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
-      end
-
-      def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
-        super(value)
       end
 
       private

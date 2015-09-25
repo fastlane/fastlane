@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Spaceship::AppVersion do
+describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppVersion.client }
@@ -18,8 +18,6 @@ describe Spaceship::AppVersion do
       expect(version.is_live?).to eq(false)
       expect(version.copyright).to eq("2015 SunApps GmbH")
       expect(version.version_id).to eq(812106519)
-      expect(version.primary_category).to eq('MZGenre.Reference')
-      expect(version.secondary_category).to eq('MZGenre.Business')
       expect(version.raw_status).to eq('readyForSale')
       expect(version.can_reject_version).to eq(false)
       expect(version.can_prepare_for_upload).to eq(false)
@@ -37,13 +35,10 @@ describe Spaceship::AppVersion do
     it "parses the localized values correctly" do
       version = app.edit_version
 
-      expect(version.name['English']).to eq('App Name 123')
-      expect(version.name['German']).to eq("yep, that's the name")
       expect(version.description['English']).to eq('Super Description here')
       expect(version.description['German']).to eq('My title')
       expect(version.keywords['English']).to eq('Some random titles')
       expect(version.keywords['German']).to eq('More random stuff')
-      expect(version.privacy_url['English']).to eq('http://privacy.sunapps.net')
       expect(version.support_url['German']).to eq('http://url.com')
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
       expect(version.release_notes['German']).to eq('Wow, News')
@@ -67,11 +62,11 @@ describe Spaceship::AppVersion do
 
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/cur')
+        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/deliverable')
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088/')
+        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/')
       end
     end
 
@@ -123,38 +118,11 @@ describe Spaceship::AppVersion do
       end
     end
 
-    describe "Modifying the category" do
-      it "prefixes the category with the correct value for all category types" do
-        version.primary_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
-
-        version.primary_first_sub_category = "Weather"
-        expect(version.primary_first_sub_category).to eq("MZGenre.Weather")
-
-        version.primary_second_sub_category = "Weather"
-        expect(version.primary_second_sub_category).to eq("MZGenre.Weather")
-
-        version.secondary_category = "Weather"
-        expect(version.secondary_category).to eq("MZGenre.Weather")
-
-        version.secondary_first_sub_category = "Weather"
-        expect(version.secondary_first_sub_category).to eq("MZGenre.Weather")
-
-        version.secondary_second_sub_category = "Weather"
-        expect(version.secondary_second_sub_category).to eq("MZGenre.Weather")
-      end
-
-      it "doesn't prefix if the prefix is already there" do
-        version.primary_category = "MZGenre.Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
-      end
-    end
-
     it "allows modifications of localized values" do
       new_title = 'New Title'
-      version.name['English'] = new_title
+      version.description['English'] = new_title
       lang = version.languages.find { |a| a['language'] == 'English' }
-      expect(lang['name']['value']).to eq(new_title)
+      expect(lang['description']['value']).to eq(new_title)
     end
 
     describe "Pushing the changes back to the server" do
@@ -175,7 +143,7 @@ describe Spaceship::AppVersion do
     describe "Accessing different languages" do
       it "raises an exception if language is not available" do
         expect do
-          version.name["English_CA"]
+          version.description["English_CA"]
         end.to raise_error "Language 'English_CA' is not activated for this app version."
       end
 

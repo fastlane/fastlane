@@ -6,6 +6,8 @@ module Spaceship
       attr_accessor :original_array # reference to original array
 
       def initialize(identifier, ref)
+        raise "ref is nil" if ref.nil?
+
         self.identifier = identifier.to_s
         self.original_array = ref
       end
@@ -20,7 +22,7 @@ module Spaceship
 
       def get_lang(lang)
         result = self.original_array.find do |current|
-          current['language'] == lang
+          current['language'] == lang or current['localeCode'] == lang # Apple being consistent
         end
         return result if result
 

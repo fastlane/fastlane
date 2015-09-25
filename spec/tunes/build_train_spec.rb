@@ -19,13 +19,15 @@ describe Spaceship::Tunes::BuildTrain do
       expect(trains.count).to eq(2)
       train = trains.values.first
 
-      expect(train.version_string).to eq("0.9.10")
+      expect(train.version_string).to eq("1.0")
       expect(train.platform).to eq("ios")
       expect(train.application).to eq(app)
 
       # TestFlight
-      expect(trains.values.first.testing_enabled).to eq(false)
-      expect(trains.values.last.testing_enabled).to eq(true)
+      expect(trains.values.first.external_testing_enabled).to eq(false)
+      expect(trains.values.first.internal_testing_enabled).to eq(true)
+      expect(trains.values.last.external_testing_enabled).to eq(false)
+      expect(trains.values.last.internal_testing_enabled).to eq(false)
     end
 
     it "returns all processing builds" do
@@ -43,10 +45,11 @@ describe Spaceship::Tunes::BuildTrain do
       end
 
       it "lets the user fetch the builds using the version as a key" do
-        train = app.build_trains['0.9.10']
-        expect(train.version_string).to eq('0.9.10')
+        train = app.build_trains['1.0']
+        expect(train.version_string).to eq('1.0')
         expect(train.platform).to eq('ios')
-        expect(train.testing_enabled).to eq(false)
+        expect(train.internal_testing_enabled).to eq(true)
+        expect(train.external_testing_enabled).to eq(false)
         expect(train.builds.count).to eq(1)
       end
     end
@@ -61,21 +64,21 @@ describe Spaceship::Tunes::BuildTrain do
       end
 
       it "properly extracted the processing builds from a train" do
-        train = app.build_trains['0.9.10']
+        train = app.build_trains['1.0']
         expect(train.processing_builds.count).to eq(0)
       end
     end
 
     describe "#update_testing_status" do
       it "just works (tm)" do
-        train1 = app.build_trains['0.9.10']
-        train2 = app.build_trains['0.9.11']
-        expect(train1.testing_enabled).to eq(false)
-        expect(train2.testing_enabled).to eq(true)
+        train1 = app.build_trains['1.0']
+        train2 = app.build_trains['1.1']
+        expect(train1.internal_testing_enabled).to eq(true)
+        expect(train2.internal_testing_enabled).to eq(false)
 
-        train1.update_testing_status!(true)
+        train2.update_testing_status!(true, 'internal')
 
-        expect(train1.testing_enabled).to eq(true)
+        expect(train2.internal_testing_enabled).to eq(true)
       end
     end
   end

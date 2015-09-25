@@ -81,6 +81,8 @@ module Spaceship
       end
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
     def handle_itc_response(raw)
       return unless raw
       return unless raw.kind_of? Hash
@@ -135,14 +137,31 @@ module Spaceship
 
       return data
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     #####################################################
     # @!group Applications
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary')
+      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
       parse_response(r, 'data')['summaries']
+    end
+
+    def app_details(app_id)
+      r = request(:get, "ra/apps/#{app_id}/details")
+      parse_response(r, 'data')
+    end
+
+    def update_app_details!(app_id, data)
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/details"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body)
     end
 
     # Creates a new application on iTunes Connect
@@ -157,21 +176,27 @@ module Spaceship
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
       # First, we need to fetch the data from Apple, which we then modify with the user's values
-      r = request(:get, 'ra/apps/create/?appType=ios')
+      app_type = 'ios'
+      r = request(:get, "ra/apps/create/v2/?platformString=#{app_type}")
       data = parse_response(r, 'data')
 
       # Now fill in the values we have
-      data['versionString']['value'] = version
-      data['newApp']['name']['value'] = name
+      # some values are nil, that's why there is a hash
+      data['versionString'] = { value: version }
+      data['newApp']['name'] = { value: name }
       data['newApp']['bundleId']['value'] = bundle_id
       data['newApp']['primaryLanguage']['value'] = primary_language || 'English'
-      data['newApp']['vendorId']['value'] = sku
+      data['newApp']['vendorId'] = {value: sku }
       data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
       data['companyName']['value'] = company_name if company_name
+      data['newApp']['appType'] = app_type
+
+      data['initialPlatform'] = app_type
+      data['enabledPlatformsForCreation']['value'] = [app_type]
 
       # Now send back the modified hash
       r = request(:post) do |req|
-        req.url 'ra/apps/create/?appType=ios'
+        req.url 'ra/apps/create/v2'
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -202,9 +227,17 @@ module Spaceship
     def app_version(app_id, is_live)
       raise "app_id is required" unless app_id
 
-      v_text = (is_live ? 'live' : nil)
+      # First we need to fetch the IDs for the edit / live version
+      r = request(:get, "ra/apps/#{app_id}/overview")
+      platforms = parse_response(r, 'data')['platforms']
 
-      r = request(:get, "ra/apps/version/#{app_id}", {v: v_text})
+      platforms = platforms.first # That won't work for mac apps
+
+      version = platforms[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
+      return nil unless version
+      version_id = version['id']
+
+      r = request(:get, "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}")
       parse_response(r, 'data')
     end
 
@@ -226,18 +259,18 @@ module Spaceship
     # @!group Build Trains
     #####################################################
 
-    def build_trains(app_id)
+    # @param (testing_type) internal or external
+    def build_trains(app_id, testing_type)
       raise "app_id is required" unless app_id
-
-      r = request(:get, "ra/apps/#{app_id}/trains/")
+      r = request(:get, "ra/apps/#{app_id}/trains/?testingType=#{testing_type}")
       parse_response(r, 'data')
     end
 
-    def update_build_trains!(app_id, data)
+    def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/trains/"
+        req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end

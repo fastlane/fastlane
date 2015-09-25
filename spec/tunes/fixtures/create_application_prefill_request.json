@@ -4,37 +4,43 @@
     "sectionInfoKeys": [],
     "sectionWarningKeys": [],
     "companyName": {
-      "value": "SunApps GmbH",
+      "value": "Felix Krause",
       "isEditable": false,
       "isRequired": false,
       "errorKeys": null
     },
-    "versionString": {
-      "value": null,
-      "isEditable": true,
-      "isRequired": true,
-      "errorKeys": null
-    },
+    "versionString": null,
     "appRegInfo": null,
     "bundleIds": {
-      "com.krausefx.app_name": "Spaceship App - com.krausefx.app_name",
-      "net.sunapps.*": "SunApps - net.sunapps.*",
-      "net.sunapps.947474": "My App Name - net.sunapps.947474",
-      "*": "Xcode iOS Wildcard App ID - *",
-      "net.sunapps.100": "Baconfy - net.sunapps.100"
+      "*": "Xcode iOS Wildcard App ID - *"
     },
     "enabledPlatformsForCreation": {
-      "value": ["ios"],
+      "value": ["appletvos", "ios"],
       "isEditable": true,
       "isRequired": true,
       "errorKeys": null
     },
     "name": null,
-    "primaryLanguage": null,
-    "bundleId": null,
-    "bundleIdSuffix": null,
+    "primaryLanguage": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "bundleId": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "bundleIdSuffix": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
     "vendorId": null,
-    "initialPlatform": null,
+    "initialPlatform": "ios",
     "adamId": null,
     "newApp": {
       "sectionErrorKeys": [],
@@ -49,23 +55,13 @@
       "bundleIdSuffix": {
         "value": null,
         "isEditable": true,
-        "isRequired": false,
-        "errorKeys": null
-      },
-      "vendorId": {
-        "value": null,
-        "isEditable": true,
         "isRequired": true,
         "errorKeys": null
       },
+      "vendorId": null,
       "adamId": null,
-      "appType": "iOS App",
-      "name": {
-        "value": null,
-        "isEditable": true,
-        "isRequired": true,
-        "errorKeys": null
-      },
+      "appType": "ios",
+      "name": null,
       "liveVersion": null,
       "inFlightVersion": null,
       "primaryLanguage": {

@@ -40,9 +40,11 @@ module Spaceship
       # @return (Integer): When is the external build going to expire?
       attr_accessor :external_expiry_date
 
-      # @return (Boolean): Is this build available for external beta testing
-      #   this is only true after the build was approved by Apple
-      attr_accessor :external_testing_enabled
+      # @return (Bool) Is external beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :external_testing_enabled
+
+      # @return (Bool) Is internal beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :internal_testing_enabled
 
       # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
@@ -87,7 +89,9 @@ module Spaceship
         'internalExpiry' => :internal_expiry_date,
         'externalExpiry' => :external_expiry_date,
         'watchKitEnabled' => :watch_kit_enabled,
-        'readyToInstall' => :ready_to_install
+        'readyToInstall' => :ready_to_install,
+        'internalTesting.value' => :internal_testing_enabled,
+        'externalTesting.value' => :external_testing_enabled
       )
 
       class << self
@@ -102,7 +106,7 @@ module Spaceship
         super
 
         self.external_expiry_date ||= 0
-        @external_testing_enabled = self.external_expiry_date > 0
+        self.internal_expiry_date ||= 0
       end
 
       # This will submit this build for TestFlight beta review
@@ -127,7 +131,7 @@ module Spaceship
       #  }
       def submit_for_beta_review!(metadata)
         # First, enable beta testing for this train (per iTC requirement)
-        self.build_train.update_testing_status!(true)
+        self.build_train.update_testing_status!(true, 'external')
 
         parameters = {
           app_id: self.build_train.application.apple_id,
@@ -160,14 +164,8 @@ module Spaceship
       # @examples:
       #   External, Internal, Inactive, Expired
       def testing_status
-        testing ||= "External" if self.external_expiry_date > 0
-
-        if self.build_train.testing_enabled
-          # only the latest build is actually valid
-          if self.build_train.builds.find_all { |b| b.upload_date > self.upload_date }.count == 0
-            testing ||= "Internal"
-          end
-        end
+        testing ||= "External" if self.external_testing_enabled
+        testing ||= "Internal" if self.internal_testing_enabled
 
         if Time.at(self.internal_expiry_date / 1000) > Time.now
           testing ||= "Inactive"
@@ -188,36 +186,49 @@ module Spaceship
   end
 end
 
-# Example response
-#   "buildVersion": "0.9.10",
-#   "trainVersion": "0.9.10",
-#   "uploadDate": 1413966436000,
-#   "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand5/v4/e8/ab/f8/e8abf8ca-6c22-a519-aa1b-c73901c4917e/Icon-60@2x.png.png/150x150bb-80.png",
-#   "appName": "Yeahaa",
-#   "platform": "ios",
-#   "betaEntitled": false,
-#   "id": 523299,
-#   "valid": true,
-#   "missingExportCompliance": false,
-#   "waitingForExportComplianceApproval": false,
-#   "addedInternalUsersCount": 0,
-#   "addedExternalUsersCount": 0,
-#   "invitedExternalUsersCount": 0,
-#   "invitedInternalUsersCount": 0,
-#   "acceptedInternalUsersCount": 0,
-#   "acceptedExternalUsersCount": 0,
-#   "installCount": 0,
-#   "internalInstallCount": 0,
-#   "externalInstallCount": 0,
-#   "sessionCount": null,
-#   "crashCount": null,
-#   "promotedVersion": null,
-#   "internalState": "noBetaEntitlement",
-#   "betaState": "noBetaEntitlement",
-#   "internalExpiry": 1416562036000,
-#   "externalExpiry": 0,
-#   "watchKitEnabled": false,
-#   "readyToInstall": false,
-#   "sdkBuildWhitelisted": true,
-#   "internalTesting": null,
-#   "externalTesting": null
+# Example Response
+# {"sectionErrorKeys"=>[],
+#  "sectionInfoKeys"=>[],
+#  "sectionWarningKeys"=>[],
+#  "buildVersion"=>"1",
+#  "trainVersion"=>"1.0",
+#  "uploadDate"=>1441975590000,
+#  "iconUrl"=>
+#   "https://is2-ssl.mzstatic.com/image/thumb/Newsstand3/v4/a9/f9/8b/a9f98b23-592d-af2e-6e10-a04873bed5df/Icon-76@2x.png.png/150x150bb-80.png",
+#  "iconAssetToken"=>
+#   "Newsstand3/v4/a9/f9/8b/a9f98b23-592d-af2e-6e10-a04873bed5df/Icon-76@2x.png.png",
+#  "appName"=>"Updated by fastlane",
+#  "platform"=>"ios",
+#  "betaEntitled"=>true,
+#  "exceededFileSizeLimit"=>false,
+#  "wentLiveWithVersion"=>false,
+#  "processing"=>false,
+#  "id"=>5298023,
+#  "valid"=>true,
+#  "missingExportCompliance"=>false,
+#  "waitingForExportComplianceApproval"=>false,
+#  "addedInternalUsersCount"=>0,
+#  "addedExternalUsersCount"=>0,
+#  "invitedExternalUsersCount"=>0,
+#  "invitedInternalUsersCount"=>0,
+#  "acceptedInternalUsersCount"=>1,
+#  "acceptedExternalUsersCount"=>0,
+#  "installCount"=>0,
+#  "internalInstallCount"=>0,
+#  "externalInstallCount"=>0,
+#  "sessionCount"=>0,
+#  "internalSessionCount"=>0,
+#  "externalSessionCount"=>0,
+#  "crashCount"=>0,
+#  "internalCrashCount"=>0,
+#  "externalCrashCount"=>0,
+#  "promotedVersion"=>nil,
+#  "internalState"=>"inactive",
+#  "betaState"=>"submitForReview",
+#  "internalExpiry"=>1444567590000,
+#  "externalExpiry"=>0,
+#  "watchKitEnabled"=>false,
+#  "readyToInstall"=>true,
+#  "sdkBuildWhitelisted"=>true,
+#  "internalTesting"=>{"value"=>false, "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil},
+#  "externalTesting"=>{"value"=>false, "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil}
