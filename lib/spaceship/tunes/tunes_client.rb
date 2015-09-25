@@ -172,21 +172,27 @@ module Spaceship
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
       # First, we need to fetch the data from Apple, which we then modify with the user's values
-      r = request(:get, 'ra/apps/create/?appType=ios')
+      app_type = 'ios'
+      r = request(:get, "ra/apps/create/v2/?platformString=#{app_type}")
       data = parse_response(r, 'data')
 
       # Now fill in the values we have
-      data['versionString']['value'] = version
-      data['newApp']['name']['value'] = name
+      # some values are nil, that's why there is a hash
+      data['versionString'] = { value: version }
+      data['newApp']['name'] = { value: name }
       data['newApp']['bundleId']['value'] = bundle_id
       data['newApp']['primaryLanguage']['value'] = primary_language || 'English'
-      data['newApp']['vendorId']['value'] = sku
+      data['newApp']['vendorId'] = {value: sku }
       data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
       data['companyName']['value'] = company_name if company_name
+      data['newApp']['appType'] = app_type
+      
+      data['initialPlatform'] = app_type
+      data['enabledPlatformsForCreation']['value'] = [app_type]
 
       # Now send back the modified hash
       r = request(:post) do |req|
-        req.url 'ra/apps/create/?appType=ios'
+        req.url 'ra/apps/create/v2'
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
