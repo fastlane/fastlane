@@ -26,7 +26,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.can_beta_test).to eq(true)
       expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
-      expect(version.large_app_icon.url).to eq('https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/1024x1024ss-80.png')
+      expect(version.large_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/0x0ss.jpg')
       expect(version.large_app_icon.original_file_name).to eq('AppIconFull.png')
       expect(version.watch_app_icon.url).to eq('https://muycustomurl.com')
       expect(version.watch_app_icon.original_file_name).to eq('OriginalName.png')
@@ -84,7 +84,7 @@ describe Spaceship::AppVersion, all: true do
       end
     end
 
-    describe "Screenshots", :screenshots do
+    describe "Screenshots" do
       it "properly parses all the screenshots" do
         v = app.live_version
 
@@ -93,8 +93,7 @@ describe Spaceship::AppVersion, all: true do
 
         s1 = v.screenshots["English"].first
         expect(s1.device_type).to eq('iphone4')
-        expect(s1.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/640x1136ss-80.png')
-        expect(s1.thumbnail_url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/500x500bb-80.png')
+        expect(s1.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/0x0ss.jpg')
         expect(s1.sort_order).to eq(1)
         expect(s1.original_file_name).to eq('b6a876130fa48da21db6622f08b815b4.png')
         expect(s1.language).to eq("English")

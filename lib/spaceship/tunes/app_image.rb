@@ -2,9 +2,9 @@ module Spaceship
   module Tunes
     # Represents an image hosted on iTunes Connect. Used for icons, screenshots, etc
     class AppImage < TunesBase
-      attr_accessor :asset_token
+      HOST_URL = "https://is1-ssl.mzstatic.com/image/thumb"
 
-      attr_accessor :thumbnail_url
+      attr_accessor :asset_token
 
       attr_accessor :sort_order
 
@@ -16,8 +16,7 @@ module Spaceship
         'assetToken' => :asset_token,
         'sortOrder' => :sort_order,
         'url' => :url,
-        'originalFileName' => :original_file_name,
-        'thumbNailUrl' => :thumbnail_url
+        'originalFileName' => :original_file_name
       )
 
       class << self
@@ -32,10 +31,14 @@ module Spaceship
             asset_token: nil,
             original_file_name: nil,
             sort_order: nil,
-            thumbnail_url: nil,
             url: nil
           }.merge(attrs)
         )
+      end
+
+      def setup
+        # Since September 2015 we don't get the url any more, so we have to manually build it
+        self.url = "#{HOST_URL}/#{self.asset_token}/0x0ss.jpg"
       end
 
       private
