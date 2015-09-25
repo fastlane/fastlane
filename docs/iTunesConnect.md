@@ -44,6 +44,15 @@ app = Spaceship::Tunes::Application.create!(name: "App Name",
                                        bundle_id: "com.krausefx.app")
 ```
 
+To update non version specific details, use the following code
+
+```ruby
+details = app.details
+details.name['en-US'] = "App Name"
+details.privacy_url['en-US'] = "https://fastlane.tools"
+details.save!
+```
+
 ## AppVersions
 
 <img src="/assets/docs/AppVersions.png" width="500">
