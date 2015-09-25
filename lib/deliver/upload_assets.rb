@@ -3,7 +3,7 @@ module Deliver
     def upload(options)
       app = options[:app]
 
-      v = app.edit_version || app.live_version # TODO: get changes from work macbook here
+      v = app.edit_version
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
 
       if options[:app_icon]

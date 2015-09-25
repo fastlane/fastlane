@@ -8,6 +8,7 @@ module Deliver
       @app = options[:app]
       @version = @app.latest_version
       @screenshots = screenshots || []
+      @details = @app.details
 
       html_path = File.join(lib_path, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system

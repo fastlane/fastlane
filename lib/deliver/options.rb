@@ -64,6 +64,10 @@ module Deliver
                                        raise "Could not find png file at path '#{value}'".red unless File.exist?(value)
                                        raise "'#{value}' doesn't seem to be a png file".red unless value.end_with?(".png")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :copyright,
+                                     description: "Metadata: The copyright notice",
+                                     optional: true,
+                                     is_string: true),
 
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,

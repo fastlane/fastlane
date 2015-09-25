@@ -41,12 +41,11 @@ module Deliver
     end
 
     def generate_metadata_files(v, deliver_path)
-      UploadMetadata::LOCALISED_VALUES.each do |key|
-        v.name.languages.each do |language|
+      UploadMetadata::LOCALISED_VERSION_VALUES.each do |key|
+        v.description.languages.each do |language|
           content = v.send(key)[language]
 
-          locale_code = Spaceship::Tunes::LanguageConverter.from_itc_to_standard(language) # German => de-DE
-          resulting_path = File.join(deliver_path, 'metadata', locale_code, "#{key}.txt")
+          resulting_path = File.join(deliver_path, 'metadata', language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
           Helper.log.debug "Writing to '#{resulting_path}'"

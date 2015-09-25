@@ -1,12 +1,10 @@
 module Deliver
   # upload screenshots to iTunes Connect
   class UploadScreenshots
-    LOCALISED_VALUES = [:description, :name, :keywords]
-
     def upload(options, screenshots)
       app = options[:app]
 
-      v = app.edit_version || app.live_version # TODO: get changes from work macbook here
+      v = app.edit_version
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
 
       Helper.log.info "Starting with the upload of screenshots..."
@@ -37,8 +35,7 @@ module Deliver
     def collect_screenshots(options)
       screenshots = []
       Dir.glob(File.join(options[:screenshots_path], "*")) do |lng_folder|
-        lng = File.basename(lng_folder)
-        language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc(lng) # de-DE => German
+        language = File.basename(lng_folder)
 
         files = Dir.glob(File.join(lng_folder, '*.png'))
         next if files.count == 0

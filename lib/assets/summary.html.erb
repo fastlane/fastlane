@@ -110,13 +110,13 @@
     </head>
     
     <body>
-      <% @version.name.languages.each do |language| %>
+      <% @version.description.languages.each do |language| %>
         <div id="app-name">
-          <%= language %>: <%= @version.name[language] %>
+          <%= language %>: <%= @details.name[language] %>
         </div>
 
         <div id="app-urls">
-          <% all_keys = [:support_url, :privacy_url, :marketing_url] %>
+          <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
             <% value = @version.send(key)[language] %>
             <% if value %>
@@ -127,14 +127,16 @@
           <% end %>
         </div>
         
-        <div id="app-keyword">
-            <div class="cat-headline">Keywords</div>
-            <ul class="app-keyword-list">
-              <% @version.keywords[language].split(" ").each do |keyword| %>
-                <li><%= keyword %></li>
-              <% end %>
-            </ul>
-        </div>
+        <% if @version.keywords and @version.keywords[language] %>
+          <div id="app-keyword">
+              <div class="cat-headline">Keywords</div>
+              <ul class="app-keyword-list">
+                <% @version.keywords[language].split(" ").each do |keyword| %>
+                  <li><%= keyword %></li>
+                <% end %>
+              </ul>
+          </div>
+        <% end %>
         
         <div id="app-description">
              <div class="cat-headline">Description</div>
@@ -175,7 +177,7 @@
             <div style="border: 3px solid red; padding: 0px 20px">
               <h2 style="color: red">No Screenshots Found</h2>
               <p>
-                deliver couldn't find any screenshots. 
+                deliver couldn't find any screenshots. This will <b>remove</b> existing screenshots, but will also not upload any.
               <p>
                 Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
               </p>
