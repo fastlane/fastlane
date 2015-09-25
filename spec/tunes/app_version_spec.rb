@@ -18,8 +18,6 @@ describe Spaceship::AppVersion, all: true do
       expect(version.is_live?).to eq(false)
       expect(version.copyright).to eq("2015 SunApps GmbH")
       expect(version.version_id).to eq(812106519)
-      expect(version.primary_category).to eq('MZGenre.Reference')
-      expect(version.secondary_category).to eq('MZGenre.Business')
       expect(version.raw_status).to eq('readyForSale')
       expect(version.can_reject_version).to eq(false)
       expect(version.can_prepare_for_upload).to eq(false)
@@ -37,13 +35,10 @@ describe Spaceship::AppVersion, all: true do
     it "parses the localized values correctly" do
       version = app.edit_version
 
-      expect(version.name['English']).to eq('App Name 123')
-      expect(version.name['German']).to eq("yep, that's the name")
       expect(version.description['English']).to eq('Super Description here')
       expect(version.description['German']).to eq('My title')
       expect(version.keywords['English']).to eq('Some random titles')
       expect(version.keywords['German']).to eq('More random stuff')
-      expect(version.privacy_url['English']).to eq('http://privacy.sunapps.net')
       expect(version.support_url['German']).to eq('http://url.com')
       expect(version.marketing_url['English']).to eq('https://sunapps.net')
       expect(version.release_notes['German']).to eq('Wow, News')
@@ -125,9 +120,9 @@ describe Spaceship::AppVersion, all: true do
 
     it "allows modifications of localized values" do
       new_title = 'New Title'
-      version.name['English'] = new_title
+      version.description['English'] = new_title
       lang = version.languages.find { |a| a['language'] == 'English' }
-      expect(lang['name']['value']).to eq(new_title)
+      expect(lang['description']['value']).to eq(new_title)
     end
 
     describe "Pushing the changes back to the server" do

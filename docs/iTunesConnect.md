@@ -204,7 +204,6 @@ parameters = {
 
   # Optional Metadata:
   privacy_policy_url: nil,
-  review_notes: nil,
   review_user_name: nil,
   review_password: nil,
   encryption: false

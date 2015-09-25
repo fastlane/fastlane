@@ -144,17 +144,12 @@ describe Spaceship::Application do
 
     describe "Access app_versions" do
       describe "#edit_version" do
-        it "returns nil if there is only a live version" do
-          app = Spaceship::Application.all.find { |a| a.apple_id == '1013943394' }
-          expect(app.edit_version).to eq(nil)
-        end
-
         it "returns the edit version if there is an edit version" do
           app = Spaceship::Application.all.first
           v = app.edit_version
           expect(v.class).to eq(Spaceship::AppVersion)
           expect(v.application).to eq(app)
-          expect(v.name['German']).to eq("yep, that's the name")
+          expect(v.description['German']).to eq("My title")
           expect(v.is_live).to eq(false)
         end
       end
@@ -181,12 +176,6 @@ describe Spaceship::Application do
         expect do
           app.create_version!('0.1')
         end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
-      end
-
-      it "works if there is no `edit_version` already available" do
-        app = Spaceship::Application.all.find { |a| a.apple_id == '1013943394' }
-        expect(app.edit_version).to eq(nil)
-        app.create_version!('0.1')
       end
     end
   end

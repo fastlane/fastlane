@@ -69,7 +69,7 @@ describe Spaceship::Tunes::Build do
         expect(r).to eq({
           app_id: "898536088",
           train: "1.0",
-          build_number: "123123",
+          build_number: "10",
           changelog: "Custom Changelog",
           description: "No app description provided",
           feedback_email: "contact@company.com",
