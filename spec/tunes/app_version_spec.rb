@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Spaceship::AppVersion do
+describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppVersion.client }
@@ -123,33 +123,6 @@ describe Spaceship::AppVersion do
       end
     end
 
-    describe "Modifying the category" do
-      it "prefixes the category with the correct value for all category types" do
-        version.primary_category = "Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
-
-        version.primary_first_sub_category = "Weather"
-        expect(version.primary_first_sub_category).to eq("MZGenre.Weather")
-
-        version.primary_second_sub_category = "Weather"
-        expect(version.primary_second_sub_category).to eq("MZGenre.Weather")
-
-        version.secondary_category = "Weather"
-        expect(version.secondary_category).to eq("MZGenre.Weather")
-
-        version.secondary_first_sub_category = "Weather"
-        expect(version.secondary_first_sub_category).to eq("MZGenre.Weather")
-
-        version.secondary_second_sub_category = "Weather"
-        expect(version.secondary_second_sub_category).to eq("MZGenre.Weather")
-      end
-
-      it "doesn't prefix if the prefix is already there" do
-        version.primary_category = "MZGenre.Weather"
-        expect(version.primary_category).to eq("MZGenre.Weather")
-      end
-    end
-
     it "allows modifications of localized values" do
       new_title = 'New Title'
       version.name['English'] = new_title
@@ -175,7 +148,7 @@ describe Spaceship::AppVersion do
     describe "Accessing different languages" do
       it "raises an exception if language is not available" do
         expect do
-          version.name["English_CA"]
+          version.description["English_CA"]
         end.to raise_error "Language 'English_CA' is not activated for this app version."
       end
 

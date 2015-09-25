@@ -62,6 +62,11 @@ def itc_stub_applications
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/overview").
          with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;itctx=abc:def;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
          to_return(:status => 200, body: itc_read_fixture_file('app_overview.json'), headers: {'Content-Type' => 'application/json'})  
+
+  # App Details
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/details").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;itctx=abc:def;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, body: itc_read_fixture_file('app_details.json'), headers: {'Content-Type' => 'application/json'})  
 end
 
 def itc_stub_applications_first_create
