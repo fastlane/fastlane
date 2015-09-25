@@ -22,7 +22,7 @@ module Spaceship
             'iphone6Plus' => [2208, 1242],
             'ipad' => [1024, 768]
         }
-        # puts "#{device}: #{resolutions[device]}"
+
         r = resolutions[device]
         r = [r[1], r[0]] if is_portrait
         r
@@ -466,11 +466,25 @@ module Spaceship
     # @!group Submit for Review
     #####################################################
 
-    def send_app_submission(app_id, data, stage)
+    def prepare_app_submissions(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:get) do |req|
+        req.url "ra/apps/#{app_id}/versions/#{version}/submit/summary"
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    def send_app_submission(app_id, data)
       raise "app_id is required" unless app_id
 
+      # ra/apps/1039164429/version/submit/complete
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/version/submit/#{stage}"
+        req.url "ra/apps/#{app_id}/version/submit/complete"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end

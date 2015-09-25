@@ -223,7 +223,7 @@ app.all_processing_builds       # => Array of processing builds for this applica
 submission = app.create_submission
 
 # Set app submission information
-submission.content_rights_contains_third_party_content = true
+submission.content_rights_contains_third_party_content = false
 submission.content_rights_has_rights = true
 submission.add_id_info_uses_idfa = false
 
