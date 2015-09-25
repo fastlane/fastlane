@@ -17,12 +17,13 @@ module Deliver
     def upload(options)
       app = options[:app]
 
+      details = app.details
       v = app.edit_version
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
 
       # TODO: Create new language
 
-      LOCALISED_VERSION_VALUES.each do |key|
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         value = options[key]
         next unless value
 
@@ -32,18 +33,21 @@ module Deliver
         end
 
         value.each do |language, value|
-          v.send(key)[language] = value
+          v.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
+          details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
         end
       end
 
-      NON_LOCALISED_VERSION_VALUES.each do |key|
+      (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
         value = options[key]
         next unless value
-        v.send("#{key}=", value)
+        v.send("#{key}=", value) if NON_LOCALISED_VERSION_VALUES.include?(key)
+        details.send("#{key}=", value) if NON_LOCALISED_APP_VALUES.include?(key)
       end
 
       Helper.log.info "Uploading metadata to iTunes Connect"
       v.save!
+      details.save!
       Helper.log.info "Successfully uploaded initial set of metadata to iTunes Connect".green
     end
 
@@ -71,7 +75,7 @@ module Deliver
         next unless File.exist?(path)
 
         Helper.log.info "Loading '#{path}'..."
-        options[key] ||= File.read(path) # we can use the `lng`, it will be converted later
+        options[key] ||= File.read(path)
       end
     end
   end
