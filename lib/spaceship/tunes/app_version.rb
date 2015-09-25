@@ -144,12 +144,12 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this version is for
         # @param app_id (String) The unique Apple ID of this app
-        # @param version_id (String)
-        def find(application, app_id, version_id)
-          attrs = client.app_version(app_id, version_id)
+        # @param is_live (Boolean)
+        def find(application, app_id, is_live)
+          attrs = client.app_version(app_id, is_live)
           return nil unless attrs
           attrs.merge!(application: application)
-          attrs.merge!(version_id: version_id)
+          attrs.merge!(is_live: is_live)
 
           return self.factory(attrs)
         end
@@ -202,7 +202,9 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.application.apple_id}/" + (self.is_live? ? "cur" : "")
+        url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/"
+        url += "deliverable" if self.is_live?
+        return url
       end
 
       # Private methods

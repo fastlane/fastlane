@@ -81,9 +81,11 @@ module Spaceship
           train["#{testing_type}Testing"]['value'] = false
           train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
         end
+
         result = client.update_build_trains!(application.apple_id, testing_type, data)
         self.internal_testing_enabled = new_value if testing_type == 'internal'
         self.external_testing_enabled = new_value if testing_type == 'external'
+        
         result
       end
     end

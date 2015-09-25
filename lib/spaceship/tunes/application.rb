@@ -106,7 +106,6 @@ module Spaceship
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
       def edit_version
-        # Apple's server will respond with the same version if there is only one, for both v=live and v=
         # That's why we have to check in the app_summary.json request if there are 2 versions or just one
         # if there is only one version, we'll return nil
         # if raw_data['versions'].count == 1
@@ -172,7 +171,7 @@ module Spaceship
       #   These are all build that have no information except the upload date
       #   Those builds can also be the builds that are stuck on iTC.
       def pre_processing_builds
-        data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
+        data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
 
         builds = data.fetch('processingBuilds', []).collect do |attrs|
           attrs.merge!(build_train: self)
