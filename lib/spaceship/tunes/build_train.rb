@@ -16,8 +16,11 @@ module Spaceship
       # @return (String) Platform (e.g. "ios")
       attr_reader :platform
 
-      # @return (Bool) Is beta testing enabled for this train? Only one train can have enabled testing.
-      attr_reader :testing_enabled
+      # @return (Bool) Is external beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :external_testing_enabled
+
+      # @return (Bool) Is internal beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :internal_testing_enabled
 
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
       #  I never got this to work to properly try and debug this
@@ -26,7 +29,8 @@ module Spaceship
       attr_mapping(
         'versionString' => :version_string,
         'platform' => :platform,
-        'testing.value' => :testing_enabled
+        'externalTesting.value' => :external_testing_enabled,
+        'internalTesting.value' => :internal_testing_enabled
       )
 
       class << self
@@ -39,9 +43,12 @@ module Spaceship
         # @param application (Spaceship::Tunes::Application) The app this train is for
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id)
-          data = client.build_trains(app_id)
+          trains = []
+          trains += client.build_trains(app_id, 'internal')['trains']
+          trains += client.build_trains(app_id, 'external')['trains']
+
           result = {}
-          data['trains'].each do |attrs|
+          trains.each do |attrs|
             attrs.merge!(application: application)
             current = self.factory(attrs)
             result[current.version_string] = current
@@ -65,14 +72,19 @@ module Spaceship
         end
       end
 
-      def update_testing_status!(new_value)
-        data = client.build_trains(self.application.apple_id)
+      # @param (testing_type) internal or external
+      def update_testing_status!(new_value, testing_type)
+        data = client.build_trains(self.application.apple_id, testing_type)
+
         data['trains'].each do |train|
-          train['testing']['value'] = false
-          train['testing']['value'] = new_value if train['versionString'] == version_string
+          train["#{testing_type}Testing"]['value'] = false
+          train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
         end
-        result = client.update_build_trains!(application.apple_id, data)
-        self.testing_enabled = new_value
+
+        result = client.update_build_trains!(application.apple_id, testing_type, data)
+        self.internal_testing_enabled = new_value if testing_type == 'internal'
+        self.external_testing_enabled = new_value if testing_type == 'external'
+
         result
       end
     end

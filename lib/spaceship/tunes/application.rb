@@ -54,7 +54,7 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          self.new(attrs)
+          return self.new(attrs)
         end
 
         # @return (Array) Returns all apps available for this account
@@ -100,16 +100,24 @@ module Spaceship
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
+        if raw_data['versions'].count == 1
+          v = raw_data['versions'].last
+          if ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
+            return nil
+          end
+        end
+
         Spaceship::AppVersion.find(self, self.apple_id, true)
       end
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
       def edit_version
-        # Apple's server will respond with the same version if there is only one, for both v=live and v=
-        # That's why we have to check in the app_summary.json request if there are 2 versions or just one
-        # if there is only one version, we'll return nil
         if raw_data['versions'].count == 1
-          return nil # only live version, user should create a new version
+          v = raw_data['versions'].last
+
+          unless ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
+            return nil # only live version, user should create a new version
+          end
         end
 
         Spaceship::AppVersion.find(self, self.apple_id, false)
@@ -131,6 +139,12 @@ module Spaceship
       #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
       def resolution_center
         client.get_resolution_center(apple_id)
+      end
+
+      def details
+        attrs = client.app_details(apple_id)
+        attrs.merge!(application: self)
+        Tunes::AppDetails.factory(attrs)
       end
 
       #####################################################
@@ -164,7 +178,7 @@ module Spaceship
       #   These are all build that have no information except the upload date
       #   Those builds can also be the builds that are stuck on iTC.
       def pre_processing_builds
-        data = client.build_trains(apple_id) # we need to fetch all trains here to get the builds
+        data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
 
         builds = data.fetch('processingBuilds', []).collect do |attrs|
           attrs.merge!(build_train: self)

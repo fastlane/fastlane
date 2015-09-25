@@ -46,7 +46,9 @@ module Spaceship
       end
 
       def to_json
-        @hash.to_json
+        h = @hash.dup
+        h.delete(:application)
+        h.to_json
       end
     end
 
