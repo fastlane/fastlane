@@ -22,6 +22,7 @@ module Deliver
                                      is_string: false), # don't add any verification here, as it's used to store a spaceship ref
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
+                                     optional: true,
                                      env_name: "DELIVER_IPA_PATH",
                                      description: "Path to your ipa file",
                                      default_value: Dir["*.ipa"].first,

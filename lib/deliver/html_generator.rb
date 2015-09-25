@@ -5,10 +5,8 @@ module Deliver
     def render(options, screenshots, export_path = nil)
       lib_path = Helper.gem_path('deliver')
 
-      @app = options[:app]
-      @version = @app.latest_version
       @screenshots = screenshots || []
-      @details = @app.details
+      @options = options
 
       html_path = File.join(lib_path, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system

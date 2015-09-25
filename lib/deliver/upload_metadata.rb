@@ -51,10 +51,11 @@ module Deliver
     def load_from_filesystem(options)
       # Load localised data
       Dir.glob(File.join(options[:metadata_folder], "*")).each do |lng_folder|
-        next if lng_folder.include?"." # We don't want to read txt as they are non localised
+        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
+
         language = File.basename(lng_folder)
 
-        LOCALISED_VERSION_VALUES.each do |key|
+        (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lng_folder, "#{key}.txt")
           next unless File.exist?(path)
 
@@ -65,7 +66,7 @@ module Deliver
       end
 
       # Load non localised data
-      NON_LOCALISED_VERSION_VALUES.each do |key|
+      (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
         path = File.join(options[:metadata_folder], "#{key}.txt")
         next unless File.exist?(path)
 

@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>deliver - <%= @app.name %></title>
+        <title>deliver - <%= @options[:name]["en-US"] || @options[:name].values.first %></title>
         <meta http-equiv="content-type" content="text/html; charset=UTF-16">
         <style>
           #app-name {
@@ -110,15 +110,15 @@
     </head>
     
     <body>
-      <% @version.description.languages.each do |language| %>
+      <% @options[:description].keys.each do |language| %>
         <div id="app-name">
-          <%= language %>: <%= @details.name[language] %>
+          <%= language %>: <%= @options[:name][language] %>
         </div>
 
         <div id="app-urls">
           <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
-            <% value = @version.send(key)[language] %>
+            <% value = @options[key][language] %>
             <% if value %>
               <div class="app-url-descr">
                 <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
@@ -127,11 +127,11 @@
           <% end %>
         </div>
         
-        <% if @version.keywords and @version.keywords[language] %>
+        <% if @options[:keywords] and @options[:keywords][language] %>
           <div id="app-keyword">
               <div class="cat-headline">Keywords</div>
               <ul class="app-keyword-list">
-                <% @version.keywords[language].split(" ").each do |keyword| %>
+                <% @options[:keywords][language].split(" ").each do |keyword| %>
                   <li><%= keyword %></li>
                 <% end %>
               </ul>
@@ -141,16 +141,16 @@
         <div id="app-description">
              <div class="cat-headline">Description</div>
              <div id="app-description-text">
-                <%= (@version.description[language] || '').gsub("\n", "<br />") %>
+                <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
              </div>
         </div>
         
         <div id="app-changelog">
             <div class="cat-headline">Changelog</div>
-            <%= (@version.release_notes[language] || '').gsub("\n", "<br />") %>
+            <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
         </div>
         
-                <div id="app-screenshots">
+        <div id="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
           <% if @screenshots.count > 0 %>
