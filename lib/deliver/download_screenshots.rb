@@ -15,10 +15,13 @@ module Deliver
 
       v.screenshots.each do |language, screenshots|
         screenshots.each do |screenshot|
-          file_name = [screenshot.sort_order, screenshot.device_type, screenshot.original_file_name].join("_")
+          file_name = [screenshot.sort_order, screenshot.device_type, screenshot.sort_order].join("_")
+          original_file_extension = File.basename(screenshot.original_file_name)
+          file_name += "." + original_file_extension
+
           Helper.log.info "Downloading existing screenshot '#{file_name}'"
 
-          containing_folder = File.join(folder_path, "screenshots", screenshot.language.to_language_code)
+          containing_folder = File.join(folder_path, "screenshots", screenshot.language)
           begin
             FileUtils.mkdir_p(containing_folder)
           rescue
