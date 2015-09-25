@@ -17,8 +17,11 @@ module Spaceship
       # @return (String) Platform (e.g. "ios")
       attr_reader :platform
 
-      # @return (Bool) Is beta testing enabled for this train? Only one train can have enabled testing.
-      attr_reader :testing_enabled
+      # @return (Bool) Is external beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :external_testing_enabled
+
+      # @return (Bool) Is internal beta testing enabled for this train? Only one train can have enabled testing.
+      attr_reader :internal_testing_enabled
 
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
       #  I never got this to work to properly try and debug this
@@ -27,7 +30,8 @@ module Spaceship
       attr_mapping(
         'versionString' => :version_string,
         'platform' => :platform,
-        'testing.value' => :testing_enabled
+        'externalTesting.value' => :external_testing_enabled,
+        'internalTesting.value' => :internal_testing_enabled
       )
 
       class << self
