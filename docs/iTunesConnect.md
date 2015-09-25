@@ -84,7 +84,6 @@ v.copyright = "#{Time.now.year} Felix Krause"
 v.description.languages # => ["German", "English"]
 
 # Update localised app metadata
-v.name["English"] = "New Title"
 v.description["English"] = "App Description"
 
 # Push the changes back to the server
@@ -139,7 +138,6 @@ attr_accessor :review_notes
 ####
 
 attr_accessor :languages
-attr_reader :name
 attr_reader :keywords
 attr_reader :description
 attr_reader :release_notes
