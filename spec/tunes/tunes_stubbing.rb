@@ -32,7 +32,7 @@ def itc_stub_login
 end
 
 def itc_stub_applications
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary").
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/v2").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('app_summary.json'), headers: {'Content-Type' => 'application/json'})
 
@@ -44,38 +44,49 @@ def itc_stub_applications
 
   # Create Application
   # Pre-Fill request
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2/?platformString=ios").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_prefill_request.json'), headers: {'Content-Type' => 'application/json'})
+
   # Actual sucess request
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_success.json'), headers: {'Content-Type' => 'application/json'})
+
+
+  # Overview of application to get the versions
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/1013943394/overview").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;itctx=abc:def;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, body: itc_read_fixture_file('app_overview.json'), headers: {'Content-Type' => 'application/json'})
+
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/overview").
+         with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie'=>'myacinfo=DAWTKN;woinst=3363;itctx=abc:def;wosid=xBJMOVttbAQ1Cwlt8ktafw', 'User-Agent'=>'spaceship'}).
+         to_return(:status => 200, body: itc_read_fixture_file('app_overview.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 def itc_stub_applications_first_create
   # Create First Application
   # Pre-Fill request
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2/?platformString=ios").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_prefill_first_request.json'), headers: {'Content-Type' => 'application/json'})
   # end
 end
 
 def itc_stub_applications_broken_first_create
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_first_broken.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 def itc_stub_broken_create
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_broken.json'), headers: {'Content-Type' => 'application/json'})
 end
 
 def itc_stub_broken_create_wildcard
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/?appType=ios").
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2").
          with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
          to_return(status: 200, body: itc_read_fixture_file('create_application_wildcard_broken.json'), headers: {'Content-Type' => 'application/json'})
 end
@@ -124,13 +135,15 @@ def itc_stub_resolution_center
 end
 
 def itc_stub_build_trains
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/").
-         with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
-         to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
-  # Update build trains
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/").
-    with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
-    to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
+  %w[internal external].each do |type|
+    stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?testingType=#{type}").
+           with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
+           to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
+    # Update build trains
+    stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?testingType=#{type}").
+      with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json', 'Cookie' => itc_cookie, 'User-Agent' => 'spaceship'}).
+      to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: {'Content-Type' => 'application/json'})
+  end
 end
 
 def itc_stub_testers

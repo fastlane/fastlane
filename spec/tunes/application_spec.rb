@@ -90,7 +90,7 @@ describe Spaceship::Application do
       end
     end
 
-    describe "#create! first app" do
+    describe "#create! first app (company name required)" do
       it "works with valid data and defaults to English" do
         itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My Name",
