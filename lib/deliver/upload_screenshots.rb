@@ -9,8 +9,6 @@ module Deliver
 
       Helper.log.info "Starting with the upload of screenshots..."
 
-      du = Spaceship::Tunes.client.du_client
-
       indized = {} # per language and device type
       screenshots.each do |screenshot|
         indized[screenshot.language] ||= {}
