@@ -63,6 +63,12 @@ module Spaceship
       # Push all changes that were made back to iTunes Connect
       def save!
         client.update_app_details!(application.apple_id, raw_data)
+      rescue Spaceship::TunesClient::ITunesConnectError => ex
+        if ex.to_s == "operation_failed"
+          # That's alright, we get this error message if nothing has changed
+        else
+          raise ex
+        end
       end
 
       # Custom Setters
