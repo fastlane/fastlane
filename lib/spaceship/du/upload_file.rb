@@ -21,6 +21,19 @@ module Spaceship
       end
     end
 
+    # As things like screenshots and app icon shouldn't contain the alpha channel
+    # This will copy the image into /tmp to remove the alpha channel there
+    # That's done to not edit the original image
+    def remove_alpha_channel
+      # TODO: only for png, not for pngs
+      # Saving space \o/
+      path = "/tmp/#{Digest::MD5.hexdigest(self.file_path)}" # temporary
+      FileUtils.copy(self.file_path, path)
+      `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null since there is warning because of the extension
+      `sips -s format png '#{path}'`
+      @file_path = path
+    end
+
     private
 
     def initialize(args)

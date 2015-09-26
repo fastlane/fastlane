@@ -405,7 +405,7 @@ describe Spaceship::AppVersion, all: true do
         end
       end
 
-      describe "Add, Replace, Remove screenshots" do
+      describe "Add, Replace, Remove screenshots", now: true do
         it "can add a new screenshot to the list" do
           du_upload_screenshot_success
 

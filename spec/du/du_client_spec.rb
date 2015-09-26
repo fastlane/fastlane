@@ -17,6 +17,7 @@ describe Spaceship::DUClient, :du do
 
     it "handles successful upload request using #upload_large_icon" do
       du_upload_large_image_success
+      expect(correct_jpg_image).to receive(:remove_alpha_channel)
 
       data = subject.upload_large_icon(version, correct_jpg_image, contentProviderId, ssoTokenForImage)
       expect(data['token']).to eq('Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg')
@@ -24,6 +25,7 @@ describe Spaceship::DUClient, :du do
 
     it "handles failed upload request using #upload_watch_icon" do
       du_upload_watch_image_failure
+      expect(bad_png_image).to receive(:remove_alpha_channel)
 
       error_text = "[IMG_ALPHA_NOT_ALLOWED] Alpha is not allowed. Please edit the image to remove alpha and re-save it."
       expect do

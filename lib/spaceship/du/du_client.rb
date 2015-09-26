@@ -42,6 +42,7 @@ module Spaceship
 
     def upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = nil)
       raise "File #{upload_file.file_path} is empty" if upload_file.file_size == 0
+      upload_file.remove_alpha_channel
 
       version = app_version.version
       app_id = app_version.application.apple_id

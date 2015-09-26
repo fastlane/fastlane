@@ -54,6 +54,10 @@ describe Spaceship::TunesClient do
       expect(subject.cookie).to eq(itc_cookie)
     end
 
+    it 'stores the username' do
+      expect(subject.user).to eq('spaceship@krausefx.com')
+    end
+
     it "#hostname" do
       expect(subject.class.hostname).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/')
     end
