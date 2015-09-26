@@ -31,6 +31,7 @@ module Spaceship
       alias_method :[], :get
 
       def set(keys, value)
+        raise "'keys' must be an array, got #{keys.class} instead" unless keys.kind_of?(Array)
         last = keys.pop
         ref = lookup(keys) || @hash
         ref[last] = value

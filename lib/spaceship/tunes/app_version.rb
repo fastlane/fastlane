@@ -203,6 +203,24 @@ module Spaceship
       #   languages
       # end
 
+      # Returns an array of all builds that can be sent to review
+      def candidate_builds
+        res = client.candidate_builds(self.application.apple_id, self.version_id)
+        res.collect do |attrs|
+          Tunes::Build.factory(attrs)
+        end
+      end
+
+      # Select a build to be submitted for Review.
+      # You have to pass a build you got from - candidate_builds
+      # Don't forget to call save! after calling this method
+      def select_build(build)
+        raw_data.set(['preReleaseBuildVersionString', 'value'], build.build_version)
+        raw_data.set(['preReleaseBuildTrainVersionString'], build.train_version)
+        raw_data.set(['preReleaseBuildUploadDate'], build.upload_date)
+        true
+      end
+
       # Push all changes that were made back to iTunes Connect
       def save!
         client.update_app_version!(application.apple_id, is_live?, raw_data)

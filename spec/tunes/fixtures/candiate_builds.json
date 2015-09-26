@@ -1,0 +1,290 @@
+{
+  "data": {
+    "builds": [{
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "9",
+      "trainVersion": "1.1",
+      "uploadDate": 1443150586000,
+      "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "9"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "10",
+      "trainVersion": "1.0",
+      "uploadDate": 1443144470000,
+      "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "10"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "9",
+      "trainVersion": "1.0",
+      "uploadDate": 1442714016000,
+      "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand69/v4/3c/c0/1f/3cc01fa9-c763-d4b2-c009-4ecc47c04538/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand69/v4/3c/c0/1f/3cc01fa9-c763-d4b2-c009-4ecc47c04538/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "9"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "8",
+      "trainVersion": "1.0",
+      "uploadDate": 1442711542000,
+      "iconUrl": "https://is4-ssl.mzstatic.com/image/thumb/Newsstand6/v4/15/1c/c6/151cc682-e150-753d-234b-f49f5751621d/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand6/v4/15/1c/c6/151cc682-e150-753d-234b-f49f5751621d/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "8"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "7",
+      "trainVersion": "1.0",
+      "uploadDate": 1442615167000,
+      "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand69/v4/23/ea/ba/23eaba22-a0b9-43f5-b9dd-ccddf4c3660a/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand69/v4/23/ea/ba/23eaba22-a0b9-43f5-b9dd-ccddf4c3660a/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "7"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "6",
+      "trainVersion": "1.0",
+      "uploadDate": 1442600459000,
+      "iconUrl": "https://is2-ssl.mzstatic.com/image/thumb/Newsstand3/v4/bc/3c/6f/bc3c6f4f-21d7-e6fd-8952-e636025f90a3/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand3/v4/bc/3c/6f/bc3c6f4f-21d7-e6fd-8952-e636025f90a3/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "6"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "5",
+      "trainVersion": "1.0",
+      "uploadDate": 1442510918000,
+      "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Newsstand6/v4/f7/de/67/f7de67b7-cd7b-ad9e-574c-6e9d5b561ebb/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand6/v4/f7/de/67/f7de67b7-cd7b-ad9e-574c-6e9d5b561ebb/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "5"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "2",
+      "trainVersion": "1.0",
+      "uploadDate": 1442433305000,
+      "iconUrl": "https://is2-ssl.mzstatic.com/image/thumb/Newsstand6/v4/ca/49/d0/ca49d0f8-6252-d754-d0d0-6f32895ebb8e/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand6/v4/ca/49/d0/ca49d0f8-6252-d754-d0d0-6f32895ebb8e/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "2"
+    }, {
+      "type": "BUILD",
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "buildVersion": "1",
+      "trainVersion": "1.0",
+      "uploadDate": 1441975590000,
+      "iconUrl": "https://is2-ssl.mzstatic.com/image/thumb/Newsstand3/v4/a9/f9/8b/a9f98b23-592d-af2e-6e10-a04873bed5df/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand3/v4/a9/f9/8b/a9f98b23-592d-af2e-6e10-a04873bed5df/Icon-76@2x.png.png",
+      "appName": "emoji who took this thing",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "state": "notTesting",
+      "supportedHardware": ["iphone", "ipad"],
+      "largeAppIcon": null,
+      "atvTopShelfIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "atvHomeScreenIcon": {
+        "assetToken": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "issuesCount": 0,
+      "version": "1"
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": ["Success"]
+  },
+  "statusCode": "SUCCESS"
+}

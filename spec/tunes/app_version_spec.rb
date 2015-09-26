@@ -61,6 +61,28 @@ describe Spaceship::AppVersion, all: true do
       expect(version.review_notes).to eq('Such Notes here')
     end
 
+    describe "#candidate_builds" do
+      it "proplery fetches and parses all builds ready to be deployed" do
+        version = app.edit_version
+        res = version.candidate_builds
+        build = res.first
+        expect(build.build_version).to eq("9")
+        expect(build.train_version).to eq("1.1")
+        expect(build.icon_url).to eq("https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png")
+        expect(build.upload_date).to eq(1_443_150_586_000)
+      end
+
+      it "allows choosing of the build for the version to submit", now: true do
+        version = app.edit_version
+        build = version.candidate_builds.first
+
+        version.select_build(build)
+        expect(version.raw_data['preReleaseBuildVersionString']['value']).to eq("9")
+        expect(version.raw_data['preReleaseBuildTrainVersionString']).to eq("1.1")
+        expect(version.raw_data['preReleaseBuildUploadDate']).to eq(1_443_150_586_000)
+      end
+    end
+
     describe "#url" do
       it "live version" do
         expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/deliverable')
@@ -405,7 +427,7 @@ describe Spaceship::AppVersion, all: true do
         end
       end
 
-      describe "Add, Replace, Remove screenshots", now: true do
+      describe "Add, Replace, Remove screenshots" do
         it "can add a new screenshot to the list" do
           du_upload_screenshot_success
 

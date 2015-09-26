@@ -359,6 +359,15 @@ module Spaceship
     end
 
     #####################################################
+    # @!group CandiateBuilds
+    #####################################################
+
+    def candidate_builds(app_id, version_id)
+      r = request(:get, "ra/apps/#{app_id}/versions/#{version_id}/candidateBuilds")
+      parse_response(r, 'data')['builds']
+    end
+
+    #####################################################
     # @!group Build Trains
     #####################################################
 
