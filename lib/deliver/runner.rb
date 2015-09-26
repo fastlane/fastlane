@@ -46,6 +46,7 @@ module Deliver
       # Commit
       UploadMetadata.new.upload(options)
       UploadScreenshots.new.upload(options, screenshots)
+      UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
     end
 

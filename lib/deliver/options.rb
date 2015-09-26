@@ -51,6 +51,10 @@ module Deliver
                                      description: "Submit the new version for Review after uploading everything",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :price_tier,
+                                     description: "The price tier of this application",
+                                     is_string: false,
+                                     optional: true),
 
         # App Metadata
         # Non Localised
