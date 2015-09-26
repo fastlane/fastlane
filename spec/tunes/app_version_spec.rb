@@ -28,7 +28,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.supports_apple_watch).to eq(false)
       expect(version.large_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/0x0ss.jpg')
       expect(version.large_app_icon.original_file_name).to eq('AppIconFull.png')
-      expect(version.watch_app_icon.url).to eq('https://muycustomurl.com')
+      expect(version.watch_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb//0x0ss.jpg')
       expect(version.watch_app_icon.original_file_name).to eq('OriginalName.png')
       expect(version.transit_app_file).to eq(nil)
     end
