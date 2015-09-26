@@ -16,7 +16,7 @@ module Deliver
 
     def run
       upload_metadata unless options[:skip_metadata]
-      # upload_binary if options[:ipa]
+      upload_binary if options[:ipa]
 
       Helper.log.info "Finished the upload to iTunes Connect".green
 
