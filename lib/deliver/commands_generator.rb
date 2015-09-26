@@ -8,11 +8,10 @@ module Deliver
     include Commander::Methods
 
     def self.start
-      # FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
-      # Deliver::DependencyChecker.check_dependencies
+      FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
       self.new.run
     ensure
-      # FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
+      FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
     def run
@@ -45,7 +44,7 @@ module Deliver
         c.action do |args, options|
           if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
             Helper.log.info "You already got a running deliver setup in this directory".yellow
-            return
+            return 0
           end
 
           require 'deliver/setup'

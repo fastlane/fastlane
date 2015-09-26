@@ -17,19 +17,16 @@ module Deliver
 
       Helper.log.info "Successfully submitted the app for review!".green
     end
-    
+
     def select_build(options)
       Helper.log.info "Selecting the latest build..."
       app = options[:app]
       v = app.edit_version
 
       start = Time.now
-      binding.pry
 
       loop do
-        processing = v.candidate_builds.find_all do |build|
-          build.processing
-        end
+        processing = v.candidate_builds.find_all(&:processing)
         break if processing.count == 0
 
         Helper.log.info "Waiting iTunes Connect processing... this might take a while..."

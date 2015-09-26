@@ -4,13 +4,12 @@ module Deliver
       Helper.log.info "Downloading all existing screenshots...".green
       download(options, path)
       Helper.log.info "Successfully downloaded all existing screenshots".green
-    rescue Exception => ex
+    rescue => ex
       Helper.log.error ex
       Helper.log.error "Couldn't download already existing screenshots from iTunesConnect.".red
     end
 
     def self.download(options, folder_path)
-      languages = JSON.parse(File.read(File.join(Helper.gem_path('spaceship'), "lib", "assets", "languageMapping.json")))
       v = options[:app].latest_version
 
       v.screenshots.each do |language, screenshots|

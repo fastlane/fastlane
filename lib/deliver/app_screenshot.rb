@@ -72,13 +72,13 @@ module Deliver
     end
 
     # Validates the given screenshots (size and format)
+    # rubocop:disable Style/PredicateName
     def is_valid?
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
-      size = FastImage.size(self.path)
-
       return self.screen_size == self.class.calculate_screen_size(self.path)
     end
+    # rubocop:enable Style/PredicateName
 
     def self.calculate_screen_size(path)
       size = FastImage.size(path)

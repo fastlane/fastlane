@@ -78,12 +78,7 @@ module Deliver
 
     def download_screenshots(deliver_path, options)
       FileUtils.mkdir_p(File.join(deliver_path, 'screenshots'))
-      begin
-        Deliver::DownloadScreenshots.run(options, deliver_path)
-      rescue Exception => ex
-        Helper.log.error ex
-        Helper.log.error "Couldn't download already existing screenshots from iTunesConnect. You have to add them manually!".red
-      end
+      Deliver::DownloadScreenshots.run(options, deliver_path)
     end
   end
 end

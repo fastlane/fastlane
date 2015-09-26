@@ -24,15 +24,15 @@ module Deliver
       # TODO: Create new language
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        value = options[key]
-        next unless value
+        current = options[key]
+        next unless current
 
-        unless value.kind_of?(Hash)
+        unless current.kind_of?(Hash)
           Helper.log.error "Error with provided '#{key}'. Must be a hash, the key being the language.".red
           next
         end
 
-        value.each do |language, value|
+        current.each do |language, value|
           next unless value.to_s.length > 0
           v.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
           details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
@@ -40,10 +40,10 @@ module Deliver
       end
 
       (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
-        value = options[key]
-        next unless value.to_s.length > 0
-        v.send("#{key}=", value) if NON_LOCALISED_VERSION_VALUES.include?(key)
-        details.send("#{key}=", value) if NON_LOCALISED_APP_VALUES.include?(key)
+        current = options[key]
+        next unless current.to_s.length > 0
+        v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
+        details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
       end
 
       set_review_information(v, options) if options[:app_review_information]
