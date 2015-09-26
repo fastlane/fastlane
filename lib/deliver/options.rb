@@ -82,7 +82,10 @@ module Deliver
                                      description: "Metadata: The english name of the secondary category(e.g. `Business`, `Books`)",
                                      optional: true,
                                      is_string: true),
-
+        FastlaneCore::ConfigItem.new(key: :app_review_information,
+                                     description: "Metadata: A hash containing the review information",
+                                     optional: true,
+                                     is_string: false),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",

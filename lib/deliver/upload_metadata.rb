@@ -46,6 +46,8 @@ module Deliver
         details.send("#{key}=", value) if NON_LOCALISED_APP_VALUES.include?(key)
       end
 
+      set_review_information(v, options) if options[:app_review_information]
+
       Helper.log.info "Uploading metadata to iTunes Connect"
       v.save!
       details.save!
@@ -78,6 +80,21 @@ module Deliver
         Helper.log.info "Loading '#{path}'..."
         options[key] ||= File.read(path)
       end
+    end
+
+    private
+
+    def set_review_information(v, options)
+      info = options[:app_review_information]
+      raise "`app_review_information` must be a hash" unless info.kind_of?(Hash)
+
+      v.review_first_name = info[:first_name] if info[:first_name]
+      v.review_last_name = info[:last_name] if info[:last_name]
+      v.review_phone_number = info[:phone_number] if info[:phone_number]
+      v.review_email = info[:email_address] if info[:email_address]
+      v.review_demo_user = info[:demo_user] if info[:demo_user]
+      v.review_demo_password = info[:demo_password] if info[:demo_password]
+      v.review_notes = info[:notes] if info[:notes]
     end
   end
 end

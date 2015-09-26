@@ -161,7 +161,7 @@ automatic_release false
 app_review_information(
   first_name: "Felix",
   last_name: "Krause",
-  phone_number: "123123",
+  phone_number: "+44 844 209 0611",
   email_address: "github@krausefx.com",
   demo_user: "demoUser",
   demo_password: "demoPass",
