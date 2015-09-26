@@ -148,7 +148,17 @@ attr_reader :screenshots
 
 **Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_version.rb).
 
-## Build Trains
+## Select a build for review
+
+```ruby
+version = app.edit_version
+
+builds = version.candidate_builds
+version.select_build(builds.first)
+version.save!
+```
+
+## Build Trains (TestFlight)
 
 <img src="/assets/docs/BuildTrains.png" width="700">
 
