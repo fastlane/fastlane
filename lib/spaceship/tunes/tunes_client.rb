@@ -272,6 +272,53 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Pricing
+    #####################################################
+
+    def update_price_tier(app_id, price_tier)
+      r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
+      data = parse_response(r, 'data')
+
+      first_price = (data["pricingIntervalsFieldTO"]["value"] || []).count == 0 # first price
+      data["pricingIntervalsFieldTO"]["value"] ||= []
+      data["pricingIntervalsFieldTO"]["value"] << {} if data["pricingIntervalsFieldTO"]["value"].count == 0
+      data["pricingIntervalsFieldTO"]["value"].first["tierStem"] = price_tier.to_s
+
+      effective_date = (first_price ? nil : Time.now.to_i * 1000)
+      data["pricingIntervalsFieldTO"]["value"].first["priceTierEffectiveDate"] = effective_date
+      data["pricingIntervalsFieldTO"]["value"].first["priceTierEndDate"] = nil
+      data["countriesChanged"] = first_price
+      data["theWorld"] = true
+
+      if first_price # first price, need to set all countries
+        data["countries"] = supported_countries.collect do |c|
+          c.delete('region') # we don't care about le region
+          c
+        end
+      end
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/pricing/intervals"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    # An array of supported countries
+    # [{
+    #   "code": "AL",
+    #   "name": "Albania",
+    #   "region": "Europe"
+    # }, {
+    # ...
+    def supported_countries
+      r = request(:get, "ra/apps/pricing/supportedCountries")
+      parse_response(r, 'data')
+    end
+
+    #####################################################
     # @!group App Icons
     #####################################################
     # Uploads a large icon

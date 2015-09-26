@@ -115,7 +115,8 @@ module Spaceship
         if raw_data['versions'].count == 1
           v = raw_data['versions'].last
 
-          unless ['Prepare for Upload', 'Developer Rejected', 'Rejected'].include?(v['state']) # this only applies for the initial version
+          # this only applies for the initial version
+          unless ['Prepare for Upload', 'Developer Rejected', 'Rejected', 'prepareForUpload'].include?(v['state'])
             return nil # only live version, user should create a new version
           end
         end
