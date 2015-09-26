@@ -206,9 +206,12 @@ module Spaceship
       # Returns an array of all builds that can be sent to review
       def candidate_builds
         res = client.candidate_builds(self.application.apple_id, self.version_id)
-        res.collect do |attrs|
-          Tunes::Build.factory(attrs)
+        builds = []
+        res.each do |attrs|
+          next unless attrs["type"] == "BUILD" # I don't know if it can be something else.
+          builds << Tunes::Build.factory(attrs)
         end
+        return builds
       end
 
       # Select a build to be submitted for Review.

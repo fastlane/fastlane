@@ -21,6 +21,9 @@ module Spaceship
       # @return (String) The version number (e.g. 1.3)
       attr_accessor :train_version
 
+      # @return (Boolean) Is this build currently processing?
+      attr_accessor :processing
+
       # @return (Integer) The number of ticks since 1970 (e.g. 1413966436000)
       attr_accessor :upload_date
 
@@ -79,6 +82,7 @@ module Spaceship
         'platform' => :platform,
         'id' => :id,
         'valid' => :valid,
+        'processing' => :processing,
 
         'installCount' => :install_count,
         'internalInstallCount' => :internal_install_count,
