@@ -1,7 +1,7 @@
 module Deliver
   class HtmlGenerator
     # Renders all data available to quickly see if everything was correctly generated.
-    # @param export_path (String) The path to a folder where the resulting HTML file should be stored. 
+    # @param export_path (String) The path to a folder where the resulting HTML file should be stored.
     def render(options, screenshots, export_path = nil)
       lib_path = Helper.gem_path('deliver')
 

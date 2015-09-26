@@ -1,8 +1,7 @@
 require 'fastimage'
 
-
 module Deliver
-  # AppScreenshot represents one screenshots for one specific locale and 
+  # AppScreenshot represents one screenshots for one specific locale and
   # device type.
   class AppScreenshot
     module ScreenSize
@@ -16,8 +15,8 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
-      #  Watch
-      IOS_APPLE_WATCH= "iOS-Apple-Watch"
+      # Apple Watch
+      IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Mac
       MAC = "Mac"
     end
@@ -84,7 +83,7 @@ module Deliver
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
-      raise "Could not find or parse file at path '#{path}'" if (size == nil or size.count == 0)
+      raise "Could not find or parse file at path '#{path}'" if size.nil? or size.count == 0
 
       devices = {
         ScreenSize::IOS_55 => [
@@ -120,7 +119,7 @@ module Deliver
           [2880, 1800],
           [2560, 1600]
         ],
-        ScreenSize::IOS_APPLE_WATCH=> [
+        ScreenSize::IOS_APPLE_WATCH => [
           [312, 390]
         ]
       }
@@ -128,7 +127,7 @@ module Deliver
       devices.each do |device_type, array|
         array.each do |resolution|
           if (size[0] == resolution[0] and size[1] == resolution[1]) or # portrait
-              (size[1] == resolution[0] and size[0] == resolution[1]) # landscape
+             (size[1] == resolution[0] and size[0] == resolution[1]) # landscape
             return device_type
           end
         end

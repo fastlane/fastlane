@@ -114,7 +114,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :marketing_url,
                                      description: "Metadata: Localised marketing url",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false)
       ]
     end
   end

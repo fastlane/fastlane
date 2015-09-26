@@ -13,7 +13,6 @@ module Deliver
 
       indized = {} # per language and device type
       screenshots.each do |screenshot|
-
         indized[screenshot.language] ||= {}
         indized[screenshot.language][screenshot.device_type] ||= 0
         indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
@@ -21,12 +20,12 @@ module Deliver
         index = indized[screenshot.language][screenshot.device_type]
 
         Helper.log.info "Uploading '#{screenshot.path}'..."
-        v.upload_screenshot!(screenshot.path, 
-                            index, 
-                            screenshot.language, 
-                            screenshot.device_type)
-      end      
-      
+        v.upload_screenshot!(screenshot.path,
+                             index,
+                             screenshot.language,
+                             screenshot.device_type)
+      end
+
       Helper.log.info "Saving changes"
       v.save!
       Helper.log.info "Successfully uploaded screenshots to iTunes Connect".green

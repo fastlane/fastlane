@@ -32,7 +32,7 @@ module Deliver
       )
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username])
-      result = transporter.upload(options[:app].apple_id, package_path)
+      transporter.upload(options[:app].apple_id, package_path)
     end
 
     def upload_metadata

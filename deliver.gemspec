@@ -8,14 +8,14 @@ Gem::Specification.new do |spec|
   spec.version       = Deliver::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["deliver@krausefx.com"]
-  spec.summary       = %q{Upload screenshots, metadata and your app to the App Store using a single command}
-  spec.description   = %q{Upload screenshots, metadata and your app to the App Store using a single command}
+  spec.summary       = Deliver::DESCRIPTION
+  spec.description   = Deliver::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ bin/deliver README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w( bin/deliver README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
