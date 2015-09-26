@@ -7,6 +7,7 @@ require 'deliver/runner'
 require 'deliver/upload_metadata'
 require 'deliver/upload_screenshots'
 require 'deliver/upload_assets'
+require 'deliver/submit_for_review'
 require 'deliver/app_screenshot'
 require 'deliver/html_generator'
 

@@ -33,6 +33,7 @@ module Deliver
         end
 
         value.each do |language, value|
+          next unless value.to_s.length > 0
           v.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
           details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
         end
@@ -40,7 +41,7 @@ module Deliver
 
       (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
         value = options[key]
-        next unless value
+        next unless value.to_s.length > 0
         v.send("#{key}=", value) if NON_LOCALISED_VERSION_VALUES.include?(key)
         details.send("#{key}=", value) if NON_LOCALISED_APP_VALUES.include?(key)
       end

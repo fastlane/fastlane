@@ -19,6 +19,8 @@ module Deliver
       # upload_binary if options[:ipa]
 
       Helper.log.info "Finished the upload to iTunes Connect".green
+
+      submit_for_review if options[:submit_for_review]
     end
 
     def upload_binary
@@ -45,6 +47,10 @@ module Deliver
       UploadMetadata.new.upload(options)
       UploadScreenshots.new.upload(options, screenshots)
       UploadAssets.new.upload(options) # e.g. app icon
+    end
+
+    def submit_for_review
+      SubmitForReview.new.submit!(options)
     end
 
     private
