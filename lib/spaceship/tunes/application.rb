@@ -165,6 +165,11 @@ module Spaceship
         # Future: implemented -reload method
       end
 
+      # set the price tier. This method doesn't require `save` to be called
+      def update_price_tier!(price_tier)
+        client.update_price_tier!(self.apple_id, price_tier)
+      end
+
       #####################################################
       # @!group Builds
       #####################################################

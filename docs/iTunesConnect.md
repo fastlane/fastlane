@@ -53,6 +53,12 @@ details.privacy_url['en-US'] = "https://fastlane.tools"
 details.save!
 ```
 
+To change the price of the app (it's not necessary to call `save!` when updating the price)
+
+```ruby
+version.update_price_tier("3")
+```
+
 ## AppVersions
 
 <img src="/assets/docs/AppVersions.png" width="500">

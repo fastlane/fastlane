@@ -275,7 +275,7 @@ module Spaceship
     # @!group Pricing
     #####################################################
 
-    def update_price_tier(app_id, price_tier)
+    def update_price_tier!(app_id, price_tier)
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
 

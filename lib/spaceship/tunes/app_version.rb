@@ -203,10 +203,6 @@ module Spaceship
       #   languages
       # end
 
-      def update_price_tier(price_tier)
-        client.set_pricing(self.application.apple_id, price_tier)
-      end
-
       # Returns an array of all builds that can be sent to review
       def candidate_builds
         res = client.candidate_builds(self.application.apple_id, self.version_id)
