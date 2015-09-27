@@ -29,7 +29,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.email).to eq("felix@sunapps.net")
       expect(t.first_name).to eq("Felix")
       expect(t.last_name).to eq("Krause")
-      expect(t.devices).to eq([{"model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil}])
+      expect(t.devices).to eq([{ "model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil }])
     end
 
     it "External Testers" do
@@ -42,7 +42,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.email).to eq("private@krausefx.com")
       expect(t.first_name).to eq("Detlef")
       expect(t.last_name).to eq("Müller")
-      expect(t.devices).to eq([{"model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil}])
+      expect(t.devices).to eq([{ "model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil }])
     end
   end
 
@@ -64,8 +64,8 @@ describe Spaceship::Tunes::Tester do
   describe "Last Install information" do
     it "pre-fills this information correctly" do
       tester = Spaceship::Tunes::Tester::Internal.all[1]
-      expect(tester.latest_install_app_id).to eq(794902327)
-      expect(tester.latest_install_date).to eq(1427565638420)
+      expect(tester.latest_install_app_id).to eq(794_902_327)
+      expect(tester.latest_install_date).to eq(1_427_565_638_420)
       expect(tester.latest_installed_build_number).to eq("1")
       expect(tester.latest_installed_version_number).to eq("0.9.14")
     end

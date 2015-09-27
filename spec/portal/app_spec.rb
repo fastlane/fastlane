@@ -83,7 +83,7 @@ describe Spaceship::Portal::App do
   describe '#create' do
     it 'creates an app id with an explicit bundle_id' do
       expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app') {
-        {'isWildCard' => true}
+        { 'isWildCard' => true }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
       expect(app.is_wildcard).to eq(true)
@@ -91,7 +91,7 @@ describe Spaceship::Portal::App do
 
     it 'creates an app id with a wildcard bundle_id' do
       expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*') {
-        {'isWildCard' => false}
+        { 'isWildCard' => false }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.*', name: 'Development App')
       expect(app.is_wildcard).to eq(false)

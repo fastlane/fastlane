@@ -10,9 +10,9 @@ describe Spaceship::TunesClient do
 
     it "raises a different exception if the server doesn't respond with any cookies" do
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1").
-         with(body: {"theAccountName" => "user", "theAccountPW" => "password"},
-              headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'spaceship'}).
-         to_return(status: 200, body: 'random Body', headers: {} )
+        with(body: { "theAccountName" => "user", "theAccountPW" => "password" },
+              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'spaceship' }).
+        to_return(status: 200, body: 'random Body', headers: {})
 
       # This response doesn't set any header information and is therefore useless
       expect do
@@ -22,9 +22,9 @@ describe Spaceship::TunesClient do
 
     it "raises a different exception if the server responds with cookies but they can't be parsed" do
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wo/4.0.1.13.3.13.3.2.1.1.3.1.1").
-         with(body: {"theAccountName" => "user", "theAccountPW" => "password"},
-              headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'spaceship'}).
-         to_return(status: 200, body: 'random Body', headers: {'Set-Cookie' => "myacinfo=asdf; That's a big mess;"} )
+        with(body: { "theAccountName" => "user", "theAccountPW" => "password" },
+              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'spaceship' }).
+        to_return(status: 200, body: 'random Body', headers: { 'Set-Cookie' => "myacinfo=asdf; That's a big mess;" })
 
       # This response doesn't set any header information and is therefore useless
       expect do
@@ -52,6 +52,10 @@ describe Spaceship::TunesClient do
 
     it 'returns the session cookie' do
       expect(subject.cookie).to eq(itc_cookie)
+    end
+
+    it 'stores the username' do
+      expect(subject.user).to eq('spaceship@krausefx.com')
     end
 
     it "#hostname" do

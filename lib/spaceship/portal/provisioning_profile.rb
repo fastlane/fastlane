@@ -222,7 +222,7 @@ module Spaceship
                                                 self.type,
                                                 app.app_id,
                                                 certificate_parameter,
-                                                devices.map(&:id) )
+                                                devices.map(&:id))
           end
 
           self.new(profile)
@@ -256,7 +256,6 @@ module Spaceship
             profile.app.bundle_id == bundle_id
           end
         end
-
       end
 
       # Represents a Development profile from the Dev Portal

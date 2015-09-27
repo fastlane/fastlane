@@ -16,8 +16,6 @@ describe Spaceship::AppSubmission do
       expect(submission.export_compliance_platform).to eq("ios")
       expect(submission.export_compliance_app_type).to eq("iOS App")
       expect(submission.export_compliance_compliance_required).to eq(true)
-      expect(submission.stage).to eq("start")
-      expect(submission.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/start")
     end
 
     it "submits a valid app submission to iTunes Connect" do

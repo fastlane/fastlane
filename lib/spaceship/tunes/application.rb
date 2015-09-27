@@ -1,7 +1,6 @@
 module Spaceship
   module Tunes
     class Application < TunesBase
-
       # @return (String) The App identifier of this app, provided by iTunes Connect
       # @example
       #   "1013943394"
@@ -116,7 +115,8 @@ module Spaceship
         if raw_data['versions'].count == 1
           v = raw_data['versions'].last
 
-          unless ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
+          # this only applies for the initial version
+          unless ['Prepare for Upload', 'Developer Rejected', 'Rejected', 'prepareForUpload'].include?(v['state'])
             return nil # only live version, user should create a new version
           end
         end
@@ -163,6 +163,11 @@ module Spaceship
         client.create_version!(apple_id, version_number)
 
         # Future: implemented -reload method
+      end
+
+      # set the price tier. This method doesn't require `save` to be called
+      def update_price_tier!(price_tier)
+        client.update_price_tier!(self.apple_id, price_tier)
       end
 
       #####################################################

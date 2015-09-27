@@ -53,6 +53,12 @@ details.privacy_url['en-US'] = "https://fastlane.tools"
 details.save!
 ```
 
+To change the price of the app (it's not necessary to call `save!` when updating the price)
+
+```ruby
+version.update_price_tier("3")
+```
+
 ## AppVersions
 
 <img src="/assets/docs/AppVersions.png" width="500">
@@ -148,7 +154,17 @@ attr_reader :screenshots
 
 **Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_version.rb).
 
-## Build Trains
+## Select a build for review
+
+```ruby
+version = app.edit_version
+
+builds = version.candidate_builds
+version.select_build(builds.first)
+version.save!
+```
+
+## Build Trains (TestFlight)
 
 <img src="/assets/docs/BuildTrains.png" width="700">
 
@@ -223,7 +239,7 @@ app.all_processing_builds       # => Array of processing builds for this applica
 submission = app.create_submission
 
 # Set app submission information
-submission.content_rights_contains_third_party_content = true
+submission.content_rights_contains_third_party_content = false
 submission.content_rights_has_rights = true
 submission.add_id_info_uses_idfa = false
 

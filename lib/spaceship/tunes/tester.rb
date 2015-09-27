@@ -1,7 +1,6 @@
 module Spaceship
   module Tunes
     class Tester < TunesBase
-
       # @return (String) The identifier of this tester, provided by iTunes Connect
       # @example
       #   "60f858b4-60a8-428a-963a-f943a3d68d17"
@@ -59,7 +58,6 @@ module Spaceship
       )
 
       class << self
-
         # @return (Hash) All urls for the ITC used for web requests
         def url
           raise "You have to use a subclass: Internal or External"

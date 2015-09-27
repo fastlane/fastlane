@@ -82,9 +82,9 @@ module Spaceship
 
       def ==(other)
         self.class == other.class &&
-        self.service_id == other.service_id &&
-        self.value == other.value &&
-        self.service_uri == other.service_uri
+          self.service_id == other.service_id &&
+          self.value == other.value &&
+          self.service_uri == other.service_uri
       end
 
       #

@@ -6,3 +6,16 @@
 inherit_from: .rubocop_general.yml
 
 
+##################
+# TODO
+##################
+
+# Offense count: 19
+Style/Documentation:
+  Enabled: false
+
+# Offense count: 2
+# Cop supports --auto-correct.
+Style/PerlBackrefs:
+  Enabled: false
+

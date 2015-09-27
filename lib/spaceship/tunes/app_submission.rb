@@ -11,9 +11,6 @@ module Spaceship
       # @return (AppVersion) The version to use for this submission
       attr_accessor :version
 
-      # @return (String) The stage of this submission (start, complete)
-      attr_accessor :stage
-
       # @return (Boolean) Submitted for Review
       attr_accessor :submitted_for_review
 
@@ -116,11 +113,9 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this submission is for
         def create(application, version)
-          stage = "start"
-          attrs = client.send_app_submission(application.apple_id, version.raw_data, stage)
+          attrs = client.prepare_app_submissions(application.apple_id, application.edit_version.version_id)
           attrs.merge!(application: application)
           attrs.merge!(version: version)
-          attrs.merge!(stage: stage)
 
           return self.factory(attrs)
         end
@@ -128,20 +123,13 @@ module Spaceship
 
       # Save and complete the app submission
       def complete!
-        @stage = "complete"
-        client.send_app_submission(application.apple_id, raw_data, @stage)
+        client.send_app_submission(application.apple_id, raw_data)
         @submitted_for_review = true
-      end
-
-      # @return (String) An URL to this specific resource. You can enter this URL into your browser
-      def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/#{self.application.apple_id}/version/submit/#{self.stage}"
       end
 
       def setup
         @submitted_for_review = false
       end
-
     end
   end
 end

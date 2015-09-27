@@ -21,7 +21,7 @@ describe Spaceship::Application do
       expect(app.platform).to eq('ios')
       expect(app.vendor_id).to eq('107')
       expect(app.bundle_id).to eq('net.sunapps.107')
-      expect(app.last_modified).to eq(1435685244000)
+      expect(app.last_modified).to eq(1_435_685_244_000)
       expect(app.issues_count).to eq(0)
       expect(app.app_icon_preview_url).to eq('https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png')
 
@@ -54,7 +54,7 @@ describe Spaceship::Application do
         end
 
         it "supports int parameters too" do
-          a = Spaceship::Application.find(898536088)
+          a = Spaceship::Application.find(898_536_088)
           expect(a.class).to eq(Spaceship::Application)
           expect(a.bundle_id).to eq('net.sunapps.107')
         end
@@ -120,7 +120,7 @@ describe Spaceship::Application do
 
       it "when the app was not rejected" do
         itc_stub_resolution_center_valid
-        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({"sectionErrorKeys" => [], "sectionInfoKeys" => [], "sectionWarningKeys" => [], "replyConstraints" => {"minLength" => 1, "maxLength" => 4000}, "appNotes" => {"threads" => []}, "betaNotes" => {"threads" => []}, "appMessages" => {"threads" => []}})
+        expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({ "sectionErrorKeys" => [], "sectionInfoKeys" => [], "sectionWarningKeys" => [], "replyConstraints" => { "minLength" => 1, "maxLength" => 4000 }, "appNotes" => { "threads" => [] }, "betaNotes" => { "threads" => [] }, "appMessages" => { "threads" => [] } })
       end
     end
 

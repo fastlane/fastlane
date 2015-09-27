@@ -51,12 +51,12 @@ describe Spaceship::Base do
       end
 
       it 'can map nested attributes' do
-        inst = test_class.new({'nestedAttribute' => {'name' => {'value' => 'a value'}}})
+        inst = test_class.new({ 'nestedAttribute' => { 'name' => { 'value' => 'a value' } } })
         expect(inst.nested_attr_name).to eq('a value')
       end
 
       it 'can overwrite an attribute and call super' do
-        inst = test_class.new({'isLiveString' => 'true'})
+        inst = test_class.new({ 'isLiveString' => 'true' })
         expect(inst.is_live).to eq(true)
       end
     end
