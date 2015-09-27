@@ -57,14 +57,14 @@ module Gym
     #####################################################
 
     def clear_old_files
-      return unless Xcode.pre_7?
+      return unless Gym.config[:use_legacy_build_api]
       if File.exist?(PackageCommandGenerator.ipa_path)
         File.delete(PackageCommandGenerator.ipa_path)
       end
     end
 
     def fix_package
-      return unless Xcode.pre_7?
+      return unless Gym.config[:use_legacy_build_api]
       Gym::XcodebuildFixes.swift_library_fix
       Gym::XcodebuildFixes.watchkit_fix
     end
@@ -149,7 +149,7 @@ module Gym
     private
 
     def find_archive_path
-      if Xcode.pre_7?
+      if Gym.config[:use_legacy_build_api]
         BuildCommandGenerator.archive_path
       else
         Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
