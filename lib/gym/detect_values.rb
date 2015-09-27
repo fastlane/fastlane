@@ -24,6 +24,8 @@ module Gym
         config.load_configuration_file(Gym.gymfile_name)
       end
 
+      config[:use_legacy_build_api] = true if Xcode.pre_7?
+
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
       detect_configuration
