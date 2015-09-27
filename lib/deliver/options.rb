@@ -52,6 +52,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,
+                                     short_option: "-r",
                                      description: "The price tier of this application",
                                      is_string: false,
                                      optional: true),
