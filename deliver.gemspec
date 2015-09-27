@@ -22,9 +22,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # fastlane dependencies
-  spec.add_dependency 'fastlane_core', '>= 0.16.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.18.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.8.1'
-  spec.add_dependency 'spaceship', '>= 0.8.0', '<= 1.0.0' # Communication with iTunes Connect
+  spec.add_dependency 'spaceship', '>= 0.9.0', '<= 1.0.0' # Communication with iTunes Connect
 
   # third party dependencies
   spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
