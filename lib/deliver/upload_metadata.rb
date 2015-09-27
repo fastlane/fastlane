@@ -46,6 +46,8 @@ module Deliver
         details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
       end
 
+      v.release_on_approval = options[:automatic_release]
+
       set_review_information(v, options) if options[:app_review_information]
 
       Helper.log.info "Uploading metadata to iTunes Connect"
