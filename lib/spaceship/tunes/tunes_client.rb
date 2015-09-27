@@ -312,7 +312,7 @@ module Spaceship
 
       begin
         data["pricingIntervalsFieldTO"]["value"].first["tierStem"]
-      rescue => ex
+      rescue
         nil
       end
     end
