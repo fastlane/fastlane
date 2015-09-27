@@ -306,6 +306,17 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    def price_tier(app_id)
+      r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
+      data = parse_response(r, 'data')
+
+      begin
+        data["pricingIntervalsFieldTO"]["value"].first["tierStem"]
+      rescue => ex
+        nil
+      end
+    end
+
     # An array of supported countries
     # [{
     #   "code": "AL",

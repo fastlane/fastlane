@@ -170,6 +170,11 @@ module Spaceship
         client.update_price_tier!(self.apple_id, price_tier)
       end
 
+      # The current price tier
+      def price_tier
+        client.price_tier(self.apple_id)
+      end
+
       #####################################################
       # @!group Builds
       #####################################################
