@@ -15,9 +15,6 @@ require 'deliver/html_generator'
 require 'spaceship'
 require 'fastlane_core'
 
-# TODO
-require 'pry'
-
 module Deliver
   class << self
   end
