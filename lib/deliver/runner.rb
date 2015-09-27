@@ -57,8 +57,11 @@ module Deliver
     private
 
     def validate_html(screenshots)
-      html_path = HtmlGenerator.new.render(options, screenshots, '.')
       return if options[:force]
+      Helper.log.info "In the beta version of deliver the generation of the PDF is currently disabled"
+      return
+
+      html_path = HtmlGenerator.new.render(options, screenshots, '.')
       puts "----------------------------------------------------------------------------"
       puts "Verifying the upload via the HTML file can be disabled by either adding"
       puts "'skip_pdf true' to your Deliverfile or using the flag --force."
