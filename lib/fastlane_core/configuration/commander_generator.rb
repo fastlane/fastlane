@@ -26,7 +26,8 @@ module FastlaneCore
         # c.option '-p', '--pattern STRING', String, 'Description'
 
         flag = "--#{option.key} #{appendix}"
-        description = (option.description + " (#{option.env_name})")
+        description = option.description
+        description += " (#{option.env_name})" if option.env_name.to_s.length > 0
 
         global_option short_option, flag, type, description
       end
