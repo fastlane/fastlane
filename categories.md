@@ -1,19 +1,20 @@
-Book
-Business
-Education
-Entertainment
-Finance
-Healthcare_Fitness
-Lifestyle
-Medical
-Music
-Navigation
-News
-Photography
-Productivity
-Reference
-SocialNetworking
-Sports
-Travel
-Utilities
-Weather
+
+- Book
+- Business
+- Education
+- Entertainment
+- Finance
+- Healthcare_Fitness
+- Lifestyle
+- Medical
+- Music
+- Navigation
+- News
+- Photography
+- Productivity
+- Reference
+- SocialNetworking
+- Sports
+- Travel
+- Utilities
+- Weather
