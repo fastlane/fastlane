@@ -262,13 +262,12 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def update_app_version!(app_id, is_live, data)
+    def update_app_version!(app_id, version_id, data)
       raise "app_id is required" unless app_id
-
-      v_text = (is_live ? 'live' : nil)
+      raise "version_id is required" unless version_id.to_i > 0
 
       r = request(:post) do |req|
-        req.url "ra/apps/version/save/#{app_id}?v=#{v_text}"
+        req.url "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end

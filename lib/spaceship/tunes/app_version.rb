@@ -226,7 +226,7 @@ module Spaceship
 
       # Push all changes that were made back to iTunes Connect
       def save!
-        client.update_app_version!(application.apple_id, is_live?, raw_data)
+        client.update_app_version!(application.apple_id, self.version_id, raw_data)
       end
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
