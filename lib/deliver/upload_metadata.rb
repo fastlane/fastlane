@@ -21,7 +21,25 @@ module Deliver
       v = app.edit_version
       raise "Could not find a version to edit for app '#{app.name}'".red unless v
 
-      # TODO: Create new language
+      # Collect all languages we need
+      # We only care about languages from user provided values
+      # as the other languages are on iTC already anyway
+      enabled_languages = []    
+      LOCALISED_VERSION_VALUES.each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+      
+      if enabled_languages.count > 0
+        v.create_languages!(enabled_languages)
+        Helper.log.info "Activating language(s) #{enabled_languages.join(', ')}..."
+        v.save!
+        v = app.edit_version # this is due to spaceship not automatically refreshing the version from iTC
+      end
+  
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         current = options[key]
