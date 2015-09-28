@@ -173,35 +173,28 @@ module Spaceship
       # Call this method to make sure the given languages are available for this app
       # You should call this method before accessing the name, description and other localized values
       # This will create the new language if it's not available yet and do nothing if everything's there
-      # def create_languages!(languages)
-      #   raise "Please pass an array" unless languages.kind_of?Array
+      # Important: Due to a bug you have to fetch the `edit_version` again, as it doesn't get refreshed immediately
+      def create_languages!(languages)
+        languages = [languages] if languages.kind_of?(String)
+        raise "Please pass an array" unless languages.kind_of? Array
+        require 'pry'
 
-      #   copy_from = self.languages.first
-      #   languages.each do |language|
-      #     # First, see if it's already available
-      #     found = self.languages.find do |local|
-      #       local['language'] == language
-      #     end
+        copy_from = self.languages.find { |a| a['language'] == 'en-US' } || self.languages.first
 
-      #     unless found
-      #       new_language = copy_from.dup
-      #       new_language['language'] = language
-      #       [:description, :releaseNotes, :keywords].each do |key|
-      #         new_language[key.to_s]['value'] = nil
-      #       end
+        languages.each do |language|
+          # First, see if it's already available
+          found = self.languages.find do |local|
+            local['language'] == language
+          end
+          next if found
 
-      #       self.languages << new_language
-      #       unfold_languages
+          new_language = copy_from.clone
+          new_language['language'] = language
 
-      #       # Now we need to set a useless `pageLanguageValue` value because iTC says so, after adding a new version
-      #       self.languages.each do |current|
-      #         current['pageLanguageValue'] = current['language']
-      #       end
-      #     end
-      #   end
-
-      #   languages
-      # end
+          self.languages << new_language
+        end
+        nil
+      end
 
       # Returns an array of all builds that can be sent to review
       def candidate_builds
