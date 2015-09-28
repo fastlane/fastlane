@@ -26,6 +26,8 @@ module Fastlane
         end
 
         if api_version.to_i == 1
+          ## v1 api requires 1|0
+          notify_room = (options[:notify_room] ? 1 : 0)
           ########## running on V1 ##########
           if user?(channel)
             raise 'HipChat private message not working with API V1 please use API V2 instead'.red
