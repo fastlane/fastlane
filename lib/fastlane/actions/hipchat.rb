@@ -12,7 +12,6 @@ module Fastlane
         api_version = options[:version]
         api_host = options[:api_host]
 
-        notify_room = (options[:notify_room] ? 'true' : 'false')
         message_format = options[:message_format]
 
         channel = options[:channel]
@@ -37,7 +36,7 @@ module Fastlane
                                                   'message_format' => message_format,
                                                   'room_id' => channel,
                                                   'message' => message,
-                                                  'notify' => notify_room })
+                                                  'notify' => options[:notify_room] ? '1' : '0' })
 
             check_response_code(response, channel)
           end
@@ -62,7 +61,7 @@ module Fastlane
                                                   'color' => color,
                                                   'message_format' => message_format,
                                                   'message' => message,
-                                                  'notify' => notify_room })
+                                                  'notify' => options[:notify_room] ? 'true' : 'false' })
 
             check_response_code(response, channel)
           end
