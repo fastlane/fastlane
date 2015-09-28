@@ -12,6 +12,7 @@ module Produce
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
+                                     short_option: "-a",
                                      description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :bundle_identifier_suffix,
