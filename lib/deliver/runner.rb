@@ -15,6 +15,7 @@ module Deliver
     end
 
     def run
+      verify_version if options[:ipa]
       upload_metadata unless options[:skip_metadata]
       upload_binary if options[:ipa]
 
@@ -23,18 +24,22 @@ module Deliver
       submit_for_review if options[:submit_for_review]
     end
 
-    def upload_binary
-      Helper.log.info "Uploading binary to iTunes Connect"
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-        app_id: options[:app].apple_id,
-        ipa_path: options[:ipa],
-        package_path: "/tmp"
-      )
+    # Make sure the version on iTunes Connect matches the one in the ipa
+    # If not, the new version will automatically be created
+    def verify_version
+      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
+      return unless app_version.to_s.length > 0
+      Helper.log.info "Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file..."
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
-      transporter.upload(options[:app].apple_id, package_path)
+      changed = options[:app].ensure_version!(app_version)
+      if changed
+        Helper.log.info "Successfully set the version to '#{app_version}'".green
+      else
+        Helper.log.info "'#{app_version}' is the latest version on iTunes Connect".green
+      end
     end
 
+    # Upload all metadata, screenshots, pricing information, etc. to iTunes Connect
     def upload_metadata
       # First, collect all the things for the HTML Report
       screenshots = UploadScreenshots.new.collect_screenshots(options)
@@ -48,6 +53,19 @@ module Deliver
       UploadScreenshots.new.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
+    end
+
+    # Upload the binary to iTunes Connect
+    def upload_binary
+      Helper.log.info "Uploading binary to iTunes Connect"
+      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+        app_id: options[:app].apple_id,
+        ipa_path: options[:ipa],
+        package_path: "/tmp"
+      )
+
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      transporter.upload(options[:app].apple_id, package_path)
     end
 
     def submit_for_review
