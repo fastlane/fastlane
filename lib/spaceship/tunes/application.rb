@@ -165,6 +165,22 @@ module Spaceship
         # Future: implemented -reload method
       end
 
+      # Will make sure the current edit_version matches the given version number
+      # This will either create a new version or change the version number
+      # from an existing version
+      def ensure_version!(version_number)
+        if (e = edit_version)
+          if e.version.to_s != version_number.to_s
+            # Update an existing version
+            e.version = version_number
+            e.save!
+          end
+        else
+          create_version!(version_number)
+        end
+        true
+      end
+
       # set the price tier. This method doesn't require `save` to be called
       def update_price_tier!(price_tier)
         client.update_price_tier!(self.apple_id, price_tier)

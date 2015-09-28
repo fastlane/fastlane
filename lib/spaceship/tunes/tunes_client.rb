@@ -223,12 +223,17 @@ module Spaceship
 
     def create_version!(app_id, version_number)
       r = request(:post) do |req|
-        req.url "ra/apps/version/create/#{app_id}"
-        req.body = { version: version_number.to_s }.to_json
+        req.url "ra/apps/#{app_id}/platforms/ios/versions/create/"
+        req.body = {
+          version: {
+            value: version_number.to_s
+          }
+        }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
-      parse_response(r, 'data')
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
     end
 
     def get_resolution_center(app_id)
