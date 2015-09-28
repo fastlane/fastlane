@@ -52,7 +52,10 @@ module Deliver
         files = Dir.glob(File.join(lng_folder, '*.png'))
         next if files.count == 0
 
+        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.png')).count > 0
+
         files.each do |path|
+          next if prefer_framed && !path.include?("_framed.png")
           screenshots << AppScreenshot.new(path, language)
         end
       end
