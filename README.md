@@ -39,6 +39,10 @@ deliver
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
+# Important: Recent change of iTunes Connect
+
+The current public version of `deliver` is broken. Please check out the first beta release of an updated version [here](https://github.com/KrauseFx/deliver/releases/tag/1.0.0.beta).
+
 
 -------
 <p align="center">
@@ -67,6 +71,10 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Upload new builds to the new Apple TestFlight
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+
+### Important: Recent change of iTunes Connect
+
+The current public version of `deliver` is broken. Please check out the first beta release of an updated version [here](https://github.com/KrauseFx/deliver/releases/tag/1.0.0.beta).
 
 # Installation
 
