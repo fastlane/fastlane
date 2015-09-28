@@ -61,12 +61,12 @@ module Spaceship
       def setup
         super
 
-        @builds = self.raw_data['builds'].collect do |attrs|
+        @builds = (self.raw_data['builds'] || []).collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)
         end
 
-        @processing_builds = self.raw_data['buildsInProcessing'].collect do |attrs|
+        @processing_builds = (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)
         end
