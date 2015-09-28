@@ -1,3 +1,4 @@
+### Available Categories
 
 - Book
 - Business
@@ -18,3 +19,23 @@
 - Travel
 - Utilities
 - Weather
+
+### Available Languages
+
+- `en-GB`
+- `de-DE`
+- `fr-FR`
+- `it`
+- `nl-NL`
+- `pt-PT`
+- `ru`
+- `es-ES`
+- `sv`
+- `es-MX`
+- `pt-BR`
+- `en-CA`
+- `en-US`
+- `en-AU`
+- `zh-Hans`
+- `ja`
+- `ko`
