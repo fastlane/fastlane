@@ -42,7 +42,7 @@ module Fastlane
 
         ipa_filename = options[:ipa]
         ipa_filename = nil if options[:upload_dsym_only]
-        
+
         response = client.upload_build(ipa_filename, values)
         case response.status
         when 200...300
