@@ -110,7 +110,7 @@
     </head>
     
     <body>
-      <% @options[:description].keys.each do |language| %>
+      <% @languages.each do |language| %>
         <% if @options[:name] %>
           <div id="app-name">
             <%= language %>: <%= @options[:name][language] %>

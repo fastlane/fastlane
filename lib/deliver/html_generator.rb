@@ -26,6 +26,9 @@ module Deliver
       @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
       @app_name ||= options[:app].name
 
+      @languages = options[:description].keys if options[:description]
+      @languages ||= options[:app].latest_version.description.languages
+
       html_path = File.join(lib_path, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
