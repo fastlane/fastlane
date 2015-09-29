@@ -1,25 +1,33 @@
-### deliver migration guide to 1.0
+## deliver migration guide to 1.0
 
-#### Why breaking changes?
+### Why breaking changes?
 
- With it there were some breaking changes. Originally `deliver` was designed to be "The Continuous Delivery tool for iOS". With the introduction of fastlane it doesn't make sense any more. Did you know that deliver was able to run tests and post messages to Slack? :wink: All that is now part of [fastlane](https://fastlane.tools).
+Originally `deliver` was designed to be "The Continuous Delivery tool for iOS". With the introduction of [fastlane](https://fastlane.tools) many things have changed. It was time for a big rewrite for `deliver`, which is one of the most popular tools of the [fastlane toolchain](https://fastlane.tools).
 
-#### What do I have to do to get my setup working again?
+### What do I have to do to get my setup working again?
 
-The easiest way for standard setups is to run `deliver init` and `deliver` will generate all configuration files for you.
+In general, check out the latest documentation for the [Deliverfile](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md).
+
+#### Standard Setups (one app)
+
+The easiest way is to remove the existing `Deliverfile` (which is probably almost empty anyway) and clear the `metadata` folder and run `deliver init`, so that `deliver` creates everything in the new format for you.
+
+#### Advanced Setups
 
 To manually migrate setups (especially if you make heavy use of the `Deliverfile`):
 
 **The following options have been removed from the `Delivefile`:**
 
-- `beta_ipa`
-- `success` (now part of [fastlane](https://fastlane.tools))
-- `error` (now part of [fastlane](https://fastlane.tools))
-- `email` (use `username` instead)
-- `apple_id` (use `app_identifier` to specify the bundle identifier instead). If you want to specify the ID of your app, you can also use the `app` option
-- `version` (will automatically be detected)
-- `default_language`
-- `config_json_folder`
+Removed     | Use instead              | Note
+---------|-----------------|------------------------------------------------------------
+`beta_ipa` | |
+`success`| [fastlane](https://fastlane.tools) |
+`error` | [fastlane](https://fastlane.tools) |
+`email` | `username` |
+`apple_id` |  `app` | use `app_identifier` to specify the bundle identifier instead
+`version` | | is automatically detected
+`default_language` | | 
+`config_json_folder` | | No more support for JSON based configuration
 
 **The following options have been changed:**
 

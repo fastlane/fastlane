@@ -88,6 +88,8 @@ The guide will create all the necessary files for you, using the existing app me
 
 From now on, you can run `deliver` to deploy a new update, or just upload new app metadata and screenshots.
 
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/KrauseFx/deliver/blob/master/MigrationGuide.md).
+
 # Usage
 
 Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
