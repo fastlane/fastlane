@@ -8,9 +8,19 @@ module Deliver
       submission = app.create_submission
 
       # Set app submission information
+      # Default Values
       submission.content_rights_contains_third_party_content = false
       submission.content_rights_has_rights = true
       submission.add_id_info_uses_idfa = false
+
+      # User Values
+      if options[:submission_information]
+        raise "`submission_information` must be a hash" unless options[:submission_information].kind_of?(Hash)
+        options[:submission_information].each do |key, value|
+          Helper.log.info "Setting '#{key}' to '#{value}'..."
+          submission.send("#{key}=", value)
+        end
+      end
 
       # Finalize app submission
       submission.complete!

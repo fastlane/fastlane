@@ -69,6 +69,11 @@ module Deliver
                                        raise "Could not find config file at path '#{value}'".red unless File.exist?(value)
                                        raise "'#{value}' doesn't seem to be a JSON file".red unless value.end_with?(".json")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :submission_information,
+                                     short_option: "-b",
+                                     description: "Extra information for the submission (e.g. third party content)",
+                                     is_string: false,
+                                     optional: true),
 
         # App Metadata
         # Non Localised
