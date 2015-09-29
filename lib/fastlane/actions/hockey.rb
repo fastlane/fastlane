@@ -141,7 +141,6 @@ module Fastlane
                                       env_name: "FL_HOCKEY_UPLOAD_DSYM_ONLY",
                                       description: "Flag to upload only the dSYM file to hockey app",
                                       is_string: false,
-                                      optional: true,
                                       default_value: false)
         ]
       end
