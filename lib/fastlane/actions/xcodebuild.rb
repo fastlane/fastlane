@@ -17,7 +17,7 @@ module Fastlane
         clean: "clean",
         install: "install",
         installsrc: "installsrc",
-        test: "test",
+        test: "build test",
 
         # parameters
         alltargets: "-alltargets",
