@@ -14,7 +14,6 @@ module Spaceship
       # @return (Boolean) Submitted for Review
       attr_accessor :submitted_for_review
 
-
       # To pass from the user
 
       # @return (Boolean) Ad ID Info - Limits ads tracking
