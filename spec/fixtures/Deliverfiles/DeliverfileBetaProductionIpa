@@ -1,7 +1,0 @@
-ipa do
-  # we're doing nothing here
-end
-
-beta_ipa do
-  "./spec/fixtures/ipas/Example1.ipa" # that's a valid ipa file
-end

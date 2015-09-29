@@ -1,24 +1,23 @@
 require 'json'
 require 'deliver/version'
-require 'deliver/app'
-require 'deliver/app_metadata'
-require 'deliver/metadata_item'
-require 'deliver/app_screenshot'
-require 'deliver/itunes_connect/itunes_connect'
-require 'deliver/itunes_transporter'
-require 'deliver/deliverfile/deliverfile'
-require 'deliver/deliverfile/deliverfile_creator'
-require 'deliver/deliverer'
-require 'deliver/ipa_uploader'
-require 'deliver/html_generator'
-require 'deliver/deliver_process'
-require 'deliver/dependency_checker'
-require 'deliver/ipa_file_analyser'
-require 'deliver/testflight'
+require 'deliver/options'
 require 'deliver/commands_generator'
+require 'deliver/detect_values'
+require 'deliver/runner'
+require 'deliver/upload_metadata'
+require 'deliver/upload_screenshots'
+require 'deliver/upload_price_tier'
+require 'deliver/upload_assets'
+require 'deliver/submit_for_review'
+require 'deliver/app_screenshot'
+require 'deliver/html_generator'
 
+require 'spaceship'
 require 'fastlane_core'
 
 module Deliver
+  class << self
+  end
+
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 end

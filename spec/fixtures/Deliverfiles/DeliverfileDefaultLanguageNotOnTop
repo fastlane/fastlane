@@ -1,8 +1,0 @@
-
-changelog({
-  'en-US' => "Thanks for using this app",
-  'de-DE' => "Deutscher Changelog",
-  'en-GB' => "So british"
-})
-
-default_language 'de-DE'

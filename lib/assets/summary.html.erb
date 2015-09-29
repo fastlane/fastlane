@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>deliver - <%= @data['en-US'][:title][:value] rescue @data.values.first[:title][:value] %></title>
+        <title>deliver - <%= @app_name %></title>
         <meta http-equiv="content-type" content="text/html; charset=UTF-16">
         <style>
           #app-name {
@@ -106,65 +106,63 @@
               margin-left: 10px;
               margin-right: 10px;
           }
-
-          /*for highlighting a changed value*/
-          .modified {
-              color: #0056ba;
-          }
         </style>
     </head>
-
-    <%
-      def modified?(val)
-        "modified" if (val and val[:modified] == true)
-      end
-    %>
     
     <body>
-      <% @data.each do |language, content| %>
-        <div id="app-name" class="<%= modified?(content[:title]) %>">
-          <%= language %>: <%= content[:title][:value] %>
-        </div>
+      <% @languages.each do |language| %>
+        <% if @options[:name] %>
+          <div id="app-name">
+            <%= language %>: <%= @options[:name][language] %>
+          </div>
+        <% end %>
 
         <div id="app-urls">
-          <% all_keys = [:support_url, :privacy_url, :software_url] %>
+          <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
-            <% value = content[key][:value] rescue nil %>
+            <% value = @options[key][language] if @options[key] %>
             <% if value %>
-              <div class="app-url-descr <%= modified?(content[key]) %>">
+              <div class="app-url-descr">
                 <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
               </div>
             <% end %>
           <% end %>
         </div>
         
-        <div id="app-keyword" class="<%= modified?(content[:keywords]) %>">
-            <div class="cat-headline">Keywords</div>
-            <ul class="app-keyword-list">
-              <% (content[:keywords][:value] rescue []).each do |keyword| %>
-                <li><%= keyword %></li>
-              <% end %>
-            </ul>
-        </div>
+        <% if @options[:keywords] and @options[:keywords][language] %>
+          <div id="app-keyword">
+              <div class="cat-headline">Keywords</div>
+              <ul class="app-keyword-list">
+                <% @options[:keywords][language].split(" ").each do |keyword| %>
+                  <li><%= keyword %></li>
+                <% end %>
+              </ul>
+          </div>
+        <% end %>
         
-        <div id="app-description" class="<%= modified?(content[:description]) %>">
-             <div class="cat-headline">Description</div>
-             <div id="app-description-text">
-                <%= content[:description][:value].gsub("\n", "<br />") rescue nil %>
-             </div>
-        </div>
+        <% if @options[:description] %>
+          <div id="app-description">
+               <div class="cat-headline">Description</div>
+               <div id="app-description-text">
+                  <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
+               </div>
+          </div>
+        <% end %>
         
-        <div id="app-changelog" class="<%= modified?(content[:version_whats_new]) %>">
-            <div class="cat-headline">Changelog</div>
-            <%= content[:version_whats_new][:value].gsub("\n", "<br />") rescue nil %>
-        </div>
+        <% if @options[:release_notes] %>
+          <div id="app-changelog">
+              <div class="cat-headline">Changelog</div>
+              <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
+          </div>
+        <% end %>
         
         <div id="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
-          <% if (content[:screenshots] || []).count > 0 %>
+          <% if @screenshots.count > 0 %>
             <% last_size = nil %>
-            <% content[:screenshots].sort{|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+            <% sc = @screenshots.find_all { |s| s.language == language } %>
+            <% sc.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
 
               <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
 
@@ -173,7 +171,7 @@
               <% end %>
 
               <% if new_row %>
-                <h4><%= screenshot.screen_size %></h4>
+                <h4><%= screenshot.formatted_name %></h4>
                 <div class="app-screenshot-row">
               <% end %>
               
@@ -186,19 +184,15 @@
             <div style="border: 3px solid red; padding: 0px 20px">
               <h2 style="color: red">No Screenshots Found</h2>
               <p>
-                deliver couldn't find any screenshots. Due to a bug in iTunes Transporter this will <b>remove</b> the existing screenshots on iTunes Connect.
-              </p>
+                deliver couldn't find any screenshots. This will <b>remove</b> existing screenshots, but will also not upload any.
               <p>
                 Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
               </p>
             </div>
           <% end %>
           </div>
-          
-        </div>
+        
         <hr />
       <% end # end data %>
     </body>
 </html>
-
-

@@ -1,3 +1,0 @@
-ipa "./spec/fixtures/ipas/Example1.ipa"
-
-changelog({'en-US' => "Simple \o/"})

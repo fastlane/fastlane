@@ -8,26 +8,28 @@ Gem::Specification.new do |spec|
   spec.version       = Deliver::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["deliver@krausefx.com"]
-  spec.summary       = %q{Upload screenshots, metadata and your app to the App Store using a single command}
-  spec.description   = %q{Upload screenshots, metadata and your app to the App Store using a single command}
+  spec.summary       = Deliver::DESCRIPTION
+  spec.description   = Deliver::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w{ bin/deliver README.md LICENSE }
+  spec.files = Dir["lib/**/*"] + %w( bin/deliver README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.17.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.3.0'
+  # fastlane dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.18.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.8.1'
+  spec.add_dependency 'spaceship', '>= 0.10.1', '<= 1.0.0' # Communication with iTunes Connect
+
+  # third party dependencies
   spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-  spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
-  spec.add_dependency 'plist', '~> 3.1' # for reading the Info.plist of the ipa file
-  spec.add_dependency 'excon' # HTTP client
+  spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
 
   # Development only
   spec.add_development_dependency 'bundler'

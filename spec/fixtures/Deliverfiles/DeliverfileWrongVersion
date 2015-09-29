@@ -1,5 +1,0 @@
-default_language 'de-DE'
-
-version "128378973"
-
-ipa "./spec/fixtures/ipas/Example1.ipa"
