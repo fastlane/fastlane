@@ -131,7 +131,7 @@ The release_notes (What's new / Changelog) of the latest version
 These URLs are shown in the AppStore
 
 ##### keywords
-An array of keywords
+
 ```ruby
 keywords(
   "en-US" => "Keyword1, Keyword2"
