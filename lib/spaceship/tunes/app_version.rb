@@ -178,7 +178,6 @@ module Spaceship
       def create_languages(languages)
         languages = [languages] if languages.kind_of?(String)
         raise "Please pass an array" unless languages.kind_of? Array
-        require 'pry'
 
         copy_from = self.languages.find { |a| a['language'] == 'en-US' } || self.languages.first
 
