@@ -1,5 +1,14 @@
 ## Available options
 
+All the options below can easily be added to your `Deliverfile`. The great thing: if you use `fastlane` you can use all these options from your `Fastfile` too, for example:
+
+```ruby
+deliver(
+  submit_for_review: true,
+  metadata_folder: "../folder"
+)
+```
+
 ##### app_identifier
 The bundle identifier (e.g. "com.krausefx.app")
 
@@ -25,6 +34,8 @@ submit_for_review true
 
 ##### screenshots_path
 A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution. Also includes  Watch Support.
+
+![/assets/screenshots.png](/assets/screenshots.png)
 
 ##### metadata_folder
 Path to the metadata you want to use. The folder has to be structured like this
@@ -71,6 +82,7 @@ submission_information({
   add_id_info_serves_ads: true,
   ...
 })
+```
 
 ##### automatic_release
 Should the app be released to all users once Apple approves it? If set to `false`, you'll have to manually release the update once it got approved.
