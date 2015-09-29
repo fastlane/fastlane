@@ -1,7 +1,15 @@
 module Deliver
   class HtmlGenerator
     def run(options, screenshots)
-      html_path = self.render(options, screenshots, '.')
+      begin
+        html_path = self.render(options, screenshots, '.')
+      rescue => ex
+        Helper.log.error ex.inspect
+        Helper.log.error ex.backtrace.join("\n")
+        okay = agree("Could not render HTML preview. Do you still want to continue? (y/n)".red, true)
+        return if okay
+        raise "Could not render HTML page"
+      end
       puts "----------------------------------------------------------------------------"
       puts "Verifying the upload via the HTML file can be disabled by either adding"
       puts "`force true` to your Deliverfile or using `deliver --force`"
