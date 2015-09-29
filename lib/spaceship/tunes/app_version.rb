@@ -175,7 +175,7 @@ module Spaceship
       # You should call this method before accessing the name, description and other localized values
       # This will create the new language if it's not available yet and do nothing if everything's there
       # Important: Due to a bug you have to fetch the `edit_version` again, as it doesn't get refreshed immediately
-      def create_languages!(languages)
+      def create_languages(languages)
         languages = [languages] if languages.kind_of?(String)
         raise "Please pass an array" unless languages.kind_of? Array
         require 'pry'
