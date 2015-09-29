@@ -14,6 +14,7 @@ module Deliver
                                      short_option: "-a",
                                      env_name: "DELIVER_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
+                                     optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :app,
                                      short_option: "-p",

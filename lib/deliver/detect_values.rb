@@ -1,8 +1,20 @@
 module Deliver
   class DetectValues
     def run!(options)
+      find_app_identifier(options)
       find_app(options)
       find_folders(options)
+    end
+
+    def find_app_identifier(options)
+      return if options[:app_identifier]
+
+      if options[:ipa]
+        identifier = FastlaneCore::IpaFileAnalyser.fetch_app_identifier(options[:ipa])
+        options[:app_identifier] = identifier if identifier.to_s.length > 0
+      end
+
+      options[:app_identifier] ||= ask("The Bundle Identifier of your App: ")
     end
 
     def find_app(options)
