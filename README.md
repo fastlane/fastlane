@@ -59,7 +59,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Upload a new ipa file to iTunes Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to iTunes Connect
 - Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
-- Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server (e.g. Jenkins)
+- Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
 - Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
 
 To upload builds to TestFlight check out [pilot](https://github.com/fastlane/pilot).
