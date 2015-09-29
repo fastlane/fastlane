@@ -116,7 +116,8 @@ module Spaceship
           v = raw_data['versions'].last
 
           # this only applies for the initial version
-          unless ['Prepare for Upload', 'Developer Rejected', 'Rejected', 'prepareForUpload'].include?(v['state'])
+          # no idea why it's sometimes the short code and sometimes the long one
+          unless ['Prepare for Upload', 'Developer Rejected', 'devRejected', 'Rejected', 'prepareForUpload'].include?(v['state'])
             return nil # only live version, user should create a new version
           end
         end
@@ -127,7 +128,7 @@ module Spaceship
       # @return (Spaceship::AppVersion) This will return the `edit_version` if available
       #   and fallback to the `edit_version`. Use this to just access the latest data
       def latest_version
-        edit_version || live_version
+        edit_version || live_version || Spaceship::AppVersion.find(self, self.apple_id, false) # we want to get *any* version, prefered the latest one
       end
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
