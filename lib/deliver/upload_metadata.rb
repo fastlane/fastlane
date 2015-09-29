@@ -19,27 +19,6 @@ module Deliver
 
       details = app.details
       v = app.edit_version
-      raise "Could not find a version to edit for app '#{app.name}'".red unless v
-
-      # Collect all languages we need
-      # We only care about languages from user provided values
-      # as the other languages are on iTC already anyway
-      enabled_languages = []    
-      LOCALISED_VERSION_VALUES.each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-      
-      if enabled_languages.count > 0
-        v.create_languages!(enabled_languages)
-        Helper.log.info "Activating language(s) #{enabled_languages.join(', ')}..."
-        v.save!
-        v = app.edit_version # this is due to spaceship not automatically refreshing the version from iTC
-      end
-  
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         current = options[key]
@@ -66,12 +45,40 @@ module Deliver
 
       v.release_on_approval = options[:automatic_release]
 
-      set_review_information(v, options) if options[:app_review_information]
+      set_review_information(v, options)
+      set_app_rating(v, options)
 
       Helper.log.info "Uploading metadata to iTunes Connect"
       v.save!
       details.save!
       Helper.log.info "Successfully uploaded initial set of metadata to iTunes Connect".green
+    end
+
+    # Makes sure all languages we need are actually created
+    def verify_available_languages!(options)
+      # Collect all languages we need
+      # We only care about languages from user provided values
+      # as the other languages are on iTC already anyway
+      v = options[:app].edit_version
+      raise "Could not find a version to edit for app '#{app.name}'".red unless v
+
+      enabled_languages = []
+      LOCALISED_VERSION_VALUES.each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      if enabled_languages.count > 0
+        v.create_languages(enabled_languages)
+        lng_text = "language"
+        lng_text += "s" if languages.count != 1
+        Helper.log.info "Activating #{lng_text} #{enabled_languages.join(', ')}..."
+        v.save!
+      end
+      true
     end
 
     # Loads the metadata files and stores them into the options object
@@ -105,6 +112,7 @@ module Deliver
     private
 
     def set_review_information(v, options)
+      return unless options[:app_review_information]
       info = options[:app_review_information]
       raise "`app_review_information` must be a hash" unless info.kind_of?(Hash)
 
@@ -115,6 +123,19 @@ module Deliver
       v.review_demo_user = info[:demo_user] if info[:demo_user]
       v.review_demo_password = info[:demo_password] if info[:demo_password]
       v.review_notes = info[:notes] if info[:notes]
+    end
+
+    def set_app_rating(v, options)
+      return unless options[:app_rating_config_path]
+
+      require 'json'
+      begin
+        json = JSON.parse(File.read(options[:app_rating_config_path]))
+      rescue => ex
+        Helper.log.fatal ex.to_s
+        raise "Error parsing JSON file at path '#{options[:app_rating_config_path]}'".red
+      end
+      v.update_rating(json)
     end
   end
 end

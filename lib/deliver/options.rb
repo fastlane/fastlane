@@ -60,6 +60,15 @@ module Deliver
                                      description: "The price tier of this application",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
+                                     short_option: "-g",
+                                     description: "Path to the app rating's config",
+                                     is_string: true,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "Could not find config file at path '#{value}'".red unless File.exist?(value)
+                                       raise "'#{value}' doesn't seem to be a JSON file".red unless value.end_with?(".json")
+                                     end),
 
         # App Metadata
         # Non Localised
