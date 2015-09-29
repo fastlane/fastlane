@@ -561,6 +561,13 @@ module Spaceship
       end
 
       handle_itc_response(r.body)
+
+      if r.body.fetch('messages').fetch('info').last == "Successful POST"
+        # success
+      else
+        raise "Something went wrong when submitting the app for review. Make sure to pass valid options to submit your app for review"
+      end
+
       parse_response(r, 'data')
     end
 

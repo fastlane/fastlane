@@ -14,6 +14,9 @@ module Spaceship
       # @return (Boolean) Submitted for Review
       attr_accessor :submitted_for_review
 
+
+      # To pass from the user
+
       # @return (Boolean) Ad ID Info - Limits ads tracking
       attr_accessor :add_id_info_limits_tracking
 
@@ -66,7 +69,6 @@ module Spaceship
       attr_accessor :export_compliance_platform
 
       attr_mapping({
-
         # Ad ID Info Section
         'adIdInfo.limitsTracking.value' => :add_id_info_limits_tracking,
         'adIdInfo.servesAds.value' => :add_id_info_serves_ads,

@@ -241,7 +241,7 @@ module Spaceship
             to_set = "NONE" if value == 0
             to_set = "INFREQUENT_MILD" if value == 1
             to_set = "FREQUENT_INTENSE" if value == 2
-            raise "Invalid value '#{value}' for '#{key}', must be 0-2".red unless to_set
+            raise "Invalid value '#{value}' for '#{key}', must be 0-2" unless to_set
             to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
           else
             # Maybe it's a boolean descriptor?
@@ -254,7 +254,7 @@ module Spaceship
               to_set = "YES" if value.to_i > 0
               to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
             else
-              raise "Could not find option '#{key}' in the list of available options".red
+              raise "Could not find option '#{key}' in the list of available options"
             end
           end
         end
