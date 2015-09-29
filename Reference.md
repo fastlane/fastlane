@@ -1,24 +1,30 @@
 ### Available Categories
 
-- Book
-- Business
-- Education
-- Entertainment
-- Finance
-- Healthcare_Fitness
-- Lifestyle
-- Medical
-- Music
-- Navigation
-- News
-- Photography
-- Productivity
-- Reference
-- SocialNetworking
-- Sports
-- Travel
-- Utilities
-- Weather
+You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). `deliver` supports both notations.
+
+- `Book`
+- `Business`
+- `Apps.Catalogs`
+- `Education`
+- `Entertainment`
+- `Finance`
+- `Apps.Food_Drink`
+- `Games`
+- `Healthcare_Fitness`
+- `Lifestyle`
+- `Medical`
+- `Music`
+- `Navigation`
+- `News`
+- `Apps.Newsstand`
+- `Photography`
+- `Productivity`
+- `Reference`
+- `SocialNetworking`
+- `Sports`
+- `Travel`
+- `Utilities`
+- `Weather`
 
 ### Available Languages
 
