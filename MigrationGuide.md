@@ -28,6 +28,7 @@ Removed     | Use instead              | Note
 `version` | | is automatically detected
 `default_language` | | 
 `config_json_folder` | | No more support for JSON based configuration
+`hide_transporter` | | This might be implemented at a later point
 
 **The following options have been changed:**
 
@@ -55,3 +56,5 @@ Removed                   | Use instead
 - Improved the selection of the newly uploaded build and waiting for processing to be finished, which is possible thanks to `spaceship`
 - Updating the app metadata and uploading of the screenshots now happen using `spaceship` instead of the iTunes Transporter, which means changes will immediately visible after running `deliver` :sparkles: 
 - Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://github.com/fastlane/pilot)
+
+If you run into any issues with the new version of `deliver` please submit an issue on GitHub.
