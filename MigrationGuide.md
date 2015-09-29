@@ -47,7 +47,9 @@ Removed                   | Use instead
 `deliver testflight` | [pilot](https://github.com/fastlane/pilot)
 `testflight` | [pilot](https://github.com/fastlane/pilot)
 
-### What has changed? :recycle: 
+Also, check out [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md) to see a list of available categories, age rating sections and language codes.
+
+### What's different now? :recycle: 
 
 <img width="154" alt="screenshot 2015-09-26 21 47 35" src="https://cloud.githubusercontent.com/assets/869950/10121262/38e52e02-6498-11e5-8269-bf5d63ca698a.png">
 

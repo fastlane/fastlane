@@ -164,7 +164,7 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 
 ## Available language codes
 ```
-en-GB, de-DE, fr-FR, it, nl-NL, pt-PT, ru, es-ES, sv, es-MX, pt-BR, en-CA, en-US, en-AU, zh-Hans, ja, ko
+no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms, pt-BR, el, es-ES, it, fr-CA, es-MX, pt-PT, vi, th, ja, fr-FR, da, tr, en-GB
 ```
 
 ## Automatically create screenshots
