@@ -100,10 +100,10 @@ module Spaceship
       # @return (Hash) The changelog
       attr_reader :release_notes
 
-      # @return (Hash) A hash representing the keywords in all languages
+      # @return (Hash) A hash representing the support url in all languages
       attr_reader :support_url
 
-      # @return (Hash) A hash representing the keywords in all languages
+      # @return (Hash) A hash representing the marketing url in all languages
       attr_reader :marketing_url
 
       # @return (Hash) Represents the screenshots of this app version (read-only)

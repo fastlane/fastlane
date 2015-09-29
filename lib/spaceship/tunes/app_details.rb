@@ -13,7 +13,7 @@ module Spaceship
       # @return (Hash) A hash representing the app name in all languages
       attr_reader :name
 
-      # @return (Hash) A hash representing the keywords in all languages
+      # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
       # Categories (e.g. MZGenre.Business)
