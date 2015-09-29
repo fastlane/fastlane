@@ -132,6 +132,8 @@ These URLs are shown in the AppStore
 
 ##### keywords
 
+Keywords separated using a comma.
+
 ```ruby
 keywords(
   "en-US" => "Keyword1, Keyword2"
