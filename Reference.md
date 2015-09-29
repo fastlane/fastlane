@@ -39,3 +39,35 @@
 - `zh-Hans`
 - `ja`
 - `ko`
+
+### Available age rating groups
+
+#### Non Boolean
+
+**Values**
+
+- 0: None
+- 1: Infrequent/Mild
+- 2: Frequent/Intense
+
+**Keys**
+
+- `CARTOON_FANTASY_VIOLENCE`
+- `REALISTIC_VIOLENCE`
+- `PROLONGED_GRAPHIC_SADISTIC_REALISTIC_VIOLENCE`
+- `PROFANITY_CRUDE_HUMOR`
+- `MATURE_SUGGESTIVE`
+- `HORROR`
+- `MEDICAL_TREATMENT_INFO`
+- `ALCOHOL_TOBACCO_DRUGS`
+- `GAMBLING`
+- `SEXUAL_CONTENT_NUDITY`
+- `GRAPHIC_SEXUAL_CONTENT_NUDITY`
+
+#### Boolean
+
+**Keys**
+
+- `UNRESTRICTED_WEB_ACCESS`
+- `GAMBLING_CONTESTS`
+
