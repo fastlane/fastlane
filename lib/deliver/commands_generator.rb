@@ -28,18 +28,6 @@ module Deliver
 
       always_trace!
 
-      def show_itc_error
-        Helper.log.fatal "A big iTunes Connect Update was released on 24th September".red
-        Helper.log.fatal "Most parts of `deliver` don't work with it (yet)".red
-        Helper.log.fatal "I'm working on an update for deliver to push a new version ASAP".red
-        Helper.log.fatal "More information about the current status on GitHub".red
-        Helper.log.fatal "https://github.com/KrauseFx/deliver/issues/337".red
-        Helper.log.fatal "https://github.com/KrauseFx/deliver/pull/259".red
-        sleep 5
-      end
-
-      show_itc_error
-
       command :run do |c|
         c.syntax = 'deliver'
         c.description = 'Upload metadata and binary to iTunes Connect'
