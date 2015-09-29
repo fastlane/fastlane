@@ -35,7 +35,7 @@ deliver
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
-`deliver` **can upload ipa files, app screenshots and more to iTunes Connect** from the command line.
+`deliver` can upload ipa files, app screenshots and more to iTunes Connect from the command line.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -126,6 +126,8 @@ deliver --help
 ```
 
 Check out [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md) for more options.
+
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/KrauseFx/deliver/blob/master/MigrationGuide.md).
 
 # Credentials
 
