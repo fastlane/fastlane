@@ -4,7 +4,7 @@ module Deliver
       html_path = self.render(options, screenshots, '.')
       puts "----------------------------------------------------------------------------"
       puts "Verifying the upload via the HTML file can be disabled by either adding"
-      puts "'skip_pdf true' to your Deliverfile or using the flag --force."
+      puts "`force true` to your Deliverfile or using `deliver --force`"
       puts "----------------------------------------------------------------------------"
 
       system("open '#{html_path}'")

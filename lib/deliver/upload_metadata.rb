@@ -84,7 +84,7 @@ module Deliver
     # Loads the metadata files and stores them into the options object
     def load_from_filesystem(options)
       # Load localised data
-      Dir.glob(File.join(options[:metadata_folder], "*")).each do |lng_folder|
+      Dir.glob(File.join(options[:metadata_path], "*")).each do |lng_folder|
         next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
 
         language = File.basename(lng_folder)
@@ -101,7 +101,7 @@ module Deliver
 
       # Load non localised data
       (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
-        path = File.join(options[:metadata_folder], "#{key}.txt")
+        path = File.join(options[:metadata_path], "#{key}.txt")
         next unless File.exist?(path)
 
         Helper.log.info "Loading '#{path}'..."

@@ -30,7 +30,7 @@ module Deliver
                                        raise "Could not find ipa file at path '#{value}'".red unless File.exist?(value)
                                        raise "'#{value}' doesn't seem to be an ipa file".red unless value.end_with?(".ipa")
                                      end),
-        FastlaneCore::ConfigItem.new(key: :metadata_folder,
+        FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
                                      description: "Path to the folder containing the metadata files",
                                      optional: true),
