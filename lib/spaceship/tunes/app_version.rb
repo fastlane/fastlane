@@ -2,6 +2,7 @@ module Spaceship
   module Tunes
     # Represents an editable version of an iTunes Connect Application
     # This can either be the live or the edit version retrieved via the app
+    # rubocop:disable Metrics/ClassLength
     class AppVersion < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
@@ -214,6 +215,49 @@ module Spaceship
         raw_data.set(['preReleaseBuildVersionString', 'value'], build.build_version)
         raw_data.set(['preReleaseBuildTrainVersionString'], build.train_version)
         raw_data.set(['preReleaseBuildUploadDate'], build.upload_date)
+        true
+      end
+
+      # Set the age restriction rating
+      # Call it like this:
+      # v.update_rating({
+      #   'CARTOON_FANTASY_VIOLENCE' => 0,
+      #   'MATURE_SUGGESTIVE' => 2,
+      #   'UNRESTRICTED_WEB_ACCESS' => 0,
+      #   'GAMBLING_CONTESTS' => 0
+      # })
+      #
+      # Available Values
+      # https://github.com/KrauseFx/deliver/blob/master/Reference.md
+      def update_rating(hash)
+        raise "Must be a hash" unless hash.kind_of?(Hash)
+
+        hash.each do |key, value|
+          to_edit = self.raw_data['ratings']['nonBooleanDescriptors'].find do |current|
+            current['name'].include?(key)
+          end
+
+          if to_edit
+            to_set = "NONE" if value == 0
+            to_set = "INFREQUENT_MILD" if value == 1
+            to_set = "FREQUENT_INTENSE" if value == 2
+            raise "Invalid value '#{value}' for '#{key}', must be 0-2".red unless to_set
+            to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
+          else
+            # Maybe it's a boolean descriptor?
+            to_edit = self.raw_data['ratings']['booleanDescriptors'].find do |current|
+              current['name'].include?(key)
+            end
+
+            if to_edit
+              to_set = "NO"
+              to_set = "YES" if value.to_i > 0
+              to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
+            else
+              raise "Could not find option '#{key}' in the list of available options".red
+            end
+          end
+        end
         true
       end
 
@@ -526,5 +570,6 @@ module Spaceship
         raw_data["details"]["value"]
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

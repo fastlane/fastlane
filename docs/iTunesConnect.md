@@ -92,6 +92,15 @@ v.description.languages # => ["German", "English"]
 # Update localised app metadata
 v.description["English"] = "App Description"
 
+# set the app age rating
+v.set_rating({
+  'CARTOON_FANTASY_VIOLENCE' => 0,
+  'MATURE_SUGGESTIVE' => 2,
+  'UNRESTRICTED_WEB_ACCESS' => 0
+})
+# Available values:
+# https://github.com/KrauseFx/deliver/blob/master/Reference.md
+
 # Push the changes back to the server
 v.save!
 ```

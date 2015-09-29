@@ -61,6 +61,55 @@ describe Spaceship::AppVersion, all: true do
       expect(version.review_notes).to eq('Such Notes here')
     end
 
+    describe "supports setting of the app rating" do
+      before do
+        @v = app.edit_version
+
+        @v.update_rating({
+          'CARTOON_FANTASY_VIOLENCE' => 1,
+          'MATURE_SUGGESTIVE' => 2,
+          'GAMBLING' => 0,
+          'UNRESTRICTED_WEB_ACCESS' => 1,
+          'GAMBLING_CONTESTS' => 0
+        })
+      end
+
+      it "increquent_mild" do
+        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
+          a['name'].include?('CARTOON_FANTASY_VIOLENCE')
+        end
+        expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
+      end
+
+      it "increquent_mild" do
+        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
+          a['name'].include?('CARTOON_FANTASY_VIOLENCE')
+        end
+        expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
+      end
+
+      it "none" do
+        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
+          a['name'].include?('GAMBLING')
+        end
+        expect(val['level']).to eq("ITC.apps.ratings.level.NONE")
+      end
+
+      it "boolean true" do
+        val = @v.raw_data['ratings']['booleanDescriptors'].find do |a|
+          a['name'].include?('UNRESTRICTED_WEB_ACCESS')
+        end
+        expect(val['level']).to eq("ITC.apps.ratings.level.YES")
+      end
+
+      it "boolean false" do
+        val = @v.raw_data['ratings']['booleanDescriptors'].find do |a|
+          a['name'].include?('GAMBLING_CONTESTS')
+        end
+        expect(val['level']).to eq("ITC.apps.ratings.level.NO")
+      end
+    end
+
     describe "#candidate_builds" do
       it "proplery fetches and parses all builds ready to be deployed" do
         version = app.edit_version
