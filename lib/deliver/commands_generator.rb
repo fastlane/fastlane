@@ -33,7 +33,17 @@ module Deliver
         c.description = 'Upload metadata and binary to iTunes Connect'
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
-          options.load_configuration_file("Deliverfile")
+          loaded = options.load_configuration_file("Deliverfile")
+          loaded = true if (options[:description] || options[:ipa]) # do we have *anything* here?
+          unless loaded
+            if agree("No deliver configuration found in the current directory. Do you want to setup deliver? (y/n)".yellow, true)
+              require 'deliver/setup'
+              Deliver::Runner.new(options) # to login...
+              Deliver::Setup.new.run(options)
+              return
+            end
+          end
+
           Deliver::Runner.new(options).run
         end
       end
