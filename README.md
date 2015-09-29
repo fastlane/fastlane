@@ -35,7 +35,7 @@ deliver
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
-`deliver` **can upload ipa files, app screenshots and more to the iTunes Connect backend**, which means, you can deploy new iPhone app updates using the command line.
+`deliver` **can upload ipa files, app screenshots and more to iTunes Connect** from the command line.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -46,7 +46,6 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#installation">Installation</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#can-i-trust-deliver">Can I trust deliver?</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
@@ -56,13 +55,14 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 <h5 align="center"><code>deliver</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 # Features
-- Upload hundreds of screenshots with different languages from different devices
-- Upload a new ipa file to iTunes Connect without Xcode from any computer
-- Update app metadata
-- Easily implement a real Continuous Deployment process using [fastlane](https://github.com/KrauseFx/fastlane)
-- Store the configuration in git to easily deploy from **any** computer, including your Continuous Integration server (e.g. Jenkins)
-- Get a PDF preview of the fetched metadata before uploading the app metadata and screenshots to Apple: [Example Preview](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1)
-- Automatically create new screenshots with [snapshot](https://github.com/KrauseFx/snapshot)
+- Upload hundreds of localised screenshots completely automatically
+- Upload a new ipa file to iTunes Connect without Xcode from any Mac
+- Maintain your app metadata locally and push changes back to iTunes Connect
+- Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
+- Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server (e.g. Jenkins)
+- Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
+
+To upload builds to TestFlight check out [pilot](https://github.com/fastlane/pilot).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -75,10 +75,6 @@ Install the gem
 Make sure, you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
-
-To create new screenshots automatically, check out my other open source project [snapshot](https://github.com/KrauseFx/snapshot).
-
-To upload builds to TestFlight check out [pilot](https://github.com/fastlane/pilot).
 
 # Quick Start
 
@@ -94,20 +90,53 @@ From now on, you can run `deliver` to deploy a new update, or just upload new ap
 
 # Usage
 
-TODO
+Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
+
+![/assets/metadata.png](/assets/metadata.png)
+
+You'll see your metadata from iTunes Connect. Feel free to store the metadata in git (not the screenshots). You can now modify it locally and push the changes back to iTunes Connect.
+
+Run `deliver` to upload the app metadata from your local machine
+
+```
+deliver
+```
+
+Provide the path to an `ipa` file to upload and submit your app for review:
+
+```
+deliver --ipa "App.ipa" --submit_for_review
+```
+
+If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa` file. 
+
+This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md)
+
+Download existing screenshots from iTunes Connect
+
+```
+deliver download_screenshots
+```
+
+To get a list of available options run
+
+```
+deliver --help
+```
+
+Check out [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md) for more options.
 
 # Credentials
 
 A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/CredentialsManager).
 
-# Can I trust `deliver`? 
-###How does this thing even work? Is magic involved? 🎩###
+### How does this thing even work? Is magic involved? 🎩###
 
-`deliver` is fully open source, you can take a look at its source files. It will only modify the content you want to modify using the ```Deliverfile```. Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/CredentialsManager))
+Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/CredentialsManager))
 
-Before actually uploading anything to iTunes, ```deliver``` will generate a [HTML summary](https://github.com/krausefx/deliver/blob/master/assets/PDFExample.png?raw=1) of the collected data. 
+Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data. 
 
-```deliver``` uses the following techniques under the hood:
+`deliver` uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to upload the binary to iTunes Connect. iTMSTransporter is a command line tool provided by Apple.
 - For all metadata related actions `deliver` uses [spaceship](https://github.com/fastlane/spaceship)
@@ -132,15 +161,13 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a [HTM
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Available language codes
-```ruby
-"da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "id", "it", "ja", "ko", "ms", "nl", "no", "pt-BR", "pt-PT", "ru", "sv", "th", "tr", "vi", "zh-Hans", "zh-Hant"
+```
+en-GB, de-DE, fr-FR, it, nl-NL, pt-PT, ru, es-ES, sv, es-MX, pt-BR, en-CA, en-US, en-AU, zh-Hans, ja, ko
 ```
 
 ## Automatically create screenshots
 
-If you want to integrate ```deliver``` with ```snapshot```, check out [fastlane](https://github.com/KrauseFx/fastlane)!
-
-More information about ```snapshot``` can be found on the [Snapshot GitHub page](https://github.com/KrauseFx/snapshot).
+If you want to integrate `deliver` with [snapshot](https://github.com/KrauseFx/snapshot), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
 Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
