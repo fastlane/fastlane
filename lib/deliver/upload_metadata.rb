@@ -15,6 +15,8 @@ module Deliver
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
+      verify_available_languages!(options)
+
       app = options[:app]
 
       details = app.details
@@ -60,7 +62,7 @@ module Deliver
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
       v = options[:app].edit_version
-      raise "Could not find a version to edit for app '#{app.name}'".red unless v
+      raise "Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently".red unless v
 
       enabled_languages = []
       LOCALISED_VERSION_VALUES.each do |key|
