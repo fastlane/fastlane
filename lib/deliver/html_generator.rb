@@ -19,7 +19,7 @@ module Deliver
       okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
 
       if okay
-        puts "HTML file confirmed..." # print this to give feedback to the user immediately
+        puts "HTML file confirmed...".green # print this to give feedback to the user immediately
       else
         raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
       end

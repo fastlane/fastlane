@@ -76,7 +76,7 @@ module Deliver
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
         lng_text = "language"
-        lng_text += "s" if languages.count != 1
+        lng_text += "s" if enabled_languages.count != 1
         Helper.log.info "Activating #{lng_text} #{enabled_languages.join(', ')}..."
         v.save!
       end
