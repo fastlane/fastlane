@@ -120,7 +120,7 @@
         <div id="app-urls">
           <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
-            <% value = @options[key][language] %>
+            <% value = @options[key][language] if @options[key] %>
             <% if value %>
               <div class="app-url-descr">
                 <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
@@ -140,17 +140,21 @@
           </div>
         <% end %>
         
-        <div id="app-description">
-             <div class="cat-headline">Description</div>
-             <div id="app-description-text">
-                <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
-             </div>
-        </div>
+        <% if @options[:description] %>
+          <div id="app-description">
+               <div class="cat-headline">Description</div>
+               <div id="app-description-text">
+                  <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
+               </div>
+          </div>
+        <% end %>
         
-        <div id="app-changelog">
-            <div class="cat-headline">Changelog</div>
-            <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
-        </div>
+        <% if @options[:release_notes] %>
+          <div id="app-changelog">
+              <div class="cat-headline">Changelog</div>
+              <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
+          </div>
+        <% end %>
         
         <div id="app-screenshots">
           <div class="cat-headline">Screenshots</div>
