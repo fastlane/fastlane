@@ -41,10 +41,10 @@ From     | To              | Note
 
 **The following commands have been removed:**
 
-- `deliver testflight`
-- `testflight`
-
-Use [pilot](https://github.com/fastlane/pilot) instead.
+Removed                   | Use instead
+--------------------------|------------------------------------------------------------
+`deliver testflight` | [pilot](https://github.com/fastlane/pilot)
+`testflight` | [pilot](https://github.com/fastlane/pilot)
 
 ### What has changed? :recycle: 
 
