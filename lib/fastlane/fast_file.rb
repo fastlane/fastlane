@@ -16,6 +16,13 @@ module Fastlane
       @path = File.expand_path(path)
       content = File.read(path)
 
+      if content.tr!('“”‘’‛', %(""'''))
+        Helper.log.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
+                    'To avoid issues in the future, you should not use ' \
+                    'TextEdit for editing it. If you are not using TextEdit, ' \
+                    'you should turn off smart quotes in your editor of choice.'.red
+      end
+
       parse(content)
     end
 
@@ -28,13 +35,8 @@ module Fastlane
           eval(data) # this is okay in this case
           # rubocop:enable Lint/Eval
         rescue SyntaxError => ex
-          if ex.to_s.include? "‘"
-            Helper.log.fatal ex
-            raise "Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a developer's text editor like Sublime Text to edit your Fastfile".red
-          else
-            line = ex.to_s.match(/\(eval\):(\d+)/)[1]
-            raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
-          end
+          line = ex.to_s.match(/\(eval\):(\d+)/)[1]
+          raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
         end
       end
 
