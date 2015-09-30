@@ -112,16 +112,6 @@ module Spaceship
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
       def edit_version
-        if raw_data['versions'].count == 1
-          v = raw_data['versions'].last
-
-          # this only applies for the initial version
-          # no idea why it's sometimes the short code and sometimes the long one
-          unless ['Prepare for Upload', 'Developer Rejected', 'devRejected', 'Rejected', 'prepareForUpload'].include?(v['state'])
-            return nil # only live version, user should create a new version
-          end
-        end
-
         Spaceship::AppVersion.find(self, self.apple_id, false)
       end
 
