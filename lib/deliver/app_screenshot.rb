@@ -52,7 +52,7 @@ module Deliver
         ScreenSize::IOS_55 => "iphone6Plus",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::MAC => "mac",
-        ScreenSize::IOS_APPLE_WATCH => "Watch"
+        ScreenSize::IOS_APPLE_WATCH => "watch"
       }
       return matching[self.screen_size]
     end
