@@ -16,7 +16,7 @@ module Deliver
       puts "----------------------------------------------------------------------------"
 
       system("open '#{html_path}'")
-      okay = agree("Does the Preview on path '#{html_path}' look okay for you? (blue = updated) (y/n)", true)
+      okay = agree("Does the Preview on path '#{html_path}' look okay for you? (y/n)", true)
 
       if okay
         puts "HTML file confirmed...".green # print this to give feedback to the user immediately
