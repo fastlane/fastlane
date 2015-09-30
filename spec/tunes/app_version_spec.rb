@@ -122,7 +122,7 @@ describe Spaceship::AppVersion, all: true do
         expect(build.processing).to eq(false)
       end
 
-      it "allows choosing of the build for the version to submit", now: true do
+      it "allows choosing of the build for the version to submit" do
         version = app.edit_version
         build = version.candidate_builds.first
 

@@ -110,7 +110,11 @@ describe Spaceship::ProvisioningProfile do
     let(:certificate) { Spaceship::Certificate.all.first }
 
     it 'creates a new development provisioning profile' do
-      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"]).and_return({})
+      # Spaceship::Device.all_iphones + Spaceship::Device.all_ipads + Spaceship::Device.all_ipod_touches
+      expect(Spaceship::Device).to receive(:all_iphones).and_return([])
+      expect(Spaceship::Device).to receive(:all_ipads).and_return([])
+      expect(Spaceship::Device).to receive(:all_ipod_touches).and_return([])
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", []).and_return({})
       Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
