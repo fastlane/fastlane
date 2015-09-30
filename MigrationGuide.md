@@ -36,7 +36,7 @@ Removed     | Use instead              | Note
 
 From     | To              | Note
 ---------|-----------------|------------------------------------------------------------
-`title`  | `name`
+`title`  | `name` | requires a hash: `name ({ "en-US" => "App name" })`
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
 `ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#app_rating_config_path)
@@ -49,7 +49,7 @@ Removed                   | Use instead
 `deliver testflight` | [pilot](https://github.com/fastlane/pilot)
 `testflight` | [pilot](https://github.com/fastlane/pilot)
 
-**The following codes/values haev been changed:**
+**The following codes/values have been changed:**
 
 Changed                   | &nbsp;
 --------------------------|------------------------
@@ -69,5 +69,9 @@ App Categories | [Reference.md](https://github.com/KrauseFx/deliver/blob/master/
 - Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://github.com/fastlane/pilot)
 - All parameters are now in the config system, which means you can pass values using the `Deliverfile`, from within your `Fastfile` or as command line parameter
 <img width="500" alt="screenshot 2015-09-26 21 57 15" src="https://cloud.githubusercontent.com/assets/869950/10121297/c6ea1c7a-6499-11e5-8d2b-301f86faacf0.png">
+- The preview doesn't currently show changes in blue
+- Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/KrauseFx/deliver/issues/353)
+- Apple watch screenshots are not currently supported. This is on the [next-tasks list](https://github.com/KrauseFx/deliver/issues/353)
+
 
 If you run into any issues with the new version of `deliver` please submit an issue on GitHub.
