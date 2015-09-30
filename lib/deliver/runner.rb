@@ -15,7 +15,7 @@ module Deliver
     end
 
     def run
-      verify_version if options[:ipa]
+      verify_version if options[:app_version].to_s.length > 0
       upload_metadata unless options[:skip_metadata]
       upload_binary if options[:ipa]
 
@@ -27,8 +27,7 @@ module Deliver
     # Make sure the version on iTunes Connect matches the one in the ipa
     # If not, the new version will automatically be created
     def verify_version
-      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
-      return unless app_version.to_s.length > 0
+      app_version = options[:app_version]
       Helper.log.info "Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file..."
 
       changed = options[:app].ensure_version!(app_version)

@@ -27,7 +27,7 @@ Removed     | Use instead              | Note
 `error` | [fastlane](https://fastlane.tools) |
 `email` | `username` |
 `apple_id` |  `app` | use `app_identifier` to specify the bundle identifier instead
-`version` | | is automatically detected
+`version` | `app_version` | is usually automatically detected
 `default_language` | | 
 `config_json_folder` | | No more support for JSON based configuration
 `hide_transporter` | | This might be implemented at a later point

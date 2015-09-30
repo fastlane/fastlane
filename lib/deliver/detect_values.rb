@@ -4,6 +4,7 @@ module Deliver
       find_app_identifier(options)
       find_app(options)
       find_folders(options)
+      find_version(options)
     end
 
     def find_app_identifier(options)
@@ -30,6 +31,12 @@ module Deliver
 
       FileUtils.mkdir_p(options[:screenshots_path])
       FileUtils.mkdir_p(options[:metadata_path])
+    end
+
+    def find_version(options)
+      if options[:ipa]
+        options[:app_version] ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
+      end
     end
   end
 end

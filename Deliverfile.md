@@ -24,6 +24,14 @@ ipa "App.ipa"
 
 if you use [fastlane](https://fastlane.tools) the ipa file will automatically be detected.
 
+##### app_version
+
+Optional, as it is usually automatically detected. Specify the version that should be created / edited on iTunes Connect:
+
+```ruby
+app_version "2.0"
+```
+
 ##### submit_for_review
 
 Add this to your `Deliverfile` to automatically submit the app for review after uploading metadata/binary. This will select the latest build.
