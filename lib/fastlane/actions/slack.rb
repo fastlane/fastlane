@@ -115,6 +115,7 @@ module Fastlane
           fallback: options[:message],
           text: options[:message],
           color: color,
+          mrkdwn_in: ["pretext", "text", "fields", "message"],
           fields: []
         }
 

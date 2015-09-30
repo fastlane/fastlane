@@ -4,8 +4,7 @@ module Fastlane
       def self.run(options)
         paths = [
           Actions.lane_context[Actions::SharedValues::IPA_OUTPUT_PATH],
-          Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH],
-          Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH]
+          Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH]
         ]
 
         paths += Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] || []

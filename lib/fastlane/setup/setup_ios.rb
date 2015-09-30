@@ -97,7 +97,11 @@ module Fastlane
         if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
           Helper.log.info "Loading up 'deliver', this might take a few seconds"
           require 'deliver'
-          Deliver::DeliverfileCreator.create(folder)
+          require 'deliver/setup'
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+          Deliver::Runner.new(options) # to login...
+          Deliver::Setup.new.run(options)
+
           @tools[:deliver] = true
         end
       end
@@ -119,7 +123,7 @@ module Fastlane
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
 
-      scheme = ask("Optional: The scheme name of your app: (If you don't need one, just hit Enter.) ").to_s.strip
+      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else
