@@ -36,7 +36,7 @@ Removed     | Use instead              | Note
 
 From     | To              | Note
 ---------|-----------------|------------------------------------------------------------
-`title`  | `name` | requires a hash: `name({ "en-US" => "App name" })`
+`title`  | `name` | requires `name({ "en-US" => "App name" })`
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
 `ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#app_rating_config_path)
