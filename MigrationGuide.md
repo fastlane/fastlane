@@ -49,7 +49,7 @@ Removed                   | Use instead
 `deliver testflight` | [pilot](https://github.com/fastlane/pilot)
 `testflight` | [pilot](https://github.com/fastlane/pilot)
 
-** The following codes/values haev been changed:**
+**The following codes/values haev been changed:**
 
 Changed                   | &nbsp;
 --------------------------|------------------------
