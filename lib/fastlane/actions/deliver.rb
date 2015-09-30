@@ -10,6 +10,7 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('deliver') unless Helper.is_test?
 
+          config.load_configuration_file("Deliverfile")
           config[:screenshots_path] ||= Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] # use snapshot's screenshots
           config[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
 
