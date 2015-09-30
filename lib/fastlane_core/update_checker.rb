@@ -13,9 +13,10 @@ module FastlaneCore
 
       @start_time = Time.now
 
+      url = generate_fetch_url(gem_name)
       Thread.new do
         begin
-          server_results[gem_name] = fetch_latest(gem_name)
+          server_results[gem_name] = fetch_latest(url)
         rescue
         end
       end
@@ -55,12 +56,17 @@ module FastlaneCore
       puts '#######################################################################'.green
     end
 
-    def self.fetch_latest(gem_name)
+    # Generate the URL on the main thread (since we're switching directory)
+    def self.generate_fetch_url(gem_name)
       url = UPDATE_URL + gem_name
       params = {}
       params["ci"] = "1" if Helper.is_ci?
       params["p_hash"] = p_hash if p_hash
       url += "?" + URI.encode_www_form(params) if params.count > 0
+      return url
+    end
+
+    def self.fetch_latest(url)
       JSON.parse(Excon.post(url).body).fetch("version", nil)
     end
 
