@@ -34,6 +34,8 @@ module Fastlane
           return
         end
 
+        Helper.log.info "Looking for updates for #{tools_to_update.join(', ')}..."
+
         updater = Gem::CommandManager.instance[:update]
         cleaner = Gem::CommandManager.instance[:cleanup]
 
@@ -60,7 +62,8 @@ module Fastlane
         update_needed.each do |tool_info|
           tool = tool_info[0]
           local_version = Gem::Version.new(highest_versions[tool].version)
-          latest_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
+          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(tool)
+          latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
           Helper.log.info "Updating #{tool} from #{local_version} to #{latest_version} ... 🚀"
 
           # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
