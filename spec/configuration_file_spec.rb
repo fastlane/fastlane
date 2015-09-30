@@ -57,9 +57,9 @@ describe FastlaneCore do
       describe "Handling invalid broken configuration files" do
         it "properly shows an error message when the user uses invalid quotation" do
           config = FastlaneCore::Configuration.create(options, {})
-          expect do
-            config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
-          end.to raise_error("Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your configuration file".red)
+          config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
+          # Not raising an error, even though we have invalid quotes
+          expect(config[:app_identifier]).to eq("net.sunapps.1")
         end
 
         it "properly shows an error message when there is a syntax error in the Fastfile" do
