@@ -1,4 +1,5 @@
 require 'excon'
+require 'digest'
 
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
@@ -56,7 +57,10 @@ module FastlaneCore
 
     def self.fetch_latest(gem_name)
       url = UPDATE_URL + gem_name
-      url += "?ci=1" if Helper.is_ci?
+      params = {}
+      params["ci"] = "1" if Helper.is_ci?
+      params["p_hash"] = p_hash if p_hash
+      url += "?" + URI.encode_www_form(params) if params.count > 0
       JSON.parse(Excon.post(url).body).fetch("version", nil)
     end
 
@@ -67,6 +71,20 @@ module FastlaneCore
       url += "?time=#{time}"
       url += "&ci=1" if Helper.is_ci?
       Excon.post(url)
+    end
+
+    # To not count the same projects multiple time for the number of launches
+    # More information: https://github.com/fastlane/refresher
+    # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
+    # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
+    def self.p_hash
+      return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
+      require 'credentials_manager'
+      value = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      return Digest::SHA256.hexdigest("p" + value + "fastlan3_SAlt") if value # hashed + salted the bundle identifier
+      return nil
+    rescue
+      return nil
     end
   end
 end
