@@ -49,13 +49,13 @@ module Deliver
       Dir.glob(File.join(options[:screenshots_path], "*"), File::FNM_CASEFOLD).sort.each do |lng_folder|
         language = File.basename(lng_folder)
 
-        files = Dir.glob(File.join(lng_folder, '*.png'))
+        files = Dir.glob(File.join(lng_folder, '*.{png,PNG,jpg,JPG}'))
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.png')).count > 0
+        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.{png,PNG,jpg,JPG}')).count > 0
 
         files.each do |path|
-          next if prefer_framed && !path.include?("_framed.png")
+          next if prefer_framed && !path.include?("_framed.{png,PNG,jpg,JPG}")
           screenshots << AppScreenshot.new(path, language)
         end
       end
