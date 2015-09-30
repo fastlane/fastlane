@@ -30,7 +30,7 @@ module Fastlane
         rescue SyntaxError => ex
           if ex.to_s.include? "‘"
             Helper.log.fatal ex
-            raise "Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a good text editor like Sublime Text to edit your Fastfile".red
+            raise "Invalid quotation: You used the invalid quote ‘ instead of '. Make sure to use a developer's text editor like Sublime Text to edit your Fastfile".red
           else
             line = ex.to_s.match(/\(eval\):(\d+)/)[1]
             raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
