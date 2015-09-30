@@ -49,7 +49,13 @@ Removed                   | Use instead
 `deliver testflight` | [pilot](https://github.com/fastlane/pilot)
 `testflight` | [pilot](https://github.com/fastlane/pilot)
 
-Also, check out [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md) to see a list of available categories, age rating sections and language codes.
+** The following codes/values haev been changed:**
+
+Changed                   | &nbsp;
+--------------------------|------------------------
+Language Codes | [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md)
+Age Rating | [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md)
+App Categories | [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md)
 
 ### What's different now? :recycle: 
 
