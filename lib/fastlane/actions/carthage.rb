@@ -50,7 +50,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Please pass a valid value for no_build. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),          
+                                       end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
