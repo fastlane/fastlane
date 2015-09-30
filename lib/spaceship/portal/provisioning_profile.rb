@@ -213,7 +213,7 @@ module Spaceship
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all devices by default
-              devices = Spaceship::Device.all_iphones + Spaceship::Device.all_ipads + Spaceship::Device.all_ipod_touches
+              devices = Spaceship::Device.all.collect { |d| d.device_type != 'pc' }
             end
           end
 

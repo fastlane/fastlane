@@ -39,6 +39,7 @@ module Spaceship
       #   'ipad'   - iPad
       #   'iphone' - iPhone
       #   'ipod'   - iPod
+      #   'pc'     - Apple TV
       attr_accessor :device_type
 
       attr_mapping({
