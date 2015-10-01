@@ -24,7 +24,7 @@ describe FastlaneCore do
 
     it "prints out all the information in a nice table" do
       title = "Custom Title"
-      
+
       value = FastlaneCore::PrintTable.print_values(config: @config, title: title)
       expect(value[:title]).to eq(title)
       expect(value[:rows]).to eq([[:cert_name, "asdf"], [:output, '..']])

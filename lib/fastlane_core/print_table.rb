@@ -5,7 +5,7 @@ module FastlaneCore
       def print_values(config: nil, title: nil)
         require 'terminal-table'
         rows = []
-        
+
         config.available_options.each do |config_item|
           value = config[config_item.key]
           next if value.nil?
