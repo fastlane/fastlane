@@ -32,7 +32,7 @@ describe FastlaneCore do
 
     it "supports hide_keys property" do
       value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:cert_name])
-      expect(value).to eq({rows: [[:output, '..']]})
+      expect(value).to eq({ rows: [[:output, '..']] })
     end
   end
 end
