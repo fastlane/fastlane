@@ -6,6 +6,7 @@ module Deliver
       self.options = options
       login
       Deliver::DetectValues.new.run!(self.options)
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], title: "Summary")
     end
 
     def login
