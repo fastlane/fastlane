@@ -3,7 +3,7 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?ENV["CER_FILE_PATH"]
+      installed = FastlaneCore::CertChecker.installed? ENV["CER_FILE_PATH"]
       raise "Could not find the newly generated certificate installed" unless installed
     end
 
@@ -30,7 +30,7 @@ module Cert
       certificates.each do |certificate|
         path = store_certificate(certificate)
 
-        if FastlaneCore::CertChecker.installed?path
+        if FastlaneCore::CertChecker.installed? path
           # This certificate is installed on the local machine
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
