@@ -28,7 +28,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'faraday', '~> 0.9'
   spec.add_dependency 'faraday_middleware', '~> 0.9'
-  spec.add_dependency 'fastimage'
+  spec.add_dependency 'fastimage', '~> 1.6'
+
+
+  # for the playground
+  spec.add_dependency 'pry'
+  spec.add_dependency 'colored'
 
   # Development only
   spec.add_development_dependency 'bundler'

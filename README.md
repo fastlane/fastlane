@@ -95,6 +95,10 @@ How fast are tools using `spaceship` compared to web scraping?
 
 # Usage
 
+## Playground
+
+To try `spaceship`, just run `spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
+
 ## Apple Developer Portal API
 
 ##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
