@@ -47,7 +47,7 @@ module Sigh
         ptn = 'Assuming Distribution Identity'
       end
 
-      if output.include?(ptn)
+      if output.include?(ptn) && $?.to_i == 0
         Helper.log.info "Successfully signed #{ipa}!".green
         true
       else

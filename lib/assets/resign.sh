@@ -357,7 +357,6 @@ then
 fi
 
 
-# Resign the application
 if [ "$ENTITLEMENTS" != "" ];
 then
     if [ -n "$APP_IDENTIFER_PREFIX" ];
@@ -491,8 +490,9 @@ rm -f "$TEMP_DIR/profile.plist"
 while IFS= read -d '' -r app;
 do
     resign "$app" YES
-done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d \( -name "*.app" -or -name "*.appex" \) -print0)
+done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
 
+# Resign the application
 resign "$TEMP_DIR/Payload/$APP_NAME" NO
 
 # Repackage quietly
