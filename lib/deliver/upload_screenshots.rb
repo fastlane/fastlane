@@ -46,7 +46,7 @@ module Deliver
 
     def collect_screenshots(options)
       screenshots = []
-      extensions = '.{png,jpg,jpeg}'
+      extensions = '{png,jpg,jpeg}'
       Dir.glob(File.join(options[:screenshots_path], "*"), File::FNM_CASEFOLD).sort.each do |lng_folder|
         language = File.basename(lng_folder)
 
