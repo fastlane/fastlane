@@ -22,11 +22,18 @@ module Sigh
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profile)
 
+      if provisioning_profile.respond_to? :each
+        provisioning_options = provisioning_profile.map { |key, value| "-m #{key.shellescape}=#{value.shellescape}" }.join(' ')
+      else
+        provisioning_options = "-p #{provisioning_profile.shellescape}"
+      end
+
       command = [
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        "-r yes -p #{provisioning_profile.shellescape}",
+        "-r yes",
+        provisioning_options,
         ipa.shellescape
       ].join(' ')
 
@@ -52,7 +59,7 @@ module Sigh
     def get_inputs(options, args)
       ipa = args.first || find_ipa || ask('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profile = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profile = options.provisioning_profiles.each_slice(2).to_a || options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
 
       return ipa, signing_identity, provisioning_profile
     end
@@ -81,7 +88,11 @@ module Sigh
     def validate_params(resign_path, ipa, provisioning_profile)
       validate_resign_path(resign_path)
       validate_ipa_file(ipa)
-      validate_provisioning_file(provisioning_profile)
+      if provisioning_profile.respond_to? :each
+        provisioning_profile.each { |key, value| validate_provisioning_file(value) }
+      else
+        validate_provisioning_file(provisioning_profile)
+      end
     end
 
     def validate_resign_path(resign_path)
