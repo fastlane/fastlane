@@ -65,6 +65,11 @@ module Spaceship
         req.headers['Content-Length'] = "#{upload_file.file_size}"
         req.headers['Connection'] = "keep-alive"
       end
+
+      if r.status == 500 and r.body.include?("Server Error")
+        return upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set)
+      end
+
       parse_upload_response(r)
     end
 
