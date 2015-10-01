@@ -8,6 +8,8 @@ module Cert
     end
 
     def run
+      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [], title: "Summary")
+
       Helper.log.info "Starting login with user '#{Cert.config[:username]}'"
       Spaceship.login(Cert.config[:username], nil)
       Spaceship.select_team
