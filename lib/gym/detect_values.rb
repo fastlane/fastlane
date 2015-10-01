@@ -155,25 +155,6 @@ module Gym
           config[:configuration] = nil
         end
       end
-
-      # Usually we want `Release`
-      # We prefer `Release` to export the DSYM file as well
-      config[:configuration] ||= "Release" if configurations.include?("Release")
-
-      return if config[:configuration].to_s.length > 0
-
-      if configurations.count == 1
-        config[:configuration] = configurations.last
-      else
-        if Helper.is_ci?
-          Helper.log.error "Multiple configurations found but you haven't specified one.".red
-          Helper.log.error "Since this is a CI, please pass one using the `configuration` option".red
-          raise "Multiple configurations found".red
-        else
-          puts "Select Configuration: "
-          config[:configuration] = choose(*(configurations))
-        end
-      end
     end
   end
 end

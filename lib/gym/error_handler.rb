@@ -69,8 +69,6 @@ module Gym
           print "Could not find provisioning profile with the name '#{$1}'"
           print "Make sure the name of the provisioning profile is correct"
           print "and it matches a locally installed profile"
-          print "You can pass the name of the provisioning profile using the"
-          print "`--provisioning_profile_path` option"
         when /mismatch between specified provisioning profile and signing identity/
           print "Mismatch between provisioning profile and code signing identity"
           print "This means, the specified provisioning profile was not created using"
