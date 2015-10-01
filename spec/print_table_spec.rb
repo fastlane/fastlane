@@ -29,5 +29,10 @@ describe FastlaneCore do
       expect(value[:title]).to eq(title)
       expect(value[:rows]).to eq([[:cert_name, "asdf"], [:output, '..']])
     end
+
+    it "supports hide_keys property" do
+      value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:cert_name])
+      expect(value).to eq({rows: [[:output, '..']]})
+    end
   end
 end
