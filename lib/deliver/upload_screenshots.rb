@@ -46,16 +46,17 @@ module Deliver
 
     def collect_screenshots(options)
       screenshots = []
+      extensions = '.{png,jpg,jpeg}'
       Dir.glob(File.join(options[:screenshots_path], "*"), File::FNM_CASEFOLD).sort.each do |lng_folder|
         language = File.basename(lng_folder)
 
-        files = Dir.glob(File.join(lng_folder, '*.{png,jpg}'))
+        files = Dir.glob(File.join(lng_folder, "*.#{extensions}"))
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.{png,jpg}')).count > 0
+        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.#{extensions}')).count > 0
 
         files.each do |path|
-          if prefer_framed && !path.include?("_framed.{png,PNG,jpg,JPG}") && !path.downcase.include?("watch")
+          if prefer_framed && !path.downcase.include?("_framed.#{extensions}") && !path.downcase.include?("watch")
             next
           end
 
