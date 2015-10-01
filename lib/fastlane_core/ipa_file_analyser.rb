@@ -4,14 +4,14 @@ module FastlaneCore
   class IpaFileAnalyser
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def self.fetch_app_identifier(path)
-      plist = IpaFileAnalyser.fetch_info_plist_file(path)
+      plist = self.fetch_info_plist_file(path)
       return plist['CFBundleIdentifier'] if plist
       return nil
     end
 
     # Fetches the app version from the given ipa file.
     def self.fetch_app_version(path)
-      plist = IpaFileAnalyser.fetch_info_plist_file(path)
+      plist = self.fetch_info_plist_file(path)
       return plist['CFBundleShortVersionString'] if plist
       return nil
     end
