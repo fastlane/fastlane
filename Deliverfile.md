@@ -5,7 +5,7 @@ All the options below can easily be added to your `Deliverfile`. The great thing
 ```ruby
 deliver(
   submit_for_review: true,
-  metadata_folder: "../folder"
+  metadata_path: "../folder"
 )
 ```
 
@@ -45,7 +45,7 @@ A path to a folder containing subfolders for each language. This will automatica
 
 ![/assets/screenshots.png](/assets/screenshots.png)
 
-##### metadata_folder
+##### metadata_path
 Path to the metadata you want to use. The folder has to be structured like this
 
 ![/assets/metadata.png](/assets/metadata.png)
