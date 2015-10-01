@@ -1,6 +1,3 @@
-require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
-
 require 'sigh'
 require 'webmock/rspec'
 require 'stubbing.rb'
@@ -9,4 +6,4 @@ require 'stubbing.rb'
 module SpecHelper
 end
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!
