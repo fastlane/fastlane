@@ -7,6 +7,8 @@ module Sigh
     # Uses the spaceship to create or download a provisioning profile
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
+      FastlaneCore::PrintTable.print_values(config: Sigh.config, hide_keys: [], title: "Summary")
+
       Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
