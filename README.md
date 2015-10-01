@@ -12,8 +12,8 @@ By default, your Apple credentials are stored in the OS X Keychain. You can easi
 ## Using environment variables
 
 ```
-DELIVER_USER
-DELIVER_PASSWORD
+FASTLANE_USER
+FASTLANE_PASSWORD
 ```
 
 If you don't want to have your password stored in the Keychain use `FASTLANE_DONT_STORE_PASSWORD`.
