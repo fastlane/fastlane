@@ -203,9 +203,9 @@ module Fastlane
 
         # Stdout format
         if testing && !archiving
-          xcpretty_args.push "--test"
+          xcpretty_args << (params[:xcpretty_output] ? "--#{params[:xcpretty_output]}" : "--test")
         else
-          xcpretty_args.push "--simple"
+          xcpretty_args << (params[:xcpretty_output] ? "--#{params[:xcpretty_output]}" : "--simple")
         end
 
         xcpretty_args = xcpretty_args.join(" ")
@@ -301,7 +301,8 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
 
@@ -341,7 +342,8 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
     end
@@ -374,7 +376,8 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
     end
@@ -407,7 +410,8 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
     end
@@ -436,7 +440,8 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
 
@@ -469,7 +474,8 @@ module Fastlane
           ['destination_timeout', 'The timeout for connecting to the simulator, in seconds'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
-          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
+          ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
         ]
       end
 

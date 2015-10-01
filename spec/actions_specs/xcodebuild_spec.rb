@@ -42,7 +42,8 @@ describe Fastlane do
             workspace: 'MyApp.xcworkspace',
             xcconfig: 'my.xcconfig',
             buildlog_path: 'mypath',
-            raw_buildlog: false
+            raw_buildlog: false,
+            xcpretty_output: 'test'
           )
         end").runner.execute(:test)
 
@@ -79,7 +80,7 @@ describe Fastlane do
           + "install " \
           + "installsrc " \
           + "test " \
-          + "| tee 'mypath/xcodebuild.log' | xcpretty --color --simple"
+          + "| tee 'mypath/xcodebuild.log' | xcpretty --color --test"
         )
       end
 
@@ -90,7 +91,7 @@ describe Fastlane do
             'name=iPhone 5s,OS=8.1',
             'name=iPhone 4,OS=7.1',
           ],
-          destination_timeout: 240,
+          destination_timeout: 240
         )
       end").runner.execute(:test)
 
