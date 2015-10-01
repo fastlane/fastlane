@@ -7,7 +7,13 @@ All code related to your username and password can be found here: [password_mana
 
 ## Storing in the keychain
 
-By default, your Apple credentials are stored in the OS X Keychain. You can easily delete them by opening the "Keychain Access" app, switching to *All Items*, and searching for "*deliver*".
+By default, your Apple credentials are stored in the OS X Keychain.
+
+Your password is only stored locally on your computer.
+
+## Change Password
+
+You can easily delete the stored password by opening the "Keychain Access" app, switching to *All Items*, and searching for "*deliver*". Select the item you want to change and delete it. Next time running one of the tools, you'll be asked for the new password.
 
 ## Using environment variables
 
@@ -22,7 +28,13 @@ If you don't want to have your password stored in the Keychain use `FASTLANE_DON
 
 All ```fastlane``` tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
 
-Your password is only stored locally on your computer.
+```ruby
+require 'credentials_manager'
+
+data = CredentialsManager::AccountManager.new(user: user, password: password)
+puts data.user
+puts data.password
+```
 
 # License
 
