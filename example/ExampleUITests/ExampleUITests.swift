@@ -15,24 +15,16 @@ class ExampleUITests: XCTestCase {
         super.setUp()
         
         let app = XCUIApplication()
-        let env = NSProcessInfo.processInfo().environment
-        print(env)
-        print("Yo")
         
         let path = "/tmp/language.txt"
-        var locale = ""
-        print("Loaded up \(locale)")
-        
         do {
-            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            app.launchArguments = ["-AppleLanguages", "(\(locale))"]
         } catch {
 //            TODO: crash here
         }
         
-        app.launchArguments = ["-AppleLanguages", "(\(locale))"]
-        
         continueAfterFailure = false
-
         app.launch()
     }
     
@@ -43,11 +35,18 @@ class ExampleUITests: XCTestCase {
         
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft
         
+        snapshot("1 - First Screen")
+        
         secondButton.tap()
+    
         
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeRight
         
         secondButton.tap()
+    }
+    
+    func snapshot(name: String) {
+        print("snapshot: \(name) (\(NSDate().timeIntervalSince1970))")
     }
     
 }

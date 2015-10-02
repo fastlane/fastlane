@@ -43,8 +43,8 @@ module Snapshot
                                      description: "A list of languages which should be used",
                                      is_string: false,
                                      default_value: [
-                                      'de-DE',
-                                      'en-US'
+                                      'en-US',
+                                      # 'de-DE',
                                      ]),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",

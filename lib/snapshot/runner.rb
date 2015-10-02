@@ -40,35 +40,38 @@ module Snapshot
                                           print_all: true,
                                       print_command: true,
                                               error: proc do |output, return_code|
-                                                ErrorHandler.handle_test_error(output, return_code)
-
+                                                ErrorHandler.handle_test_error(output, return_code) 
                                                 # no exception raised... that means we need to retry
                                                 launch(language, device_type)
                                               end)
+
+      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
+      fetch_screenshots(raw_output, language, device_type)
     end
 
+    def fetch_screenshots(output, language, device_type)
+      containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test", "Attachments")
+      screenshots = Dir.glob(File.join(containing, "*.png")).collect do |path|
+        {
+          path: path,
+          modified: File.mtime(path)
+        }
+      end
 
-    # def generate_test_command(language, device_type)
-    #   proj_path = Snapshot.config[:project_path]
-    #   pre_command = Snapshot.config[:custom_args] || ENV["SNAPSHOT_CUSTOM_ARGS"] || ''
-    #   custom_build_args = Snapshot.config[:custom_build_args] || ENV["SNAPSHOT_CUSTOM_BUILD_ARGS"] || ''
-    #   build_command = pre_command + ' xcodebuild'
-    #   actions = []
-    #   # actions << 'clean' if clean
-    #   actions << 'test'
-    #   require 'pry'; binding.pry
-    #   pipe = "| xcpretty" # TODO
-    #   [
-    #     build_command,
-    #     "-sdk iphonesimulator",
-    #     "-#{proj_key} '#{proj_path}'",
-    #     "-scheme '#{Snapshot.config[:scheme]}'",
-    #     "-destination 'platform=iOS Simulator,name=iPad 2,OS=#{Snapshot.config[:ios_version]}'",
-    #     # "-AppleLanguages='(#{language})'",
-    #     custom_build_args,
-    #     actions.join(' '),
-    #     pipe
-    #   ].join(' ')
-    # end
+      output.scan(/snapshot: (.*) \((.*)\)/).each do |current|
+        name = current[0]
+        time_stamp = Time.at(current[1].to_i)
+        
+        # Find the closest screenshot taken at this time
+        closest = nil
+        screenshots.each do |screenshot|
+          if !closest || (screenshot[:modified] - time_stamp > closest[:modified] - time_stamp)
+            closest = screenshot
+          end
+        end
+
+        FileUtils.cp(closest[:path], "./#{name} - #{language} - #{device_type.name}.png")
+      end
+    end
   end
 end

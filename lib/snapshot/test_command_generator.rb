@@ -32,6 +32,7 @@ module Snapshot
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+        options << "-derivedDataPath '#{derived_data_path}'"
         # options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         # options << "-archivePath '#{archive_path}'"
         # options << config[:xcargs] if config[:xcargs]
@@ -69,6 +70,10 @@ module Snapshot
         FileUtils.mkdir_p(containing)
 
         return File.join(containing, file_name)
+      end
+
+      def derived_data_path
+        "/tmp/snapshot_derived/"
       end
     end
   end
