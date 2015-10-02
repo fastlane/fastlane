@@ -1,0 +1,15 @@
+.DS_Store
+Gemfile.lock
+*UserInterfaceState.xcuserstate
+pkg
+**/Example.app.dSYM.zip
+fastlane/report.xml
+
+# Build
+**/Example.app.dSYM.zip
+**/Example.ipa
+**/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+ExampleProductName.ipa
+ExampleProductName.app.dSYM.zip
+**/*.dSYM.zip
+**/*.app

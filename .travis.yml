@@ -1,0 +1,6 @@
+language: objective-c
+osx_image: xcode6.4
+before_install: gem update --system
+rvm:
+  - 2.0.0
+script: bundle exec fastlane test
