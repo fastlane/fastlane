@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday_middleware', '~> 0.9'
   spec.add_dependency 'fastimage', '~> 1.6'
 
-
   # for the playground
   spec.add_dependency 'pry'
   spec.add_dependency 'colored'

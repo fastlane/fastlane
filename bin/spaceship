@@ -13,7 +13,7 @@ def docs
 end
 
 username = ARGV[1] if ARGV[0] == '-u'
-username = CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 username ||= ask("Username: ")
 
 begin
@@ -29,10 +29,9 @@ begin
   Spaceship::Portal.login(username)
   puts "Successfully logged in to the Developer Portal".green
   puts ""
-rescue 
+rescue
   puts "Could not login to the Developer Portal..."
 end
-
 
 puts "---------------------------------------".green
 puts "| Welcome to the spaceship playground |".green
@@ -44,4 +43,6 @@ puts "Enter #{'_'.yellow} to access the return value of the last executed comman
 puts ""
 puts "Just enter the commands and confirm with Enter".green
 
-binding.pry(quiet: true) # 🚀  take off
+# rubocop:disable Lint/Debugger
+binding.pry(quiet: true)
+# rubocop:enable Lint/Debugger
