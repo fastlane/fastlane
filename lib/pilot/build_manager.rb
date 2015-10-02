@@ -83,13 +83,13 @@ module Pilot
 
       # We try this multiple times, as it sometimes takes some time
       # to process the binary
-      10.times do
+      100.times do
         current_build = app.builds.find do |build|
           build.upload_date == upload_date
         end
 
         if current_build
-          current_build.build_train.update_testing_status!(true)
+          current_build.build_train.update_testing_status!(true, 'external')
           return true
         else
           Helper.log.info "Binary is not yet available online..."
