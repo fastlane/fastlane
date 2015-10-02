@@ -15,21 +15,25 @@ class ExampleUITests: XCTestCase {
         super.setUp()
         
         let app = XCUIApplication()
+        let env = NSProcessInfo.processInfo().environment
+        print(env)
+        print("Yo")
         
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-//        app.launchArguments = ["AppleLanguages '(de-DE})'", "AppleLocale 'de-DE'"]
-        app.launchArguments = ["-AppleLanguages \"(de)\""]
+        let path = "/tmp/language.txt"
+        var locale = ""
+        print("Loaded up \(locale)")
         
-        // In UI tests it is usually best to stop immediately when a failure occurs.
+        do {
+            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+        } catch {
+//            TODO: crash here
+        }
+        
+        app.launchArguments = ["-AppleLanguages", "(\(locale))"]
+        
         continueAfterFailure = false
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
 
         app.launch()
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
     }
     
     func testExample() {

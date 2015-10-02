@@ -4,9 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'snapshot'
 require 'commander'
-require 'snapshot/snapfile_creator'
-require 'snapshot/snapshot_config'
-require 'snapshot/custom_callback_handler'
 require 'snapshot/options'
 
 HighLine.track_eof = false
@@ -39,13 +36,12 @@ class SnapshotApplication
       c.action do |args, options|
         path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
-          callback = Snapshot::CustomCallbackHandler.get
+          # callback = Snapshot::CustomCallbackHandler.get
           o = options.__hash__.dup
           o.delete(:verbose)
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o, 'Snapfile', callback)
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
 
           Snapshot::DependencyChecker.check_simulators
-          Snapshot::SnapshotConfig.shared_instance(options.snapfile)
           Snapshot::Runner.new.work
         end
       end

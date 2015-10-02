@@ -2,7 +2,6 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       self.check_xcode_select
-      self.check_for_automation_subfolder
       self.check_simctl
     end
 
@@ -28,8 +27,8 @@ module Snapshot
     end
 
     def self.check_simulators
-      Helper.log.debug "Found #{Simulators.available_devices.count} simulators." if $verbose
-      if Simulators.available_devices.count < 1
+      Helper.log.debug "Found #{Simulator.all.count} simulators." if $verbose
+      if Simulator.all.count < 1
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to add new simulators using Xcode"
         Helper.log.fatal "# You can let snapshot create new simulators: 'snapshot reset_simulators'"
@@ -37,12 +36,6 @@ module Snapshot
         Helper.log.fatal "# Please run `instruments -s` to verify your xcode path"
         Helper.log.fatal '#############################################################'
         raise "Create the new simulators and run this script again"
-      end
-    end
-
-    def self.check_for_automation_subfolder
-      if File.directory?"./Automation" or File.exists?"./Automation"
-        raise "Seems like you have an 'Automation' folder in the current directory. You need to delete/rename it!".red
       end
     end
 
