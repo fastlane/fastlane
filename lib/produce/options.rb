@@ -29,7 +29,7 @@ module Produce
                                      description: "Initial version number (e.g. '1.0')"),
         FastlaneCore::ConfigItem.new(key: :sku,
                                      env_name: "PRODUCE_SKU",
-                                     short_code: "-y",
+                                     short_option: "-y",
                                      description: "SKU Number (e.g. '1234')",
                                      default_value: Time.now.to_i.to_s,
                                      is_string: false), # false, as we also allow integers
