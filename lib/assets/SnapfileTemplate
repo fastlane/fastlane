@@ -34,7 +34,7 @@ screenshots_path "./screenshots"
 
 # Comment out the line below to add a `SNAPSHOT` preprocessor macro
 # More information available: https://github.com/krausefx/snapshot#custom-args-for-the-build-command
-# custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' OTHER_SWIFT_FLAGS='$(inherited) -DSNAPSHOT=1'"
+# custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' OTHER_SWIFT_FLAGS='$(inherited) -D SNAPSHOT'"
 
 
 # Custom Callbacks
