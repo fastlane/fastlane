@@ -173,14 +173,6 @@ describe Fastlane do
         end
 
         describe "Invalid Parameters" do
-          it "raises an error if no parameters were given" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                crashlytics
-              end").runner.execute(:test)
-            end.to raise_error("No value found for 'crashlytics_path'")
-          end
-
           it "raises an error if no crashlytics path was given" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do

@@ -2,8 +2,6 @@ module Fastlane
   module Actions
     class CrashlyticsAction < Action
       def self.run(params)
-        Helper.log.info 'Uploading the IPA to Crashlytics Beta. Time for some ☕️.'.green
-
         params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
         params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
 
@@ -29,6 +27,7 @@ module Fastlane
           raise "You have to either pass an ipa or an apk file to the Crashlytics action".red
         end
 
+        Helper.log.info 'Uploading the IPA to Crashlytics Beta. Time for some ☕️.'.green
         Helper.log.debug command.join(" ") if $verbose
         Actions.sh command.join(" ")
 
@@ -67,6 +66,7 @@ module Fastlane
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
                                        description: "Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)",
                                        default_value: Dir["./Pods/Crashlytics/Crashlytics.framework"].last,
+                                       optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find crashlytics at path '#{File.expand_path(value)}'`".red unless File.exist?(File.expand_path(value))
                                        end),

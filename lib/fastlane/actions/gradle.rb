@@ -11,10 +11,10 @@ module Fastlane
 
         gradle = Helper::GradleHelper.new(gradle_path: params[:gradle_path])
 
-        gradle.trigger(task: task, flags: params[:flags])
+        result = gradle.trigger(task: task, flags: params[:flags])
 
         if task.start_with?("assemble")
-          # We build our app. Store the path to the apk 
+          # We built our app. Store the path to the apk
           flavor = task.match(/assemble(\w*)/)
           if flavor and flavor[1]
             flavor = flavor[1]
@@ -25,6 +25,8 @@ module Fastlane
             Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor
           end
         end
+
+        return result
       end
 
       #####################################################

@@ -3,6 +3,9 @@ module Fastlane
     class CrashlyticsHelper
       class << self
         def generate_ios_command(params)
+          raise "No value found for 'crashlytics_path'" unless params[:crashlytics_path]
+          raise "The crashlytics bundle must be of type .framework" unless params[:crashlytics_path].end_with?(".framework") || Helper.test?
+
           command = []
           command << File.join(params[:crashlytics_path], 'submit')
           command << params[:api_token]
@@ -19,10 +22,13 @@ module Fastlane
         def generate_android_command(params)
           # We have to generate an empty XML file to make the crashlytics CLI happy :)
           require 'tempfile'
-
           xml = Tempfile.new('xml')
           xml.write('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>')
           xml.close
+
+          params[:crashlytics_path] = download_android_tools unless params[:crashlytics_path]
+
+          raise "The `crashlytics_path` must be a jar file for Android" unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
 
           command = ["java"]
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
@@ -39,6 +45,36 @@ module Fastlane
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
           return command
+        end
+
+        def download_android_tools
+          containing = File.join(File.expand_path("~/Library"), "CrashlyticsAndroid")
+          zip_path = File.join(containing, "crashlytics-devtools.zip")
+          jar_path = File.join(containing, "crashlytics-devtools.jar")
+          return jar_path if File.exist?(jar_path)
+
+          url = "https://ssl-download-crashlytics-com.s3.amazonaws.com/android/ant/crashlytics.zip"
+          require 'net/http'
+
+          FileUtils.mkdir_p(containing)
+
+          begin
+            Helper.log.info "Downloading Crashlytics Support Library - this might take a minute...".yellow
+
+            result = Net::HTTP.get(URI(url))
+            File.write(zip_path, result)
+
+            # Now unzip the file
+            Action.sh "unzip '#{zip_path}' -d '#{containing}'"
+
+            raise "Coulnd't find 'crashlytics-devtools.jar'" unless File.exist?(jar_path)
+
+            Helper.log.info "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'".green
+          rescue => ex
+            raise "Error fetching remote file: #{ex}"
+          end
+
+          return jar_path
         end
       end
     end
