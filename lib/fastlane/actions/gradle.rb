@@ -72,7 +72,7 @@ module Fastlane
       end
 
       def self.return_value
-        # TODO
+        "The output of running the gradle task"
       end
 
       def self.authors

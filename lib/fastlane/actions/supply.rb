@@ -8,6 +8,8 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('supply') unless Helper.is_test?
 
+          params[:apk] ||= Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+
           Supply.config = params # we already have the finished config
 
           Supply::Uploader.new.perform_upload
