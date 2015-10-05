@@ -98,6 +98,8 @@ You can either run `supply` on its own and use it interactively, or you can pass
 
 Simply run `supply --apk path/to/app.apk`, or use the `SUPPLY_APK` environment variable.
 
+This will also upload app metadata if you previously ran `supply init`.
+
 ## Images and Screenshots
 
 After running `supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short.txt`.
