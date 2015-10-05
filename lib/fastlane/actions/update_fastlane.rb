@@ -18,7 +18,10 @@ module Fastlane
         "produce",
         "cert",
         "codes",
-        "credentials_manager"
+        "credentials_manager",
+        "gym",
+        "spaceship",
+        "pilot"
       ]
 
       def self.run(options)
