@@ -19,7 +19,7 @@ module Fastlane
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
         copy_existing_files
-        generate_app_metadata
+        generate_appfile
         detect_installed_tools # after copying the existing files
         ask_to_enable_other_tools
         FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
@@ -59,7 +59,7 @@ module Fastlane
       end
     end
 
-    def generate_app_metadata
+    def generate_appfile
       Helper.log.info '------------------------------'
       Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
 

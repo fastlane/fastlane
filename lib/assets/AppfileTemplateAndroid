@@ -1,0 +1,3 @@
+issuer "[[ISSUER]]" # Follow https://github.com/fastlane/supply#setup to get one
+keyfile "[[KEYFILE]]" # Path to the keyfile
+package_name "[[PACKAGE_NAME]]" # e.g. com.krausefx.app

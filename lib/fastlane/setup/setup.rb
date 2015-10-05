@@ -11,7 +11,7 @@ module Fastlane
         platform = :android
       else
         Helper.log.info "Couldn't automatically detect the platform"
-        val = agree("Is this project an iOS or Mac project? (y/n) ".yellow, true)
+        val = agree("Is this project an iOS project? (y/n) ".yellow, true)
         platform = (val ? :ios : :android)
       end
 
