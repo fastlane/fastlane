@@ -31,8 +31,7 @@ class FastlaneApplication
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, options|
-        if Fastlane::FastlaneFolder.path
-
+        if Fastlane::FastlaneFolder.setup?
           Fastlane::CommandLineHandler.handle(args, options)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
