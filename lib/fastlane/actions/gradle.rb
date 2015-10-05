@@ -40,7 +40,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: Dir["./gradlew"].last, # Using Dir to be nil when the file doesn't exist (import for validation)
                                        verify_block: proc do |value|
-                                         raise "Couldn't find gradle file at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                         raise "Couldn't find gradlew at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                        end)
         ]
       end

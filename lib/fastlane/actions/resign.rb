@@ -21,7 +21,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_RESIGN_IPA",
-                                       description: "Path to the ipa file to resign. Optional if you use the `ipa` or `xcodebuild` action",
+                                       description: "Path to the ipa file to resign. Optional if you use the `gym` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
