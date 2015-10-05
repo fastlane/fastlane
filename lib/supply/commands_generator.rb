@@ -32,7 +32,7 @@ module Supply
         c.description = 'Run a deploy process'
         c.action do |args, options|
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
-          load_gymfile
+          load_supplyfile
 
           Supply::Uploader.new.perform_upload
         end
@@ -44,7 +44,7 @@ module Supply
         c.action do |args, options|
           require 'supply/setup'
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
-          load_gymfile
+          load_supplyfile
 
           Supply::Setup.new.perform_download
         end
@@ -55,7 +55,7 @@ module Supply
       run!
     end
 
-    def load_gymfile
+    def load_supplyfile
       Supply.config.load_configuration_file('Supplyfile')
     end
   end
