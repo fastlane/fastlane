@@ -17,7 +17,7 @@ module Supply
                                      default_value: 'production',
                                      verify_block: proc do |value|
                                        available = %w(production beta alpha)
-                                       raise "Invalid '#{value}', must be #{available.join(', ')}".red unless available.include? value
+                                       raise "Invalid value '#{value}', must be #{available.join(', ')}".red unless available.include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      env_name: "SUPPLY_METADATA_PATH",
@@ -44,7 +44,7 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
-                                     default_value: Dir["*.apk"].first,
+                                     default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "Could not find apk file at path '#{value}'".red unless File.exist?(value)
