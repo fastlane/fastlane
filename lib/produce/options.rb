@@ -32,7 +32,7 @@ module Produce
                                      short_option: "-y",
                                      description: "SKU Number (e.g. '1234')",
                                      default_value: Time.now.to_i.to_s,
-                                     is_string: false), # false, as we also allow integers
+                                     is_string: true),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
