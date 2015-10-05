@@ -1,5 +1,10 @@
 module Fastlane
   module Actions
+    module SharedValues
+      GRADLE_APK_OUTPUT_PATH = :APK_OUTPUT_PATH
+      GRADLE_FLAVOR = :GRADLE_FLAVOR
+    end
+
     class GradleAction < Action
       def self.run(params)
         task = params[:task]
@@ -7,6 +12,19 @@ module Fastlane
         gradle = Helper::GradleHelper.new(gradle_path: params[:gradle_path])
 
         gradle.trigger(task: task, flags: params[:flags])
+
+        if task.start_with?("assemble")
+          # We build our app. Store the path to the apk 
+          flavor = task.match(/assemble(\w*)/)
+          if flavor and flavor[1]
+            flavor = flavor[1]
+            apk_path = File.join("app", "build", "outputs", "apk", "app-#{flavor}.apk")
+            if File.exist?(apk_path)
+              Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
+            end
+            Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor
+          end
+        end
       end
 
       #####################################################
@@ -46,6 +64,9 @@ module Fastlane
       end
 
       def self.output
+        [
+          ['APK_OUTPUT_PATH', 'The path to the newly generated apk file']
+        ]
       end
 
       def self.return_value

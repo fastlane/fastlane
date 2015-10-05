@@ -56,7 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :apk_path,
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
-                                       default_value: Actions.lane_context[SharedValues::APK_OUTPUT_PATH] || Dir["*.apk"].last, # TODO: more sensible defaults
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
