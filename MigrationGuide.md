@@ -18,7 +18,7 @@ The easiest way is to remove the existing `Deliverfile` (which is probably almos
 
 To manually migrate setups (especially if you make heavy use of the `Deliverfile`):
 
-**The following options have been removed from the `Delivefile`:**
+**The following options have been removed from the `Deliverfile`:**
 
 Removed     | Use instead              | Note
 ---------|-----------------|------------------------------------------------------------
