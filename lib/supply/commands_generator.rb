@@ -11,11 +11,10 @@ module Supply
     FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
 
     def self.start
-      # FastlaneCore::UpdateChecker.start_looking_for_update("supply")
+      FastlaneCore::UpdateChecker.start_looking_for_update("supply")
       new.run
     ensure
-      puts 'Finished'
-      # FastlaneCore::UpdateChecker.show_update_status("supply", Supply::VERSION)
+      FastlaneCore::UpdateChecker.show_update_status("supply", Supply::VERSION)
     end
 
     def run
