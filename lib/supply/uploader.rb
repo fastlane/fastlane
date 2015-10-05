@@ -3,17 +3,21 @@ module Supply
     def perform_upload
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      Dir.foreach(metadata_path) do |language|
-        next if language.start_with?('.') # e.g. . or .. or hidden folders
+      raise "No local metadata found, make sure to run `supply init` to setup supply".red unless metadata_path || Supply.config[:apk]
 
-        listing = client.listing_for_language(language)
+      if metadata_path
+        Dir.foreach(metadata_path) do |language|
+          next if language.start_with?('.') # e.g. . or .. or hidden folders
 
-        upload_metadata(language, listing)
-        upload_images(language)
-        upload_screenshots(language)        
+          listing = client.listing_for_language(language)
+
+          upload_metadata(language, listing)
+          upload_images(language)
+          upload_screenshots(language)        
+        end
       end
 
-      # upload_binary
+      upload_binary
 
       Helper.log.info "Uploading all changes to Google Play..."
       client.commit_current_edit!
