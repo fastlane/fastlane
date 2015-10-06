@@ -2,7 +2,13 @@ module Fastlane
   module Actions
     class GitCommitAction < Action
       def self.run(params)
-        result = Actions.sh("git commit -m '#{params[:message]}' '#{params[:path]}'")
+        if params[:path].kind_of?(String)
+          paths = "'#{params[:path]}'"
+        else
+          paths = params[:path].join(" ")
+        end
+
+        result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")
         Helper.log.info "Successfully committed \"#{params[:path]}\" 💾.".green
         return result
       end
@@ -23,8 +29,15 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file you want to commit",
+                                       is_string: false,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         if value.kind_of?(String)
+                                           raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         else
+                                           value.each do |x|
+                                             raise "Couldn't find file at path '#{x}'".red unless File.exist?(x)
+                                           end
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used")
