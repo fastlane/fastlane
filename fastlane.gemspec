@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
   spec.add_dependency 'gym', '>= 0.8.4', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.2.1', '< 1.0.0'
+  spec.add_dependency 'supply' # TODO: insert version number
 
   # Development only
   spec.add_development_dependency 'bundler'

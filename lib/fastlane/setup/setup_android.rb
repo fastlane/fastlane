@@ -14,12 +14,12 @@ module Fastlane
       generate_appfile
       generate_fastfile
       show_analytics
-      Helper.log.info ""
-      Helper.log.info "If you want to upload app metadata and builds to Google Play".green
-      Helper.log.info "run `supply init`".green
+
+      init_supply
+
       Helper.log.info 'Successfully finished setting up fastlane'.green
     end
-    
+
     def generate_appfile
       Helper.log.info '------------------------------'
       Helper.log.info 'To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.'.green
@@ -48,6 +48,26 @@ module Fastlane
       path = File.join(folder, 'Fastfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your own deployment lanes.".green
+    end
+
+    def init_supply
+      Helper.log.info ""
+      question = "Do you want to upload metadata, screenshots and builds to Google Play?"
+      Helper.log.info question
+      Helper.log.info "This will download your existing metadata and screenshots into the `fastlane` folder"
+      if agree(question + " (y/n) ", true)
+        begin
+          require 'supply'
+          require 'supply/setup'
+          Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, {})
+          Supply::Setup.new.perform_download
+        rescue => ex
+          Helper.log.error ex.to_s
+          Helper.log.error "supply failed, but don't worry, you can launch supply using `supply init` whenever you want.".red
+        end
+      else
+        Helper.log.info "You can run `supply init` to do so at a later point.".green
+      end
     end
 
     def folder
