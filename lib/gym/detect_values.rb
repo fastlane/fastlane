@@ -61,6 +61,8 @@ module Gym
     end
 
     def self.detect_projects
+      return if Gym.config[:project].to_s.length > 0
+
       if Gym.config[:workspace].to_s.length == 0
         workspace = Dir["./*.xcworkspace"]
         if workspace.count > 1
@@ -70,6 +72,8 @@ module Gym
           Gym.config[:workspace] = workspace.first # this will result in nil if no files were found
         end
       end
+
+      return if Gym.config[:workspace].to_s.length > 0
 
       if Gym.config[:workspace].to_s.length == 0 and Gym.config[:project].to_s.length == 0
         project = Dir["./*.xcodeproj"]
