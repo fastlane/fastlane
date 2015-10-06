@@ -94,7 +94,7 @@ module Fastlane
         Helper.log.info 'Please read the above carefully and hit Enter to confirm.'.green
         STDIN.gets unless Helper.is_test?
       else
-        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? (y/n)".yellow, true)
+        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
           Helper.log.info "Loading up 'deliver', this might take a few seconds"
           require 'deliver'
           require 'deliver/setup'
