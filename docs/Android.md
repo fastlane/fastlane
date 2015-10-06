@@ -20,7 +20,7 @@ Feel free to skip any of these inputs by submitting with empty without entering 
 
 That's your package name, which usually looks something like `com.krausefx.app`
 
-### Issuer
+### Google Play Access
 
 To enable `fastlane` to access Google Play you have to follow these steps:
 
@@ -33,6 +33,10 @@ To enable `fastlane` to access Google Play you have to follow these steps:
 - The _Email address_ underneath _Service account_ is the email address you have to enter as the `Issuer`
 - Back on the Google Play developer console, click on _Grant Access_ for the newly added service account
 - Choose _Release Manager_ from the dropdown and confirm
+
+### Issuer
+
+Copy and paste the email address which looks like this `137123276006-aaaeltp0aqgn2opfb7tk46ovaaa3hv1g@developer.gserviceaccount.com`
 
 ### Keyfile
 

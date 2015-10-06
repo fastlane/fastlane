@@ -26,6 +26,7 @@ module Fastlane
 
       package_name = ask('Package Name (com.krausefx.app): '.yellow)
       puts ""
+      puts "To automatically upload builds and metadata to Google Play, fastlane needs an issuer and keyfile"
       puts "Follow the Setup Guide on how to get the Issuer: https://github.com/fastlane/supply#setup".yellow
       puts "The issuer email looks like this: 137123276006-aaaeltp0aqgn2opfb7tk46ovaaa3hv1g@developer.gserviceaccount.com".yellow
       issuer = ask('Issuer: '.yellow)
@@ -52,7 +53,7 @@ module Fastlane
 
     def init_supply
       Helper.log.info ""
-      question = "Do you want to upload metadata, screenshots and builds to Google Play?"
+      question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?"
       Helper.log.info question
       Helper.log.info "This will download your existing metadata and screenshots into the `fastlane` folder"
       if agree(question + " (y/n) ", true)
