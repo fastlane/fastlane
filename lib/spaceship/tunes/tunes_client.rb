@@ -252,9 +252,12 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      platforms = platforms.first # That won't work for mac apps
+      # An app can only have either ios or mac, but we ignore apple tv right now
+      platform = platforms.find do |p|
+        p['platformString'] == 'ios' or p['platformString'] == 'osx'
+      end
 
-      version = platforms[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
+      version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
       return nil unless version
       version_id = version['id']
 
