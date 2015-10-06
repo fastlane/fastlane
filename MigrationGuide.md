@@ -18,6 +18,8 @@ The easiest way is to remove the existing `Deliverfile` (which is probably almos
 
 To manually migrate setups (especially if you make heavy use of the `Deliverfile`):
 
+Make sure to adapt the paths to include the `fastlane` directory (if necessary).
+
 **The following options have been removed from the `Delivefile`:**
 
 Removed     | Use instead              | Note
