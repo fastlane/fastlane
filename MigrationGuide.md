@@ -20,7 +20,7 @@ To manually migrate setups (especially if you make heavy use of the `Deliverfile
 
 Make sure to adapt the paths to include the `fastlane` directory (if necessary).
 
-**The following options have been removed from the `Delivefile`:**
+**The following options have been removed from the `Deliverfile`:**
 
 Removed     | Use instead              | Note
 ---------|-----------------|------------------------------------------------------------
@@ -33,6 +33,8 @@ Removed     | Use instead              | Note
 `default_language` | | 
 `config_json_folder` | | No more support for JSON based configuration
 `hide_transporter` | | This might be implemented at a later point
+`primary_subcategories` | `primary_first_sub_category` and `primary_second_sub_category` |
+`secondary_subcategories` | `secondary_first_sub_category` and `secondary_second_sub_category` |
 
 **The following options have been changed:**
 
