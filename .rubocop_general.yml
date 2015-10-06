@@ -51,6 +51,11 @@ Metrics/MethodLength:
   Exclude:
     - 'lib/*/options.rb'
 
+Metrics/AbcSize:
+  Max: 60
+  Exclude:
+    - 'lib/*/options.rb'
+
 # Both string notations are okay
 Style/StringLiterals:
   Enabled: false
@@ -82,10 +87,6 @@ Style/AlignHash:
 # and and or is okay
 Style/AndOr:
   Enabled: false
-
-# Offense count: 20
-Metrics/AbcSize:
-  Max: 60
 
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
