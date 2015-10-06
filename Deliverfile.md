@@ -175,3 +175,15 @@ See [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md)
 
 ##### secondary_category
 The english name of the secondary category you want to set
+
+##### primary_first_sub_category
+The english name of the primary first sub category you want to set
+
+##### primary_second_sub_category
+The english name of the primary second sub category you want to set
+
+##### secondary_first_sub_category
+The english name of the secondary first sub category you want to set
+
+##### secondary_second_sub_category
+The english name of the secondary second sub category you want to set
