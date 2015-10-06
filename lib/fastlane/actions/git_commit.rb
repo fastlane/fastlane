@@ -34,9 +34,9 @@ module Fastlane
                                          if value.kind_of?(String)
                                            raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                          else
-                                           value.each { |x|
+                                           value.each do |x|
                                              raise "Couldn't find file at path '#{x}'".red unless File.exist?(x)
-                                           }
+                                           end
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
