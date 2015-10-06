@@ -55,7 +55,7 @@ describe FastlaneCore do
       end
 
       describe "Handling invalid broken configuration files" do
-        it "properly shows an error message when the user uses invalid quotation" do
+        it "automatically corrects invalid quotations" do
           config = FastlaneCore::Configuration.create(options, {})
           config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
           # Not raising an error, even though we have invalid quotes
