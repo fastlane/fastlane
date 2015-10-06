@@ -43,7 +43,7 @@ platform :ios do
   lane :beta do
     snapshot
     sigh
-    deliver(beta: true)
+    pilot
 
     # sh "your_script.sh"
     # You can also use other beta testing services here
