@@ -1,5 +1,4 @@
 require 'sigh/version'
-require 'sigh/dependency_checker'
 require 'sigh/resign'
 require 'sigh/manager'
 
@@ -15,6 +14,4 @@ module Sigh
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["SIGH_TEAM_ID"]
   ENV['DELIVER_USER'] ||= ENV["SIGH_USERNAME"]
-
-  DependencyChecker.check_dependencies
 end
