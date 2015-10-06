@@ -1348,6 +1348,18 @@ This will find the first podspec in the folder. You can also pass in the specifi
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
 ```
 
+### pod_push_trunk
+
+Push a Podspec to trunk
+
+```ruby
+# If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
+pod_push_trunk
+
+# Alternatively, supply the Podspec file path
+pod_push_trunk(path: 'TSMessages.podspec')
+```
+
 ### prompt
 
 You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
