@@ -2,7 +2,10 @@ module Fastlane
   module Actions
     class SayAction < Action
       def self.run(params)
-        text = params.join(' ')
+        text = params.join(' ') if params.kind_of?(Array) # that's usually the case
+        text = params if params.kind_of?(String)
+        raise "You can't call the `say` action as OneOff" unless text
+
         Actions.sh("say '#{text}'")
       end
 

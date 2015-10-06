@@ -37,7 +37,7 @@ module Fastlane
         if output.include?("source=Mac App Store") or output.include?("source=Apple") or output.include?("source=Apple System")
           Helper.log.info "Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧".green
         else
-          show_and_raise_error("Invalid Download Source of Xcode")
+          show_and_raise_error("Invalid Download Source of Xcode: #{output}")
         end
 
         true
@@ -59,7 +59,7 @@ module Fastlane
         return output
       end
 
-      def show_and_raise_error(error)
+      def self.show_and_raise_error(error)
         Helper.log.fatal "Attention: Your Xcode Installation might be hacked.".red
         Helper.log.fatal "This might be a false alarm, if so, please submit an issue on GitHub".red
         Helper.log.fatal "The following information couldn't be found:".red

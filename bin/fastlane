@@ -25,8 +25,8 @@ class FastlaneApplication
 
     always_trace!
 
-    command :run do |c|
-      c.syntax = 'fastlane run [lane]'
+    command :trigger do |c|
+      c.syntax = 'fastlane [lane]'
       c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
@@ -100,6 +100,16 @@ class FastlaneApplication
       end
     end
 
+    command :run do |c|
+      c.syntax = 'fastlane run [action] key1:value1 key2:value2'
+      c.description = 'Run a fastlane one-off action without a full lane'
+
+      c.action do |args, options|
+        require 'fastlane/one_off'
+        Fastlane::OneOff.execute(args: args)
+      end
+    end
+
     command :actions do |c|
       c.syntax = 'fastlane actions'
       c.description = 'Lists all available fastlane actions'
@@ -121,7 +131,7 @@ class FastlaneApplication
       end
     end
 
-    default_command :run
+    default_command :trigger
 
     run!
   end

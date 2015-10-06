@@ -111,7 +111,7 @@ end
 lane :beta do
   snapshot
   sigh
-  deliver(skip_deploy: true, beta: true)
+  pilot
   # sh "your_script.sh"
 end
 

@@ -60,7 +60,7 @@ module Fastlane
                              optional: true,
                              verify_block: proc do |value|
                                raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
-                               raise "Could not find Xcode project".red if !File.exist?(value) and !Helper.is_test?
+                               raise "Could not find Xcode project at path '#{File.expand_path(value)}'".red if !File.exist?(value) and !Helper.is_test?
                              end)
         ]
       end

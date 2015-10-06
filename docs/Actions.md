@@ -502,7 +502,7 @@ More information about the available options `fastlane action pilot` and a more 
 deliver
 ```
 
-To upload a new build to TestFlight use ```deliver(beta: true)```.
+To upload a new build to TestFlight use `pilot` instead.
 
 If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
 
@@ -510,19 +510,10 @@ Other options
 
 ```ruby
 deliver(
-  force: true,# Set to true to skip PDF verification
-  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
-  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+  force: true, # Set to true to skip PDF verification
+  email: "itunes@connect.com" # different Apple ID than the dev portal
 )
 ```
-
-If you want to use a different Apple ID for iTunes Connect in `deliver`, just add this to your `Deliverfile`:
-
-```ruby
-email "itunes@connect.com"
-```
-
-If you only want to upload a binary without any metadata, use `deliver(beta: true, skip_deploy: true)`
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
@@ -914,6 +905,13 @@ To simply commit one file with a certain commit message use
 
 ```ruby
 git_commit(path: "./version.txt",
+        message: "Version Bump")
+```
+
+To commit several files with a certain commit message use
+
+```ruby
+git_commit(path: ["./version.txt", "./changelog.txt"]
         message: "Version Bump")
 ```
 
@@ -1346,6 +1344,18 @@ This will find the first podspec in the folder. You can also pass in the specifi
 
 ```ruby
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
+```
+
+### pod_push_trunk
+
+Push a Podspec to trunk
+
+```ruby
+# If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
+pod_push_trunk
+
+# Alternatively, supply the Podspec file path
+pod_push_trunk(path: 'TSMessages.podspec')
 ```
 
 ### prompt
