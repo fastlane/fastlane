@@ -3,3 +3,5 @@ for_platform "ios" do
     app_identifier "abc.xyz"
   end
 end
+
+apple_id ""
