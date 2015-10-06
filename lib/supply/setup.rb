@@ -38,12 +38,18 @@ module Supply
       IMAGES_TYPES.each do |image_type|
         next if ['featureGraphic'].include?(image_type) # we don't get all files in full resolution :(
 
-        url = client.fetch_images(image_type: image_type, language: listing.language).last
-        next unless url
+        begin
+          Helper.log.info "Downloading #{image_type} for #{listing.language}..."
 
-        Helper.log.info "Downloading #{image_type} for #{listing.language}..."
-        path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
-        File.write(path, Net::HTTP.get(URI.parse(url)))
+          url = client.fetch_images(image_type: image_type, language: listing.language).last
+          next unless url
+
+          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
+          File.write(path, Net::HTTP.get(URI.parse(url)))
+        rescue => ex
+          Helper.log.error ex.to_s
+          Helper.log.error "Error downloading '#{image_type}' for #{listing.language}...".red
+        end
       end
     end
 
@@ -54,6 +60,8 @@ module Supply
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
         FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
       end
+
+      Helper.log.info "Due to the limit of the Google Play API `supply` can't download your existing screenshots..."
     end
 
     private

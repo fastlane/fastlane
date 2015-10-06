@@ -3,7 +3,7 @@ PATH
   specs:
     supply (0.0.2)
       credentials_manager (>= 0.8.2)
-      fastlane_core (>= 0.17.0)
+      fastlane_core (>= 0.19.0)
       google-api-client (= 0.8.6)
 
 GEM
@@ -43,7 +43,7 @@ GEM
     extlib (0.9.16)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    fastlane_core (0.17.0)
+    fastlane_core (0.19.0)
       babosa
       capybara (~> 2.4.3)
       colored
@@ -57,6 +57,7 @@ GEM
       plist (~> 3.1)
       poltergeist (~> 1.5.1)
       rubyzip (~> 1.1.6)
+      terminal-table (~> 1.4.5)
     google-api-client (0.8.6)
       activesupport (>= 3.2)
       addressable (~> 2.3)
@@ -75,7 +76,7 @@ GEM
       memoist (~> 0.12)
       multi_json (~> 1.11)
       signet (~> 0.6)
-    highline (1.7.6)
+    highline (1.7.7)
     i18n (0.7.0)
     json (1.8.3)
     jwt (1.5.1)
@@ -89,7 +90,7 @@ GEM
     method_source (0.8.2)
     mime-types (2.6.2)
     mini_portile (0.6.2)
-    minitest (5.8.0)
+    minitest (5.8.1)
     multi_json (1.11.2)
     multipart-post (2.0.0)
     nokogiri (1.6.6.2)
@@ -132,6 +133,7 @@ GEM
       jwt (~> 1.5)
       multi_json (~> 1.10)
     slop (3.6.0)
+    terminal-table (1.4.5)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
