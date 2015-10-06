@@ -108,10 +108,13 @@ module Gym
 
       # Compress and move the dsym file
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
-      file_name = File.basename(PackageCommandGenerator.dsym_path)
+
+      available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
+
+      Helper.log.info "Compressing #{available_dsyms.count} dSYM(s)"
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' '#{file_name}'"
+      command = "cd '#{containing_directory}' && zip -r '#{output_path}' '*.dSYM'"
       Helper.log.info command.yellow unless Gym.config[:silent]
       command_result = `#{command}`
       Helper.log.info command_result if $verbose
