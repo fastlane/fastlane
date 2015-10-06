@@ -12,7 +12,7 @@ describe Fastlane do
         action = 'increment_build_number'
 
         expect(@runner).to receive(:execute_action).with(
-          action, Fastlane::Actions::IncrementBuildNumberAction, [{}]
+          action, Fastlane::Actions::IncrementBuildNumberAction, [{}], { custom_dir: "." }
         )
 
         Fastlane::OneOff.execute(args: [action])
@@ -22,7 +22,7 @@ describe Fastlane do
         action = 'slack'
 
         expect(@runner).to receive(:execute_action).with(
-          action, Fastlane::Actions::SlackAction, [{message: "something" }]
+          action, Fastlane::Actions::SlackAction, [{message: "something" }], { custom_dir: "." }
         )
 
         Fastlane::OneOff.execute(args: [action, "message:something"])
