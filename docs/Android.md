@@ -6,7 +6,6 @@ This guide will show you step by step how to get started with `fastlane` for you
 
 Install `fastlane` if you haven't already
 
-
     sudo gem install fastlane --verbose
 
 Navigate your terminal to your project directory and run
@@ -62,5 +61,3 @@ This folder contains the metadata fetched from Google Play. You can modify any v
 ### Next Steps
 
 Go ahead and modify the `Fastfile` to fit your needs. You might want to add the API Keys to your `crashlytics` action or your Slack URL to show notifications in your Slack room.
-
-
