@@ -28,6 +28,15 @@ module Fastlane
         command << " ~/Library/Keychains/#{escaped_name}"
 
         commands << Fastlane::Actions.sh(command, log: false)
+
+        if params[:add_to_search_list]
+          keychains = []
+          keychains << Fastlane::Actions.sh("security list-keychains -d user", log: false).shellsplit unless Helper.test?
+          keychains << File.expand_path(params[:name], "~/Library/Keychains")
+          keychains.uniq!
+          commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
+        end
+
         commands
       end
 
@@ -64,7 +73,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :lock_after_timeout,
                                        description: 'Lock keychain after timeout interval',
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :add_to_search_list,
+                                       description: 'Add keychain to search list',
+                                       is_string: false,
+                                       default_value: true)
         ]
       end
 
