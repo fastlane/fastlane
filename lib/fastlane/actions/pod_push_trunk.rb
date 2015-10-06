@@ -8,7 +8,7 @@ module Fastlane
         end
 
         result = Actions.sh("#{command}")
-        Helper.log.info "Successfully pushed Podspec".green
+        Helper.log.info "Successfully pushed Podspec ⬆️ ".green
         return result
       end
 
@@ -31,6 +31,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         raise "File must be a `.podspec`".red unless value.end_with?(".podspec")
                                        end)
         ]
       end

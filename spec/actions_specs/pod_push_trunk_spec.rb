@@ -11,10 +11,10 @@ describe Fastlane do
 
       it "generates the correct pod push command with an argument" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          pod_push_trunk(path: './fastlane/README.md')
+          pod_push_trunk(path: './fastlane/spec/fixtures/podspecs/test.podspec')
         end").runner.execute(:test)
 
-        expect(result).to eq("pod trunk push './fastlane/README.md'")
+        expect(result).to eq("pod trunk push './fastlane/spec/fixtures/podspecs/test.podspec'")
       end
     end
   end
