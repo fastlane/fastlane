@@ -43,6 +43,7 @@ module CredentialsManager
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
       puts "The login information you enter will be stored in your Mac OS Keychain".green
+      puts "You can also pass the password using the `FASTLANE_PASSWORD` env variable".green
       puts "More information about it on GitHub: https://github.com/fastlane/CredentialsManager".green
       puts "-------------------------------------------------------------------------------------".green
 
