@@ -61,8 +61,15 @@ class SighApplication
       c.description = 'Resigns an existing ipa file with the given provisioning profile'
       c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
       c.option '-p', '--provisioning_profile STRING', String, 'The path to the provisioning profile which should be used'
-      c.option '-P', '--provisioning_profiles BUNDLE_ID,PATH,BUNDLE_ID,PATH', Array, 'A list of bundle identifiers and the paths to the related provisioning profile'
+      c.option '-P', '--provisioning_profiles BUNDLE_ID,PATH', Array, 'A pair of bundle identifier and the path to the related provisioning profile. Can be provided multiple times.' do |value|
+        provisioning_profiles_option = c.proxy_options.find { |option| option[0] == "provisioning_profiles"} || []
+        provisioning_profiles = provisioning_profiles_option[1] || {}
+        provisioning_profiles[value[0]] = value[1]
 
+        c.proxy_options.delete provisioning_profiles_option
+        c.proxy_options << ["provisioning_profiles", provisioning_profiles]
+      end
+      
       c.action do |args, options|
         Sigh::Resign.new.run(options, args)
       end

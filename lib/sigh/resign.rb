@@ -59,7 +59,7 @@ module Sigh
     def get_inputs(options, args)
       ipa = args.first || find_ipa || ask('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profile = options.provisioning_profiles.each_slice(2).to_a || options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profile = options.provisioning_profiles || options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
 
       return ipa, signing_identity, provisioning_profile
     end
