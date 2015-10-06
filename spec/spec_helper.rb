@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
 require 'sigh'
 require 'webmock/rspec'
 require 'stubbing.rb'
