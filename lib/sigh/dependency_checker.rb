@@ -5,6 +5,8 @@ module Sigh
     end
 
     def self.check_xcode_select
+      return if Helper.test?
+
       unless `xcode-select -v`.include? "xcode-select version "
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to install the Xcode commdand line tools to use sigh"
