@@ -118,7 +118,7 @@ module CredentialsManager
       else
         value = args.shift
       end
-      data[key] = value if value
+      data[key] = value if value && value.to_s.length > 0
     end
   end
 end

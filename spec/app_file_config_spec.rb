@@ -153,6 +153,10 @@ describe CredentialsManager do
         ENV["FASTLANE_LANE_NAME"] = :beta.to_s
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile7').data[:app_identifier]).to eq('abc.xyz')
       end
+
+      it "doesn't return empty strings but nil instead" do
+        expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile7').data[:apple_id]).to eq(nil)
+      end
     end
 
     describe "Appfile8" do
