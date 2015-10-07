@@ -82,6 +82,11 @@ task :fetch_rubocop do
 				puts "- File #{path} unchanged"
 			end
 		end
+
+		File.write(File.join(repo, ".hound.yml"), File.read("./fastlane/.hound.yml"))
+		unless repo == 'gym' # gym needs mac os
+			File.write(File.join(repo, ".travis.yml"), File.read("./fastlane/.travis.yml"))
+		end
 	end
 end
 
