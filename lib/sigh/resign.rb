@@ -18,7 +18,10 @@ module Sigh
     def resign(ipa, signing_identity, provisioning_profiles)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
-      provisioning_profiles = [provisioning_profiles] unless provisioning_profiles.is_a?(Enumerable)
+
+      unless provisioning_profiles.kind_of?(Enumerable)
+        provisioning_profiles = [provisioning_profiles]
+      end
 
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
