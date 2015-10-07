@@ -5,28 +5,25 @@ module Sigh
   class Resign
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
-      ipa, signing_identity, provisioning_profile = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles = get_inputs(options, args)
 
       # ... then invoke out programmatic interface with these vars
-      resign(ipa, signing_identity, provisioning_profile)
+      resign(ipa, signing_identity, provisioning_profiles)
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profile)
-      self.new.resign(ipa, signing_identity, provisioning_profile)
+    def self.resign(ipa, signing_identity, provisioning_profiles)
+      self.new.resign(ipa, signing_identity, provisioning_profiles)
     end
 
-    def resign(ipa, signing_identity, provisioning_profile)
+    def resign(ipa, signing_identity, provisioning_profiles)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
+      provisioning_profiles = [provisioning_profiles] unless provisioning_profiles.is_a?(Enumerable)
 
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
-      validate_params(resign_path, ipa, provisioning_profile)
+      validate_params(resign_path, ipa, provisioning_profiles)
 
-      if provisioning_profile.respond_to? :each
-        provisioning_options = provisioning_profile.map { |key, value| "-m #{key.shellescape}=#{value.shellescape}" }.join(' ')
-      else
-        provisioning_options = "-p #{provisioning_profile.shellescape}"
-      end
+      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.join('=')}" }.join(' ')
 
       command = [
         resign_path.shellescape,
@@ -59,9 +56,9 @@ module Sigh
     def get_inputs(options, args)
       ipa = args.first || find_ipa || ask('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profile = options.provisioning_profiles || options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
 
-      return ipa, signing_identity, provisioning_profile
+      return ipa, signing_identity, provisioning_profiles
     end
 
     def find_resign_path
@@ -85,14 +82,10 @@ module Sigh
       signing_identity
     end
 
-    def validate_params(resign_path, ipa, provisioning_profile)
+    def validate_params(resign_path, ipa, provisioning_profiles)
       validate_resign_path(resign_path)
       validate_ipa_file(ipa)
-      if provisioning_profile.respond_to? :each
-        provisioning_profile.each { |key, value| validate_provisioning_file(value) }
-      else
-        validate_provisioning_file(provisioning_profile)
-      end
+      provisioning_profiles.each { |fst, snd| validate_provisioning_file(snd || fst) }
     end
 
     def validate_resign_path(resign_path)
