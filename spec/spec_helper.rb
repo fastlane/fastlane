@@ -7,4 +7,5 @@ require 'credentials_manager'
 module SpecHelper
 end
 
+require 'webmock'
 WebMock.disable_net_connect!(allow: 'coveralls.io')
