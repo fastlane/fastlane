@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'spaceship', '>= 0.10.2', '<= 1.0.0' # Communication with iTunes Connect
 
   # third party dependencies
-  spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
 
