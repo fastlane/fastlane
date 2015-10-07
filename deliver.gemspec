@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   # fastlane dependencies
   spec.add_dependency 'fastlane_core', '>= 0.19.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.8.1'
+  spec.add_dependency 'credentials_manager', '>= 0.8.2'
   spec.add_dependency 'spaceship', '>= 0.11.2', '<= 1.0.0' # Communication with iTunes Connect
 
   # third party dependencies
