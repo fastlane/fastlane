@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # External
-  spec.add_dependency 'google-api-client', '0.8.6' # Google API Client to access Play Publishing API
+  spec.add_dependency 'google-api-client', '~> 0.8.6' # Google API Client to access Play Publishing API
 
   # fastlane
   spec.add_dependency 'fastlane_core', '>= 0.19.0' # all shared code and dependencies
@@ -34,5 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.1.0'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
-  spec.add_development_dependency 'webmock', '~> 1.19.0'
+  spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'fastlane'
+  spec.add_development_dependency 'rubocop', '~> 0.34'
 end
