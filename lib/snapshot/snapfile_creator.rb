@@ -4,7 +4,7 @@ module Snapshot
     def self.create(path)
       snapfile_path = File.join(path, 'Snapfile')
 
-      raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use Snapshot.".red if File.exists?(snapfile_path)
+      raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use Snapshot.".red if File.exist?(snapfile_path)
 
       gem_path = Helper.gem_path("snapshot")
       File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))

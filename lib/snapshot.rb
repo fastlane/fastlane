@@ -30,7 +30,7 @@ module Snapshot
       "Snapfile"
     end
   end
-  
+
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   Snapshot::DependencyChecker.check_dependencies

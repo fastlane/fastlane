@@ -84,7 +84,7 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :custom_build_args,
                                      env_name: 'SNAPSHOT_CUSTOM_BUILD_ARGS',
                                      description: "TODO",
-                                     default_value: 'KrauseFx/snapshot'),
+                                     default_value: 'KrauseFx/snapshot')
       ]
     end
 

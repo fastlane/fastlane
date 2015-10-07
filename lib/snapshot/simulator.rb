@@ -4,7 +4,7 @@ module Snapshot
       def all
         return @devices if @devices
         Helper.log.info "Fetching available devices" if $verbose
-        result = []
+
         # we do it using open since ` just randomly hangs with instruments -s
         output = ''
         Open3.popen3('instruments -s') do |stdin, stdout, stderr, wait_thr|
@@ -30,7 +30,7 @@ module Snapshot
     end
 
     # Example Output for `instruments -s`
-    # 
+    #
     #   Known Devices:
     #   Felix [A8B765B9-70D4-5B89-AFF5-EDDAF0BC8AAA]
     #   Felix Krause's iPhone 6 (9.0.1) [2cce6c8deb5ea9a46e19304f4c4e665069ccaaaa]

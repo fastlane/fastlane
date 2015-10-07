@@ -6,7 +6,7 @@ module Snapshot
     end
 
     def self.check_xcode_select
-      unless `xcode-select -v`.include?"xcode-select version"
+      unless `xcode-select -v`.include? "xcode-select version"
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to install the Xcode commdand line tools to use snapshot"
         Helper.log.fatal "# Install the latest version of Xcode from the AppStore"
@@ -40,7 +40,7 @@ module Snapshot
     end
 
     def self.check_simctl
-      unless `xcrun simctl`.include?"openurl"
+      unless `xcrun simctl`.include? "openurl"
         raise "Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and Mac OS installed.".red
       end
     end

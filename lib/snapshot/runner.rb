@@ -3,7 +3,6 @@ require 'shellwords'
 
 module Snapshot
   class Runner
-
     attr_accessor :errors
 
     def work
@@ -40,7 +39,7 @@ module Snapshot
                                           print_all: true,
                                       print_command: true,
                                               error: proc do |output, return_code|
-                                                ErrorHandler.handle_test_error(output, return_code) 
+                                                ErrorHandler.handle_test_error(output, return_code)
                                                 # no exception raised... that means we need to retry
                                                 launch(language, device_type)
                                               end)
@@ -61,7 +60,7 @@ module Snapshot
       output.scan(/snapshot: (.*) \((.*)\)/).each do |current|
         name = current[0]
         time_stamp = Time.at(current[1].to_i)
-        
+
         # Find the closest screenshot taken at this time
         closest = nil
         screenshots.each do |screenshot|

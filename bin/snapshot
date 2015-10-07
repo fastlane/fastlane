@@ -8,7 +8,6 @@ require 'snapshot/options'
 
 HighLine.track_eof = false
 
-
 class SnapshotApplication
   include Commander::Methods
 
@@ -22,7 +21,7 @@ class SnapshotApplication
 
     # global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
     # global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
-    
+
     global_option('--verbose', 'Shows more output including all output printed by Instruments.') { $verbose = true }
 
     always_trace!
@@ -34,7 +33,7 @@ class SnapshotApplication
       c.description = 'Take new screenshots based on the Snapfile.'
 
       c.action do |args, options|
-        path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+        path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
         Dir.chdir(path) do # switch the context
           # callback = Snapshot::CustomCallbackHandler.get
           o = options.__hash__.dup
@@ -52,7 +51,7 @@ class SnapshotApplication
       c.description = "Creates a new Snapfile in the current directory"
 
       c.action do |args, options|
-        path = (Snapshot::Helper.fastlane_enabled?? './fastlane' : '.')
+        path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
         Snapshot::SnapfileCreator.create(path)
       end
     end

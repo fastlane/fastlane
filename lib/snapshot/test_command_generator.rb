@@ -41,8 +41,6 @@ module Snapshot
       end
 
       def actions
-        config = Snapshot.config
-
         actions = []
         # actions << :clean if config[:clean]
         actions << :test
@@ -60,7 +58,7 @@ module Snapshot
 
       def destination(device)
         value = "platform=iOS Simulator,name=#{device.name},OS=#{Snapshot.config[:ios_version]}"
-        
+
         ["-destination '#{value}'"]
       end
 

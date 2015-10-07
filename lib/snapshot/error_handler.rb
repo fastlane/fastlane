@@ -11,7 +11,7 @@ module Snapshot
         # The order of the handling below is import
 
         if return_code == 65
-          raise TestsFailedException.new("Tests failed - check out the log above".red)
+          raise TestsFailedException.new, "Tests failed - check out the log above".red
         end
 
         case output
