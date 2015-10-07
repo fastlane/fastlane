@@ -1352,13 +1352,13 @@ Push a Podspec to Trunk or a private repository
 
 ```ruby
 # If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
-pod_push_trunk
+pod_trunk
 
 # Alternatively, supply the Podspec file path
-pod_push_trunk(path: 'TSMessages.podspec')
+pod_trunk(path: 'TSMessages.podspec')
 
 # You may also push to a private repo instead of Trunk
-pod_push_trunk(path: 'TSMessages.podspec', :repo: 'MyRepo')
+pod_trunk(path: 'TSMessages.podspec', :repo: 'MyRepo')
 ```
 
 ### prompt
