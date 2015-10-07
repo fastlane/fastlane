@@ -1,7 +1,6 @@
 require 'json'
 require 'produce/version'
 require 'produce/manager'
-require 'produce/dependency_checker'
 require 'produce/developer_center'
 require 'produce/itunes_connect'
 require 'produce/available_default_languages'
@@ -17,6 +16,4 @@ module Produce
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
   ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
-
-  DependencyChecker.check_dependencies
 end
