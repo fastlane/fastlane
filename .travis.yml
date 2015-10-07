@@ -2,7 +2,6 @@ language: ruby
 before_install: gem update --system
 rvm:
   - 2.0.0
-  - 2.1.0
-notifications:
-  email:
-    - snapshot@krausefx.com
+  - 2.1.6
+  - 2.2.2
+script: bundle exec fastlane test
