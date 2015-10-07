@@ -2,7 +2,7 @@ module Frameit
   class FrameConverter
     DOWNLOAD_URL = 'https://developer.apple.com/app-store/marketing/guidelines/#images'
     FRAME_PATH = '.frameit/devices_frames'
-    
+
     def run
       self.setup_frames
     end
@@ -14,7 +14,7 @@ module Frameit
       puts "Press Enter to get started".green
       puts "----------------------------------------------------".green
       STDIN.gets
-      
+
       system("open '#{DOWNLOAD_URL}'")
       puts "----------------------------------------------------".green
       puts "Download the zip files for the following devices".green
@@ -34,7 +34,7 @@ module Frameit
         puts "----------------------------------------------------".green
         STDIN.gets
 
-        if not frames_exist?
+        if !frames_exist?
           puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{templates_path}'".red
         else
           break # everything is finished
@@ -60,17 +60,17 @@ module Frameit
 
       Dir["#{templates_path}/**/*.psd"].each do |psd|
         resulting_path = psd.gsub('.psd', '.png')
-        unless File.exists?resulting_path
-          Helper.log.debug "Converting PSD file '#{psd}'".yellow
-          image = MiniMagick::Image.open(psd)
-          if image
-            image.format 'png'
-            image.trim
-            
-            image.write(resulting_path)
-          else
-            Helper.log.error "Could not parse PSD file at path '#{psd}'"
-          end
+        next if File.exist?(resulting_path)
+
+        Helper.log.debug "Converting PSD file '#{psd}'".yellow
+        image = MiniMagick::Image.open(psd)
+        if image
+          image.format 'png'
+          image.trim
+
+          image.write(resulting_path)
+        else
+          Helper.log.error "Could not parse PSD file at path '#{psd}'"
         end
       end
     end

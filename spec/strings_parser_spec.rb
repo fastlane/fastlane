@@ -2,15 +2,15 @@ describe Frameit do
   describe Frameit::ConfigParser do
     describe "parse" do
       it "raise error when file can't be found" do
-        expect {
+        expect do
           Frameit::StringsParser.parse("./nothere")
-        }.to raise_exception "Couldn't find strings file at path './nothere'".red
+        end.to raise_exception "Couldn't find strings file at path './nothere'".red
       end
 
       it "raise error when file isn't a .strings file" do
-        expect {
+        expect do
           Frameit::StringsParser.parse("./spec/fixtures/background.jpg")
-        }.to raise_exception "Must be .strings file, only got './spec/fixtures/background.jpg'".red
+        end.to raise_exception "Must be .strings file, only got './spec/fixtures/background.jpg'".red
       end
 
       describe "successfully parsing" do
@@ -18,8 +18,8 @@ describe Frameit do
           translations = Frameit::StringsParser.parse("./spec/fixtures/translations.strings")
 
           expect(translations).to eq({
-            "Cancel" => "Abbrechen", 
-            "OK" => "OK", 
+            "Cancel" => "Abbrechen",
+            "OK" => "OK",
             "Multiple words working" => "einlangesdeutshceswort mit Abstand"
           })
         end

@@ -1,10 +1,9 @@
 module Frameit
   # Responsible for finding the correct device
   class TemplateFinder
-
     # This will detect the screen size and choose the correct template
     def self.get_template(screenshot)
-      return nil if screenshot.is_mac?
+      return nil if screenshot.mac?
       parts = [
         screenshot.device_name,
         screenshot.orientation_name,
@@ -12,11 +11,9 @@ module Frameit
       ]
       parts << "sRGB" if screenshot.device_name == 'iPad_mini'
 
-
       templates_path = [ENV['HOME'], FrameConverter::FRAME_PATH].join('/')
       templates = Dir["../**/#{parts.join('_')}*.{png,jpg}"] # local directory
-      templates = templates + Dir["#{templates_path}/**/#{parts.join('_')}*.{png,jpg}"] # ~/.frameit folder
-      
+      templates += Dir["#{templates_path}/**/#{parts.join('_')}*.{png,jpg}"] # ~/.frameit folder
 
       if templates.count == 0
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35
@@ -30,7 +27,7 @@ module Frameit
         end
         return nil
       else
-        return templates.first.gsub(" ", "\ ")
+        return templates.first.tr(" ", "\ ")
       end
     end
   end

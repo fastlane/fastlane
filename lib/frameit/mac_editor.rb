@@ -1,7 +1,6 @@
 module Frameit
   # Responsible for framing Mac Screenshots
   class MacEditor < Editor
-
     def prepare_image
       image = super
       image.resize("#{offset['width']}x") if offset['width']
