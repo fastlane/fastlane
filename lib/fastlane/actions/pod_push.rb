@@ -39,7 +39,6 @@ module Fastlane
                                          raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                          raise "File must be a `.podspec`".red unless value.end_with?(".podspec")
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :repo,
                                        description: "The repo you want to push. Pushes to Trunk by default",
                                        optional: true)

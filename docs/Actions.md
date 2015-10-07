@@ -1358,7 +1358,7 @@ pod_trunk
 pod_trunk(path: 'TSMessages.podspec')
 
 # You may also push to a private repo instead of Trunk
-pod_trunk(path: 'TSMessages.podspec', :repo: 'MyRepo')
+pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
 ```
 
 ### prompt
