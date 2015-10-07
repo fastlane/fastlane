@@ -30,7 +30,7 @@ module Fastlane
 
           FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_LCOV_ARCH",
-                                       description: "The build arch where will search .gcda files."),
+                                       description: "The build arch where will search .gcda files"),
 
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: "FL_LCOV_OUTPUT_DIR",
