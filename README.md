@@ -33,6 +33,7 @@ supply
 [![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
 [![Build Status](https://img.shields.io/travis/KrauseFx/supply/master.svg?style=flat)](https://travis-ci.org/KrauseFx/supply)
 
+###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -57,7 +58,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 - Upload new builds (APKs)
 - Retrieve and edit metadata, such as title and description, for multiple languages
 - Upload the app icon, promo graphics and screenshots for multiple languages
-- Use the command line tool interactively or non-interactively
+- Have a local copy of the metadata in your git repository
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
