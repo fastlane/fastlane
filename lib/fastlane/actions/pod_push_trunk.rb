@@ -2,7 +2,13 @@ module Fastlane
   module Actions
     class PodPushTrunkAction < Action
       def self.run(params)
-        command = 'pod trunk push'
+        if params[:repo]
+          repo = params[:repo]
+          command = "pod repo push #{repo}"
+        else
+          command = 'pod trunk push'
+        end
+
         if params[:path]
           command << " '#{params[:path]}'"
         end
@@ -17,7 +23,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Push a Podspec to Trunk"
+        "Push a Podspec to Trunk or a private repository"
       end
 
       def self.details
@@ -32,7 +38,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                          raise "File must be a `.podspec`".red unless value.end_with?(".podspec")
-                                       end)
+                                       end),
+
+          FastlaneCore::ConfigItem.new(key: :repo,
+                                       description: "The repo you want to push. Pushes to Trunk by default",
+                                       optional: true)
         ]
       end
 

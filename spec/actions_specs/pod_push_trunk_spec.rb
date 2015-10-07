@@ -16,6 +16,14 @@ describe Fastlane do
 
         expect(result).to eq("pod trunk push './fastlane/spec/fixtures/podspecs/test.podspec'")
       end
+
+      it "generates the correct pod push command with a repo argument" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push_trunk(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo')
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec'")
+      end
     end
   end
 end
