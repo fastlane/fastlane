@@ -17,3 +17,5 @@ RSpec.configure do |config|
     allow(Spaceship::Tunes).to receive(:login).and_return(nil)
   end
 end
+
+WebMock.disable_net_connect!
