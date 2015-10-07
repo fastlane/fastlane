@@ -8,12 +8,6 @@ inherit_from: .rubocop_general.yml
 Style/ClassVars:
   Enabled: false
 
-AllCops:
-  Exclude:
-    # Legacy code that gets removed soon
-    - 'lib/fastlane_core/itunes_connect/*'
-
-
 
 ##################
 # TODO
