@@ -244,6 +244,10 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 ## Generate localized screenshots
 Check out [`snapshot`](https://github.com/KrauseFx/snapshot) to automatically generate screenshots using ```UI Automation```.
 
+## Alternative location to store device_frames
+
+Device frames can also be stored in a ```./fastlane/screenshots``` directory if you prefer rather than in the ```.frameit``` directory. If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your .gitignore file.
+
 ## White background of frames
 
 Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `frameit` again.
