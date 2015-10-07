@@ -1,5 +1,4 @@
 require 'cert/version'
-require 'cert/dependency_checker'
 require 'cert/cert_runner'
 require 'cert/keychain_importer'
 
@@ -18,6 +17,4 @@ module Cert
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
-
-  DependencyChecker.check_dependencies
 end
