@@ -18,4 +18,4 @@ RSpec.configure do |config|
   end
 end
 
-WebMock.disable_net_connect!
+WebMock.disable_net_connect!(allow: 'coveralls.io')
