@@ -211,6 +211,7 @@ module Snapshot
         return :retry
       elsif line.include?"Timed out waiting" # a new bug introduced with Xcode 7
         `killall "iOS Simulator"`
+        `killall "Simulator"`
         return :retry
       elsif line.include?"Screenshot captured"
         return :screenshot
