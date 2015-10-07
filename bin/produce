@@ -12,6 +12,8 @@ HighLine.track_eof = false
 class ProduceApplication
   include Commander::Methods
 
+  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize
   def run
     program :version, Produce::VERSION
     program :description, 'CLI for \'produce\''

@@ -38,6 +38,10 @@ module Produce
       options.__hash__.select { |key, value| allowed_keys.include? key }
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
     def update(on, app, options)
       updated = valid_services_for(options).count
 

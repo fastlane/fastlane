@@ -15,11 +15,11 @@ module Produce
         ENV["CREATED_NEW_GROUP_ID"] = nil
         # Nothing to do here
       else
-        unless options.group_name
+        if options.group_name
+          group_name = valid_name_for(options.group_name)
+        else
           group_name = group_identifier.split(".").map(&:capitalize).reverse.join(' ')
           group_name = valid_name_for(group_name)
-        else
-          group_name = valid_name_for(options.group_name)
         end
 
         Helper.log.info "Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center".green
@@ -52,8 +52,8 @@ module Produce
 
         Helper.log.info "Validating groups before association"
 
-        for group_identifier in args
-          if !app_group_exists? group_identifier
+        args.each do |group_identifier|
+          if !app_group_exists?(group_identifier)
             Helper.log.info "[DevCenter] App group '#{group_identifier}' does not exist, please create it first, skipping for now".red
           else
             new_groups.push(Spaceship.app_group.find(group_identifier))
