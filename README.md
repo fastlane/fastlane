@@ -36,7 +36,7 @@ PEM
 
 Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server? 
 
-```PEM``` does all that for, just by running ```pem```.
+`PEM` does all that for, just by running `pem`.
 
 To automate iOS Provisioning profiles you can use [sigh](https://github.com/KrauseFx/sigh).
 
