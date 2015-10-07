@@ -1346,9 +1346,9 @@ This will find the first podspec in the folder. You can also pass in the specifi
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
 ```
 
-### pod_push_trunk
+### pod_push
 
-Push a Podspec to trunk
+Push a Podspec to Trunk or a private repository
 
 ```ruby
 # If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.

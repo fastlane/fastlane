@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class PodPushTrunkAction < Action
+    class PodPushAction < Action
       def self.run(params)
         if params[:repo]
           repo = params[:repo]
