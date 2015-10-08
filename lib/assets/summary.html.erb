@@ -159,7 +159,13 @@
         <div id="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
-          <% if @screenshots.count > 0 %>
+          <% if options[:skip_screenshots] %>
+              <h2 style="color: blue">Skipped Screenshots</h2>
+              <p>
+                Options to skip_screenshots activated. Deliver will not try to modify your app screenshots.
+              </p>
+            </div>
+          <% elsif @screenshots.count > 0 %>
             <% last_size = nil %>
             <% sc = @screenshots.find_all { |s| s.language == language } %>
             <% sc.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
