@@ -87,7 +87,7 @@ module Spaceship
         'exportCompliance.isExempt.value' => :export_compliance_is_exempt,
         'exportCompliance.usesEncryption.value' => :export_compliance_uses_encryption,
         'exportCompliance.appType' => :export_compliance_app_type,
-        'exportCompliance.encryptionUpdated' => :export_compliance_encryption_updated,
+        'exportCompliance.encryptionUpdated.value' => :export_compliance_encryption_updated
         'exportCompliance.exportComplianceRequired' => :export_compliance_compliance_required,
         'exportCompliance.platform' => :export_compliance_platform
       })
