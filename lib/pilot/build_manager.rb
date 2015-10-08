@@ -64,7 +64,7 @@ module Pilot
       upload_date = nil
       loop do
         Helper.log.info "Waiting for iTunes Connect to process the new build"
-        sleep 5
+        sleep 30
         builds = app.all_processing_builds
         break if builds.count == 0
         upload_date = builds.last.upload_date
@@ -93,7 +93,7 @@ module Pilot
           return true
         else
           Helper.log.info "Binary is not yet available online..."
-          sleep 5
+          sleep 30
         end
       end
 
