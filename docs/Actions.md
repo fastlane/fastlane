@@ -517,6 +517,8 @@ deliver(
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
+**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
+
 ### TestFlight
 
 To upload a new binary to Apple TestFlight use the `testflight` action:
