@@ -26,7 +26,7 @@ module Deliver
       v = app.edit_version
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
+        current = options[key].to_s.strip
         next unless current
 
         unless current.kind_of?(Hash)
@@ -42,7 +42,7 @@ module Deliver
       end
 
       (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
+        current = options[key].to_s.strip
         next unless current.to_s.length > 0
         v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
         details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
