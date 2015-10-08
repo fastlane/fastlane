@@ -109,8 +109,8 @@ lane :test do
 end
 
 lane :beta do
-  snapshot
   sigh
+  gym
   pilot
   # sh "your_script.sh"
 end
@@ -118,7 +118,8 @@ end
 lane :deploy do
   snapshot
   sigh
-  deliver(skip_deploy: true, force: true)
+  gym
+  deliver(force: true)
   # frameit
 end
 

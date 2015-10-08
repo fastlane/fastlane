@@ -757,6 +757,30 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
+## update_info_plist
+
+This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+
+```ruby
+# update app identifier string
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  app_identifier: "com.example.newappidentifier"
+)
+
+# Change the Display Name of your app
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
+# Target a specific `xcodeproj` rather than finding the first available one
+update_info_plist(
+  xcodeproj: "path/to/Example.proj",
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
@@ -1346,16 +1370,19 @@ This will find the first podspec in the folder. You can also pass in the specifi
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
 ```
 
-### pod_push_trunk
+### pod_push
 
-Push a Podspec to trunk
+Push a Podspec to Trunk or a private repository
 
 ```ruby
 # If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
-pod_push_trunk
+pod_trunk
 
 # Alternatively, supply the Podspec file path
-pod_push_trunk(path: 'TSMessages.podspec')
+pod_trunk(path: 'TSMessages.podspec')
+
+# You may also push to a private repo instead of Trunk
+pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
 ```
 
 ### prompt
