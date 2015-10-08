@@ -16,6 +16,9 @@ module Spaceship
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
+      # @return (Hash) Some bla bla about privacy
+      attr_reader :apple_tv_privacy_policy
+
       # Categories (e.g. MZGenre.Business)
       attr_accessor :primary_category
 
@@ -54,7 +57,8 @@ module Spaceship
       def unfold_languages
         {
           name: :name,
-          privacyPolicyUrl: :privacy_url
+          privacyPolicyUrl: :privacy_url,
+          privacyPolicy: :apple_tv_privacy_policy
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
