@@ -56,22 +56,22 @@ module Snapshot
 
     def fetch_screenshots(output, language, device_type)
       # The way this works:
-      # When the user calls `snapshot` in the UI Tests it actually just does a 
+      # When the user calls `snapshot` in the UI Tests it actually just does a
       # long press on the Application (!) which you usually wouldn't do probably
       # We go through all test events and check where we do a long press
-      # 
+      #
       # Xcode generates a plist file that contains all the events and test results
-      # 
-      # Once we have all events that apply and the file name of the snapshot we now have to 
+      #
+      # Once we have all events that apply and the file name of the snapshot we now have to
       # match them to the actual file name
       # we make use of the test run output we have in the `output` variable
       # This includes something like
-      # 
+      #
       #   snapshot: [some random text here]
-      # 
+      #
       # We find all these entries using a regex. The number of events and snapshot output
       # should be the same
-      # 
+      #
       # We now go ahead and use this information to copy over the screenshot with a meaningful
       # name to the current directory
 
@@ -80,8 +80,8 @@ module Snapshot
       attachments_path = File.join(containing, "Attachments")
 
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
-      Helper.log.info "Loading up '#{plist_path}'..." #if $verbose
-      report = Plist::parse_xml(plist_path)
+      Helper.log.info "Loading up '#{plist_path}'..." if $verbose
+      report = Plist.parse_xml(plist_path)
 
       activities = []
       report["TestableSummaries"].each do |summary|
@@ -107,10 +107,10 @@ module Snapshot
         to_store << attachment_entry["Attachments"].last["FileName"]
       end
 
-      Helper.log.info "Found #{to_store.join(', ')}" #if $verbose
+      Helper.log.info "Found #{to_store.join(', ')}" if $verbose
 
       matches = output.scan(/snapshot: (.*)/)
-      
+
       if matches.count != to_store.count
         Helper.log.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
       end
