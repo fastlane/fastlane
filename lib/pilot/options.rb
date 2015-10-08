@@ -12,6 +12,7 @@ module Pilot
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
+                                     optional: true,
                                      env_name: "PILOT_IPA",
                                      description: "Path to the ipa file to upload",
                                      default_value: Dir["*.ipa"].first,

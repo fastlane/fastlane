@@ -3,6 +3,8 @@ module Pilot
     def upload(options)
       start(options)
 
+      raise "No ipa file given" unless config[:ipa]
+
       Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
 
       package_path = PackageBuilder.new.generate(apple_id: app.apple_id,
