@@ -58,7 +58,7 @@ module CredentialsManager
       end
 
       return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
-      return true unless (/darwin/ =~ RUBY_PLATFORM) != nil # mac?, since we don't have access to the helper here
+      return true if (/darwin/ =~ RUBY_PLATFORM).nil? # mac?, since we don't have access to the helper here
 
       # Now we store this information in the keychain
       if Security::InternetPassword.add(server_name, user, password)
