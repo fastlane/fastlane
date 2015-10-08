@@ -44,7 +44,7 @@ module Deliver
           Helper.log.info ""
           Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
         end
-        sleep 10
+        sleep 30
       end
 
       build = nil
