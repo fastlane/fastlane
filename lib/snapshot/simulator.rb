@@ -17,12 +17,16 @@ module Snapshot
           m = current.match(/(.*) \((.*)\) \[(.*)\]/)
           next unless m
           name = m[1]
+          udid = m[3]
+          next unless udid.include?("-") # as we want to ignore the real devices
 
           next if name.include?("iPad") and !name.include?("Retina") # we only need one iPad
           next if name.include?("6s") # same screen resolution
           next if name.include?("5s") # same screen resolution
 
-          @devices << Device.new(name: name, ios_version: m[2], udid: m[3])
+          next if name.include?("iPad") # TODO: remove that line
+
+          @devices << Device.new(name: name, ios_version: m[2], udid: udid)
         end
 
         return @devices

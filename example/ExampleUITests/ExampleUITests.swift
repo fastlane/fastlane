@@ -15,38 +15,23 @@ class ExampleUITests: XCTestCase {
         super.setUp()
         
         let app = XCUIApplication()
-        
-        let path = "/tmp/language.txt"
-        do {
-            let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-            app.launchArguments = ["-AppleLanguages", "(\(locale))"]
-        } catch {
-//            TODO: crash here
-        }
-        
-        continueAfterFailure = false
+        setLanguage(app)
         app.launch()
     }
     
     func testExample() {
         let tabBar = XCUIApplication().tabBars
-        
         let secondButton = tabBar.buttons["Second"]
-        
+
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft
-        
-        snapshot("1 - First Screen")
+        snapshot("yeah 1 - First Screen")
         
         secondButton.tap()
-    
-        
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeRight
-        
+        snapshot("yeah 2 - Second Screen")
+
         secondButton.tap()
+        XCUIDevice().orientation = UIDeviceOrientation.Portrait
+        snapshot("yeah 3 - Third Screen")
     }
-    
-    func snapshot(name: String) {
-        print("snapshot: \(name) (\(NSDate().timeIntervalSince1970))")
-    }
-    
 }
