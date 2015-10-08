@@ -6,3 +6,5 @@ module SpecHelper
 end
 
 require 'gym'
+
+WebMock.disable_net_connect!(allow: 'coveralls.io')
