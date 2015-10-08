@@ -55,7 +55,9 @@
 # new features October 2015
 # 1. now re-signs nested applications and app extensions, if present, prior to re-signing the application itself
 # 2. enables the -p option to be used more than once
-# 2. ensures the provisioning profile's bundle-identifier matches the app's bundle identifier
+# 3. ensures the provisioning profile's bundle-identifier matches the app's bundle identifier
+# 4. extracts the entitlements from the provisioning profile if -u flag is used
+# 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
 
 
@@ -69,10 +71,12 @@ fi
 }
 
 if [ $# -lt 3 ]; then
-    echo "usage: $0 source identity -p provisioning [-e entitlements] [-r adjustBetaReports] [-d displayName] [-n version] [-b bundleId] outputIpa" >&2
+    echo "usage: $0 source identity -p provisioning [-e entitlements] [-d displayName] [-n version] [-ur] [-b bundleId] outputIpa" >&2
     echo "       -p option may be provided multiple times" >&2
-    echo "       -r flag requires a value '-r yes'" >&2
-    echo "       -r flag is ignored if -e is also used" >&2
+    echo "       -r: adjust beta-reports-active entitlement" >&2
+    echo "       -r flag is ignored if -e or -u is also used" >&2
+    echo "       -u: use entitlements from provisioning profile" >&2
+    echo "       -u flag is ignored if -e is also used" >&2
     exit 1
 fi
 
@@ -84,6 +88,7 @@ DISPLAY_NAME=""
 KEYCHAIN=""
 VERSION_NUMBER=""
 ADJUST_BETA_REPORTS_ACTIVE_FLAG="0"
+USE_ENTITLEMENTS_FROM_PROVISION="0"
 RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
@@ -91,7 +96,7 @@ TEMP_DIR="_floatsignTemp"
 
 # options start index
 OPTIND=3
-while getopts p:d:e:k:b:r:n: opt; do
+while getopts p:d:e:k:b:run: opt; do
     case $opt in
         p)
             RAW_PROVISIONS+=("$OPTARG")
@@ -124,6 +129,10 @@ while getopts p:d:e:k:b:r:n: opt; do
         r)
             ADJUST_BETA_REPORTS_ACTIVE_FLAG="1"
             echo "Enabled adjustment of beta-reports-active entitlements" >&2
+            ;;
+        u)
+            USE_ENTITLEMENTS_FROM_PROVISION="1"
+            echo "Specified provisioning profile's entitlements should be used" >&2
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -457,7 +466,18 @@ then
 
     echo "Resigning application using certificate: '$CERTIFICATE'" >&2
     echo "and entitlements: $ENTITLEMENTS" >&2
+    cp -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
     /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$ENTITLEMENTS" "$APP_PATH"
+    checkStatus
+elif [ "$USE_ENTITLEMENTS_FROM_PROVISION" == 1 ];
+then
+    echo "Extracting entitlements from provisioning profile" >&2
+    PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
+    checkStatus
+    echo "Resigning application using certificate: '$CERTIFICATE'" >&2
+    echo "and entitlements from provisioning profile: $NEW_PROVISION" >&2
+    cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
+    /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
     checkStatus
 else
     echo "Extracting existing entitlements for updating" >&2
@@ -524,6 +544,7 @@ else
                 then
                     echo "and team identifier: '$TEAM_IDENTIFIER'" >&2
                 fi
+                cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
                 /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
                 checkStatus
             else

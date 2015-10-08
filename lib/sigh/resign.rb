@@ -32,22 +32,15 @@ module Sigh
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        "-r yes",
+        "-u",
         provisioning_options,
         ipa.shellescape
       ].join(' ')
 
       puts command.magenta
-      output = `#{command}`
-      puts output
+      puts `#{command}`
 
-      if signing_identity =~ /^iPhone Developer:*/
-        ptn = 'Assuming Development Identity'
-      else
-        ptn = 'Assuming Distribution Identity'
-      end
-
-      if output.include?(ptn) && $?.to_i == 0
+      if $?.to_i == 0
         Helper.log.info "Successfully signed #{ipa}!".green
         true
       else
