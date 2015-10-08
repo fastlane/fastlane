@@ -1404,3 +1404,11 @@ changelog = prompt(
 
 hockey(notes: changelog)
 ```
+
+### backup_file
+
+This action backs up your file to `[path].back`.
+
+```ruby
+# copies `file` to `/path/to/file.back`
+backup_file(path: '/path/to/file')
