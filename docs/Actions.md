@@ -757,6 +757,30 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
+## update_info_plist
+
+This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+
+```ruby
+# update app identifier string
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  app_identifier: "com.example.newappidentifier"
+)
+
+# Change the Display Name of your app
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
+# Target a specific `xcodeproj` rather than finding the first available one
+update_info_plist(
+  xcodeproj: "path/to/Example.proj",
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
