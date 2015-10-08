@@ -46,10 +46,12 @@ module Gym
         c.syntax = "gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
-          raise "Gymfile already exists" if File.exist?(Gym.gymfile_name)
+          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          path = File.join(containing, Gym.gymfile_name)
+          raise "Gymfile already exists" if File.exist?(path)
           template = File.read("#{Helper.gem_path('gym')}/lib/assets/GymfileTemplate")
-          File.write(Gym.gymfile_name, template)
-          Helper.log.info "Successfully created '#{Gym.gymfile_name}'. Open the file using a code editor.".green
+          File.write(path, template)
+          Helper.log.info "Successfully created '#{path}'. Open the file using a code editor.".green
         end
       end
 
