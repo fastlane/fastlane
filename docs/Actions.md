@@ -1412,3 +1412,17 @@ This action backs up your file to `[path].back`.
 ```ruby
 # copies `file` to `/path/to/file.back`
 backup_file(path: '/path/to/file')
+```
+
+### backup_xcarchive
+
+Save your [zipped] xcarchive elsewhere from default path.
+
+```ruby
+backup_xcarchive(
+  xcarchive: '/path/to/file.xcarchive', # Optional if you use the `xcodebuild` action
+  destination: '/somewhere/else/file.xcarchive', # Where the backup should be created
+  zip: false, # Enable compression of the archive. Defaults to `true`.
+  versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+)
+```
