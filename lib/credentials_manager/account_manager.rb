@@ -58,6 +58,7 @@ module CredentialsManager
       end
 
       return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
+      return true unless Helper.mac?
 
       # Now we store this information in the keychain
       if Security::InternetPassword.add(server_name, user, password)
