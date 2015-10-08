@@ -11,6 +11,10 @@ module Snapshot
           output = stdout.read
         end
 
+        unless output.include?("Known Devices")
+          raise "instruments CLI broken, run `instruments -s` and make sure it works".red
+        end
+
         output = output.split("Known Devices:").last.split("Known Templates:").first
         @devices = []
         output.split("\n").each do |current|
