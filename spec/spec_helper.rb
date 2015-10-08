@@ -23,3 +23,5 @@ ENV["DELIVER_HTML_EXPORT_PATH"] = "/tmp" # to not pollute the working directory
 #     raise "Looks like there were too many mock files set in the Deliver::ItunesTransporter in this test: '#{test.metadata[:example_group][:full_description]}'" if count > 0
 #   end
 # end
+
+WebMock.disable_net_connect!(allow: 'coveralls.io')
