@@ -29,13 +29,16 @@ module CredentialsManager
 
     # Call this method to ask the user to re-enter the credentials
     # @param force: if false the user is asked before it gets deleted
+    # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
       puts "The login credentials for '#{user}' seem to be wrong".red
       if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts "Removing Keychain entry for user '#{user}'...".yellow
         remove_from_keychain
         ask_for_login
+        return true
       end
+      false
     end
 
     private
