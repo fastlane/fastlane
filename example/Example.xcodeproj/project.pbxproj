@@ -382,7 +382,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "ExampleUITests/ExampleUITests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_TARGET_NAME = Example;
 				USES_XCTRUNNER = YES;
@@ -401,7 +400,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "ExampleUITests/ExampleUITests-Bridging-Header.h";
 				TEST_TARGET_NAME = Example;
 				USES_XCTRUNNER = YES;
 			};
