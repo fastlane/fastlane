@@ -48,8 +48,9 @@ class SnapshotApplication
       c.description = "Creates a new Snapfile in the current directory"
 
       c.action do |args, options|
+        require 'snapshot/setup'
         path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
-        Snapshot::SnapfileCreator.create(path)
+        Snapshot::Setup.create(path)
       end
     end
 
