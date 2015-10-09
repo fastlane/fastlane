@@ -30,8 +30,6 @@ module Snapshot
           next if name.include?("6s") # same screen resolution
           next if name.include?("5s") # same screen resolution
 
-          next if name.include?("iPad") # TODO: remove that line
-
           @devices << Device.new(name: name, ios_version: m[2], udid: udid)
         end
 
@@ -71,6 +69,10 @@ module Snapshot
         self.name = name
         self.udid = udid
         self.ios_version = ios_version
+      end
+
+      def to_s
+        self.name
       end
     end
   end

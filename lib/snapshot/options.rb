@@ -37,7 +37,7 @@ module Snapshot
                                        available = Simulator.all
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
-                                           raise "Device '#{current}' not in list of avaiable simulators '#{available.join(', ')}'"
+                                           raise "Device '#{current}' not in list of available simulators '#{available.join(', ')}'".red
                                          end
                                        end
                                      end),
