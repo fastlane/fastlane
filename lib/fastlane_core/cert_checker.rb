@@ -10,6 +10,20 @@ module FastlaneCore
       return ids.include? finger_print
     end
 
+    def self.wwdr_certificate_installed?
+      certificate_name = "Apple Worldwide Developer Relations Certification Authority"
+      `security find-certificate -c #{certificate_name}`
+      $?.success?
+    end
+
+    def self.install_wwdr_certificate
+      Dir.chdir '/tmp'
+      url = 'http://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+      filename = File.basename(url)
+      `curl -O #{url} && security import #{filename} -k login.keychain`
+      raise "Could not install WWDR certificate".red unless $?.success?
+    end
+
     # Legacy Method, use `installed?` instead
     # rubocop:disable Style/PredicateName
     def self.is_installed?(path)
@@ -18,6 +32,8 @@ module FastlaneCore
     # rubocop:enable Style/PredicateName
 
     def self.installed_identies
+      install_wwdr_certificate unless wwdr_certificate_installed?
+
       available = `security find-identity -v -p codesigning`
       ids = []
       available.split("\n").each do |current|
