@@ -28,8 +28,12 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
         waitForLoadingIndicatorToDisappear()
     }
     
-    print("snapshot: \(name)") // more information about this on the repo
-    XCUIApplication().pressForDuration(3.0)
+    print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
+
+    let view = XCUIApplication()
+    let start = view.coordinateWithNormalizedOffset(CGVectorMake(-30, -30))
+    let finish = view.coordinateWithNormalizedOffset(CGVectorMake(-30, -31))
+    start.pressForDuration(0, thenDragToCoordinate: finish)
 }
 
 func waitForLoadingIndicatorToDisappear()

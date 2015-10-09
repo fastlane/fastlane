@@ -246,13 +246,13 @@ You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for 
 
 # How does it work?
 
-The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different appraoch:
+The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different approach:
 
 When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occured during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, duing and after each of these events. There seems to be no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
 
-When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually just does a long press on the Application (!) which doesn't make any sense. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
+When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually just does a swipe gesture outside of the screen bounds which doesn't make any sense. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
 
-`snapshot` then iterates through all test events and check where we did a long press. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application. 
+`snapshot` then iterates through all test events and check where we did this weird gesture. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application. 
 
 In the test output, the Swift `snapshot` function will print out something like this
 

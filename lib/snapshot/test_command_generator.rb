@@ -65,9 +65,10 @@ module Snapshot
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         # 
 
-        device_udid = Simulator.all.find_all do |sim|
+        device_udid = nil
+        Simulator.all.each do |sim|
           device_udid = sim.udid if sim.name.strip == device.strip
-        end.last
+        end
 
         value = "platform=iOS Simulator,id=#{device_udid},OS=#{Snapshot.config[:ios_version]}"
 
