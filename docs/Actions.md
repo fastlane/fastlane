@@ -1471,8 +1471,7 @@ debug
 Reads in production secrets set in a dotgpg file and puts them in ENV.
 
 ```ruby
-dotgpg_environment(dotgpg_file:
-"./path/to/gpgfile")
+dotgpg_environment(dotgpg_file: './path/to/gpgfile')
 ```
 
 ### update_info_plist
@@ -1485,3 +1484,5 @@ update_info_plist(
   plist_path: '/path/to/Info.plist', # Path to the info plist file
   app_identifier: 'com.example.newapp', # Optional. The new App Identifier of your app
   display_name: 'MyNewApp' # Optional. The new Display Name of your app
+)
+```
