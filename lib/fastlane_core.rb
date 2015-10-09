@@ -12,6 +12,7 @@ require 'fastlane_core/provisioning_profile'
 require 'fastlane_core/command_executor'
 require 'fastlane_core/ipa_upload_package_builder'
 require 'fastlane_core/print_table'
+require 'fastlane_core/project'
 
 # Third Party code
 require 'colored'
