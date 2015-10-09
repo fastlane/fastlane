@@ -3,6 +3,8 @@ require 'fastlane_core'
 module Snapshot
   class Options
     def self.available_options
+      output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
+
       @@options ||= [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
