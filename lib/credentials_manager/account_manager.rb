@@ -71,6 +71,7 @@ module CredentialsManager
 
     def remove_from_keychain
       Security::InternetPassword.delete(server: server_name)
+      @password = nil
     end
 
     def server_name
