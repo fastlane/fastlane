@@ -1436,6 +1436,15 @@ This action backs up your file to `[path].back`.
 backup_file(path: '/path/to/file')
 ```
 
+### restore_file
+
+This action restores a file previously backed up by the `backup_file` action.
+
+```ruby
+# copies `file.back` to '/path/to/file'
+restore_file(path: '/path/to/file')
+```
+
 ### backup_xcarchive
 
 Save your [zipped] xcarchive elsewhere from default path.
