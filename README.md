@@ -90,7 +90,7 @@ As a result, `snapshot` was completely rewritten from ground up without changing
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/KrauseFx/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
-- ```snapshot``` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
+- `snapshot` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 - Support for advanced configuration, like preprocess macros or [prefilling of data](#prefilling)
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
@@ -141,42 +141,31 @@ Here a few links to get started:
 - Add `snapshot("01LoginScreen")` method calls inbetween your interactions to take new screenshots
 
 TODO: renew
-Here is a nice gif, that shows ```snapshot``` in action:
+Here is a nice gif, that shows `snapshot` in action:
 ![assets/snapshot.gif](assets/snapshot.gif)
 
 You can take a look at the example project to play around with it.
 
-## Use `snapshot`
+# Usage
 
-Just run this in your project directory
-
-```
+```sh
 snapshot
 ```
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
-
-From now on, you can run `snapshot` to create new screenshots of your app.
-
-# Usage
-
-```
-snapshot
-```
-
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and `snapshot` will continue with the next device or language. To stop the flow after the first error, run
 
 Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
 
 
-```
+```sh
 snapshot --stop_after_first_error --skip_open_summary
 ```
 
 There are a lot of options available that define how to build your app, for example
 
-```
+```sh
 snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
 ```
 
@@ -184,7 +173,7 @@ You can also
 
 For a list for all available options run
 
-```
+```sh
 snapshot --help
 ```
 
