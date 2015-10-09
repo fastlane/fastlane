@@ -27,7 +27,7 @@ module Fastlane
       parse(content, @path)
     end
 
-    def get_binding
+    def parsing_binding
       binding
     end
 
@@ -46,9 +46,9 @@ module Fastlane
 
           # rubocop:disable Lint/Eval
           if path.nil?
-            eval(data, get_binding) # this is okay in this case
+            eval(data, parsing_binding) # this is okay in this case
           else
-            eval(data, get_binding, relative_path) # this is okay in this case
+            eval(data, parsing_binding, relative_path) # this is okay in this case
           end
           # rubocop:enable Lint/Eval
         rescue SyntaxError => ex
