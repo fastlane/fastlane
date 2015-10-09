@@ -21,8 +21,23 @@ func setLanguage(app: XCUIApplication)
     }
 }
 
-func snapshot(name: String)
+func snapshot(name: String, waitForLoadingIndicator: Bool = true)
 {
-    print("snapshot: \(name)")
+    if (waitForLoadingIndicator)
+    {
+        waitForLoadingIndicatorToDisappear()
+    }
+    
+    print("snapshot: \(name)") // more information about this on the repo
     XCUIApplication().pressForDuration(3.0)
+}
+
+func waitForLoadingIndicatorToDisappear()
+{
+    let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
+    
+    while (query.count > 4) {
+        sleep(1)
+        print("Number of Elements in Status Bar: \(query.count)... waiting for status bar to disappear")
+    }
 }
