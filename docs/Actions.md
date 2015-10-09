@@ -1426,3 +1426,11 @@ backup_xcarchive(
   versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
 )
 ```
+
+### debug
+
+Print out an overview of the lane context values.
+
+```ruby
+debug
+```
