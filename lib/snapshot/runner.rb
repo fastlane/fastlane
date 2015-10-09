@@ -119,7 +119,10 @@ module Snapshot
         name = current[0]
         filename = to_store[index]
 
-        output_path = "./#{name} - #{language} - #{device_type.name}.png"
+        language_folder = File.join(Snapshot.config[:output_directory], language)
+        FileUtils.mkdir_p(language_folder)
+
+        output_path = File.join(language_folder, [device_type.name, name].join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
         FileUtils.cp(from_path, output_path)
