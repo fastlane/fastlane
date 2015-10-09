@@ -6,17 +6,25 @@ module FastlaneCore
       # @param print_all [Boolean] Do we want to print out the command output while running?
       # @param print_command [Boolean] Should we print the command that's being executed
       # @param error [Block] A block that's called if an error occurs
+      # @param prefix [Array] An array containg a prefix + block which might get applied to the output
+      # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil)
+      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
         print_all = true if $verbose
+        prefix ||= {}
 
         output = []
         command = command.join(" ")
         Helper.log.info command.yellow.strip if print_command
 
         puts "\n-----".cyan if print_all
+        if loading
+          print(loading.cyan + "\r")
+          last_length = loading.length
+        else
+          last_length = 0
+        end
 
-        last_length = 0
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
             stdin.each do |l|
@@ -25,9 +33,16 @@ module FastlaneCore
 
               next unless print_all
 
+              line = line.cyan
+
+              # Prefix the current line with a string
+              prefix.each do |element|
+                line = element[:prefix] + line if element[:block] && element[:block].call(line)
+              end
+
               current_length = line.length
               spaces = [last_length - current_length, 0].max
-              print((line + " " * spaces + "\r").cyan)
+              print(line + " " * spaces + "\r")
               last_length = current_length
             end
             Process.wait(pid)
