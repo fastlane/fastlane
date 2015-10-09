@@ -246,7 +246,7 @@ Check out [`snapshot`](https://github.com/KrauseFx/snapshot) to automatically ge
 
 ## Alternative location to store device_frames
 
-Device frames can also be stored in a ```./fastlane/screenshots``` directory if you prefer rather than in the ```.frameit``` directory. If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your .gitignore file.
+Device frames can also be stored in a ```./fastlane/screenshots/device_frames``` directory if you prefer rather than in the ```~/.frameit/device_frames``` directory. If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your .gitignore file.
 
 ## White background of frames
 
