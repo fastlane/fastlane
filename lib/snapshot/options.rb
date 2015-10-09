@@ -71,11 +71,6 @@ module Snapshot
                                      description: "Enabling this option will automatically clear previously generated screenshots before running snapshot",
                                      default_value: false,
                                      is_string: false),
-        FastlaneCore::ConfigItem.new(key: :html_title,
-                                     short_option: "-y",
-                                     env_name: 'SNAPSHOT_HTML_TITLE',
-                                     description: "The title that is shown on the the browser window in the HTML summary",
-                                     default_value: 'KrauseFx/snapshot'),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
