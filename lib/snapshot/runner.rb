@@ -7,6 +7,8 @@ module Snapshot
     attr_accessor :errors
 
     def work
+      FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary")
+
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
       self.errors = []
