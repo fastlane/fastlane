@@ -1004,6 +1004,14 @@ add_git_tag(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### git_pull
+
+Executes a simple `git pull` command
+
+```ruby
+git_pull # will run `git pull --tags`
+```
+
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
