@@ -55,25 +55,7 @@ module Snapshot
     end
 
     def fetch_screenshots(output, language, device_type)
-      # The way this works:
-      # When the user calls `snapshot` in the UI Tests it actually just does a
-      # long press on the Application (!) which you usually wouldn't do probably
-      # We go through all test events and check where we do a long press
-      #
-      # Xcode generates a plist file that contains all the events and test results
-      #
-      # Once we have all events that apply and the file name of the snapshot we now have to
-      # match them to the actual file name
-      # we make use of the test run output we have in the `output` variable
-      # This includes something like
-      #
-      #   snapshot: [some random text here]
-      #
-      # We find all these entries using a regex. The number of events and snapshot output
-      # should be the same
-      #
-      # We now go ahead and use this information to copy over the screenshot with a meaningful
-      # name to the current directory
+      # Documentation about how this works in the project README
 
       Helper.log.info "Collecting screenshots..."
       containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")

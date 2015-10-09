@@ -48,19 +48,17 @@ It's hard to get everything right!
 - No loading indicators
 - Same content / screens
 - [Clean Status Bar](#use-a-clean-status-bar)
-- Uploading screenshots ([```deliver```](https://github.com/KrauseFx/deliver) is your friend)
+- Uploading screenshots ([`deliver`](https://github.com/KrauseFx/deliver) is your friend)
 
 This gem solves all those problems. It will run completely in the background - you can do something else, while your computer takes the screenshots for you.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-### Note: Support for UI Tests with Xcode 7
+### Note: New `snapshot` with UI Tests in Xcode 7
 
-Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you will be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
+Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you are now be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
 
-It's still work in progress and there are some technical difficulties I need to solve. 
-
-As a result, `snapshot` will be completely rewritten from ground up without changing its public API :rocket:
+As a result, `snapshot` was completely rewritten from ground up without changing its public API.
 
 **Why change to UI Tests?**
 
@@ -78,14 +76,13 @@ As a result, `snapshot` will be completely rewritten from ground up without chan
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
+    <a href="#how-does-it-work">How?</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
 -------
 
 <h5 align="center"><code>snapshot</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
-
-
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
@@ -98,14 +95,15 @@ As a result, `snapshot` will be completely rewritten from ground up without chan
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-After ```snapshot``` successfully created new screenshots, it will generate a beautiful html file to get a quick overview of all screens:
+After `snapshot` successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
 
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
 ## Why?
-This gem automatically switches the language and device type and runs the automation script to take all screenshots.
+This tool automatically switches the language and device type and runs UI Tests for every combination.
 
 ### Why should I automate this process?
+
 - It takes **hours** to take screenshots
 - It is an integration test: You can test for UI elements and other things inside your scripts
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
@@ -113,14 +111,6 @@ This gem automatically switches the language and device type and runs the automa
 - You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
 - Easy verification that localizations fit into labels on all screen dimensions
 - Easy verification for translators (without an iDevice) that translations do make sense in real App context
-
-###Why use ```snapshot``` instead of....
-
-I've been using many other solutions out there. Unfortunately none of them were perfect. The biggest issue was random timeouts of ```Instruments``` when starting the script. This problem is solved with ```snapshot```
-
-- **UI Automation in Instruments**: Instruments can only run your app on one device in one language. You have to manually switch it.
-- **[ui-screen-shooter](https://github.com/jonathanpenn/ui-screen-shooter)**: This is the best alternative out there right now. It's based on AppleScript, you can not update it properly and there are quite some hacks in there. ```snapshot``` uses a very similar technique - just in a clean and maintainable Ruby gem.
-- **[Subliminal](https://github.com/inkling/Subliminal)**: A good approach to write the interaction code in Objective C. Unfortunately the project seems to be dead and doesn't work with the latest version of Xcode yet. Also, it requires modifications of your Xcode project and schemes, which might break some other things.
 
 # Installation
 
@@ -132,39 +122,41 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
     xcode-select --install
     
-# UI Automation
+# UI Tests
 
 ## Getting started
-This project uses Apple's ```UI Automation``` under the hood. I will not go into detail on how to write scripts. 
+This project uses Apple's newly announced UI Tests. I will not go into detail on how to write scripts. 
 
 Here a few links to get started:
 
-- [Apple's official documentation](https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UsingtheAutomationInstrument/UsingtheAutomationInstrument.html)
-- [UI Automation: An Introduction (cocoamanifest.net)](http://cocoamanifest.net/articles/2011/05/uiautomation-an-introduction.html)
-- [Functional Testing UI Automation (mattmccomb.com)](http://www.mattmccomb.com/blog/2013/06/02/ios-functional-testing-with-uiautomation/)
-- [Cheat and use NSNotifications with HSUIAutomationCheat (github.com)](https://github.com/ConfusedVorlon/HSUIAutomationCheat)
+- [WWDC 2015 Introduction to UI Tests](https://developer.apple.com/videos/play/wwdc2015-406/)
+- [A first look into UI Tests](http://www.mokacoding.com/blog/xcode-7-ui-testing/)
+- [UI Testing in Xcode 7](http://masilotti.com/ui-testing-xcode-7/)
 
 # Quick Start
 
-- Run ```snapshot init``` in your project folder
-- Profile your app in Xcode (CMD + I), choose ```Automation``` and click the Record button on the bottom of the window.
-- This will get you started. Copy the generated code into ```./snapshot.js```. Make sure, you leave the import statement on the top.
-- To take a screenshot, use ```captureLocalizedScreenshot('0-name')```
+- Run `snapshot init` in your project folder
+- Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
+- In your UI Test class, click the `Record` button on the bottom left and record your interaction
+- Add `snapshot("01LoginScreen")` method calls inbetween your interactions to take new screenshots
 
+TODO: renew
 Here is a nice gif, that shows ```snapshot``` in action:
 ![assets/snapshot.gif](assets/snapshot.gif)
 
 You can take a look at the example project to play around with it.
 
-## Start ```snapshot```
+## Use `snapshot`
 
-- ```cd [your_project_folder]```
-- ```snapshot```
+Just run this in your project directory
 
-Your screenshots will be stored in ```./screenshots/``` by default.
+```
+snapshot
+```
 
-From now on, you can run ```snapshot``` to create new screenshots of your app.
+Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
 
+From now on, you can run `snapshot` to create new screenshots of your app.
 
 # Usage
 
@@ -172,153 +164,65 @@ From now on, you can run ```snapshot``` to create new screenshots of your app.
 snapshot
 ```
 
-To skip cleaning the project:
-```
-snapshot --noclean
-```
-
-To only run tests (i.e. don't actually take any screenshots):
-```
-snapshot test
-```
-
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and `snapshot` will continue with the next device or language. To stop the flow after the first error, run
 
-```
-SNAPSHOT_BREAK_ON_FIRST_ERROR=1 snapshot
-```
-
-
-By default, `snapshot` will re-install the app, to make sure it's in a clean state. In case you don't want this run
-
-```
-SNAPSHOT_SKIP_UNINSTALL=1 snapshot
-```
-
-
 Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
 
+
 ```
-SNAPSHOT_SKIP_OPEN_SUMMARY=1 snapshot
+snapshot --stop_after_first_error --skip_open_summary
+```
+
+There are a lot of options available that define how to build your app, for example
+
+```
+snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
+```
+
+You can also 
+
+For a list for all available options run
+
+```
+snapshot --help
 ```
 
 ## Snapfile
 
-#### Why should you have to remember complicated commands and parameters?
+All of the available options can also be stored in a configuration file called the `Snapfile`. Since most values will not change often for your project, it is recommended to store them there:
 
-Store your configuration in a text file to easily take screenshots from any computer.
+First make sure to have a `Snapfile` (you get it for free when running `snapshot init`)
 
-Create a file called ```Snapfile``` in your project directory.
-Once you created your configuration, just run ```snapshot```.
+The `Snapfile` can contain all the options that are also available on `snapshot --help`
 
-The ```Snapfile``` may contain the following information (all are optional):
 
-### Simulator Types
 ```ruby
+scheme "UITests"
+
 devices([
   "iPhone 6",
   "iPhone 6 Plus",
   "iPhone 5",
-  "iPhone 4s",
-  "iPad Air"
+  "iPhone 4s"
 ])
-```
 
-### Languages
-
-```ruby
 languages([
   "en-US",
   "de-DE",
-  "es-ES",
-  ["cmn-Hans", "cmn-Hans_CN"] # you can specify a locale if needed
+  "es-ES"
 ])
-```
 
-### JavaScript file
-Usually ```snapshot``` automatically finds your JavaScript file. If that's not the case, you can pass the path 
-to your test file.
-```ruby
-js_file './path/file.js'
-```
+# The directory in which the screenshots should be stored
+output_directory './screenshots'
 
-You can add a custom script for iPads: `./path/file-iPad.js` and it will automatically be used if found. Just append the `-iPad` to your existing file.
-
-If you want to overwrite the JS path using environment variables, use `SNAPSHOT_JS_FILE`.
-
-### Scheme
-To not be asked which scheme to use, just set it like this:
-```ruby
-scheme "Name"
-```
-You can also use the environment variable ```SNAPSHOT_SCHEME```.
-
-### Screenshots output path
-All generated screenshots will be stored in the given path.
-```ruby
-screenshots_path './screenshots'
-```
-You can also use the environment variable ```SNAPSHOT_SCREENSHOTS_PATH```.
-
-### Project Path
-By default, ```snapshot``` will look for your project in the current directory. If it is located somewhere else, pass your custom path:
-```ruby
-project_path "./my_project/Project.xcworkspace"
-```
-
-### iOS Version
-I'll try to keep the script up to date. If you need to change the iOS version, you can do it like this:
-
-```ruby
-ios_version "9.0"
-```
-
-### HTML Title
-
-If you want to change the title of the generated HTML page, you can use:
-
-```ruby
-html_title 'Example'
-```
-
-### Custom Args for the build command
-Use the ```custom_args``` directive to prepend custom statements to the build command.
-
-Add a ```custom_build_args``` line to your ```Snapfile``` to add custom arguments to the build command.
-
-Here is an example for adding a preprocessor macro `SNAPSHOT`:
-
-```ruby
-custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1'"
-```
-
-In your Objective-C code, use the following code to detect the `snapshot` mode:
-
-```objective-c
-#ifdef SNAPSHOT
-// Your Code here
-#endif
-```
-
-### Custom Args for the run command
-Add a ```custom_run_args``` line to your ```Snapfile``` to add custom arguments to the run command (i.e. the invocation of `instruments`. You can use this to set the value of a specific `NSUserDefaults` key, for example
-
-```ruby
-custom_run_args "-DidViewOnboarding YES"
-```
-
-### Custom Build Command
-If for some reason, the default build command does not work for your project, you can pass your own build script. The script will be executed **once** before the tests are being run.
-
-**Make sure** you are setting the output path to ```/tmp/snapshot``` or specify a custom ```build_dir``` on your ```Snapfile```.
-
-```ruby
-build_command "xcodebuild DSTROOT='/tmp/snapshot' OBJROOT='/tmp/snapshot' SYMROOT='/tmp/snapshot' ... "
+clear_previous_screenshots true
 ```
 
 ### Custom callbacks to prepare your app
-Run your own script when ```snapshot``` switches the simulator type or the language.
+
+# TODO: finish that part
+Run your own script when `snapshot` switches the simulator type or the language.
 This can be used to
 - Logout the user
 - Reset all user defaults
@@ -339,27 +243,38 @@ teardown_device do |language, device|
 end
 ```
 
-### Skip alpha removal from screenshots
-In case you want to skip this process, just add ```skip_alpha_removal``` to your ```Snapfile```.
-
-### Clear old screenshots
-
-If you add this line in your `Snapfile`, the previously generated screenshots will be deleted before generating new ones:
-
-```ruby
-clear_previous_screenshots
-```
-
 ### Completely reset all simulators
 
 You can run this command in the terminal to delete and re-create all iOS simulators:
 
-    snapshot reset_simulators
+```
+snapshot reset_simulators
+```
 
 **Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird `Instruments` problems when running `snapshot`. 
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
+# How does it work?
+
+When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occured during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, duing and after each of these events. There seems to be no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
+
+When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually just does a long press on the Application (!) which doesn't make any sense. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
+
+`snapshot` then iterates through all test events and check where we did a long press. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application. 
+
+In the test output, the Swift `snapshot` function will print out something like this
+
+  snapshot: [some random text here]
+
+`snapshot` finds all these entries using a regex. The number of `snapshot` outputs in the terminal and the number of `snapshot` events in the plist file should be the same. Knowing that, `snapshot` automatically matches these 2 lists to identify the name of each of these screenshots. They are then copied over to the output directory and separated by language and device.
+
+2 thing have to be passed on from `snapshot` to the `xcodebuild` command line tool:
+
+- The device type is passed via the `destination` parameter of the `xcodebuild` parameter
+- The language is passed via a temporary file which is written by `snapshot` before running the tests and read by the UI Tests when launching the application
+
+If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
 # Tips
 
