@@ -142,9 +142,9 @@ module Spaceship
       if user.to_s.empty? or password.to_s.empty?
         require 'credentials_manager'
 
-        data = CredentialsManager::AccountManager.new(user: user, password: password)
-        user ||= data.user
-        password = data.password
+        keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
+        user ||= keychain_entry.user
+        password = keychain_entry.password
       end
 
       if user.to_s.strip.empty? or password.to_s.strip.empty?
@@ -152,7 +152,18 @@ module Spaceship
       end
 
       self.user = user
-      send_login_request(user, password) # different in subclasses
+
+      begin
+        send_login_request(user, password) # different in subclasses
+      rescue InvalidUserCredentialsError => ex
+        raise ex unless keychain_entry
+
+        if keychain_entry.invalid_credentials
+          login(user)
+        else
+          puts "Please run this tool again to apply the new password"
+        end
+      end
     end
 
     # @return (Bool) Do we have a valid session?
