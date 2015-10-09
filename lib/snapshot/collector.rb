@@ -20,7 +20,8 @@ module Snapshot
         language_folder = File.join(Snapshot.config[:output_directory], language)
         FileUtils.mkdir_p(language_folder)
 
-        output_path = File.join(language_folder, [device_type, name].join("-") + ".png")
+        device_name = device_type.gsub(" ", "")
+        output_path = File.join(language_folder, [device_name, name].join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
           Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
