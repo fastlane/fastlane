@@ -4,17 +4,16 @@ require 'plist'
 
 module Snapshot
   class Runner
-    attr_accessor :errors
+    attr_accessor :number_of_retries
 
     def work
       FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
-      self.errors = []
-
       Helper.log.info "Building and running project - this might take some time...".green
 
+      self.number_of_retries = 0
       errors = []
       Snapshot.config[:devices].each do |device|
         Snapshot.config[:languages].each do |language|
@@ -54,7 +53,14 @@ module Snapshot
 
                                                 # no exception raised... that means we need to retry
                                                 Helper.log.info "Cought error... #{return_code}".red
-                                                launch(language, device_type)
+
+                                                self.number_of_retries += 1
+                                                if self.number_of_retries < 20
+                                                  launch(language, device_type)
+                                                else
+                                                  # It's important to raise an error, as we don't want to collect the screenshots
+                                                  raise "Too many errors... no more retries...".red
+                                                end
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
