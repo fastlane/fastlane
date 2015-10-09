@@ -20,9 +20,13 @@ module Snapshot
         language_folder = File.join(Snapshot.config[:output_directory], language)
         FileUtils.mkdir_p(language_folder)
 
-        output_path = File.join(language_folder, [device_type.name, name].join("-") + ".png")
+        output_path = File.join(language_folder, [device_type, name].join("-") + ".png")
         from_path = File.join(attachments_path, filename)
-        Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
+        if $verbose
+          Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
+        else
+          Helper.log.info "Copying '#{output_path}'...".green
+        end
         FileUtils.cp(from_path, output_path)
       end
     end

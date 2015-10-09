@@ -19,10 +19,7 @@ class SnapshotApplication
     program :help, 'GitHub', 'https://github.com/krausefx/snapshot'
     program :help_formatter, :compact
 
-    # global_option '--snapfile PATH', String, 'Custom path for your Snapfile.'
-    # global_option '--noclean', 'Skips the clean process of the build command when running snapshot.'
-
-    global_option('--verbose', 'Shows more output including all output printed by Instruments.') { $verbose = true }
+    global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
 
     always_trace!
 

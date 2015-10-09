@@ -1,6 +1,7 @@
 require 'snapshot/version'
 require 'snapshot/runner'
 require 'snapshot/reports_generator'
+require 'snapshot/detect_values'
 require 'snapshot/screenshot_flatten'
 require 'snapshot/screenshot_rotate'
 require 'snapshot/simulator'
@@ -24,7 +25,7 @@ module Snapshot
 
     def config=(value)
       @config = value
-      Options.set_additional_default_values
+      DetectValues.set_additional_default_values
     end
 
     def snapfile_name

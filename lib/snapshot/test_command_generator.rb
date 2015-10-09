@@ -57,7 +57,7 @@ module Snapshot
       end
 
       def destination(device)
-        device_name = device.name.gsub("'", "\\'")
+        device_name = device.gsub("'", "\\'")
         value = "platform=iOS Simulator,name=#{device_name},OS=#{Snapshot.config[:ios_version]}"
 
         ["-destination '#{value}'"]

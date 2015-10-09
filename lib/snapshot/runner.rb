@@ -39,7 +39,7 @@ module Snapshot
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
-      Helper.log_alert("#{device_type.name} - #{language}")
+      Helper.log_alert("#{device_type} - #{language}")
 
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
