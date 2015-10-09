@@ -12,7 +12,9 @@ module Snapshot
         end
 
         unless output.include?("Known Devices")
-          raise "instruments CLI broken, run `instruments -s` and make sure it works".red
+          Helper.log.error "Instruments CLI broken, run `instruments -s` and make sure it works".red
+          Helper.log.error "The easiest way to fix this is to restart your Mac".red
+          raise "Instruments CLI not working...".red
         end
 
         output = output.split("Known Devices:").last.split("Known Templates:").first
