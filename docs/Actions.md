@@ -1434,3 +1434,12 @@ Print out an overview of the lane context values.
 ```ruby
 debug
 ```
+
+### dotgpg_environment
+
+Reads in production secrets set in a dotgpg file and puts them in ENV.
+
+```ruby
+dotgpg_environment(dotgpg_file:
+"./path/to/gpgfile")
+```
