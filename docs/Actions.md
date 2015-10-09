@@ -1073,6 +1073,20 @@ puts release['name']
 
 To get a list of all available values run `fastlane action get_github_release`.
 
+### import_from_git
+
+Import another Fastfile from a remote git repository to use its lanes.
+
+This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository.
+
+```ruby
+import_from_git(
+  url: 'git@github.com:KrauseFx/fastlane.git', # The url of the repository to import the Fastfile from.
+  branch: 'HEAD', # The branch to checkout on the repository. Defaults to `HEAD`.
+  path: 'fastlane/Fastfile' # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
+)
+```
+
 ## Using mercurial
 
 ### hg_ensure_clean_status
