@@ -88,7 +88,7 @@ module Spaceship
 
         return @client
       else
-        if (response.body || "").include?("You have successfully signed out")
+        if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         else

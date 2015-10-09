@@ -41,8 +41,14 @@ module Spaceship
         @cookie = "myacinfo=#{$1};"
         return @client
       else
-        # User Credentials are wrong
-        raise InvalidUserCredentialsError.new, response
+        # Something went wrong. Was it invalid credentials or server issue
+        if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
+          # User Credentials are wrong
+          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        else
+          info = [response.body, response['Set-Cookie']]
+          raise UnexpectedResponse.new, info.join("\n")
+        end
       end
     end
 
