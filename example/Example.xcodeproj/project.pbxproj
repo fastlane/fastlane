@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		645D46071BC709E9002FD9CC /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645D46061BC709E9002FD9CC /* SnapshotHelper.swift */; settings = {ASSET_TAGS = (); }; };
+		64D49E131BC805AC00C47C4F /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */; settings = {ASSET_TAGS = (); }; };
 		CA0BF1641A1117FD007D51BE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1631A1117FD007D51BE /* main.m */; };
 		CA0BF1671A1117FD007D51BE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1661A1117FD007D51BE /* AppDelegate.m */; };
 		CA0BF16A1A1117FD007D51BE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1691A1117FD007D51BE /* FirstViewController.m */; };
@@ -29,7 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		645D46061BC709E9002FD9CC /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
+		64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = ../../lib/assets/SnapshotHelper.swift; sourceTree = "<group>"; };
 		CA0BF15E1A1117FD007D51BE /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0BF1621A1117FD007D51BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CA0BF1631A1117FD007D51BE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -116,9 +116,9 @@
 		CAF3CF391B33E9AB006CEDE9 /* ExampleUITests */ = {
 			isa = PBXGroup;
 			children = (
+				64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */,
 				CAF3CF3A1B33E9AB006CEDE9 /* ExampleUITests.swift */,
 				CAF3CF3C1B33E9AB006CEDE9 /* Info.plist */,
-				645D46061BC709E9002FD9CC /* SnapshotHelper.swift */,
 			);
 			path = ExampleUITests;
 			sourceTree = "<group>";
@@ -236,7 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAF3CF3B1B33E9AB006CEDE9 /* ExampleUITests.swift in Sources */,
-				645D46071BC709E9002FD9CC /* SnapshotHelper.swift in Sources */,
+				64D49E131BC805AC00C47C4F /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
