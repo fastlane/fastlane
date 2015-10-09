@@ -1474,3 +1474,14 @@ Reads in production secrets set in a dotgpg file and puts them in ENV.
 dotgpg_environment(dotgpg_file:
 "./path/to/gpgfile")
 ```
+
+### update_info_plist
+
+Update an `Info.plist` with a bundle identifier and display name.
+
+```ruby
+update_info_plist(
+  xcodeproj: '/path/to/Project.xcodeproj', # Optional. Will pick the first `xcodeproj` in the directory if left blank
+  plist_path: '/path/to/Info.plist', # Path to the info plist file
+  app_identifier: 'com.example.newapp', # Optional. The new App Identifier of your app
+  display_name: 'MyNewApp' # Optional. The new Display Name of your app
