@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Snapshot::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["snapshot@krausefx.com"]
-  spec.summary       = 'Automate taking localized screenshots of your iOS app on every device'
-  spec.description   = 'Automate taking localized screenshots of your iOS app on every device'
+  spec.summary       = Snapshot::DESCRIPTION
+  spec.description   = Snapshot::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
