@@ -29,6 +29,9 @@ module Snapshot
       end
 
       raise errors.join('; ') if errors.count > 0
+
+      # Generate HTML report
+      ReportsGenerator.new.generate
     end
 
     def launch(language, device_type)

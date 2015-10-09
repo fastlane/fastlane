@@ -4,28 +4,25 @@ require 'fastimage'
 module Snapshot
   class ReportsGenerator
     def generate
-      config = SnapshotConfig.shared_instance
-      screens_path = config.screenshots_path
+      Helper.log.info "Generating HTML Report"
 
-      @title = config.html_title
+      screens_path = Snapshot.config[:output_directory]
+
       @data = {}
 
-      Dir["#{screens_path}/*"].sort.each do |language_path|
-        language = File.basename(language_path)
-        Dir[File.join(language_path, '*')].sort.each do |screenshot|
-          ["portrait", "landscape"].each do |orientation|
-            available_devices.each do |key_name, output_name|
-              next unless File.basename(screenshot).include?(key_name) and File.basename(screenshot).include?(orientation)
+      Dir[File.join(screens_path, "*")].sort.each do |language_folder|
+        language = File.basename(language_folder)
+        Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
+          available_devices.each do |key_name, output_name|
+            next unless File.basename(screenshot).include?(key_name)
 
-              output_name += " (#{orientation.capitalize})"
-              # This screenshot it from this device
-              @data[language] ||= {}
-              @data[language][output_name] ||= []
+            # This screenshot is from this device
+            @data[language] ||= {}
+            @data[language][output_name] ||= []
 
-              resulting_path = File.join('.', language, File.basename(screenshot))
-              @data[language][output_name] << resulting_path
-              break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
-            end
+            resulting_path = File.join('.', language, File.basename(screenshot))
+            @data[language][output_name] << resulting_path
+            break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
           end
         end
       end
