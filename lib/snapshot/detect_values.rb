@@ -16,7 +16,7 @@ module Snapshot
 
       # Devices
       unless config[:devices]
-        config[:devices] = Simulator.all.collect { |d| d.name }
+        config[:devices] = Simulator.all.collect(&:name)
       end
     end
 
