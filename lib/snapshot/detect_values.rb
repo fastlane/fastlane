@@ -7,12 +7,13 @@ module Snapshot
       detect_projects
 
       Snapshot.project = FastlaneCore::Project.new(config)
-      Snapshot.project.select_scheme
 
       # Go into the project's folder
       Dir.chdir(File.expand_path("..", Snapshot.project.path)) do
         config.load_configuration_file(Snapshot.snapfile_name)
       end
+
+      Snapshot.project.select_scheme
 
       # Devices
       unless config[:devices]
