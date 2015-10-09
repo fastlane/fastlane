@@ -8,6 +8,7 @@ require 'snapshot/dependency_checker'
 require 'snapshot/latest_ios_version'
 require 'snapshot/test_command_generator'
 require 'snapshot/error_handler'
+require 'snapshot/collector'
 
 require 'fastlane_core'
 

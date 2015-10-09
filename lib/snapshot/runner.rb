@@ -7,6 +7,8 @@ module Snapshot
     attr_accessor :errors
 
     def work
+      clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
+
       self.errors = []
 
       Helper.log.info "Building and running project - this might take some time...".green
@@ -19,6 +21,8 @@ module Snapshot
           rescue => ex
             Helper.log.error ex # we should to show right here as well
             errors << ex
+
+            raise ex if Snapshot.config[:stop_after_first_error]
           end
         end
       end
@@ -44,70 +48,22 @@ module Snapshot
                                                 "Touching" => "Running Tests: "
                                               },
                                               error: proc do |output, return_code|
-                                                Helper.log.info "cought error... #{return_code}".red
                                                 ErrorHandler.handle_test_error(output, return_code)
+
                                                 # no exception raised... that means we need to retry
+                                                Helper.log.info "Cought error... #{return_code}".red
                                                 launch(language, device_type)
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
-      fetch_screenshots(raw_output, language, device_type)
+      Collector.fetch_screenshots(raw_output, language, device_type)
     end
 
-    def fetch_screenshots(output, language, device_type)
-      # Documentation about how this works in the project README
-
-      Helper.log.info "Collecting screenshots..."
-      containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
-      attachments_path = File.join(containing, "Attachments")
-
-      plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
-      Helper.log.info "Loading up '#{plist_path}'..." if $verbose
-      report = Plist.parse_xml(plist_path)
-
-      activities = []
-      report["TestableSummaries"].each do |summary|
-        summary["Tests"].each do |test|
-          test["Subtests"].each do |subtest|
-            subtest["Subtests"].each do |subtest2|
-              subtest2["Subtests"].each do |subtest3|
-                subtest3["ActivitySummaries"].each do |activity|
-                  activities << activity if activity["Title"].include?("Long press Target Application")
-                end
-              end
-            end
-          end
-        end
-      end
-
-      Helper.log.info "Found #{activities.count} screenshots..."
-
-      to_store = [] # contains the names of all the attachments we want to use
-      activities.each do |activity|
-        # We do care about this, all "Long press Target" events mean screenshots
-        attachment_entry = activity["SubActivities"].last # the latest event is fine
-        to_store << attachment_entry["Attachments"].last["FileName"]
-      end
-
-      Helper.log.info "Found #{to_store.join(', ')}" if $verbose
-
-      matches = output.scan(/snapshot: (.*)/)
-
-      if matches.count != to_store.count
-        Helper.log.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
-      end
-
-      matches.each_with_index do |current, index|
-        name = current[0]
-        filename = to_store[index]
-
-        language_folder = File.join(Snapshot.config[:output_directory], language)
-        FileUtils.mkdir_p(language_folder)
-
-        output_path = File.join(language_folder, [device_type.name, name].join("-") + ".png")
-        from_path = File.join(attachments_path, filename)
-        Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
-        FileUtils.cp(from_path, output_path)
+    def clear_previous_screenshots
+      Helper.log.info "Clearing previously generated screenshots".yellow
+      path = File.join(".", Snapshot.config[:output_directory], "*", "*.png")
+      Dir[path].each do |path|
+        File.delete(path)
       end
     end
   end
