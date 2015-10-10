@@ -9,12 +9,15 @@
 import Foundation
 import XCTest
 
+var deviceLanguage = ""
+
 func setLanguage(app: XCUIApplication)
 {
     let path = "/tmp/language.txt"
     
     do {
         let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+        deviceLanguage = locale
         app.launchArguments = ["-AppleLanguages", "(\(locale))"]
     } catch {
         print("Couldn't detect/set language...")
