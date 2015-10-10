@@ -246,7 +246,24 @@ describe Fastlane do
       it "properly shows an error message when there is a syntax error in the Fastfile" do
         expect do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSytnaxError')
-        end.to raise_error("Syntax error in your Fastfile on line 17: (eval):17: syntax error, unexpected keyword_end, expecting ')'".red)
+        end.to raise_error("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'".red)
+      end
+
+      it "properly shows an error message when there is a syntax error in the Fastfile from string" do
+        expect do
+          ff = Fastlane::FastFile.new.parse("lane :test do
+            cases = [:abc,
+          end")
+        end.to raise_error("Syntax error in your Fastfile on line 3: (eval):3: syntax error, unexpected keyword_end, expecting ']'
+          end
+             ^".red)
+      end
+
+      it "properly shows an error message when there is a syntax error in the imported Fastfile" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile')
+        expect do
+          ff.import('./FastfileSytnaxError')
+        end.to raise_error("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'".red)
       end
 
       it "raises an error if lane is not available" do
