@@ -33,13 +33,6 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
-You have an iPhone app. You support 20 languages. You updated the design. You want to release the update to the App Store.
-What's missing?
-
-**New Screenshots**
-
-You want them to look **perfect** and **gorgeous**. They should show the same screens on all devices in all languages.
-
 You have to manually create 20 (languages) x 5 (devices) x 5 (screenshots) = **500 screenshots**.
 
 It's hard to get everything right!
@@ -50,7 +43,9 @@ It's hard to get everything right!
 - [Clean Status Bar](#use-a-clean-status-bar)
 - Uploading screenshots ([`deliver`](https://github.com/KrauseFx/deliver) is your friend)
 
-This gem solves all those problems. It will run completely in the background - you can do something else, while your computer takes the screenshots for you.
+More information about [creating perfect screenshots](https://krausefx.com/blog/creating-perfect-app-store-screenshots-of-your-ios-app).
+
+`snapshot` runs completely in the background - you can do something else, while your computer takes the screenshots for you.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -91,7 +86,6 @@ As a result, `snapshot` was completely rewritten from ground up without changing
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/KrauseFx/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - `snapshot` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
-- Support for advanced configuration, like preprocess macros or [prefilling of data](#prefilling)
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -100,17 +94,18 @@ After `snapshot` successfully created new screenshots, it will generate a beauti
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
 ## Why?
+
 This tool automatically switches the language and device type and runs UI Tests for every combination.
 
 ### Why should I automate this process?
 
 - It takes **hours** to take screenshots
+- You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
+- Easy verification for translators (without an iDevice) that translations do make sense in real App context
+- Easy verification that localizations fit into labels on all screen dimensions
 - It is an integration test: You can test for UI elements and other things inside your scripts
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
 - You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script
-- You get a great overview of all your screens, running on all available simulators without the need to manually start it hundreds of times
-- Easy verification that localizations fit into labels on all screen dimensions
-- Easy verification for translators (without an iDevice) that translations do make sense in real App context
 
 # Installation
 
@@ -135,10 +130,18 @@ Here a few links to get started:
 
 # Quick Start
 
-- Run `snapshot init` in your project folder
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
+- Run `snapshot init` in your project folder
+- Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
 - In your UI Test class, click the `Record` button on the bottom left and record your interaction
 - Add `snapshot("01LoginScreen")` method calls inbetween your interactions to take new screenshots
+- Add the following code to your `setUp()` method
+
+```swift
+let app = XCUIApplication()
+setLanguage(app)
+app.launch()
+```
 
 TODO: renew
 Here is a nice gif, that shows `snapshot` in action:
@@ -297,7 +300,7 @@ If you want to add frames around the screenshots and even put a title on top, ch
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
-## Editing the ```Snapfile```
+## Editing the `Snapfile`
 Change syntax highlighting to *Ruby*.
 
 ### Simulator doesn't launch the application
@@ -322,12 +325,3 @@ Please submit an issue on GitHub and provide information about your setup
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
-
-# Contributing
-
-1. Create an issue to discuss about your idea
-2. Fork it (https://github.com/KrauseFx/snapshot/fork)
-3. Create your feature branch (`git checkout -b my-new-feature`)
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create a new Pull Request
