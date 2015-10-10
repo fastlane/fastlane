@@ -9,6 +9,12 @@ fastlane actions: List all available fastlane actions
 fastlane action [action_name]:
 ```
 
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
 - [Building](#building)
 - [Testing](#testing)
 - [Deploying](#deploying)
@@ -1006,11 +1012,7 @@ add_git_tag(
 
 ### git_pull
 
-Executes a simple `git pull` command
-
-```ruby
-git_pull # will run `git pull --tags`
-```
+Executes a simple `git pull --tags` command
 
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
