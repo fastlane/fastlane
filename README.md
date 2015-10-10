@@ -289,98 +289,6 @@ If you find a better way to do any of this, please submit an issue on GitHub or 
 
 If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://github.com/fastlane/frameit).
 
-## Prefilling
-
-Usually you want to mock your screenshot data to show the same content for all screenshots.
-
-There are 2 ways of doing this:
-
-#### Preprocessor macro
-Use the preprocessor macro `SNAPSHOT` to check if `snapshot` is currently running in your code. This enables you to add checks like this:
-
-```objective-c
-#ifdef SNAPSHOT
-// Your Code here
-#endif
-```
-
-Open your `Snapfile` and add `custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1'"` to it.
-
-#### By pre-filling data/documents in the bundle
-
-As used by [MindNode](https://github.com/fastlane/examples/blob/master/MindNode/Snapfile) you can fill your bundle after building with demo data using your `Snapfile` to use it on run-time.
-
-```ruby
-example_files = './ExampleDocuments'
-folder_name = "ExampleDocuments"
-
-setup_for_device_change do |device, udid, language|
-  # This will make sure, all example documents are installed on the simulator
-
-  puts "Copying example files to .app"
-
-  app_path = "/tmp/snapshot/build/MindNode.app/"
-
-  FileUtils.mkdir_p(File.join(app_path, folder_name))
-
-  Dir.glob(File.join(example_files, '*.mindnode')).each do |example_path|
-    puts "Copying '#{example_path}' to .app container"
-    FileUtils.cp_r(example_path, File.join(app_path, folder_name)) rescue nil # in case the file already exists
-  end
-end
-```
-
-This is simple Ruby that gets executed **after** the app was built and **before** it is installed on the simulator.
-
-In your `Objective-C` code you can now load the documents from your bundle and copy them over to your `Documents` folder (if necessary).
-
-```objective-c
-#ifdef SNAPSHOT
-/** This method will take care of copying over the example documents from the app's bundle into the `Documents` directory */
-+ (void)load
-{
-    static NSString *exampleFolderName = @"ExampleDocuments";
-    if ([[NSBundle mainBundle] pathForResource:exampleFolderName ofType:@""]) {
-        NSArray *filesToCopy = @[@"File1",
-                                 @"File2"];
-        NSString *documents = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
-        
-        for (NSString *currentFile in filesToCopy) {
-            NSString *from = [[NSBundle mainBundle] pathForResource:currentFile ofType:@"filetype" inDirectory:exampleFolderName];
-            if (from && documents) {
-                NSError *error = nil;
-                NSString *resultingFileName = [NSString stringWithFormat:@"%@.filetype", currentFile];
-                [[NSFileManager defaultManager] copyItemAtPath:from
-                                                        toPath:[documents stringByAppendingPathComponent:resultingFileName]
-                                                         error:&error];
-                
-                if (error) {
-                    NSLog(@"Error copying the example MindNode file: %@", error);
-                }
-            }
-        }
-    }
-}
-
-```
-
-## Run in Continuous Integration System
-If you want to run `snapshot` on your `Jenkins` machine (or any other CI-system), you might run into an `authorization` popup coming up.
-
-You can disable this dialog, running the following command:
-```
-security authorizationdb read system.privilege.taskport > /tmp/system.privilege.taskport.plist
-/usr/libexec/PlistBuddy -c "Set :allow-root true" /tmp/system.privilege.taskport.plist
-sudo security authorizationdb write system.privilege.taskport < /tmp/system.privilege.taskport.plist
-```
-I found this solution in the [`Subliminal` wiki](https://github.com/inkling/Subliminal/wiki/Continuous-Integration#faq).
-
-## Specify a custom ```Snapfile```
-
-    snapshot --snapfile ./SpecialSnapfile
-
-Be aware: The file will be executed from the current directory, not the location of the ```Snapfile```. That means: ```./screenshots``` will export the screenshots to the current directory of your terminal session.
-
 ## Available language codes
 ```ruby
 ["cs-CZ", "da-DK", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-CA", "fr-FR", "id-ID", "it-IT", "ja-JP", "ko-KR", "ms-MY", "nl-NL", "no-NO", "pt-BR", "pt-PT", "ru-RU", "sv-SE", "th-TH", "tr-TR", "vi-VI", "cmn-Hans", "cmn-Hant"]
@@ -392,50 +300,19 @@ You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/Simulator
 ## Editing the ```Snapfile```
 Change syntax highlighting to *Ruby*.
 
-## Instruments is not responding
-Unfortunately ```Instruments``` sometimes decides, to not respond to anything. Which means, neither the ```Instruments``` application, nor the ```instruments``` command line work. Killing the process doesn't help.
-
-The only way to fix this, is a restart of the Mac. 
-
-## Use a custom build system
-Using a build systems not based on Xcode –such as RubyMotion or Xamarin– is also possible.
-
-### RubyMotion
-
-Add to your ```Snapfile```:
-
-```ruby
-build_dir 'build/iPhoneSimulator-7.0-Development'
-build_command 'rake build:simulator'
-```
-
-### Xamarin
-
-Add to your ```Snapfile```:
-
-```ruby
-build_dir 'YourProject/bin/iPhoneSimulator'
-build_command '/Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool -v build "--configuration:Debug|iPhoneSimulator" YourProject.sln'
-```
-
 ### Simulator doesn't launch the application
 
 When the app dies directly after the application is launched there might be 2 problems
 
 - The simulator is somehow in a broken state and you need to re-create it. You can use `snapshot reset_simulators` to reset all simulators (this will remove all installed apps)
-- You haven't enabled the correct architectures. Make sure you have the same architectures as in the example project of this repository. 
+- A restart helps very often
 
-### Snapshot throws an `Instruments Usage Error: Timed out waiting for device to boot: ...` error 
+## Determine language
 
-This can happen when you launch `fastlane` or `snapshot` inside of a tool like `tmux`. Thankfully, Chris Johnsen wrote a fix to help us out, which you can find [here](https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard). Just follow the instructions at his repository, and launching the Simulator from `tmux` will work!
-
-## Determine language in UI Automation script
-
-To detect the currently used localization in your Javascript file, use the following code:
+To detect the currently used localization in your tests, use the following code:
 
 ```javascript
-var result = target.host().performTaskWithPathArgumentsTimeout("/usr/bin/printenv" , ["SNAPSHOT_LANGUAGE"], 5);
-var language = result.stdout.substring(0, result.stdout.length - 1);
+You can access the language using the `deviceLanguage` variable.
 ```
 
 # Need help?
