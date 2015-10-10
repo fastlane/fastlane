@@ -20,7 +20,7 @@ module Snapshot
         language_folder = File.join(Snapshot.config[:output_directory], language)
         FileUtils.mkdir_p(language_folder)
 
-        device_name = device_type.gsub(" ", "")
+        device_name = device_type.delete(" ")
         output_path = File.join(language_folder, [device_name, name].join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose

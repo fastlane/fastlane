@@ -59,11 +59,11 @@ module Snapshot
       def destination(device)
         # we now fetch the device's udid. Why? Because we might get this error message
         # > The requested device could not be found because multiple devices matched the request.
-        # 
+        #
         # This happens when you have multiple simulators for a given device type / iOS combination
         #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
-        # 
+        #
 
         device_udid = nil
         Simulator.all.each do |sim|
