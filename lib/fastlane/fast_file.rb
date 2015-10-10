@@ -36,7 +36,7 @@ module Fastlane
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         # create nice path that we want to print in case of some problem
-        relative_path = path.nil? ? nil : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+        relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
 
         begin
           # We have to use #get_binding method, because some test files defines method called `path` (for example SwitcherFastfile)
@@ -45,17 +45,10 @@ module Fastlane
           # instead of local.
 
           # rubocop:disable Lint/Eval
-          if path.nil?
-            eval(data, parsing_binding) # this is okay in this case
-          else
-            eval(data, parsing_binding, relative_path) # this is okay in this case
-          end
+          eval(data, parsing_binding, relative_path) # using eval is ok for this case
           # rubocop:enable Lint/Eval
         rescue SyntaxError => ex
-          match = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/) unless relative_path.nil?
-          match ||= ex.to_s.match(/\(eval\):(\d+)/)
-
-          line = match[1]
+          line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
           raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
         end
       end
