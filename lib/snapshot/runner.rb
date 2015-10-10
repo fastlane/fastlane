@@ -45,12 +45,20 @@ module Snapshot
 
       Helper.log_alert("#{device_type} - #{language}")
 
+      prefix_hash = [
+        {
+          prefix: "Running Tests: ",
+          block: proc do |value|
+            value.include?("Touching")
+          end
+        }
+      ]
+
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
-                                             prefix: {
-                                                "Touching" => "Running Tests: "
-                                              },
+                                             prefix: prefix_hash,
+                                            loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
 
