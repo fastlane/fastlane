@@ -16,7 +16,7 @@ module Gym
         raise "No project/workspace found in the current directory.".red
       end
 
-      Gym.project = Project.new(config)
+      Gym.project = FastlaneCore::Project.new(config)
       detect_provisioning_profile
 
       # Go into the project's folder
@@ -106,36 +106,7 @@ module Gym
     end
 
     def self.detect_scheme
-      config = Gym.config
-      proj_schemes = Gym.project.schemes
-
-      if config[:scheme].to_s.length > 0
-        # Verify the scheme is available
-        unless proj_schemes.include?(config[:scheme].to_s)
-          Helper.log.error "Couldn't find specified scheme '#{config[:scheme]}'.".red
-          config[:scheme] = nil
-        end
-      end
-
-      return if config[:scheme].to_s.length > 0
-
-      if proj_schemes.count == 1
-        config[:scheme] = proj_schemes.last
-      elsif proj_schemes.count > 1
-        if Helper.is_ci?
-          Helper.log.error "Multiple schemes found but you haven't specified one.".red
-          Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-          raise "Multiple schemes found".red
-        else
-          puts "Select Scheme: "
-          config[:scheme] = choose(*(proj_schemes))
-        end
-      else
-        Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
-        Helper.log.error "Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use".red
-
-        raise "No Schemes found".red
-      end
+      Gym.project.select_scheme
     end
 
     # Is it an iOS device or a Mac?

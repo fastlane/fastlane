@@ -4,7 +4,7 @@ describe Gym do
       options = { project: "./examples/multipleSchemes/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options,
                                                       options)
-      @project = Gym::Project.new(Gym.config)
+      @project = FastlaneCore::Project.new(Gym.config)
     end
 
     it "#schemes returns all available schemes" do

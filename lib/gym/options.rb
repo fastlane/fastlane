@@ -65,7 +65,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "GYM_BUILDLOG_PATH",
-                                     description: "The directory were to store the build log",
+                                     description: "The directory where to store the build log",
                                      default_value: "~/Library/Logs/gym"),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
