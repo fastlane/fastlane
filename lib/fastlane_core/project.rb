@@ -1,6 +1,62 @@
 module FastlaneCore
   # Represents an Xcode project
   class Project
+    class << self
+      # Project discovery
+      def detect_projects(config)
+        if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
+          raise "You can only pass either a workspace or a project path, not both".red
+        end
+
+        return if config[:project].to_s.length > 0
+
+        if config[:workspace].to_s.length == 0
+          workspace = Dir["./*.xcworkspace"]
+          if workspace.count > 1
+            puts "Select Workspace: "
+            config[:workspace] = choose(*(workspace))
+          else
+            config[:workspace] = workspace.first # this will result in nil if no files were found
+          end
+        end
+
+        return if config[:workspace].to_s.length > 0
+
+        if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
+          project = Dir["./*.xcodeproj"]
+          if project.count > 1
+            puts "Select Project: "
+            config[:project] = choose(*(project))
+          else
+            config[:project] = project.first # this will result in nil if no files were found
+          end
+        end
+
+        if config[:workspace].nil? and config[:project].nil?
+          select_project(config)
+        end
+      end
+
+      def select_project(config)
+        loop do
+          path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
+          if File.directory? path
+            if path.end_with? ".xcworkspace"
+              config[:workspace] = path
+              break
+            elsif path.end_with? ".xcodeproj"
+              config[:project] = path
+              break
+            else
+              Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
+            end
+          else
+            Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
+          end
+        end
+      end
+    end
+
     # Path to the project/workspace
     attr_accessor :path
 
