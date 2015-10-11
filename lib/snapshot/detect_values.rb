@@ -4,7 +4,7 @@ module Snapshot
     def self.set_additional_default_values
       config = Snapshot.config
 
-      detect_projects
+      FastlaneCore::Project.detect_projects(config)
 
       Snapshot.project = FastlaneCore::Project.new(config)
 
@@ -18,28 +18,6 @@ module Snapshot
       # Devices
       unless config[:devices]
         config[:devices] = Simulator.all.collect(&:name)
-      end
-    end
-
-    def self.detect_projects
-      if Snapshot.config[:workspace].to_s.length == 0
-        workspace = Dir["./*.xcworkspace"]
-        if workspace.count > 1
-          puts "Select Workspace: "
-          Snapshot.config[:workspace] = choose(*(workspace))
-        else
-          Snapshot.config[:workspace] = workspace.first # this will result in nil if no files were found
-        end
-      end
-
-      if Snapshot.config[:workspace].to_s.length == 0 and Snapshot.config[:project].to_s.length == 0
-        project = Dir["./*.xcodeproj"]
-        if project.count > 1
-          puts "Select Project: "
-          Snapshot.config[:project] = choose(*(project))
-        else
-          Snapshot.config[:project] = project.first # this will result in nil if no files were found
-        end
       end
     end
   end
