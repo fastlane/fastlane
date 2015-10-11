@@ -128,6 +128,8 @@ Here a few links to get started:
 - [A first look into UI Tests](http://www.mokacoding.com/blog/xcode-7-ui-testing/)
 - [UI Testing in Xcode 7](http://masilotti.com/ui-testing-xcode-7/)
 
+**Note**: Since there is no official way to trigger a screenshot from UI Tests, `snapshot` uses a workaround (described in [How Does It Work?](how-does-it-work)) to trigger a screenshot. If you feel like this should be done right, please duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
+
 # Quick Start
 
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
@@ -267,6 +269,8 @@ In the test output, the Swift `snapshot` function will print out something like 
 - The language is passed via a temporary file which is written by `snapshot` before running the tests and read by the UI Tests when launching the application
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
+
+Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) to make things easier.
 
 # Tips
 
