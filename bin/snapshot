@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'snapshot'
 require 'commander'
-require 'snapshot/options'
 
 HighLine.track_eof = false
 
