@@ -47,7 +47,7 @@ module Snapshot
               subtest2["Subtests"].each do |subtest3|
                 subtest3["ActivitySummaries"].each do |activity|
                   # We now check if it's the drag gesture with a negative value
-                  was_snapshot = activity["Title"].match(/Press and drag from Target Application.*\[\-.*\].*/)
+                  was_snapshot = activity["Title"].match(/Press and drag from Target Application.*\[32.10.*\].*/)
                   activities << activity if was_snapshot
                 end
               end
