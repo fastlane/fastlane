@@ -170,9 +170,7 @@ There are a lot of options available that define how to build your app, for exam
 
 ```sh
 snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
-```
-
-You can also 
+``` 
 
 For a list for all available options run
 
