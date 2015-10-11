@@ -6,15 +6,7 @@ module Gym
     def self.set_additional_default_values
       config = Gym.config
 
-      detect_projects
-
-      if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
-        raise "You can only pass either a workspace or a project path, not both".red
-      end
-
-      if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
-        raise "No project/workspace found in the current directory.".red
-      end
+      FastlaneCore::Project.detect_projects(config)
 
       Gym.project = FastlaneCore::Project.new(config)
       detect_provisioning_profile
@@ -57,51 +49,6 @@ module Gym
 
       if Gym.config[:provisioning_profile_path]
         FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
-      end
-    end
-
-    def self.detect_projects
-      return if Gym.config[:project].to_s.length > 0
-
-      if Gym.config[:workspace].to_s.length == 0
-        workspace = Dir["./*.xcworkspace"]
-        if workspace.count > 1
-          puts "Select Workspace: "
-          Gym.config[:workspace] = choose(*(workspace))
-        else
-          Gym.config[:workspace] = workspace.first # this will result in nil if no files were found
-        end
-      end
-
-      return if Gym.config[:workspace].to_s.length > 0
-
-      if Gym.config[:workspace].to_s.length == 0 and Gym.config[:project].to_s.length == 0
-        project = Dir["./*.xcodeproj"]
-        if project.count > 1
-          puts "Select Project: "
-          Gym.config[:project] = choose(*(project))
-        else
-          Gym.config[:project] = project.first # this will result in nil if no files were found
-        end
-      end
-    end
-
-    def self.choose_project
-      loop do
-        path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
-        if File.directory? path
-          if path.end_with? ".xcworkspace"
-            config[:workspace] = path
-            break
-          elsif path.end_with? ".xcodeproj"
-            config[:project] = path
-            break
-          else
-            Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
-          end
-        else
-          Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
-        end
       end
     end
 
