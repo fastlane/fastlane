@@ -2,7 +2,7 @@ describe Snapshot do
   describe Snapshot::TestCommandGenerator do
     describe "Valid Configuration" do
       before do
-        options = { project: "./example/Example.xcodeproj" }
+        options = { project: "./example/Example.xcodeproj", scheme: "ExampleUITests" }
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
       end
 
