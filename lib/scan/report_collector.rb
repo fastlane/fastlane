@@ -1,20 +1,22 @@
 module Scan
   class ReportCollector
-    SUPPORTED = %w(html junit)
+    SUPPORTED = %w(html junit json-compilation-database)
 
     def parse_raw_file(path)
       raise "Couldn't find file at path '#{path}'".red unless File.exist?(path)
 
       commands = generate_commands(path)
-      commands.each do |command|
+      commands.each do |output_path, command|
         system(command)
+        Helper.log.info("Successfully generated report at '#{output_path}'".green)
       end
     end
 
+    # Returns a hash containg the resulting path as key and the command as value
     def generate_commands(path)
       types = Scan.config[:output_types]
       types = types.split(",") if types.kind_of?(String) # might already be an array when passed via fastlane
-      commands = []
+      commands = {}
 
       types.each do |raw|
         type = raw.strip
@@ -30,9 +32,11 @@ module Scan
         parts << "xcpretty"
         parts << "--report #{type}"
         parts << "--output '#{output_path}'"
+        parts << "&> /dev/null "
 
-        commands << parts.join(" ")
+        commands[output_path] = parts.join(" ")
       end
+
       return commands
     end
   end

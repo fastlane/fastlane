@@ -13,7 +13,9 @@ describe Scan do
       commands = Scan::ReportCollector.new.generate_commands(path)
 
       expect(commands.count).to eq(1)
-      expect(commands).to eq(["cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html'"])
+      expect(commands).to eq({
+        "/tmp/report.html" => "cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null "
+      })
     end
   end
 end
