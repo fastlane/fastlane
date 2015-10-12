@@ -4,12 +4,6 @@ require "credentials_manager"
 module Scan
   class Options
     def self.available_options
-      return @options if @options
-
-      @options = plain_options
-    end
-
-    def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
@@ -32,6 +26,14 @@ module Scan
                                        raise "Project file not found at path '#{v}'".red unless File.exist?(v)
                                        raise "Project file invalid".red unless File.directory?(v)
                                        raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :device,
+                                     short_option: "-a",
+                                     optional: true,
+                                     env_name: "SCAN_DEVICE",
+                                     description: "The name of the simulator type you want to run tests on",
+                                     verify_block: proc do |value|
+                                       
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
@@ -64,16 +66,10 @@ module Scan
                                      env_name: "SCAN_CONFIGURATION",
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :silent,
-                                     short_option: "-a",
-                                     env_name: "SCAN_SILENT",
-                                     description: "Hide all information that's not necessary while building",
-                                     default_value: false,
-                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
                                      env_name: "SCAN_DESTINATION",
-                                     description: "Use a custom destination for building the app",
+                                     description: "Use only if you're a pro, use the other options instead",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",

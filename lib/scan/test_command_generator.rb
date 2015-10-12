@@ -33,7 +33,7 @@ module Scan
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-destination '#{config[:destination]}'" if config[:destination]
+        options << "-destination '#{config[:destination]}'"
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
@@ -59,6 +59,7 @@ module Scan
         ["| tee '#{xcodebuild_log_path}' | xcpretty"]
       end
 
+      # Store the raw file
       def xcodebuild_log_path
         file_name = "#{Scan.project.app_name}-#{Scan.config[:scheme]}.log"
         containing = File.expand_path(Scan.config[:buildlog_path])

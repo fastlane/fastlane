@@ -16,18 +16,37 @@ module Scan
 
       Scan.project.select_scheme
 
-      detect_platform # we can only do that *after* we have the scheme
+      default_device unless config[:device]
+      detect_destination
 
       return config
     end
 
-    # Is it an iOS device or a Mac?
-    def self.detect_platform
-      return if Scan.config[:destination]
-      platform = Scan.project.mac? ? "OS X" : "iOS" # either `iOS` or `OS X`
+    def self.default_device
+      config = Scan.config
 
-      # TODO: here
-      Scan.config[:destination] = "platform=iOS Simulator,name=iPhone 5s"
+      # An iPhone 5s is reasonable small and useful for tests
+      found = FastlaneCore::Simulator.all.find { |d| d.name == "iPhone 5s" }
+      found ||= FastlaneCore::Simulator.all.first # anything is better than nothing
+
+      config[:device] = found.name
+      raise "No simulators found".red unless config[:device]
+    end
+
+    # Is it an iOS device or a Mac?
+    def self.detect_destination
+      if Scan.config[:destination]
+        Helper.log.info "It's not recommended to set the `destination` value directly".yellow
+        Helper.log.info "Instead use the other options available in `scan --help`".yellow
+        Helper.log.info "Using your value '#{Scan.config[:destination]}' for now".yellow
+        Helper.log.info "because I trust you know what you're doing...".yellow
+        return
+      end
+
+      # building up the destination now
+      Scan.config[:destination] = "platform=iOS Simulator,name=#{Scan.config[:device]}"
+      require 'pry'
+      binding.pry
     end
   end
 end
