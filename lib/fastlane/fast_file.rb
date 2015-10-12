@@ -24,19 +24,31 @@ module Fastlane
                     'you should turn off smart quotes in your editor of choice.'.red
       end
 
-      parse(content)
+      parse(content, @path)
     end
 
-    def parse(data)
+    def parsing_binding
+      binding
+    end
+
+    def parse(data, path = nil)
       @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+        # create nice path that we want to print in case of some problem
+        relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+
         begin
+          # We have to use #get_binding method, because some test files defines method called `path` (for example SwitcherFastfile)
+          # and local variable has higher priority, so it causes to remove content of original Fastfile for example. With #get_binding
+          # is this always clear and safe to declare any local variables we want, because the eval function uses the instance scope
+          # instead of local.
+
           # rubocop:disable Lint/Eval
-          eval(data) # this is okay in this case
+          eval(data, parsing_binding, relative_path) # using eval is ok for this case
           # rubocop:enable Lint/Eval
         rescue SyntaxError => ex
-          line = ex.to_s.match(/\(eval\):(\d+)/)[1]
+          line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
           raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
         end
       end
@@ -190,7 +202,7 @@ module Fastlane
       raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
 
       collector.did_launch_action(:import)
-      parse(File.read(path))
+      parse(File.read(path), path)
 
       # Check if we can also import local actions which are in the same directory as the Fastfile
       actions_path = File.join(File.expand_path("..", path), 'actions')
