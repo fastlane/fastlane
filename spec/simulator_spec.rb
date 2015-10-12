@@ -44,5 +44,14 @@ describe FastlaneCore do
       expect(sim.udid).to eq('863234B6-C857-4DF3-9E27-897DEDF26EDA')
       expect(sim.ios_version).to eq('9.0')
     end
+
+    it "doesn't call the CLI twice as it's super slow" do
+      response = "response"
+      expect(response).to receive(:read).and_return(@valid_simulators)
+      expect(Open3).to receive(:popen3).with("instruments -s").and_yield(nil, response, nil, nil)
+
+      expect(FastlaneCore::Simulator.all.count).to eq(11)
+      expect(FastlaneCore::Simulator.all.count).to eq(11)
+    end
   end
 end
