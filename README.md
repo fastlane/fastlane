@@ -82,6 +82,12 @@ You'll be asked for any missing information. Additionally, you can pass all kind
 pilot --help
 ```
 
+You can pass a changelog using
+
+```
+pilot upload --changelog "Something that is new here"
+```
+
 You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributed to testers:
 
 ```

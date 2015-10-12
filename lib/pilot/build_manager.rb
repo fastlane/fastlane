@@ -18,8 +18,8 @@ module Pilot
         Helper.log.info "Successfully uploaded the new binary to iTunes Connect"
 
         unless config[:skip_submission]
-          upload_date = wait_for_processing_build
-          distribute_build(upload_date)
+          uploaded_build = wait_for_processing_build
+          distribute_build(uploaded_build, options)
 
           Helper.log.info "Successfully distribute build to beta testers 🚀"
         end
@@ -59,49 +59,50 @@ module Pilot
     end
 
     # This method will takes care of checking for the processing builds every few seconds
-    # @return [Integer] The upload date
+    # @return [Build] The build that we just uploaded
     def wait_for_processing_build
       # the upload date of the new buid
       # we use it to identify the build
-      upload_date = nil
+
+      latest_build = nil
       loop do
         Helper.log.info "Waiting for iTunes Connect to process the new build"
         sleep 30
         builds = app.all_processing_builds
         break if builds.count == 0
-        upload_date = builds.last.upload_date
+        latest_build = builds.last # store the latest pre-processing build here
       end
 
-      if upload_date
+      full_build = nil
+
+      while full_build.nil? || full_build.processing
+        # Now get the full builds with a reference to the application and more
+        # As the processing build from before doesn't have a refernece to the application
+        full_build = app.build_trains[latest_build.train_version].builds.find do |b|
+          b.build_version == latest_build.build_version
+        end
+
+        Helper.log.info "Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})"
+        sleep 5
+      end
+
+      if full_build
         Helper.log.info "Build successfully processed by iTunes Connect".green
-        return upload_date
+        return full_build
       else
         raise "Error: Seems like iTunes Connect didn't properly pre-process the binary".red
       end
     end
 
-    def distribute_build(upload_date)
+    def distribute_build(uploaded_build, options)
       Helper.log.info "Distributing new build to testers"
 
-      # We try this multiple times, as it sometimes takes some time
-      # to process the binary
-      100.times do
-        current_build = app.builds.find do |build|
-          build.upload_date == upload_date
-        end
+      # First, set the changelog (if necessary)
+      uploaded_build.update_build_information!(whats_new: options[:changelog])
 
-        if current_build
-          current_build.build_train.update_testing_status!(true, 'external')
-          return true
-        else
-          Helper.log.info "Binary is not yet available online..."
-          sleep 30
-        end
-      end
-
-      Helper.log.error "Build is not visible on iTunes Connect any more - couldn't distribute to testers.".red
-      Helper.log.error "You can run `pilot --skip_submission` to only upload the binary without distributing.".red
-      raise "Error distributing the binary"
+      # Submit for internal beta testing
+      uploaded_build.build_train.update_testing_status!(true, 'external')
+      return true
     end
   end
 end

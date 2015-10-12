@@ -20,6 +20,11 @@ module Pilot
                                        raise "Could not find ipa file at path '#{value}'" unless File.exist? value
                                        raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
                                      end),
+        FastlaneCore::ConfigItem.new(key: :changelog,
+                                     short_option: "-w",
+                                     optional: true,
+                                     env_name: "PILOT_CHANGELOG",
+                                     description: "Provide the what's new text when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :skip_submission,
                                      short_option: "-s",
                                      env_name: "PILOT_SKIP_SUBMISSION",
