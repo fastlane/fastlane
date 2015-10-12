@@ -21,12 +21,7 @@ module Gym
       # This will also include the scheme (if given)
       # @return [Array] The array with all the components to join
       def project_path_array
-        config = Gym.config
-        proj = []
-        proj << "-workspace '#{config[:workspace]}'" if config[:workspace]
-        proj << "-scheme '#{config[:scheme]}'" if config[:scheme]
-        proj << "-project '#{config[:project]}'" if config[:project]
-
+        proj = Gym.project.xcodebuild_parameters
         return proj if proj.count > 0
         raise "No project/workspace found"
       end
