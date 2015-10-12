@@ -112,6 +112,21 @@ module Spaceship
         self.internal_expiry_date ||= 0
       end
 
+      def update_build_information!(whats_new: nil,
+                                    description: nil,
+                                    feedback_email: nil)
+        parameters = {
+          app_id: self.build_train.application.apple_id,
+          train: self.build_train.version_string,
+          build_number: self.build_version
+        }.merge({
+          whats_new: whats_new,
+          description: description,
+          feedback_email: feedback_email
+        })
+        client.update_build_information!(parameters)
+      end
+
       # This will submit this build for TestFlight beta review
       # @param metadata [Hash] A hash containing the following information (keys must be symbols):
       #  {

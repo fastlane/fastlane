@@ -464,6 +464,37 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    def update_build_information!(app_id: nil,
+                                  train: nil,
+                                  build_number: nil,
+
+                                  # optional:
+                                  whats_new: nil,
+                                  description: nil,
+                                  feedback_email: nil)
+      url = "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/testInformation"
+      r = request(:get) do |req|
+        req.url url
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+
+      build_info = r.body['data']
+      build_info["details"].each do |current|
+        current["whatsNew"]["value"] = whats_new if whats_new
+        current["description"]["value"] = description if description
+        current["feedbackEmail"]["value"] = feedback_email if feedback_email
+      end
+
+      # Now send everything back to iTC
+      r = request(:post) do |req| # same URL, but a POST request
+        req.url url
+        req.body = build_info.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
     # rubocop:disable Metrics/AbcSize
     def submit_testflight_build_for_review!( # Required:
                                             app_id: nil,
