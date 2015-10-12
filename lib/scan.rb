@@ -4,6 +4,7 @@ require 'scan/manager'
 require 'scan/options'
 require 'scan/runner'
 require 'scan/detect_values'
+require 'scan/report_collector'
 require 'scan/test_command_generator'
 
 require 'fastlane_core'

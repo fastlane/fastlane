@@ -1,6 +1,6 @@
 module Scan
   # Responsible for building the fully working xcodebuild command
-  class BuildCommandGenerator
+  class TestCommandGenerator
     class << self
       def generate
         parts = prefix
@@ -56,7 +56,12 @@ module Scan
       end
 
       def pipe
-        ["| tee '#{xcodebuild_log_path}' | xcpretty"]
+        # During building we just show the output in the terminal
+        # Check out the ReportCollector class for more xcpretty things
+        formatter = ""
+        formatter = "-f `xcpretty-travis-formatter`" if Helper.ci?
+
+        ["| tee '#{xcodebuild_log_path}' | xcpretty #{formatter}"]
       end
 
       # Store the raw file

@@ -22,7 +22,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core', '>= 0.21.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'xcpretty' # pretty xcodebuild output
+  spec.add_dependency 'xcpretty', '~> 0.1.12' # pretty xcodebuild output
+  spec.add_dependency 'xcpretty-travis-formatter', '~> 0.0.3'
   spec.add_dependency 'terminal-table' # print out build information
 
   # Development only

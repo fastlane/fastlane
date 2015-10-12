@@ -16,7 +16,7 @@ module Scan
 
       Scan.project.select_scheme
 
-      default_device unless config[:device]
+      default_device
       detect_destination
 
       return config
@@ -24,6 +24,11 @@ module Scan
 
     def self.default_device
       config = Scan.config
+
+      if config[:device] # make sure it actually exists
+        return if FastlaneCore::Simulator.all.find { |d| d.name == config[:device].strip }
+        Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+      end
 
       # An iPhone 5s is reasonable small and useful for tests
       found = FastlaneCore::Simulator.all.find { |d| d.name == "iPhone 5s" }
@@ -45,8 +50,6 @@ module Scan
 
       # building up the destination now
       Scan.config[:destination] = "platform=iOS Simulator,name=#{Scan.config[:device]}"
-      require 'pry'
-      binding.pry
     end
   end
 end
