@@ -25,7 +25,7 @@ module Fastlane
         command += " --source-directory #{params[:source_directory]}" if params[:source_directory]
         command += " --output-directory #{params[:output_directory]}" if params[:output_directory]
         command += " --ignore #{params[:ignore]}" if params[:ignore]
-        command += " #{params[:proj]}"
+        command += " #{params[:xcodeproj]}"
         sh command
       end
 
@@ -51,11 +51,11 @@ Slather is available at https://github.com/venmo/slather
                                        description: "The location of the build output", # a short description of this parameter
                                        optional: true
                                       ),
-          FastlaneCore::ConfigItem.new(key: :proj,
-                                       env_name: "FL_SLATHER_PROJ", # The name of the environment variable
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                       env_name: "FL_SLATHER_PROJECT", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         raise "No project file specified, pass using `proj: 'Project.xcodeproj'`".red unless value and !value.empty?
+                                         raise "No project file specified, pass using `xcodeproj: 'Project.xcodeproj'`".red unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
