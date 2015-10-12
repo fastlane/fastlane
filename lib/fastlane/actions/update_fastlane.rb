@@ -48,7 +48,7 @@ module Fastlane
           return
         end
 
-        highest_versions = updater.highest_installed_gems.keep_if {|key| tools_to_update.include? key }
+        highest_versions = updater.highest_installed_gems.keep_if { |key| tools_to_update.include? key }
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
         if update_needed.count == 0
@@ -73,7 +73,7 @@ module Fastlane
         end
 
         all_updated_tools = updater.installer.installed_gems.select do |updated_tool|
-          updated_tool.version > highest_versions[updated_tool.name].version
+          updated_tool.version > highest_versions[updated_tool.name].version if highest_versions[updated_tool.name]
         end
 
         if all_updated_tools.empty?
