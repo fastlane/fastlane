@@ -20,7 +20,7 @@ describe Fastlane do
             source_directory: 'baz',
             output_directory: '123',
             ignore: 'nothing',
-            xcodeproj: 'foo.xcodeproj'
+            proj: 'foo.xcodeproj'
           })
         end").runner.execute(:test)
 
@@ -39,7 +39,7 @@ describe Fastlane do
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
             slather({
-              xcodeproj: 'foo.xcodeproj'
+              proj: 'foo.xcodeproj'
             })
           end").runner.execute(:test)
 
