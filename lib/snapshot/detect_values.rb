@@ -17,7 +17,16 @@ module Snapshot
 
       # Devices
       unless config[:devices]
-        config[:devices] = Simulator.all.collect(&:name)
+        config[:devices] = []
+
+        # We only care about a subset of the simulators
+        FastlaneCore::Simulator.all.each do |sim|
+          next if sim.name.include?("iPad") and !sim.name.include?("Retina") # we only need one iPad
+          next if sim.name.include?("6s") # same screen resolution
+          next if sim.name.include?("5s") # same screen resolution
+
+          config[:devices] << sim.name
+        end
       end
     end
   end

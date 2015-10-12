@@ -34,7 +34,7 @@ module Snapshot
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "Devices must be an array" unless value.kind_of?(Array)
-                                       available = Simulator.all
+                                       available = FastlaneCore::Simulator.all
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
                                            raise "Device '#{current}' not in list of available simulators '#{available.join(', ')}'".red

@@ -22,7 +22,9 @@ module Snapshot
       # This will also include the scheme (if given)
       # @return [Array] The array with all the components to join
       def project_path_array
-        Snapshot.project.xcodebuild_parameters
+        proj = Snapshot.project.xcodebuild_parameters
+        return proj if proj.count > 0
+        raise "No project/workspace found"
       end
 
       def options
@@ -66,7 +68,7 @@ module Snapshot
         #
 
         device_udid = nil
-        Simulator.all.each do |sim|
+        FastlaneCore::Simulator.all.each do |sim|
           device_udid = sim.udid if sim.name.strip == device.strip
         end
 
