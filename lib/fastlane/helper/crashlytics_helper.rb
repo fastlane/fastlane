@@ -86,8 +86,8 @@ end
 # -androidRes . \
 # -uploadDist /Users/fkrause/AndroidStudioProjects/AppName/app/build/outputs/apk/app-release.apk \
 # -androidManifest /Users/fkrause/Downloads/manifest.xml \
-# -apiKey 016f6bbbcafe8bbce36c7278ed0eb6bb2edef5e1 \
-# -apiSecret 7b77ac4a9c7d549d2171fd2bfc412c9e38ade1b5c7a6ed27190dc3a4d0cd95f8 \
+# -apiKey api_key \
+# -apiSecret secret_key \
 
 # -betaDistributionReleaseNotes "Yeah" \
 # -betaDistributionEmails "something11@krausefx.com" \
