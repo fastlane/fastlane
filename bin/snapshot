@@ -29,16 +29,12 @@ class SnapshotApplication
       c.description = 'Take new screenshots based on the Snapfile.'
 
       c.action do |args, options|
-        path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
-        Dir.chdir(path) do # switch the context
-          # callback = Snapshot::CustomCallbackHandler.get
-          o = options.__hash__.dup
-          o.delete(:verbose)
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
+        o = options.__hash__.dup
+        o.delete(:verbose)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
 
-          Snapshot::DependencyChecker.check_simulators
-          Snapshot::Runner.new.work
-        end
+        Snapshot::DependencyChecker.check_simulators
+        Snapshot::Runner.new.work
       end
     end
 
