@@ -3,7 +3,7 @@ module Scan
     def work(options)
       Scan.config = options
 
-      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [], title: "Summary")
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:destination], title: "Summary")
 
       return Runner.new.run
     end
