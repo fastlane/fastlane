@@ -19,6 +19,7 @@ describe FastlaneCore do
           iPhone 6s Plus (9.0) [A3754407-21A3-4A80-9559-3170BB3D50FC]
           Known Templates:
           ..."
+      FastlaneCore::Simulator.clear_cache
     end
 
     it "raises an error if instruments CLI prints garbage" do

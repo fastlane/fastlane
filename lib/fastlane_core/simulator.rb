@@ -34,6 +34,10 @@ module FastlaneCore
 
         return @devices
       end
+
+      def clear_cache
+        @devices = nil
+      end
     end
 
     # Example Output for `instruments -s`
