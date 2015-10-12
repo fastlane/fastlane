@@ -48,7 +48,7 @@ module Deliver
                                      description: "The version that should be edited or created",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_metadata,
-                                     description: "Only upload the build - no metadata or screenshots",
+                                     description: "Don't upload the metadata (e.g. title, description), this will still upload screenshots",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,

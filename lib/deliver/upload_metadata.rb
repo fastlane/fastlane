@@ -18,6 +18,7 @@ module Deliver
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
+      return if options[:skip_metadata]
       verify_available_languages!(options)
 
       app = options[:app]
@@ -61,6 +62,8 @@ module Deliver
 
     # Makes sure all languages we need are actually created
     def verify_available_languages!(options)
+      return if options[:skip_metadata]
+
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
@@ -88,6 +91,8 @@ module Deliver
 
     # Loads the metadata files and stores them into the options object
     def load_from_filesystem(options)
+      return if options[:skip_metadata]
+
       # Load localised data
       Dir.glob(File.join(options[:metadata_path], "*")).each do |lng_folder|
         next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
