@@ -247,6 +247,14 @@ If you run into any issues you can use the `verbose` mode to get a more detailed
 
     pilot --verbose
 
+## Firewall Issues
+
+`pilot` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol using
+
+```
+DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
+```
+
 ## How is my password stored?
 
 `pilot` uses the [CredentialsManager](https://github.com/fastlane/CredentialsManager) from `fastlane`.
