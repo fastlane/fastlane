@@ -59,7 +59,10 @@ module Scan
         # During building we just show the output in the terminal
         # Check out the ReportCollector class for more xcpretty things
         formatter = ""
-        formatter = "-f `xcpretty-travis-formatter`" if Helper.ci?
+        if Helper.ci?
+          formatter = "-f `xcpretty-travis-formatter`"
+          Helper.log.info "Automatically switched to Travis formatter".green
+        end
 
         ["| tee '#{xcodebuild_log_path}' | xcpretty #{formatter}"]
       end
