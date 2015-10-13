@@ -16,7 +16,7 @@ module FastlaneCore
 
     def self.create(available_options, values)
       v = values.dup
-      v.delete(:verbose) # as this is being processed by commander
+      v.delete(:verbose) if v.kind_of?(Hash) # as this is being processed by commander
       Configuration.new(available_options, v)
     end
 
