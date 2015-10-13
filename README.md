@@ -142,7 +142,7 @@ Run `gym init` to create a new configuration file. Example:
 ```ruby
 scheme "Example"
 
-sdk "9.0"
+sdk "iphoneos9.0"
 
 clean true
 
