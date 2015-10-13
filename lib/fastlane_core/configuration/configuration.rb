@@ -15,7 +15,9 @@ module FastlaneCore
     attr_accessor :config_file_name
 
     def self.create(available_options, values)
-      Configuration.new(available_options, values)
+      v = values.dup
+      v.delete(:verbose) # as this is being processed by commander
+      Configuration.new(available_options, v)
     end
 
     #####################################################
