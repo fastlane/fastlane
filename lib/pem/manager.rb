@@ -6,6 +6,7 @@ module PEM
   class Manager
     class << self
       def start
+        FastlaneCore::PrintTable.print_values(config: PEM.config, hide_keys: [], title: "Summary")
         login
 
         existing_certificate = certificate.all.detect do |c|
