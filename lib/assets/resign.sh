@@ -440,7 +440,7 @@ echo "Repackaging as $NEW_FILE" >&2
 # Zip all the contents, saving the zip file in the above directory
 # Navigate back to the orignating directory (sending the output to null)
 pushd "$TEMP_DIR" > /dev/null
-zip -qr "../$TEMP_DIR.ipa" *
+zip -qry "../$TEMP_DIR.ipa" *
 popd > /dev/null
 
 # Move the resulting ipa to the target destination
