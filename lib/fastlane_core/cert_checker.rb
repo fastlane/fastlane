@@ -18,7 +18,7 @@ module FastlaneCore
 
     def self.install_wwdr_certificate
       Dir.chdir '/tmp'
-      url = 'http://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
       filename = File.basename(url)
       `curl -O #{url} && security import #{filename} -k login.keychain`
       raise "Could not install WWDR certificate".red unless $?.success?
