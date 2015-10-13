@@ -69,7 +69,7 @@ xcodebuild \
 As the output will look like this
 
 ```
-rause/Library/Developer/Xcode/DerivedData/Example-fhlmxikmujknefgidqwqvtbatohi/Build/Intermediates/ArchiveIntermediates/Example/IntermediateBuildFilesPath/Example.build/Release-iphoneos/Example.build/Objects-normal/arm64/main.o Example/main.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+/Users/felixkrause/Library/Developer/Xcode/DerivedData/Example-fhlmxikmujknefgidqwqvtbatohi/Build/Intermediates/ArchiveIntermediates/Example/IntermediateBuildFilesPath/Example.build/Release-iphoneos/Example.build/Objects-normal/arm64/main.o Example/main.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
     cd /Users/felixkrause/Developer/fastlane/gym/example/cocoapods
     export LANG=en_US.US-ASCII
     export PATH="/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode-beta.app/Contents/Developer/usr/bin:/Users/felixkrause/.rvm/gems/ruby-2.2.0/bin:/Users/felixkrause/.rvm/gems/ruby-2.2.0@global/bin:/Users/felixkrause/.rvm/rubies/ruby-2.2.0/bin:/Users/felixkrause/.rvm/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -102,17 +102,16 @@ scan
 
               |  scan Features
 --------------------------|------------------------------------------------------------
-<!-- :rocket:            | `scan` is much faster than running a plain `xcodebuild` command as the output  -->
 :checkered_flag: | Beautiful inline build output while running the tests
-:book:     | Helps you resolve common build errors like code signing issues
 :mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
-:package: | Automatically generates an `ipa` and a compressed `dSYM` file
 :bullettrain_side: | Don't remember any complicated build commands, just `scan`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
+:rocket:            | `scan` is faster than running a plain `xcodebuild` command as the output
 :floppy_disk:   | Store common build settings in a `Scanfile` 
-:outbox_tray: | All archives are stored and accessible in the Xcode Organizer
+:outbox_tray: | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
 :computer: | Supports both iOS and Mac applications
+:book:     | Helps you resolve common test errors like simulator not responding
 
 ![/assets/scanScreenshot.png](/assets/scanScreenshot.png)
 
