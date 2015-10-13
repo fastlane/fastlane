@@ -100,8 +100,6 @@ gym
 
 # Installation
 
-This tool is still work in progress. You can already try it by cloning the repo and running
-
     sudo gem install gym
 
 Make sure, you have the latest version of the Xcode command line tools installed:
