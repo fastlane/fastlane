@@ -114,12 +114,8 @@ To get a list of available options run:
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Environment Variables
-In case you prefer environment variables:
 
-- ```PEM_USERNAME```
-- ```PEM_APP_IDENTIFIER```
-- ```PEM_TEAM_ID```
-- ```PEM_SAVE_PRIVATEKEY``` - Set to "1" to save the private RSA key
+Run `pem --help` to get a list of available environment variables.
 
 # How does it work?
 
