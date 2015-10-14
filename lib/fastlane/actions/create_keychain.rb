@@ -30,8 +30,7 @@ module Fastlane
         commands << Fastlane::Actions.sh(command, log: false)
 
         if params[:add_to_search_list]
-          keychains = `security list-keychains -d user`.shellsplit
-          raise "Retrieving the keychain search list failed with exit status #{$?.exitstatus} instead of 0" unless $?.exitstatus.zero?
+          keychains = Action.sh("security list-keychains -d user").shellsplit
           keychains << File.expand_path(params[:name], "~/Library/Keychains")
           commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
         end
