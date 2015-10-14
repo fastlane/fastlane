@@ -118,6 +118,22 @@ describe FastlaneCore do
         expect(config[:false_value2]).to eq(false)
       end
 
+      describe "Automatically removes the --verbose flag" do
+        it "removes --verbose if not an available options (e.g. a tool)" do
+          config = FastlaneCore::Configuration.create([], { verbose: true })
+          expect(config.values).to eq({})
+        end
+
+        it "doesn't remove --verbose if it's a valid option" do
+          options = [
+            FastlaneCore::ConfigItem.new(key: :verbose,
+                                   is_string: false)
+          ]
+          config = FastlaneCore::Configuration.create(options, { verbose: true })
+          expect(config[:verbose]).to eq(true)
+        end
+      end
+
       describe "Use a valid Configuration Manager" do
         before do
           @options = [

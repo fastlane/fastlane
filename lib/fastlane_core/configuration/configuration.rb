@@ -16,7 +16,14 @@ module FastlaneCore
 
     def self.create(available_options, values)
       v = values.dup
-      v.delete(:verbose) if v.kind_of?(Hash) # as this is being processed by commander
+
+      if v.kind_of?(Hash) && available_options.kind_of?(Array) # we only want to deal with the new configuration system
+        # Now see if --verbose would be a valid input
+        # If not, it might be because it's an action and not a tool
+        unless available_options.find { |a| a.kind_of?(ConfigItem) && a.key == :verbose }
+          v.delete(:verbose) # as this is being processed by commander
+        end
+      end
       Configuration.new(available_options, v)
     end
 
