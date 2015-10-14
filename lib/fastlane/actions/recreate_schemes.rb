@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.description
-        "Recreate not shared Xcode project schemes."
+        "Recreate not shared Xcode project schemes"
       end
 
       def self.available_options
@@ -19,7 +19,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :project,
             env_name: "XCODE_PROJECT",
-            description: "The project to use"
+            description: "The Xcode project"
           )
         ]
       end
