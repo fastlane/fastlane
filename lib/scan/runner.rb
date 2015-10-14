@@ -1,6 +1,7 @@
 require 'pty'
 require 'open3'
 require 'fileutils'
+require 'terminal-table'
 
 module Scan
   class Runner
@@ -10,14 +11,24 @@ module Scan
 
     def test_app
       command = TestCommandGenerator.generate
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                              error: proc do |output|
-                                                require 'pry'
-                                                binding.pry
-                                                # TODO: error handler
-                                              end)
+      output = FastlaneCore::CommandExecutor.execute(command: command,
+                                                  print_all: true,
+                                              print_command: true,
+                                                      error: proc do |output|
+                                                        require 'pry'
+                                                        binding.pry
+                                                        # TODO: error handler
+                                                      end)
+      result = TestResultParser.new.parse_result(output)
+      puts Terminal::Table.new({
+        title: "Test Results",
+        rows: [
+          ["Number of tests", result[:tests]],
+          ["Number of failures", result[:failures]],
+          ["Duration (in seconds)", result[:duration]]
+        ]
+      })
+      puts ""
 
       ReportCollector.new.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 

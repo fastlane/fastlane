@@ -6,6 +6,7 @@ require 'scan/runner'
 require 'scan/detect_values'
 require 'scan/report_collector'
 require 'scan/test_command_generator'
+require 'scan/test_result_parser'
 
 require 'fastlane_core'
 
