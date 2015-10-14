@@ -33,7 +33,6 @@ module Fastlane
           keychains = []
           keychains += Fastlane::Actions.sh("security list-keychains -d user", log: false).shellsplit unless Helper.test?
           keychains << File.expand_path(params[:name], "~/Library/Keychains")
-          keychains.uniq!
           commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
         end
 
