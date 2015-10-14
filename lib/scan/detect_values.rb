@@ -49,7 +49,7 @@ module Scan
       end
 
       # building up the destination now
-      Scan.config[:destination] = "platform=iOS Simulator,name=#{Scan.config[:device].udid}"
+      Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.config[:device].udid}"
     end
   end
 end
