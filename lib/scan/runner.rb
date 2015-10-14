@@ -15,9 +15,7 @@ module Scan
                                                   print_all: true,
                                               print_command: true,
                                                       error: proc do |output|
-                                                        require 'pry'
-                                                        binding.pry
-                                                        # TODO: error handler
+                                                        ErrorHandler.handle_build_error(output)
                                                       end)
       result = TestResultParser.new.parse_result(output)
       puts Terminal::Table.new({
