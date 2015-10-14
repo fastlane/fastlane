@@ -12,9 +12,19 @@ module Scan
 
     def test_app
       command = TestCommandGenerator.generate
+      prefix_hash = [
+        {
+          prefix: "Running Tests: ",
+          block: proc do |value|
+            value.include?("Touching")
+          end
+        }
+      ]
       output = FastlaneCore::CommandExecutor.execute(command: command,
                                                   print_all: true,
                                               print_command: true,
+                                                     prefix: prefix_hash,
+                                                    loading: "Loading...",
                                                       error: proc do |error_output|
                                                         ErrorHandler.handle_build_error(error_output)
                                                       end)
