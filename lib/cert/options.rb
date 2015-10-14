@@ -35,14 +35,6 @@ module Cert
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "Keychain not found at path '#{value}'".red unless File.exist? value
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :signing_request_path,
-                                     short_option: "-s",
-                                     env_name: "CERT_SIGNING_REQUEST_PATH",
-                                     description: "Path to a signing request file (optional)",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       raise "File not found at path '#{value}'".red unless File.exist? value
                                      end)
       ]
     end
