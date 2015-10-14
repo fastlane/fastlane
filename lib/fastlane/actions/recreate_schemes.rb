@@ -8,7 +8,6 @@ module Fastlane
 
         project = Xcodeproj::Project.open(params[:project])
         project.recreate_user_schemes
-        #project.save
       end
 
       def self.description
