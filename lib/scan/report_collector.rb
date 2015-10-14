@@ -18,8 +18,8 @@ module Scan
     end
 
     # Returns a hash containg the resulting path as key and the command as value
-    def generate_commands(path)
-      types = Scan.config[:output_types]
+    def generate_commands(path, types: nil, output_file_name: nil)
+      types ||= Scan.config[:output_types]
       types = types.split(",") if types.kind_of?(String) # might already be an array when passed via fastlane
       commands = {}
 
@@ -32,7 +32,7 @@ module Scan
         end
 
         file_name = "report.#{type}"
-        output_path = File.join(Scan.config[:output_directory], file_name)
+        output_path = output_file_name || File.join(Scan.config[:output_directory], file_name)
         parts = ["cat '#{path}' | "]
         parts << "xcpretty"
         parts << "--report #{type}"

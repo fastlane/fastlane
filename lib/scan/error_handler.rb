@@ -22,6 +22,12 @@ module Scan
           print "https://stackoverflow.com/a/17031697/445598"
         when /Testing failed/
           raise "Error building the application - see the log above".red
+        when /Executed/
+          # this is *really* important:
+          # we don't want to raise an exception here
+          # as we handle this in runner.rb at a later point
+          # after parsing the actual test results
+          return
         end
         raise "Error building/testing the application - see the log above".red
       end
