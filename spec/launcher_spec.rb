@@ -43,5 +43,20 @@ describe Spaceship do
     it "App" do
       expect(spaceship1.app.all.count).to eq(5)
     end
+
+    context "With an uninitialized environment" do
+      before do
+        Spaceship::App.set_client(nil)
+        Spaceship::AppGroup.set_client(nil)
+        Spaceship::Device.set_client(nil)
+        Spaceship::Certificate.set_client(nil)
+        Spaceship::ProvisioningProfile.set_client(nil)
+      end
+      it "shouldn't fail if provisioning_profile is invoked before app and device" do
+        clean_launcher = Spaceship::Launcher.new
+        clean_launcher.login(username, password)
+        expect(clean_launcher.provisioning_profile.all.count).to eq(33)
+      end
+    end
   end
 end
