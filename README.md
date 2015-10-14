@@ -39,8 +39,6 @@ sigh
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
-Special thanks to [Matthias Tretter](https://twitter.com/myell0w) for coming up with the name.
-
 -------
 <p align="center">
     <a href="#features">Features</a> &bull; 
@@ -74,7 +72,7 @@ To automate iOS Push profiles you can use [PEM](https://github.com/KrauseFx/PEM)
 ### Why not let Xcode do the work?
 
 - ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
-- Xcode sometimes invalidates all existing profiles ([Screenshot](assets/SignErrors.png))
+- Xcode sometimes invalidates [all existing profiles](assets/SignErrors.png)
 - You have control over what happens
 - You still get to have the signing files, which you can then use for your build scripts or store in git
 
@@ -130,6 +128,10 @@ To save the provisioning profile under a specific name, use the -q option:
 
     sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
 
+If for some reason you don't want `sigh` to verify that the code signing identity is installed on your local machine:
+
+    sigh --skip_certificate_verification
+
 If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime. `--force` will also add all available devices to this profile.
 
     sigh --force
@@ -145,8 +147,6 @@ For a list of available parameters and commands run
 # Repair
 
 `sigh` can automatically repair all your existing provisioning profiles which are expired or just invalid.
-
-All you have to do is
 
     sigh repair
 
@@ -179,23 +179,10 @@ Or delete all `iOS Team Provisioning Profile` by using a regular expression
     sigh manage -p "iOS\ ?Team Provisioning Profile:"
 
 ## Environment Variables
-In case you prefer environment variables:
 
-- `SIGH_USERNAME`
-- `SIGH_APP_IDENTIFIER` (The App's Bundle ID , e.g. `com.yourteam.awesomeapp`)
-- `SIGH_TEAM_ID` (The Team ID, e.g. `Q2CBPK58CA`)
-- `SIGH_PROVISIONING_PROFILE_NAME` (set a custom name for the name of the generated file)
-
-Choose signing certificate to use:
-
-- `SIGH_CERTIFICATE` (The name of the certificate to use)
-- `SIGH_CERTIFICATE_ID` (The ID of the certificate)
-
-As always, run `sigh --help` to get a list of all variables.
+Run `sigh --help` to get a list of all available environment variables.
 
 If you're using [cert](https://github.com/KrauseFx/cert) in combination with [fastlane](https://github.com/KrauseFx/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
-
-`sigh` will store the `UDID` of the generated provisioning profile in the environment: `SIGH_UDID`.
 
 # How does it work?
 
