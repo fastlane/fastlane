@@ -13,5 +13,5 @@ ExampleProductName.ipa
 ExampleProductName.app.dSYM.zip
 **/*.dSYM.zip
 **/*.app
-examples/standard/test_output/report.html
-examples/standard/test_output/report.junit
+
+examples/*/test_output/*
