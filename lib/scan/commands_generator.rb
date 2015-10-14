@@ -42,6 +42,19 @@ module Scan
         end
       end
 
+      command :init do |c|
+        c.syntax = "scan init"
+        c.description = "Creates a new Scanfile for you"
+        c.action do |_args, options|
+          containing = (Helper.fastlane_enabled? ? 'fastlane' : '.')
+          path = File.join(containing, Scan.scanfile_name)
+          raise "Scanfile already exists".yellow if File.exist?(path)
+          template = File.read("#{Helper.gem_path('scan')}/lib/assets/ScanfileTemplate")
+          File.write(path, template)
+          Helper.log.info "Successfully created '#{path}'. Open the file using a code editor.".green
+        end
+      end
+
       default_command :tests
 
       run!
