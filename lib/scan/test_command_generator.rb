@@ -33,7 +33,7 @@ module Scan
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-destination '#{config[:destination]}'"
+        options << "-destination '#{config[:destination]}'" # generated in `detect_values`
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 

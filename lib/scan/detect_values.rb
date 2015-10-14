@@ -34,7 +34,7 @@ module Scan
       found = FastlaneCore::Simulator.all.find { |d| d.name == "iPhone 5s" }
       found ||= FastlaneCore::Simulator.all.first # anything is better than nothing
 
-      config[:device] = found.name
+      config[:device] = found
       raise "No simulators found".red unless config[:device]
     end
 
@@ -49,7 +49,7 @@ module Scan
       end
 
       # building up the destination now
-      Scan.config[:destination] = "platform=iOS Simulator,name=#{Scan.config[:device]}"
+      Scan.config[:destination] = "platform=iOS Simulator,name=#{Scan.config[:device].udid}"
     end
   end
 end
