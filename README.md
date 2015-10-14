@@ -118,10 +118,6 @@ scan
 ![/assets/scanScreenshot.png](/assets/scanScreenshot.png)
 ![/assets/slack.png](/assets/slack.png)
 
------
-
-![/assets/scan.gif](/assets/scan.gif)
-
 # Installation
 
     sudo gem install scan
