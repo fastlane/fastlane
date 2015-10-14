@@ -29,6 +29,13 @@ module Fastlane
         return false
       end
 
+      def self.is_hg?
+        Actions.sh 'hg status'
+        return true
+      rescue
+        return false
+      end
+
       def self.run(params)
         if is_svn?
           Helper.log.info "Detected repo: svn"
@@ -39,6 +46,13 @@ module Fastlane
         elsif is_git?
           Helper.log.info "Detected repo: git"
           command = 'git rev-parse --short HEAD'
+        elsif is_hg?
+          Helper.log.info "Detected repo: hg"
+          if params[:use_hg_revision_number]
+            command = 'hg parent --template {rev}'
+          else
+            command = 'hg parent --template "{node|short}"'
+          end
         else
           raise "No repository detected"
         end
@@ -58,6 +72,12 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :use_hg_revision_number,
+                                       env_name: "USE_HG_REVISION_NUMBER",
+                                       description: "Use hg revision number instead of hash (ignored for non-hg repos)",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 
@@ -66,8 +86,8 @@ module Fastlane
         ]
       end
 
-      def self.author
-        'pbrooks'
+      def self.authors
+        ["pbrooks", "armadsen"]
       end
     end
   end
