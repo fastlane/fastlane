@@ -1,5 +1,5 @@
 require 'cert/version'
-require 'cert/cert_runner'
+require 'cert/runner'
 require 'cert/keychain_importer'
 
 require 'fastlane_core'

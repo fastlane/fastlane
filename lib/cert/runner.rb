@@ -1,5 +1,5 @@
 module Cert
-  class CertRunner
+  class Runner
     def launch
       run
 
