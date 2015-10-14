@@ -16,7 +16,7 @@ module Scan
 
       Scan.project.select_scheme
 
-      default_device
+      default_device if Scan.project.ios?
       detect_destination
 
       return config
@@ -49,7 +49,11 @@ module Scan
       end
 
       # building up the destination now
-      Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.config[:device].udid}"
+      if Scan.project.ios?
+        Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.config[:device].udid}"
+      else
+        Scan.config[:destination] = "platform=OS X"
+      end
     end
   end
 end
