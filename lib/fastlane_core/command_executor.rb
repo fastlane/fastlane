@@ -46,7 +46,7 @@ module FastlaneCore
               last_length = current_length
             end
             Process.wait(pid)
-            puts "-----\n".cyan if print_all
+            puts "\n-----\n".cyan if print_all
           end
         rescue => ex
           # This could happen when the environment is wrong:
