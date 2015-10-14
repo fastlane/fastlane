@@ -13,6 +13,7 @@ describe Cert do
       Cert::Runner.new.launch
       expect(ENV["CER_CERTIFICATE_ID"]).to eq("cert_id")
       expect(ENV["CER_FILE_PATH"]).to eq("./cert_id.cer")
+      File.delete(ENV["CER_FILE_PATH"])
     end
   end
 end
