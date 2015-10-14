@@ -104,6 +104,7 @@ scan
 --------------------------|------------------------------------------------------------
 :checkered_flag: | Beautiful inline build output while running the tests
 :mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
+:bar_chart: | Support for HTML, JSON and JUnit reports
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
 :bullettrain_side: | Don't remember any complicated build commands, just `scan`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
