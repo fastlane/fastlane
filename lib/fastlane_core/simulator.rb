@@ -61,6 +61,16 @@ module FastlaneCore
     #   "/Applications/Xcode70.app/Contents/Applications/Instruments.app/Contents/PlugIns/OpenGLESAnalyzerInstrument.xrplugin/Contents/Resources/OpenGL ES Analysis.tracetemplate"
     #   "/Applications/Xcode70.app/Contents/Applications/Instruments.app/Contents/PlugIns/XRMobileDeviceDiscoveryPlugIn.xrplugin/Contents/Resources/Energy Diagnostics.tracetemplate"
 
+    # Use the UDID for the given device when setting the destination
+    # Why? Because we might get this error message
+    # > The requested device could not be found because multiple devices matched the request.
+    #
+    # This happens when you have multiple simulators for a given device type / iOS combination
+    #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
+    #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
+    #
+    # We don't want to deal with that, so we just use the UDID
+
     class Device
       attr_accessor :name
 
