@@ -14,7 +14,7 @@ module FastlaneCore
         prefix ||= {}
 
         output = []
-        command = command.join(" ")
+        command = command.join(" ") if command.kind_of?(Array)
         Helper.log.info command.yellow.strip if print_command
 
         puts "\n-----".cyan if print_all
