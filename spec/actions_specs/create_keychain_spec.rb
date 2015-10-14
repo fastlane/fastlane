@@ -9,7 +9,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 2
+        expect(result.size).to eq 3
         expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
 
         expect(result[1]).to start_with 'security set-keychain-settings'
@@ -17,6 +17,8 @@ describe Fastlane do
         expect(result[1]).to_not include '-l'
         expect(result[1]).to_not include '-u'
         expect(result[1]).to include '~/Library/Keychains/test.keychain'
+        expect(result[2]).to start_with "security list-keychains -s"
+        expect(result[2]).to end_with "#{File.expand_path('~/Library/Keychains/test.keychain')}"
       end
 
       it "works with name and password that contain spaces or `\"`" do
@@ -27,7 +29,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 2
+        expect(result.size).to eq 3
         expect(result[0]).to eq %(security create-keychain -p \\\"test\\ password\\\" test.keychain)
       end
 
@@ -42,7 +44,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 2
+        expect(result.size).to eq 3
         expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
 
         expect(result[1]).to start_with 'security set-keychain-settings'
@@ -61,7 +63,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 3
+        expect(result.size).to eq 4
         expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
 
         expect(result[1]).to eq 'security default-keychain -s test.keychain'
@@ -82,7 +84,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result.size).to eq 3
+        expect(result.size).to eq 4
         expect(result[0]).to eq 'security create-keychain -p testpassword test.keychain'
 
         expect(result[1]).to eq 'security unlock-keychain -p testpassword test.keychain'
@@ -104,6 +106,7 @@ describe Fastlane do
             timeout: 600,
             lock_when_sleeps: true,
             lock_after_timeout: true,
+            add_to_search_list: false,
           })
         end").runner.execute(:test)
 
