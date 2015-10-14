@@ -117,6 +117,7 @@ scan
 
 ![/assets/scanScreenshot.png](/assets/scanScreenshot.png)
 ![/assets/slack.png](/assets/slack.png)
+![/assets/scanHTML.png](/assets/scanHTML.png)
 
 # Installation
 
