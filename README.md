@@ -34,8 +34,6 @@ cert
 
 ###### Automatically create and maintain iOS code signing certificates.
 
-##### This tool was sponsored by [AppInstitute](http://appinstitute.co.uk/).
-
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
@@ -98,14 +96,11 @@ For a list of available commands run
 
     cert --help
 
-## Environment Variables
-In case you prefer environment variables:
+Keep in mind, there is no way for `cert` to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer. 
 
-- ```CERT_USERNAME```
-- ```CERT_TEAM_ID```
-- ```CERT_KEYCHAIN_PATH``` The path to a specific Keychain if you don't want to use the default one
-- ```CERT_SIGNING_REQUEST_PATH``` Path to your own signing request file
-- ```FASTLANE_TEAM_NAME``` (the Team Name, e.g. `Felix Krause`)
+## Environment Variables
+
+Run `cert --help` to get a list of all available environment variables.
 
 ## Use with [`sigh`](https://github.com/KrauseFx/sigh)
 
@@ -125,7 +120,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 
 
 ## How is my password stored?
-```cert``` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
+`cert` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
 
 # Tips
 

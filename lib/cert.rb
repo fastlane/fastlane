@@ -1,6 +1,7 @@
 require 'cert/version'
 require 'cert/runner'
 require 'cert/keychain_importer'
+require 'cert/options'
 
 require 'fastlane_core'
 require 'spaceship'
@@ -10,9 +11,6 @@ module Cert
   class << self
     attr_accessor :config
   end
-
-  TMP_FOLDER = "/tmp/cert/"
-  FileUtils.mkdir_p TMP_FOLDER
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
