@@ -1,5 +1,3 @@
-require 'sigh/options'
-
 describe Sigh do
   describe Sigh::Manager do
     before do
