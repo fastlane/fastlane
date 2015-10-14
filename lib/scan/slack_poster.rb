@@ -4,8 +4,6 @@ module Scan
       return if Scan.config[:skip_slack]
       return if Scan.config[:slack_only_on_failure] && results[:failures] == 0
 
-      results[:tests] += 130
-
       require 'slack-notifier'
       notifier = Slack::Notifier.new(Scan.config[:slack_url])
       notifier.username = 'fastlane'
@@ -35,8 +33,8 @@ module Scan
       end
 
       result = notifier.ping "#{Scan.project.app_name} Tests:",
-                               icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                               attachments: attachments
+                             icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+                             attachments: attachments
 
       if result.code.to_i == 200
         Helper.log.info 'Successfully sent Slack notification'.green
