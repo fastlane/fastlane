@@ -30,7 +30,7 @@ module Cert
       certificates.each do |certificate|
         path = store_certificate(certificate)
 
-        if FastlaneCore::CertChecker.installed? path
+        if FastlaneCore::CertChecker.installed?(path)
           # This certificate is installed on the local machine
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path

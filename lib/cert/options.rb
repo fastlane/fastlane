@@ -1,4 +1,5 @@
 require 'fastlane_core'
+require 'credentials_manager'
 
 module Cert
   class Options
