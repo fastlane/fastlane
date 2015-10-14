@@ -27,7 +27,7 @@ module Deliver
       v = app.edit_version
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        current = options[key].to_s.strip
+        current = options[key]
         next unless current
 
         unless current.kind_of?(Hash)
@@ -37,8 +37,9 @@ module Deliver
 
         current.each do |language, value|
           next unless value.to_s.length > 0
-          v.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
-          details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
+          strip_value = value.to_s.strip
+          v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
+          details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
         end
       end
 
