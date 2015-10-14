@@ -94,7 +94,21 @@ module Scan
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :slack_url,
+                                     env_name: "SLACK_URL",
+                                     description: "Create an Incoming WebHook for your Slack group to post results there",
+                                     verify_block: proc do |value|
+                                       raise "Invalid URL, must start with https://" unless value.start_with? "https://"
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_slack,
+                                     description: "Don't publish to slack, even when an URL is given",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
+                                    description: "Only post on Slack if the tests fail",
+                                    is_string: false,
+                                    default_value: false)
       ]
     end
   end

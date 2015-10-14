@@ -6,8 +6,8 @@ require 'terminal-table'
 module Scan
   class Runner
     def run
-      output = test_app
-      handle_results(output)
+      test_app
+      handle_results
     end
 
     def test_app
@@ -20,19 +20,24 @@ module Scan
           end
         }
       ]
-      output = FastlaneCore::CommandExecutor.execute(command: command,
-                                                  print_all: true,
-                                              print_command: true,
-                                                     prefix: prefix_hash,
-                                                    loading: "Loading...",
-                                                      error: proc do |error_output|
-                                                        ErrorHandler.handle_build_error(error_output)
-                                                      end)
-
-      return output
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: true,
+                                      print_command: true,
+                                             prefix: prefix_hash,
+                                            loading: "Loading...",
+                                              error: proc do |error_output|
+                                                begin
+                                                  ErrorHandler.handle_build_error(error_output)
+                                                rescue => ex
+                                                  SlackPoster.new.run({
+                                                    build_errors: 1
+                                                  })
+                                                  raise ex
+                                                end
+                                              end)
     end
 
-    def handle_results(_output)
+    def handle_results
       # First, generate a JUnit report to get the number of tests
       require 'tempfile'
       output_file = Tempfile.new("junit_report")
@@ -42,6 +47,7 @@ module Scan
       system(cmd)
 
       result = TestResultParser.new.parse_result(output_file.read)
+      SlackPoster.new.run(result)
 
       if result[:failures] > 0
         failures_str = result[:failures].to_s.red

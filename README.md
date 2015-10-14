@@ -109,13 +109,14 @@ scan
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
 :bullettrain_side: | Don't remember any complicated build commands, just `scan`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
-:rocket:            | `scan` is faster than running a plain `xcodebuild` command as the output
+:loudspeaker: | Beautiful slack notifications of the test results
 :floppy_disk:   | Store common build settings in a `Scanfile` 
 :outbox_tray: | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
 :computer: | Supports both iOS and Mac applications
 :book:     | Helps you resolve common test errors like simulator not responding
 
 ![/assets/scanScreenshot.png](/assets/scanScreenshot.png)
+![/assets/slack.png](/assets/slack.png)
 
 -----
 

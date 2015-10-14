@@ -8,6 +8,7 @@ require 'scan/report_collector'
 require 'scan/test_command_generator'
 require 'scan/test_result_parser'
 require 'scan/error_handler'
+require 'scan/slack_poster'
 
 require 'fastlane_core'
 
