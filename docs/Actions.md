@@ -788,6 +788,7 @@ update_info_plist(
   plist_path: "path/to/Info.plist",
   display_name: "MyApp-Beta"
 )
+```
 
 ## Developer Portal
 
