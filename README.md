@@ -14,7 +14,6 @@
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/boarding">gym</a> &bull;
@@ -169,8 +168,7 @@ output_types "html"
 Using `fastlane` you can define a configuration like
 
 ```ruby
-lane :beta do
-  xctool
+lane :test do
   scan(scheme: "Example")
 end
 ```
