@@ -12,7 +12,7 @@ module Produce
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
       if app_exists?
-        Helper.log.info "[DevCenter] App '#{Produce.config[:app_name]}' already exists, nothing to do on the Dev Center".green
+        Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center".green
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else

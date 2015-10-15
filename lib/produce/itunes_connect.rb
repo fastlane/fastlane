@@ -14,7 +14,7 @@ module Produce
     def create_new_app
       application = fetch_application
       if application
-        Helper.log.info "[iTC] App '#{Produce.config[:app_name]}' already exists (#{application.apple_id}), nothing to do on iTunes Connect".green
+        Helper.log.info "[iTC] App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on iTunes Connect".green
         # Nothing to do here
       else
         Helper.log.info "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect".green
