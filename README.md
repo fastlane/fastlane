@@ -34,11 +34,7 @@ produce
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-##### This tool was sponsored by [AppInstitute](http://appinstitute.co.uk/).
-
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
-
-
 
 -------
 <p align="center">
@@ -79,20 +75,29 @@ To get a list of all available parameters:
     produce --help
 
 ```
+  Commands:
+    associate_group  Associate with a group, which is create if needed or simply located otherwise
+    create           Creates a new app on iTunes Connect and the Apple Developer Portal
+    disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
+    enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
+    group            Ensure that a specific App Group exists
+    help             Display global or [command] help documentation
+
+  Global Options:
     -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
     -a, --app_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
-    -b, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*)
-(PRODUCE_APP_IDENTIFIER_SUFFIX)
+    -e, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*) (PRODUCE_APP_IDENTIFIER_SUFFIX)
     -q, --app_name STRING App Name (PRODUCE_APP_NAME)
     -z, --app_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
-    -s, --sku            SKU Number (e.g. '1234') (PRODUCE_SKU)
+    -y, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
     -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
-    -c, --company_name STRING The name of your comapny. Only required if it's the first app you create
-(PRODUCE_COMPANY_NAME)
+    -c, --company_name STRING The name of your comapny. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
     -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
     -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
-    -t, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
+    -b, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
     -l, --team_name STRING The name of your team if you're in multiple teams (PRODUCE_TEAM_NAME)
+    -h, --help           Display help documentation
+    -v, --version        Display version information
 ```
 
 ## Enabling / Disabling Application Services
@@ -150,21 +155,8 @@ Get a list of all available options using
 ```
 
 ## Environment Variables
-In case you want to pass more information to `produce` using environment variables:
 
-- `PRODUCE_USERNAME` (your iTunes Connect username)
-- `PRODUCE_APP_IDENTIFIER` (the bundle identifier of the new app)
-- `PRODUCE_APP_NAME` (the name of the new app)
-- `PRODUCE_GROUP_IDENTIFIER` (the group identifier of the new app group)
-- `PRODUCE_GROUP_NAME` (the name of the new app group)
-- `PRODUCE_LANGUAGE` (the language you want your app to use, e.g. `English`, `German`)
-- `PRODUCE_VERSION` (the initial app version)
-- `PRODUCE_SKU` (the SKU you want to use, which must be a unique number)
-- `PRODUCE_SKIP_ITC` (should iTunes Connect app be created)
-- `PRODUCE_SKIP_DEVCENTER` (should Apple Developer Portal app be created)
-- `PRODUCE_TEAM_ID` (the Team ID, e.g. `Q2CBPK58CA`)
-- `PRODUCE_TEAM_NAME` (the Team Name, e.g. `Felix Krause`)
-
+All available values can also be passed using environment variables, run `produce --help` to get a list of all available parameters.
 
 ## [`fastlane`](https://github.com/KrauseFx/fastlane) Integration
 
