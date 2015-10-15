@@ -1,6 +1,7 @@
 require 'json'
 require 'produce/version'
 require 'produce/manager'
+require 'produce/options'
 require 'produce/developer_center'
 require 'produce/itunes_connect'
 require 'produce/available_default_languages'

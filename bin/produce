@@ -5,7 +5,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 require 'produce'
 require 'commander'
 require 'credentials_manager/appfile_config'
-require 'produce/options'
 
 HighLine.track_eof = false
 
