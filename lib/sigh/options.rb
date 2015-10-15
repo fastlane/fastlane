@@ -6,7 +6,6 @@ module Sigh
     def self.available_options
       @@options ||= [
         FastlaneCore::ConfigItem.new(key: :adhoc,
-                                     short_option: "-k",
                                      env_name: "SIGH_AD_HOC",
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
                                      is_string: false,
