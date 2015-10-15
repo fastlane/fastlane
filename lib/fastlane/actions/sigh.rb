@@ -10,8 +10,6 @@ module Fastlane
     class SighAction < Action
       def self.run(values)
         require 'sigh'
-        require 'sigh/options'
-        require 'sigh/manager'
         require 'credentials_manager/appfile_config'
 
         begin
@@ -59,7 +57,6 @@ module Fastlane
 
       def self.available_options
         require 'sigh'
-        require 'sigh/options'
         Sigh::Options.available_options
       end
 
