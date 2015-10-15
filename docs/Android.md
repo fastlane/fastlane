@@ -65,3 +65,17 @@ This folder contains the metadata fetched from Google Play. You can modify any v
 ### Next Steps
 
 Go ahead and modify the `Fastfile` to fit your needs. You might want to add the API Keys to your `crashlytics` action or your Slack URL to show notifications in your Slack room.
+
+To get a list of all available integrations run
+
+```
+fastlane actions --platform android
+```
+
+and to get more information about what a specific action does and the available parameters use
+
+```
+fastlane action [action_name]
+```
+
+For more information, visit [Actions.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md).
