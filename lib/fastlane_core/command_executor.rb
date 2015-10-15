@@ -18,7 +18,7 @@ module FastlaneCore
         Helper.log.info command.yellow.strip if print_command
 
         if print_all and loading # this is only used to show the "Loading text"...
-          system("clear")
+          clear_display
           puts loading.cyan
         end
 
@@ -38,11 +38,11 @@ module FastlaneCore
               end
 
               # The actual output here, first clear and then print out 3 lines
-              system("clear")
+              clear_display
               puts line
             end
             Process.wait(pid)
-            system("clear")
+            clear_display
           end
         rescue => ex
           # This could happen when the environment is wrong:
@@ -63,6 +63,10 @@ module FastlaneCore
         end
 
         return output.join("\n")
+      end
+
+      def clear_display
+        system("clear") unless Helper.ci?
       end
     end
   end
