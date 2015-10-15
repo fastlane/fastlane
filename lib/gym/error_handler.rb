@@ -2,7 +2,7 @@ module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler
     class << self
-      # @param [Array] The output of the errored build (line by line)
+      # @param [String] The output of the errored build
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
         # The order of the handling below is import
@@ -47,7 +47,7 @@ module Gym
           print "You'll have to restart your shell session after updating the file."
           print "If you are using zshell or another shell, make sure to edit the correct bash file."
           print "For more information visit this stackoverflow answer:"
-          print "http://stackoverflow.com/a/17031697/445598"
+          print "https://stackoverflow.com/a/17031697/445598"
         end
         raise "Error building the application - see the log above".red
       end
@@ -90,6 +90,7 @@ module Gym
         print "The generated archive is invalid, this can have various reasons:"
         print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
+        print "Also, make sure to have a valid code signing identity and provisioning profile installed"
         raise "Archive invalid"
       end
 
