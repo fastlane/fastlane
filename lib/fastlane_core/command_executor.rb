@@ -17,12 +17,9 @@ module FastlaneCore
         command = command.join(" ") if command.kind_of?(Array)
         Helper.log.info command.yellow.strip if print_command
 
-        puts "\n-----".cyan if print_all
-        if loading
-          print(loading.cyan + "\r")
-          last_length = loading.length
-        else
-          last_length = 0
+        if print_all and loading # this is only used to show the "Loading text"...
+          system("clear")
+          puts loading.cyan
         end
 
         begin
@@ -40,13 +37,12 @@ module FastlaneCore
                 line = element[:prefix] + line if element[:block] && element[:block].call(line)
               end
 
-              current_length = line.length
-              spaces = [last_length - current_length, 0].max
-              print(line + " " * spaces + "\r")
-              last_length = current_length
+              # The actual output here, first clear and then print out 3 lines
+              system("clear")
+              puts line
             end
             Process.wait(pid)
-            puts "\n-----\n".cyan if print_all
+            system("clear")
           end
         rescue => ex
           # This could happen when the environment is wrong:
