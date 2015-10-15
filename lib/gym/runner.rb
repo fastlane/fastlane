@@ -114,7 +114,7 @@ module Gym
       Helper.log.info "Compressing #{available_dsyms.count} dSYM(s)"
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' '*.dSYM'"
+      command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
       Helper.log.info command.yellow unless Gym.config[:silent]
       command_result = `#{command}`
       Helper.log.info command_result if $verbose
