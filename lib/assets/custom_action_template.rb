@@ -78,7 +78,7 @@ module Fastlane
         # 
         #  platform == :ios
         # 
-        #  [:ios, :mac].include? platform
+        #  [:ios, :mac].include?(platform)
         # 
 
         platform == :ios
