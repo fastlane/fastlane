@@ -145,8 +145,6 @@ setLanguage(app)
 app.launch()
 ```
 
-TODO: renew
-Here is a nice gif, that shows `snapshot` in action:
 ![assets/snapshot.gif](assets/snapshot.gif)
 
 You can take a look at the example project to play around with it.
@@ -211,30 +209,6 @@ output_directory './screenshots'
 clear_previous_screenshots true
 ```
 
-### Custom callbacks to prepare your app
-
-# TODO: finish that part
-Run your own script when `snapshot` switches the simulator type or the language.
-This can be used to
-- Logout the user
-- Reset all user defaults
-- Pre-fill the database
-
-The `setup_for_device_change` will be called **before** the app is installed on the simulator.
-
-To run a shell script, just use ```system('./script.sh')```.
-```ruby
-setup_for_device_change do |device, udid, language|
-  puts "Running #{language} on #{device}"
-  system("./populateDatabase.sh")
-end
-
-teardown_device do |language, device|
-  puts "Finished with #{language} on #{device}"
-  system("./cleanup.sh")
-end
-```
-
 ### Completely reset all simulators
 
 You can run this command in the terminal to delete and re-create all iOS simulators:
@@ -270,7 +244,7 @@ In the test output, the Swift `snapshot` function will print out something like 
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
-Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) to make things easier.
+Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
 # Tips
 
@@ -301,6 +275,8 @@ If you want to add frames around the screenshots and even put a title on top, ch
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+
+If you enable a clean status bar, you have to remove the `waitForLoadingIndicatorToDisappear` from the `SnapshotHelper.swift` code, as it doesn't detect when the loading indicator disappears. 
 
 ## Editing the `Snapfile`
 Change syntax highlighting to *Ruby*.
