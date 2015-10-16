@@ -21,7 +21,9 @@ module Fastlane
         "credentials_manager",
         "gym",
         "spaceship",
-        "pilot"
+        "pilot",
+        "supply",
+        "scan"
       ]
 
       def self.run(options)
