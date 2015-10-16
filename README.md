@@ -69,7 +69,7 @@ Please check out the [MigrationGuide to 1.0](/MigrationGuide.md) :+1:
 <p align="center">
     <a href="#features">Features</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
-    <a href="#ui-automation">UI Automation</a> &bull; 
+    <a href="#ui-tests">UI Tests</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
     <a href="#tips">Tips</a> &bull; 
