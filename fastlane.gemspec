@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pem', '>= 0.8.0', '< 1.0.0'
   spec.add_dependency 'cert', '>= 0.3.2', '< 1.0.0'
   spec.add_dependency 'sigh', '>= 0.10.8', '< 1.0.0'
-  spec.add_dependency 'produce', '>= 0.6.2', '< 1.0.0'
+  spec.add_dependency 'produce', '>= 1.0.0', '< 2.0.0'
   spec.add_dependency 'gym', '>= 0.9.0', '< 1.0.0'
   spec.add_dependency 'pilot', '>= 0.3.0', '< 1.0.0'
   spec.add_dependency 'supply' # TODO: insert version number

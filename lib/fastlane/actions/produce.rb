@@ -7,7 +7,6 @@ module Fastlane
     class ProduceAction < Action
       def self.run(params)
         require 'produce'
-        require 'produce/options'
 
         return if Helper.test?
 
@@ -40,7 +39,6 @@ module Fastlane
 
       def self.available_options
         require 'produce'
-        require 'produce/options'
         Produce::Options.available_options
       end
 
