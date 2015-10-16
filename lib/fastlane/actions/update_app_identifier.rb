@@ -55,7 +55,7 @@ module Fastlane
       end
 
       def self.description
-        'Update an app identifier by either setting `CFBundleIdentifier` or `PRODUCT_BUNDLE_IDENTIFIER`'
+        'Update an app identifier'
       end
 
       def self.available_options
