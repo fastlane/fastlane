@@ -8,7 +8,6 @@ module Fastlane
     class CertAction < Action
       def self.run(params)
         require 'cert'
-        require 'cert/options'
 
         return if Helper.test?
 
@@ -20,7 +19,7 @@ module Fastlane
 
             Cert.config = params # we alread have the finished config
 
-            Cert::CertRunner.new.launch
+            Cert::Runner.new.launch
             cert_file_path = ENV["CER_FILE_PATH"]
             certificate_id = ENV["CER_CERTIFICATE_ID"]
             Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
@@ -41,7 +40,6 @@ module Fastlane
 
       def self.available_options
         require 'cert'
-        require 'cert/options'
         Cert::Options.available_options
       end
 
