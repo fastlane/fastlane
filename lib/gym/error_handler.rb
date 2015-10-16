@@ -91,6 +91,7 @@ module Gym
         print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
+        print "Follow this guide to setup code signing https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
         raise "Archive invalid"
       end
 

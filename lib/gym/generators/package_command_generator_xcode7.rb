@@ -41,6 +41,7 @@ module Gym
       def ipa_path
         unless Gym.cache[:ipa_path]
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
+          ErrorHandler.handle_empty_archive unless path
 
           Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
           FileUtils.mv(path, Gym.cache[:ipa_path]) if File.expand_path(path).downcase != File.expand_path(Gym.cache[:ipa_path]).downcase
