@@ -406,6 +406,24 @@ If you use `gym` the `dsym` parameter is optional.
 
 ## Testing
 
+### [scan](https://github.com/KrauseFx/scan)
+
+`scan` makes it super easy to run tests of your iOS and Mac applications
+
+```ruby
+scan
+```
+
+You can define all options that are available in `scan --help`
+
+```ruby
+scan(
+  workspace: "App.xcworkspace",
+  scheme: "MyTests",
+  clean: false
+)
+```
+
 ### xctest
 
 Use the `xctest` command to run unit tests.
