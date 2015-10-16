@@ -113,6 +113,8 @@ If you experience slow launch times of fastlane, try running
 
 to clean up outdated gems.
 
+System Requirements: `fastlane` requires Mac OS X or Linux with Ruby 2.0.0 or above.
+
 
 If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
 
