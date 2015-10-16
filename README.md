@@ -106,14 +106,14 @@ I've been using many other solutions out there. Unfortunately none of them were 
 
 # Installation
 
+Make sure, you have the latest version of the Xcode command line tools installed:
+
+    xcode-select --install
+
 Install the gem
 
     sudo gem install snapshot
 
-Make sure, you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
-    
 # UI Automation
 
 ## Getting started
