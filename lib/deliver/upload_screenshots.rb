@@ -64,6 +64,10 @@ module Deliver
             next
           end
 
+          if !prefer_framed && path.downcase.include?("_framed.#{extensions}")
+            next
+          end
+
           screenshots << AppScreenshot.new(path, language)
         end
       end
