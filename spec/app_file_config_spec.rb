@@ -187,7 +187,7 @@ describe CredentialsManager do
 
       it "falls back to environment variable `DELIVER_USER` for the username" do
         env_name = "User@#{Time.now.to_i}"
-        ENV["DELIVER_USER"] = env_name
+        ENV["FASTLANE_USER"] = env_name
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile9').data[:apple_id]).to eq(env_name)
         ENV.delete("DELIVER_USER")
       end
