@@ -67,6 +67,17 @@ To run the modified version of the tool, run the following in the project direct
 ./bin/[tool_name]
 ```
 
+# Debugging
+
+I personally use a plain Sublime Text with a terminal. Debuggin is pretty, just insert the following code to where you want to jump in:
+
+```ruby
+require 'pry'
+binding.pry
+```
+
+You then jump into an interactive debugger that allows you to print out variables, call methods and much more. Continue running the original script using `control` + `d`
+
 # Running tests
 
 In the directory of one project, run the tests using
