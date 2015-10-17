@@ -13,7 +13,7 @@ module CredentialsManager
     end
 
     def self.default_path
-      ["./fastlane/Appfile", "./Appfile"].each do |current|
+      ["./fastlane/Appfile", "./.fastlane/Appfile", "./Appfile"].each do |current|
         return current if File.exist? current
       end
       nil
