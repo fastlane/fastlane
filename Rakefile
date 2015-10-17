@@ -84,7 +84,7 @@ task :fetch_rubocop do
 		end
 
 		File.write(File.join(repo, ".hound.yml"), File.read("./fastlane/.hound.yml"))
-		unless repo == 'gym' # gym needs mac os
+		unless %w[gym fastlane_core].include?(repo) # some repos need Mac OS
 			File.write(File.join(repo, ".travis.yml"), File.read("./fastlane/.travis.yml"))
 		end
 	end
