@@ -53,6 +53,10 @@ module FastlaneCore
       puts "# It is recommended to use the latest version.".green
       puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
       puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green
+      if Random.rand(5) == 1
+        puts '#######################################################################'.green
+        puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
+      end
       puts '#######################################################################'.green
     end
 
