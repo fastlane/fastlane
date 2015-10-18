@@ -131,6 +131,14 @@ class FastlaneApplication
       end
     end
 
+    command :enable_crash_reporting do |c|
+      c.syntax = 'fastlane enable_crash_reporting'
+      c.description = 'Enable crash reporting to improve fastlane'
+      c.action do |args, options|
+        FastlaneCore::CrashReporting.enable
+      end
+    end
+
     default_command :trigger
 
     run!
@@ -140,6 +148,8 @@ end
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
   FastlaneApplication.new.run
+rescue => ex
+  FastlaneCore::CrashReporting.handle_crash(ex)
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
 end
