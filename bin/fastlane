@@ -139,6 +139,14 @@ class FastlaneApplication
       end
     end
 
+    command :disable_crash_reporting do |c|
+      c.syntax = 'fastlane disable_crash_reporting'
+      c.description = 'Disable crash reporting'
+      c.action do |args, options|
+        FastlaneCore::CrashReporting.disable
+      end
+    end
+
     default_command :trigger
 
     run!
