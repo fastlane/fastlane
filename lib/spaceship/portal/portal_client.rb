@@ -54,8 +54,8 @@ module Spaceship
 
     # @return (Array) A list of all available teams
     def teams
-      r = request(:post, 'account/listTeams.action')
-      parse_response(r, 'teams')
+      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
+      parse_response(req, 'teams')
     end
 
     # @return (String) The currently selected Team ID
