@@ -21,7 +21,7 @@ module FastlaneCore
         puts "-------------------------------------------------------------------------------------------".yellow
         puts "😨  An error occured. Please enable crash reports using `fastlane enable_crash_reporting`".yellow
         puts "👍  This makes resolving issues much easier and helps improving fastlane".yellow
-        puts "🔒  No sensitive data will be transfered when enabling crash reporting".yellow
+        puts "🔒  The reports might contain personal data, but will be stored securely on getsentry.com".yellow
         puts "✨  Once crash reporting is enabled, you have much cleaner output when something goes wrong".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
       end
