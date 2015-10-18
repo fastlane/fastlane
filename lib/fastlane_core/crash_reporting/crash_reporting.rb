@@ -13,6 +13,11 @@ module FastlaneCore
         puts "Thanks for helping making fastlane better".green
       end
 
+      def disable
+        File.delete(file_path) if File.exist?(file_path)
+        puts "Disabled crash reporting :("
+      end
+
       def enabled?
         File.exist?(file_path)
       end
