@@ -30,8 +30,9 @@ module FastlaneCore
         unless enabled?
           show_message
           raise ex
-          return
         end
+
+        raise ex if Helper.test?
 
         send_crash(ex)
       end
@@ -53,9 +54,9 @@ module FastlaneCore
         crash = Raven.capture_exception(ex)
         path = "/tmp/sentry_#{crash.id}.json"
         File.write(path, JSON.pretty_generate(crash.to_hash))
-        puts "Successfully submitted crash report. If you want to report this is a problem with one of the tools".yellow
+        puts "Successfully submitted crash report. If this is a problem with one of the tools you want to report".yellow
         puts "please submit an issue on GitHub and attach the following number to it: '#{crash.id}'".yellow
-        puts "Also stored the crash report stored locally '#{path}'".yellow
+        puts "Also stored the crash report locally '#{path}'".yellow
       rescue => ex
         Helper.log.debug ex # We don't want crash reporting to cause crash
       end
