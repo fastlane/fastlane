@@ -23,6 +23,7 @@ module FastlaneCore
         puts "👍  This makes resolving issues much easier and helps improving fastlane".yellow
         puts "🔒  The reports might contain personal data, but will be stored securely on getsentry.com".yellow
         puts "✨  Once crash reporting is enabled, you have much cleaner output when something goes wrong".yellow
+        puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
       end
 
