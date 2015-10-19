@@ -27,6 +27,7 @@ end
 
 ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"
+ENV.delete("FASTLANE_USER") # just in case the dev env has it
 
 unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
