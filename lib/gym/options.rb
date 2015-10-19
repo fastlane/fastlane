@@ -49,11 +49,6 @@ module Gym
                                      env_name: "GYM_OUTPUT_DIRECTORY",
                                      description: "The directory in which the ipa file should be stored in",
                                      default_value: "."),
-        FastlaneCore::ConfigItem.new(key: :archive_path,
-                                     short_option: "-b",
-                                     env_name: "GYM_ARCHIVE_PATH",
-                                     description: "The directory in which the archive file should be stored in",
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
@@ -62,16 +57,6 @@ module Gym
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
                                      end),
-        FastlaneCore::ConfigItem.new(key: :buildlog_path,
-                                     short_option: "-l",
-                                     env_name: "GYM_BUILDLOG_PATH",
-                                     description: "The directory where to store the build log",
-                                     default_value: "~/Library/Logs/gym"),
-        FastlaneCore::ConfigItem.new(key: :sdk,
-                                     short_option: "-k",
-                                     env_name: "GYM_SDK",
-                                     description: "The SDK that should be used for building the application",
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
@@ -88,24 +73,6 @@ module Gym
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :destination,
-                                     short_option: "-d",
-                                     env_name: "GYM_DESTINATION",
-                                     description: "Use a custom destination for building the app",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :xcargs,
-                                     short_option: "-x",
-                                     env_name: "GYM_XCARGS",
-                                     description: "Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :xcconfig,
-                                     short_option: "-y",
-                                     env_name: "GYM_XCCONFIG",
-                                     description: "Use an extra XCCONFIG file to build your app",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
-                                     end),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -138,6 +105,23 @@ module Gym
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
                                        raise "Unsupported export_method, must be: #{av}" unless av.include?(value)
                                      end),
+
+        # Very optional
+        FastlaneCore::ConfigItem.new(key: :archive_path,
+                                     short_option: "-b",
+                                     env_name: "GYM_ARCHIVE_PATH",
+                                     description: "The directory in which the archive file should be stored in",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :buildlog_path,
+                                     short_option: "-l",
+                                     env_name: "GYM_BUILDLOG_PATH",
+                                     description: "The directory where to store the build log",
+                                     default_value: "~/Library/Logs/gym"),
+        FastlaneCore::ConfigItem.new(key: :sdk,
+                                     short_option: "-k",
+                                     env_name: "GYM_SDK",
+                                     description: "The SDK that should be used for building the application",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",
@@ -145,8 +129,25 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :destination,
+                                     short_option: "-d",
+                                     env_name: "GYM_DESTINATION",
+                                     description: "Use a custom destination for building the app",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcargs,
+                                     short_option: "-x",
+                                     env_name: "GYM_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcconfig,
+                                     short_option: "-y",
+                                     env_name: "GYM_XCCONFIG",
+                                     description: "Use an extra XCCONFIG file to build your app",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                      end)
-
       ]
     end
   end
