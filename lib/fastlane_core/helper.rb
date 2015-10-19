@@ -77,6 +77,16 @@ module FastlaneCore
     end
     # rubocop:enable Style/PredicateName
 
+    # Does the user use the Mac stock terminal
+    def self.mac_stock_terminal?
+      !!ENV["TERM_PROGRAM_VERSION"]
+    end
+
+    # Does the user use iTerm?
+    def self.iterm?
+      !!ENV["ITERM_SESSION_ID"]
+    end
+
     # All Xcode Related things
     #
 
