@@ -286,7 +286,12 @@ module Spaceship
         displayId: certificate_id,
         type: type
       })
-      parse_response(r)
+      a = parse_response(r)
+      if a.include?("Apple Inc")
+        return a
+      else
+        raise "Couldn't download provisioning profile, got this instead: #{a}"
+      end
     end
 
     def revoke_certificate!(certificate_id, type)
@@ -332,7 +337,12 @@ module Spaceship
         teamId: team_id,
         displayId: profile_id
       })
-      parse_response(r)
+      a = parse_response(r)
+      if a.include?("DOCTYPE plist PUBLIC")
+        return a
+      else
+        raise "Couldn't download provisioning profile, got this instead: #{a}"
+      end
     end
 
     def delete_provisioning_profile!(profile_id)
