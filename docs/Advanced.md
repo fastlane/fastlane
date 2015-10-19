@@ -10,7 +10,7 @@ fastlane [lane] key:value key2:value2
 fastlane deploy submit:false build_number:24
 ```
 
-To access those values, change your lane decleration to also include `|options|`
+To access those values, change your lane declaration to also include `|options|`
 
 ```ruby
 lane :deploy do |options|
