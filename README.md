@@ -183,20 +183,7 @@ Please submit an issue on GitHub and provide information about your setup
 
 ## Special Thanks
 
-Thanks to all contributors for extending and improving the `fastlane` suite:
-
-- [Product Hunt](https://www.producthunt.com/)
-- [MindNode](https://mindnode.com)
-- [Detroit Labs](http://www.detroitlabs.com/)
-- Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))
-- Ash Furrow ([@ashfurrow](https://twitter.com/ashfurrow))
-- Dan Trenz ([@dtrenz](https://twitter.com/dtrenz))
-- Luka Mirosevic ([@lmirosevic](https://twitter.com/lmirosevic))
-- Almas Sapargali ([@almassapargali](https://twitter.com/almassapargali))
-- Manuel Wallner ([@milch](https://github.com/milch))
-- Pawel Dudek ([@eldudi](https://twitter.com/eldudi))
-
-Check out the project pages of the other tools for more sponsors and contributors.
+Thanks to all [contributors](https://github.com/KrauseFx/fastlane/graphs/contributors) for extending and improving `fastlane`. Check out the project pages of the other tools for more sponsors and contributors.
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
