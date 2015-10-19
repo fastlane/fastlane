@@ -177,8 +177,7 @@ You can optionally submit crash reports, run `fastlane enable_crash_reporting` t
 A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/credentials_manager).
 
 ## Need help?
-- If there is a technical problem with `fastlane`, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
-- I'm available for contract work - drop me an email: fastlane@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 ## Special Thanks
 
