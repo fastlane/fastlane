@@ -32,6 +32,23 @@ module FastlaneCore
         puts "-------------------------------------------------------------------------------------------".yellow
       end
 
+      # Ask the user politely if they want to send crash reports
+      def ask_during_setup
+        return if enabled?
+
+        puts "-------------------------------------------------------------------------------------------".yellow
+        puts "😃  Do you want to enable crash reporting when fastlane experiences a problem?".yellow
+        puts "👍  This makes resolving issues much easier and helps improving fastlane".yellow
+        puts "🔒  The reports might contain personal data, but will be stored securely on getsentry.com".yellow
+        puts "✨  Once crash reporting is enabled, you have much cleaner output when something goes wrong".yellow
+        puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
+        puts "🌴  You can always enable crash reports at a later point using `fastlane enable_crash_reporting`".yellow
+        puts "-------------------------------------------------------------------------------------------".yellow
+        if agree("Do you want to enable crash reporting? (y/n) ", true)
+          enable
+        end
+      end
+
       def handle_crash(ex)
         unless enabled?
           show_message
