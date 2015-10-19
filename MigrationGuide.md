@@ -44,7 +44,7 @@ From     | To              | Note
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
 `ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#app_rating_config_path)
-`submit_further_information` | `submission_information` | [New Format](https://github.com/KrauseFx/deliver/blob/feature/spaceship/Deliverfile.md#submission_information)
+`submit_further_information` | `submission_information` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#submission_information)
 
 **The following commands have been removed:**
 
