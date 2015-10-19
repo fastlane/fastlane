@@ -13,7 +13,7 @@ module Deliver
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
                                 :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_first_sub_category
+                                :secondary_first_sub_category, :secondary_second_sub_category
                                ]
 
     # Make sure to call `load_from_filesystem` before calling upload
