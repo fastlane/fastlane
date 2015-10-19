@@ -77,6 +77,8 @@ module Fastlane
 
     # Print a table as summary of the executed actions
     def self.print_table(actions)
+      return if actions.count == 0
+
       require 'terminal-table'
 
       rows = []
