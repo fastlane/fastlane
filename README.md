@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/snapshot.png">
+  <img src="assets/snapshot.png" height="110">
 </p>
 
 snapshot
