@@ -8,7 +8,7 @@ module Fastlane
           FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
 
           Scan::Manager.new.work(values)
-          
+
           true
         ensure
           FastlaneCore::UpdateChecker.show_update_status('scan', Scan::VERSION)

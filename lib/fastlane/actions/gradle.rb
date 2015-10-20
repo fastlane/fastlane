@@ -13,23 +13,23 @@ module Fastlane
 
         result = gradle.trigger(task: task, flags: params[:flags])
 
-        if task.start_with?("assemble")
-          # We built our app. Store the path to the apk
-          flavor = task.match(/assemble(\w*)/)
-          if flavor and flavor[1]
-            flavor = flavor[1].downcase # Release => release
-            apk_path = File.join("app", "build", "outputs", "apk", "app-#{flavor}.apk")
-            if File.exist?(apk_path)
-              Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
-            else
-              Helper.log.info "Couldn't find signed apk file at path '#{apk_path}'...".red
-              if flavor == 'release'
-                Helper.log.info "Make sure to enable code signing in your gradle task: ".red
-                Helper.log.info "https://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle".red
-              end
+        return result unless task.start_with?("assemble")
+
+        # We built our app. Store the path to the apk
+        flavor = task.match(/assemble(\w*)/)
+        if flavor and flavor[1]
+          flavor = flavor[1].downcase # Release => release
+          apk_path = File.join("app", "build", "outputs", "apk", "app-#{flavor}.apk")
+          if File.exist?(apk_path)
+            Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
+          else
+            Helper.log.info "Couldn't find signed apk file at path '#{apk_path}'...".red
+            if flavor == 'release'
+              Helper.log.info "Make sure to enable code signing in your gradle task: ".red
+              Helper.log.info "https://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle".red
             end
-            Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor
           end
+          Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor
         end
 
         return result
