@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/sigh.png">
+  <img src="assets/sigh.png" height="110">
 </p>
 
 sigh
