@@ -58,6 +58,7 @@ module FastlaneCore
         raise ex if Helper.test?
 
         send_crash(ex)
+        Kernel.abort # => return status 1, we could pass a message here too, but this would end up with duplicates
       end
 
       def send_crash(ex)
