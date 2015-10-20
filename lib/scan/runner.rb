@@ -65,6 +65,8 @@ module Scan
       puts ""
 
       ReportCollector.new.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
+
+      raise "Tests failed" unless result[:failures] == 0
     end
   end
 end
