@@ -9,6 +9,12 @@ fastlane actions: List all available fastlane actions
 fastlane action [action_name]:
 ```
 
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
 - [Building](#building)
 - [Testing](#testing)
 - [Deploying](#deploying)
@@ -130,6 +136,16 @@ gym(
 Use `gym --help` to get all available options.
 
 The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+### verify_xcode
+
+Verifies that the Xcode installation is properly signed by Apple. This is relevant after recent [attacks targeting Xcode](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/).
+
+Add this action to your `appstore` lane. Keep in mind this action might take several minutes to be completed.
+
+```ruby
+verify_xcode
+```
 
 ### ipa
 
@@ -374,6 +390,20 @@ dsym_zip(
 )
 ```
 
+### splunkmint
+
+Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbolication.
+
+```ruby
+splunkmint(
+	dsym: "My.app.dSYM.zip", 
+	api_key: "43564d3a",
+	api_token: "e05456234c4869fb7e0b61"
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
+
 ## Testing
 
 ### xctest
@@ -427,9 +457,9 @@ Generate code coverage reports based on lcov.
 
 ```ruby
 lcov(
-      project_name: "yourProjectName",
-      scheme: "yourScheme",
-      output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+  project_name: "yourProjectName",
+  scheme: "yourScheme",
+  output_dir: "cov_reports" # This value is optional. Default is coverage_reports
 )
 ```
 
@@ -478,7 +508,7 @@ More information about the available options `fastlane action pilot` and a more 
 deliver
 ```
 
-To upload a new build to TestFlight use ```deliver(beta: true)```.
+To upload a new build to TestFlight use `pilot` instead.
 
 If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
 
@@ -486,21 +516,14 @@ Other options
 
 ```ruby
 deliver(
-  force: true,# Set to true to skip PDF verification
-  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
-  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+  force: true, # Set to true to skip PDF verification
+  email: "itunes@connect.com" # different Apple ID than the dev portal
 )
 ```
 
-If you want to use a different Apple ID for iTunes Connect in `deliver`, just add this to your `Deliverfile`:
-
-```ruby
-email "itunes@connect.com"
-```
-
-If you only want to upload a binary without any metadata, use `deliver(beta: true, skip_deploy: true)`
-
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
+
+**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
 
 ### TestFlight
 
@@ -542,7 +565,7 @@ crashlytics(
   ipa_path: './app.ipa'
 )
 ```
-Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
+Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
@@ -658,6 +681,23 @@ artifactory(
 
 To get a list of all available parameters run `fastlane action artifactory`
 
+### [nexus_upload](http://www.sonatype.com/nexus/)
+
+Upload your ipa, or any other file you want, to Sonatype Nexus platform.
+
+```ruby
+nexus_upload(
+  file: "/path/to/file.ipa", 
+  repo_id: "artefacts", 
+  repo_group_id: "com.fastlane", 
+  repo_project_name: "ipa",
+  repo_project_version: "1.13",
+  endpoint: "http://localhost:8081",
+  username: "admin",
+  password: "admin123"
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -669,7 +709,7 @@ increment_build_number(
   build_number: '75' # set a specific number
 )
 
-increment_build_numer(
+increment_build_number(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
   xcodeproj: './path/to/MyApp.xcodeproj' # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
@@ -724,6 +764,31 @@ This action will set the **build number** according to what the SCM HEAD reports
 Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash).
 
 There are no options currently available for this action.
+
+## update_info_plist
+
+This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+
+```ruby
+# update app identifier string
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  app_identifier: "com.example.newappidentifier"
+)
+
+# Change the Display Name of your app
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
+# Target a specific `xcodeproj` rather than finding the first available one
+update_info_plist(
+  xcodeproj: "path/to/Example.proj",
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+```
 
 ## Developer Portal
 
@@ -867,6 +932,22 @@ Quickly get the name of the branch you're currently in
 git_branch
 ```
 
+### git_commit
+
+To simply commit one file with a certain commit message use
+
+```ruby
+git_commit(path: "./version.txt",
+        message: "Version Bump")
+```
+
+To commit several files with a certain commit message use
+
+```ruby
+git_commit(path: ["./version.txt", "./changelog.txt"]
+        message: "Version Bump")
+```
+
 ### ensure_git_status_clean
 A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
 
@@ -930,6 +1011,10 @@ add_git_tag(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### git_pull
+
+Executes a simple `git pull --tags` command
+
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
@@ -990,6 +1075,20 @@ puts release['name']
 ```
 
 To get a list of all available values run `fastlane action get_github_release`.
+
+### import_from_git
+
+Import another Fastfile from a remote git repository to use its lanes.
+
+This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository.
+
+```ruby
+import_from_git(
+  url: 'git@github.com:KrauseFx/fastlane.git', # The url of the repository to import the Fastfile from.
+  branch: 'HEAD', # The branch to checkout on the repository. Defaults to `HEAD`.
+  path: 'fastlane/Fastfile' # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
+)
+```
 
 ## Using mercurial
 
@@ -1213,6 +1312,24 @@ data["users"].each do |user|
 end
 ```
 
+### version_get_podspec
+
+To receive the current version number from your `.podspec` file use
+
+```ruby
+version = version_get_podspec(path: "TSMessages.podspec")
+```
+
+### version_bump_podspec
+
+To increment the version number of your `.podspec` use
+
+```ruby
+version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
+# or
+version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
+```
+
 ### get_info_plist
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
@@ -1280,6 +1397,21 @@ This will find the first podspec in the folder. You can also pass in the specifi
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
 ```
 
+### pod_push
+
+Push a Podspec to Trunk or a private repository
+
+```ruby
+# If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
+pod_trunk
+
+# Alternatively, supply the Podspec file path
+pod_trunk(path: 'TSMessages.podspec')
+
+# You may also push to a private repo instead of Trunk
+pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
+```
+
 ### prompt
 
 You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
@@ -1296,4 +1428,64 @@ changelog = prompt(
 )
 
 hockey(notes: changelog)
+```
+
+### backup_file
+
+This action backs up your file to `[path].back`.
+
+```ruby
+# copies `file` to `/path/to/file.back`
+backup_file(path: '/path/to/file')
+```
+
+### restore_file
+
+This action restores a file previously backed up by the `backup_file` action.
+
+```ruby
+# copies `file.back` to '/path/to/file'
+restore_file(path: '/path/to/file')
+```
+
+### backup_xcarchive
+
+Save your [zipped] xcarchive elsewhere from default path.
+
+```ruby
+backup_xcarchive(
+  xcarchive: '/path/to/file.xcarchive', # Optional if you use the `xcodebuild` action
+  destination: '/somewhere/else/file.xcarchive', # Where the backup should be created
+  zip: false, # Enable compression of the archive. Defaults to `true`.
+  versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+)
+```
+
+### debug
+
+Print out an overview of the lane context values.
+
+```ruby
+debug
+```
+
+### dotgpg_environment
+
+Reads in production secrets set in a dotgpg file and puts them in ENV.
+
+```ruby
+dotgpg_environment(dotgpg_file: './path/to/gpgfile')
+```
+
+### update_info_plist
+
+Update an `Info.plist` with a bundle identifier and display name.
+
+```ruby
+update_info_plist(
+  xcodeproj: '/path/to/Project.xcodeproj', # Optional. Will pick the first `xcodeproj` in the directory if left blank
+  plist_path: '/path/to/Info.plist', # Path to the info plist file
+  app_identifier: 'com.example.newapp', # Optional. The new App Identifier of your app
+  display_name: 'MyNewApp' # Optional. The new Display Name of your app
+)
 ```

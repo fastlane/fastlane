@@ -87,7 +87,7 @@ module Fastlane
 
           if required_count > 0
             puts "#{required_count} of the available parameters are required".magenta
-            puts "They are marked using an asterix *".magenta
+            puts "They are marked with an asterix *".magenta
           end
         else
           puts "No available options".yellow

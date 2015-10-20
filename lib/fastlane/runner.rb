@@ -118,13 +118,13 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments)
+    def execute_action(method_sym, class_ref, arguments, custom_dir: '..')
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
 
       begin
-        Dir.chdir('..') do # go up from the fastlane folder, to the project folder
+        Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           Actions.execute_action(class_ref.step_text) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one

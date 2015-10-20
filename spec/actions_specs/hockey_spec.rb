@@ -59,6 +59,7 @@ describe Fastlane do
         expect(values[:teams]).to eq(nil)
         expect(values[:mandatory]).to eq(0.to_s)
         expect(values[:notes_type]).to eq(1.to_s)
+        expect(values[:upload_dsym_only]).to eq(false)
       end
 
       it "has the correct default notes_type value" do

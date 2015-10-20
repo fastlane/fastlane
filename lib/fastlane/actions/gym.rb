@@ -17,6 +17,8 @@ module Fastlane
             values[:provisioning_profile_path] = File.expand_path(sigh_path) if sigh_path
           end
 
+          values[:export_method] ||= Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_TYPE]
+
           absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
           absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
@@ -33,6 +35,10 @@ module Fastlane
 
       def self.description
         "Easily build and sign your app using `gym`"
+      end
+
+      def self.details
+        "More information: https://github.com/fastlane/gym"
       end
 
       def self.author

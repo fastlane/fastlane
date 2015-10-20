@@ -16,16 +16,41 @@ module Fastlane
       @path = File.expand_path(path)
       content = File.read(path)
 
-      parse(content)
+      # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
+      if content.tr!('“”‘’‛', %(""'''))
+        Helper.log.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
+                    'To avoid issues in the future, you should not use ' \
+                    'TextEdit for editing it. If you are not using TextEdit, ' \
+                    'you should turn off smart quotes in your editor of choice.'.red
+      end
+
+      parse(content, @path)
     end
 
-    def parse(data)
+    def parsing_binding
+      binding
+    end
+
+    def parse(data, path = nil)
       @runner ||= Runner.new
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
-        # rubocop:disable Lint/Eval
-        eval(data) # this is okay in this case
-        # rubocop:enable Lint/Eval
+        # create nice path that we want to print in case of some problem
+        relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+
+        begin
+          # We have to use #get_binding method, because some test files defines method called `path` (for example SwitcherFastfile)
+          # and local variable has higher priority, so it causes to remove content of original Fastfile for example. With #get_binding
+          # is this always clear and safe to declare any local variables we want, because the eval function uses the instance scope
+          # instead of local.
+
+          # rubocop:disable Lint/Eval
+          eval(data, parsing_binding, relative_path) # using eval is ok for this case
+          # rubocop:enable Lint/Eval
+        rescue SyntaxError => ex
+          line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
+          raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
+        end
       end
 
       self
@@ -177,7 +202,7 @@ module Fastlane
       raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
 
       collector.did_launch_action(:import)
-      parse(File.read(path))
+      parse(File.read(path), path)
 
       # Check if we can also import local actions which are in the same directory as the Fastfile
       actions_path = File.join(File.expand_path("..", path), 'actions')
@@ -196,18 +221,13 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        clone_folder = File.join("/tmp", "fl_clones", repo_name)
+        tmp_path = File.join("/tmp", "fl_clones_#{Time.now.to_i}")
+        clone_folder = File.join(tmp_path, repo_name)
 
         branch_option = ""
         branch_option = "--branch #{branch}" if branch != 'HEAD'
 
         clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
-        if Dir.exist? clone_folder
-          # We want to re-clone if the folder already exists
-          Helper.log.info "Deleting existing git repo..."
-          Actions.sh("rm -rf '#{clone_folder}'")
-        end
 
         Helper.log.info "Cloning remote git repo..."
         Actions.sh(clone_command)
@@ -225,6 +245,12 @@ module Fastlane
         end
 
         import(File.join(clone_folder, path))
+
+        if Dir.exist?(clone_folder)
+          # We want to re-clone if the folder already exists
+          Helper.log.info "Clearing the git repo..."
+          Actions.sh("rm -rf '#{tmp_path}'")
+        end
       end
     end
 

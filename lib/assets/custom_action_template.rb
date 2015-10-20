@@ -44,6 +44,7 @@ module Fastlane
                                        description: "API Token for [[NAME_CLASS]]", # a short description of this parameter
                                        verify_block: proc do |value|
                                           raise "No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`".red unless (value and not value.empty?)
+                                          # raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development,
                                        env_name: "FL_[[NAME_UP]]_DEVELOPMENT",
@@ -77,7 +78,7 @@ module Fastlane
         # 
         #  platform == :ios
         # 
-        #  [:ios, :mac].include? platform
+        #  [:ios, :mac].include?(platform)
         # 
 
         platform == :ios

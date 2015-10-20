@@ -6,8 +6,10 @@ module Fastlane
 
     class SlatherAction < Action
       def self.run(params)
+        Actions.verify_gem!('slather')
+
         command = "slather coverage "
-        command += " --build-directory #{params[:build_directory]}"
+        command += " --build-directory #{params[:build_directory]}" if params[:build_directory]
         command += " --input-format #{params[:input_format]}" if params[:input_format]
         command += " --scheme #{params[:scheme]}" if params[:scheme]
         command += " --buildkite" if params[:buildkite]
@@ -47,9 +49,8 @@ Slather is available at https://github.com/venmo/slather
           FastlaneCore::ConfigItem.new(key: :build_directory,
                                        env_name: "FL_SLATHER_BUILD_DIRECTORY", # The name of the environment variable
                                        description: "The location of the build output", # a short description of this parameter
-                                       verify_block: proc do |value|
-                                         raise "No Build Directory specified, pass using `build_directory: 'location/of/your/build/output'`".red unless value and !value.empty?
-                                       end),
+                                       optional: true
+                                      ),
           FastlaneCore::ConfigItem.new(key: :proj,
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
@@ -58,11 +59,13 @@ Slather is available at https://github.com/venmo/slather
                                        end),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
-                                       description: "Scheme to use when calling slather"
+                                       description: "Scheme to use when calling slather",
+                                       optional: true
                                       ),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
-                                       description: "The input format that slather should look for"
+                                       description: "The input format that slather should look for",
+                                       optional: true
                                       ),
           FastlaneCore::ConfigItem.new(key: :buildkite,
                                        env_name: "FL_SLATHER_BUILDKITE_ENABLED", # The name of the environment variable

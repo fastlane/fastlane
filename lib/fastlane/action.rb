@@ -51,7 +51,7 @@ module Fastlane
       #
       #  platform == :ios
       #
-      #  [:ios, :android].include? platform
+      #  [:ios, :mac].include?(platform)
       #
       raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
     end

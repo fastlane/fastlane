@@ -1,6 +1,5 @@
 module Fastlane
   class Setup
-
     # the tools that are already enabled
     attr_reader :tools
 
@@ -102,10 +101,14 @@ module Fastlane
         Helper.log.info 'Please read the above carefully and hit Enter to confirm.'.green
         STDIN.gets unless Helper.is_test?
       else
-        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store or Apple TestFlight? (y/n)".yellow, true)
+        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? (y/n)".yellow, true)
           Helper.log.info "Loading up 'deliver', this might take a few seconds"
           require 'deliver'
-          Deliver::DeliverfileCreator.create(folder)
+          require 'deliver/setup'
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+          Deliver::Runner.new(options) # to login...
+          Deliver::Setup.new.run(options)
+
           @tools[:deliver] = true
         end
       end
@@ -127,7 +130,7 @@ module Fastlane
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
 
-      scheme = ask("Optional: The scheme name of your app: (If you don't need one, just hit Enter.) ").to_s.strip
+      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else

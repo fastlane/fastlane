@@ -25,6 +25,8 @@ Metrics/MethodLength:
     - 'bin/fastlane'
 
 AllCops:
+  Include:
+    - 'fastlane/Fastfile'
   Exclude:
     - 'lib/assets/custom_action_template.rb'
 

@@ -77,6 +77,8 @@ module Fastlane
 
     # Print a table as summary of the executed actions
     def self.print_table(actions)
+      return if actions.count == 0
+
       require 'terminal-table'
 
       rows = []
@@ -127,7 +129,7 @@ module Fastlane
     def self.load_dot_env(env)
       require 'dotenv'
 
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
       env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')

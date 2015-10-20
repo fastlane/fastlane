@@ -4,12 +4,12 @@
 <p align="center">
   <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull;
   <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull;
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull;
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull;
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/PEM">PEM</a> &bull;
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull;
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
@@ -25,7 +25,7 @@ fastlane
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/KrauseFx/fastlane/master.svg?style=flat)](https://travis-ci.org/KrauseFx/fastlane)
 
-######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](http://cocoapods.org) and [xctool](https://github.com/facebook/xctool).
+######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [xctool](https://github.com/facebook/xctool).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -83,7 +83,7 @@ fastlane appstore
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
 :page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs
-:rocket: | Saves you **hours** for every app udpate you release
+:rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results
@@ -150,16 +150,16 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-`fastlane` is designed to make your life easier by bringing together the `fastlane` suite of tools under one roof. 
+`fastlane` is designed to make your life easier by bringing together all `fastlane` tools under one roof. 
 
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
-- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
+- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
+- [`codes`](https://github.com/fastlane/codes): Create promo codes for iOS Apps using the command line
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
@@ -169,22 +169,21 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 `fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer) and is available publicly.
 
-You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`.
+You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
 
-To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
+You can optionally submit crash reports, run `fastlane enable_crash_reporting` to get started. This makes resolving issues much easier and helps improving fastlane. [More information](https://github.com/KrauseFx/fastlane/releases/tag/1.33.3)
 
 ## Credentials
-A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/KrauseFx/CredentialsManager).
+A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/credentials_manager).
 
 ## Need help?
-- If there is a technical problem with `fastlane`, [open an issue](https://github.com/KrauseFx/fastlane/issues/new).
-- I'm available for contract work - drop me an email: fastlane@krausefx.com
+Please submit an issue on GitHub and provide information about your setup
 
 ## Special Thanks
 
 Thanks to all contributors for extending and improving the `fastlane` suite:
 
-- [Product Hunt](http://producthunt.com)
+- [Product Hunt](https://www.producthunt.com/)
 - [MindNode](https://mindnode.com)
 - [Detroit Labs](http://www.detroitlabs.com/)
 - Josh Holtz ([@joshdholtz](https://twitter.com/joshdholtz))

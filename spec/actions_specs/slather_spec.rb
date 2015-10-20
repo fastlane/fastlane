@@ -27,25 +27,24 @@ describe Fastlane do
         expect(result).to eq("slather coverage  --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --ignore nothing foo.xcodeproj")
       end
 
-      it "requires build_directory" do
+      it "requires project to be specified" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-            slather({
-              proj: 'something.xcodeproj'
-            })
+            slather({})
           end").runner.execute(:test)
         end.to raise_error
       end
 
-      it "Missing value" do
+      it "does not require any parameters other than project" do
         expect do
-          Fastlane::FastFile.new.parse("lane :test do
+          result = Fastlane::FastFile.new.parse("lane :test do
             slather({
-              build_directory: 'foo/bar',
-              input_format: ''
+              proj: 'foo.xcodeproj'
             })
           end").runner.execute(:test)
-        end.to raise_error "No value found for 'scheme'"
+
+          expect(result).to eq("slather coverage foo.xcodeproj")
+        end
       end
     end
   end

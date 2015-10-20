@@ -31,6 +31,16 @@ describe Fastlane do
         end.to raise_error("Please pass a valid value for use_binaries. Use one of the following: true, false")
       end
 
+      it "raises an error if no_build is invalid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_build: 'thisistest'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid value for no_build. Use one of the following: true, false")
+      end
+
       it "raises an error if platform is invalid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -103,6 +113,26 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
               use_binaries: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "adds no-build flag to command if no_build is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_build: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --no-build")
+      end
+
+      it "does not add a no-build flag to command if no_build is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_build: false
             )
           end").runner.execute(:test)
 

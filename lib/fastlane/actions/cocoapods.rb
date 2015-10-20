@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     class CocoapodsAction < Action
       def self.run(params)
+        Actions.verify_gem!('cocoapods')
         cmd = []
 
         unless params[:podfile].nil?
@@ -88,4 +89,3 @@ module Fastlane
     end
   end
 end
-#  vim: set et sw=2 ts=2 :

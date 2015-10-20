@@ -408,6 +408,7 @@ module Fastlane
     class XctestAction < Action
       def self.run(params)
         params_hash = params || {}
+        params_hash[:build] = true
         params_hash[:test] = true
         XcodebuildAction.run(params_hash)
       end

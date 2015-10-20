@@ -21,7 +21,7 @@ describe Fastlane do
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
-            derived_data_path: '/derived/data/path',
+            derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
             export_archive: true,
@@ -50,6 +50,7 @@ describe Fastlane do
           + "-arch \"architecture\" " \
           + "-archivePath \"./build/MyApp.xcarchive\" " \
           + "-configuration \"Debug\" " \
+          + "-derivedDataPath \"/derived/data/path\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
           + "-exportArchive " \
@@ -298,7 +299,7 @@ describe Fastlane do
     end
 
     describe "xctest" do
-      it "is equivalent to 'xcodebuild test'" do
+      it "is equivalent to 'xcodebuild build test'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           xctest(
             destination: 'name=iPhone 5s,OS=8.1',
@@ -315,6 +316,7 @@ describe Fastlane do
           + "-destination-timeout \"240\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color --test"
         )
@@ -339,6 +341,7 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color " \
           + "--report junit " \
@@ -366,6 +369,7 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -393,6 +397,7 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -426,6 +431,7 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -460,6 +466,7 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
