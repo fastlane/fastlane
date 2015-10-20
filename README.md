@@ -112,6 +112,7 @@ scan
 :floppy_disk:   | Store common build settings in a `Scanfile` 
 :outbox_tray: | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
 :computer: | Supports both iOS and Mac applications
+:man:      | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
 :book:     | Helps you resolve common test errors like simulator not responding
 
 `scan` uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, `scan` uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
