@@ -58,6 +58,7 @@ module CredentialsManager
 
     # Setters
 
+    # iOS
     def app_identifier(*args, &block)
       setter(:app_identifier, *args, &block)
     end
@@ -72,6 +73,19 @@ module CredentialsManager
 
     def team_name(*args, &block)
       setter(:team_name, *args, &block)
+    end
+
+    # Android
+    def issuer(*args, &block)
+      setter(:issuer, *args, &block)
+    end
+
+    def package_name(*args, &block)
+      setter(:package_name, *args, &block)
+    end
+
+    def keyfile(*args, &block)
+      setter(:keyfile, *args, &block)
     end
 
     # Override Appfile configuration for a specific lane.
