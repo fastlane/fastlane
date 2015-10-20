@@ -7,8 +7,7 @@ module Fastlane
     class UpdateProjectProvisioningAction < Action
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
-        Helper.log.info "You shouldn't use update_project_provisioning"
-        Helper.log.info "Have you considered using the recommended way to do code sining?"
+        Helper.log.info "You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?"
         Helper.log.info "https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
 
         # assign folder from parameter or search for xcodeproj file
