@@ -23,6 +23,15 @@ module Cert
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value
                                      end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "CERT_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
                                      env_name: "CERT_OUTPUT_PATH",
