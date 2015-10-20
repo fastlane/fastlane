@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/cert.png">
+  <img src="assets/cert.png" height="110">
 </p>
 
 cert
