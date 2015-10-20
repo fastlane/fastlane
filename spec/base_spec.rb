@@ -22,6 +22,11 @@ describe Spaceship::Base do
     end
   end
 
+  it "doesn't blow up if it was initialized with a nil data hash" do
+    hash = Spaceship::Base::DataHash.new(nil)
+    expect { hash["key"] }.not_to raise_exception
+  end
+
   it "allows modification of values and properly retrieving them" do
     app = Spaceship::App.all.first
     app.name = "12"

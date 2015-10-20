@@ -21,7 +21,7 @@ module Spaceship
   class Base
     class DataHash
       def initialize(hash)
-        @hash = hash
+        @hash = hash || {}
       end
 
       def get(*keys)
