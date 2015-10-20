@@ -41,6 +41,10 @@ module Fastlane
         "More information: https://github.com/fastlane/gym"
       end
 
+      def self.return_value
+        "The absolute path to the generated ipa file"
+      end
+
       def self.author
         "KrauseFx"
       end

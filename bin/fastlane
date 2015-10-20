@@ -26,12 +26,12 @@ class FastlaneApplication
     always_trace!
 
     command :trigger do |c|
-      c.syntax = 'fastlane trigger [lane]'
+      c.syntax = 'fastlane [lane]'
       c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, options|
-        if Fastlane::FastlaneFolder.path
+        if Fastlane::FastlaneFolder.setup?
           Fastlane::CommandLineHandler.handle(args, options)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)

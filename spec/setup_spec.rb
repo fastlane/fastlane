@@ -1,11 +1,11 @@
 describe Fastlane do
   describe Fastlane::Setup do
     it "#files_to_copy" do
-      expect(Fastlane::Setup.new.files_to_copy).to eq(['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'snapshot-iPad.js', 'SnapshotHelper.js', 'screenshots'])
+      expect(Fastlane::SetupIos.new.files_to_copy).to eq(['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'snapshot-iPad.js', 'SnapshotHelper.js', 'screenshots'])
     end
 
     it "#show_infos" do
-      Fastlane::Setup.new.show_infos
+      Fastlane::SetupIos.new.show_infos
     end
 
     describe "Complete setup process" do
@@ -26,7 +26,7 @@ describe Fastlane do
 
       it "setup is successful and generated inital Fastfile" do
         Fastlane::FastlaneFolder.create_folder!(workspace)
-        setup = Fastlane::Setup.new
+        setup = Fastlane::SetupIos.new
         expect(setup.run).to eq(true)
         expect(setup.tools).to eq({deliver: true, snapshot: true, xctool: true, cocoapods: true, sigh: true, carthage: false})
 
