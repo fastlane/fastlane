@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/pem.png">
+  <img src="assets/pem.png" height="110">
 </p>
 
 PEM
