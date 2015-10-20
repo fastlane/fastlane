@@ -41,8 +41,8 @@ module FastlaneCore
               clear_display
               puts line
             end
+            clear_display # IMPORTANT: This has to be *before* the Process.wait
             Process.wait(pid)
-            clear_display
           end
         rescue => ex
           # This could happen when the environment is wrong:
