@@ -11,13 +11,13 @@
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
   <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull; 
-  <a href="https://github.com/KrauseFx/cert">cert</a> &bull; 
-  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
+  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <b>pilot</b> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a>
+  <a href="https://github.com/fastlane/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/scan">scan</a> &bull;
 </p>
 -------
 
@@ -232,12 +232,14 @@ pilot import -c ~/Desktop/testers.csv
 - [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
