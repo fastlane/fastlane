@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/deliver.png">
+  <img src="assets/deliver.png" height="110">
 </p>
 
 deliver
