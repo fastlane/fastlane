@@ -9,15 +9,15 @@
   <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
   <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/pem">PEM</a> &bull; 
+  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
   <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
   <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
   <b>cert</b> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a>
+  <a href="https://github.com/fastlane/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/scan">scan</a>
 </p>
 -------
 
@@ -133,11 +133,11 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`codes`](https://github.com/KrauseFx/codes): Create promo codes for iOS Apps using the command line
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
