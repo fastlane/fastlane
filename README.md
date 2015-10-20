@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/frameit.png">
+  <img src="assets/frameit.png" height="110">
 </p>
 
 frameit
