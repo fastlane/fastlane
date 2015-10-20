@@ -6,45 +6,26 @@ devices([
   "iPhone 6 Plus",
   "iPhone 5",
   "iPhone 4s",
-  "iPad Air"
+  "iPad Retina"
 ])
 
 languages([
-  'en-US',
-  'de-DE',
-  'it-IT'
+  "en-US",
+  "de-DE",
+  "it-IT"
 ])
 
+# The name of the scheme which contains the UI Tests
+# scheme "SchemeName"
+
 # Where should the resulting screenshots be stored?
-screenshots_path "./screenshots"
+# screenshots_path "./screenshots"
 
-# clear_previous_screenshots # remove the '#'' to clear all previously generated screenshots before creating new ones
+# clear_previous_screenshots # remove the '#' to clear all previously generated screenshots before creating new ones
 
-# JavaScript UIAutomation file
-# js_file './snapshot.js'
+# Choose which project/workspace to use
+# project "./Project.xcodeproj"
+# workspace "./Project.xcworkspace"
 
-# The name of the project's scheme
-# scheme 'SchemeName'
-
-# Where is your project (or workspace)? Provide the full path here
-# project_path './YourProject.xcworkspace'
-
-# By default, the latest version should be used automatically. If you want to change it, do it here
-# ios_version '8.1'
-
-# Comment out the line below to add a `SNAPSHOT` preprocessor macro
-# More information available: https://github.com/krausefx/snapshot#custom-args-for-the-build-command
-# custom_build_args "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) SNAPSHOT=1' OTHER_SWIFT_FLAGS='$(inherited) -D SNAPSHOT'"
-
-
-# Custom Callbacks
-
-# setup_for_device_change do |device, udid, language|
-#   puts "Running #{language} on #{device}"
-#   system("./populateDatabase.sh")
-# end
-
-# teardown_device do |language, device|
-#   puts "Finished with #{language} on #{device}"
-#   system("./cleanup.sh")
-# end
+# For more information about all available options run
+# snapshot --help

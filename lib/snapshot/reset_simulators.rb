@@ -21,11 +21,11 @@ module Snapshot
       all_devices.split("\n").each do |line|
         parsed = line.match(/\s+([\w\s]+)\s\(([\w\-]+)\)/) || []
         next unless parsed.length == 3 # we don't care about those headers
-        parsed, name, id = parsed.to_a
+        _, name, id = parsed.to_a
         puts "Removing device #{name} (#{id})"
         `xcrun simctl delete #{id}`
       end
-       
+
       all_device_types = `xcrun simctl list devicetypes`.scan(/(.*)\s\((.*)\)/)
       # == Device Types ==
       # iPhone 4s (com.apple.CoreSimulator.SimDeviceType.iPhone-4s)
@@ -33,7 +33,7 @@ module Snapshot
       # iPhone 5s (com.apple.CoreSimulator.SimDeviceType.iPhone-5s)
       # iPhone 6 (com.apple.CoreSimulator.SimDeviceType.iPhone-6)
       all_device_types.each do |device_type|
-        next if device_type.join(' ').include?"Watch" # we don't want to deal with the Watch right now
+        next if device_type.join(' ').include? "Watch" # we don't want to deal with the Watch right now
 
         ios_versions.each do |ios_version|
           puts "Creating #{device_type} for iOS version #{ios_version}"

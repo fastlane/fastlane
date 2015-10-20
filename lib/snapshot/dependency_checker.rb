@@ -2,13 +2,11 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       self.check_xcode_select
-      self.check_xctool
-      self.check_for_automation_subfolder
       self.check_simctl
     end
 
     def self.check_xcode_select
-      unless `xcode-select -v`.include?"xcode-select version "
+      unless `xcode-select -v`.include? "xcode-select version"
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to install the Xcode commdand line tools to use snapshot"
         Helper.log.fatal "# Install the latest version of Xcode from the AppStore"
@@ -16,11 +14,21 @@ module Snapshot
         Helper.log.fatal '#############################################################'
         raise "Run 'xcode-select --install' and start snapshot again"
       end
+
+      if Snapshot::LatestIosVersion.version.to_f < 9 # to_f is bad, but should be good enough
+        Helper.log.fatal '#############################################################'
+        Helper.log.fatal "# Your xcode-select Xcode version is below 9.0"
+        Helper.log.fatal "# To use snapshot 1.0 and above you need at leat iOS 9"
+        Helper.log.fatal "# Set the path to the Xcode version that supports UI Tests"
+        Helper.log.fatal "# or downgrade to versions older than snapshot 1.0"
+        Helper.log.fatal '#############################################################'
+        raise "Run 'sudo xcode-select -s /Applications/Xcode-beta.app'"
+      end
     end
 
     def self.check_simulators
-      Helper.log.debug "Found #{Simulators.available_devices.count} simulators." if $verbose
-      if Simulators.available_devices.count < 1
+      Helper.log.debug "Found #{FastlaneCore::Simulator.all.count} simulators." if $verbose
+      if FastlaneCore::Simulator.all.count == 0
         Helper.log.fatal '#############################################################'
         Helper.log.fatal "# You have to add new simulators using Xcode"
         Helper.log.fatal "# You can let snapshot create new simulators: 'snapshot reset_simulators'"
@@ -31,28 +39,8 @@ module Snapshot
       end
     end
 
-    def self.xctool_installed?
-      return `which xctool`.length > 1
-    end
-
-    def self.check_xctool
-      if not self.xctool_installed?
-        Helper.log.info '#############################################################'
-        Helper.log.info "# xctool is recommended to build the apps"
-        Helper.log.info "# Install it using 'brew install xctool'"
-        Helper.log.info "# Falling back to xcodebuild instead "
-        Helper.log.info '#############################################################'
-      end
-    end
-
-    def self.check_for_automation_subfolder
-      if File.directory?"./Automation" or File.exists?"./Automation"
-        raise "Seems like you have an 'Automation' folder in the current directory. You need to delete/rename it!".red
-      end
-    end
-
     def self.check_simctl
-      unless `xcrun simctl`.include?"openurl"
+      unless `xcrun simctl`.include? "openurl"
         raise "Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and Mac OS installed.".red
       end
     end
