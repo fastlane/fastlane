@@ -1,6 +1,4 @@
 language: ruby
-os:
-  - osx
 before_install: gem update --system
 rvm:
   - 2.0.0
