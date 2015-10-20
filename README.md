@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/scanFullSize.png" width="300">
+  <img src="assets/scan.png" height="110">
 </p>
 
 scan
