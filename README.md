@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/produce.png">
+  <img src="assets/produce.png" height="110">
 </p>
 
 produce
