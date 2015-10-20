@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-    <img src="assets/supply.png">
+  <img src="assets/supply.png" height="110">
 </p>
 
 supply
