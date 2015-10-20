@@ -32,6 +32,9 @@ module Spaceship
     class NoUserCredentialsError < StandardError; end
 
     class UnexpectedResponse < StandardError; end
+    
+    # Raised when 302 is received from portal request
+    class AppleTimeoutError < StandardError; end
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
@@ -173,8 +176,9 @@ module Spaceship
 
     def with_retry(tries = 5, &block)
       return block.call
-    rescue Faraday::Error::TimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+    rescue Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
       unless (tries -= 1).zero?
+        logger.warn("Timeout received: '#{ex.message}'.  Retrying after 3 seconds (remaining: #{tries})...")
         sleep 3
         retry
       end
@@ -240,7 +244,9 @@ module Spaceship
     # Automatically retries the request up to 3 times if something goes wrong
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
-        @client.send(method, url_or_path, params, headers, &block)
+        response = @client.send(method, url_or_path, params, headers, &block)
+        raise AppleTimeoutError.new("Apple 302 detected") if response.body.to_s.include?("<title>302 Found</title>")
+        return response
       end
     end
 
