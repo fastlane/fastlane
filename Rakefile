@@ -1,5 +1,5 @@
 
-GEMS = %w[fastlane fastlane_core deliver snapshot frameit pem sigh produce cert codes gym pilot credentials_manager spaceship]
+GEMS = %w[fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply]
 RAILS = %w[boarding refresher enhancer]
 
 #####################################################
