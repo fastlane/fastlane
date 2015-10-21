@@ -155,6 +155,8 @@ describe CredentialsManager do
       end
 
       it "doesn't return empty strings but nil instead" do
+        ENV.delete("FASTLANE_USER")
+        ENV.delete("DELIVER_USER")
         expect(CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile7').data[:apple_id]).to eq(nil)
       end
     end
