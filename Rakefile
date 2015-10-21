@@ -90,6 +90,13 @@ task :fetch_rubocop do
 	end
 end
 
+task :test_all do
+	GEMS.reverse.each do |repo|
+		box "Testing #{repo}"
+		sh "cd #{repo} && rspec && rubocop"
+	end
+end
+
 desc "Fetch the latest rubocop config and apply&test it for all gems"
 task :rubocop => :fetch_rubocop do
 	GEMS.each do |repo|
