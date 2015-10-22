@@ -41,6 +41,16 @@ describe Fastlane do
         end.to raise_error("Please pass a valid value for no_build. Use one of the following: true, false")
       end
 
+      it "raises an error if verbose is invalid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              verbose: 'thisistest'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid value for verbose. Use one of the following: true, false")
+      end
+
       it "raises an error if platform is invalid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -133,6 +143,26 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
               no_build: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "adds verbose flag to command if verbose is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              verbose: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --verbose")
+      end
+
+      it "does not add a verbose flag to command if verbose is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              verbose: false
             )
           end").runner.execute(:test)
 
