@@ -26,8 +26,12 @@ module Scan
       config = Scan.config
 
       if config[:device] # make sure it actually exists
-        return if FastlaneCore::Simulator.all.find { |d| d.name == config[:device].strip }
-        Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+        found = FastlaneCore::Simulator.all.find { |d| d.name == config[:device].to_s.strip }
+        if found
+          config[:device] = found
+        else
+          Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+        end
       end
 
       # An iPhone 5s is reasonable small and useful for tests
