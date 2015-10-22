@@ -98,6 +98,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      env_name: "SLACK_URL",
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
+                                     optional: true,
                                      verify_block: proc do |value|
                                        raise "Invalid URL, must start with https://" unless value.start_with? "https://"
                                      end),
