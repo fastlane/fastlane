@@ -67,6 +67,7 @@ module FastlaneCore
 
       def clear_display
         return if Helper.ci?
+        return if Helper.test?
 
         if Helper.iterm?
           system("clear")
