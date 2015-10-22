@@ -2,7 +2,7 @@ module Supply
   class Uploader
     def perform_upload
       FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary")
-      
+
       client.begin_edit(package_name: Supply.config[:package_name])
 
       raise "No local metadata found, make sure to run `supply init` to setup supply".red unless metadata_path || Supply.config[:apk]
@@ -15,7 +15,7 @@ module Supply
 
           upload_metadata(language, listing)
           upload_images(language)
-          upload_screenshots(language)        
+          upload_screenshots(language)
         end
       end
 

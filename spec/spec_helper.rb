@@ -13,4 +13,3 @@ ENV["DELIVER_USER"] = "DELIVERUSER"
 ENV["DELIVER_PASSWORD"] = "DELIVERPASS"
 
 WebMock.disable_net_connect!(allow: 'coveralls.io')
-
