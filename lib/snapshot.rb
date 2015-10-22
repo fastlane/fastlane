@@ -14,7 +14,6 @@ require 'snapshot/options'
 require 'fastlane_core'
 
 require 'open3'
-require 'pry'
 
 module Snapshot
   # Use this to just setup the configuration attribute and set it later somewhere else
