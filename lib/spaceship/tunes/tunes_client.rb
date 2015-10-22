@@ -20,7 +20,8 @@ module Spaceship
             'iphone4' => [1136, 640],
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
-            'ipad' => [1024, 768]
+            'ipad' => [1024, 768],
+            'ipadPro' => [2732, 2048]
         }
 
         r = resolutions[device]
