@@ -3,6 +3,7 @@ module Scan
     def run(results)
       return if Scan.config[:skip_slack]
       return if Scan.config[:slack_only_on_failure] && results[:failures] == 0
+      return if Scan.config[:slack_url].nil?
 
       require 'slack-notifier'
       notifier = Slack::Notifier.new(Scan.config[:slack_url])
