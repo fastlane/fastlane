@@ -32,9 +32,7 @@ module Scan
                                      optional: true,
                                      is_string: false,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on",
-                                     verify_block: proc do |value|
-                                     end),
+                                     description: "The name of the simulator type you want to run tests on"),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
