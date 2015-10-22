@@ -91,15 +91,7 @@ module Snapshot
                                      short_option: "-s",
                                      env_name: 'SNAPSHOT_SCHEME',
                                      description: "The scheme you want to use, this must be the scheme for the UI Tests",
-                                     optional: true), # optional true because we offer a picker to the user
-        FastlaneCore::ConfigItem.new(key: :custom_args,
-                                     env_name: 'SNAPSHOT_CUSTOM_ARGS',
-                                     description: "TODO",
-                                     default_value: ''),
-        FastlaneCore::ConfigItem.new(key: :custom_build_args,
-                                     env_name: 'SNAPSHOT_CUSTOM_BUILD_ARGS',
-                                     description: "TODO",
-                                     default_value: 'KrauseFx/snapshot')
+                                     optional: true) # optional true because we offer a picker to the user
       ]
     end
   end
