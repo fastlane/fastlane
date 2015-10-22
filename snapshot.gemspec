@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.34'
+  spec.add_development_dependency "webmock", "~> 1.19.0"
 end

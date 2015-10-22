@@ -16,7 +16,7 @@ describe Snapshot do
           "-derivedDataPath '/tmp/snapshot_derived/'",
           "-destination 'platform=iOS Simulator,id=,OS=9.0'",
           :test,
-          "| tee '/Users/fkrause/Library/Logs/snapshot/Example-ExampleUITests.log' | xcpretty"
+          "| tee '#{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')}' | xcpretty"
         ])
       end
     end
