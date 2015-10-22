@@ -102,7 +102,7 @@ scan
               |  scan Features
 --------------------------|------------------------------------------------------------
 :checkered_flag: | Beautiful inline build output while running the tests
-:mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
+:mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
 :bar_chart: | Support for HTML, JSON and JUnit reports
 :mag: | Xcode duplicated your simulators again? `scan` will handle this for you
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
