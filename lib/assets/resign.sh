@@ -56,7 +56,7 @@
 # 1. now re-signs nested applications and app extensions, if present, prior to re-signing the application itself
 # 2. enables the -p option to be used more than once
 # 3. ensures the provisioning profile's bundle-identifier matches the app's bundle identifier
-# 4. extracts the entitlements from the provisioning profile if -u flag is used
+# 4. extracts the entitlements from the provisioning profile
 # 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
 
@@ -71,12 +71,8 @@ fi
 }
 
 if [ $# -lt 3 ]; then
-    echo "usage: $0 source identity -p provisioning [-e entitlements] [-d displayName] [-n version] [-ur] [-b bundleId] outputIpa" >&2
+    echo "usage: $0 source identity -p provisioning [-e entitlements] [-d displayName] [-n version] [-b bundleId] outputIpa" >&2
     echo "       -p option may be provided multiple times" >&2
-    echo "       -r: adjust beta-reports-active entitlement" >&2
-    echo "       -r flag is ignored if -e or -u is also used" >&2
-    echo "       -u: use entitlements from provisioning profile" >&2
-    echo "       -u flag is ignored if -e is also used" >&2
     exit 1
 fi
 
@@ -87,8 +83,6 @@ BUNDLE_IDENTIFIER=""
 DISPLAY_NAME=""
 KEYCHAIN=""
 VERSION_NUMBER=""
-ADJUST_BETA_REPORTS_ACTIVE_FLAG="0"
-USE_ENTITLEMENTS_FROM_PROVISION="0"
 RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
@@ -96,7 +90,7 @@ TEMP_DIR="_floatsignTemp"
 
 # options start index
 OPTIND=3
-while getopts p:d:e:k:b:run: opt; do
+while getopts p:d:e:k:b:n: opt; do
     case $opt in
         p)
             RAW_PROVISIONS+=("$OPTARG")
@@ -125,14 +119,6 @@ while getopts p:d:e:k:b:run: opt; do
         n)
             VERSION_NUMBER="$OPTARG"
             echo "Specified version to use: '$VERSION_NUMBER'" >&2
-            ;;
-        r)
-            ADJUST_BETA_REPORTS_ACTIVE_FLAG="1"
-            echo "Enabled adjustment of beta-reports-active entitlements" >&2
-            ;;
-        u)
-            USE_ENTITLEMENTS_FROM_PROVISION="1"
-            echo "Specified provisioning profile's entitlements should be used" >&2
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -469,8 +455,7 @@ then
     cp -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
     /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$ENTITLEMENTS" "$APP_PATH"
     checkStatus
-elif [ "$USE_ENTITLEMENTS_FROM_PROVISION" == 1 ];
-then
+else
     echo "Extracting entitlements from provisioning profile" >&2
     PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
     checkStatus
@@ -479,92 +464,6 @@ then
     cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
     /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
     checkStatus
-else
-    echo "Extracting existing entitlements for updating" >&2
-    /usr/bin/codesign -d --entitlements - "$APP_PATH" > "$TEMP_DIR/newEntitlements" 2> /dev/null
-    if [ $? -eq 0 ];
-    then
-        ENTITLEMENTS_TEMP=`cat "$TEMP_DIR/newEntitlements" | sed -E -e '1d'`
-        if [ -n "$ENTITLEMENTS_TEMP" ]; then
-            echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>$ENTITLEMENTS_TEMP" > "$TEMP_DIR/newEntitlements"
-            if [ -s "$TEMP_DIR/newEntitlements" ];
-            then
-                if [ "$TEAM_IDENTIFIER" != "" ];
-                then
-                    PlistBuddy -c "Set :com.apple.developer.team-identifier ${TEAM_IDENTIFIER}" "$TEMP_DIR/newEntitlements"
-                    checkStatus
-                fi
-                PlistBuddy -c "Set :application-identifier ${APP_IDENTIFER_PREFIX}.${BUNDLE_IDENTIFIER}" "$TEMP_DIR/newEntitlements"
-                checkStatus
-                PlistBuddy -c "Set :keychain-access-groups:0 ${APP_IDENTIFER_PREFIX}.${BUNDLE_IDENTIFIER}" "$TEMP_DIR/newEntitlements"
-#               checkStatus  -- if this fails it's likely because the keychain-access-groups key does not exist, so we have nothing to update
-                if [[ "$CERTIFICATE" == *Distribution* ]]; then
-                    IS_ENTERPRISE_PROFILE=`PlistBuddy -c "Print :ProvisionsAllDevices" "$TEMP_DIR/profile.plist" | tr -d '\n'`
-                    ADHOC_PROVISIONING_DEVICES=`PlistBuddy -c "Print :ProvisionedDevices" "$TEMP_DIR/profile.plist" | tr -d '\n'`
-
-                    echo "Assuming Distribution Identity"
-                    if [ "$ADJUST_BETA_REPORTS_ACTIVE_FLAG" == "1" ]; then
-                        if [ "$IS_ENTERPRISE_PROFILE" == "true" ]; then
-                            echo "Ensuring beta-reports-active is not included for Enterprise environment"
-                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements" || true
-#                           checkStatus -- this can fail is beta-reports-active isn't present, which is OK
-                        elif [ -n "$ADHOC_PROVISIONING_DEVICES" ]; then
-                            echo "Ensuring beta-reports-active is not included for Adhoc environment"
-                            PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements" || true
-#                           checkStatus -- this can fail is beta-reports-active isn't present, which is OK
-                        else
-                            echo "Ensuring beta-reports-active is present and enabled"
-                            # new beta key is only used for Distribution; might not exist yet, if we were building Development
-                            PlistBuddy -c "Add :beta-reports-active bool true" "$TEMP_DIR/newEntitlements"
-                            if [ $? -ne 0 ]; then
-                                PlistBuddy -c "Set :beta-reports-active YES" "$TEMP_DIR/newEntitlements"
-                            fi
-                            checkStatus
-                        fi
-                    fi
-                    echo "Setting get-task-allow entitlement to NO"
-                    PlistBuddy -c "Set :get-task-allow NO" "$TEMP_DIR/newEntitlements"
-                else
-                    echo "Assuming Development Identity"
-                    if [ "$ADJUST_BETA_REPORTS_ACTIVE_FLAG" == "1" ]; then
-                        # if we were building with Distribution profile, we have to delete the beta key
-                        echo "Ensuring beta-reports-active is not included"
-                        PlistBuddy -c "Delete :beta-reports-active" "$TEMP_DIR/newEntitlements"
-                        # do not check status here, just let it fail if entry does not exist
-                    fi
-                    echo "Setting get-task-allow entitlement to YES"
-                    PlistBuddy -c "Set :get-task-allow YES" "$TEMP_DIR/newEntitlements"
-                fi
-                checkStatus
-                plutil -lint "$TEMP_DIR/newEntitlements" > /dev/null
-                checkStatus
-                echo "Resigning application using certificate: '$CERTIFICATE'" >&2
-                echo "using existing entitlements updated with bundle identifier: '$APP_IDENTIFER_PREFIX.$BUNDLE_IDENTIFIER'" >&2
-                if [ "$TEAM_IDENTIFIER" != "" ];
-                then
-                    echo "and team identifier: '$TEAM_IDENTIFIER'" >&2
-                fi
-                cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-                /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
-                checkStatus
-            else
-                echo "Failed to create required intermediate file" >&2
-                exit 1;
-            fi
-        else
-            echo "No entitlements found" >&2
-            echo "Resigning application using certificate: '$CERTIFICATE'" >&2
-            echo "without entitlements" >&2
-            /usr/bin/codesign -f -s "$CERTIFICATE" "$APP_PATH"
-            checkStatus
-        fi
-    else
-        echo "Failed to extract entitlements" >&2
-        echo "Resigning application using certificate: '$CERTIFICATE'" >&2
-        echo "without entitlements" >&2
-        /usr/bin/codesign -f -s "$CERTIFICATE" "$APP_PATH"
-        checkStatus
-    fi
 fi
 
 # Remove the temporary files if they were created before generating ipa

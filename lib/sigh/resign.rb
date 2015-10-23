@@ -32,7 +32,6 @@ module Sigh
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        "-u",
         provisioning_options,
         ipa.shellescape
       ].join(' ')
