@@ -33,7 +33,8 @@ module Snapshot
       # iPhone 5s (com.apple.CoreSimulator.SimDeviceType.iPhone-5s)
       # iPhone 6 (com.apple.CoreSimulator.SimDeviceType.iPhone-6)
       all_device_types.each do |device_type|
-        next if device_type.join(' ').include? "Watch" # we don't want to deal with the Watch right now
+        next if device_type.join(' ').include?("Watch") # we don't want to deal with the Watch right now
+        next if device_type.join(' ').include?("TV") # we don't want to deal with TV right now
 
         ios_versions.each do |ios_version|
           puts "Creating #{device_type} for iOS version #{ios_version}"
