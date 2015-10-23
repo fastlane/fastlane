@@ -162,6 +162,10 @@ Your screenshots will be stored in the `./screenshots/` folder by default (or `.
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and `snapshot` will continue with the next device or language. To stop the flow after the first error, run
 
+```sh
+snapshot --stop_after_first_error
+```
+
 Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
 
 
