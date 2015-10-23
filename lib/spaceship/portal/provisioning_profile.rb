@@ -212,8 +212,8 @@ module Spaceship
 
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
-              # For Development and AdHoc we usually want all devices by default
-              devices = Spaceship::Device.all.find_all { |d| d.device_type != 'pc' }
+              # For Development and AdHoc we usually want all compatible devices by default
+              devices = Spaceship::Device.all_for_profile_type(self.type)
             end
           end
 

@@ -149,7 +149,7 @@ describe Spaceship::ProvisioningProfile do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "repairs an existing profile with added devices" do
-      profile.devices = Spaceship::Device.all
+      profile.devices = Spaceship::Device.all_for_profile_type(profile.type)
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"]).and_return({})
       profile.repair!
     end

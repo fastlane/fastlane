@@ -43,6 +43,32 @@ describe Spaceship::Device do
     expect(device.device_type).to eq('ipod')
   end
 
+  subject(:all_apple_tvs) { Spaceship::Device.all_apple_tvs }
+  it "successfully loads and parses all Apple TVs" do
+    expect(all_apple_tvs.count).to eq(1)
+    device = all_apple_tvs.first
+    expect(device.id).to eq('EEEEEEEEEE')
+    expect(device.name).to eq('Tracy\'s Apple TV')
+    expect(device.udid).to eq('8defe35b2cad44affacabd124834acbd8746ff34')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('c')
+    expect(device.model).to eq('The new Apple TV')
+    expect(device.device_type).to eq('tvOS')
+  end
+
+  subject(:all_watches) { Spaceship::Device.all_watches }
+  it "successfully loads and parses all Watches" do
+    expect(all_watches.count).to eq(1)
+    device = all_watches.first
+    expect(device.id).to eq('FFFFFFFFFF')
+    expect(device.name).to eq('Tracy\'s Watch')
+    expect(device.udid).to eq('8defe35b2cad44aff7d8e9dfe4ca4d2fb94ae509')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('c')
+    expect(device.model).to eq('Apple Watch 38mm')
+    expect(device.device_type).to eq('watch')
+  end
+
   it "inspect works" do
     expect(subject.first.inspect).to include("Portal::Device")
   end
