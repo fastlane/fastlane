@@ -279,7 +279,7 @@ module Spaceship
         @app_status = Tunes::AppStatus.get_from_string(status)
         setup_large_app_icon
         setup_watch_app_icon
-        setup_transit_app_file
+        setup_transit_app_file if supports_app_transit?
         setup_screenshots
         setup_trailers
       end
@@ -465,6 +465,10 @@ module Spaceship
         watch_app_icon = raw_data["watchAppIcon"]["value"]
         @watch_app_icon = nil
         @watch_app_icon = Tunes::AppImage.factory(watch_app_icon) if watch_app_icon
+      end
+
+      def supports_app_transit?
+        raw_data["transitAppFile"] != nil
       end
 
       def setup_transit_app_file

@@ -252,16 +252,17 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      # An app can only have either ios or mac, but we ignore apple tv right now
+      # We only support platforms that exist ATM
       platform = platforms.find do |p|
-        p['platformString'] == 'ios' or p['platformString'] == 'osx'
+        ['ios', 'osx', 'appletvos'].include? p['platformString']
       end
 
       version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
       return nil unless version
       version_id = version['id']
+      version_platform = platform['platformString']
 
-      r = request(:get, "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}")
+      r = request(:get, "ra/apps/#{app_id}/platforms/#{version_platform}/versions/#{version_id}")
       parse_response(r, 'data')
     end
 
