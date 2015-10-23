@@ -45,7 +45,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 Why should you have to remember complicated commands and parameters?
 
-Store your configuration in a text file to easily test, builld, and deploy from _any_ computer.
+Store your configuration in a text file to easily test, build, and deploy from _any_ computer.
 
 [Take a look at how Wikipedia and Product Hunt use `fastlane`](https://github.com/fastlane/examples).
 
