@@ -25,7 +25,7 @@ module Snapshot
       puts "  setLanguage(app)"
       puts "  app.launch()"
       puts ""
-      puts "3) Add `snapshot(\"0Launch\")` to wherever you want to create the screenhsots".yellow
+      puts "3) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
       puts ""
       puts "More information on GitHub: https://github.com/krausefx/snapshot".green
     end
