@@ -8,13 +8,14 @@ describe Snapshot do
 
       it "uses the default parameters" do
         command = Snapshot::TestCommandGenerator.generate(device_type: "Something")
+        ios = command.join('').match(/OS=(\d+.\d+)/)[1]
         expect(command).to eq([
           "set -o pipefail &&",
           "xcodebuild",
           "-scheme 'ExampleUITests'",
           "-project './example/Example.xcodeproj'",
           "-derivedDataPath '/tmp/snapshot_derived/'",
-          "-destination 'platform=iOS Simulator,id=,OS=9.0'",
+          "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
           :test,
           "| tee '#{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')}' | xcpretty"
         ])
