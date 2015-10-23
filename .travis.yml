@@ -1,4 +1,5 @@
 language: ruby
+osx_image: xcode6.4
 before_install:
   - gem update --system
   - gem install bundler
