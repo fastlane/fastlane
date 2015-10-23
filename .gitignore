@@ -1,3 +1,6 @@
 pkg
 Gemfile.lock
 fastlane/report.xml
+.project
+*.gem
+coverage

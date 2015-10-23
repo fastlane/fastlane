@@ -28,7 +28,7 @@ module Sigh
             Helper.log.info "Updating the provisioning profile".yellow
           else
             Helper.log.info "Updating the profile to include all devices".yellow
-            profile.devices = Spaceship.device.all
+            profile.devices = Spaceship.device.all_for_profile_type(profile.type)
           end
 
           profile = profile.update! # assign it, as it's a new profile
