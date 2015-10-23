@@ -10,7 +10,7 @@ module Scan
         system(command)
         Helper.log.info("Successfully generated report at '#{output_path}'".green)
 
-        if !Scan.config[:skip_html_open] and output_path.end_with?(".html")
+        if Scan.config[:open_report] and output_path.end_with?(".html")
           # Open the HTML file
           `open --hide '#{output_path}'`
         end

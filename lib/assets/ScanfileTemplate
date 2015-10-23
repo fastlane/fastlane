@@ -8,6 +8,6 @@
 
 # scheme "Example"
 
-# skip_html_open true
+# open_report true
 
 # clean true
