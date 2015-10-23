@@ -34,12 +34,11 @@ module Spaceship
 
       # @return (String) Device type
       # @example
-      #   'pc'     - Apple TV
       #   'watch'  - Apple Watch
       #   'ipad'   - iPad
       #   'iphone' - iPhone
       #   'ipod'   - iPod
-      #   'pc'     - Apple TV
+      #   'tvOS'   - Apple TV
       attr_accessor :device_type
 
       attr_mapping({
@@ -66,7 +65,7 @@ module Spaceship
 
         # @return (Array) Returns all Apple TVs registered for this account
         def all_apple_tvs
-          client.devices_by_class('pc').map { |device| self.factory(device) }
+          client.devices_by_class('tvOS').map { |device| self.factory(device) }
         end
 
         # @return (Array) Returns all Watches registered for this account
@@ -87,6 +86,20 @@ module Spaceship
         # @return (Array) Returns all iPods registered for this account
         def all_ipod_touches
           client.devices_by_class('ipod').map { |device| self.factory(device) }
+        end
+
+        # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
+        def all_ios_profile_devices
+          all.select { |device| device.device_type != "tvOS" }
+        end
+
+        # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
+        def all_for_profile_type(profile_type)
+          if profile_type.include? "tvOS"
+            Spaceship::Device.all_apple_tvs
+          else
+            Spaceship::Device.all_ios_profile_devices
+          end
         end
 
         # @return (Device) Find a device based on the ID of the device. *Attention*:
