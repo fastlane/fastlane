@@ -29,6 +29,7 @@ module Scan
         found = FastlaneCore::Simulator.all.find { |d| d.name == config[:device].to_s.strip }
         if found
           config[:device] = found
+          return
         else
           Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
         end
