@@ -1399,6 +1399,16 @@ else
 end
 ```
 
+### verify_pods_keys
+
+Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
+
+```ruby
+verify_pods_keys
+```
+
+Will raise an error if any key is empty or a single character.
+
 ### read_podspec
 
 Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
