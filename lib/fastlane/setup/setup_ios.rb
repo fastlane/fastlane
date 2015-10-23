@@ -10,8 +10,6 @@ module Fastlane
       end
 
       show_infos
-      response = agree('Do you want to get started? This will move your Deliverfile and Snapfile (if they exist) (y/n)'.yellow, true)
-      return unless response
       response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
       return unless response
 
@@ -45,7 +43,7 @@ module Fastlane
     end
 
     def files_to_copy
-      ['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'snapshot-iPad.js', 'SnapshotHelper.js', 'screenshots']
+      ['Deliverfile', 'deliver', 'screenshots']
     end
 
     def copy_existing_files
@@ -104,9 +102,10 @@ module Fastlane
         if agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
           Helper.log.info "Loading up 'snapshot', this might take a few seconds"
 
-          require 'snapshot' # we need both requires
-          require 'snapshot/snapfile_creator'
-          Snapshot::SnapfileCreator.create(folder)
+          require 'snapshot'
+          require 'snapshot/setup'
+          Snapshot::Setup.create(folder)
+
           @tools[:snapshot] = true
         end
       end
