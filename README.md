@@ -22,7 +22,7 @@
 -------
 
 <p align="center">
-  <img src="assets/gym.png">
+  <img src="assets/gym.png" height="110">
 </p>
 
 gym
