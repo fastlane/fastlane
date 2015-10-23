@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 # Copyright (c) 2011 Float Mobile Learning
 # http://www.floatlearning.com/
@@ -11,6 +11,8 @@
 #
 # Extended by John Turnipseed and Matthew Nespor, November 2014
 # http://nanonation.net/
+#
+# Extended by Nicolas Bachschmidt, October 2015
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the "Software"),
@@ -31,7 +33,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Please let us know about any improvements you make to this script!
-# ./floatsign source "iPhone Distribution: Name" -p "path/to/profile" [-d "display name"]  [-e entitlements] [-k keychain] -b "BundleIdentifier" outputIpa
+# ./floatsign source "iPhone Distribution: Name" -p "path/to/profile" [-d "display name"]  [-e entitlements] [-k keychain] [-b "BundleIdentifier"] outputIpa
 #
 #
 # Modifed 26th January 2012
@@ -50,6 +52,11 @@
 # 4. renamed 'temp' directory and made it a variable so it can be easily modified
 # 5. various code formatting and logging adjustments
 # 
+# new features October 2015
+# 1. now re-signs nested applications and app extensions, if present, prior to re-signing the application itself
+# 2. enables the -p option to be used more than once
+# 2. ensures the provisioning profile's bundle-identifier matches the app's bundle identifier
+#
 
 
 function checkStatus {
@@ -62,24 +69,24 @@ fi
 }
 
 if [ $# -lt 3 ]; then
-    echo "usage: $0 source identity -p provisioning [-e entitlements] [-r adjustBetaReports] [-d displayName] [-n version] -b bundleId outputIpa" >&2
-    echo "       -p and -b are optional, but their use is heavly recommended" >&2
-    echo "       -r flag requires a value '-r yes'"
+    echo "usage: $0 source identity -p provisioning [-e entitlements] [-r adjustBetaReports] [-d displayName] [-n version] [-b bundleId] outputIpa" >&2
+    echo "       -p option may be provided multiple times" >&2
+    echo "       -r flag requires a value '-r yes'" >&2
     echo "       -r flag is ignored if -e is also used" >&2
     exit 1
 fi
 
 ORIGINAL_FILE="$1"
 CERTIFICATE="$2"
-NEW_PROVISION=
 ENTITLEMENTS=
 BUNDLE_IDENTIFIER=""
 DISPLAY_NAME=""
-APP_IDENTIFER_PREFIX=""
-TEAM_IDENTIFIER=""
 KEYCHAIN=""
 VERSION_NUMBER=""
 ADJUST_BETA_REPORTS_ACTIVE_FLAG="0"
+RAW_PROVISIONS=()
+PROVISIONS_BY_ID=()
+DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 
 # options start index
@@ -87,8 +94,12 @@ OPTIND=3
 while getopts p:d:e:k:b:r:n: opt; do
     case $opt in
         p)
-            NEW_PROVISION="$OPTARG"
-            echo "Specified provisioning profile: '$NEW_PROVISION'" >&2
+            RAW_PROVISIONS+=("$OPTARG")
+            if [[ "$OPTARG" =~ .+=.+ ]]; then
+                echo "Specified provisioning profile: '${OPTARG#*=}' for bundle identifier: '${OPTARG%%=*}'" >&2
+            else
+                echo "Specified provisioning profile: '$OPTARG'" >&2
+            fi
             ;;
         d)
             DISPLAY_NAME="$OPTARG"
@@ -134,6 +145,10 @@ then
     exit 1
 fi
 
+if [[ "${#RAW_PROVISIONS[*]}" == "0" ]]; then
+    echo "-p 'xxxx.mobileprovision' argument is required" >&2
+    exit 1;
+fi
 
 # Check for and remove the temporary directory if it already exists
 if [ -d "$TEMP_DIR" ]; 
@@ -178,24 +193,140 @@ APP_NAME=$(ls "$TEMP_DIR/Payload/")
 # Make sure that PATH includes the location of the PlistBuddy helper tool as its location is not standard
 export PATH=$PATH:/usr/libexec
 
+# Test whether two bundle identifiers match
+# The first one may contain the wildcard character '*', in which case pattern matching will be used unless the third parameter is "STRICT"
+function does_bundle_id_match {
+
+if [[ "$1" == "$2" ]]; then
+    return 0
+elif [[ "$3" != STRICT && "$1" =~ \* ]]; then
+    local PATTERN0="${1//\./\\.}"       # com.example.*     -> com\.example\.*
+    local PATTERN1="${PATTERN0//\*/.*}" # com\.example\.*   -> com\.example\..*
+    if [[ "$2" =~ ^$PATTERN1$ ]]; then
+        return 0
+    fi
+fi
+
+return 1
+}
+
+# Find the provisioning profile for a given bundle identifier
+function provision_for_bundle_id {
+
+for ARG in "${PROVISIONS_BY_ID[@]}"; do
+    if does_bundle_id_match "${ARG%%=*}" "$1" "$2"; then
+        echo "${ARG#*=}"
+        break
+    fi
+done
+}
+
+# Find the bundle identifier contained inside a provisioning profile
+function bundle_id_for_provison {
+
+local FULL_BUNDLE_ID=`PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< $(security cms -D -i "$1")`
+checkStatus
+echo "${FULL_BUNDLE_ID#*.}"
+}
+
+# Add given provisioning profile and bundle identifier to the search list
+function add_provision_for_bundle_id {
+
+local PROVISION="$1"
+local BUNDLE_ID="$2"
+
+local CURRENT_PROVISION=`provision_for_bundle_id "$BUNDLE_ID" STRICT`
+
+if [[ "$CURRENT_PROVISION" != "" && "$CURRENT_PROVISION" != "$PROVISION" ]]; then
+    echo "Conflicting provisioning profiles '$PROVISION' and '$CURRENT_PROVISION' for bundle identifier '$BUNDLE_ID'." >&2
+    exit 1
+fi
+
+PROVISIONS_BY_ID+=("$BUNDLE_ID=$PROVISION")
+}
+
+# Add given provisioning profile to the search list
+function add_provision {
+
+local PROVISION="$1"
+
+if [[ "$1" =~ .+=.+ ]]; then
+    PROVISION="${1#*=}"
+    add_provision_for_bundle_id "$PROVISION" "${1%%=*}"
+elif [[ "$DEFAULT_PROVISION" == "" ]]; then
+    DEFAULT_PROVISION="$PROVISION"
+fi
+
+if [[ ! -e "$PROVISION" ]]; then
+    echo "Provisioning profile '$PROVISION' file does not exist" >&2
+    exit 1;
+fi
+
+local BUNDLE_ID=`bundle_id_for_provison "$PROVISION"`
+add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
+}
+
+# Load bundle identifiers from provisioning profiles
+for ARG in "${RAW_PROVISIONS[@]}"; do
+    add_provision "$ARG"
+done
+
+# Resign the given application
+function resign {
+
+local APP_PATH="$1"
+local NESTED="$2"
+local BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER"
+local NEW_PROVISION="$NEW_PROVISION"
+local APP_IDENTIFER_PREFIX=""
+local TEAM_IDENTIFIER=""
+
+if [[ "$NESTED" == NESTED ]]; then
+    # Ignore bundle identifier for nested applications
+    BUNDLE_IDENTIFIER=""
+fi
+
 # Make sure that the Info.plist file is where we expect it
-if [ ! -e "$TEMP_DIR/Payload/$APP_NAME/Info.plist" ];
+if [ ! -e "$APP_PATH/Info.plist" ];
 then
-    echo "Expected file does not exist: '$TEMP_DIR/Payload/$APP_NAME/Info.plist'" >&2
+    echo "Expected file does not exist: '$APP_PATH/Info.plist'" >&2
     exit 1;
 fi
 
 # Read in current values from the app
-CURRENT_NAME=`PlistBuddy -c "Print :CFBundleDisplayName" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
-CURRENT_BUNDLE_IDENTIFIER=`PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
-if [ "${BUNDLE_IDENTIFIER}" == "" ];
-then
-    BUNDLE_IDENTIFIER=`egrep -a -A 2 application-identifier "${NEW_PROVISION}" | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //' | awk '{split($0,a,"."); i = length(a); for(ix=2; ix <= i;ix++){ s=s a[ix]; if(i!=ix){s=s "."};} print s;}'`
-    if [[ "${BUNDLE_IDENTIFIER}" == *\** ]]; then
-        echo "Bundle Identifier contains a *, using the current bundle identifier" >&2
-        BUNDLE_IDENTIFIER=$CURRENT_BUNDLE_IDENTIFIER;
+local CURRENT_NAME=`PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist"`
+local CURRENT_BUNDLE_IDENTIFIER=`PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist"`
+local NEW_PROVISION=`provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}"`
+
+if [[ "$NEW_PROVISION" == "" && "$NESTED" != NESTED ]]; then
+    NEW_PROVISION="$DEFAULT_PROVISION"
+fi
+
+if [[ "$NEW_PROVISION" == "" ]]; then
+    if [[ "$NESTED" == NESTED ]]; then
+        echo "No provisioning profile for nested application: '$APP_PATH' with bundle identifier '${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}'" >&2
+    else
+        echo "No provisioning profile for application: '$APP_PATH' with bundle identifier '${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}'" >&2
     fi
-    checkStatus
+    echo "Use the -p option (example: -p com.example.app=xxxx.mobileprovision)" >&2
+    exit 1;
+fi
+
+local PROVISION_BUNDLE_IDENTIFIER=`bundle_id_for_provison "$NEW_PROVISION"`
+
+# Use provisioning profile's bundle identifier
+if [ "$BUNDLE_IDENTIFIER" == "" ]; then
+    if [[ "$PROVISION_BUNDLE_IDENTIFIER" =~ \* ]]; then
+        echo "Bundle Identifier contains a *, using the current bundle identifier" >&2
+        BUNDLE_IDENTIFIER="$CURRENT_BUNDLE_IDENTIFIER"
+    else
+        BUNDLE_IDENTIFIER="$PROVISION_BUNDLE_IDENTIFIER"
+    fi
+fi
+
+if ! does_bundle_id_match "$PROVISION_BUNDLE_IDENTIFIER" "$BUNDLE_IDENTIFIER"; then
+    echo "Bundle Identifier '$PROVISION_BUNDLE_IDENTIFIER' in provisioning profile '$NEW_PROVISION' does not match the Bundle Identifier '$BUNDLE_IDENTIFIER' for application '$APP_PATH'." >&2
+    exit 1
 fi
 
 echo "Current bundle identifier is: '$CURRENT_BUNDLE_IDENTIFIER'" >&2
@@ -207,81 +338,69 @@ then
     if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
     then
         echo "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'" >&2
-        `PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
+        `PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"`
     fi
 fi
 
 # Replace the embedded mobile provisioning profile
-if [ "$NEW_PROVISION" != "" ];
+echo "Validating the new provisioning profile: $NEW_PROVISION" >&2
+security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
+checkStatus
+
+APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'` 
+if [ "$APP_IDENTIFER_PREFIX" == "" ];
 then
-    if [[ -e "$NEW_PROVISION" ]];
+    APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"` 
+    if [ "$APP_IDENTIFER_PREFIX" == "" ];
     then
-        echo "Validating the new provisioning profile: $NEW_PROVISION" >&2
-        security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
-        checkStatus
-
-        APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'` 
-        if [ "$APP_IDENTIFER_PREFIX" == "" ];
-        then
-            APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"` 
-            if [ "$APP_IDENTIFER_PREFIX" == "" ];
-            then
-                echo "Failed to extract any app identifier prefix from '$NEW_PROVISION'" >&2
-                exit 1;
-            else
-                echo "WARNING: extracted an app identifier prefix '$APP_IDENTIFER_PREFIX' from '$NEW_PROVISION', but it was not found in the profile's entitlements" >&2
-            fi
-        else
-            echo "Profile app identifier prefix is '$APP_IDENTIFER_PREFIX'" >&2
-        fi
-        
-        TEAM_IDENTIFIER=`PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n'` 
-        if [ "$TEAM_IDENTIFIER" == "" ];
-        then
-            TEAM_IDENTIFIER=`PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist"` 
-            if [ "$TEAM_IDENTIFIER" == "" ];
-            then
-                echo "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher" >&2
-            else
-                echo "WARNING: extracted a team identifier '$TEAM_IDENTIFIER' from '$NEW_PROVISION', but it was not found in the profile's entitlements, resigned ipa may fail on iOS 8 and higher" >&2
-            fi
-        else
-            echo "Profile team identifier is '$TEAM_IDENTIFIER'" >&2
-        fi
-
-        cp "$NEW_PROVISION" "$TEMP_DIR/Payload/$APP_NAME/embedded.mobileprovision"
-    else
-        echo "Provisioning profile '$NEW_PROVISION' file does not exist" >&2
+        echo "Failed to extract any app identifier prefix from '$NEW_PROVISION'" >&2
         exit 1;
+    else
+        echo "WARNING: extracted an app identifier prefix '$APP_IDENTIFER_PREFIX' from '$NEW_PROVISION', but it was not found in the profile's entitlements" >&2
     fi
 else
-    echo "-p 'xxxx.mobileprovision' argument is required" >&2
-    exit 1;
+    echo "Profile app identifier prefix is '$APP_IDENTIFER_PREFIX'" >&2
 fi
+
+TEAM_IDENTIFIER=`PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n'` 
+if [ "$TEAM_IDENTIFIER" == "" ];
+then
+    TEAM_IDENTIFIER=`PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist"` 
+    if [ "$TEAM_IDENTIFIER" == "" ];
+    then
+        echo "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher" >&2
+    else
+        echo "WARNING: extracted a team identifier '$TEAM_IDENTIFIER' from '$NEW_PROVISION', but it was not found in the profile's entitlements, resigned ipa may fail on iOS 8 and higher" >&2
+    fi
+else
+    echo "Profile team identifier is '$TEAM_IDENTIFIER'" >&2
+fi
+
+cp "$NEW_PROVISION" "$APP_PATH/embedded.mobileprovision"
 
 
 #if the current bundle identifier is different from the new one in the provisioning profile, then change it.
 if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
 then
     echo "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'" >&2
-    `PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
+    `PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"`
     checkStatus
 fi
 
 # Update the version number properties in the Info.plist if a version number has been provided
 if [ "$VERSION_NUMBER" != "" ];
 then
-    CURRENT_VERSION_NUMBER=`PlistBuddy -c "Print :CFBundleVersion" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
+    CURRENT_VERSION_NUMBER=`PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist"`
     if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
     then
         echo "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'" >&2
-        `PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
-        `PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$TEMP_DIR/Payload/$APP_NAME/Info.plist"`
+        `PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"`
+        `PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"`
     fi
 fi
 
 # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
-FRAMEWORKS_DIR="$TEMP_DIR/Payload/$APP_NAME/Frameworks"
+FRAMEWORKS_DIR="$APP_PATH/Frameworks"
 if [ -d "$FRAMEWORKS_DIR" ];
 then
     if [ "$TEAM_IDENTIFIER" == "" ];
@@ -304,7 +423,6 @@ then
 fi
 
 
-# Resign the application
 if [ "$ENTITLEMENTS" != "" ];
 then
     if [ -n "$APP_IDENTIFER_PREFIX" ];
@@ -339,11 +457,11 @@ then
 
     echo "Resigning application using certificate: '$CERTIFICATE'" >&2
     echo "and entitlements: $ENTITLEMENTS" >&2
-    /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$ENTITLEMENTS" "$TEMP_DIR/Payload/$APP_NAME"
+    /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$ENTITLEMENTS" "$APP_PATH"
     checkStatus
 else
     echo "Extracting existing entitlements for updating" >&2
-    /usr/bin/codesign -d --entitlements - "$TEMP_DIR/Payload/$APP_NAME" > "$TEMP_DIR/newEntitlements" 2> /dev/null
+    /usr/bin/codesign -d --entitlements - "$APP_PATH" > "$TEMP_DIR/newEntitlements" 2> /dev/null
     if [ $? -eq 0 ];
     then
         ENTITLEMENTS_TEMP=`cat "$TEMP_DIR/newEntitlements" | sed -E -e '1d'`
@@ -406,7 +524,7 @@ else
                 then
                     echo "and team identifier: '$TEAM_IDENTIFIER'" >&2
                 fi
-                /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$TEMP_DIR/Payload/$APP_NAME"
+                /usr/bin/codesign -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
                 checkStatus
             else
                 echo "Failed to create required intermediate file" >&2
@@ -416,14 +534,14 @@ else
             echo "No entitlements found" >&2
             echo "Resigning application using certificate: '$CERTIFICATE'" >&2
             echo "without entitlements" >&2
-            /usr/bin/codesign -f -s "$CERTIFICATE" "$TEMP_DIR/Payload/$APP_NAME"
+            /usr/bin/codesign -f -s "$CERTIFICATE" "$APP_PATH"
             checkStatus
         fi
     else
         echo "Failed to extract entitlements" >&2
         echo "Resigning application using certificate: '$CERTIFICATE'" >&2
         echo "without entitlements" >&2
-        /usr/bin/codesign -f -s "$CERTIFICATE" "$TEMP_DIR/Payload/$APP_NAME"
+        /usr/bin/codesign -f -s "$CERTIFICATE" "$APP_PATH"
         checkStatus
     fi
 fi
@@ -431,6 +549,18 @@ fi
 # Remove the temporary files if they were created before generating ipa
 rm -f "$TEMP_DIR/newEntitlements"
 rm -f "$TEMP_DIR/profile.plist"
+
+}
+
+# Sign nested applications and app extensions
+while IFS= read -d '' -r app;
+do
+    echo "Resigning nested application: '$app'" >&2
+    resign "$app" NESTED
+done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
+
+# Resign the application
+resign "$TEMP_DIR/Payload/$APP_NAME"
 
 # Repackage quietly
 echo "Repackaging as $NEW_FILE" >&2

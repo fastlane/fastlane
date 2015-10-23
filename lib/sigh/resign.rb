@@ -5,28 +5,35 @@ module Sigh
   class Resign
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
-      ipa, signing_identity, provisioning_profile = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles = get_inputs(options, args)
 
       # ... then invoke out programmatic interface with these vars
-      resign(ipa, signing_identity, provisioning_profile)
+      resign(ipa, signing_identity, provisioning_profiles)
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profile)
-      self.new.resign(ipa, signing_identity, provisioning_profile)
+    def self.resign(ipa, signing_identity, provisioning_profiles)
+      self.new.resign(ipa, signing_identity, provisioning_profiles)
     end
 
-    def resign(ipa, signing_identity, provisioning_profile)
+    def resign(ipa, signing_identity, provisioning_profiles)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
+      unless provisioning_profiles.kind_of?(Enumerable)
+        provisioning_profiles = [provisioning_profiles]
+      end
+
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
-      validate_params(resign_path, ipa, provisioning_profile)
+      validate_params(resign_path, ipa, provisioning_profiles)
+
+      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.join('=')}" }.join(' ')
 
       command = [
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        "-r yes -p #{provisioning_profile.shellescape}",
+        "-r yes",
+        provisioning_options,
         ipa.shellescape
       ].join(' ')
 
@@ -40,7 +47,7 @@ module Sigh
         ptn = 'Assuming Distribution Identity'
       end
 
-      if output.include?(ptn)
+      if output.include?(ptn) && $?.to_i == 0
         Helper.log.info "Successfully signed #{ipa}!".green
         true
       else
@@ -52,9 +59,9 @@ module Sigh
     def get_inputs(options, args)
       ipa = args.first || find_ipa || ask('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profile = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
 
-      return ipa, signing_identity, provisioning_profile
+      return ipa, signing_identity, provisioning_profiles
     end
 
     def find_resign_path
@@ -78,10 +85,10 @@ module Sigh
       signing_identity
     end
 
-    def validate_params(resign_path, ipa, provisioning_profile)
+    def validate_params(resign_path, ipa, provisioning_profiles)
       validate_resign_path(resign_path)
       validate_ipa_file(ipa)
-      validate_provisioning_file(provisioning_profile)
+      provisioning_profiles.each { |fst, snd| validate_provisioning_file(snd || fst) }
     end
 
     def validate_resign_path(resign_path)

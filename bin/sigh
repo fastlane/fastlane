@@ -60,7 +60,10 @@ class SighApplication
       c.syntax = 'sigh resign'
       c.description = 'Resigns an existing ipa file with the given provisioning profile'
       c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
-      c.option '-p', '--provisioning_profile STRING', String, 'The path to the provisioning profile which should be used'
+      c.option '-p', '--provisioning_profile PATH', String, '(or BUNDLE_ID=PATH) The path to the provisioning profile which should be used.'\
+               'Can be provided multiple times if the application contains nested applications and app extensions, which need their own provisioning profile.'\
+               'The path may be prefixed with a identifier in order to determine which provisioning profile should be used on which app.',
+               &multiple_values_option_proc(c, "provisioning_profile", &proc { |value| value.split('=', 2) })
 
       c.action do |args, options|
         Sigh::Resign.new.run(options, args)
@@ -84,6 +87,18 @@ class SighApplication
     default_command :renew
 
     run!
+  end
+
+  def multiple_values_option_proc(command, name)
+    proc do |value|
+      value = yield(value) if block_given?
+      option = command.proxy_options.find { |opt| opt[0] == name } || []
+      values = option[1] || []
+      values << value
+
+      command.proxy_options.delete option
+      command.proxy_options << [name, values]
+    end
   end
 end
 
