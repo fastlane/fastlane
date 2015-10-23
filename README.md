@@ -34,7 +34,7 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
-You have to manually create 20 (languages) x 5 (devices) x 5 (screenshots) = **500 screenshots**.
+You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
 It's hard to get everything right!
 
