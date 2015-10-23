@@ -22,15 +22,15 @@ describe Fastlane do
               )
             end').runner.execute(:test)
             ["java",
-             "-jar /Users/fkrause/Developer/fastlane/fastlane/spec/fixtures/fastfiles/Fastfile1",
+             "-jar /",
              "-androidRes .",
              "-apiKey api_token",
              "-apiSecret build_secret",
-             "-uploadDist '/Users/fkrause/Developer/fastlane/fastlane/spec/fixtures/fastfiles/Fastfile2'",
+             "-uploadDist '/",
              "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
              "-betaDistributionGroupAliases 'testgroup'",
              "-betaDistributionNotifications true"].each do |to_be|
-              expect(command).to include(to_be)
+              expect(command.join(" ")).to include(to_be)
             end
 
             # These 2 parameters are temporary
