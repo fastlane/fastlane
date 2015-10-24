@@ -44,9 +44,9 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
     <a href="#installation">Installation</a> &bull; 
     <a href="#setup">Setup</a> &bull; 
     <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#available-commands">Available Commands</a> &bull; 
+    <a href="#available-commands">Commands</a> &bull; 
     <a href="#uploading-an-apk">Uploading an APK</a> &bull; 
-    <a href="#images-and-screenshots">Images and Screenshots</a> &bull; 
+    <a href="#images-and-screenshots">Images</a>
 </p>
 
 -------
