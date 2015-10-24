@@ -124,12 +124,15 @@ For a list of all available parameters use
 
 If you run into any issues, use the `verbose` mode to get more information
 
-
     gym --verbose
+
+In general, if you run into issues while exporting the archive, try using:
+
+    gym --use_legacy_build_api true
 
 To pass boolean parameters make sure to use `gym` like this:
 
-    gym --include_bitcode true --include_symbols true
+    gym --include_bitcode true --include_symbols false
 
 To access the raw `xcodebuild` output open `~/Library/Logs/gym`
 
