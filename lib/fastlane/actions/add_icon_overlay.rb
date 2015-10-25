@@ -1,9 +1,8 @@
 module Fastlane
   module Actions
-
     class AddIconOverlayAction < Action
       def self.run(params)
-        Helper.log.info "Image to overlay on icons: #{params[:overlay_image_path]}" unless not params[:overlay_type] == 'image'
+        Helper.log.info "Image to overlay on icons: #{params[:overlay_image_path]}" if params[:overlay_type] == 'image'
         require 'mini_magick'
 
         overlay_type = params[:overlay_type]
@@ -12,13 +11,13 @@ module Fastlane
         if overlay_type == 'image'
           self.addImageOverlay(appiconset, params)
         elsif overlay_type == 'banner'
-          self.addBannerOverlay(appiconset, params)
+          self.add_banner_overlay(appiconset, params)
         else
-          self.addTextOverlay(appiconset, params)
+          self.add_text_overlay(appiconset, params)
         end
       end
 
-      def self.addTextOverlay(appiconset, params)
+      def self.add_text_overlay(appiconset, params)
         Dir.glob(File.join(appiconset, '*.png')) do |icon|
           img = MiniMagick::Image.new(icon)
           MiniMagick::Tool::Convert.new do |c|
@@ -37,7 +36,7 @@ module Fastlane
         end
       end
 
-      def self.addBannerOverlay(appiconset, params)
+      def self.add_banner_overlay(appiconset, params)
         Dir.glob(File.join(appiconset, '*.png')) do |icon|
           original_icon = MiniMagick::Image.new(icon)
           width = original_icon.width
@@ -109,16 +108,18 @@ module Fastlane
                                        is_string: true,
                                        optional: true,
                                        verify_block: Proc.new do |value|
-                                       raise "No overlay image path for AddIconOverlayAction given, pass using `overlay_image_path: 'image_path.png'`".red unless (value and not value.empty?)
-                                       end),
+                                       raise "No overlay image path for AddIconOverlayAction given, pass using `overlay_image_path: 'image_path.png'`".red unless value and not value.empty?
+                                       end
+                                      ),
           FastlaneCore::ConfigItem.new(key: :overlay_type,
                                        env_name: "FL_ADD_ICON_OVERLAY_OVERLAY_TYPE",
                                        description: "Flag specifying if an image, text or banner will be overlayed over the icon",
                                        is_string: true,
                                        default_value: 'text',
                                        verify_block: Proc.new do |value|
-                                         raise "Invalid overlay type provided. Expected 'text' or 'image' and '#{value}' was provided" unless (value == "text" or value == "image" or value == "banner")
-                                       end),
+                                         raise "Invalid overlay type provided. Expected 'text' or 'image' and '#{value}' was provided" unless value == "text" or value == "image" or value == "banner"
+                                       end
+                                      ),
           FastlaneCore::ConfigItem.new(key: :text_background_color,
                                        env_name: "FL_ADD_ICON_OVERLAY_TEXT_BACKGROUND_COLOR",
                                        description: "Background color for the text overlay. If a hex value is provided must contain the '#' character",
@@ -141,7 +142,8 @@ module Fastlane
                                        is_string: false,
                                        verify_block: Proc.new do |value|
                                          raise "Invalid height percentage provided. Must be a float value between 0.0 & 1.0" unless value and value.to_f > 0 and value.to_f <= 1.0
-                                       end),
+                                       end
+                                      ),
           FastlaneCore::ConfigItem.new(key: :text_overlay,
                                        description: "The text to be overlayed over the icon. Can contain '\\t' and '\\n' when 'overlay_type' is 'text', not on 'banner'",
                                        is_string: true,
@@ -153,9 +155,10 @@ module Fastlane
                                        is_string: true,
                                        optional: true,
                                        default_value: "south",
-                                       verify_block: Proc.new do |value|
+                                       verify_block: proc do |value|
                                          raise "Invalid text overlay position. Expected 'north' or 'south' and '#{value}' provided" unless value and (value == "north" || value == "south")
-                                       end),
+                                       end
+                                      ),
           FastlaneCore::ConfigItem.new(key: :text_overlay_font,
                                        env_name: "FL_ADD_OVERLAY_ICON_FONT",
                                        description: "Name of the font to be used on the text overlay. Must be in font list `convert -list font or full path to font",
