@@ -24,6 +24,7 @@ module Snapshot
           next if sim.name.include?("iPad") and !sim.name.include?("Retina") # we only need one iPad
           next if sim.name.include?("6s") # same screen resolution
           next if sim.name.include?("5s") # same screen resolution
+          next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name
         end
