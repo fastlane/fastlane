@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 1.3.3', '< 2.0.0'
-  spec.add_dependency 'snapshot', '>= 1.0.2', '< 2.0.0'
+  spec.add_dependency 'snapshot', '>= 1.0.3', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.2.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.0.0', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.0.0', '< 2.0.0'
