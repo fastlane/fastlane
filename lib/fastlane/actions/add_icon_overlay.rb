@@ -9,7 +9,7 @@ module Fastlane
         appiconset = params[:appiconset_path]
 
         if overlay_type == 'image'
-          self.addImageOverlay(appiconset, params)
+          self.add_image_overlay(appiconset, params)
         elsif overlay_type == 'banner'
           self.add_banner_overlay(appiconset, params)
         else
@@ -21,7 +21,7 @@ module Fastlane
         Dir.glob(File.join(appiconset, '*.png')) do |icon|
           img = MiniMagick::Image.new(icon)
           MiniMagick::Tool::Convert.new do |c|
-            height = img[:height]*params[:text_overlay_height].to_f
+            height = img[:height] * params[:text_overlay_height].to_f
             c.background(params[:text_background_color])
             c.fill(params[:text_foreground_color])
             c.gravity('center')
@@ -65,7 +65,7 @@ module Fastlane
         end
       end
 
-      def self.addImageOverlay(appiconset, params)
+      def self.add_image_overlay(appiconset, params)
         overlay_image = MiniMagick::Image.new(params[:overlay_image_path])
 
         Dir.glob(File.join(appiconset, '*.png')) do |icon|
@@ -101,13 +101,13 @@ module Fastlane
                                        description: "Path for .appiconset containing the icons",
                                        is_string: true,
                                        default_value: '**/AppIcon.appiconset'
-                                       ),
+                                      ),
           FastlaneCore::ConfigItem.new(key: :overlay_image_path,
                                        env_name: "FL_ADD_ICON_OVERLAY_OVERLAY_IMAGE_PATH",
                                        description: "Path for the image that will be overlaid on the icons",
                                        is_string: true,
                                        optional: true,
-                                       verify_block: Proc.new do |value|
+                                       verify_block: proc do |value|
                                        raise "No overlay image path for AddIconOverlayAction given, pass using `overlay_image_path: 'image_path.png'`".red unless value and not value.empty?
                                        end
                                       ),
@@ -116,7 +116,7 @@ module Fastlane
                                        description: "Flag specifying if an image, text or banner will be overlayed over the icon",
                                        is_string: true,
                                        default_value: 'text',
-                                       verify_block: Proc.new do |value|
+                                       verify_block: proc do |value|
                                          raise "Invalid overlay type provided. Expected 'text' or 'image' and '#{value}' was provided" unless value == "text" or value == "image" or value == "banner"
                                        end
                                       ),
@@ -140,7 +140,7 @@ module Fastlane
                                        optional: true,
                                        default_value: 0.3,
                                        is_string: false,
-                                       verify_block: Proc.new do |value|
+                                       verify_block: proc do |value|
                                          raise "Invalid height percentage provided. Must be a float value between 0.0 & 1.0" unless value and value.to_f > 0 and value.to_f <= 1.0
                                        end
                                       ),
@@ -165,7 +165,7 @@ module Fastlane
                                        is_string: true,
                                        optional: true,
                                        default_value: "Helvetica"
-                                       )
+                                      )
         ]
       end
 
