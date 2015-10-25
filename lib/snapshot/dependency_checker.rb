@@ -1,6 +1,8 @@
 module Snapshot
   class DependencyChecker
     def self.check_dependencies
+      return if Helper.test?
+
       self.check_xcode_select
       self.check_simctl
     end
