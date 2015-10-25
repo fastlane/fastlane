@@ -4,7 +4,7 @@ module Fastlane
     end
 
     class UpdateProjectTeamAction < Action
-      def self.run(params)       
+      def self.run(params)
         path = params[:path]
         path = File.join(path, "project.pbxproj")
         raise "Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!".red unless File.exist?(path)
@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-		[:ios, :mac].include?(platform)
+        [:ios, :mac].include?(platform)
       end
     end
   end
