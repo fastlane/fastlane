@@ -1,4 +1,4 @@
-language: ruby
+language: objective-c
 osx_image: xcode6.4
 before_install:
   - gem update --system
