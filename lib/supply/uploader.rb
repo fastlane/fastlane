@@ -57,7 +57,7 @@ module Supply
 
         client.clear_screenshots(image_type: screenshot_type, language: language)
 
-        paths.each do |path|
+        paths.sort.each do |path|
           Helper.log.info "Uploading screenshot #{path}..."
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
