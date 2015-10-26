@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     class XctoolAction < Action
       def self.run(params)
+        Helper.log.info "Have you seen the new 'scan' tool to run tests? https://github.com/fastlane/scan".yellow
         unless Helper.test?
           raise 'xctool not installed, please install using `brew install xctool`'.red if `which xctool`.length == 0
         end
