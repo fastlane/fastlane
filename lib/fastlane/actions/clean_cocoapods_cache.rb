@@ -8,6 +8,8 @@ module Fastlane
 
         cmd << "#{params[:name]}" if params[:name]
         cmd << '--all'
+
+        Actions.sh(cmd.join(' '))
       end
 
       def self.description
