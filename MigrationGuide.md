@@ -16,7 +16,7 @@ Removed     | Use instead              | Note
 
 **New options:**
 
-Removed     | Note
+Option     | Note
 ------------------------|------------------------------------------------------------
 `workspace` | Path the workspace file
 `sdk` | The SDK that should be used for building the application
