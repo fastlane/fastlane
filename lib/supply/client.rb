@@ -191,6 +191,10 @@ module Supply
     end
 
     def upload_apk_to_track(path_to_apk, track)
+      upload_apk_to_track_with_rollout(path_to_apk, track, 1.0)
+    end
+    
+    def upload_apk_to_track_with_rollout(path_to_apk, track, rollout)
       ensure_active_edit!
 
       apk = Google::APIClient::UploadIO.new(File.expand_path(path_to_apk), 'application/vnd.android.package-archive')
@@ -209,7 +213,7 @@ module Supply
 
       track_body = {
         'track' => track,
-        'userFraction' => 1,
+        'userFraction' => rollout,
         'versionCodes' => [result_upload.data.versionCode]
       }
 

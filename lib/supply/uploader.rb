@@ -69,7 +69,11 @@ module Supply
     def upload_binary
       if Supply.config[:apk]
         Helper.log.info "Preparing apk at path '#{Supply.config[:apk]}' for upload..."
-        client.upload_apk_to_track(Supply.config[:apk], Supply.config[:track])
+        if Supply.config[:track].eql? "rollout"
+          client.upload_apk_to_track_with_rollout(Supply.config[:apk], Supply.config[:track], Supply.config[:rollout])
+        else
+          client.upload_apk_to_track(Supply.config[:apk], Supply.config[:track])
+        end
       else
         Helper.log.info "No apk file found, you can pass the path to your apk using the `apk` option"
       end
