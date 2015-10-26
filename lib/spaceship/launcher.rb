@@ -88,9 +88,6 @@ module Spaceship
 
     # @return (Class) Access the provisioning profiles for this spaceship
     def provisioning_profile
-      app
-      device
-      certificate
       Spaceship::ProvisioningProfile.set_client(@client)
     end
   end
