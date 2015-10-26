@@ -21,6 +21,10 @@ module Fastlane
         "Update Development Team ID"
       end
 
+      def self.details
+        "This action update the Developer Team ID of your Xcode Project."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,

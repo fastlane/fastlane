@@ -790,6 +790,16 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
+### update developer team ID
+This action allows you to modify the developer team. This may be useful if you want a different team for alpha, beta or distribution.
+
+```ruby
+    update_project_team(
+  		path: "Example.xcodeproj",
+  		teamid: "A3ZZVJ7CNY"
+  	)
+ ```
+
 ## update_info_plist
 
 This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
@@ -814,6 +824,7 @@ update_info_plist(
   display_name: "MyApp-Beta"
 )
 ```
+
 
 ## Developer Portal
 
