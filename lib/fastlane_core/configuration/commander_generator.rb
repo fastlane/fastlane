@@ -13,6 +13,7 @@ module FastlaneCore
       options.each do |option|
         appendix = (option.is_string ? "STRING" : "")
         type = String
+        type = nil if [:force, :verbose].include?(option.key)
         short_option = option.short_option
 
         raise "Short option #{short_option} already taken for key #{option.key}".red if short_codes.include? short_option
