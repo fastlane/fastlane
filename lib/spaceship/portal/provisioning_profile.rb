@@ -164,9 +164,10 @@ module Spaceship
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
-          attrs['appId'] = App.factory(attrs['appId'])
-          attrs['devices'].map! { |device| Device.factory(device) }
-          attrs['certificates'].map! { |cert| Certificate.factory(cert) }
+          # eagerload the Apps, Devices, and Certificates using the same client if we have to.
+          attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
+          attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
+          attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
 
           klass.client = @client
           klass.new(attrs)
