@@ -20,13 +20,13 @@ describe Fastlane do
       end
 
       it "raise an exception if name is empty" do
-        expect { 
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             clean_cocoapods_cache(
               name: ''
             )
-            end").runner.execute(:test) 
-          }.to raise_error(RuntimeError)
+            end").runner.execute(:test)
+        end.to raise_error(RuntimeError)
       end
     end
   end
