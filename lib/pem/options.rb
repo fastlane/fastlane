@@ -39,6 +39,7 @@ module PEM
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "PEM_TEAM_ID",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -64,7 +65,7 @@ module PEM
                                      description: "The file name of the generated .pem file",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :output_path,
-                                     short_option: "-l",
+                                     short_option: "-e",
                                      env_name: "PEM_OUTPUT_PATH",
                                      description: "The path to a directory in which all certificates and private keys should be stored",
                                      default_value: ".")
