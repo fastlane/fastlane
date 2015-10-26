@@ -122,7 +122,7 @@ module Fastlane
         unless options[:other_fields].nil?
           options[:other_fields].each do |key, value|
             uri = URI.parse(value)
-            if uri.is_a?(URI::HTTP)
+            if uri.kind_of?(URI::HTTP)
               link_embed_id = get_embed_id(auth_config, uri)
               options[:other_fields].merge!(key => link_embed_id)
             end
