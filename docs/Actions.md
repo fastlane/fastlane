@@ -790,7 +790,7 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
-### update developer team ID
+### update_project_team
 This action allows you to modify the developer team. This may be useful if you want a different team for alpha, beta or distribution.
 
 ```ruby
