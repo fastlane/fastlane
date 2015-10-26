@@ -3,7 +3,7 @@ module Fastlane
     class CleanCocoapodsCacheAction < Action
       def self.run(params)
         Actions.verify_gem!('cocoapods')
-        
+
         cmd = ['pod cache clean']
 
         cmd << "#{params[:name]}" if params[:name]
@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.description
-        "Remove the cache for pods"
+        'Remove the cache for pods'
       end
 
       def self.available_options
@@ -22,7 +22,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                          raise "You must specify pod name which should be removed from cache".red unless (value and not value.empty?)
+                                         raise "You must specify pod name which should be removed from cache".red unless value and !value.empty?
                                        end)
         ]
       end
