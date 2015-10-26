@@ -23,8 +23,7 @@ module Fastlane
       def self.description
         'Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. See https://developers.podio.com'
       end
-
-      # TODO: update reference to blog post when published
+      
       def self.details
         "Use this action to create or update an item within your Podio app
         (see https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-).
