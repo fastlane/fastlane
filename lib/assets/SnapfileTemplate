@@ -19,7 +19,7 @@ languages([
 # scheme "SchemeName"
 
 # Where should the resulting screenshots be stored?
-# screenshots_path "./screenshots"
+# output_directory "./screenshots"
 
 # clear_previous_screenshots # remove the '#' to clear all previously generated screenshots before creating new ones
 
