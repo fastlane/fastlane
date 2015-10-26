@@ -62,54 +62,6 @@ carthage(
 )
 ```
 
-### [xctool](https://github.com/facebook/xctool)
-
-You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
-
-```ruby
-xctool :test
-```
-
-It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
-
-If you prefer to have the build configuration stored in the `Fastfile`:
-
-```ruby
-xctool :test, [
-      "--workspace", "'AwesomeApp.xcworkspace'",
-      "--scheme", "'Schema Name'",
-      "--configuration", "Debug",
-      "--sdk", "iphonesimulator",
-      "--arch", "i386"
-    ].join(" ")
-```
-
-
-### [snapshot](https://github.com/KrauseFx/snapshot)
-
-```ruby
-snapshot
-```
-
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
-
-```ruby
-snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
-)
-```
-
-Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
-
 ### [gym](https://github.com/fastlane/gym)
 
 `gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
@@ -145,6 +97,39 @@ Add this action to your `appstore` lane. Keep in mind this action might take sev
 
 ```ruby
 verify_xcode
+```
+
+### [snapshot](https://github.com/KrauseFx/snapshot)
+
+```ruby
+snapshot
+```
+
+To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
+
+To skip cleaning the project on every build use ```snapshot(noclean: true)```.
+
+To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
+
+Other options
+
+```ruby
+snapshot(
+  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
+  noclean: true, # Skip cleaning
+  verbose: true, # Show output of UIAutomation
+  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+)
+```
+
+Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+
+### clear_derived_data
+
+Clears the Xcode Derived Data at path `~/Library/Developer/Xcode/DerivedData`
+
+```ruby
+clear_derived_data
 ```
 
 ### ipa
@@ -444,6 +429,28 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
       output: './build-dir/test-report.xml'
     }]
   )
+```
+
+### [xctool](https://github.com/facebook/xctool)
+
+You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
+
+```ruby
+xctool :test
+```
+
+It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
+If you prefer to have the build configuration stored in the `Fastfile`:
+
+```ruby
+xctool :test, [
+      "--workspace", "'AwesomeApp.xcworkspace'",
+      "--scheme", "'Schema Name'",
+      "--configuration", "Debug",
+      "--sdk", "iphonesimulator",
+      "--arch", "i386"
+    ].join(" ")
 ```
 
 ### [slather](https://github.com/venmo/slather)
