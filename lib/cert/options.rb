@@ -18,6 +18,7 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      description: "The ID of your team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
