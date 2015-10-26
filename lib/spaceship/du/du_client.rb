@@ -73,6 +73,8 @@ module Spaceship
       parse_upload_response(r)
     end
 
+    # You can find this by uploading an image in iTunes connect
+    # then look for the X-Apple-Upload-Validation-RuleSets value
     def picture_type_map
       # rubocop:enable Style/ExtraSpacing
       {
@@ -81,7 +83,8 @@ module Spaceship
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
         iphone4:      "MZPFT.SortedN41ScreenShot",
-        iphone35:     "MZPFT.SortedScreenShot"
+        iphone35:     "MZPFT.SortedScreenShot",
+        appleTV:      "MZPFT.SortedATVScreenShot"
       }
     end
 

@@ -1,7 +1,7 @@
 module Spaceship
   module Tunes
     class DeviceType
-      @types = ['iphone4', 'iphone35', 'iphone6', 'iphone6Plus', 'ipad', 'watch']
+      @types = ['iphone4', 'iphone35', 'iphone6', 'iphone6Plus', 'ipad', 'watch', 'appleTV']
       class << self
         attr_accessor :types
 
