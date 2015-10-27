@@ -5,6 +5,34 @@ lane :test do
   validate_repo(tool_name: detect_tool)
 end
 
+desc "Test pull request"
+  lane :appaloosa1 do # context: user registered with private groups.
+    snapshot
+    gym(use_legacy_build_api: true)
+    appaloosa(
+      binary: 'path/to/binary_file', # ipa or apk
+      store_id: 'store_id',
+      api_token: 'api_token',
+      group_ids: '21, 42, 84',
+      locale: 'de-DE', # use snapshot, default => 'en-US'
+      device: 'iPhone6' # use snapshot
+      )
+  end
+
+  lane :appaloosa2 do # context: user anonymous
+    gym(use_legacy_build_api: true)
+    appaloosa(
+      binary: 'path/to/binary_file',
+      screenshots: 'path/to/screenshots_forder',
+      email: 'test@mail.com',
+      )
+  end
+
+  lane :appaloosa3 do # context: no option 
+    gym(use_legacy_build_api: true)
+    appaloosa
+  end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
