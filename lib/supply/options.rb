@@ -13,10 +13,18 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: production, beta, alpha",
+                                     description: "The Track to upload the Application to: production, beta, alpha or rollout",
                                      default_value: 'production',
                                      verify_block: proc do |value|
-                                       available = %w(production beta alpha)
+                                       available = %w(production beta alpha rollout)
+                                       raise "Invalid value '#{value}', must be #{available.join(', ')}".red unless available.include? value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :rollout,
+                                     short_option: "-r",
+                                     description: "The percentage of the rollout",
+                                     default_value: '1.0',
+                                     verify_block: proc do |value|
+                                       available = %w(0.005 0.01 0.05 0.1 0.2 0.5 1.0)
                                        raise "Invalid value '#{value}', must be #{available.join(', ')}".red unless available.include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
