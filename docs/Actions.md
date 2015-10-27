@@ -1447,6 +1447,18 @@ pod_trunk(path: 'TSMessages.podspec')
 pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
 ```
 
+### clean_cocoapods_cache
+
+Cleanup the Cocoapods cache.
+
+```ruby
+# Clean entire cocoapods cache.
+clean_cocoapods_cache
+
+# Alternatively, supply the name of pod to be removed from cache.
+clean_cocoapods_cache(name: 'CACHED POD')
+```
+
 ### prompt
 
 You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
