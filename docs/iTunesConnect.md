@@ -189,7 +189,7 @@ A build train contains all builds for a give `version number` (e.g. `0.9.21`). W
 train = app.build_trains["0.9.21"]
 
 train.version_string          # => "0.9.21"
-train.testing_enabled         # => false, as testing is enabled for 0.9.20
+train.external_testing_enabled         # => false, as external testing is enabled for 0.9.20
 
 # Access all builds for a given train
 train.builds.count            # => 1
@@ -198,7 +198,7 @@ build = train.builds.first
 # Enable beta testing for a build train
 # This will put the latest build into beta testing mode
 # and turning off beta testing for all other build trains
-train.update_testing_status!(true, 'internal')
+train.update_testing_status!(true, 'external')
 ```
 
 ## Builds
