@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'snapshot', '>= 1.0.3', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.2.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.0.0', '< 2.0.0'
-  spec.add_dependency 'cert', '>= 1.0.0', '< 2.0.0'
+  spec.add_dependency 'cert', '>= 1.1.0', '< 2.0.0'
   spec.add_dependency 'sigh', '>= 1.1.0', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.0.0', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.0.0', '< 2.0.0'
