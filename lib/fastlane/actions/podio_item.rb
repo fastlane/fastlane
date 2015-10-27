@@ -30,7 +30,6 @@ module Fastlane
         Pass in dictionary with field keys and their values.
         Field key is located under Modify app -> Advanced -> Developer -> External ID
         (see https://developers.podio.com/examples/items).
-        Have a look at http://??? how you can leverage from using Podio and Fastlane."
       end
 
       def self.available_options
