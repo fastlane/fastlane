@@ -19,8 +19,8 @@ module Fastlane
         flavor = task.match(/assemble(\w*)/)
         if flavor and flavor[1]
           flavor = flavor[1].downcase # Release => release
-          apk_path = File.join("app", "build", "outputs", "apk", "app-#{flavor}.apk")
-          if File.exist?(apk_path)
+          apk_path = Dir[File.join("app", "build", "outputs", "apk", "*-#{flavor}.apk")].last
+          if apk_path
             Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
           else
             Helper.log.info "Couldn't find signed apk file at path '#{apk_path}'...".red
