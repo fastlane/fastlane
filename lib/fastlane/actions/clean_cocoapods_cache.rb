@@ -24,7 +24,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         raise "You must specify pod name which should be removed from cache".red unless value and !value.empty?
+                                         raise "You must specify pod name which should be removed from cache".red if value.to_s.empty?
                                        end)
         ]
       end
