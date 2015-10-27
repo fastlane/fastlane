@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        Helper.mac?
       end
     end
   end
