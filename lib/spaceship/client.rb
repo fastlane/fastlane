@@ -32,7 +32,7 @@ module Spaceship
     class NoUserCredentialsError < StandardError; end
 
     class UnexpectedResponse < StandardError; end
-    
+
     # Raised when 302 is received from portal request
     class AppleTimeoutError < StandardError; end
 
@@ -245,7 +245,9 @@ module Spaceship
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
-        raise AppleTimeoutError.new("Apple 302 detected") if response.body.to_s.include?("<title>302 Found</title>")
+        if response.body.to_s.include?("<title>302 Found</title>")
+          raise AppleTimeoutError.new, "Apple 302 detected"
+        end
         return response
       end
     end
