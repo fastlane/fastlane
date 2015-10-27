@@ -193,7 +193,7 @@ module Supply
     def upload_apk_to_track(path_to_apk, track)
       upload_apk_to_track_with_rollout(path_to_apk, track, 1.0)
     end
-    
+
     def upload_apk_to_track_with_rollout(path_to_apk, track, rollout)
       ensure_active_edit!
 
