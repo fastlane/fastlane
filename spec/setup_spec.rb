@@ -25,14 +25,16 @@ describe Fastlane do
       end
 
       it "setup is successful and generated inital Fastfile" do
-        require 'snapshot'
-        require 'snapshot/setup'
-        expect(Snapshot::Setup).to receive(:create).with("/tmp/setup_workspace/fastlane")
+        if FastlaneCore::Helper.mac?
+          require 'snapshot'
+          require 'snapshot/setup'
+          expect(Snapshot::Setup).to receive(:create).with("/tmp/setup_workspace/fastlane")
+        end
 
         Fastlane::FastlaneFolder.create_folder!(workspace)
         setup = Fastlane::SetupIos.new
         expect(setup.run).to eq(true)
-        expect(setup.tools).to eq({deliver: true, snapshot: true, xctool: true, cocoapods: true, sigh: true, carthage: false})
+        expect(setup.tools).to eq({deliver: true, snapshot: FastlaneCore::Helper.mac?, xctool: true, cocoapods: true, sigh: true, carthage: false})
 
         content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
         expect(content).to include "# update_fastlane"
