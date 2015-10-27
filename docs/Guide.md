@@ -28,9 +28,9 @@ Additionally, to an Xcode installation, you also need the Xcode command line too
 
     xcode-select --install
     
-If you've not used the command line tools before, you'll need to accept the terms of service.  
+If you have not used the command line tools before (which is likely if you just installed it), you'll need to accept the terms of service.  
 
-    sudo gcc
+    sudo xcodebuild -license accept
 
 ### [fastlane](https://github.com/KrauseFx/fastlane)
 
