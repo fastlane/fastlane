@@ -19,6 +19,11 @@ Lint/ParenthesesAsGroupedExpression:
 Style/PredicateName:
   Enabled: false
 
+# Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
+Style/SpaceAroundOperators:
+  Exclude:
+    - 'spec/actions_specs/xcodebuild_spec.rb'
+
 Metrics/MethodLength:
   Exclude:
     - 'lib/fastlane/actions/*.rb'
@@ -29,8 +34,6 @@ AllCops:
     - 'fastlane/Fastfile'
   Exclude:
     - 'lib/assets/custom_action_template.rb'
-
-
 
 ##################
 # TODO
