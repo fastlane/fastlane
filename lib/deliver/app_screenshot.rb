@@ -15,6 +15,8 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
+      # iPad Pro
+      IOS_IPAD_PRO = "iOS-iPad-Pro"
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Mac
@@ -51,6 +53,7 @@ module Deliver
         ScreenSize::IOS_47 => "iphone6",
         ScreenSize::IOS_55 => "iphone6Plus",
         ScreenSize::IOS_IPAD => "ipad",
+        ScreenSize::IOS_IPAD_PRO => "ipadPro",
         ScreenSize::MAC => "mac",
         ScreenSize::IOS_APPLE_WATCH => "watch"
       }
@@ -65,6 +68,7 @@ module Deliver
         ScreenSize::IOS_47 => "iPhone 6",
         ScreenSize::IOS_55 => "iPhone 6 Plus",
         ScreenSize::IOS_IPAD => "iPad",
+        ScreenSize::IOS_IPAD_PRO => "iPad Pro",
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch"
       }
@@ -112,6 +116,10 @@ module Deliver
           [768, 1024],
           [1536, 2008],
           [1536, 2048]
+        ],
+        ScreenSize::IOS_IPAD_PRO => [
+          [2732, 2048],
+          [2048, 2732]
         ],
         ScreenSize::MAC => [
           [1280, 800],
