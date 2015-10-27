@@ -42,12 +42,17 @@ describe Spaceship::Tunes::Build do
     end
 
     describe "#testing_status" do
+      before do
+        now = Time.at((1_443_144_470 + 1_445_737_214) / 2).utc
+        allow(Time).to receive(:now) { now }
+      end
+
       it "properly describes a build" do
         build1 = app.build_trains.values.first.builds.first
         expect(build1.testing_status).to eq("Internal")
 
         build2 = app.build_trains.values.last.builds.first
-        expect(build1.testing_status).to eq("Internal")
+        expect(build2.testing_status).to eq("Inactive")
       end
     end
 
