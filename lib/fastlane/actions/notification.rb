@@ -5,13 +5,13 @@ module Fastlane
         require 'terminal-notifier'
 
         if params[:subtitle]
-          TerminalNotifier.notify(params[:message], 
-                           title: params[:title],
-                        subtitle: params[:subtitle])
+          TerminalNotifier.notify(params[:message],
+                                  title: params[:title],
+                               subtitle: params[:subtitle])
         else
           # It should look nice without a subtitle too
-          TerminalNotifier.notify(params[:message], 
-                           title: params[:title])
+          TerminalNotifier.notify(params[:message],
+                                  title: params[:title])
         end
       end
 
@@ -25,16 +25,16 @@ module Fastlane
 
       def self.available_options
         [
-           FastlaneCore::ConfigItem.new(key: :title,
-                                        description: "The title to display in the notification",
-                                        default_value: 'fastlane'),
-           FastlaneCore::ConfigItem.new(key: :subtitle,
-                                        description: "A subtitle to display in the notification",
-                                        optional: true),
-           FastlaneCore::ConfigItem.new(key: :message,
-                                        description: "The message to display in the notification",
-                                        optional: false)
-         ]
+          FastlaneCore::ConfigItem.new(key: :title,
+                                       description: "The title to display in the notification",
+                                       default_value: 'fastlane'),
+          FastlaneCore::ConfigItem.new(key: :subtitle,
+                                       description: "A subtitle to display in the notification",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       description: "The message to display in the notification",
+                                       optional: false)
+        ]
       end
 
       def self.is_supported?(platform)
