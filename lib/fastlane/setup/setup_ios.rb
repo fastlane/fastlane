@@ -99,7 +99,7 @@ module Fastlane
       end
 
       unless @tools[:snapshot]
-        if agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
+        if Helper.mac? and agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
           Helper.log.info "Loading up 'snapshot', this might take a few seconds"
 
           require 'snapshot'
