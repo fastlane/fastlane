@@ -139,23 +139,15 @@ private_lane :validate_repo do |options|
   sh "cd .. && rspec"
 end
 
-desc "e.g. KrauseFx/fastlane"
+desc "e.g. fastlane/deliver"
 private_lane :github_url do |options|
-  github_organisation = "fastlane"
-  github_organisation = "KrauseFx" if krausefx_repos.include? options[:tool]
-
-  [github_organisation, options[:tool]].join("/")
+  ["fastlane", options[:tool]].join("/")
 end
 
 desc "Get the version number of the last release"
 private_lane :current_version do |options|
   puts "Checking the latest version on RubyGems"
   download(url: "https://rubygems.org/api/v1/gems/#{options[:tool]}.json")["version"]
-end
-
-desc "All repos that are still on github.com/KrauseFx"
-private_lane :krausefx_repos do
-  ['fastlane', 'deliver', 'snapshot', 'sigh']
 end
 
 desc "All repos that don't have a binary to test"
