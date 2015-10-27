@@ -6,6 +6,7 @@ module Fastlane
 
     class SnapshotAction < Action
       def self.run(params)
+        return nil unless Helper.mac?
         require 'snapshot'
 
         begin
@@ -28,6 +29,7 @@ module Fastlane
       end
 
       def self.available_options
+        return [] unless Helper.mac?
         require 'snapshot'
         Snapshot::Options.available_options
       end
