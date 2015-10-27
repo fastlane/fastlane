@@ -43,7 +43,7 @@ describe Spaceship::Tunes::Build do
 
     describe "#testing_status" do
       before do
-        now = Time.at((1_443_144_470 + 1_445_737_214) / 2)
+        now = Time.at((1_443_144_470 + 1_445_737_214) / 2).utc
         allow(Time).to receive(:now) { now }
       end
 
