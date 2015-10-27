@@ -34,6 +34,7 @@ module Scan
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-destination '#{config[:destination]}'" # generated in `detect_values`
+        options << "-enableCodeCoverage YES" if config[:code_coverage]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
