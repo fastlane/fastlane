@@ -407,6 +407,7 @@ module Fastlane
 
     class XctestAction < Action
       def self.run(params)
+        Helper.log.info "Have you seen the new 'scan' tool to run tests? https://github.com/fastlane/scan".yellow
         params_hash = params || {}
         params_hash[:build] = true
         params_hash[:test] = true
