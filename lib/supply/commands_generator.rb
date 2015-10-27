@@ -19,8 +19,8 @@ module Supply
 
     def run
       program :version, Supply::VERSION
-      program :description, 'CLI for \'supply\' - TODO'
-      program :help, 'Author', 'Felix Krause <supply@krausefx.com>, Reinhard Hafenscher <TODO>'
+      program :description, Supply::DESCRIPTION
+      program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/supply'
       program :help_formatter, :compact
