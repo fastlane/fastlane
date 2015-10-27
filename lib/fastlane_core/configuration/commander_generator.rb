@@ -12,7 +12,7 @@ module FastlaneCore
       short_codes = []
       options.each do |option|
         appendix = (option.is_string ? "STRING" : "")
-        type = String
+        type = (option.is_string ? String : nil)
         type = nil if [:force, :verbose].include?(option.key)
         short_option = option.short_option
 
