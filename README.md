@@ -97,9 +97,19 @@ You can either run `supply` on its own and use it interactively, or you can pass
 
 ## Uploading an APK
 
-Simply run `supply --apk path/to/app.apk`, or use the `SUPPLY_APK` environment variable.
+To upload a new binary to Google Play, simply run
+
+```
+supply --apk path/to/app.apk
+```
 
 This will also upload app metadata if you previously ran `supply init`.
+
+To gradually roll out a new build use
+
+```
+supply --apk path/app.apk --track rollout --rollout 0.5
+```
 
 ## Images and Screenshots
 
