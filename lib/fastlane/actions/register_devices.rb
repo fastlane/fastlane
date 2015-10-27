@@ -16,7 +16,9 @@ module Fastlane
         devices_file = params[:devices_file]
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
-        Spaceship::Portal.login(credentials.user, credentials.password)
+        Spaceship.login(credentials.user, credentials.password)
+        ENV["FASTLANE_TEAM_ID"] = platform[:team_id]
+        Spaceship.select_team
 
         if devices
           device_objs = devices.map do |k, v|
