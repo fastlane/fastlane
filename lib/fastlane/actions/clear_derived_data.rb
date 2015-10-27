@@ -24,7 +24,6 @@ module Fastlane
       end
 
       def self.output
-        
       end
 
       def self.authors
