@@ -45,7 +45,6 @@ module Scan
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :code_coverage,
-                                     short_option: "-r",
                                      description: "Should generate code coverage (Xcode 7 only)?",
                                      is_string: false,
                                      default_value: false),
