@@ -1272,11 +1272,11 @@ Post a message to a **group chat**.
   )
 ```
 
-### Notify
+### Notification
 Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
 ```ruby
-  notify "Finished driving lane"
+  notification(subtitle: "Finished Building", message: "Ready to upload...")
 ```
 
 [ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
