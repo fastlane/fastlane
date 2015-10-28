@@ -16,6 +16,7 @@ describe Snapshot do
           "-project './example/Example.xcodeproj'",
           "-derivedDataPath '/tmp/snapshot_derived/'",
           "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
+          :build,
           :test,
           "| tee '#{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')}' | xcpretty"
         ])
