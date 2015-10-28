@@ -38,7 +38,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
         }
     }
     
-    class func snapshot(name: String, waitForLoadingIndicator: Bool = true)
+    class func snapshot(name: String, waitForLoadingIndicator: Bool = false)
     {
         if (waitForLoadingIndicator)
         {
