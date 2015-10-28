@@ -138,25 +138,25 @@ Here a few links to get started:
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 - Run `snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
-- (Objective C Only) add the bridging header to your test class. 
+- (Objective C only) add the bridging header to your test class. 
  - `#import “MYUITests-Swift.h"`
  - The bridging header is named after your test target with -Swift.h appended.
 - In your UI Test class, click the `Record` button on the bottom left and record your interaction
 - To take a snapshot, call the following between interactions
  -  Swift: `snapshot("01LoginScreen")`
- -  Objective-c: `[Snapshot snapshot:@"01LoginScreen" waitForLoadingIndicator:YES];` 
+ -  Objective C: `[Snapshot snapshot:@"01LoginScreen" waitForLoadingIndicator:YES];` 
 - Add the following code to your `setUp()` method
 
-Swift
+**Swift**
 ```swift
 let app = XCUIApplication()
 setLanguage(app)
 app.launch()
 ```
 
-Objective C
+**Objective C**
 ```objective-c
-XCUIApplication *app=[[XCUIApplication alloc] init];
+XCUIApplication *app = [[XCUIApplication alloc] init];
 [Snapshot setLanguage:app];
 [app launch];
 ```
