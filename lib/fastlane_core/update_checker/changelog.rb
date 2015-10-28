@@ -9,11 +9,11 @@ module FastlaneCore
           puts ""
           puts release['name'].green
           puts release['body']
-          if index == 2
-            puts ""
-            puts "To see all new releases, open https://github.com/fastlane/#{gem_name}/releases".green
-            break
-          end
+
+          next unless index == 2
+          puts ""
+          puts "To see all new releases, open https://github.com/fastlane/#{gem_name}/releases".green
+          break
         end
         puts "\nUpdate using 'sudo gem update #{gem_name.downcase}'".green
       end
