@@ -43,6 +43,7 @@ This gem contains all shared classes and code:
 - Crash Reporting
 - More helper methods and classes
 
+You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

@@ -1,6 +1,8 @@
 require 'excon'
 require 'digest'
 
+require 'fastlane_core/update_checker/changelog'
+
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
@@ -52,12 +54,13 @@ module FastlaneCore
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
       puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
-      puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green
+      puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
       if Random.rand(5) == 1
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
       puts '#######################################################################'.green
+      Changelog.show_changes(gem_name, current_version) unless ENV["FASTLANE_HIDE_CHANGELOG"]
     end
 
     # Generate the URL on the main thread (since we're switching directory)

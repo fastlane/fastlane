@@ -1,4 +1,4 @@
-require 'fastlane_core/update_checker'
+require 'fastlane_core/update_checker/update_checker'
 
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
