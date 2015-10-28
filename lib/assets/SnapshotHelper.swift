@@ -13,51 +13,53 @@ var deviceLanguage = ""
 
 func setLanguage(app: XCUIApplication)
 {
-    let path = "/tmp/language.txt"
-    
-    do {
-        let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-        deviceLanguage = locale
-        app.launchArguments = ["-AppleLanguages", "(\(locale))", "-AppleLocale", "\"\(locale)\"","-ui_testing"]
-    } catch {
-        print("Couldn't detect/set language...")
-    }
+    Snapshot.setLanguage(app)
 }
 
 func snapshot(name: String, waitForLoadingIndicator: Bool = true)
 {
-    if (waitForLoadingIndicator)
-    {
-        waitForLoadingIndicatorToDisappear()
-    }
-    print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
-
-    let view = XCUIApplication()
-    let start = view.coordinateWithNormalizedOffset(CGVectorMake(32.10, 30000))
-    let finish = view.coordinateWithNormalizedOffset(CGVectorMake(31, 30000))
-    start.pressForDuration(0, thenDragToCoordinate: finish)
-    sleep(1)
+    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
-func waitForLoadingIndicatorToDisappear()
-{
-    let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
-    
-    while (query.count > 4) {
-        sleep(1)
-        print("Number of Elements in Status Bar: \(query.count)... waiting for status bar to disappear")
-    }
-}
+
 
 @objc class Snapshot: NSObject
 {
-    class func doSetLanguage(app: XCUIApplication)
+    class func setLanguage(app: XCUIApplication)
     {
-         setLanguage(app)
+        let path = "/tmp/language.txt"
+        
+        do {
+            let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            deviceLanguage = locale
+            app.launchArguments = ["-AppleLanguages", "(\(locale))", "-AppleLocale", "\"\(locale)\"","-ui_testing"]
+        } catch {
+            print("Couldn't detect/set language...")
+        }
     }
     
-    class func doSnapshot(name: String, waitForLoadingIndicator: Bool = true)
+    class func snapshot(name: String, waitForLoadingIndicator: Bool = true)
     {
-        snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
+        if (waitForLoadingIndicator)
+        {
+            waitForLoadingIndicatorToDisappear()
+        }
+        print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
+        
+        let view = XCUIApplication()
+        let start = view.coordinateWithNormalizedOffset(CGVectorMake(32.10, 30000))
+        let finish = view.coordinateWithNormalizedOffset(CGVectorMake(31, 30000))
+        start.pressForDuration(0, thenDragToCoordinate: finish)
+        sleep(1)
+    }
+    
+    class func waitForLoadingIndicatorToDisappear()
+    {
+        let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
+        
+        while (query.count > 4) {
+            sleep(1)
+            print("Number of Elements in Status Bar: \(query.count)... waiting for status bar to disappear")
+        }
     }
 }
