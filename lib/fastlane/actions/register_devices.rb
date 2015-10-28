@@ -17,7 +17,7 @@ module Fastlane
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
-        ENV["FASTLANE_TEAM_ID"] = params[:team_id] unless params.nil?
+        ENV["FASTLANE_TEAM_ID"] = params[:team_id]
         Spaceship.select_team
 
         if devices
