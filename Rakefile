@@ -134,6 +134,14 @@ task :unreleased do
 	end
 end
 
+desc "git push all the things"
+task :push do
+	(GEMS + RAILS).each do |repo|
+		box "Pushing #{repo}"
+		sh "cd #{repo} && git push origin master"
+	end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
