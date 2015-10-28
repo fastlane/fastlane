@@ -144,9 +144,15 @@ end
 
 desc "enable lol commits for all repos"
 task :lolcommits do
-	(GEMS + RAILS).each do |repo|
-		box "Pushing #{repo}"
+	(["."] + GEMS + RAILS).each do |repo|
+		box "Enabling lol commits for #{repo}"
 		sh "cd #{repo} && lolcommits --enable"
+
+		# We need to patch it to work with El Capitan
+		path = File.join(repo, ".git", "hooks", "post-commit")
+		content = File.read(path)
+		content.gsub!("lolcommits --capture", "lolcommits --capture --delay 4")
+		File.write(path, content)
 	end
 end
 
