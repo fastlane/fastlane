@@ -417,12 +417,14 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
-    # Fetches the User Detail information from ITC
+    # Fetches the User Detail information from ITC. This gets called often and almost never changes
+    # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
+      return @cached if @cached
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
       data = parse_response(r, 'data')
-      Spaceship::Tunes::UserDetail.factory(data)
+      @cached ||= Spaceship::Tunes::UserDetail.factory(data)
     end
 
     #####################################################
