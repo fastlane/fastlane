@@ -1,17 +1,17 @@
 <h3 align="center">
-  <a href="https://github.com/KrauseFx/fastlane">
+  <a href="https://github.com/fastlane/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <b>cert</b> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
@@ -29,7 +29,7 @@ cert
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/cert/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/cert/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
 
 ###### Automatically create and maintain iOS code signing certificates.
@@ -61,9 +61,9 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Why?
 
-Please check out [this guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md) which shows how to manually create an iOS code signing profile and a provisioning profile using the Apple Developer Portal.
+Please check out [this guide](https://github.com/fastlane/cert/blob/master/ManualSteps.md) which shows how to manually create an iOS code signing profile and a provisioning profile using the Apple Developer Portal.
 
-**After** checking out the [guide](https://github.com/KrauseFx/cert/blob/master/ManualSteps.md), take a look how `cert` and [`sigh`](https://github.com/KrauseFx/sigh) do all that for you.
+**After** checking out the [guide](https://github.com/fastlane/cert/blob/master/ManualSteps.md), take a look how `cert` and [`sigh`](https://github.com/fastlane/sigh) do all that for you.
 
 ![assets/cert.gif](assets/cert.gif) 
 
@@ -102,9 +102,9 @@ Keep in mind, there is no way for `cert` to download existing certificates + pri
 
 Run `cert --help` to get a list of all available environment variables.
 
-## Use with [`sigh`](https://github.com/KrauseFx/sigh)
+## Use with [`sigh`](https://github.com/fastlane/sigh)
 
-`cert` becomes really interesting when used in [`fastlane`](https://github.com/KrauseFx/fastlane) in combination with [`sigh`](https://github.com/KrauseFx/sigh).
+`cert` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane) in combination with [`sigh`](https://github.com/fastlane/sigh).
 
 Update your `Fastfile` to contain the following code:
 
@@ -120,19 +120,19 @@ This will result in `sigh` always using the correct signing certificate, which i
 
 
 ## How is my password stored?
-`cert` uses the [password manager](https://github.com/fastlane/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/CredentialsManager) for more information.
+`cert` uses the [password manager](https://github.com/fastlane/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/credentials_manager) for more information.
 
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/fastlane/PEM): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
