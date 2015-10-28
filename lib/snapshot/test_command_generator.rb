@@ -44,7 +44,7 @@ module Snapshot
 
       def actions
         actions = []
-        # actions << :clean if config[:clean]
+        actions << :clean if Snapshot.config[:clean]
         actions << :build # https://github.com/fastlane/snapshot/issues/246
         actions << :test
 
