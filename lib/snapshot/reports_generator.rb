@@ -35,7 +35,7 @@ module Snapshot
 
       export_path = File.expand_path(export_path)
       Helper.log.info "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'".green
-      system("open '#{export_path}'") unless ENV["SNAPSHOT_SKIP_OPEN_SUMMARY"]
+      system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
     end
 
     private
