@@ -1,18 +1,18 @@
 <h3 align="center">
-  <a href="https://github.com/KrauseFx/fastlane">
+  <a href="https://github.com/fastlane/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
@@ -29,7 +29,7 @@ scan
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/scan/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/scan/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](http://rubygems.org/gems/scan)
 [![Build Status](https://img.shields.io/travis/fastlane/scan/master.svg?style=flat)](https://travis-ci.org/fastlane/scan)
 
@@ -174,19 +174,19 @@ lane :test do
 end
 ```
 
-For more information visit the [fastlane GitHub page](https://github.com/KrauseFx/fastlane).
+For more information visit the [fastlane GitHub page](https://github.com/fastlane/fastlane).
 
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
-- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/fastlane/PEM): Automatically generate and renew your push notification profiles
+- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
