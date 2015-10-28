@@ -156,6 +156,19 @@ task :lolcommits do
 	end
 end
 
+desc "enable auto push for all repos"
+task :autopush do
+	(["."] + GEMS + RAILS).each do |repo|
+		box "Enabling auto push for #{repo}"
+
+		path = File.join(repo, ".git", "hooks", "post-commit")
+		content = File.read(path)
+		next if content.include?("git push")
+		content += "\ngit push"
+		File.write(path, content)
+	end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
