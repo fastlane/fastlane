@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://github.com/KrauseFx/fastlane">
+  <a href="https://github.com/fastlane/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
@@ -7,12 +7,12 @@
 </h3>
 <p align="center">
   <b>deliver</b> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/PEM">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
@@ -29,7 +29,7 @@ deliver
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
 
@@ -87,7 +87,7 @@ The guide will create all the necessary files for you, using the existing app me
 
 From now on, you can run `deliver` to deploy a new update, or just upload new app metadata and screenshots.
 
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/KrauseFx/deliver/blob/master/MigrationGuide.md).
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/deliver/blob/master/MigrationGuide.md).
 
 # Usage
 
@@ -111,7 +111,7 @@ deliver --ipa "App.ipa" --submit_for_review
 
 If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa` file. 
 
-This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md)
+This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md)
 
 Download existing screenshots from iTunes Connect
 
@@ -125,17 +125,17 @@ To get a list of available options run
 deliver --help
 ```
 
-Check out [Deliverfile.md](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md) for more options.
+Check out [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md) for more options.
 
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/KrauseFx/deliver/blob/master/MigrationGuide.md).
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/deliver/blob/master/MigrationGuide.md).
 
 # Credentials
 
-A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/CredentialsManager).
+A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/credentials_manager).
 
 ### How does this thing even work? Is magic involved? 🎩###
 
-Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/CredentialsManager))
+Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/credentials_manager))
 
 Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data. 
 
@@ -149,12 +149,12 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/KrauseFx/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+- [`PEM`](https://github.com/fastlane/PEM): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
@@ -170,10 +170,10 @@ no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms,
 
 ## Automatically create screenshots
 
-If you want to integrate `deliver` with [snapshot](https://github.com/KrauseFx/snapshot), check out [fastlane](https://fastlane.tools)!
+If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/snapshot), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
-Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md).
 
 ## Firewall Issues
 
