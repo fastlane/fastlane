@@ -1,18 +1,18 @@
 <h3 align="center">
-  <a href="https://github.com/KrauseFx/fastlane">
+  <a href="https://github.com/fastlane/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
   <b>PEM</b> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
-  <a href="https://github.com/KrauseFx/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
@@ -29,7 +29,7 @@ PEM
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/pem/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/pem/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
@@ -38,7 +38,7 @@ Tired of manually creating and maintaining your push notification profiles for y
 
 `PEM` does all that for, just by running `pem`.
 
-To automate iOS Provisioning profiles you can use [sigh](https://github.com/KrauseFx/sigh).
+To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/sigh).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -122,19 +122,19 @@ Run `pem --help` to get a list of available environment variables.
 `PEM` uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
 
 ## How is my password stored?
-```PEM``` uses the [password manager](https://github.com/KrauseFx/CredentialsManager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/KrauseFx/CredentialsManager) for more information.
+```PEM``` uses the [password manager](https://github.com/fastlane/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/credentials_manager) for more information.
 
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/KrauseFx/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/KrauseFx/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/KrauseFx/frameit): Quickly put your screenshots into the right device frames
-- [`sigh`](https://github.com/KrauseFx/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/KrauseFx/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/KrauseFx/cert): Automatically create and maintain iOS code signing certificates
+- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+- [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
