@@ -33,7 +33,7 @@ scan
 [![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](http://rubygems.org/gems/scan)
 [![Build Status](https://img.shields.io/travis/fastlane/scan/master.svg?style=flat)](https://travis-ci.org/fastlane/scan)
 
-###### Building your app has never been easier
+###### The easiest way to run tests of your iOS and Mac app
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
