@@ -48,3 +48,16 @@ func waitForLoadingIndicatorToDisappear()
         print("Number of Elements in Status Bar: \(query.count)... waiting for status bar to disappear")
     }
 }
+
+@objc class Snapshot: NSObject
+{
+    class func doSetLanguage(app: XCUIApplication)
+    {
+         setLanguage(app)
+    }
+    
+    class func doSnapshot(name: String, waitForLoadingIndicator: Bool = true)
+    {
+        snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
+    }
+}
