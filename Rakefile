@@ -142,6 +142,14 @@ task :push do
 	end
 end
 
+desc "enable lol commits for all repos"
+task :lolcommits do
+	(GEMS + RAILS).each do |repo|
+		box "Pushing #{repo}"
+		sh "cd #{repo} && lolcommits --enable"
+	end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
