@@ -299,7 +299,7 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
@@ -339,7 +339,7 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
@@ -372,7 +372,7 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
@@ -405,7 +405,7 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
@@ -434,7 +434,7 @@ module Fastlane
           ['workspace', 'The workspace to use'],
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
@@ -467,7 +467,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['destination', 'The simulator to use, e.g. "name=iPhone 5s,OS=8.1"'],
           ['destination_timeout', 'The timeout for connecting to the simulator, in seconds'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII outout)'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false']
         ]
