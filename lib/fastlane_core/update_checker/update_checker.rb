@@ -54,7 +54,7 @@ module FastlaneCore
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
       puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
-      puts "# To see what's new, open https://github.com/KrauseFx/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
+      puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
       if Random.rand(5) == 1
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
