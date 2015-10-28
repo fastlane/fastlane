@@ -1,4 +1,4 @@
 module Gym
-  VERSION = "1.1.1"
+  VERSION = "1.1.2"
   DESCRIPTION = "Building your iOS apps has never been easier"
 end
