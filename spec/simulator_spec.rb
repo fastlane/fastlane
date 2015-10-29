@@ -45,7 +45,7 @@ describe FastlaneCore do
         Device.new(name: "iPhone 4s", ios_version: "8.1", udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13"),
         Device.new(name: "iPhone 5", ios_version: "8.1", udid: "0D80C781-8702-4156-855E-A9B737FF92D3"),
         Device.new(name: "iPhone 6s Plus", ios_version: "9.1", udid: "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0"),
-        Device.new(name: "iPad Air 2", ios_version: "9.1", udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA"),
+        Device.new(name: "iPad Air 2", ios_version: "9.1", udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA")
       )
     end
 
