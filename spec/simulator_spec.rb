@@ -43,7 +43,7 @@ describe FastlaneCore do
       puts "devices: #{devices}"
 
       expect(devices[0]).to have_attributes(
-        name: "iPhone 4s", ios_version: "8.1", 
+        name: "iPhone 4s", ios_version: "8.1",
         udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13"
       )
       expect(devices[1]).to have_attributes(
