@@ -20,6 +20,8 @@ module Scan
 
     attr_accessor :cache
 
+    attr_accessor :device
+
     def config=(value)
       @config = value
       DetectValues.set_additional_default_values

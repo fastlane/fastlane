@@ -26,9 +26,14 @@ module Scan
       config = Scan.config
 
       if config[:device] # make sure it actually exists
-        found = FastlaneCore::Simulator.all.find { |d| d.name == config[:device].to_s.strip }
+
+        device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
+
+        found = FastlaneCore::Simulator.all.find { |d| (d.name + " " + d.ios_version).include? device }
+        found = nil
+
         if found
-          config[:device] = found
+          Scan.device = found
           return
         else
           Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
@@ -39,8 +44,9 @@ module Scan
       found = FastlaneCore::Simulator.all.find { |d| d.name == "iPhone 5s" }
       found ||= FastlaneCore::Simulator.all.first # anything is better than nothing
 
-      config[:device] = found
-      raise "No simulators found".red unless config[:device]
+      Scan.device = found
+
+      raise "No simulators found".red unless Scan.device
     end
 
     # Is it an iOS device or a Mac?
@@ -55,7 +61,7 @@ module Scan
 
       # building up the destination now
       if Scan.project.ios?
-        Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.config[:device].udid}"
+        Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.device.udid}"
       else
         Scan.config[:destination] = "platform=OS X"
       end
