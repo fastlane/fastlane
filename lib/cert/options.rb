@@ -44,7 +44,8 @@ module Cert
                                      description: "Path to a custom keychain",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Keychain not found at path '#{value}'".red unless File.exist? File.expand_path(value)
+                                       value = File.expand_path(value)
+                                       raise "Keychain not found at path '#{value}'".red unless File.exist? value
                                      end)
       ]
     end
