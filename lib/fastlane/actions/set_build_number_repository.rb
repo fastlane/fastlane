@@ -50,7 +50,7 @@ module Fastlane
         Actions.sh('git rev-list --max-parents=0 --abbrev-commit HEAD').chomp
       end
 
-      def self.git_commit_count_between(commitA, commitB="HEAD")
+      def self.git_commit_count_between(commitA, commitB = "HEAD")
         Actions.sh("git rev-list #{commitA}..#{commitB} --count").chomp
       end
 
@@ -85,7 +85,7 @@ module Fastlane
         else
           raise "No repository detected"
         end
-        if build_number == nil
+        if build_number.nil?
           build_number = Actions.sh command
         end
 
