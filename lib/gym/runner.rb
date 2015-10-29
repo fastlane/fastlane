@@ -87,7 +87,7 @@ module Gym
     # Makes sure the archive is there and valid
     def verify_archive
       # from https://github.com/fastlane/gym/issues/115
-      if (Dir[BuildCommandGenerator.archive_path + "/*"] + Dir[BuildCommandGenerator.archive_path + ".xcarchive/*"]).count == 0
+      if (Dir[BuildCommandGenerator.archive_path + "/*"]).count == 0
         ErrorHandler.handle_empty_archive
       end
     end
