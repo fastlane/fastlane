@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
 
-  spec.add_dependency 'fastlane_core', '>= 0.25.4', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.26.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.10.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.13.0', '< 1.0.0' # communication layer with Apple's web services
 
@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'gym', '>= 1.1.1', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.0.0', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.2.1', '< 1.0.0'
-  spec.add_dependency 'scan', '>= 0.1.2', '< 1.0.0'
+  spec.add_dependency 'scan', '>= 0.2.0', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
