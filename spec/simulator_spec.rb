@@ -60,13 +60,5 @@ describe FastlaneCore do
       )
     end
 
-    it "doesn't call the CLI twice as it's super slow" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-
-      expect(FastlaneCore::Simulator.all.count).to eq(4)
-      expect(FastlaneCore::Simulator.all.count).to eq(4)
-    end
   end
 end
