@@ -32,7 +32,7 @@ module Scan
         end
 
         file_name = "report.#{type}"
-        output_path = output_file_name || File.join(Scan.config[:output_directory], file_name)
+        output_path = output_file_name || File.join(File.expand_path(Scan.config[:output_directory]), file_name)
         parts = ["cat '#{path}' | "]
         parts << "xcpretty"
         parts << "--report #{type}"
