@@ -59,6 +59,5 @@ describe FastlaneCore do
         udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA"
       )
     end
-
   end
 end
