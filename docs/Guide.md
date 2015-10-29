@@ -38,8 +38,6 @@ Install the gem and all its dependencies (this might take a few minutes).
 
     sudo gem install fastlane --verbose
 
-In case RubyGems has a hard time installing Nokogiri, check out their [official installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html).
-
 ## Setting up `fastlane`
 
 Before changing anything, I recommend committing everything in `git` (in case something goes wrong).

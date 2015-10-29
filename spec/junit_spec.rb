@@ -26,7 +26,7 @@ describe Fastlane do
         expect(content).to include("0: My Step Name")
         expect(content).to include("1: error step")
         expect(content).to include("Some error text")
-        
+
         File.delete(path)
       end
     end
