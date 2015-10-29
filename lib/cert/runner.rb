@@ -33,6 +33,7 @@ module Cert
     def find_existing_cert
       certificates.each do |certificate|
         path = store_certificate(certificate)
+        private_key_path = File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12'))
 
         if FastlaneCore::CertChecker.installed?(path)
           # This certificate is installed on the local machine
@@ -42,6 +43,15 @@ module Cert
           Helper.log.info "Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.".green
 
           return path
+
+        else File.exists?(private_key_path)
+          KeychainImporter.import_file(private_key_path)
+          KeychainImporter.import_file(path)
+
+          Helper.log.info "Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.".green
+
+          return path
+          
         else
           Helper.log.info "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
@@ -78,11 +88,16 @@ module Cert
       end
 
       # Store all that onto the filesystem
+
       request_path = File.expand_path(File.join(Cert.config[:output_path], 'CertCertificateSigningRequest.certSigningRequest'))
       File.write(request_path, csr.to_pem)
+
       private_key_path = File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12'))
       File.write(private_key_path, pkey)
+
       cert_path = store_certificate(certificate)
+
+      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12')))
 
       # Import all the things into the Keychain
       KeychainImporter.import_file(private_key_path)
