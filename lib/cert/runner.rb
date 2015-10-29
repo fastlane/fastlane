@@ -33,7 +33,7 @@ module Cert
     def find_existing_cert
       certificates.each do |certificate|
         path = store_certificate(certificate)
-        private_key_path = File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12'))
+        private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
 
         if FastlaneCore::CertChecker.installed?(path)
           # This certificate is installed on the local machine
@@ -102,7 +102,7 @@ module Cert
       KeychainImporter.import_file(cert_path)
 
       #Rename it for the future
-      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12')))
+      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12")))
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
