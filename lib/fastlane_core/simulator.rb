@@ -10,7 +10,17 @@ module FastlaneCore
         @devices = []
         os_type = 'unknown'
         os_version = 'unknown'
-        `xcrun simctl list devices`.split(/\n/).each do |line|
+        output = ''
+        Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
+          output = stdout.read
+        end
+
+        unless output.include?("== Devices ==")
+          Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
+          raise "xcrun simctl not working.".red
+        end
+
+        output.split(/\n/).each do |line|
           next if line.match(/^== /)
           if line.match(/^-- /)
             (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
