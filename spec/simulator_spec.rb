@@ -3,56 +3,61 @@ require 'open3'
 describe FastlaneCore do
   describe FastlaneCore::Simulator do
     before do
-      @valid_simulators = "Known Devices:
-          Felix [A8B765B9-70D4-5B89-AFF5-EDDAF0BC8AAA]
-          Felix Krause's iPhone 6 (9.0.1) [2cce6c8deb5ea9a46e19304f4c4e665069ccaaaa]
-          iPad 2 (9.0) [863234B6-C857-4DF3-9E27-897DEDF26EDA]
-          iPad Air (9.0) [3827540A-D953-49D3-BC52-B66FC59B085E]
-          iPad Air 2 (9.0) [6731E2F9-B70A-4102-9B49-6AEFE300F460]
-          iPad Retina (9.0) [DFEE2E76-DABF-47C6-AA1A-ACF873E57435]
-          iPhone 4s (9.0) [CDEB0462-9ECD-40C7-9916-B7C44EC10E17]
-          iPhone 5 (9.0) [1685B071-AFB2-4DC1-BE29-8370BA4A6EBD]
-          iPhone 5s (9.0) [C60F3E7A-3D0E-407B-8D0A-EDAF033ED626]
-          iPhone 6 (9.0) [4A822E0C-4873-4F12-B798-8B39613B24CE]
-          iPhone 6 Plus (9.0) [A522ACFF-7948-4344-8CA8-3F62ED9FFB18]
-          iPhone 6s (9.0) [C956F5AA-2EA3-4141-B7D2-C5BE6250A60D]
-          iPhone 6s Plus (9.0) [A3754407-21A3-4A80-9559-3170BB3D50FC]
-          Known Templates:
-          ..."
+      @valid_simulators = "== Devices ==
+-- iOS 7.1 --
+    iPhone 4s (8E3D97C4-1143-4E84-8D57-F697140F2ED0) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
+    iPhone 5 (65D0F571-1260-4241-9583-611EAF4D56AE) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
+-- iOS 8.1 --
+    iPhone 4s (DBABD2A2-0144-44B0-8F93-263EB656FC13) (Shutdown)
+    iPhone 5 (0D80C781-8702-4156-855E-A9B737FF92D3) (Shutdown)
+-- iOS 9.1 --
+    iPhone 6s Plus (BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0) (Shutdown)
+    Resizable iPad (B323CCB4-840B-4B26-B57B-71681D6C30C2) (Shutdown) (unavailable, device type profile not found)
+    iPad Air 2 (961A7DF9-F442-4CA5-B28E-D96288D39DCA) (Shutdown)
+-- tvOS 9.0 --
+    Apple TV 1080p (D239A51B-A61C-4B60-B4D6-B7EC16595128) (Shutdown)
+-- watchOS 2.0 --
+    Apple Watch - 38mm (FE0C82A5-CDD2-4062-A62C-21278EEE32BB) (Shutdown)
+    Apple Watch - 38mm (66D1BF17-3003-465F-A165-E6E3A565E5EB) (Shutdown)
+"
       FastlaneCore::Simulator.clear_cache
     end
 
-    it "raises an error if instruments CLI prints garbage" do
+    it "raises an error if xcrun CLI prints garbage" do
       response = "response"
       expect(response).to receive(:read).and_return("💩")
-      expect(Open3).to receive(:popen3).with("instruments -s").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
       expect do
         devices = FastlaneCore::Simulator.all
-      end.to raise_error("Instruments CLI not working.".red)
+      end.to raise_error("xcrun simctl not working.".red)
     end
 
-    it "properly parses the instruments output and generates Device objects" do
+    it "properly parses the simctl output and generates Device objects" do
       response = "response"
       expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("instruments -s").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::Simulator.all
-      expect(devices.count).to eq(11)
+      expect(devices.count).to eq(4)
+      puts "devices: #{devices}"
 
-      sim = devices.first
-      expect(sim.name).to eq('iPad 2')
-      expect(sim.udid).to eq('863234B6-C857-4DF3-9E27-897DEDF26EDA')
-      expect(sim.ios_version).to eq('9.0')
-    end
-
-    it "doesn't call the CLI twice as it's super slow" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("instruments -s").and_yield(nil, response, nil, nil)
-
-      expect(FastlaneCore::Simulator.all.count).to eq(11)
-      expect(FastlaneCore::Simulator.all.count).to eq(11)
+      expect(devices[0]).to have_attributes(
+        name: "iPhone 4s", ios_version: "8.1",
+        udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13"
+      )
+      expect(devices[1]).to have_attributes(
+        name: "iPhone 5", ios_version: "8.1",
+        udid: "0D80C781-8702-4156-855E-A9B737FF92D3"
+      )
+      expect(devices[2]).to have_attributes(
+        name: "iPhone 6s Plus", ios_version: "9.1",
+        udid: "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0"
+      )
+      expect(devices[3]).to have_attributes(
+        name: "iPad Air 2", ios_version: "9.1",
+        udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA"
+      )
     end
   end
 end
