@@ -44,14 +44,14 @@ module Cert
 
           return path
 
-        else File.exists?(private_key_path)
+        elsif File.exists?(private_key_path)
           KeychainImporter.import_file(private_key_path)
           KeychainImporter.import_file(path)
 
           Helper.log.info "Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.".green
 
           return path
-          
+
         else
           Helper.log.info "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
