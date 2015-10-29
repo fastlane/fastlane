@@ -89,10 +89,10 @@ module Cert
 
       # Store all that onto the filesystem
 
-      request_path = File.expand_path(File.join(Cert.config[:output_path], 'CertCertificateSigningRequest.certSigningRequest'))
+      request_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.certSigningRequest"))
       File.write(request_path, csr.to_pem)
 
-      private_key_path = File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12'))
+      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       File.write(private_key_path, pkey)
 
       cert_path = store_certificate(certificate)
@@ -100,9 +100,6 @@ module Cert
       # Import all the things into the Keychain
       KeychainImporter.import_file(private_key_path)
       KeychainImporter.import_file(cert_path)
-
-      #Rename it for the future
-      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12")))
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
