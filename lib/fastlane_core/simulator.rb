@@ -6,23 +6,24 @@ module FastlaneCore
       def all
         return @devices if @devices
         Helper.log.info "Fetching available devices" if $verbose
-        
+
         @devices = []
-        (os_type, os_version) = ['unknown', 'unknown']
+        os_type = 'unknown'
+        os_version = 'unknown'
         `xcrun simctl list devices`.split(/\n/).each do |line|
-          next if line.match /^== /
-          if line.match /^-- /
+          next if line.match(/^== /)
+          if line.match(/^-- /)
             (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
           else
             # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)
             # iPad Air 2 (4F3B8059-03FD-4D72-99C0-6E9BBEE2A9CE) (Shutdown) (unavailable, device type profile not found)
-            match = line.match /\s+([^\(]+) \(([-0-9A-F]+)\) \((?:[^\(]+)\)(.*unavailable.*)?/
+            match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \((?:[^\(]+)\)(.*unavailable.*)?/)
             if match && !match[3] && os_type == 'iOS'
               @devices << Device.new(name: match[1], ios_version: os_version, udid: match[2])
             end
           end
         end
-        
+
         return @devices
       end
 
