@@ -31,8 +31,8 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
         
         do {
             let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-            deviceLanguage = locale
-            app.launchArguments = ["-AppleLanguages", "(\(locale))", "-AppleLocale", "\"\(locale)\"","-ui_testing"]
+            deviceLanguage = locale.substringToIndex(locale.startIndex.advancedBy(2, limit:locale.endIndex))
+            app.launchArguments = ["-AppleLanguages", "(\(deviceLanguage))", "-AppleLocale", "\"\(locale)\"","-ui_testing"]
         } catch {
             print("Couldn't detect/set language...")
         }
