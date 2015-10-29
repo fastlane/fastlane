@@ -10,7 +10,8 @@ module Cert
     end
 
     def run
-      FileUtils.mkdir_p(Gym.config[:output_path])
+      FileUtils.mkdir_p(Cert.config[:output_path])
+
       FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [], title: "Summary for cert #{Cert::VERSION}")
 
       Helper.log.info "Starting login with user '#{Cert.config[:username]}'"
