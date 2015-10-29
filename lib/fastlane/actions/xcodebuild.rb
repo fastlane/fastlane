@@ -316,6 +316,8 @@ module Fastlane
       def self.run(params)
         params_hash = params || {}
         params_hash[:build] = true
+
+        SetBuildNumberRepositoryAction.add_build_number_build_setting(params_hash, :build_settings)
         XcodebuildAction.run(params_hash)
       end
 
