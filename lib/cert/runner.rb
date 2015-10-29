@@ -97,11 +97,12 @@ module Cert
 
       cert_path = store_certificate(certificate)
 
-      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12')))
-
       # Import all the things into the Keychain
       KeychainImporter.import_file(private_key_path)
       KeychainImporter.import_file(cert_path)
+
+      #Rename it for the future
+      File.rename(File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12')), File.expand_path(File.join(Cert.config[:output_path], '#{certificate.id}.p12')))
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
