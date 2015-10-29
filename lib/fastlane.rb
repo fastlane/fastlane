@@ -4,7 +4,7 @@ require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
 require 'fastlane/dependency_checker'
 require 'fastlane/runner'
-require 'fastlane/setup'
+require 'fastlane/setup/setup'
 require 'fastlane/lane'
 require 'fastlane/fastlane_folder'
 require 'fastlane/junit_generator'

@@ -11,7 +11,7 @@ module Fastlane
           key, value = current.split(":", 2)
           raise "Please pass values like this: key:value" unless key.length > 0
           value = convert_value(value)
-          Helper.log.debug "Using #{key}: #{value}".green
+          Helper.log.debug "Using #{key}: #{value}".yellow
           lane_parameters[key.to_sym] = value
         else
           platform_lane_info << current

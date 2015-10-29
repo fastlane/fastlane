@@ -1,6 +1,7 @@
-# rubocop:disable Style/SpaceAroundOperators
 describe Fastlane do
   describe Fastlane::FastFile do
+    build_log_path = File.expand_path("~/Library/Logs/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log")
+
     describe "Xcodebuild Integration" do
       before :each do
         Fastlane::Actions.lane_context.delete :IPA_OUTPUT_PATH
@@ -21,7 +22,7 @@ describe Fastlane do
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
-            derived_data_path: '/derived/data/path',
+            derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
             export_archive: true,
@@ -40,6 +41,9 @@ describe Fastlane do
             target: 'MyAppTarget',
             workspace: 'MyApp.xcworkspace',
             xcconfig: 'my.xcconfig',
+            buildlog_path: 'mypath',
+            raw_buildlog: false,
+            xcpretty_output: 'test'
           )
         end").runner.execute(:test)
 
@@ -50,6 +54,7 @@ describe Fastlane do
           + "-arch \"architecture\" " \
           + "-archivePath \"./build/MyApp.xcarchive\" " \
           + "-configuration \"Debug\" " \
+          + "-derivedDataPath \"/derived/data/path\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
           + "-exportArchive " \
@@ -75,7 +80,7 @@ describe Fastlane do
           + "install " \
           + "installsrc " \
           + "test " \
-          + "| xcpretty --color --simple"
+          + "| tee 'mypath/xcodebuild.log' | xcpretty --color --test"
         )
       end
 
@@ -86,7 +91,7 @@ describe Fastlane do
             'name=iPhone 5s,OS=8.1',
             'name=iPhone 4,OS=7.1',
           ],
-          destination_timeout: 240,
+          destination_timeout: 240
         )
       end").runner.execute(:test)
 
@@ -98,7 +103,7 @@ describe Fastlane do
           + "-destination-timeout \"240\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
 
@@ -153,7 +158,7 @@ describe Fastlane do
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
 
@@ -196,7 +201,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "archive " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
 
@@ -217,7 +222,7 @@ describe Fastlane do
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end
@@ -239,7 +244,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "archive " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end
@@ -259,7 +264,70 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+    end
+
+    describe "xcbuild without xpretty" do
+      it "is equivalent to 'xcodebuild build'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            raw_buildlog: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "| tee '#{build_log_path}' "
+        )
+      end
+    end
+
+    describe "xcbuild without xpretty and with test" do
+      it "is equivalent to 'xcodebuild build'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            raw_buildlog: true,
+            test: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build test " \
+          + "| tee '#{build_log_path}' "
+        )
+      end
+    end
+
+    describe "xcbuild without xpretty and with test and reports" do
+      it "is equivalent to 'xcodebuild build'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            raw_buildlog: true,
+            report_formats: ['html'],
+            test: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "cat '#{build_log_path}' " \
+          + "| xcpretty --color --report html --test > /dev/null"
         )
       end
     end
@@ -271,7 +339,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "set -o pipefail && xcodebuild clean | xcpretty --color --simple"
+          "set -o pipefail && xcodebuild clean | tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end
@@ -292,13 +360,13 @@ describe Fastlane do
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| xcpretty --color --simple"
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end
 
     describe "xctest" do
-      it "is equivalent to 'xcodebuild test'" do
+      it "is equivalent to 'xcodebuild build test'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           xctest(
             destination: 'name=iPhone 5s,OS=8.1',
@@ -315,8 +383,9 @@ describe Fastlane do
           + "-destination-timeout \"240\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color --test"
+          + "| tee '#{build_log_path}' | xcpretty --color --test"
         )
       end
     end
@@ -339,8 +408,9 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--report junit " \
           + "--output \"./build-dir/test-report\" " \
           + "--test"
@@ -366,8 +436,9 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--report html " \
           + "--screenshots " \
           + "--output \"./build/report\" " \
@@ -393,8 +464,9 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--report html " \
           + "--report json-compilation-database " \
           + "--report junit " \
@@ -426,8 +498,9 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--report html " \
           + "--output \"./build-dir/test-report.html\" " \
           + "--screenshots " \
@@ -460,8 +533,9 @@ describe Fastlane do
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
           + "test " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--report html " \
           + "--output \"./build/report/report.html\" " \
           + "--report junit " \
@@ -469,6 +543,7 @@ describe Fastlane do
           + "--test"
         )
       end
+
       it "should detect and use the workspace, when a workspace is present" do
         allow(Dir).to receive(:glob).with("*.xcworkspace").and_return(["MyApp.xcworkspace"])
 
@@ -481,11 +556,10 @@ describe Fastlane do
           + "xcodebuild " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
-          + "| xcpretty --color " \
+          + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--simple"
         )
       end
     end
   end
 end
-# rubocop:enable Style/SpaceAroundOperators

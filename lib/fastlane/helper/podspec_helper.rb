@@ -51,7 +51,7 @@ module Fastlane
         new_version = version || @version_value
         updated_podspec_content = @podspec_content.gsub(@version_regex, "#{@version_match[:begin]}#{new_version}#{@version_match[:end]}")
 
-        File.open(podspec_path, "w") {|file| file.puts updated_podspec_content} unless Helper.test?
+        File.open(@path, "w") {|file| file.puts updated_podspec_content} unless Helper.test?
 
         updated_podspec_content
       end

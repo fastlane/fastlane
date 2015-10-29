@@ -8,12 +8,22 @@ Make sure it's structured like this:
 
 ```ruby
 module Fastlane
-	module Helper
-		class PodspecHelper
-			...
-		end
-	end
+  module Helper
+    class PodspecHelper
+      ...
+    end
+  end
 end
 ```
 
 The `git_helper` and `sh_helper` are different, please make sure to build something like `podspec_helper`.
+
+### Use of the helper class
+
+To access the helper class use
+
+```ruby
+Helper::PodspecHelper....
+```
+
+Make sure to prefix your helper with the `Helper::` module.

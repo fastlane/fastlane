@@ -25,15 +25,14 @@ module Fastlane
       end
 
       def self.add_keychain_to_search_list(keychain_path)
-        escaped_path = keychain_path.shellescape
+        keychains = Fastlane::Actions.sh("security list-keychains -d user", log: false).shellsplit
 
-        result = Fastlane::Actions.sh("security list-keychains", log: false)
+        # add the keychain to the keychain list
+        unless keychains.include?(keychain_path)
+          keychains << keychain_path
 
-        # add the keychain to the keychains list
-        # the basic strategy is to open the keychain file with Keychain Access
-        unless result.include?(keychain_path)
           commands = []
-          commands << Fastlane::Actions.sh("open #{escaped_path}")
+          commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
           commands
         end
       end

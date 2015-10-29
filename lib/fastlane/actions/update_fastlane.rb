@@ -18,7 +18,12 @@ module Fastlane
         "produce",
         "cert",
         "codes",
-        "credentials_manager"
+        "credentials_manager",
+        "gym",
+        "spaceship",
+        "pilot",
+        "supply",
+        "scan"
       ]
 
       def self.run(options)
@@ -34,6 +39,8 @@ module Fastlane
           return
         end
 
+        Helper.log.info "Looking for updates for #{tools_to_update.join(', ')}..."
+
         updater = Gem::CommandManager.instance[:update]
         cleaner = Gem::CommandManager.instance[:cleanup]
 
@@ -46,11 +53,11 @@ module Fastlane
           return
         end
 
-        highest_versions = updater.highest_installed_gems.keep_if {|key| tools_to_update.include? key }
+        highest_versions = updater.highest_installed_gems.keep_if { |key| tools_to_update.include? key }
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
         if update_needed.count == 0
-          Helper.log.info "Nothing to update ✅".yellow
+          Helper.log.info "Nothing to update ✅".green
           return
         end
 
@@ -60,7 +67,8 @@ module Fastlane
         update_needed.each do |tool_info|
           tool = tool_info[0]
           local_version = Gem::Version.new(highest_versions[tool].version)
-          latest_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
+          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(tool)
+          latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
           Helper.log.info "Updating #{tool} from #{local_version} to #{latest_version} ... 🚀"
 
           # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
@@ -70,7 +78,7 @@ module Fastlane
         end
 
         all_updated_tools = updater.installer.installed_gems.select do |updated_tool|
-          updated_tool.version > highest_versions[updated_tool.name].version
+          updated_tool.version > highest_versions[updated_tool.name].version if highest_versions[updated_tool.name]
         end
 
         if all_updated_tools.empty?

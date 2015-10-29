@@ -2,11 +2,14 @@ module Fastlane
   module Actions
     class CleanBuildArtifactsAction < Action
       def self.run(options)
-        [
+        paths = [
           Actions.lane_context[Actions::SharedValues::IPA_OUTPUT_PATH],
-          Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH],
           Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH]
-        ].reject { |file| file.nil? || !File.exist?(file) }.each do |file|
+        ]
+
+        paths += Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] || []
+
+        paths.reject { |file| file.nil? || !File.exist?(file) }.each do |file|
           if options[:exclude_pattern]
             next if file.match(options[:exclude_pattern])
           end
@@ -22,7 +25,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :exclude_pattern,
                                        env_name: "FL_CLEAN_BUILD_ARTIFACTS_EXCLUDE_PATTERN",
-                                       description: "Exclude all files from clearing that match the given pattern: e.g. '.*\.mobileprovision'",
+                                       description: "Exclude all files from clearing that match the given Regex pattern: e.g. '.*\.mobileprovision'",
                                        default_value: nil,
                                        optional: true)
         ]

@@ -7,6 +7,8 @@ module Fastlane
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
+        cmd << "--no-build" if params[:no_build] == true
+        cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
 
         Actions.sh(cmd.join(' '))
@@ -42,6 +44,22 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "Please pass a valid value for use_binaries. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :no_build,
+                                       env_name: "FL_CARTHAGE_NO_BUILD",
+                                       description: "When bootstrapping Carthage do not build",
+                                       is_string: false,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a valid value for no_build. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_CARTHAGE_VERBOSE",
+                                       description: "Print xcodebuild output inline",
+                                       is_string: false,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a valid value for verbose. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
@@ -57,7 +75,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42"]
+        ["bassrock", "petester42", "jschmid"]
       end
     end
   end

@@ -7,135 +7,246 @@ describe Fastlane do
         ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
       end
 
-      it "raises an error if no parameters were given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics()
-          end").runner.execute(:test)
-        end.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
+      describe "Android", nower: true do
+        describe "Valid parameters" do
+          it "works with valid parameters" do
+            command = Fastlane::FastFile.new.parse('lane :test do
+              crashlytics(
+                crashlytics_path: "./fastlane/spec/fixtures/fastfiles/Fastfile1",
+                api_token: "api_token",
+                build_secret: "build_secret",
+                apk_path: "./fastlane/spec/fixtures/fastfiles/Fastfile2",
+                emails: ["email1@krausefx.com", "email2@krausefx.com"],
+                groups: "testgroup",
+                notes: "Such notes, very release"
+              )
+            end').runner.execute(:test)
+            ["java",
+             "-jar /",
+             "-androidRes .",
+             "-apiKey api_token",
+             "-apiSecret build_secret",
+             "-uploadDist '/",
+             "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
+             "-betaDistributionGroupAliases 'testgroup'",
+             "-betaDistributionNotifications true"].each do |to_be|
+              expect(command.join(" ")).to include(to_be)
+            end
+
+            # These 2 parameters are temporary
+            # "-androidManifest '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/xml20151005-29563-m97zs2'",
+            # "-betaDistributionReleaseNotesFilePath '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/changelog20151005-29563-1o3uf3m'",
+            expect(command.join(" ")).to include("-betaDistributionReleaseNotesFilePath")
+            expect(command.join(" ")).to include("-androidManifest")
+          end
+        end
       end
 
-      it "raises an error if no crashlytics path was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              api_token: 'wadus',
-              build_secret: 'wadus',
-              ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
-      end
+      describe "iOS" do
+        describe "Valid Parameters" do
+          it "works with valid parameters" do
+            command = Fastlane::FastFile.new.parse("lane :test do
+              crashlytics({
+                crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                api_token: 'wadus',
+                build_secret: 'secret',
+                ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+              })
+            end").runner.execute(:test)
 
-      it "raises an error if the given crashlytics path was not found" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              crashlytics_path: './fastlane/wadus',
-              api_token: 'wadus',
-              build_secret: 'wadus',
-              ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red)
-      end
+            expect(command).to eq(["./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+                                   "wadus",
+                                   "secret",
+                                   "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+                                   "-notifications YES"
+                                  ])
+          end
 
-      it "raises an error if no api token was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              build_secret: 'wadus',
-              ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`".red)
-      end
+          it "works automatically stores the notes in a file if given" do
+            command = Fastlane::FastFile.new.parse("lane :test do
+              crashlytics({
+                crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                api_token: 'wadus',
+                build_secret: 'secret',
+                ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                notes: 'Yooo, hi!'
+              })
+            end").runner.execute(:test)
 
-      it "raises an error if no build secret was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              api_token: 'wadus',
-              ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red)
-      end
+            ["./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+             "wadus",
+             "secret",
+             "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+             "-notifications YES"
+            ].each do |to_be|
+              expect(command).to include(to_be)
+            end
+          end
 
-      it "raises an error if no ipa path was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              api_token: 'wadus',
-              build_secret: 'wadus'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("Couldn't find ipa file at path ''".red)
-      end
+          it "works when using environment variables in place of parameters" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
 
-      it "raises an error if the given ipa path was not found" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            crashlytics({
-              crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-              api_token: 'wadus',
-              build_secret: 'wadus',
-              ipa_path: './fastlane/wadus'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'".red)
-      end
+            command = Fastlane::FastFile.new.parse("lane :test do
+              crashlytics({
+                ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+              })
+            end").runner.execute(:test)
 
-      it "works with valid parameters" do
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-            api_token: 'wadus',
-            build_secret: 'wadus',
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-          })
-        end").runner.execute(:test)
-      end
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-notifications YES"
+            ])
+          end
 
-      it "works when using environment variables in place of parameters" do
-        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
-        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
-        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+          it "works when using TrueClass variable in place of notifications parameter" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
 
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-          })
-        end").runner.execute(:test)
-      end
+            command = Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  notifications: true
+                })
+              end").runner.execute(:test)
 
-      it "works when using TrueClass variable in place of notifications parameter" do
-        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
-        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
-        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-notifications YES"
+            ])
+          end
 
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-            notifications: true
-          })
-        end").runner.execute(:test)
-      end
+          it "works when using 'false' String variable in place of notifications parameter" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
 
-      it "works when using 'false' String variable in place of notifications parameter" do
-        ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
-        ENV["CRASHLYTICS_BUILD_SECRET"] = "wadus"
-        ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            command = Fastlane::FastFile.new.parse("lane :test do
+              crashlytics({
+                ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                notifications: 'false'
+              })
+            end").runner.execute(:test)
 
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-            notifications: 'false'
-          })
-        end").runner.execute(:test)
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-notifications NO"
+            ])
+          end
+
+          it "works when filling out all the parameters" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+
+            command = Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  notes_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  groups: ['groups', '123'],
+                  emails: ['email1', 'email2'],
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  notifications: false
+                })
+              end").runner.execute(:test)
+
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-emails 'email1,email2'",
+              "-notesPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-groupAliases 'groups,123'",
+              "-notifications NO"])
+          end
+        end
+
+        describe "Invalid Parameters" do
+          it "raises an error if no crashlytics path was given" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  api_token: 'wadus',
+                  build_secret: 'wadus',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end.to raise_error("No value found for 'crashlytics_path'")
+          end
+
+          it "raises an error if the given crashlytics path was not found" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/wadus',
+                  api_token: 'wadus',
+                  build_secret: 'wadus',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end.to raise_error
+          end
+
+          it "raises an error if no api token was given" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  build_secret: 'wadus',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`".red)
+          end
+
+          it "raises an error if no build secret was given" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'wadus',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red)
+          end
+
+          it "raises an error if no ipa path was given" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'wadus',
+                  build_secret: 'wadus'
+                })
+              end").runner.execute(:test)
+            end.to raise_error("You have to either pass an ipa or an apk file to the Crashlytics action".red)
+          end
+
+          it "raises an error if the given ipa path was not found" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'wadus',
+                  build_secret: 'wadus',
+                  ipa_path: './fastlane/wadus'
+                })
+              end").runner.execute(:test)
+            end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'".red)
+          end
+        end
       end
     end
   end

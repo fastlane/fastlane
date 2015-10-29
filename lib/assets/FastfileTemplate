@@ -28,8 +28,6 @@ platform :ios do
     carthage
     # increment_build_number
 
-    gym[[SCHEME]] # Build your app - more options available
-
     xctool # run the tests of your app
   end
 
@@ -43,18 +41,20 @@ platform :ios do
   lane :beta do
     snapshot
     sigh
-    deliver(beta: true)
+    gym[[SCHEME]] # Build your app - more options available
+    pilot
 
     # sh "your_script.sh"
     # You can also use other beta testing services here
   end
 
   desc "Deploy a new version to the App Store"
-  desc "** Full Markdown** Support: `code`"
   lane :deploy do
     snapshot
+  desc "** Full Markdown** Support: `code`"
     sigh
-    deliver(skip_deploy: true, force: true)
+    gym[[SCHEME]] # Build your app - more options available
+    deliver(force: true)
     # frameit
   end
 
@@ -77,5 +77,6 @@ platform :ios do
 end
 
 
-# More information about multiple platforms in fastlane: 
-# https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md
+
+# More information about multiple platforms in fastlane: https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md
+# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md

@@ -8,11 +8,11 @@ module Fastlane
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
 
         Helper.log.info "Adding git tag '#{tag}' 🎯."
-        Actions.sh("git tag \"#{tag}\"")
+        Actions.sh("git tag -am '#{tag} (fastlane)' '#{tag}'")
       end
 
       def self.description
-        "This will add a git tag to the current branch"
+        "This will add an annotated git tag to the current branch"
       end
 
       def self.available_options

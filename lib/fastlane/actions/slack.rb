@@ -31,7 +31,7 @@ module Fastlane
           raise 'No SLACK_URL given.'.red
         end
 
-        notifier = Slack::Notifier.new url
+        notifier = Slack::Notifier.new(url)
 
         notifier.username = 'fastlane'
         if options[:channel].to_s.length > 0
@@ -115,6 +115,7 @@ module Fastlane
           fallback: options[:message],
           text: options[:message],
           color: color,
+          mrkdwn_in: ["pretext", "text", "fields", "message"],
           fields: []
         }
 

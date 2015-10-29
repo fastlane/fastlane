@@ -192,6 +192,7 @@ module Fastlane
       end
 
       def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
+        Actions.verify_gem!('aws-sdk')
         require 'aws-sdk'
         s3_client = AWS::S3.new(
           access_key_id: s3_access_key,

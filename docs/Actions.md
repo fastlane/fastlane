@@ -9,6 +9,12 @@ fastlane actions: List all available fastlane actions
 fastlane action [action_name]:
 ```
 
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
 - [Building](#building)
 - [Testing](#testing)
 - [Deploying](#deploying)
@@ -56,54 +62,6 @@ carthage(
 )
 ```
 
-### [xctool](https://github.com/facebook/xctool)
-
-You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
-
-```ruby
-xctool :test
-```
-
-It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
-
-If you prefer to have the build configuration stored in the `Fastfile`:
-
-```ruby
-xctool :test, [
-      "--workspace", "'AwesomeApp.xcworkspace'",
-      "--scheme", "'Schema Name'",
-      "--configuration", "Debug",
-      "--sdk", "iphonesimulator",
-      "--arch", "i386"
-    ].join(" ")
-```
-
-
-### [snapshot](https://github.com/KrauseFx/snapshot)
-
-```ruby
-snapshot
-```
-
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
-
-```ruby
-snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
-)
-```
-
-Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
-
 ### [gym](https://github.com/fastlane/gym)
 
 `gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
@@ -130,6 +88,49 @@ gym(
 Use `gym --help` to get all available options.
 
 The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
+
+### verify_xcode
+
+Verifies that the Xcode installation is properly signed by Apple. This is relevant after recent [attacks targeting Xcode](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/).
+
+Add this action to your `appstore` lane. Keep in mind this action might take several minutes to be completed.
+
+```ruby
+verify_xcode
+```
+
+### [snapshot](https://github.com/KrauseFx/snapshot)
+
+```ruby
+snapshot
+```
+
+To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
+
+To skip cleaning the project on every build use ```snapshot(noclean: true)```.
+
+To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
+
+Other options
+
+```ruby
+snapshot(
+  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
+  noclean: true, # Skip cleaning
+  verbose: true, # Show output of UIAutomation
+  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+)
+```
+
+Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+
+### clear_derived_data
+
+Clears the Xcode Derived Data at path `~/Library/Developer/Xcode/DerivedData`
+
+```ruby
+clear_derived_data
+```
 
 ### ipa
 
@@ -374,7 +375,39 @@ dsym_zip(
 )
 ```
 
+### splunkmint
+
+Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbolication.
+
+```ruby
+splunkmint(
+	dsym: "My.app.dSYM.zip", 
+	api_key: "43564d3a",
+	api_token: "e05456234c4869fb7e0b61"
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
+
 ## Testing
+
+### [scan](https://github.com/KrauseFx/scan)
+
+`scan` makes it super easy to run tests of your iOS and Mac applications
+
+```ruby
+scan
+```
+
+You can define all options that are available in `scan --help`
+
+```ruby
+scan(
+  workspace: "App.xcworkspace",
+  scheme: "MyTests",
+  clean: false
+)
+```
 
 ### xctest
 
@@ -396,6 +429,28 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
       output: './build-dir/test-report.xml'
     }]
   )
+```
+
+### [xctool](https://github.com/facebook/xctool)
+
+You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
+
+```ruby
+xctool :test
+```
+
+It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
+If you prefer to have the build configuration stored in the `Fastfile`:
+
+```ruby
+xctool :test, [
+      "--workspace", "'AwesomeApp.xcworkspace'",
+      "--scheme", "'Schema Name'",
+      "--configuration", "Debug",
+      "--sdk", "iphonesimulator",
+      "--arch", "i386"
+    ].join(" ")
 ```
 
 ### [slather](https://github.com/venmo/slather)
@@ -427,9 +482,9 @@ Generate code coverage reports based on lcov.
 
 ```ruby
 lcov(
-      project_name: "yourProjectName",
-      scheme: "yourScheme",
-      output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+  project_name: "yourProjectName",
+  scheme: "yourScheme",
+  output_dir: "cov_reports" # This value is optional. Default is coverage_reports
 )
 ```
 
@@ -478,7 +533,7 @@ More information about the available options `fastlane action pilot` and a more 
 deliver
 ```
 
-To upload a new build to TestFlight use ```deliver(beta: true)```.
+To upload a new build to TestFlight use `pilot` instead.
 
 If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
 
@@ -486,21 +541,14 @@ Other options
 
 ```ruby
 deliver(
-  force: true,# Set to true to skip PDF verification
-  skip_deploy: true, # To don't submit the app for review (works with both App Store and beta builds)
-  deliver_file_path: './nothere' # Specify a path to the directory containing the Deliverfile
+  force: true, # Set to true to skip PDF verification
+  email: "itunes@connect.com" # different Apple ID than the dev portal
 )
 ```
 
-If you want to use a different Apple ID for iTunes Connect in `deliver`, just add this to your `Deliverfile`:
-
-```ruby
-email "itunes@connect.com"
-```
-
-If you only want to upload a binary without any metadata, use `deliver(beta: true, skip_deploy: true)`
-
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
+
+**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
 
 ### TestFlight
 
@@ -542,7 +590,7 @@ crashlytics(
   ipa_path: './app.ipa'
 )
 ```
-Additionally you can specify `notes_path`, `emails`, `groups` and `notifications`.
+Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
@@ -658,6 +706,23 @@ artifactory(
 
 To get a list of all available parameters run `fastlane action artifactory`
 
+### [nexus_upload](http://www.sonatype.com/nexus/)
+
+Upload your ipa, or any other file you want, to Sonatype Nexus platform.
+
+```ruby
+nexus_upload(
+  file: "/path/to/file.ipa", 
+  repo_id: "artefacts", 
+  repo_group_id: "com.fastlane", 
+  repo_project_name: "ipa",
+  repo_project_version: "1.13",
+  endpoint: "http://localhost:8081",
+  username: "admin",
+  password: "admin123"
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -669,7 +734,7 @@ increment_build_number(
   build_number: '75' # set a specific number
 )
 
-increment_build_numer(
+increment_build_number(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
   xcodeproj: './path/to/MyApp.xcodeproj' # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
@@ -724,6 +789,31 @@ This action will set the **build number** according to what the SCM HEAD reports
 Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash).
 
 There are no options currently available for this action.
+
+## update_info_plist
+
+This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+
+```ruby
+# update app identifier string
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  app_identifier: "com.example.newappidentifier"
+)
+
+# Change the Display Name of your app
+update_info_plist(
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+
+# Target a specific `xcodeproj` rather than finding the first available one
+update_info_plist(
+  xcodeproj: "path/to/Example.proj",
+  plist_path: "path/to/Info.plist",
+  display_name: "MyApp-Beta"
+)
+```
 
 ## Developer Portal
 
@@ -867,6 +957,22 @@ Quickly get the name of the branch you're currently in
 git_branch
 ```
 
+### git_commit
+
+To simply commit one file with a certain commit message use
+
+```ruby
+git_commit(path: "./version.txt",
+        message: "Version Bump")
+```
+
+To commit several files with a certain commit message use
+
+```ruby
+git_commit(path: ["./version.txt", "./changelog.txt"]
+        message: "Version Bump")
+```
+
 ### ensure_git_status_clean
 A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
 
@@ -930,6 +1036,10 @@ add_git_tag(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### git_pull
+
+Executes a simple `git pull --tags` command
+
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
@@ -990,6 +1100,20 @@ puts release['name']
 ```
 
 To get a list of all available values run `fastlane action get_github_release`.
+
+### import_from_git
+
+Import another Fastfile from a remote git repository to use its lanes.
+
+This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository.
+
+```ruby
+import_from_git(
+  url: 'git@github.com:KrauseFx/fastlane.git', # The url of the repository to import the Fastfile from.
+  branch: 'HEAD', # The branch to checkout on the repository. Defaults to `HEAD`.
+  path: 'fastlane/Fastfile' # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
+)
+```
 
 ## Using mercurial
 
@@ -1148,11 +1272,11 @@ Post a message to a **group chat**.
   )
 ```
 
-### Notify
+### Notification
 Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
 ```ruby
-  notify "Finished driving lane"
+  notification(subtitle: "Finished Building", message: "Ready to upload...")
 ```
 
 [ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
@@ -1282,6 +1406,16 @@ else
 end
 ```
 
+### verify_pods_keys
+
+Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
+
+```ruby
+verify_pods_keys
+```
+
+Will raise an error if any key is empty or a single character.
+
 ### read_podspec
 
 Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
@@ -1296,6 +1430,33 @@ This will find the first podspec in the folder. You can also pass in the specifi
 
 ```ruby
 spec = read_podspec(path: "./XcodeServerSDK.podspec")
+```
+
+### pod_push
+
+Push a Podspec to Trunk or a private repository
+
+```ruby
+# If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
+pod_trunk
+
+# Alternatively, supply the Podspec file path
+pod_trunk(path: 'TSMessages.podspec')
+
+# You may also push to a private repo instead of Trunk
+pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
+```
+
+### clean_cocoapods_cache
+
+Cleanup the Cocoapods cache.
+
+```ruby
+# Clean entire cocoapods cache.
+clean_cocoapods_cache
+
+# Alternatively, supply the name of pod to be removed from cache.
+clean_cocoapods_cache(name: 'CACHED POD')
 ```
 
 ### prompt
@@ -1314,4 +1475,64 @@ changelog = prompt(
 )
 
 hockey(notes: changelog)
+```
+
+### backup_file
+
+This action backs up your file to `[path].back`.
+
+```ruby
+# copies `file` to `/path/to/file.back`
+backup_file(path: '/path/to/file')
+```
+
+### restore_file
+
+This action restores a file previously backed up by the `backup_file` action.
+
+```ruby
+# copies `file.back` to '/path/to/file'
+restore_file(path: '/path/to/file')
+```
+
+### backup_xcarchive
+
+Save your [zipped] xcarchive elsewhere from default path.
+
+```ruby
+backup_xcarchive(
+  xcarchive: '/path/to/file.xcarchive', # Optional if you use the `xcodebuild` action
+  destination: '/somewhere/else/file.xcarchive', # Where the backup should be created
+  zip: false, # Enable compression of the archive. Defaults to `true`.
+  versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+)
+```
+
+### debug
+
+Print out an overview of the lane context values.
+
+```ruby
+debug
+```
+
+### dotgpg_environment
+
+Reads in production secrets set in a dotgpg file and puts them in ENV.
+
+```ruby
+dotgpg_environment(dotgpg_file: './path/to/gpgfile')
+```
+
+### update_info_plist
+
+Update an `Info.plist` with a bundle identifier and display name.
+
+```ruby
+update_info_plist(
+  xcodeproj: '/path/to/Project.xcodeproj', # Optional. Will pick the first `xcodeproj` in the directory if left blank
+  plist_path: '/path/to/Info.plist', # Path to the info plist file
+  app_identifier: 'com.example.newapp', # Optional. The new App Identifier of your app
+  display_name: 'MyNewApp' # Optional. The new Display Name of your app
+)
 ```

@@ -6,9 +6,10 @@ module Fastlane
 
     class ReadPodspecAction < Action
       def self.run(params)
+        Actions.verify_gem!('cocoapods')
+
         path = params[:path]
 
-        # will fail if cocoapods is not installed
         require 'cocoapods-core'
         spec = Pod::Spec.from_file(path).to_hash
 

@@ -5,12 +5,7 @@ module Fastlane
 
     class DotgpgEnvironmentAction < Action
       def self.run(options)
-        begin
-          Gem::Specification.find_by_name('dotgpg')
-        rescue Gem::LoadError
-          raise "You have to install the `dotgpg` using `sudo gem install dotgpg` to use this action".red
-        end
-
+        Actions.verify_gem!('dotgpg')
         require 'dotgpg/environment'
 
         Helper.log.info "Reading secrets from #{options[:dotgpg_file]}"

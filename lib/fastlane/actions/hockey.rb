@@ -40,7 +40,10 @@ module Fastlane
 
         return values if Helper.test?
 
-        response = client.upload_build(options[:ipa], values)
+        ipa_filename = options[:ipa]
+        ipa_filename = nil if options[:upload_dsym_only]
+
+        response = client.upload_build(ipa_filename, values)
         case response.status
         when 200...300
           url = response.body['public_url']
@@ -69,7 +72,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action. For Mac zip the .app",
+                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action. For Mac zip the .app",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
@@ -133,7 +136,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_server_url,
                                       env_name: "FL_HOCKEY_BUILD_SERVER_URL",
                                       description: "The URL of the build job on your build server",
-                                      optional: true)
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :upload_dsym_only,
+                                      env_name: "FL_HOCKEY_UPLOAD_DSYM_ONLY",
+                                      description: "Flag to upload only the dSYM file to hockey app",
+                                      is_string: false,
+                                      default_value: false)
         ]
       end
 

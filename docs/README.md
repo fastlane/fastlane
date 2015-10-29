@@ -9,6 +9,7 @@
 - [Platforms.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
 - [Appfile.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md) describes the `Appfile`
 - [Advanced.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
+- [Android.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Android.md) Getting started with fastlane for Android
 
 ## Fastfile
 

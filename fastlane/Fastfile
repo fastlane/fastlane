@@ -1,21 +1,46 @@
+update_fastlane
 
 desc "Run bundle install and tests"
 lane :test do
   validate_repo(tool_name: detect_tool)
 end
 
+desc "Increment the version number of this gem"
+lane :bump do |options|
+  tool_name = options[:tool] || detect_tool
+  path = "./lib/#{tool_name}/version.rb"
+
+  latest_release = current_version(tool: tool_name)
+  `open https://github.com/#{github_url(tool: tool_name)}/compare/#{latest_release}...master`
+
+  local_version = version_get_podspec(path: path) # here, to not show the lane change
+
+  puts "Live Version: #{latest_release}"
+  puts "Local Version: #{local_version}"
+
+  bump_type ||= 'minor' if prompt(text: "New Feature?", boolean: true)
+  bump_type ||= 'patch' if bump_type.nil? && prompt(text: "Bugfix/Improvements?", boolean: true)
+
+  if bump_type
+    version_bump_podspec(path: path, bump_type: bump_type)
+    git_commit(path: path,
+               message: "Version Bump by fastlane")
+    push_to_git_remote
+  else
+    puts "Doing nothing..."
+  end
+end
+
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
   # Fetching all information required for the release
-  # 
+  #
   tool_name = options[:tool] || detect_tool
 
-  github_organisation = "fastlane"
-  github_organisation = "KrauseFx" if krausefx_repos.include?tool_name
-  github_url = [github_organisation, tool_name].join("/")
-
   # Verifying RubyGems version
-  # 
+  #
+  validate_repo(tool_name: tool_name)
+
   require "../lib/#{tool_name}/version"
   version = module_ref(tool_name: tool_name)::VERSION
   old_version = current_version(tool: tool_name)
@@ -24,27 +49,25 @@ lane :release do |options|
     raise "Version number #{version} was already deployed"
   end
 
-  validate_repo(tool_name: tool_name)
-
   # Git verification
-  # 
+  #
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
   git_pull
   push_to_git_remote
 
   # Preparing GitHub Release
-  # 
-  github_release = get_github_release(url: github_url, version: version)
+  #
+  github_release = get_github_release(url: github_url(tool: tool_name), version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    `open https://github.com/#{github_url}/compare/#{old_version}...master`
+    `open https://github.com/#{github_url(tool: tool_name)}/compare/#{old_version}...master`
 
     title = prompt(text: 'Title: ')
     description = prompt(text: "Please enter a changelog: ",
                          multi_line_end_keyword: "END")
 
     github_release = set_github_release(
-      repository_name: github_url,
+      repository_name: github_url(tool: tool_name),
       name: [version, title].join(" "),
       tag_name: version,
       description: description,
@@ -53,28 +76,28 @@ lane :release do |options|
   end
 
   # Actual release
-  # 
+  #
   sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
-  github_url = github_release['html_url']
+  release_url = github_release['html_url']
 
   # After publishing
-  # 
+  #
   if ENV['SLACK_URL']
     slack(
       channel: "releases",
       default_payloads: [],
-      message: "Successfully released [#{tool_name} #{version}](#{github_url}) :rocket:",
+      message: "Successfully released [#{tool_name} #{version}](#{release_url}) :rocket:",
       payload: {
         "New" => github_release['body']
       }
     )
   end
 
-  clipboard(value: github_url)
+  clipboard(value: release_url)
 
   puts "You can now tweet:".green
-  puts "[#{tool_name}] #{github_release['name']} #{github_url}"
+  puts "[#{tool_name}] #{github_release['name']} #{release_url}"
 end
 
 error do |lane, exception|
@@ -83,12 +106,12 @@ error do |lane, exception|
   end
 end
 
-desc "Verifies all tests pass and the current state of the repo is valid" 
+desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do |options|
   tool_name = options[:tool_name]
 
   # Verifying that no debug code is in the code base
-  # 
+  #
   ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/") # debugging code
   ensure_no_debug_code(text: "TODO", extension: ".rb", path: "./lib/") # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/") # rspec focus
@@ -97,23 +120,28 @@ private_lane :validate_repo do |options|
   rubocop if File.exist?("../.rubocop.yml") # some project don't yet use rubocop
 
   # Verifying the --help command
-  # 
+  #
   binary_path = File.join("..", "bin", tool_name)
-  unless no_binary.include?tool_name
-    content = sh "#{binary_path} --help" # not using `sh` here as it doesn't go out of the help screen
+  unless no_binary.include? tool_name
+    content = sh "#{binary_path} --help"
     ["--version", "Felix Krause", "https://fastlane.tools", tool_name].each do |current|
-      raise "--help missing information: '#{current}'" unless content.include?current
+      raise "--help missing information: '#{current}'" unless content.include? current
     end
   end
 
   # Running ruby things
-  # 
+  #
   sh "cd .. && bundle install"
   sh "cd .. && rake install"
 
   # Run the tests
-  # 
+  #
   sh "cd .. && rspec"
+end
+
+desc "e.g. fastlane/deliver"
+private_lane :github_url do |options|
+  ["fastlane", options[:tool]].join("/")
 end
 
 desc "Get the version number of the last release"
@@ -122,19 +150,14 @@ private_lane :current_version do |options|
   download(url: "https://rubygems.org/api/v1/gems/#{options[:tool]}.json")["version"]
 end
 
-desc "All repos that are still on github.com/KrauseFx"
-private_lane :krausefx_repos do
-  ['fastlane', 'deliver', 'snapshot', 'sigh']
-end
-
-desc "All repos that don't have a binary to test" 
+desc "All repos that don't have a binary to test"
 private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
 end
 
-desc "Detects the name of the tool based on the current directory" 
+desc "Detects the name of the tool based on the current directory"
 private_lane :detect_tool do
-  Dir["*.gemspec"].last.split(".").first
+  Dir["../*.gemspec"].last.match(/(\w+).gemspec/)[1]
 end
 
 desc "Get a reference to the module of this tool"

@@ -7,7 +7,7 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
         command_prefix = [
           'cd',
@@ -32,7 +32,7 @@ module Fastlane
           Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
         end
       rescue => ex
-        Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
+        Helper.log.error 'Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
         raise ex
       end
 
@@ -60,7 +60,7 @@ module Fastlane
                              optional: true,
                              verify_block: proc do |value|
                                raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
-                               raise "Could not find Xcode project".red if !File.exist?(value) and !Helper.is_test?
+                               raise "Could not find Xcode project at path '#{File.expand_path(value)}'".red if !File.exist?(value) and !Helper.is_test?
                              end)
         ]
       end

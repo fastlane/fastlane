@@ -16,7 +16,7 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
-        folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
         command_prefix = [
           'cd',
@@ -41,7 +41,7 @@ module Fastlane
           Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
       rescue => ex
-        Helper.log.error 'Make sure to to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
+        Helper.log.error 'Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
         raise ex
       end
 
