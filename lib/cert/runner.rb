@@ -48,6 +48,9 @@ module Cert
           KeychainImporter.import_file(private_key_path)
           KeychainImporter.import_file(path)
 
+          ENV["CER_CERTIFICATE_ID"] = certificate.id
+          ENV["CER_FILE_PATH"] = path
+
           Helper.log.info "Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.".green
 
           return path
