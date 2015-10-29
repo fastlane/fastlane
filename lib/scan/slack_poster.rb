@@ -9,6 +9,11 @@ module Scan
       notifier = Slack::Notifier.new(Scan.config[:slack_url])
       notifier.username = 'fastlane'
 
+      if options[:slack_channel].to_s.length > 0
+        notifier.channel = options[:slack_channel]
+        notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
+      end
+
       attachments = []
 
       attachments << {

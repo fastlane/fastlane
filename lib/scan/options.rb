@@ -100,6 +100,10 @@ module Scan
                                      verify_block: proc do |value|
                                        raise "Invalid URL, must start with https://" unless value.start_with? "https://"
                                      end),
+        FastlaneCore::ConfigItem.new(key: :slack_channel,
+                                     env_name: "SCAN_SLACK_CHANNEL",
+                                     description: "#channel or @username",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_slack,
                                      description: "Don't publish to slack, even when an URL is given",
                                      is_string: false,
