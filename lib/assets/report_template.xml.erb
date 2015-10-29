@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="fastlane">
+  <testsuite name="run">
+    <% @steps.each_with_index do |step, index| %>
+      <% name = [index, step[:name]].join(": ") %>
+      <testcase name=<%= name.encode(:xml => :attr) %> time="<%= step[:time] %>">
+        <% if step[:error] %>
+          <failure message=<%= step[:error].encode(:xml => :attr).gsub("\n", "&#10;") %> />
+        <% end %>
+      </testcase>
+    <% end %>
+  </testsuite>
+</testsuites>
