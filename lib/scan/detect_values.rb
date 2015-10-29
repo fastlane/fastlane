@@ -30,7 +30,6 @@ module Scan
         device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
 
         found = FastlaneCore::Simulator.all.find { |d| (d.name + " " + d.ios_version).include? device }
-        found = nil
 
         if found
           Scan.device = found
