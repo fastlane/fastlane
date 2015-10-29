@@ -4,7 +4,6 @@ module FastlaneCore
   class Simulator
     class << self
       def all
-        return @devices if @devices
         Helper.log.info "Fetching available devices" if $verbose
 
         @devices = []
