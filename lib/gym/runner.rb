@@ -86,7 +86,8 @@ module Gym
 
     # Makes sure the archive is there and valid
     def verify_archive
-      if Dir[BuildCommandGenerator.archive_path + "/*"].count == 0
+      # from https://github.com/fastlane/gym/issues/115
+      if (Dir[BuildCommandGenerator.archive_path + "/*"]).count == 0
         ErrorHandler.handle_empty_archive
       end
     end
@@ -124,9 +125,8 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting ipa file
     def move_ipa
-      FileUtils.mv(PackageCommandGenerator.ipa_path, Gym.config[:output_directory], force: true)
-
-      ipa_path = File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path))
+      FileUtils.mv(PackageCommandGenerator.ipa_path, File.expand_path(Gym.config[:output_directory]), force: true)
+      ipa_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path)))
 
       Helper.log.info "Successfully exported and signed the ipa file:".green
       Helper.log.info ipa_path
@@ -138,7 +138,7 @@ module Gym
       app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
       raise "Couldn't find application in '#{BuildCommandGenerator.archive_path}'".red unless app_path
 
-      FileUtils.mv(app_path, Gym.config[:output_directory], force: true)
+      FileUtils.mv(app_path, File.expand_path(Gym.config[:output_directory]), force: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
 
       Helper.log.info "Successfully exported the .app file:".green
