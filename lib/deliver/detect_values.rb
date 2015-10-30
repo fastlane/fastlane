@@ -21,7 +21,12 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      options[:app] = Spaceship::Application.find(search_by)
+      app = Spaceship::Application.find(search_by)
+      if app
+        options[:app] = app
+      else
+        raise "Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account".red
+      end
     end
 
     def find_folders(options)

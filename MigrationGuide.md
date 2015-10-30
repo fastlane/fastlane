@@ -18,7 +18,9 @@ The easiest way is to remove the existing `Deliverfile` (which is probably almos
 
 To manually migrate setups (especially if you make heavy use of the `Deliverfile`):
 
-**The following options have been removed from the `Delivefile`:**
+Make sure to adapt the paths to include the `fastlane` directory (if necessary).
+
+**The following options have been removed from the `Deliverfile`:**
 
 Removed     | Use instead              | Note
 ---------|-----------------|------------------------------------------------------------
@@ -31,6 +33,8 @@ Removed     | Use instead              | Note
 `default_language` | | 
 `config_json_folder` | | No more support for JSON based configuration
 `hide_transporter` | | This might be implemented at a later point
+`primary_subcategories` | `primary_first_sub_category` and `primary_second_sub_category` |
+`secondary_subcategories` | `secondary_first_sub_category` and `secondary_second_sub_category` |
 
 **The following options have been changed:**
 
@@ -40,7 +44,7 @@ From     | To              | Note
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
 `ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#app_rating_config_path)
-`submit_further_information` | `submission_information` | [New Format](https://github.com/KrauseFx/deliver/blob/feature/spaceship/Deliverfile.md#submission_information)
+`submit_further_information` | `submission_information` | [New Format](https://github.com/KrauseFx/deliver/blob/master/Deliverfile.md#submission_information)
 
 **The following commands have been removed:**
 

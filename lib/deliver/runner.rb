@@ -6,7 +6,7 @@ module Deliver
       self.options = options
       login
       Deliver::DetectValues.new.run!(self.options)
-      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], title: "Summary")
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], title: "deliver #{Deliver::VERSION} Summary")
     end
 
     def login
@@ -17,7 +17,7 @@ module Deliver
 
     def run
       verify_version if options[:app_version].to_s.length > 0
-      upload_metadata unless options[:skip_metadata]
+      upload_metadata
       upload_binary if options[:ipa]
 
       Helper.log.info "Finished the upload to iTunes Connect".green

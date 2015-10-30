@@ -2,6 +2,8 @@ module Deliver
   # upload screenshots to iTunes Connect
   class UploadScreenshots
     def upload(options, screenshots)
+      return if options[:skip_screenshots]
+
       app = options[:app]
 
       v = app.edit_version
@@ -45,6 +47,8 @@ module Deliver
     end
 
     def collect_screenshots(options)
+      return [] if options[:skip_screenshots]
+
       screenshots = []
       extensions = '{png,jpg,jpeg}'
       Dir.glob(File.join(options[:screenshots_path], "*"), File::FNM_CASEFOLD).sort.each do |lng_folder|
@@ -57,6 +61,10 @@ module Deliver
 
         files.each do |path|
           if prefer_framed && !path.downcase.include?("_framed.#{extensions}") && !path.downcase.include?("watch")
+            next
+          end
+
+          if !prefer_framed && path.downcase.include?("_framed.#{extensions}")
             next
           end
 

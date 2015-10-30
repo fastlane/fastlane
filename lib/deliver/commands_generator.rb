@@ -14,6 +14,8 @@ module Deliver
       FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Deliver::VERSION
       program :description, Deliver::DESCRIPTION
@@ -78,6 +80,31 @@ module Deliver
           Deliver::DownloadScreenshots.run(options, path)
         end
       end
+
+      command :download_metadata do |c|
+        c.syntax = 'deliver download_metadata'
+        c.description = "Downloads existing metadata and stores it locally. This overwrites the local files."
+
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          Deliver::Runner.new(options) # to login...
+
+          path = (FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.')
+
+          res = ENV["DELIVER_FORCE_OVERWRITE"]
+          res ||= agree("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}/metadata'? (y/n)", true)
+          if res
+            require 'deliver/setup'
+            v = options[:app].latest_version
+            Deliver::Setup.new.generate_metadata_files(v, path)
+          else
+            return 0
+          end
+        end
+      end
+      # rubocop:enable Metrics/AbcSize
+      # rubocop:enable Metrics/MethodLength
 
       default_command :run
 

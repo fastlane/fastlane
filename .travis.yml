@@ -1,10 +1,9 @@
 language: ruby
-before_install: gem update --system
+before_install:
+  - gem update --system
+  - gem install bundler
 rvm:
   - 2.0.0
-  - 2.1.0
-notifications:
-  slack: fastlane-tools:zSZhCfKthyIIZnSyODvyPBPQ
-addons:
-    code_climate:
-        repo_token: 260bfcb1b7acf86c3a2424724879c02401d7fc9fc59ac7ca7dfa4b8c39bd1015
+  - 2.1.6
+  - 2.2.2
+script: bundle exec fastlane test

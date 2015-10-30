@@ -23,8 +23,6 @@ module Deliver
       Helper.log.info "Successfully created new Deliverfile at path '#{file_path}'".green
     end
 
-    private
-
     # This method takes care of creating a new 'deliver' folder, containg the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)

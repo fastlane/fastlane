@@ -23,11 +23,10 @@ Gem::Specification.new do |spec|
 
   # fastlane dependencies
   spec.add_dependency 'fastlane_core', '>= 0.19.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.8.1'
-  spec.add_dependency 'spaceship', '>= 0.10.2', '<= 1.0.0' # Communication with iTunes Connect
+  spec.add_dependency 'credentials_manager', '>= 0.9.0'
+  spec.add_dependency 'spaceship', '>= 0.13.0', '<= 1.0.0' # Communication with iTunes Connect
 
   # third party dependencies
-  spec.add_dependency 'nokogiri', '~> 1.6.5' # parsing and updating XML files
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
   spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
 
@@ -39,4 +38,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'fastlane'
+  spec.add_development_dependency 'rubocop', '~> 0.34'
 end

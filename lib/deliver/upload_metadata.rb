@@ -11,10 +11,14 @@ module Deliver
     LOCALISED_APP_VALUES = [:name, :privacy_url]
 
     # Non localized app details values
-    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category]
+    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
+                                :primary_first_sub_category, :primary_second_sub_category,
+                                :secondary_first_sub_category, :secondary_second_sub_category
+                               ]
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
+      return if options[:skip_metadata]
       verify_available_languages!(options)
 
       app = options[:app]
@@ -33,13 +37,14 @@ module Deliver
 
         current.each do |language, value|
           next unless value.to_s.length > 0
-          v.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
-          details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
+          strip_value = value.to_s.strip
+          v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
+          details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
         end
       end
 
       (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
+        current = options[key].to_s.strip
         next unless current.to_s.length > 0
         v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
         details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
@@ -58,6 +63,8 @@ module Deliver
 
     # Makes sure all languages we need are actually created
     def verify_available_languages!(options)
+      return if options[:skip_metadata]
+
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
@@ -85,6 +92,8 @@ module Deliver
 
     # Loads the metadata files and stores them into the options object
     def load_from_filesystem(options)
+      return if options[:skip_metadata]
+
       # Load localised data
       Dir.glob(File.join(options[:metadata_path], "*")).each do |lng_folder|
         next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
