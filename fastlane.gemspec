@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'spaceship', '>= 0.13.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.4.0', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.5.0', '< 2.0.0'
   spec.add_dependency 'snapshot', '>= 1.0.4', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.2.2', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.0.0', '< 2.0.0'
