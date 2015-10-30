@@ -66,7 +66,15 @@ module Pilot
                                      env_name: "PILOT_TESTERS_FILE",
                                      description: "Path to a CSV file of testers",
                                      default_value: "./testers.csv",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
+                                     short_option: "-k",
+                                     env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
+                                     description: "Interval in seconds to wait for iTunes Connect processing",
+                                     default_value: "30",
+                                     verify_block: proc do |value|
+                                       raise "Please enter a valid positive number of seconds" unless value.to_i > 0
+                                     end)
 
       ]
     end

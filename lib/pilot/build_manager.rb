@@ -64,10 +64,11 @@ module Pilot
       # the upload date of the new buid
       # we use it to identify the build
 
+      wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       loop do
         Helper.log.info "Waiting for iTunes Connect to process the new build"
-        sleep 30
+        sleep wait_processing_interval
         builds = app.all_processing_builds
         break if builds.count == 0
         latest_build = builds.last # store the latest pre-processing build here
@@ -83,7 +84,7 @@ module Pilot
         end
 
         Helper.log.info "Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})"
-        sleep 5
+        sleep wait_processing_interval
       end
 
       if full_build
