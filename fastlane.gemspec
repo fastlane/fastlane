@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'krausefx-shenzhen', '>= 0.14.6' # to upload to Hockey and Crashlytics and build the app
   spec.add_dependency 'slack-notifier', '~> 1.3' # Slack notifications
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 1.0.0' # Needed for commit_version_bump action
-  spec.add_dependency 'xcpretty', '>= 0.1.11' # prettify xcodebuild output
+  spec.add_dependency 'xcpretty', '>= 0.2.1' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'pbxplorer', '~> 1.0.0' # Manipulate xcproject files for provisioning profiles
