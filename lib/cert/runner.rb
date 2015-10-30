@@ -15,9 +15,8 @@ module Cert
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
 
-      if find_existing_cert
-        return # success
-      else
+      cert_path = find_existing_cert
+      if cert_path.nil? || Cert.config[:force]
         if create_certificate # no certificate here, creating a new one
           return # success
         else
