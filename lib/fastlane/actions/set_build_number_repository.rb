@@ -75,10 +75,10 @@ module Fastlane
           command = 'git svn info | grep Revision | egrep -o "[0-9]+"'
         elsif is_git?
           Helper.log.info "Detected repo: git"
-          tagPrefix = params[:use_git_counts_matching_tag]
-          if tagPrefix
-            major = git_tags_matching(tagPrefix).count
-            minor = git_commit_count_between(git_diverging_commit_matching(tagPrefix))
+          tag_prefix = params[:use_git_counts_matching_tag]
+          if tag_prefix
+            major = git_tags_matching(tag_prefix).count
+            minor = git_commit_count_between(git_diverging_commit_matching(tag_prefix))
             patch = git_abbrev_last_commit.to_i(16)
             build_number = "#{major}.#{minor}.#{patch}"
           else
