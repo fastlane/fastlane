@@ -18,7 +18,7 @@ module FastlaneCore
 
         params = {}
         params[:rows] = rows
-        params[:title] = title if title
+        params[:title] = title.green if title
 
         puts ""
         puts Terminal::Table.new(params)
