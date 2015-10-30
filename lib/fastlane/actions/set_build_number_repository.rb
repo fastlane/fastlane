@@ -5,7 +5,7 @@ module Fastlane
 
     class SetBuildNumberRepositoryAction < Action
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include? platform
       end
 
       def self.is_svn?
