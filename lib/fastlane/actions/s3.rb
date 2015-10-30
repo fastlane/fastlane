@@ -208,7 +208,7 @@ module Fastlane
             secret_access_key: s3_secret_access_key
           )
         end
-        
+
         bucket = s3_client.buckets[s3_bucket]
 
         plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
