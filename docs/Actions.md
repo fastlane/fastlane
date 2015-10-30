@@ -1406,12 +1406,12 @@ else
 end
 ```
 
-### verify_pods_keys
+### verify_pod_keys
 
 Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
 
 ```ruby
-verify_pods_keys
+verify_pod_keys
 ```
 
 Will raise an error if any key is empty or a single character.
