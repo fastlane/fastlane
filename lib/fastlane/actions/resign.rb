@@ -17,6 +17,20 @@ module Fastlane
         "Codesign an existing ipa file"
       end
 
+      def self.details
+        [
+          "You may provide multiple provisioning profiles if the application contains",
+          "nested applications or app extensions, which need their own provisioning",
+          "profile. You can do so by passing an array of provisiong profile strings or a",
+          "hash that associates provisioning profile values to bundle identifier keys.",
+          "",
+          "resign ipa: 'path', signing_identity: 'identity', provisioning_profile: {",
+          "  'com.example.awesome-app' => 'App.mobileprovision',",
+          "  'com.example.awesome-app.app-extension' => 'Extension.mobileprovision'",
+          "}"
+        ].join("\n")
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :ipa,
@@ -33,8 +47,12 @@ module Fastlane
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
                                        description: "Path to your provisioning_profile. Optional if you use `sigh`",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       is_string: false,
                                        verify_block: proc do |value|
-                                         raise "No provisioning_profile file given or found, pass using `provisioning_profile: 'path/app.mobileprovision'`".red unless File.exist?(value)
+                                         files = value.kind_of?(Enumerable) ? value.map { |fst, snd| snd || fst } : [value]
+                                         files.each do |file|
+                                           raise "Couldn't find provisiong profile at path '#{file}'".red unless File.exist?(file)
+                                         end
                                        end)
         ]
       end
