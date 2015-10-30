@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core', '>= 0.25.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'xcpretty', '~> 0.1' # pretty xcodebuild output
+  spec.add_dependency 'xcpretty' # pretty xcodebuild output
   spec.add_dependency 'terminal-table' # print out build information
   spec.add_dependency 'plist' # Generate the Xcode config plist file
   spec.add_dependency 'rubyzip', '>= 1.1.7' # fix swift/ipa
