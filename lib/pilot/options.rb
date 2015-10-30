@@ -71,7 +71,8 @@ module Pilot
                                      short_option: "-k",
                                      env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
                                      description: "Interval in seconds to wait for iTunes Connect processing",
-                                     default_value: "30",
+                                     default_value: 30,
+                                     is_string: false,
                                      verify_block: proc do |value|
                                        raise "Please enter a valid positive number of seconds" unless value.to_i > 0
                                      end)
