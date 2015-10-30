@@ -50,6 +50,7 @@ module Fastlane
         build_args = params_to_build_args(params)
 
         # Pulling parameters for other uses
+        s3_region = params[:region]
         s3_subdomain = params[:region] ? "s3-#{params[:region]}" : "s3"
         s3_access_key = params[:access_key]
         s3_secret_access_key = params[:secret_access_key]
@@ -166,6 +167,7 @@ module Fastlane
           s3_access_key,
           s3_secret_access_key,
           s3_bucket,
+          s3_region,
           plist_file_name,
           plist_render,
           html_file_name,
@@ -191,13 +193,22 @@ module Fastlane
         end.compact
       end
 
-      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
+      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, s3_region, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
         Actions.verify_gem!('aws-sdk')
         require 'aws-sdk'
-        s3_client = AWS::S3.new(
-          access_key_id: s3_access_key,
-          secret_access_key: s3_secret_access_key
-        )
+        if s3_region
+          s3_client = AWS::S3.new(
+            access_key_id: s3_access_key,
+            secret_access_key: s3_secret_access_key,
+            region: s3_region
+          )
+        else
+          s3_client = AWS::S3.new(
+            access_key_id: s3_access_key,
+            secret_access_key: s3_secret_access_key
+          )
+        end
+        
         bucket = s3_client.buckets[s3_bucket]
 
         plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
