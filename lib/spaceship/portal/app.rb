@@ -73,15 +73,11 @@ module Spaceship
         def factory(attrs)
           self.new(attrs)
         end
-
-        # @return (Array) Returns all apps available for this account
-        def all
-          client.apps.map { |app| self.factory(app) }
-        end
         
-        # @return (Array) Returns all Mac apps available for this account
-        def all_mac
-          client.apps(true).map { |app| self.factory(app) }
+        # @param mac [Bool] Fetches Mac apps if true
+        # @return (Array) Returns all apps available for this account
+        def all(mac: false)
+          client.apps(mac: mac).map { |app| self.factory(app) }
         end
 
         # Creates a new App ID on the Apple Dev Portal
@@ -89,22 +85,24 @@ module Spaceship
         # if bundle_id ends with '*' then it is a wildcard id otherwise, it is an explicit id
         # @param bundle_id [String] the bundle id (app_identifier) of the app associated with this provisioning profile
         # @param name [String] the name of the App
+        # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
-        def create!(bundle_id: nil, name: nil)
+        def create!(bundle_id: nil, name: nil, mac: false)
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id)
+          new_app = client.create_app!(type, name, bundle_id, mac: mac)
           self.new(new_app)
         end
 
         # Find a specific App ID based on the bundle_id
+        # @param mac [Bool] Searches Mac apps if true
         # @return (App) The app you're looking for. This is nil if the app can't be found.
-        def find(bundle_id)
-          all.find do |app|
+        def find(bundle_id, mac: false)
+          all(mac: mac).find do |app|
             app.bundle_id == bundle_id
           end
         end
@@ -114,7 +112,7 @@ module Spaceship
       # or there are active profiles
       # @return (App) The app you just deletd
       def delete!
-        client.delete_app!(app_id)
+        client.delete_app!(app_id, mac: mac?)
         self
       end
 

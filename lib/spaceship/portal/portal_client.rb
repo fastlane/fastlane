@@ -105,7 +105,7 @@ module Spaceship
     # @!group Apps
     #####################################################
 
-    def apps(mac = false)
+    def apps(mac: false)
       paging do |page_number|
         r = request(:post, account_path(mac) + '/identifiers/listAppIds.action', {
           teamId: team_id,
@@ -147,7 +147,7 @@ module Spaceship
       details_for_app(app)
     end
 
-    def create_app!(type, name, bundle_id)
+    def create_app!(type, name, bundle_id, mac: false)
       ident_params = case type.to_sym
                      when :explicit
                        {
@@ -173,12 +173,12 @@ module Spaceship
 
       params.merge!(ident_params)
 
-      r = request(:post, 'account/ios/identifiers/addAppId.action', params)
+      r = request(:post, account_path(mac) + '/identifiers/addAppId.action', params)
       parse_response(r, 'appId')
     end
 
-    def delete_app!(app_id)
-      r = request(:post, 'account/ios/identifiers/deleteAppId.action', {
+    def delete_app!(app_id, mac: false)
+      r = request(:post, account_path(mac) + '/identifiers/deleteAppId.action', {
         teamId: team_id,
         appIdId: app_id
       })
