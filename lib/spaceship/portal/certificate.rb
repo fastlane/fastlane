@@ -160,7 +160,7 @@ module Spaceship
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
         "DIVN2GW3XT" => DeveloperIDApplication,
-        "FUOY7LWJET" => WebsitePush,
+        # "FUOY7LWJET" => WebsitePush,
         # "3T2ZP62QW8" => ?
       }
       
@@ -229,17 +229,17 @@ module Spaceship
           klass.new(attrs)
         end
 
-        # @param mac [Bool] Fetches Mac certificates if true
+        # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
         def all(mac: false)
-          type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
-          
           if (self == Certificate) # are we the base-class?
+            type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
           else
-            types = [type_ids.key(self)]
+            types = [CERTIFICATE_TYPE_IDS.key(self)]
+            mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
           end
 
           client.certificates(types, mac: mac).map do |cert|
