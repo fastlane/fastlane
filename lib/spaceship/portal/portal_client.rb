@@ -91,14 +91,23 @@ module Spaceship
       return @in_house unless @in_house.nil?
       @in_house = (team_information['type'] == 'In-House')
     end
+    
+    def account_path(mac)
+      if mac
+        'account/mac'
+      else
+        'account/ios'
+      end
+    end
+    private :account_path
 
     #####################################################
     # @!group Apps
     #####################################################
 
-    def apps
+    def apps(mac = false)
       paging do |page_number|
-        r = request(:post, 'account/ios/identifiers/listAppIds.action', {
+        r = request(:post, account_path(mac) + '/identifiers/listAppIds.action', {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
@@ -109,7 +118,7 @@ module Spaceship
     end
 
     def details_for_app(app)
-      r = request(:post, 'account/ios/identifiers/getAppIdDetail.action', {
+      r = request(:post, account_path(app.mac?) + '/identifiers/getAppIdDetail.action', {
         teamId: team_id,
         appIdId: app.app_id
       })

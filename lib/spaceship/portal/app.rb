@@ -78,6 +78,11 @@ module Spaceship
         def all
           client.apps.map { |app| self.factory(app) }
         end
+        
+        # @return (Array) Returns all Mac apps available for this account
+        def all_mac
+          client.apps(true).map { |app| self.factory(app) }
+        end
 
         # Creates a new App ID on the Apple Dev Portal
         #
@@ -132,6 +137,11 @@ module Spaceship
       def update_service(service)
         app = client.update_service_for_app(self, service)
         self.class.factory(app)
+      end
+      
+      # @return (Bool) Is this a Mac app?
+      def mac?
+        platform == 'mac'
       end
     end
   end
