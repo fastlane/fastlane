@@ -126,6 +126,7 @@ module Spaceship
       # Associate specific groups with this app
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
       def associate_groups(groups)
+        raise "`associate_groups` not available for Mac apps" if mac?
         app = client.associate_groups_with_app(self, groups)
         self.class.factory(app)
       end
@@ -133,6 +134,7 @@ module Spaceship
       # Update a service for the app with given AppService object
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
       def update_service(service)
+        raise "`update_service` not implemented for Mac apps" if mac?
         app = client.update_service_for_app(self, service)
         self.class.factory(app)
       end
