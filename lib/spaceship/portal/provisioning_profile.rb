@@ -232,8 +232,8 @@ module Spaceship
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all(mac = false)
-          profiles = client.provisioning_profiles(mac).map do |profile|
+        def all(mac: false)
+          profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
           end
 
@@ -252,8 +252,8 @@ module Spaceship
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id(bundle_id)
-          all.find_all do |profile|
+        def find_by_bundle_id(bundle_id, mac: false)
+          all(mac: mac).find_all do |profile|
             profile.app.bundle_id == bundle_id
           end
         end
@@ -295,12 +295,12 @@ module Spaceship
       # @example
       #  File.write("path.mobileprovision", profile.download)
       def download
-        client.download_provisioning_profile(self.id)
+        client.download_provisioning_profile(self.id, mac: mac?)
       end
 
       # Delete the provisioning profile
       def delete!
-        client.delete_provisioning_profile!(self.id)
+        client.delete_provisioning_profile!(self.id, mac: mac?)
       end
 
       # Repair an existing provisioning profile
@@ -366,6 +366,11 @@ module Spaceship
       # @return (Bool) Is this profile managed by Xcode?
       def managed_by_xcode?
         managing_app == 'Xcode'
+      end
+      
+      # @return (Bool) Is this a Mac provisioning profile?
+      def mac?
+        platform == 'mac'
       end
     end
   end

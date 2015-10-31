@@ -316,7 +316,7 @@ module Spaceship
     # @!group Provisioning Profiles
     #####################################################
 
-    def provisioning_profiles(mac = false)
+    def provisioning_profiles(mac: false)
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{mac ? 'mac' : 'ios'}/listProvisioningProfiles.action"
         r.params = {
@@ -341,8 +341,8 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    def download_provisioning_profile(profile_id)
-      r = request(:get, 'https://developer.apple.com/account/ios/profile/profileContentDownload.action', {
+    def download_provisioning_profile(profile_id, mac: false)
+      r = request(:get, 'https://developer.apple.com/' + account_path(mac) + '/profile/profileContentDownload.action', {
         teamId: team_id,
         displayId: profile_id
       })
@@ -354,8 +354,8 @@ module Spaceship
       end
     end
 
-    def delete_provisioning_profile!(profile_id)
-      r = request(:post, 'account/ios/profile/deleteProvisioningProfile.action', {
+    def delete_provisioning_profile!(profile_id, mac: false)
+      r = request(:post, account_path(mac) + '/profile/deleteProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id
       })
