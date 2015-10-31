@@ -222,7 +222,7 @@ module Spaceship
     # @!group Devices
     #####################################################
 
-    def devices(mac = false)
+    def devices(mac: false)
       paging do |page_number|
         r = request(:post, account_path(mac) + '/device/listDevices.action', {
           teamId: team_id,
@@ -247,9 +247,9 @@ module Spaceship
       end
     end
 
-    def create_device!(device_name, device_id)
+    def create_device!(device_name, device_id, mac: false)
       req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/addDevice.action"
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{mac ? 'mac' : 'ios'}/addDevice.action"
         r.params = {
           teamId: team_id,
           deviceNumber: device_id,

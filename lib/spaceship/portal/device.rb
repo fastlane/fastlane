@@ -58,9 +58,10 @@ module Spaceship
           self.new(attrs)
         end
 
+        # @param mac [Bool] Fetches Mac devices if true
         # @return (Array) Returns all devices registered for this account
-        def all
-          client.devices.map { |device| self.factory(device) }
+        def all(mac: false)
+          client.devices(mac: mac).map { |device| self.factory(device) }
         end
 
         # @return (Array) Returns all Apple TVs registered for this account
@@ -90,7 +91,7 @@ module Spaceship
         
         # @return (Array) Returns all Macs registered for this account
         def all_macs
-          client.devices(true).map { |device| self.factory(device) }
+          all(mac: true)
         end
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
@@ -107,24 +108,27 @@ module Spaceship
           end
         end
 
+        # @param mac [Bool] Searches for Macs if true
         # @return (Device) Find a device based on the ID of the device. *Attention*:
         #  This is *not* the UDID. nil if no device was found.
-        def find(device_id)
-          all.find do |device|
+        def find(device_id, mac: false)
+          all(mac: mac).find do |device|
             device.id == device_id
           end
         end
 
+        # @param mac [Bool] Searches for Macs if true
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
-        def find_by_udid(device_udid)
-          all.find do |device|
+        def find_by_udid(device_udid, mac: false)
+          all(mac: mac).find do |device|
             device.udid == device_udid
           end
         end
 
+        # @param mac [Bool] Searches for Macs if true
         # @return (Device) Find a device based on its name. nil if no device was found.
-        def find_by_name(device_name)
-          all.find do |device|
+        def find_by_name(device_name, mac: false)
+          all(mac: mac).find do |device|
             device.name == device_name
           end
         end
@@ -132,23 +136,24 @@ module Spaceship
         # Register a new device to this account
         # @param name (String) (required): The name of the new device
         # @param udid (String) (required): The UDID of the new device
+        # @param mac (Bool) (optional): Pass Mac if device is a Mac
         # @example
         #   Spaceship.device.create!(name: "Felix Krause's iPhone 6", udid: "4c24a7ee5caaa4847f49aaab2d87483053f53b65")
         # @return (Device): The newly created device
-        def create!(name: nil, udid: nil)
+        def create!(name: nil, udid: nil, mac: false)
           # Check whether the user has passed in a UDID and a name
           unless udid && name
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
           # Find the device by UDID, raise an exception if it already exists
-          if self.find_by_udid(udid)
+          if self.find_by_udid(udid, mac: mac)
             raise "The device UDID '#{udid}' already exists on this team."
           end
 
           # It is valid to have the same name for multiple devices
 
-          device = client.create_device!(name, udid)
+          device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device
           self.new(device)
