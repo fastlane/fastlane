@@ -95,10 +95,10 @@ module Spaceship
       class MacDevelopment < Certificate; end
       
       # A Mac production code signing certificate for building .app bundles
-      class MacProduction < Certificate; end
+      class MacAppDistribution < Certificate; end
       
       # A Mac production code signing certificate for building .pkg installers
-      class MacProductionInstaller < Certificate; end
+      class MacInstallerDistribution < Certificate; end
       
       # A Mac Developer ID signing certificate for building .app bundles
       class DeveloperIDApplication < Certificate; end
@@ -153,8 +153,8 @@ module Spaceship
       
       MAC_CERTIFICATE_TYPE_IDS = {
         "749Y1QAGU7" => MacDevelopment,
-        "HXZEUKP0FP" => MacProduction,
-        "2PQI8IDXNH" => MacProductionInstaller,
+        "HXZEUKP0FP" => MacAppDistribution,
+        "2PQI8IDXNH" => MacInstallerDistribution,
         "OYVN2GW35E" => DeveloperIDInstaller,
         "W0EURJRMC5" => DeveloperIDApplication,
         "CDZ7EMXIZ1" => MacProductionPush,

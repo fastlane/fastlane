@@ -322,7 +322,7 @@ module Spaceship
             if self.kind_of? Development
               self.certificates = [Spaceship::Certificate::MacDevelopment.all(mac: true).first]
             else
-              self.certificates = [Spaceship::Certificate::MacProduction.all(mac: true).first]
+              self.certificates = [Spaceship::Certificate::MacAppDistribution.all(mac: true).first]
             end
           else
             if self.kind_of? Development
