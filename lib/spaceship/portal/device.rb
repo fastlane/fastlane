@@ -87,6 +87,11 @@ module Spaceship
         def all_ipod_touches
           client.devices_by_class('ipod').map { |device| self.factory(device) }
         end
+        
+        # @return (Array) Returns all Macs registered for this account
+        def all_macs
+          client.devices(true).map { |device| self.factory(device) }
+        end
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
         def all_ios_profile_devices

@@ -90,6 +90,12 @@ module Spaceship
 
       # An In House code signing certificate used for enterprise distributions
       class InHouse < Certificate; end
+      
+      class MacDevelopment < Certificate; end
+      class MacProduction < Certificate; end
+      class MacProductionInstaller < Certificate; end
+      class DeveloperIDApplication < Certificate; end
+      class DeveloperIDInstaller < Certificate; end
 
       #####################################################
       # Certs that are specific for one app
@@ -116,6 +122,9 @@ module Spaceship
 
       # ApplePay certificate
       class ApplePay < Certificate; end
+      
+      class MacDevelopmentPush < PushCertificate; end
+      class MacProductionPush < PushCertificate; end
 
       CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
@@ -127,7 +136,20 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => WebsitePush,
-        "4APLUP237T" => ApplePay
+        "4APLUP237T" => ApplePay,
+      }
+      
+      MAC_CERTIFICATE_TYPE_IDS = {
+        "749Y1QAGU7" => MacDevelopment,
+        "HXZEUKP0FP" => MacProduction,
+        "2PQI8IDXNH" => MacProductionInstaller,
+        "OYVN2GW35E" => DeveloperIDInstaller,
+        "W0EURJRMC5" => DeveloperIDApplication,
+        "CDZ7EMXIZ1" => MacProductionPush,
+        "HQ4KP3I34R" => MacDevelopmentPush,
+        "DIVN2GW3XT" => DeveloperIDApplication,
+        "FUOY7LWJET" => WebsitePush,
+        # "3T2ZP62QW8" => ?
       }
 
       # Class methods
@@ -187,7 +209,8 @@ module Spaceship
           # rubocop:enable Style/RescueModifier
 
           # Here we go
-          klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
+          certificateIds = CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+          klass = certificateIds[attrs['certificateTypeDisplayId']]
           klass ||= Certificate
           klass.client = @client
           klass.new(attrs)
@@ -204,6 +227,21 @@ module Spaceship
           end
 
           client.certificates(types).map do |cert|
+            factory(cert)
+          end
+        end
+        
+        # @return (Array) Returns all Mac certificates of this account.
+        #  If this is called from a subclass of Certificate, this will
+        #  only include certificates matching the current type.
+        def all_mac
+          if (self == Certificate) # are we the base-class?
+            types = MAC_CERTIFICATE_TYPE_IDS.keys
+          else
+            types = [MAC_CERTIFICATE_TYPE_IDS.key(self)]
+          end
+
+          client.certificates(types, true).map do |cert|
             factory(cert)
           end
         end

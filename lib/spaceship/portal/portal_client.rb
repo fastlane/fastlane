@@ -222,9 +222,9 @@ module Spaceship
     # @!group Devices
     #####################################################
 
-    def devices
+    def devices(mac = false)
       paging do |page_number|
-        r = request(:post, 'account/ios/device/listDevices.action', {
+        r = request(:post, account_path(mac) + '/device/listDevices.action', {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
@@ -264,9 +264,9 @@ module Spaceship
     # @!group Certificates
     #####################################################
 
-    def certificates(types)
+    def certificates(types, mac = false)
       paging do |page_number|
-        r = request(:post, 'account/ios/certificate/listCertRequests.action', {
+        r = request(:post, account_path(mac) + '/certificate/listCertRequests.action', {
           teamId: team_id,
           types: types.join(','),
           pageNumber: page_number,
