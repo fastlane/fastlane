@@ -316,9 +316,9 @@ module Spaceship
     # @!group Provisioning Profiles
     #####################################################
 
-    def provisioning_profiles
+    def provisioning_profiles(mac = false)
       req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/ios/listProvisioningProfiles.action"
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{mac ? 'mac' : 'ios'}/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
           includeInactiveProfiles: true,
