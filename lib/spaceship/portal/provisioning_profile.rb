@@ -192,12 +192,13 @@ module Spaceship
         # @param devices (Array) (optional): An array of Device objects that should be used in this profile.
         #  It is recommend to not pass devices as spaceship will automatically add all devices for AdHoc
         #  and Development profiles and add none for AppStore and Enterprise Profiles
+        # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
-          app = Spaceship::App.find(bundle_id)
+          app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
           # Fill in sensible default values
@@ -214,7 +215,11 @@ module Spaceship
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
-              devices = Spaceship::Device.all_for_profile_type(self.type)
+              if mac
+                devices = Spaceship::Device.all_macs
+              else
+                devices = Spaceship::Device.all_for_profile_type(self.type)
+              end
             end
           end
 
@@ -223,7 +228,8 @@ module Spaceship
                                                 self.type,
                                                 app.app_id,
                                                 certificate_parameter,
-                                                devices.map(&:id))
+                                                devices.map(&:id),
+                                                mac: mac)
           end
 
           self.new(profile)

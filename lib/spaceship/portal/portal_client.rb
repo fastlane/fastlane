@@ -329,8 +329,8 @@ module Spaceship
       parse_response(req, 'provisioningProfiles')
     end
 
-    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids)
-      r = request(:post, 'account/ios/profile/createProvisioningProfile.action', {
+    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
+      r = request(:post, account_path(mac) + '/profile/createProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileName: name,
         appIdId: app_id,
