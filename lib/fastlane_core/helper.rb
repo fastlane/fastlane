@@ -4,6 +4,8 @@ module FastlaneCore
   module Helper
     # Logging happens using this method
     def self.log
+      $stdout.sync = true
+
       if is_test?
         @@log ||= Logger.new(nil) # don't show any logs when running tests
       else
