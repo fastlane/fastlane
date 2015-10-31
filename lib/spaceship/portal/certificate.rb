@@ -91,10 +91,19 @@ module Spaceship
       # An In House code signing certificate used for enterprise distributions
       class InHouse < Certificate; end
       
+      # A Mac development code signing certificate used for development environment
       class MacDevelopment < Certificate; end
+      
+      # A Mac production code signing certificate for building .app bundles
       class MacProduction < Certificate; end
+      
+      # A Mac production code signing certificate for building .pkg installers
       class MacProductionInstaller < Certificate; end
+      
+      # A Mac Developer ID signing certificate for building .app bundles
       class DeveloperIDApplication < Certificate; end
+      
+      # A Mac Developer ID signing certificate for building .pkg installers
       class DeveloperIDInstaller < Certificate; end
 
       #####################################################
@@ -123,10 +132,13 @@ module Spaceship
       # ApplePay certificate
       class ApplePay < Certificate; end
       
+      # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
+      
+      # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
-      CERTIFICATE_TYPE_IDS = {
+      IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
         "R58UK2EWSO" => Production,
         "9RQEK7MSXA" => InHouse,
@@ -151,6 +163,8 @@ module Spaceship
         "FUOY7LWJET" => WebsitePush,
         # "3T2ZP62QW8" => ?
       }
+      
+      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -209,46 +223,34 @@ module Spaceship
           # rubocop:enable Style/RescueModifier
 
           # Here we go
-          certificateIds = CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
-          klass = certificateIds[attrs['certificateTypeDisplayId']]
+          klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
           klass ||= Certificate
           klass.client = @client
           klass.new(attrs)
         end
 
+        # @param mac [Bool] Fetches Mac certificates if true
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
-        def all
+        def all(mac: false)
+          type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+          
           if (self == Certificate) # are we the base-class?
-            types = CERTIFICATE_TYPE_IDS.keys
+            types = type_ids.keys
           else
-            types = [CERTIFICATE_TYPE_IDS.key(self)]
+            types = [type_ids.key(self)]
           end
 
-          client.certificates(types).map do |cert|
-            factory(cert)
-          end
-        end
-        
-        # @return (Array) Returns all Mac certificates of this account.
-        #  If this is called from a subclass of Certificate, this will
-        #  only include certificates matching the current type.
-        def all_mac
-          if (self == Certificate) # are we the base-class?
-            types = MAC_CERTIFICATE_TYPE_IDS.keys
-          else
-            types = [MAC_CERTIFICATE_TYPE_IDS.key(self)]
-          end
-
-          client.certificates(types, true).map do |cert|
+          client.certificates(types, mac: mac).map do |cert|
             factory(cert)
           end
         end
 
+        # @param mac [Bool] Searches Mac certificates if true
         # @return (Certificate) Find a certificate based on the ID of the certificate.
-        def find(certificate_id)
-          all.find do |c|
+        def find(certificate_id, mac: false)
+          all(mac: mac).find do |c|
             c.id == certificate_id
           end
         end
@@ -291,7 +293,7 @@ module Spaceship
 
       # @return (String) Download the raw data of the certificate without parsing
       def download_raw
-        client.download_certificate(id, type_display_id)
+        client.download_certificate(id, type_display_id, mac: mac?)
       end
 
       # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate
@@ -301,7 +303,7 @@ module Spaceship
 
       # Revoke the certificate. You shouldn't use this method probably.
       def revoke!
-        client.revoke_certificate!(id, type_display_id)
+        client.revoke_certificate!(id, type_display_id, mac: mac?)
       end
 
       # @return (Bool): Is this certificate a push profile for apps?
@@ -310,6 +312,11 @@ module Spaceship
         self.kind_of? PushCertificate
       end
       # rubocop:enable Style/PredicateName
+      
+      # @return (Bool) Is this a Mac profile?
+      def mac?
+        MAC_CERTIFICATE_TYPE_IDS.include? type_display_id
+      end
     end
   end
 end

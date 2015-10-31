@@ -264,7 +264,7 @@ module Spaceship
     # @!group Certificates
     #####################################################
 
-    def certificates(types, mac = false)
+    def certificates(types, mac: false)
       paging do |page_number|
         r = request(:post, account_path(mac) + '/certificate/listCertRequests.action', {
           teamId: team_id,
@@ -287,10 +287,10 @@ module Spaceship
       parse_response(r, 'certRequest')
     end
 
-    def download_certificate(certificate_id, type)
+    def download_certificate(certificate_id, type, mac: false)
       { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
-      r = request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action', {
+      r = request(:post, 'https://developer.apple.com/' + account_path(mac) + '/certificate/certificateContentDownload.action', {
         teamId: team_id,
         displayId: certificate_id,
         type: type
@@ -303,8 +303,8 @@ module Spaceship
       end
     end
 
-    def revoke_certificate!(certificate_id, type)
-      r = request(:post, 'account/ios/certificate/revokeCertificate.action', {
+    def revoke_certificate!(certificate_id, type, mac: false)
+      r = request(:post, account_path(mac) + '/certificate/revokeCertificate.action', {
         teamId: team_id,
         certificateId: certificate_id,
         type: type
