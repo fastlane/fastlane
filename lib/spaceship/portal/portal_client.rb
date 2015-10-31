@@ -362,8 +362,8 @@ module Spaceship
       parse_response(r)
     end
 
-    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids)
-      r = request(:post, 'account/ios/profile/regenProvisioningProfile.action', {
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
+      r = request(:post, account_path(mac) + '/profile/regenProvisioningProfile.action', {
         teamId: team_id,
         provisioningProfileId: profile_id,
         provisioningProfileName: name,

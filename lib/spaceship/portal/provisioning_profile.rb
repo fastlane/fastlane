@@ -318,12 +318,20 @@ module Spaceship
       #  the repair method will generate a profile with a new ID
       def update!
         unless certificate_valid?
-          if self.kind_of? Development
-            self.certificates = [Spaceship::Certificate::Development.all.first]
-          elsif self.kind_of? InHouse
-            self.certificates = [Spaceship::Certificate::InHouse.all.first]
+          if mac?
+            if self.kind_of? Development
+              self.certificates = [Spaceship::Certificate::MacDevelopment.all(mac: true).first]
+            else
+              self.certificates = [Spaceship::Certificate::MacProduction.all(mac: true).first]
+            end
           else
-            self.certificates = [Spaceship::Certificate::Production.all.first]
+            if self.kind_of? Development
+              self.certificates = [Spaceship::Certificate::Development.all.first]
+            elsif self.kind_of? InHouse
+              self.certificates = [Spaceship::Certificate::InHouse.all.first]
+            else
+              self.certificates = [Spaceship::Certificate::Production.all.first]
+            end
           end
         end
 
@@ -334,12 +342,13 @@ module Spaceship
             distribution_method,
             app.app_id,
             certificates.map(&:id),
-            devices.map(&:id)
+            devices.map(&:id),
+            mac: mac?
           )
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
-        profile = Spaceship::ProvisioningProfile.all.find do |p|
+        profile = Spaceship::ProvisioningProfile.all(mac: mac?).find do |p|
           p.name == self.name # we can use the name as it's valid
         end
 
@@ -351,7 +360,7 @@ module Spaceship
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
-          if Spaceship::Certificate.all.collect(&:id).include?(c.id)
+          if Spaceship::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
             return true
           end
         end
