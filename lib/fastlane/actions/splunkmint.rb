@@ -11,7 +11,8 @@ module Fastlane
         command << upload_progress(params)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
-        #result = Fastlane::Actions.sh(command.join(' '), log: false)
+        # will reanable it when it is fixed
+        # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
         result = Helper.is_test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
