@@ -3,6 +3,7 @@ module Fastlane
     class NotifyAction < Action
       def self.run(params)
         require 'terminal-notifier'
+        Helper.log.warn "It's recommended to use the new 'notification' method instead of 'notify'".yellow
 
         text = params.join(' ')
         TerminalNotifier.notify(text, title: 'fastlane')
@@ -13,11 +14,14 @@ module Fastlane
       end
 
       def self.author
-        "champo"
+        ["champo", "KrauseFx"]
+      end
+
+      def self.available_options
       end
 
       def self.is_supported?(platform)
-        true
+        Helper.mac?
       end
     end
   end

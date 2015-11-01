@@ -7,7 +7,7 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join('.', params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
         command_prefix = [
           'cd',

@@ -2,30 +2,32 @@ module Fastlane
   module Actions
     class CrashlyticsAction < Action
       def self.run(params)
-        Helper.log.info 'Uploading the IPA to Crashlytics Beta. Time for some ☕️.'.green
-
         params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
         params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
 
+        params.values # to validate all inputs before looking for the ipa/apk
+
         if params[:notes]
-          # We need to store it in a file, because the crashlytics CLI says so
+          require 'tempfile'
+          # We need to store it in a file, because the crashlytics CLI (iOS) says so
           Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
 
-          notes_path = File.join("/tmp", "#{Time.now.to_i}_changelog.txt")
-          File.write(notes_path, params[:notes])
-          params[:notes_path] = notes_path # we can only set it *after* writing the file there
+          changelog = Tempfile.new('changelog')
+          changelog.write(params[:notes])
+          changelog.close
+
+          params[:notes_path] = changelog.path # we can only set it *after* writing the file there as it gets validated
         end
 
-        command = []
-        command << File.join(params[:crashlytics_path], 'submit')
-        command << params[:api_token]
-        command << params[:build_secret]
-        command << "-ipaPath '#{params[:ipa_path]}'"
-        command << "-emails '#{params[:emails]}'" if params[:emails]
-        command << "-notesPath '#{params[:notes_path]}'" if params[:notes_path]
-        command << "-groupAliases '#{params[:groups]}'" if params[:groups]
-        command << "-notifications #{(params[:notifications] ? 'YES' : 'NO')}"
+        if params[:ipa_path]
+          command = Helper::CrashlyticsHelper.generate_ios_command(params)
+        elsif params[:apk_path]
+          command = Helper::CrashlyticsHelper.generate_android_command(params)
+        else
+          raise "You have to either pass an ipa or an apk file to the Crashlytics action".red
+        end
 
+        Helper.log.info 'Uploading the IPA to Crashlytics Beta. Time for some ☕️.'.green
         Helper.log.debug command.join(" ") if $verbose
         Actions.sh command.join(" ")
 
@@ -40,12 +42,33 @@ module Fastlane
 
       def self.available_options
         [
+          # iOS Specific
+          FastlaneCore::ConfigItem.new(key: :ipa_path,
+                                       env_name: "CRASHLYTICS_IPA_PATH",
+                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                       end),
+          # Android Specific
+          FastlaneCore::ConfigItem.new(key: :apk_path,
+                                       env_name: "CRASHLYTICS_APK_PATH",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
+                                       end),
+
+          # General
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
-                                       description: "Path to the submit binary in the Crashlytics bundle",
+                                       description: "Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)",
                                        default_value: Dir["./Pods/Crashlytics/Crashlytics.framework"].last,
+                                       optional: true,
                                        verify_block: proc do |value|
-                                         raise "No Crashlytics path given or found, pass using `crashlytics_path: 'path'`".red unless File.exist?(value)
+                                         raise "Couldn't find crashlytics at path '#{File.expand_path(value)}'`".red unless File.exist?(File.expand_path(value))
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
@@ -58,13 +81,6 @@ module Fastlane
                                        description: "Crashlytics Build Secret",
                                        verify_block: proc do |value|
                                          raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value and !value.empty?
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :ipa_path,
-                                       env_name: "CRASHLYTICS_IPA_PATH",
-                                       description: "Path to your IPA file. Optional if you use the `ipa` or `xcodebuild` action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
-                                       verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
@@ -97,7 +113,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        [:ios, :mac, :android].include?(platform)
       end
 
       def self.author

@@ -6,8 +6,8 @@ describe Fastlane do
       ff = nil
       begin
         ff = Fastlane::FastFile.new.parse("lane :test do
-          snapshot(noclean: true)
-          snapshot
+          add_git_tag(build_number: 0)
+          add_git_tag(build_number: 1)
         end")
       rescue
       end
@@ -15,7 +15,7 @@ describe Fastlane do
       result = ff.runner.execute(:test)
 
       expect(ff.collector.launches).to eq({
-        snapshot: 2
+        add_git_tag: 2
       })
     end
 
@@ -27,8 +27,8 @@ describe Fastlane do
       ff = nil
       begin
         ff = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag(build_number: 1)
           example_action
-          snapshot
         end")
       rescue
       end
@@ -36,7 +36,7 @@ describe Fastlane do
       result = ff.runner.execute(:test)
 
       expect(ff.collector.launches).to eq({
-        snapshot: 1
+        add_git_tag: 1
       })
     end
   end

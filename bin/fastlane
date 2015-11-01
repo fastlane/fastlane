@@ -26,12 +26,12 @@ class FastlaneApplication
     always_trace!
 
     command :trigger do |c|
-      c.syntax = 'fastlane trigger [lane]'
+      c.syntax = 'fastlane [lane]'
       c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, options|
-        if Fastlane::FastlaneFolder.path
+        if Fastlane::FastlaneFolder.setup?
           Fastlane::CommandLineHandler.handle(args, options)
         else
           create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
@@ -131,6 +131,22 @@ class FastlaneApplication
       end
     end
 
+    command :enable_crash_reporting do |c|
+      c.syntax = 'fastlane enable_crash_reporting'
+      c.description = 'Enable crash reporting to improve fastlane'
+      c.action do |args, options|
+        FastlaneCore::CrashReporting.enable
+      end
+    end
+
+    command :disable_crash_reporting do |c|
+      c.syntax = 'fastlane disable_crash_reporting'
+      c.description = 'Disable crash reporting'
+      c.action do |args, options|
+        FastlaneCore::CrashReporting.disable
+      end
+    end
+
     default_command :trigger
 
     run!
@@ -140,6 +156,8 @@ end
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
   FastlaneApplication.new.run
+rescue => ex
+  FastlaneCore::CrashReporting.handle_crash(ex)
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
 end

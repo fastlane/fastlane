@@ -62,54 +62,6 @@ carthage(
 )
 ```
 
-### [xctool](https://github.com/facebook/xctool)
-
-You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
-
-```ruby
-xctool :test
-```
-
-It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
-
-If you prefer to have the build configuration stored in the `Fastfile`:
-
-```ruby
-xctool :test, [
-      "--workspace", "'AwesomeApp.xcworkspace'",
-      "--scheme", "'Schema Name'",
-      "--configuration", "Debug",
-      "--sdk", "iphonesimulator",
-      "--arch", "i386"
-    ].join(" ")
-```
-
-
-### [snapshot](https://github.com/KrauseFx/snapshot)
-
-```ruby
-snapshot
-```
-
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
-
-```ruby
-snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
-)
-```
-
-Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
-
 ### [gym](https://github.com/fastlane/gym)
 
 `gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
@@ -145,6 +97,39 @@ Add this action to your `appstore` lane. Keep in mind this action might take sev
 
 ```ruby
 verify_xcode
+```
+
+### [snapshot](https://github.com/KrauseFx/snapshot)
+
+```ruby
+snapshot
+```
+
+To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
+
+To skip cleaning the project on every build use ```snapshot(noclean: true)```.
+
+To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
+
+Other options
+
+```ruby
+snapshot(
+  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
+  noclean: true, # Skip cleaning
+  verbose: true, # Show output of UIAutomation
+  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+)
+```
+
+Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+
+### clear_derived_data
+
+Clears the Xcode Derived Data at path `~/Library/Developer/Xcode/DerivedData`
+
+```ruby
+clear_derived_data
 ```
 
 ### ipa
@@ -406,6 +391,24 @@ If you use `gym` the `dsym` parameter is optional.
 
 ## Testing
 
+### [scan](https://github.com/KrauseFx/scan)
+
+`scan` makes it super easy to run tests of your iOS and Mac applications
+
+```ruby
+scan
+```
+
+You can define all options that are available in `scan --help`
+
+```ruby
+scan(
+  workspace: "App.xcworkspace",
+  scheme: "MyTests",
+  clean: false
+)
+```
+
 ### xctest
 
 Use the `xctest` command to run unit tests.
@@ -426,6 +429,28 @@ When running tests, coverage reports can be generated via [xcpretty](https://git
       output: './build-dir/test-report.xml'
     }]
   )
+```
+
+### [xctool](https://github.com/facebook/xctool)
+
+You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).
+
+```ruby
+xctool :test
+```
+
+It is recommended to have the `xctool` configuration stored in a [`.xctool-args`](https://github.com/facebook/xctool#configuration-xctool-args) file.
+
+If you prefer to have the build configuration stored in the `Fastfile`:
+
+```ruby
+xctool :test, [
+      "--workspace", "'AwesomeApp.xcworkspace'",
+      "--scheme", "'Schema Name'",
+      "--configuration", "Debug",
+      "--sdk", "iphonesimulator",
+      "--arch", "i386"
+    ].join(" ")
 ```
 
 ### [slather](https://github.com/venmo/slather)
@@ -709,7 +734,7 @@ increment_build_number(
   build_number: '75' # set a specific number
 )
 
-increment_build_numer(
+increment_build_number(
   build_number: 75, # specify specific build number (optional, omitting it increments by one)
   xcodeproj: './path/to/MyApp.xcodeproj' # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
 )
@@ -1247,11 +1272,11 @@ Post a message to a **group chat**.
   )
 ```
 
-### Notify
+### Notification
 Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
 ```ruby
-  notify "Finished driving lane"
+  notification(subtitle: "Finished Building", message: "Ready to upload...")
 ```
 
 [ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
@@ -1381,6 +1406,16 @@ else
 end
 ```
 
+### verify_pods_keys
+
+Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
+
+```ruby
+verify_pods_keys
+```
+
+Will raise an error if any key is empty or a single character.
+
 ### read_podspec
 
 Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
@@ -1410,6 +1445,18 @@ pod_trunk(path: 'TSMessages.podspec')
 
 # You may also push to a private repo instead of Trunk
 pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
+```
+
+### clean_cocoapods_cache
+
+Cleanup the Cocoapods cache.
+
+```ruby
+# Clean entire cocoapods cache.
+clean_cocoapods_cache
+
+# Alternatively, supply the name of pod to be removed from cache.
+clean_cocoapods_cache(name: 'CACHED POD')
 ```
 
 ### prompt

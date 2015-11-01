@@ -1,11 +1,11 @@
 describe Fastlane do
   describe Fastlane::Setup do
     it "#files_to_copy" do
-      expect(Fastlane::Setup.new.files_to_copy).to eq(['Deliverfile', 'Snapfile', 'deliver', 'snapshot.js', 'snapshot-iPad.js', 'SnapshotHelper.js', 'screenshots'])
+      expect(Fastlane::SetupIos.new.files_to_copy).to eq(['Deliverfile', 'deliver', 'screenshots'])
     end
 
     it "#show_infos" do
-      Fastlane::Setup.new.show_infos
+      Fastlane::SetupIos.new.show_infos
     end
 
     describe "Complete setup process" do
@@ -25,15 +25,20 @@ describe Fastlane do
       end
 
       it "setup is successful and generated inital Fastfile" do
+        if FastlaneCore::Helper.mac?
+          require 'snapshot'
+          require 'snapshot/setup'
+          expect(Snapshot::Setup).to receive(:create).with("/tmp/setup_workspace/fastlane")
+        end
+
         Fastlane::FastlaneFolder.create_folder!(workspace)
-        setup = Fastlane::Setup.new
+        setup = Fastlane::SetupIos.new
         expect(setup.run).to eq(true)
-        expect(setup.tools).to eq({deliver: true, snapshot: true, xctool: true, cocoapods: true, sigh: true, carthage: false})
+        expect(setup.tools).to eq({deliver: true, snapshot: FastlaneCore::Helper.mac?, xctool: true, cocoapods: true, sigh: true, carthage: false})
 
         content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
         expect(content).to include "# update_fastlane"
         expect(content).to include "# opt_out_usage"
-        expect(content).to include "  snapshot"
         expect(content).to include "  deliver"
         expect(content).to include "  xctool"
         expect(content).to include "gym(scheme: \"y\")"

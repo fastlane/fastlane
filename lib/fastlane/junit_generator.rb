@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Fastlane
   class JUnitGenerator
     def self.generate(results)
@@ -9,23 +7,23 @@ module Fastlane
       containing_folder = Fastlane::FastlaneFolder.path || Dir.pwd
       path = File.join(containing_folder, 'report.xml')
 
-      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
-        xml.testsuites(name: 'fastlane') do
-          xml.testsuite(name: 'deploy') do
-            results.each_with_index do |current, index|
-              xml.testcase(name: [index, current[:name]].join(': '), time: current[:time]) do
-                xml.failure(message: current[:error]) if current[:error]
-                xml.system_out current[:output] if current[:output]
-              end
-            end
-          end
-        end
+      @steps = results
+      xml_path = File.join(lib_path, "assets/report_template.xml.erb")
+      xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+
+      xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
+
+      File.write(path, xml)
+
+      return path
+    end
+
+    def self.lib_path
+      if !Helper.is_test? and Gem::Specification.find_all_by_name('fastlane').any?
+        return [Gem::Specification.find_by_name('fastlane').gem_dir, 'lib'].join('/')
+      else
+        return './lib'
       end
-      result = builder.to_xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
-
-      File.write(path, result)
-
-      path
     end
   end
 end

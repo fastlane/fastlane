@@ -6,30 +6,19 @@ module Fastlane
 
     class SnapshotAction < Action
       def self.run(params)
-        $verbose = true if params[:verbose]
-        clean = !params[:noclean]
-        build = !params[:nobuild]
-
-        if Helper.test?
-          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = Dir.pwd
-          return clean
-        end
-
+        return nil unless Helper.mac?
         require 'snapshot'
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
-
-        ENV['SNAPSHOT_SKIP_OPEN_SUMMARY'] = "1" # it doesn't make sense to show the HTML page here
-
         begin
-          Dir.chdir(params[:snapshot_file_path] || FastlaneFolder.path) do
-            Snapshot::SnapshotConfig.shared_instance
-            Snapshot::Runner.new.work(clean: clean, build: build)
+          FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
 
-            results_path = Snapshot::SnapshotConfig.shared_instance.screenshots_path
+          Snapshot.config = params
+          Snapshot::DependencyChecker.check_simulators
+          Snapshot::Runner.new.work
 
-            Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(results_path) # absolute URL
-          end
+          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(params[:output_directory]) # absolute URL
+
+          true
         ensure
           FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
         end
@@ -40,30 +29,9 @@ module Fastlane
       end
 
       def self.available_options
-        [
-          FastlaneCore::ConfigItem.new(key: :noclean,
-                                       env_name: "FL_SNAPSHOT_NO_CLEAN",
-                                       description: "Skips the clean process when building the app",
-                                       is_string: false,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :verbose,
-                                       env_name: "FL_SNAPSHOT_VERBOSE",
-                                       description: "Print out the UI Automation output",
-                                       is_string: false,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :snapshot_file_path,
-                                       env_name: "FL_SNAPSHOT_CONFIG_PATH",
-                                       description: "Specify a path to the directory containing the Snapfile",
-                                       default_value: FastlaneFolder.path || Dir.pwd, # defaults to fastlane folder
-                                       verify_block: proc do |value|
-                                         raise "Couldn't find folder '#{value}'. Make sure to pass the path to the directory not the file!".red unless File.directory?(value)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :nobuild,
-                                       env_name: "FL_SNAPSHOT_NO_BUILD",
-                                       description: "Skip the build process and use a pre-built .app under your build_dir",
-                                       is_string: false,
-                                       default_value: false)
-        ]
+        return [] unless Helper.mac?
+        require 'snapshot'
+        Snapshot::Options.available_options
       end
 
       def self.author
