@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Clean Cocoapods Cache Integration" do
+    describe "Appledoc Integration" do
       it "default use case" do
         result = Fastlane::FastFile.new.parse("lane :test do
           appledoc(
