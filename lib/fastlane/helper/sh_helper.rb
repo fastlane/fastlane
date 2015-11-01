@@ -23,6 +23,7 @@ module Fastlane
       else
         exit_status = nil
         IO.popen(command, err: [:child, :out]) do |io|
+          io.sync = true
           io.each do |line|
             Helper.log.info ['[SHELL]', line.strip].join(': ')
             result << line
