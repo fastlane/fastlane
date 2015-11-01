@@ -1321,6 +1321,24 @@ end
 
 ## Misc
 
+### appledoc
+
+Generate Apple-like source code documentation from specially formatted source code comments.
+
+```ruby
+appledoc(
+      project_name: "MyProjectName",
+      project_company: "Company Name",
+      company_id: "com.company.id",
+      input: "MyProjectSources",
+      output: "/tmp/appledoc/myProjectDocs",
+      options: "--keep-intermediate-files --search-undocumented-doc",
+      warnings: "--warn-missing-output-path --warn-missing-company-id",
+      exit_threshold: 2 # Exit code threshold below which 0 is returned
+    )
+```
+Use ``appledoc --help`` to see the list of all command line options.
+
 ### download
 
 Download a file from a remote server (e.g. JSON file)
