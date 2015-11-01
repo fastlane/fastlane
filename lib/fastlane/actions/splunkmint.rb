@@ -8,15 +8,19 @@ module Fastlane
         command += proxy_options(params)
         command += upload_options(params)
         command << upload_url
+        command << upload_progress(params)
 
-        result = Fastlane::Actions.sh(command.join(' '), log: false)
+        # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
+        #result = Fastlane::Actions.sh(command.join(' '), log: false)
+        shell_command = command.join(' ')
+        result = Helper.is_test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
 
         result
       end
 
       def self.fail_on_error(result)
-        if result.include?("error") || result.include?("Excess found")
+        if result.include?("error")
           raise "Server error, failed to upload the dSYM file".red
         end
       end
@@ -26,7 +30,11 @@ module Fastlane
       end
 
       def self.verbose(params)
-        params[:verbose] ? "--verbose" : "--silent"
+        params[:verbose] ? "--verbose" : ""
+      end
+
+      def self.upload_progress(params)
+        params[:upload_progress] ? " --progress-bar -o /dev/null --no-buffer" : ""
       end
 
       def self.dsym_path(params)
@@ -90,6 +98,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SPLUNKMINT_VERBOSE",
                                        description: "Make detailed output",
+                                       is_string: false,
+                                       default_value: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :upload_progress,
+                                       env_name: "FL_SPLUNKMINT_UPLOAD_PROGRESS",
+                                       description: "Show upload progress",
                                        is_string: false,
                                        default_value: false,
                                        optional: true),
