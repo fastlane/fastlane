@@ -43,7 +43,8 @@ describe Fastlane do
             xcconfig: 'my.xcconfig',
             buildlog_path: 'mypath',
             raw_buildlog: false,
-            xcpretty_output: 'test'
+            xcpretty_output: 'test',
+            xcargs: '-newArgument YES'
           )
         end").runner.execute(:test)
 
@@ -64,6 +65,7 @@ describe Fastlane do
           + "-exportProvisioningProfile \"MyApp Distribution\" " \
           + "-exportSigningIdentity \"Distribution: MyCompany, LLC\" " \
           + "-exportWithOriginalSigningIdentity " \
+          + "-newArgument YES " \
           + "-project \"MyApp.xcodeproj\" " \
           + "-resultBundlePath \"/result/bundle/path\" " \
           + "-scheme \"MyApp\" " \
