@@ -58,7 +58,8 @@ describe Fastlane do
                                    "wadus",
                                    "secret",
                                    "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
-                                   "-notifications YES"
+                                   "-notifications YES",
+                                   "-debug NO"
                                   ])
           end
 
@@ -77,7 +78,8 @@ describe Fastlane do
              "wadus",
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
-             "-notifications YES"
+             "-notifications YES",
+             "-debug NO"
             ].each do |to_be|
               expect(command).to include(to_be)
             end
@@ -99,7 +101,8 @@ describe Fastlane do
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
-              "-notifications YES"
+              "-notifications YES",
+              "-debug NO"
             ])
           end
 
@@ -120,7 +123,8 @@ describe Fastlane do
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
-              "-notifications YES"
+              "-notifications YES",
+              "-debug NO"
             ])
           end
 
@@ -141,7 +145,53 @@ describe Fastlane do
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
-              "-notifications NO"
+              "-notifications NO",
+              "-debug NO"
+            ])
+          end
+
+          it "works when using TrueClass variable in place of debug parameter" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+
+            command = Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  debug: 'true'
+                })
+              end").runner.execute(:test)
+
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-notifications YES",
+              "-debug YES"
+            ])
+          end
+
+          it "works when using 'false' String variable in place of debug parameter" do
+            ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
+            ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+
+            command = Fastlane::FastFile.new.parse("lane :test do
+              crashlytics({
+                ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                notifications: 'false',
+                debug: 'false'
+              })
+            end").runner.execute(:test)
+
+            expect(command).to eq([
+              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              "wadus",
+              "secret",
+              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
+              "-notifications NO",
+              "-debug NO"
             ])
           end
 
@@ -168,7 +218,8 @@ describe Fastlane do
               "-emails 'email1,email2'",
               "-notesPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
               "-groupAliases 'groups,123'",
-              "-notifications NO"])
+              "-notifications NO",
+              "-debug NO"])
           end
         end
 
