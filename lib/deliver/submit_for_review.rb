@@ -35,18 +35,6 @@ module Deliver
 
       start = Time.now
 
-      loop do
-        processing = v.candidate_builds.find_all(&:processing)
-        break if processing.count == 0
-
-        Helper.log.info "Waiting iTunes Connect processing... this might take a while..."
-        if (Time.now - start) > (60 * 5)
-          Helper.log.info ""
-          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
-        end
-        sleep 30
-      end
-
       build = nil
       v.candidate_builds.each do |b|
         if !build or b.upload_date > build.upload_date
@@ -57,6 +45,17 @@ module Deliver
       unless build
         Helper.log.fatal v.candidate_builds
         raise "Could not find build to select".red
+      end
+
+      loop do
+        break if build.processing == false
+
+        Helper.log.info "Waiting iTunes Connect processing... this might take a while..."
+        if (Time.now - start) > (60 * 5)
+          Helper.log.info ""
+          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
+        end
+        sleep 30
       end
 
       Helper.log.info "Selecting build #{build.train_version} (#{build.build_version})..."
