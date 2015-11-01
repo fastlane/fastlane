@@ -458,7 +458,7 @@ module Fastlane
         params_hash[:build] = true
         params_hash[:test] = true
 
-        if params.key? :enable_code_coverage 
+        if params.key? :enable_code_coverage
           params[:enableCodeCoverage] = params[:enable_code_coverage] ? 'YES' : 'NO'
         end
 
