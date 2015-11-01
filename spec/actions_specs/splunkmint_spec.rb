@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Splunk MINT integration" do
       it "verbosity is set correctly" do
         expect(Fastlane::Actions::SplunkmintAction.verbose(verbose: true)).to eq "--verbose"
-        expect(Fastlane::Actions::SplunkmintAction.verbose(verbose: false)).to eq "--silent"
+        expect(Fastlane::Actions::SplunkmintAction.verbose(verbose: false)).to eq ""
       end
 
       it "upload url is set correctly" do
@@ -152,6 +152,31 @@ describe Fastlane do
         expect(result).to include('--verbose')
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
+        expect(result).not_to include('-x')
+        expect(result).not_to include('--proxy-user')
+      end
+
+      it "show progres bar option is used" do
+        ENV['DSYM_OUTPUT_PATH'] = nil
+        ENV['DSYM_ZIP_PATH'] = nil
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
+
+        file_path = '/tmp/file.dSYM.zip'
+        FileUtils.touch file_path
+        result = Fastlane::FastFile.new.parse("lane :test do
+          splunkmint(dsym: '/tmp/file.dSYM.zip',
+                      api_key: '33823d3a',
+                      api_token: 'e05ba40754c4869fb7e0b61',
+                      verbose: true,
+                      upload_progress: true)
+        end").runner.execute(:test)
+
+        expect(result).to include("-F file=@/tmp/file.dSYM.zip")
+        expect(result).to include('--verbose')
+        expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
+        expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
+        expect(result).to include('--progress-bar -o /dev/null --no-buffer')
         expect(result).not_to include('-x')
         expect(result).not_to include('--proxy-user')
       end
