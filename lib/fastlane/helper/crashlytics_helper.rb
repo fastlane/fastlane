@@ -15,6 +15,7 @@ module Fastlane
           command << "-notesPath '#{params[:notes_path]}'" if params[:notes_path]
           command << "-groupAliases '#{params[:groups]}'" if params[:groups]
           command << "-notifications #{(params[:notifications] ? 'YES' : 'NO')}"
+          command << "-debug #{(params[:debug] ? 'YES' : 'NO')}"
 
           return command
         end
