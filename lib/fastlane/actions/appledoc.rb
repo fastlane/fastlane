@@ -349,7 +349,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :exit_threshold,
                                        env_name: "FL_APPLEDOC_OPTIONS_EXIT_THRESHOLD",
                                        description: "Exit code threshold below which 0 is returned",
-                                       is_string: true,
+                                       is_string: false,
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :docs_section_title,
@@ -369,13 +369,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :logformat,
                                        env_name: "FL_APPLEDOC_LOGFORMAT",
                                        description: "Log format [0-3]",
-                                       is_string: true,
+                                       is_string: false,
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_APPLEDOC_VERBOSE",
                                        description: "Log verbosity level [0-6,xcode]",
-                                       is_string: true,
+                                       is_string: false,
                                        optional: true)
         ]
       end
