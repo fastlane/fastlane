@@ -21,7 +21,7 @@ task :clone do
     if File.directory? repo
       sh "cd #{repo} && git pull"
     else
-      sh "git clone https://github.com/krausefx/#{repo}"
+      sh "git clone https://github.com/fastlane/#{repo}"
     end
   end
 end
@@ -124,7 +124,7 @@ task :unreleased do
         output.split("\n").each do |line|
           puts "\t" + line.split(' ', 1).last # we don't care about the commit ID
         end
-        puts "\nhttps://github.com/KrauseFx/#{repo}/compare/#{last_tag}...master"
+        puts "\nhttps://github.com/fastlane/#{repo}/compare/#{last_tag}...master"
       end
     end
   end
