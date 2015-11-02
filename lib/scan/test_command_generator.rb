@@ -59,13 +59,21 @@ module Scan
       def pipe
         # During building we just show the output in the terminal
         # Check out the ReportCollector class for more xcpretty things
-        formatter = ""
+        formatter = []
         if Helper.ci?
-          formatter = "-f `xcpretty-travis-formatter`"
+          formatter << "-f `xcpretty-travis-formatter`"
           Helper.log.info "Automatically switched to Travis formatter".green
         end
 
-        ["| tee '#{xcodebuild_log_path}' | xcpretty #{formatter}"]
+        if Scan.config[:output_style] == 'basic'
+          formatter << "--no-utf"
+        end
+
+        if Scan.config[:output_style] == 'rspec'
+          formatter << "--test"
+        end
+
+        ["| tee '#{xcodebuild_log_path}' | xcpretty #{formatter.join(' ')}"]
       end
 
       # Store the raw file

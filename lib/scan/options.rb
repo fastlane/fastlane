@@ -49,6 +49,14 @@ module Scan
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
                                      description: "The directory in which all reports will be stored",
                                      default_value: "./test_output"),
+        FastlaneCore::ConfigItem.new(key: :output_style,
+                                     short_option: "-b",
+                                     env_name: "SCAN_OUTPUT_STYLE",
+                                     description: "Define how the output should look like (standard, basic or rspec)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       raise "Invalid output_style #{value}".red unless ['standard', 'basic', "rspec"].include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
                                      env_name: "SCAN_OUTPUT_TYPES",
