@@ -32,7 +32,7 @@ WatchBuild
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/watchbuild/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/watchbuild.svg?style=flat)](http://rubygems.org/gems/watchbuild)
 
-###### Because you would rather spend your time building stuff than fighting provisioning
+###### Get a notification once your iTunes Connect build is finished processing
 
 WatchBuild is a simple tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect. 
 
@@ -92,20 +92,6 @@ For a list of available parameters and commands run
 - [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
-
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
-
-It will show you the `mobileprovision` files like this: 
-![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
-
-## App Identifier couldn't be found
-
-If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/produce), which does exactly that.
-
-## What happens to my Xcode managed profiles?
-
-`sigh` will never touch or use the profiles which are created and managed by Xcode. Instead `sigh` will manage its own set of provisioning profiles.
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
