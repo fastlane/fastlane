@@ -86,6 +86,7 @@ module Gym
           file_name = [Gym.config[:output_name], Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
           Gym.cache[:archive_path] = File.join(build_path, file_name.join(" ") + ".xcarchive")
         end
+
         if File.extname(Gym.cache[:archive_path]) != ".xcarchive"
           Gym.cache[:archive_path] += ".xcarchive"
         end
