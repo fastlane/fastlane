@@ -35,13 +35,13 @@ module WatchBuild
         raise "Could not find build".red
       end
 
+      start = Time.now
       loop do
         break if build.processing == false
 
-        Helper.log.info "Waiting iTunes Connect processing... this might take a while..."
+        Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
         if (Time.now - start) > (60 * 5)
-          Helper.log.info ""
-          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
+          Helper.log.info "You can now tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
         end
         sleep 30
       end
