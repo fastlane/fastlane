@@ -6,7 +6,8 @@ module Fastlane
         sh "curl -Lso #{zip_path} #{params[:url]}"
         Action.sh "unzip -qo '#{zip_path}' -d '#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins'"
 
-        Helper.log.info("Plugin #{File.basename(params[:url], '.zip')} installed successfully")
+        Helper.log.info("Plugin #{File.basename(params[:url], '.zip')} installed successfully".green)
+        Helper.log.info("Please restart Xcode to use the newly installed plugin")
       end
 
       #####################################################
