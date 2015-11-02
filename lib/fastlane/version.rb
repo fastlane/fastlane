@@ -1,3 +1,3 @@
 module Fastlane
-  VERSION = '1.36.4'
+  VERSION = '1.37.0'
 end
