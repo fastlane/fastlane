@@ -1,8 +1,7 @@
-APPALOOSA_SERVER = 'http://appaloosa-store.com/api/v1'
-
 module Fastlane
   module Actions
     class AppaloosaAction < Action
+      APPALOOSA_SERVER = 'http://appaloosa-int.herokuapp.com/api/v1'
       def self.run(params)
         require 'http'
 
@@ -18,10 +17,49 @@ module Fastlane
 
         binary = normalize_binary_name params[:binary]
         remove_extra_screenshots_file params[:screenshots]
+        binary_url = get_binary_link binary, api_key, store_id, params[:group_ids]
+        return if binary_url.nil?
         screenshots_url = get_screenshots_links api_key, store_id, params[:screenshots], params[:locale], params[:device]
-        binary_url = get_binary_link binary, api_key, store_id
         upload_on_appaloosa api_key, store_id, binary_url, screenshots_url, params[:group_ids]
         reset_original_binary_names binary, params[:binary]
+      end
+
+      def self.get_binary_link(binary, api_key, store_id, group_ids)
+        key_s3 = upload_on_s3 binary, store_id, group_ids
+        return if key_s3.nil?
+        get_s3_url api_key, store_id, key_s3
+      end
+
+      def self.upload_on_s3(file, store_id, group_ids = '')
+        file_name = file.split('/').last
+        response = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/fastlane",
+                            json: { store_id: store_id,
+                                    file: file_name,
+                                    group_ids: group_ids })
+        if response.status == 404
+          return nil if error_detected("A problem occurred with your API token and your store id. Please try again.")
+        end
+        json_res = JSON.parse response
+        return if error_detected json_res['errors']
+        url = json_res['s3_sign']
+        path = json_res['path']
+        uri = URI.parse(Base64.decode64(url))
+        File.open(file, 'rb') do |f|
+          Net::HTTP.start(uri.host) do |http|
+            http.send_request('PUT', uri.request_uri, f.read, 'content-type' => '')
+          end
+        end
+        path
+      end
+
+      def self.get_s3_url(api_key, store_id, path)
+        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/fastlane/url_for_download",
+                               json: { store_id: store_id,
+                                       api_key: api_key,
+                                       key: path })
+        json_res = JSON.parse binary_path
+        return if error_detected json_res['errors']
+        json_res['binary_url']
       end
 
       def self.reset_original_binary_names(current_name, original_name)
@@ -33,11 +71,6 @@ module Fastlane
         File.unlink(extra_file) if File.exist?(extra_file)
       end
 
-      def self.get_binary_link(binary, api_key, store_id)
-        key_s3 = upload_on_s3 binary
-        get_s3_url api_key, store_id, key_s3
-      end
-
       def self.normalize_binary_name(binary)
         binary_rename = binary.delete(' ')
         File.rename("#{binary}", "#{binary_rename}")
@@ -45,7 +78,7 @@ module Fastlane
       end
 
       def self.create_an_account(email)
-        response = HTTP.post("#{APPALOOSA_SERVER}/bitrise_binaries/create_an_account", form: { email: email })
+        response = HTTP.post("#{APPALOOSA_SERVER}/fastlane/create_an_account", form: { email: email })
         JSON.parse response
       end
 
@@ -53,11 +86,11 @@ module Fastlane
         api_key.size == 0 && store_id.size == 0
       end
 
-      def self.upload_screenshots(screenshots)
+      def self.upload_screenshots(screenshots, store_id)
         return if screenshots.nil?
         list = []
         list << screenshots.map do |screen|
-          upload_on_s3 screen
+          upload_on_s3 screen, store_id
         end
       end
 
@@ -71,7 +104,8 @@ module Fastlane
 
       def self.get_screenshots_links(api_key, store_id, screenshots_path, locale, device)
         screenshots = get_screenshots screenshots_path, locale, device
-        uploaded = upload_screenshots screenshots
+        return if screenshots.nil?
+        uploaded = upload_screenshots screenshots, store_id
         links = get_uploaded_links uploaded, api_key, store_id
         links.kind_of?(Array) ? links.flatten : nil
       end
@@ -83,6 +117,7 @@ module Fastlane
       end
 
       def self.screenshots_list(path, locale, device)
+        return warning_detected("screenshots folder not found") unless Dir.exist?("#{path}/#{locale}")
         list = Dir.entries("#{path}/#{locale}") - ['.', '..']
         list.map do |screen|
           next if screen.match(device).nil?
@@ -102,17 +137,18 @@ module Fastlane
                                        screenshot3: screenshots[2],
                                        screenshot4: screenshots[3],
                                        screenshot5: screenshots[4],
-                                       group_ids: group_ids
+                                       group_ids: group_ids,
+                                       provider: 'fastlane'
                                      }
                                    })
         json_res = JSON.parse response
-        puts json_res
+        Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
       end
 
       def self.all_screenshots_links(screenshots)
         if screenshots.nil?
           screens = %w(screenshot1 screenshot2 screenshot3 screenshot4 screenshot5)
-          screenshots = screens.map do |_k, v|
+          screenshots = screens.map do |_k, _v|
             ''
           end
         else
@@ -124,30 +160,6 @@ module Fastlane
         screenshots
       end
 
-      def self.get_s3_url(api_key, store_id, path)
-        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/bitrise_binaries/url_for_download",
-                               json: { store_id: store_id, api_key: api_key, key: path })
-        json_res = JSON.parse binary_path
-        return if error_detected json_res['errors']
-        json_res['binary_url']
-      end
-
-      def self.upload_on_s3(file)
-        file_name = file.split('/').last
-        response = HTTP.get("#{APPALOOSA_SERVER}/bitrise_binaries/fastlane",
-                            json: { file: file_name })
-        json_res = JSON.parse response
-        url = json_res['s3_sign']
-        path = json_res['path']
-        uri = URI.parse(Base64.decode64(url))
-        File.open(file, 'rb') do |f|
-          Net::HTTP.start(uri.host) do |http|
-            http.send_request('PUT', uri.request_uri, f.read, 'content-type' => '')
-          end
-        end
-        path
-      end
-
       def self.get_env_value(option)
         available_options.map do |opt|
           opt if opt.key == option.to_sym
@@ -156,11 +168,16 @@ module Fastlane
 
       def self.error_detected(errors)
         if errors
-          puts "ERROR: #{errors}".red
+          Helper.log.info("ERROR: #{errors}".red)
           true
         else
           false
         end
+      end
+
+      def self.warning_detected(warning)
+        Helper.log.info("WARNING: #{warning}".yellow)
+        nil
       end
 
       #####################################################
