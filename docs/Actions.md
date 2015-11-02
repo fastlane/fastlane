@@ -197,6 +197,16 @@ update_app_group_identifiers(
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
+### [xcode_install](https://github.com/neonichu/xcode-install)
+
+Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. 
+
+This will make sure to use the correct Xcode for later actions.
+
+```ruby
+xcode_install(version: "7.1")
+```
+
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
 Use this command if you are supporting multiple versions of Xcode
 

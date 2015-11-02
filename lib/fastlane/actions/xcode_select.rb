@@ -30,7 +30,7 @@ module Fastlane
 
         Helper.log.info "Setting Xcode version to #{xcode_path} for all build steps"
 
-        ENV["DEVELOPER_DIR"] = xcode_path + "/Contents/Developer"
+        ENV["DEVELOPER_DIR"] = File.join(xcode_path, "/Contents/Developer")
       end
 
       def self.description

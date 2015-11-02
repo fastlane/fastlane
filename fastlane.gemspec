@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rest-client', '~> 1.8.0' # Needed for mailgun action
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
+  spec.add_dependency 'xcode-install', '~> 1.0.0' # Download new Xcode versions
 
   spec.add_dependency 'fastlane_core', '>= 0.26.1', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.10.0', '< 1.0.0' # Password Manager
