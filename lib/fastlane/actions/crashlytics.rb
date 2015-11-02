@@ -108,7 +108,13 @@ module Fastlane
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
                                        description: "Crashlytics notification option (true/false)",
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :debug,
+                                       env_name: "CRASHLYTICS_DEBUG",
+                                       description: "Crashlytics debug option (true/false)",
+                                       default_value: false,
                                        is_string: false)
+
         ]
       end
 

@@ -152,7 +152,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-`fastlane` is designed to make your life easier by bringing together all `fastlane` tools under one roof. 
+`fastlane` is designed to make your life easier by bringing together all `fastlane` tools
 
 - [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
