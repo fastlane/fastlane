@@ -21,12 +21,10 @@
 </p>
 -------
 
-<p align="center">
-  <img src="assets/sigh.png" height="110">
-</p>
-
 WatchBuild
 ============
+
+<img src="assets/screenshot.png">
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/watchbuild/blob/master/LICENSE)
