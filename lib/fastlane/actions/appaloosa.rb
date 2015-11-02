@@ -64,7 +64,7 @@ module Fastlane
       end
 
       def self.reset_original_binary_names(current_name, original_name)
-        File.rename("#{current_name}", "#{original_name}")
+        File.rename("#{current_name}", "#{original_name}") 
       end
 
       def self.remove_extra_screenshots_file(screenshots_env)
@@ -74,7 +74,7 @@ module Fastlane
 
       def self.normalize_binary_name(binary)
         binary_rename = binary.delete(' ')
-        File.rename("#{binary}", "#{binary_rename}")
+        File.rename("#{binary}", "#{binary_rename}") 
         binary_rename
       end
 
@@ -102,13 +102,12 @@ module Fastlane
           get_s3_url api_key, store_id, url
         end
       end
-
       def self.get_screenshots_links(api_key, store_id, screenshots_path, locale, device)
         screenshots = get_screenshots screenshots_path, locale, device
         return if screenshots.nil?
         uploaded = upload_screenshots screenshots, store_id
         links = get_uploaded_links uploaded, api_key, store_id
-        links.kind_of?(Array) ? links.flatten : nil
+        links.is_a?(Array) ? links.flatten : nil
       end
 
       def self.get_screenshots(screenshots_path, locale, device)
@@ -127,7 +126,7 @@ module Fastlane
       end
 
       def self.upload_on_appaloosa(api_key, store_id, binary_path, screenshots, group_ids)
-        screenshots = all_screenshots_links screenshots
+        screenshots = set_all_screenshots_links screenshots
         response = HTTP.post("#{APPALOOSA_SERVER}/#{store_id}/applications/upload",
                              json: { store_id: store_id,
                                      api_key: api_key,
@@ -146,7 +145,7 @@ module Fastlane
         Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
       end
 
-      def self.all_screenshots_links(screenshots)
+      def self.set_all_screenshots_links(screenshots)
         if screenshots.nil?
           screens = %w(screenshot1 screenshot2 screenshot3 screenshot4 screenshot5)
           screenshots = screens.map do |_k, _v|
