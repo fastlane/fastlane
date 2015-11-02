@@ -1536,3 +1536,11 @@ update_info_plist(
   display_name: 'MyNewApp' # Optional. The new Display Name of your app
 )
 ```
+
+### install_xcode_plugin
+
+Install an Xcode plugin for the current user
+
+```ruby
+install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+```
