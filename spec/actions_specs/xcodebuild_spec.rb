@@ -390,6 +390,58 @@ describe Fastlane do
       end
     end
 
+    describe "test code coverage" do
+      it "code coverage is enabled" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            destination_timeout: 240,
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            enable_code_coverage: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination-timeout \"240\" " \
+          + "-enableCodeCoverage \"YES\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "test " \
+          + "| tee '#{build_log_path}' | xcpretty --color --test"
+        )
+      end
+
+      it "code coverage is disabled" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            destination_timeout: 240,
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            enable_code_coverage: false
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination-timeout \"240\" " \
+          + "-enableCodeCoverage \"NO\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "build " \
+          + "test " \
+          + "| tee '#{build_log_path}' | xcpretty --color --test"
+        )
+      end
+    end
+
     describe "test reporting" do
       it "should work with xcpretty report params" do
         result = Fastlane::FastFile.new.parse("lane :test do
