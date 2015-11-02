@@ -23,7 +23,8 @@ module Fastlane
                                        env_name: "FL_XCODE_PLUGIN_URL",
                                        description: "URL for Xcode plugin ZIP file",
                                        verify_block: proc do |value|
-                                         raise "No URL for InstallXcodePluginAction given, pass using `url: 'url'`".red unless value and !value.empty?
+                                         raise "No URL for InstallXcodePluginAction given, pass using `url: 'url'`".red if value.to_s.length == 0
+                                         raise "URL doesn't use HTTPS".red unless value.start_with?("https://")
                                        end)
         ]
       end
