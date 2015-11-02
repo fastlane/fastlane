@@ -72,7 +72,7 @@ For a list of available parameters and commands run
     watchbuild --help
 
 ## How is my password stored?
-`sigh` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
+`WatchBuild` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
