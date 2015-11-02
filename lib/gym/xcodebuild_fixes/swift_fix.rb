@@ -61,7 +61,7 @@ module Gym
         files = []
         Zip::File.open(zipfile) do |zip_file|
           zip_file.each do |entry|
-            files << entry.name if entry.name.match file_pattern
+            files << entry.name if entry.name.force_encoding("utf-8").match file_pattern
           end
         end
         files
