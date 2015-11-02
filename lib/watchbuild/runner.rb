@@ -21,22 +21,10 @@ module WatchBuild
 
     def wait_for_build
       raise "Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}".red unless app
-      v = app.latest_version
-
-      build = nil
-      v.candidate_builds.each do |b|
-        if !build or b.upload_date > build.upload_date
-          build = b
-        end
-      end
-
-      unless build
-        Helper.log.fatal v.candidate_builds
-        raise "Could not find build".red
-      end
 
       start = Time.now
       loop do
+        build = find_build
         break if build.processing == false
 
         Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
@@ -57,12 +45,31 @@ module WatchBuild
                               title: build.app_name,
                            subtitle: "#{build.train_version} (#{build.build_version})",
                             execute: "open '#{url}'")
+
+      Helper.log.info "Successfully finished processing the build".green
+      Helper.log.info url
     end
 
     private
 
     def app
       @app ||= Spaceship::Application.find(WatchBuild.config[:app_identifier])
+    end
+
+    def find_build
+      build = nil
+      app.latest_version.candidate_builds.each do |b|
+        if !build or b.upload_date > build.upload_date
+          build = b
+        end
+      end
+
+      unless build
+        Helper.log.fatal v.candidate_builds
+        raise "Could not find build".red
+      end
+
+      return build
     end
   end
 end
