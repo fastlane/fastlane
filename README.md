@@ -51,6 +51,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 -------
 
 # Installation
+
     sudo gem install watchbuild
 
 Make sure, you have the latest version of the Xcode command line tools installed:
@@ -68,6 +69,8 @@ You can pass your bundle identifier and username like this:
 For a list of available parameters and commands run
 
     watchbuild --help
+
+<img src="assets/terminal.png">
 
 ## How is my password stored?
 `WatchBuild` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
