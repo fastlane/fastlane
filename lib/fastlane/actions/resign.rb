@@ -50,10 +50,10 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          files = case value
-                                         when Hash; value.values
-                                         when Enumerable; value
-                                         else [value]
-                                         end
+                                                 when Hash then value.values
+                                                 when Enumerable then value
+                                                 else [value]
+                                                 end
                                          files.each do |file|
                                            raise "Couldn't find provisiong profile at path '#{file}'".red unless File.exist?(file)
                                          end
