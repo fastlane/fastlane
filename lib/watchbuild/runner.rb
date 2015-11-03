@@ -15,29 +15,26 @@ module WatchBuild
       Spaceship::Tunes.login(WatchBuild.config[:username], nil)
       Helper.log.info "Successfully logged in"
 
+      start = Time.now
       build = wait_for_build
-      notification(build)
+      minutes = ((Time.now - start) / 60).round
+      notification(build, minutes)
     end
 
     def wait_for_build
       raise "Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}".red unless app
 
-      start = Time.now
       loop do
         build = find_build
-        break if build.processing == false
+        return build if build.processing == false
 
         Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
-        if (Time.now - start) > (60 * 5)
-          Helper.log.info "You can now tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
-        end
         sleep 30
       end
-
-      return build
+      nil
     end
 
-    def notification(build)
+    def notification(build, minutes)
       require 'terminal-notifier'
 
       url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{@app.apple_id}/activity/ios/builds/#{build.train_version}/#{build.build_version}/details"
@@ -47,6 +44,8 @@ module WatchBuild
                             execute: "open '#{url}'")
 
       Helper.log.info "Successfully finished processing the build".green
+      Helper.log.info "You can now tweet: "
+      Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
       Helper.log.info url
     end
 
