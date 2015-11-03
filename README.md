@@ -24,17 +24,19 @@
 WatchBuild
 ============
 
-<img src="assets/screenshot.png">
-
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/watchbuild/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/watchbuild.svg?style=flat)](http://rubygems.org/gems/watchbuild)
 
 ###### Get a notification once your iTunes Connect build is finished processing
 
+<img src="assets/screenshot.png" width=350>
+
 WatchBuild is a simple tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect. 
 
 As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) varies from a few minutes to multiple hours, we sometimes forget to check iTunes Connect to see if the build is ready. WatchBuild does that for you.
+
+Once the build is ready to be pushed to TestFlight or for review, you get a Mac OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
