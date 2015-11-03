@@ -49,7 +49,11 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         files = value.kind_of?(Enumerable) ? value.map { |fst, snd| snd || fst } : [value]
+                                         files = case value
+                                         when Hash; value.values
+                                         when Enumerable; value
+                                         else [value]
+                                         end
                                          files.each do |file|
                                            raise "Couldn't find provisiong profile at path '#{file}'".red unless File.exist?(file)
                                          end
