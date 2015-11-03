@@ -130,6 +130,10 @@ In general, if you run into issues while exporting the archive, try using:
 
     gym --use_legacy_build_api true
 
+Set the right export method if you're not uploading to App Store or TestFlight:
+
+    gym --export_method ad-hoc
+
 To pass boolean parameters make sure to use `gym` like this:
 
     gym --include_bitcode true --include_symbols false
