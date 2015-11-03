@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Cert
   class Runner
     def launch
@@ -8,6 +10,8 @@ module Cert
     end
 
     def run
+      FileUtils.mkdir_p(Cert.config[:output_path])
+
       FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [], title: "Summary for cert #{Cert::VERSION}")
 
       Helper.log.info "Starting login with user '#{Cert.config[:username]}'"
@@ -73,9 +77,9 @@ module Cert
       end
 
       # Store all that onto the filesystem
-      request_path = File.join(Cert.config[:output_path], 'CertCertificateSigningRequest.certSigningRequest')
+      request_path = File.expand_path(File.join(Cert.config[:output_path], 'CertCertificateSigningRequest.certSigningRequest'))
       File.write(request_path, csr.to_pem)
-      private_key_path = File.join(Cert.config[:output_path], 'private_key.p12')
+      private_key_path = File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12'))
       File.write(private_key_path, pkey)
       cert_path = store_certificate(certificate)
 
@@ -93,7 +97,7 @@ module Cert
     end
 
     def store_certificate(certificate)
-      path = File.join(Cert.config[:output_path], "#{certificate.id}.cer")
+      path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.cer"))
       raw_data = certificate.download_raw
       File.write(path, raw_data)
       return path
