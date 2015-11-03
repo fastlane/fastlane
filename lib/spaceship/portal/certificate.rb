@@ -90,19 +90,19 @@ module Spaceship
 
       # An In House code signing certificate used for enterprise distributions
       class InHouse < Certificate; end
-      
+
       # A Mac development code signing certificate used for development environment
       class MacDevelopment < Certificate; end
-      
+
       # A Mac production code signing certificate for building .app bundles
       class MacAppDistribution < Certificate; end
-      
+
       # A Mac production code signing certificate for building .pkg installers
       class MacInstallerDistribution < Certificate; end
-      
+
       # A Mac Developer ID signing certificate for building .app bundles
       class DeveloperIDApplication < Certificate; end
-      
+
       # A Mac Developer ID signing certificate for building .pkg installers
       class DeveloperIDInstaller < Certificate; end
 
@@ -131,10 +131,10 @@ module Spaceship
 
       # ApplePay certificate
       class ApplePay < Certificate; end
-      
+
       # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
-      
+
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
@@ -148,9 +148,9 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => WebsitePush,
-        "4APLUP237T" => ApplePay,
+        "4APLUP237T" => ApplePay
       }
-      
+
       MAC_CERTIFICATE_TYPE_IDS = {
         "749Y1QAGU7" => MacDevelopment,
         "HXZEUKP0FP" => MacAppDistribution,
@@ -163,7 +163,7 @@ module Spaceship
         # "FUOY7LWJET" => WebsitePush,
         # "3T2ZP62QW8" => ?
       }
-      
+
       CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
@@ -312,7 +312,7 @@ module Spaceship
         self.kind_of? PushCertificate
       end
       # rubocop:enable Style/PredicateName
-      
+
       # @return (Bool) Is this a Mac profile?
       def mac?
         MAC_CERTIFICATE_TYPE_IDS.include? type_display_id

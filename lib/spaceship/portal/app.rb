@@ -73,7 +73,7 @@ module Spaceship
         def factory(attrs)
           self.new(attrs)
         end
-        
+
         # @param mac [Bool] Fetches Mac apps if true
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
@@ -138,7 +138,7 @@ module Spaceship
         app = client.update_service_for_app(self, service)
         self.class.factory(app)
       end
-      
+
       # @return (Bool) Is this a Mac app?
       def mac?
         platform == 'mac'

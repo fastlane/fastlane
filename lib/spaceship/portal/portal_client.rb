@@ -91,7 +91,7 @@ module Spaceship
       return @in_house unless @in_house.nil?
       @in_house = (team_information['type'] == 'In-House')
     end
-    
+
     def platform_slug(mac)
       if mac
         'mac'

@@ -88,7 +88,7 @@ module Spaceship
         def all_ipod_touches
           client.devices_by_class('ipod').map { |device| self.factory(device) }
         end
-        
+
         # @return (Array) Returns all Macs registered for this account
         def all_macs
           all(mac: true)

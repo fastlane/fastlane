@@ -382,7 +382,7 @@ module Spaceship
       def managed_by_xcode?
         managing_app == 'Xcode'
       end
-      
+
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
