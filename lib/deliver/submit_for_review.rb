@@ -48,6 +48,11 @@ module Deliver
       end
 
       loop do
+        v.candidate_builds.each do |b|
+          if b.upload_date == build.upload_date
+            build = b
+          end
+        end
         break if build.processing == false
 
         Helper.log.info "Waiting iTunes Connect processing... this might take a while..."
