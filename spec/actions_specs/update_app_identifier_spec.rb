@@ -44,6 +44,17 @@ describe Fastlane do
       end
 
       it "updates the xcode project when product bundle identifier in use" do
+        stub_project = 'stub project'
+        stub_configuration = 'stub config'
+        stub_object = ['object']
+        stub_settings = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
+
+        expect(Xcodeproj::Project).to receive(:open).with('/tmp/fastlane/tests/fastlane/bundle.xcodeproj').and_return(stub_project)
+        expect(stub_project).to receive(:objects).and_return(stub_object)
+        expect(stub_object).to receive(:select).and_return([stub_configuration])
+        expect(stub_configuration).to receive(:build_settings).and_return(stub_settings)
+        expect(stub_project).to receive(:save)
+
         create_plist_with_identifier("$(#{identifier_key})")
         Fastlane::FastFile.new.parse("lane :test do
           update_app_identifier ({
@@ -53,24 +64,19 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        project = Xcodeproj::Project.open(xcodeproj)
-        configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
-        configs.each do |c|
-          result = c.build_settings[identifier_key]
-          expect(result).to eq("#{app_identifier}")
-        end
+        expect(stub_settings['PRODUCT_BUNDLE_IDENTIFIER']).to eq('com.test.plist')
       end
 
       it "should raise an exception when PRODUCT_BUNDLE_IDENTIFIER in info plist but not project" do
+        stub_project = 'stub project'
+        stub_configuration = 'stub config'
+        stub_object = ['object']
+
+        expect(Xcodeproj::Project).to receive(:open).with('/tmp/fastlane/tests/fastlane/bundle.xcodeproj').and_return(stub_project)
+        expect(stub_project).to receive(:objects).and_return(stub_object)
+        expect(stub_object).to receive(:select).and_return([])
+
         create_plist_with_identifier("$(#{identifier_key})")
-
-        project = Xcodeproj::Project.open(xcodeproj)
-        configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
-        configs.each do |c|
-          c.build_settings.delete(identifier_key)
-        end
-        project.save
-
         expect do
           Fastlane::FastFile.new.parse("lane :test do
           update_app_identifier ({
