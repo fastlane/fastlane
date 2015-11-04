@@ -31,7 +31,7 @@ deliver
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/deliver/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
-[![Build Status](https://img.shields.io/travis/KrauseFx/deliver/master.svg?style=flat)](https://travis-ci.org/KrauseFx/deliver)
+[![Build Status](https://img.shields.io/travis/fastlane/deliver/master.svg?style=flat)](https://travis-ci.org/fastlane/deliver)
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
