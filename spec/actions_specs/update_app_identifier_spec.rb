@@ -1,3 +1,6 @@
+require 'xcodeproj'
+include Xcodeproj
+
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update App Identifier Integration" do
