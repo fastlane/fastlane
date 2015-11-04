@@ -4,11 +4,14 @@ module Snapshot
     def self.set_additional_default_values
       config = Snapshot.config
 
-      FastlaneCore::Project.detect_projects(config)
+      # First, try loading the Snapfile from the current directory
+      config.load_configuration_file(Snapshot.snapfile_name)
 
+      # Detect the project
+      FastlaneCore::Project.detect_projects(config)
       Snapshot.project = FastlaneCore::Project.new(config)
 
-      # Go into the project's folder
+      # Go into the project's folder, as there might be a Snapfile there
       Dir.chdir(File.expand_path("..", Snapshot.project.path)) do
         config.load_configuration_file(Snapshot.snapfile_name)
       end
