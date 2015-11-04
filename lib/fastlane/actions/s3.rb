@@ -2,7 +2,6 @@
 # rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
-require 'shenzhen'
 
 module Fastlane
   module Actions
@@ -28,6 +27,7 @@ module Fastlane
 
     class S3Action < Action
       def self.run(config)
+        require 'shenzhen'
         # Calling fetch on config so that default values will be used
         params = {}
         params[:ipa] = config[:ipa]
