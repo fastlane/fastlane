@@ -35,6 +35,8 @@ This allows you to also support more complex setups, for example if your app sup
 
 Check out the [MindNode Setup](https://github.com/fastlane/examples/blob/master/MindNode/Fastfile) that shows you how to set different provisioning profiles for various targets.
 
+To be sure to have a valid code signing identity installed as well, you can add a `cert` call before the `sigh` action.
+
 ### Hacky Solution: Modify the Xcode project
 Using the [update_project_provisioning](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#update_project_provisioning) action you can modify your Xcode project's targets to use a specific provisioning profile. 
 
