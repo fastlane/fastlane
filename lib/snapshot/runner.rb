@@ -14,7 +14,7 @@ module Snapshot
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
-      FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary")
+      FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
