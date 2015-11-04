@@ -70,7 +70,7 @@ module Deliver
       end
 
       unless build
-        Helper.log.fatal v.candidate_builds
+        Helper.log.fatal app.latest_version.candidate_builds
         raise "Could not find build".red
       end
 
