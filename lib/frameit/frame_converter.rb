@@ -18,7 +18,7 @@ module Frameit
       system("open '#{DOWNLOAD_URL}'")
       puts "----------------------------------------------------".green
       puts "Download the zip files for the following devices".green
-      puts "iPhone 6, iPhone 6 Plus, iPhone 5s and iPad mini 3".green
+      puts "iPhone 6s, iPhone 6s Plus, iPhone 5s and iPad mini 4".green
       puts "You only need to download the devices you want to use".green
       puts "Press Enter when you downloaded the zip files".green
       puts "----------------------------------------------------".green
