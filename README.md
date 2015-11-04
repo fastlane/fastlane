@@ -130,6 +130,7 @@ Here a few links to get started:
 - [WWDC 2015 Introduction to UI Tests](https://developer.apple.com/videos/play/wwdc2015-406/)
 - [A first look into UI Tests](http://www.mokacoding.com/blog/xcode-7-ui-testing/)
 - [UI Testing in Xcode 7](http://masilotti.com/ui-testing-xcode-7/)
+- [HSTestingBackchannel : ‘Cheat’ by communicating directly with your app](https://github.com/ConfusedVorlon/HSTestingBackchannel)
 
 **Note**: Since there is no official way to trigger a screenshot from UI Tests, `snapshot` uses a workaround (described in [How Does It Work?](#how-does-it-work)) to trigger a screenshot. If you feel like this should be done right, please duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
