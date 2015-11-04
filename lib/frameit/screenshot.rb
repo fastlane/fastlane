@@ -31,8 +31,12 @@ module Frameit
         return 'iPhone_4'
       when sizes::IOS_IPAD
         return 'iPad-mini'
+      when sizes::IOS_IPAD_PRO
+        return 'iPad-Pro'
       when sizes::MAC
         return 'Mac'
+      else
+        Helper.log.error "Unknown device type for size #{@screen_size} for path '#{path}'"
       end
     end
 

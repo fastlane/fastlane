@@ -10,7 +10,8 @@ module Frameit
         screenshot.color
       ]
       joiner = "_"
-      if screenshot.device_name == 'iPad-mini'
+
+      if screenshot.device_name.include?('iPad')
         parts = [
           screenshot.device_name,
           (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver"),

@@ -32,6 +32,11 @@ module Frameit
             'offset' => '+47+135',
             'width' => 737
           }
+        when size::IOS_IPAD_PRO
+          return {
+            'offset' => '+48+90',
+            'width' => 805
+          }
         end
       when Orientation::LANDSCAPE
         case screenshot.screen_size
@@ -59,6 +64,11 @@ module Frameit
           return {
             'offset' => '+135+47',
             'width' => 983
+          }
+        when size::IOS_IPAD_PRO
+          return {
+            'offset' => '+88+48',
+            'width' => 1075
           }
         end
       end
