@@ -10,7 +10,7 @@ module FastlaneCore
         File.write(file_path, "1")
         puts "Successfully enabled crash reporting for future crashes".green
         puts "This will only send the stack trace the installed gems to sentry".green
-        puts "Thanks for helping making fastlane better".green
+        puts "Thanks for help making fastlane better".green
       end
 
       def disable
