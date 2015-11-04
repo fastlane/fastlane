@@ -38,6 +38,12 @@ As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) v
 
 Once the build is ready to be pushed to TestFlight or for review, you get a Mac OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
 
+### Why use WatchBuild?
+
+WatchBuild is a standalone tool and can be used without any of the other [fastlane tools](https://fastlane.tools). This is *big*, since you can use WatchBuild also if you use Xcode to upload your app. 
+
+This tool is not a replacement for [deliver](https://github.com/fastlane/deliver) (Upload metadata and builds to iTunes Connect) or [pilot](https://github.com/fastlane/pilot) (Upload and distribute new builds to TestFlight), but is meant as a standalone tool with the main purpose to just wait for the binary processing to be finished.
+
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
 -------
