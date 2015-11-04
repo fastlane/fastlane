@@ -2,6 +2,7 @@ module Frameit
   class Offsets
     # Returns the image offset needed for a certain device type for a given orientation
     # uses deliver to detect the screen size
+    # rubocop:disable Metrics/MethodLength
     def self.image_offset(screenshot)
       size = Deliver::AppScreenshot::ScreenSize
       case screenshot.orientation_name
@@ -73,5 +74,6 @@ module Frameit
         end
       end
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end

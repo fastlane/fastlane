@@ -15,7 +15,7 @@ module Frameit
         parts = [
           screenshot.device_name,
           (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver"),
-          (screenshot.orientation_name == "Horz" ? "horizontal" : "vertical"),
+          (screenshot.orientation_name == "Horz" ? "horizontal" : "vertical")
         ]
         joiner = "-"
       end
