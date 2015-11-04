@@ -136,7 +136,7 @@ private_lane :validate_repo do |options|
 
   # Run the tests
   #
-  sh "cd .. && rspec"
+  sh "cd .. && bundle exec rspec"
 end
 
 desc "e.g. fastlane/deliver"
