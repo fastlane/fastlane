@@ -32,36 +32,7 @@ module Deliver
       Helper.log.info "Selecting the latest build..."
       app = options[:app]
       v = app.edit_version
-
-      start = Time.now
-
-      build = nil
-      v.candidate_builds.each do |b|
-        if !build or b.upload_date > build.upload_date
-          build = b
-        end
-      end
-
-      unless build
-        Helper.log.fatal v.candidate_builds
-        raise "Could not find build to select".red
-      end
-
-      loop do
-        v.candidate_builds.each do |b|
-          if b.upload_date == build.upload_date
-            build = b
-          end
-        end
-        break if build.processing == false
-
-        Helper.log.info "Waiting iTunes Connect processing... this might take a while..."
-        if (Time.now - start) > (60 * 5)
-          Helper.log.info ""
-          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
-        end
-        sleep 30
-      end
+      build = wait_for_build(app)
 
       Helper.log.info "Selecting build #{build.train_version} (#{build.build_version})..."
 
@@ -69,6 +40,41 @@ module Deliver
       v.save!
 
       Helper.log.info "Successfully selected build".green
+    end
+
+    def wait_for_build(app)
+      raise "Could not find app with app identifier #{WatchBuild.config[:app_identifier]}".red unless app
+
+      start = Time.now
+
+      loop do
+        build = find_build(app)
+        return build if build.processing == false
+
+        Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
+        if (Time.now - start) > (60 * 5)
+          Helper.log.info ""
+          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
+        end
+        sleep 30
+      end
+      nil
+    end
+
+    def find_build(app)
+      build = nil
+      app.latest_version.candidate_builds.each do |b|
+        if !build or b.upload_date > build.upload_date
+          build = b
+        end
+      end
+
+      unless build
+        Helper.log.fatal v.candidate_builds
+        raise "Could not find build".red
+      end
+
+      return build
     end
   end
 end
