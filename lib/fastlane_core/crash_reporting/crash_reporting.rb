@@ -8,9 +8,9 @@ module FastlaneCore
 
       def enable
         File.write(file_path, "1")
-        puts "Successfully enabled crash reporting for future crashes".green
-        puts "This will only send the stack trace the installed gems to sentry".green
-        puts "Thanks for help making fastlane better".green
+        puts "Successfully enabled crash reporting.".green
+        puts "This will only send a stack trace for installed gems to Sentry.".green
+        puts "Thanks for improving fastlane!".green
       end
 
       def disable
@@ -24,10 +24,10 @@ module FastlaneCore
 
       def show_message
         puts "-------------------------------------------------------------------------------------------".yellow
-        puts "😨  An error occured. Please enable crash reports using `fastlane enable_crash_reporting`".yellow
-        puts "👍  This makes resolving issues much easier and helps improving fastlane".yellow
-        puts "🔒  The reports might contain personal data, but will be stored securely on getsentry.com".yellow
-        puts "✨  Once crash reporting is enabled, you have much cleaner output when something goes wrong".yellow
+        puts "😨  An error occured. Please enable crash reports using `fastlane enable_crash_reporting`.".yellow
+        puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
+        puts "🔒  The reports will be stored securely on getsentry.com.".yellow
+        puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong.".yellow
         puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
       end
@@ -37,12 +37,12 @@ module FastlaneCore
         return if enabled?
 
         puts "-------------------------------------------------------------------------------------------".yellow
-        puts "😃  Do you want to enable crash reporting when fastlane experiences a problem?".yellow
-        puts "👍  This makes resolving issues much easier and helps improving fastlane".yellow
-        puts "🔒  The reports might contain personal data, but will be stored securely on getsentry.com".yellow
-        puts "✨  Once crash reporting is enabled, you have much cleaner output when something goes wrong".yellow
+        puts "😃  Enable crash reporting when fastlane experiences a problem?".yellow
+        puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
+        puts "🔒  The reports will be stored securely on getsentry.com".yellow
+        puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong".yellow
         puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
-        puts "🌴  You can always enable crash reports at a later point using `fastlane enable_crash_reporting`".yellow
+        puts "🌴  You can always disable crash reports at anytime `fastlane disable_crash_reporting`".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
         if agree("Do you want to enable crash reporting? (y/n) ", true)
           enable
@@ -78,9 +78,9 @@ module FastlaneCore
         crash = Raven.capture_exception(ex)
         path = "/tmp/sentry_#{crash.id}.json"
         File.write(path, JSON.pretty_generate(crash.to_hash))
-        puts "Successfully submitted crash report. If this is a problem with one of the tools you want to report".yellow
+        puts "Successfully submitted a crash report. If this is a problem with one of the tools specifically,".yellow
         puts "please submit an issue on GitHub and attach the following number to it: '#{crash.id}'".yellow
-        puts "Also stored the crash report locally '#{path}'".yellow
+        puts "The crash report has been stored locally '#{path}'".yellow
       rescue => ex
         Helper.log.debug ex # We don't want crash reporting to cause crash
       end
