@@ -82,6 +82,10 @@ module Gym
           print "It seems like you ran into this radar"
           print "https://openradar.appspot.com/radar?id=4952000420642816"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
+        when /IDEDistributionErrorDomain error 1/
+          print "There was an error exporting your application"
+          print "Unfortunately the new Xcode export API is unstable and causes problems on some project"
+          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
         raise "Error packaging up the application".red
       end
