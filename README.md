@@ -32,9 +32,11 @@ WatchBuild
 
 <img src="assets/screenshot.png" width=350>
 
-WatchBuild is a simple tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect. 
+When you upload a new binary to iTunes Connect, you have to wait until it's done processing before you can submit it to the App Store.
 
-As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) varies from a few minutes to multiple hours, we sometimes forget to check iTunes Connect to see if the build is ready. WatchBuild does that for you.
+As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) varies from a few minutes to multiple hours, it's easy to forget to check iTunes Connect to see if the build is ready. WatchBuild lets you know as soon as it is done.
+
+WatchBuild is a simple stand-alone tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect. 
 
 Once the build is ready to be pushed to TestFlight or for review, you get a OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
 
