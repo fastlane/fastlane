@@ -14,6 +14,12 @@ module Supply
         download_images(listing)
       end
 
+      client.apks_version_codes.each do |apk_version_code|
+        client.apk_listings(apk_version_code).each do |apk_listing|
+          store_apk_listing(apk_listing)
+        end
+      end
+
       client.abort_current_edit
 
       Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
@@ -62,6 +68,17 @@ module Supply
       end
 
       Helper.log.info "Due to the limit of the Google Play API `supply` can't download your existing screenshots..."
+    end
+
+    def store_apk_listing(apk_listing)
+      containing = File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
+      unless File.exist?(containing)
+        FileUtils.mkdir_p(containing)
+      end
+
+      path = File.join(containing, "#{apk_listing.apk_version_code}.txt")
+      Helper.log.info "Writing to #{path}..."
+      File.write(path, apk_listing.recent_changes)
     end
 
     private

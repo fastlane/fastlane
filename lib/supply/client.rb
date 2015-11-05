@@ -161,6 +161,45 @@ module Supply
       end
     end
 
+    # Get a list of all apks verion codes - returns the list of version codes
+    def apks_version_codes
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.apks.list,
+        parameters: {
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message.red if result.error? && result.status != 404
+
+      return result.data.apks.collect(&:versionCode)
+    end
+
+    # Get a list of all apk listings (changelogs) - returns the list
+    def apk_listings(apk_version_code)
+      ensure_active_edit!
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.apklistings.list,
+        parameters: {
+          'apkVersionCode' => apk_version_code,
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name
+        },
+        authorization: auth_client
+      )
+
+      raise result.error_message.red if result.error? && result.status != 404
+
+      return result.data.listings.collect do |row|
+        ApkListing.new(row.recentChanges, row.language, apk_version_code)
+      end
+    end
+
     #####################################################
     # @!group Modifying data
     #####################################################
@@ -190,11 +229,7 @@ module Supply
       raise result.error_message.red if result.error?
     end
 
-    def upload_apk_to_track(path_to_apk, track)
-      upload_apk_to_track_with_rollout(path_to_apk, track, 1.0)
-    end
-
-    def upload_apk_to_track_with_rollout(path_to_apk, track, rollout)
+    def upload_apk(path_to_apk)
       ensure_active_edit!
 
       apk = Google::APIClient::UploadIO.new(File.expand_path(path_to_apk), 'application/vnd.android.package-archive')
@@ -211,10 +246,16 @@ module Supply
 
       raise result_upload.error_message.red if result_upload.error?
 
+      return result_upload.data.versionCode
+    end
+
+    def update_track(track, rollout, apk_version_code)
+      ensure_active_edit!
+
       track_body = {
         'track' => track,
         'userFraction' => rollout,
-        'versionCodes' => [result_upload.data.versionCode]
+        'versionCodes' => [apk_version_code]
       }
 
       result_update = api_client.execute(
@@ -229,6 +270,28 @@ module Supply
         authorization: auth_client)
 
       raise result_update.error_message.red if result_update.error?
+    end
+
+    def update_apk_listing_for_language(apk_listing)
+      ensure_active_edit!
+
+      body_object = {
+        'language' => apk_listing.language,
+        'recentChanges' => apk_listing.recent_changes
+      }
+
+      result = api_client.execute(
+        api_method: android_publisher.edits.apklistings.update,
+        parameters: {
+          'apkVersionCode' => apk_listing.apk_version_code,
+          'editId' => current_edit.data.id,
+          'packageName' => current_package_name,
+          'language' => apk_listing.language
+        },
+        body_object: body_object,
+        authorization: auth_client
+      )
+      raise result.error_message.red if result.error?
     end
 
     #####################################################

@@ -3,6 +3,7 @@ require 'supply/version'
 require 'supply/options'
 require 'supply/client'
 require 'supply/listing'
+require 'supply/apk_listing'
 require 'supply/uploader'
 
 require 'fastlane_core'
@@ -19,6 +20,8 @@ module Supply
 
   IMAGES_FOLDER_NAME = "images"
   IMAGE_FILE_EXTENSIONS = "{png,jpg,jpeg}"
+
+  CHANGELOGS_FOLDER_NAME = "changelogs"
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
