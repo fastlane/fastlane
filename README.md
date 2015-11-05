@@ -81,7 +81,8 @@ For a list of available parameters and commands run
 <img src="assets/terminal.png">
 
 ## How is my password stored?
-`WatchBuild` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
+
+`WatchBuild` uses the secure [CredentialsManager](https://github.com/fastlane/credentials_manager) from [fastlane](https://fastlane.tools) that stores your credentials in your local keychain. 
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
