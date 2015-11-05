@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://github.com/KrauseFx/fastlane">
+  <a href="https://github.com/fastlane/fastlane">
     <img src="https://raw.githubusercontent.com/KrauseFx/fastlane/master/assets/fastlane_text.png" width=400 />
     <br />
     countdown
@@ -7,14 +7,14 @@
 </h3>
 
 <p align="center">
-  <a href="https://github.com/KrauseFx/deliver">deliver</a> &bull; 
-  <a href="https://github.com/KrauseFx/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/KrauseFx/frameit">frameit</a> &bull; 
-  <a href="https://github.com/KrauseFx/pem">PEM</a> &bull; 
-  <a href="https://github.com/KrauseFx/sigh">sigh</a> &bull; 
-  <a href="https://github.com/KrauseFx/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/cert/produce">cert</a> &bull;
-  <a href="https://github.com/KrauseFx/codes">codes</a> &bull;
+  <a href="https://github.com/fastlane/codes">codes</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
@@ -26,7 +26,7 @@ countdown
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/countdown/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/countdown/blob/master/LICENSE)
 
 ###### Get started with fastlane development the fast way
 
