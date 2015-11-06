@@ -255,7 +255,7 @@ module Spaceship
 
       # We only support platforms that exist ATM
       platform = platforms.find do |p|
-        ['ios', 'osx', 'appletvos'].include? p['platformString']
+        ['ios', 'osx'].include? p['platformString']
       end
 
       version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
