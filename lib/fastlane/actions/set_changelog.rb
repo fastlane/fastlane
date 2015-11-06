@@ -34,7 +34,7 @@ module Fastlane
           end
         end
 
-        Helper.log.info "Going to update the changelog to:\n\n#{changelog}\n\n"
+        Helper.log.info "Going to update the changelog to:\n\n#{changelog.yellow}\n\n"
 
         if (v = app.edit_version)
           if v.version != version_number
