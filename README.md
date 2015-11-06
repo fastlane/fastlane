@@ -154,7 +154,7 @@ I won't go into too much technical details about the various API endpoints, but 
  - Managing apps
  - Managing beta testers
  - Submitting updates to review
- - Manaing app metadata
+ - Managing app metadata
 - `https://du-itc.itunesconnect.apple.com`:
  - Upload icons, screenshots, trailers ...
 
