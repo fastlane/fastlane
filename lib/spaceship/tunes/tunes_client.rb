@@ -514,6 +514,7 @@ module Spaceship
                                             last_name: nil,
                                             review_email: nil,
                                             phone_number: nil,
+                                            significant_change: false,
 
                                             # Optional Metadata:
                                             privacy_policy_url: nil,
@@ -540,6 +541,7 @@ module Spaceship
         current['privacyPolicyUrl']['value'] = privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
+      build_info['significantChange']['value'] = significant_change
       build_info['testInfo']['reviewFirstName']['value'] = first_name
       build_info['testInfo']['reviewLastName']['value'] = last_name
       build_info['testInfo']['reviewPhone']['value'] = phone_number
@@ -559,6 +561,7 @@ module Spaceship
         # only sometimes this is required
 
         encryption_info['usesEncryption']['value'] = encryption
+        encryption_info['encryptionUpdated']['value'] = encryption
 
         r = request(:post) do |req|
           req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
