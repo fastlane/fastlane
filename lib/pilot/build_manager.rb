@@ -64,6 +64,7 @@ module Pilot
       # the upload date of the new buid
       # we use it to identify the build
 
+      start = Time.now
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       loop do
@@ -88,7 +89,10 @@ module Pilot
       end
 
       if full_build
-        Helper.log.info "Build successfully processed by iTunes Connect".green
+        minutes = ((Time.now - start) / 60).round
+        Helper.log.info "Successfully finished processing the build".green
+        Helper.log.info "You can now tweet: "
+        Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
         return full_build
       else
         raise "Error: Seems like iTunes Connect didn't properly pre-process the binary".red
