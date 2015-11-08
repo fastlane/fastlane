@@ -93,10 +93,7 @@ module Cert
 
       request_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.certSigningRequest"))
       File.write(request_path, csr.to_pem)
-<<<<<<< HEAD
 
-=======
->>>>>>> f/CertificateTrusting
       private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       File.write(private_key_path, pkey)
 
