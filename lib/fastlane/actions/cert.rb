@@ -14,21 +14,17 @@ module Fastlane
         FastlaneCore::UpdateChecker.start_looking_for_update('cert') unless Helper.is_test?
 
         begin
-          Dir.chdir(FastlaneFolder.path || Dir.pwd) do
-            # This should be executed in the fastlane folder
+          Cert.config = params # we alread have the finished config
 
-            Cert.config = params # we alread have the finished config
+          Cert::Runner.new.launch
+          cert_file_path = ENV["CER_FILE_PATH"]
+          certificate_id = ENV["CER_CERTIFICATE_ID"]
+          Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
+          Actions.lane_context[SharedValues::CERT_CERTIFICATE_ID] = certificate_id
 
-            Cert::Runner.new.launch
-            cert_file_path = ENV["CER_FILE_PATH"]
-            certificate_id = ENV["CER_CERTIFICATE_ID"]
-            Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
-            Actions.lane_context[SharedValues::CERT_CERTIFICATE_ID] = certificate_id
+          Helper.log.info("Use signing certificate '#{certificate_id}' from now on!".green)
 
-            Helper.log.info("Use signing certificate '#{certificate_id}' from now on!".green)
-
-            ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
-          end
+          ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
         ensure
           FastlaneCore::UpdateChecker.show_update_status('cert', Cert::VERSION)
         end
