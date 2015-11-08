@@ -3,7 +3,14 @@
     "sectionErrorKeys": [],
     "sectionInfoKeys": [],
     "sectionWarningKeys": [],
-    "significantChange": null,
+    "significantChange": {
+      "value": false,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "maxLength": 1,
+      "minLength": 1
+    },
     "build": {
       "sectionErrorKeys": [],
       "sectionInfoKeys": [],

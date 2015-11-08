@@ -83,6 +83,7 @@ describe Spaceship::Tunes::Build do
           last_name: "Krause",
           review_email: "contact@company.com",
           phone_number: "0123456789",
+          significant_change: false,
           privacy_policy_url: nil,
           review_user_name: nil,
           review_password: nil,
