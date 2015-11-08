@@ -9,7 +9,7 @@ module Fastlane
         command << " -T /usr/bin/codesign"
         command << " -T /usr/bin/security"
 
-        Fastlane::Actions.sh command, log: false
+        Fastlane::Actions.sh(command, log: false)
       end
 
       def self.description
@@ -20,16 +20,14 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
-                                       description: "Keychain name into which item",
+                                       description: "Keychain the items should be imported to",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :certificate_path,
-                                       env_name: "",
                                        description: "Path to certificate",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :certificate_password,
-                                       env_name: "",
                                        description: "Certificate password",
-                                       optional: true)
+                                       default_value: "login.keychain")
         ]
       end
 
