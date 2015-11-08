@@ -1448,13 +1448,13 @@ Push a Podspec to Trunk or a private repository
 
 ```ruby
 # If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
-pod_trunk
+pod_push
 
 # Alternatively, supply the Podspec file path
-pod_trunk(path: 'TSMessages.podspec')
+pod_push(path: 'TSMessages.podspec')
 
 # You may also push to a private repo instead of Trunk
-pod_trunk(path: 'TSMessages.podspec', repo: 'MyRepo')
+pod_push(path: 'TSMessages.podspec', repo: 'MyRepo')
 ```
 
 ### clean_cocoapods_cache
