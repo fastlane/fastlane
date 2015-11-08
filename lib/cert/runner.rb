@@ -79,7 +79,7 @@ module Cert
       # Store all that onto the filesystem
       request_path = File.expand_path(File.join(Cert.config[:output_path], 'CertCertificateSigningRequest.certSigningRequest'))
       File.write(request_path, csr.to_pem)
-      private_key_path = File.expand_path(File.join(Cert.config[:output_path], 'private_key.p12'))
+      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       File.write(private_key_path, pkey)
       cert_path = store_certificate(certificate)
 
