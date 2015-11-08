@@ -27,7 +27,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :certificate_password,
                                        description: "Certificate password",
-                                       default_value: "login.keychain")
+                                       optional: true)
         ]
       end
 
