@@ -56,6 +56,7 @@ module Snapshot
         'iPhone6' => "iPhone 6",
         'iPhone5' => "iPhone 5",
         'iPhone4' => "iPhone 4",
+        'iPadPro' => "iPad Pro",
         'iPad' => "iPad",
         'Mac' => "Mac"
       }
