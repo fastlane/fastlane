@@ -131,6 +131,7 @@ Here a few links to get started:
 - [A first look into UI Tests](http://www.mokacoding.com/blog/xcode-7-ui-testing/)
 - [UI Testing in Xcode 7](http://masilotti.com/ui-testing-xcode-7/)
 - [HSTestingBackchannel : ‘Cheat’ by communicating directly with your app](https://github.com/ConfusedVorlon/HSTestingBackchannel)
+- [Automating App Store screenshots using fastlane snapshot and frameit](https://tisunov.github.io/2015/11/06/automating-app-store-screenshots-generation-with-fastlane-snapshot-and-sketch.html)
 
 **Note**: Since there is no official way to trigger a screenshot from UI Tests, `snapshot` uses a workaround (described in [How Does It Work?](#how-does-it-work)) to trigger a screenshot. If you feel like this should be done right, please duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
