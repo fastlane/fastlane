@@ -4,7 +4,11 @@ module Cert
       raise "Could not find file '#{path}'".red unless File.exist?(path)
       keychain = Cert.config[:keychain_path] || "#{Dir.home}/Library/Keychains/login.keychain"
 
-      puts `security import '#{path}' -k '#{keychain}'`
+      command = "security import #{path.shellescape} -k '#{keychain}'"
+      command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
+      command << " -T /usr/bin/security"
+      Helper.log.info command.yellow
+      Helper.log.info `#{command}`
     end
   end
 end
