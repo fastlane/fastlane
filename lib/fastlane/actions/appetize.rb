@@ -32,7 +32,7 @@ module Fastlane
         params.merge!(privateKey: options[:private_key]) unless options[:private_key].nil?
         req.body = JSON.generate(params)
         response = https.request(req)
-        if parse_response response
+        if parse_response(response)
           Helper.log.info "App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}"
           Helper.log.info "Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}"
           Helper.log.info "App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}"
@@ -53,7 +53,7 @@ module Fastlane
           Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
           Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
           Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
-          return true
+          true
         rescue
           Helper.log.fatal "Error uploading to Appetize.io: #{response.body}".red
           help_message(response)
