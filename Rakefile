@@ -1,5 +1,5 @@
 
-GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply)
+GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild danger)
 RAILS = %w(boarding refresher enhancer)
 
 #####################################################
