@@ -733,6 +733,18 @@ nexus_upload(
 )
 ```
 
+### [Appetize.io](https://appetize.io/)
+
+Upload your zipped app to Appetize.io
+
+```ruby
+appetize(
+    api_token: 'yourapitoken',
+    url: 'https://example.com/your/zipped/app.zip',
+    private_key: 'yourprivatekey'
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
