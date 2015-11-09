@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    let(:response_string) {
+    let(:response_string) do
       <<-"EOS"
       {
         "privateKey" : "private_Djksfj",
@@ -9,17 +9,17 @@ describe Fastlane do
         "manageURL"  : "https://appetize.io/manage/private_Djksfj"
       }
       EOS
-    }
+    end
     let(:api_token) { 'mysecrettoken' }
     let(:url) { 'https://example.com/app.zip' }
     let(:http) { double('http') }
     let(:request) { double('request') }
     let(:response) { double('response') }
-    let(:params) {
+    let(:params) do
       {token: api_token,
        url: url,
        platform: 'ios'}
-    }
+    end
     before do
       allow(Net::HTTP).to receive(:new).and_return(http)
       allow(Net::HTTP::Post).to receive(:new).and_return(request)
@@ -40,7 +40,7 @@ describe Fastlane do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
-              'api_token': '#{api_token}'
+              api_token: '#{api_token}'
             })
           end").runner.execute(:test)
         end.to raise_error
@@ -49,7 +49,7 @@ describe Fastlane do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
-              'url': '#{url}'
+              url: '#{url}'
             })
           end").runner.execute(:test)
         end.to raise_error
@@ -58,8 +58,8 @@ describe Fastlane do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
-              'api_token': '#{api_token}',
-              'url': '#{url}'
+              api_token: '#{api_token}',
+              url: '#{url}'
             })
           end").runner.execute(:test)
         end.not_to raise_error
