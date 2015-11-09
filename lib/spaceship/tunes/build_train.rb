@@ -79,6 +79,13 @@ module Spaceship
         data['trains'].each do |train|
           train["#{testing_type}Testing"]['value'] = false
           train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
+
+          #also update the builds
+          train['builds'].each do |build|
+            next if build["#{testing_type}Testing"].nil?
+            build["#{testing_type}Testing"]['value'] = false
+            build["#{testing_type}Testing"]['value'] = new_value if build['trainVersion'] == version_string
+          end
         end
 
         result = client.update_build_trains!(application.apple_id, testing_type, data)
