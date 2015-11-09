@@ -53,12 +53,14 @@ module Fastlane
       # @!group Git Actions
       #####################################################
       def self.clone(git_url)
-        dir = Dir.mktmpdir
-        command = "git clone '#{git_url}' '#{dir}' --depth 1"
+        return @dir if @dir
+
+        @dir = Dir.mktmpdir
+        command = "git clone '#{git_url}' '#{@dir}' --depth 1"
         Helper.log.info "Cloning remote git repo..."
         Actions.sh(command)
 
-        return dir
+        return @dir
       end
 
       def self.commit_changes(path)
@@ -73,8 +75,6 @@ module Fastlane
             Action.sh(command)
           end
         end
-
-        FileUtils.rm_rf(path)
       end
     end
   end
