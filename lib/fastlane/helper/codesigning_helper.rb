@@ -5,9 +5,6 @@ module Fastlane
       # @!group General
       #####################################################
 
-      def self.import_certificates
-      end
-
       def self.import(params, item_path)
         command = "security import #{item_path.shellescape} -k ~/Library/Keychains/#{params[:keychain_name].shellescape}"
         command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
@@ -30,7 +27,8 @@ module Fastlane
       def self.generate_certificate(params)
         arguments = ConfigurationHelper.parse(Actions::CertAction, {
           development: params[:type] == :development,
-          output_path: File.join(params[:path], "certs")
+          output_path: File.join(params[:path], "certs"),
+          force: true # we don't need a certificate without its private key
         })
 
         Actions::CertAction.run(arguments)

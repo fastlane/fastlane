@@ -25,7 +25,7 @@ module Fastlane
 
         if certs.count == 0 or keys.count == 0
           Helper.log.error "Couldn't find a valid code signing identity in the git repo..."
-          ConfigurationHelper.generate_certificate(params)
+          Helper::CodesigningHelper.generate_certificate(params)
         end
 
         # Install the provisioning profiles
@@ -38,7 +38,7 @@ module Fastlane
         if params[:app_identifier]
           # identifiers include the prefix, e.g. 439BBMAA67.tools.fastlane.app
           unless identifiers.any? { |a| a.include?(params[:app_identifier]) }
-            ConfigurationHelper.generate_provisioning_profile(params)
+            Helper::CodesigningHelper.generate_provisioning_profile(params)
           end
         end
 
@@ -47,6 +47,7 @@ module Fastlane
         # We have to remove the provisioning profile path from the lane context
         # as the temporary folder gets deleted
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] = nil
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = nil
 
         Helper.log.info "All required keys, certificates and provisioning profiles are installed 🙌".green
       end
