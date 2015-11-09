@@ -4,11 +4,16 @@ module Fastlane
   module Actions
     class SetupCodesigningAction < Action
       def self.run(params)
+        cert_type = :distribution
+        cert_type = :development if params[:type] == :development
+
+        prov_type = params[:type]
+
         params[:path] = Helper::CodesigningHelper.clone(params[:git_url]) if params[:git_url]
 
-        certs = Dir[File.join(params[:path], "**", "*.cer")]
-        keys = Dir[File.join(params[:path], "**", "*.p12")]
-        profiles = Dir[File.join(params[:path], "**", "*.mobileprovision")]
+        certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
+        keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
+        profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
 
         certs.each do |cert|
           if FastlaneCore::CertChecker.installed?(cert)
@@ -25,7 +30,7 @@ module Fastlane
 
         if certs.count == 0 or keys.count == 0
           Helper.log.error "Couldn't find a valid code signing identity in the git repo..."
-          Helper::CodesigningHelper.generate_certificate(params)
+          Helper::CodesigningHelper.generate_certificate(params, cert_type)
         end
 
         # Install the provisioning profiles
@@ -38,7 +43,7 @@ module Fastlane
         if params[:app_identifier]
           # identifiers include the prefix, e.g. 439BBMAA67.tools.fastlane.app
           unless identifiers.any? { |a| a.include?(params[:app_identifier]) }
-            Helper::CodesigningHelper.generate_provisioning_profile(params)
+            Helper::CodesigningHelper.generate_provisioning_profile(params, prov_type)
           end
         end
 

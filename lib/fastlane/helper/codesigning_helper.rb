@@ -24,10 +24,10 @@ module Fastlane
       #####################################################
       # @!group Generate missing resources
       #####################################################
-      def self.generate_certificate(params)
+      def self.generate_certificate(params, cert_type)
         arguments = ConfigurationHelper.parse(Actions::CertAction, {
           development: params[:type] == :development,
-          output_path: File.join(params[:path], "certs"),
+          output_path: File.join(params[:path], "certs", cert_type.to_s),
           force: true # we don't need a certificate without its private key
         })
 
@@ -36,12 +36,14 @@ module Fastlane
         Dir[File.join(params[:path], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
       end
 
-      def self.generate_provisioning_profile(params)
+      def self.generate_provisioning_profile(params, prov_type)
+        prov_type = :enterprise if ENV["SIGH_PROFILE_ENTERPRISE"]
+
         arguments = ConfigurationHelper.parse(Actions::SighAction, {
           app_identifier: params[:app_identifier],
           adhoc: params[:type] == :adhoc,
           development: params[:type] == :development,
-          output_path: File.join(params[:path], "profiles")
+          output_path: File.join(params[:path], "profiles", prov_type.to_s)
         })
 
         Actions::SighAction.run(arguments)
