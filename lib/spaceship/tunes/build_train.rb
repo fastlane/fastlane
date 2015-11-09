@@ -72,17 +72,20 @@ module Spaceship
         end
       end
 
+      #TODO: override internal_testing, external_testing setters and getters
+
       # @param (testing_type) internal or external
-      def update_testing_status!(new_value, testing_type)
+      def update_testing_status!(new_value, testing_type, build)
         data = client.build_trains(self.application.apple_id, testing_type)
 
         data['trains'].each do |train|
           train["#{testing_type}Testing"]['value'] = false
           train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
 
-          #also update the builds
+          # also update the builds
           train['builds'].each do |build|
             next if build["#{testing_type}Testing"].nil?
+            next if build["buildVersion"] != build.build_version
             build["#{testing_type}Testing"]['value'] = false
             build["#{testing_type}Testing"]['value'] = new_value if build['trainVersion'] == version_string
           end
