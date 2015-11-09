@@ -70,10 +70,7 @@ module Fastlane
                                        env_name: "FL_SETUP_CODESIGNING_PATH",
                                        description: "Path to the certificates directory",
                                        default_value: File.join('fastlane', 'certificates'),
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         raise "Directory not found at path '#{value}'".red unless File.directory?(value)
-                                       end),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :git_url,
                                        env_name: "FL_SETUP_CODESIGNING_GIT_URl",
                                        description: "URL to the git repo containing all the certificates",
@@ -84,6 +81,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :type,
                                        env_name: "FL_SETUP_CODESIGNING_DEVELOPMENT",
                                        description: "Create a development certificate instead of a distribution one",
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          value = value.to_sym
                                          supported = [:appstore, :adhoc, :development, :enterprise]
