@@ -24,16 +24,8 @@ module Fastlane
         end
 
         if certs.count == 0 or keys.count == 0
-          Helper.log.error "Couldn't find a valid code signing identity in the git repo".red
-
-          arguments = ConfigurationHelper.parse(Actions::CertAction, {
-            development: params[:type] == :development,
-            output_path: File.join(params[:path], "certs")
-          })
-
-          Actions::CertAction.run(arguments)
-          # We don't care about the signing request
-          Dir[File.join(params[:path], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
+          Helper.log.error "Couldn't find a valid code signing identity in the git repo..."
+          ConfigurationHelper.generate_certificate(params)
         end
 
         # Install the provisioning profiles
@@ -46,14 +38,7 @@ module Fastlane
         if params[:app_identifier]
           # identifiers include the prefix, e.g. 439BBMAA67.tools.fastlane.app
           unless identifiers.any? { |a| a.include?(params[:app_identifier]) }
-            arguments = ConfigurationHelper.parse(Actions::SighAction, {
-              app_identifier: params[:app_identifier],
-              adhoc: params[:type] == :adhoc,
-              development: params[:type] == :development,
-              output_path: File.join(params[:path], "profiles")
-            })
-
-            Actions::SighAction.run(arguments)
+            ConfigurationHelper.generate_provisioning_profile(params)
           end
         end
 

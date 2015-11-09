@@ -6,7 +6,6 @@ module Fastlane
       #####################################################
 
       def self.import_certificates
-
       end
 
       def self.import(params, item_path)
@@ -23,6 +22,31 @@ module Fastlane
           end
         end
         true
+      end
+
+      #####################################################
+      # @!group Generate missing resources
+      #####################################################
+      def self.generate_certificate(params)
+        arguments = ConfigurationHelper.parse(Actions::CertAction, {
+          development: params[:type] == :development,
+          output_path: File.join(params[:path], "certs")
+        })
+
+        Actions::CertAction.run(arguments)
+        # We don't care about the signing request
+        Dir[File.join(params[:path], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
+      end
+
+      def self.generate_provisioning_profile(params)
+        arguments = ConfigurationHelper.parse(Actions::SighAction, {
+          app_identifier: params[:app_identifier],
+          adhoc: params[:type] == :adhoc,
+          development: params[:type] == :development,
+          output_path: File.join(params[:path], "profiles")
+        })
+
+        Actions::SighAction.run(arguments)
       end
 
       #####################################################
