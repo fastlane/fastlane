@@ -43,7 +43,7 @@ module Cert
 
           return path
 
-        elsif File.exists?(private_key_path)
+        elsif File.exist?(private_key_path)
           KeychainImporter.import_file(private_key_path)
           KeychainImporter.import_file(path)
 
