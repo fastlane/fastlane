@@ -72,8 +72,6 @@ module Spaceship
         end
       end
 
-      #TODO: override internal_testing, external_testing setters and getters
-
       # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
       def latest_build
         @builds.max_by do |build|
