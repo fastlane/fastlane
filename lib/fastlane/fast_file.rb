@@ -221,7 +221,7 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        tmp_path = File.join("/tmp", "fl_clones_#{Time.now.to_i}")
+        tmp_path = File.join("/tmp", "fl_clones_#{Time.now.to_f}")
         clone_folder = File.join(tmp_path, repo_name)
 
         branch_option = ""
