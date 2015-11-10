@@ -32,6 +32,7 @@ module Fastlane
       #####################################################
       # @!group Generate missing resources
       #####################################################
+
       def self.generate_certificate(params, cert_type)
         arguments = ConfigurationHelper.parse(Actions::CertAction, {
           development: params[:type] == :development,
@@ -44,6 +45,7 @@ module Fastlane
         Dir[File.join(params[:path], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
       end
 
+      # @return (String) The UUID of the newly generated profile
       def self.generate_provisioning_profile(params, prov_type)
         prov_type = :enterprise if ENV["SIGH_PROFILE_ENTERPRISE"]
 

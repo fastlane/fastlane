@@ -13,7 +13,9 @@ module Fastlane
 
         certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
         keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
-        profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+
+        profile_name = [prov_type.to_s, params[:app_identifier]].join("_")
+        profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
         certs.each do |cert|
           if FastlaneCore::CertChecker.installed?(cert)
@@ -36,9 +38,6 @@ module Fastlane
         # Install the provisioning profiles
         found_profile = false
         profiles.each do |profile|
-          # check if that's the app identifier we want to have
-          next unless profile.include?(params[:app_identifier])
-
           parsed = FastlaneCore::ProvisioningProfile.parse(profile)
 
           FastlaneCore::ProvisioningProfile.install(profile)
