@@ -94,6 +94,7 @@ module Spaceship
           # also update the builds
           train['builds'].each do |b|
             next if b["#{testing_type}Testing"].nil?
+            next if build.nil?
             next if b["buildVersion"] != build.build_version
             b["#{testing_type}Testing"]['value'] = false
             b["#{testing_type}Testing"]['value'] = new_value if b['trainVersion'] == version_string
