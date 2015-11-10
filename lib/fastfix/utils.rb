@@ -5,7 +5,7 @@ module Fastfix
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
       command << " -T /usr/bin/security"
       begin
-        puts command.yellow
+        Helper.log.info command.yellow
         `#{command}`
       rescue => ex
         if ex.to_s.include?("SecKeychainItemImport: The specified item already exists in the keychain")

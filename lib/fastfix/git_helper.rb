@@ -6,7 +6,8 @@ module Fastfix
       @dir = Dir.mktmpdir
       command = "git clone '#{git_url}' '#{@dir}' --depth 1"
       Helper.log.info "Cloning remote git repo..."
-      Actions.sh(command)
+      Helper.log.info command.yellow
+      puts `#{command}`
 
       return @dir
     end
@@ -31,7 +32,8 @@ module Fastfix
         commands << "git push origin master"
 
         commands.each do |command|
-          Action.sh(command)
+          Helper.log.info command.yellow
+          puts `#{command}`
         end
       end
     end

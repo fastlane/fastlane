@@ -22,10 +22,20 @@ class FastfixApplication
 
     command :run do |c|
       c.syntax = 'fastfix'
-      c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
+      c.description = 'TODO'
 
       c.action do |args, options|
         params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+        Fastfix::Runner.new.run(params)
+      end
+    end
+
+    command :appstore do |c|
+      c.syntax = 'fastfix appstore'
+      c.action do |args, options|
+        h = options.__hash__
+        h[:type] = 'appstore'
+        params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, h)
         Fastfix::Runner.new.run(params)
       end
     end

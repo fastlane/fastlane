@@ -2,7 +2,7 @@ module Fastfix
   class Runner
     def run(params)
       cert_type = :distribution
-      cert_type = :development if params[:type] == :development
+      cert_type = :development if params[:type] == "development"
 
       prov_type = params[:type]
 
@@ -14,43 +14,30 @@ module Fastfix
       profile_name = [prov_type.to_s, params[:app_identifier]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
-      certs.each do |cert|
+      if certs.count == 0 or keys.count == 0
+        Helper.log.error "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
+        Generator.generate_certificate(params, cert_type)
+      else
+        cert = certs.last
         if FastlaneCore::CertChecker.installed?(cert)
           Helper.log.info "Certificate '#{cert}' is already installed on this machine"
         else
           Utils.import(params, cert)
         end
-      end
 
-      # Import all the private keys
-      keys.each do |key|
-        Utils.import(params, key)
-      end
-
-      if certs.count == 0 or keys.count == 0
-        Helper.log.error "Couldn't find a valid code signing identity in the git repo..."
-        Generator.generate_certificate(params, cert_type)
+        # Import the private key
+        Utils.import(params, keys.last)
       end
 
       # Install the provisioning profiles
-      uuid = nil
-      profiles.each do |profile|
-        parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+      profile = profiles.last
+      profile ||= Generator.generate_provisioning_profile(params, prov_type)
 
-        FastlaneCore::ProvisioningProfile.install(profile)
-        uuid = parsed["UUID"]
-        Utils.fill_environment(params, uuid)
-      end
+      FastlaneCore::ProvisioningProfile.install(profile)
 
-      unless uuid
-        uuid = Generator.generate_provisioning_profile(params, prov_type)
-        Utils.fill_environment(params, uuid)
-
-        # We have to remove the provisioning profile path from the lane context
-        # as the temporary folder gets deleted
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] = nil
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = nil
-      end
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+      uuid = parsed["UUID"]
+      Utils.fill_environment(params, uuid)
 
       if params[:git_url]
         message = GitHelper.generate_commit_message(params)

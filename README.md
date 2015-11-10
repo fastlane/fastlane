@@ -30,8 +30,8 @@ fastlane automatically pre-fills environment variables to enable proper code sig
 ### How does it work (seen from the user)
 
 ```ruby
-  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: :development)
-  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: :adhoc, app_identifier: "tools.fastlane.app")
+  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: "development")
+  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
 ```
 
 The user specifies 3 things only:

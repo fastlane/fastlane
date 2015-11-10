@@ -14,21 +14,22 @@ module Fastfix
                                        env_name: "FASTFIX_GIT_URl",
                                        description: "URL to the git repo containing all the certificates",
                                        optional: true,
+                                       short_option: "-r",
                                        verify_block: proc do |value|
                                          # TODO
                                        end),
           FastlaneCore::ConfigItem.new(key: :type,
                                        env_name: "FASTFIX_TYPE",
                                        description: "Create a development certificate instead of a distribution one",
-                                       is_string: false,
+                                       is_string: true,
+                                       short_option: "-y",
+                                       default_value: 'appstore',
                                        verify_block: proc do |value|
-                                         value = value.to_sym
-                                         supported = [:appstore, :adhoc, :development, :enterprise]
+                                         supported = %w{appstore adhoc development enterprise}
                                          unless supported.include?(value)
                                            raise "Unsupported environment #{value}, must be in #{supported.join(', ')}".red
                                          end
-                                       end,
-                                       default_value: :appstore),
+                                       end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "FASTFIX_APP_IDENTIFIER",

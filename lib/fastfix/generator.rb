@@ -5,7 +5,7 @@ module Fastfix
       require 'cert'
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
-        development: params[:type] == :development,
+        development: params[:type] == "development",
         output_path: File.join(params[:path], "certs", cert_type.to_s),
         force: true, # we don't need a certificate without its private key
         username: params[:username]
@@ -26,16 +26,15 @@ module Fastfix
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: params[:app_identifier],
-        adhoc: params[:type] == :adhoc,
-        development: params[:type] == :development,
+        adhoc: params[:type] == 'adhoc',
+        development: params[:type] == 'development',
         output_path: File.join(params[:path], "profiles", prov_type.to_s),
         username: params[:username]
       })
 
       Sigh.config = arguments
       path = Sigh::Manager.start
-      parsed = FastlaneCore::ProvisioningProfile.parse(path)
-      return parsed["UUID"]
+      return path
     end
   end
 end
