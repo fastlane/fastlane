@@ -83,7 +83,7 @@ def du_upload_large_image_success
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/image").
     with(body: "binary image...",
            headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '520', 'Content-Type' => 'image/jpeg', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
-                     'User-Agent' => 'spaceship', 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Apple-Upload-Validation-Rulesets' => 'MZPFT.LargeApplicationIcon', 'X-Original-Filename' => 'icon1024.jpg' }).
     to_return(status: 201, body: du_read_fixture_file('upload_image_success.json'), headers: { 'Content-Type' => 'application/json' })
 end
@@ -92,7 +92,7 @@ def du_upload_watch_image_failure
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/image").
     with(body: "invalid binary image...",
            headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '520', 'Content-Type' => 'image/png', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
-                     'User-Agent' => 'spaceship', 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Apple-Upload-Validation-Rulesets' => 'MZPFT.GizmoAppIcon', 'X-Original-Filename' => 'icon1024.png' }).
     to_return(status: 400, body: du_read_fixture_file('upload_image_failed.json'), headers: { 'Content-Type' => 'application/json' })
 end
@@ -101,7 +101,7 @@ def du_upload_geojson_success
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/geo-json").
     with(body: du_upload_valid_geojson.bytes,
            headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '224', 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
-                     'User-Agent' => 'spaceship', 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Original-Filename' => 'upload_valid.geojson' }).
     to_return(status: 201, body: du_read_upload_geojson_response_success, headers: { 'Content-Type' => 'application/json' })
 end
@@ -110,7 +110,7 @@ def du_upload_geojson_failure
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/geo-json").
     with(body: du_upload_invalid_geojson.bytes,
            headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '243', 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
-                     'User-Agent' => 'spaceship', 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Original-Filename' => 'upload_invalid.GeoJSON' }).
     to_return(status: 400, body: du_read_upload_geojson_response_failed, headers: { 'Content-Type' => 'application/json' })
 end
@@ -119,7 +119,7 @@ def du_upload_screenshot_success
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/image").
     with(body: "the screenshot...",
            headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '1234520', 'Content-Type' => 'image/jpeg', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
-                     'User-Agent' => 'spaceship', 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'the_sso_token_for_image',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'the_sso_token_for_image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Apple-Upload-Validation-Rulesets' => 'MZPFT.SortedN41ScreenShot', 'X-Original-Filename' => 'screenshot1024.jpg' }).
     to_return(status: 201, body: du_read_upload_screenshot_response_success, headers: { 'Content-Type' => 'application/json' })
 end

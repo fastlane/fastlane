@@ -56,24 +56,16 @@ module Spaceship
     end
 
     # Set a new team ID which will be used from now on
-    def team_id=(t_id)
-      r = request(:post) do |req|
+    def team_id=(team_id)
+      response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
         req.body = { contentProviderId: t_id }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
-      unless r.headers['Set-Cookie'].to_s.include?("itctx")
-        raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
-      end
+      handle_itc_response(response.body)
 
-      itctx_regex = /itctx=([^;]*)/
-      new_itctx = r.headers['Set-Cookie'].match(itctx_regex).to_s
-
-      @cookie = @cookie.gsub(itctx_regex, new_itctx)
-      handle_itc_response(r.body)
-
-      @current_team_id = t_id
+      @current_team_id = team_id
     end
 
     # Shows a team selection for the user in the terminal. This should not be
@@ -120,32 +112,6 @@ module Spaceship
       end
     end
 
-    # returns wosinst, wosid and itctx
-    def login_overhead_cookies(myacinfo)
-      return @login_overhead_cookies if @login_overhead_cookies
-
-      response = request(:get, "route?noext") # for woinst and wosid
-      cookies = {
-        woinst: response['Set-Cookie'].match(/woinst=([^;]*)/)[1],
-        wosid: response['Set-Cookie'].match(/wosid=([^;]*)/)[1],
-        myacinfo: myacinfo
-      }
-
-      # The second request has to be after getting the woinst and wois
-      woa = request(:get) do |req|
-        req.url "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa"
-        req.headers["Cookie"] = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
-      end
-
-      unless woa['Set-Cookie'].include?("itctx")
-        raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
-      end
-
-      cookies[:itctx] = woa['Set-Cookie'].match(/itctx=([^;]*)/)[1]
-
-      return @login_overhead_cookies ||= cookies
-    end
-
     def service_key
       return @service_key if @service_key
       # We need a service key from a JS file to properly auth
@@ -164,25 +130,23 @@ module Spaceship
         req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['Accept'] = 'application/json, text/javascript'
       end
 
-      if response['Set-Cookie'] =~ /myacinfo=(\w+);/
-        # To use the session properly we'll need the following cookies:
-        #  - myacinfo
-        #  - woinst
-        #  - wosid
-        #  - itctx
-        begin
-          re = response['Set-Cookie']
-          myacinfo = re.match(/myacinfo=([^;]*)/)[1]
-          cookies = login_overhead_cookies(myacinfo)
+      # get woinst, wois, and itctx cookie values
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      response = request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
 
-          @cookie = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
-        rescue
-          raise ITunesConnectError.new, [response.body, response['Set-Cookie']].join("\n")
-        end
+      unless response['Set-Cookie'].include?("itctx")
+        raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
+      end
 
-        return @client
+      case response.status
+      when 403, 401
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      when 200
+        return response
       else
         if response["Location"] == "/auth" # redirect to 2 step auth page
           raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."

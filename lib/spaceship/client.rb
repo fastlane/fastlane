@@ -1,6 +1,7 @@
 require 'faraday' # HTTP Client
 require 'logger'
 require 'faraday_middleware'
+require 'faraday-cookie_jar'
 require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
@@ -14,9 +15,9 @@ end
 module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
+    USER_AGENT = "Spaceship #{Spaceship::VERSION}"
 
     attr_reader :client
-    attr_accessor :cookie
 
     # The user that is currently logged in
     attr_accessor :user
@@ -67,6 +68,7 @@ module Spaceship
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
+        c.use :cookie_jar
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
@@ -169,11 +171,6 @@ module Spaceship
       end
     end
 
-    # @return (Bool) Do we have a valid session?
-    def session?
-      !!@cookie
-    end
-
     def with_retry(tries = 5, &block)
       return block.call
     rescue Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
@@ -204,11 +201,8 @@ module Spaceship
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
-      if session?
-        headers.merge!({ 'Cookie' => cookie })
-        headers.merge!(csrf_tokens)
-      end
-      headers.merge!({ 'User-Agent' => 'spaceship' })
+      headers.merge!(csrf_tokens)
+      headers.merge!({ 'User-Agent' => USER_AGENT })
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)

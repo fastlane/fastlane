@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'faraday', '~> 0.9'
   spec.add_dependency 'faraday_middleware', '~> 0.9'
+  spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '~> 1.6'
 
   # for the playground

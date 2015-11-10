@@ -37,9 +37,11 @@ module Spaceship
         appIdKey: api_key
       })
 
-      if response['Set-Cookie'] =~ /myacinfo=(\w+);/
-        @cookie = "myacinfo=#{$1};"
-        return @client
+      case response.status
+      when 302
+        return response
+      when 200
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       else
         # Something went wrong. Was it invalid credentials or server issue
         if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
@@ -51,6 +53,8 @@ module Spaceship
           info = [response.body, response['Set-Cookie']]
           raise UnexpectedResponse.new, info.join("\n")
         end
+        info = [response.body, response['Set-Cookie']]
+        raise UnexpectedResponse.new, info.join("\n")
       end
     end
 
