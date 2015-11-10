@@ -55,7 +55,10 @@ module Fastlane
           Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = nil
         end
 
-        Helper::CodesigningHelper.commit_changes(params[:path]) if params[:git_url]
+        if params[:git_url]
+          message = Helper::CodesigningHelper.generate_commit_message(params)
+          Helper::CodesigningHelper.commit_changes(params[:path], message)
+        end
 
         Helper::CodesigningHelper.print_summary(params, uuid)
 

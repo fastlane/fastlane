@@ -80,7 +80,7 @@ module Fastlane
 
         Actions::SighAction.run(arguments)
 
-        return Actions.lane_context[SharedValues::SIGH_UDID]
+        return Actions.lane_context[Actions::SharedValues::SIGH_UDID]
       end
 
       #####################################################
@@ -97,12 +97,23 @@ module Fastlane
         return @dir
       end
 
-      def self.commit_changes(path)
+      def self.generate_commit_message(params)
+        # 'Automatic commit via fastlane'
+        [
+          "[fastlane]",
+          "Updated",
+          params[:app_identifier],
+          "for",
+          params[:type].to_s
+        ].join(" ")
+      end
+
+      def self.commit_changes(path, message)
         Dir.chdir(path) do
           return if `git status`.include?("nothing to commit")
           commands = []
           commands << "git add -A"
-          commands << "git commit -m 'Automatic commit via fastlane'"
+          commands << "git commit -m '#{message}'"
           commands << "git push origin master"
 
           commands.each do |command|
