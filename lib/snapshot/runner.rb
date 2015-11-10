@@ -70,7 +70,7 @@ module Snapshot
                                                 ErrorHandler.handle_test_error(output, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                Helper.log.info "Cought error... #{return_code}".red
+                                                Helper.log.info "Caught error... #{return_code}".red
 
                                                 self.number_of_retries += 1
                                                 if self.number_of_retries < 20
