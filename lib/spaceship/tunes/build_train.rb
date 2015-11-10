@@ -74,7 +74,7 @@ module Spaceship
 
       # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
       def latest_build
-        @builds.max_by {|build| build.upload_date }
+        @builds.max_by(&:upload_date)
       end
 
       # @param (testing_type) internal or external
