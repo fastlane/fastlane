@@ -14,7 +14,7 @@ module Fastlane
         certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
         keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
 
-        profile_name = [prov_type.to_s, params[:app_identifier]].join("_")
+        profile_name = [prov_type.to_s, params[:app_identifier]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
         profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
         certs.each do |cert|
