@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'fastfix'
+require 'commander'
+
+HighLine.track_eof = false
+
+class FastfixApplication
+  include Commander::Methods
+
+  def run
+    program :version, Fastfix::VERSION
+    program :description, Fastfix::DESCRIPTION
+    program :help, 'Author', 'Felix Krause <fastfix@krausefx.com>'
+    program :help, 'Website', 'https://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/fastlane/fastfix'
+    program :help_formatter, :compact
+
+    FastlaneCore::CommanderGenerator.new.generate(Fastfix::Options.available_options)
+
+    command :run do |c|
+      c.syntax = 'fastfix'
+      c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
+
+      c.action do |args, options|
+        params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+        Fastfix::Runner.new.run(params)
+      end
+    end
+
+    default_command :run
+
+    run!
+  end
+end
+
+begin
+  # FastlaneCore::UpdateChecker.start_looking_for_update('fastfix')
+  FastfixApplication.new.run
+ensure
+  # FastlaneCore::UpdateChecker.show_update_status('fastfix', Fastfix::VERSION)
+end
