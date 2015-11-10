@@ -30,13 +30,16 @@ class FastfixApplication
       end
     end
 
-    command :appstore do |c|
-      c.syntax = 'fastfix appstore'
-      c.action do |args, options|
-        h = options.__hash__
-        h[:type] = 'appstore'
-        params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, h)
-        Fastfix::Runner.new.run(params)
+    [:appstore, :adhoc, :development, :enterprise].each do |type|
+      command type do |c|
+        c.syntax = "fastfix #{type}"
+
+        c.action do |args, options|
+          h = options.__hash__
+          h[:type] = type.to_s
+          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, h)
+          Fastfix::Runner.new.run(params)
+        end
       end
     end
 
