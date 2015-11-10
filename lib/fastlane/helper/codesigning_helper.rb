@@ -24,9 +24,31 @@ module Fastlane
       # Fill in the UUID of the profiles in environment variables, much recycling
       def self.fill_environment(params, uuid)
         # instead we specify the UUID of the profiles
-        key = ["sigh", params[:app_identifier], params[:type]].join("_")
-        Helper.log.info "Setting environment variable '#{key}' to '#{uuid}'".green
+        key = environment_variable_name(params)
+        Helper.log.info "Setting environment variable '#{key}' to '#{uuid}'".yellow
         ENV[key] = uuid
+      end
+
+      def self.print_summary(params, uuid)
+        require 'terminal-table'
+        rows = []
+
+        rows << ["App Identifier", params[:app_identifier]]
+        rows << ["Type", params[:type]]
+        rows << ["UUID", uuid]
+        rows << ["Environment Variable", environment_variable_name(params)]
+
+        params = {}
+        params[:rows] = rows
+        params[:title] = "Installed Provisioning Profile".green
+
+        puts ""
+        puts Terminal::Table.new(params)
+        puts ""
+      end
+
+      def self.environment_variable_name(params)
+        ["sigh", params[:app_identifier], params[:type]].join("_")
       end
 
       #####################################################

@@ -36,16 +36,16 @@ module Fastlane
         end
 
         # Install the provisioning profiles
-        found_profile = false
+        uuid = nil
         profiles.each do |profile|
           parsed = FastlaneCore::ProvisioningProfile.parse(profile)
 
           FastlaneCore::ProvisioningProfile.install(profile)
-          Helper::CodesigningHelper.fill_environment(params, parsed["UUID"])
-          found_profile = true
+          uuid = parsed["UUID"]
+          Helper::CodesigningHelper.fill_environment(params, uuid)
         end
 
-        unless found_profile
+        unless uuid
           uuid = Helper::CodesigningHelper.generate_provisioning_profile(params, prov_type)
           Helper::CodesigningHelper.fill_environment(params, uuid)
 
@@ -56,6 +56,8 @@ module Fastlane
         end
 
         Helper::CodesigningHelper.commit_changes(params[:path]) if params[:git_url]
+
+        Helper::CodesigningHelper.print_summary(params, uuid)
 
         Helper.log.info "All required keys, certificates and provisioning profiles are installed 🙌".green
       end
