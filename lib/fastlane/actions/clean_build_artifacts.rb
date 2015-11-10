@@ -8,6 +8,7 @@ module Fastlane
         ]
 
         paths += Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] || []
+        paths = paths.uniq
 
         paths.reject { |file| file.nil? || !File.exist?(file) }.each do |file|
           if options[:exclude_pattern]
