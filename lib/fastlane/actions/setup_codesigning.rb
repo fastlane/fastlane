@@ -34,25 +34,29 @@ module Fastlane
         end
 
         # Install the provisioning profiles
-        identifiers = profiles.collect do |profile|
+        found_profile = false
+        profiles.each do |profile|
+          # check if that's the app identifier we want to have
+          next unless profile.include?(params[:app_identifier])
+
+          parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+
           FastlaneCore::ProvisioningProfile.install(profile)
-          FastlaneCore::ProvisioningProfile.parse(profile).fetch('Entitlements', {}).fetch('application-identifier', nil)
+          Helper::CodesigningHelper.fill_environment(params, parsed["UUID"])
+          found_profile = true
         end
 
-        # Do we need to create a provisioning profile
-        if params[:app_identifier]
-          # identifiers include the prefix, e.g. 439BBMAA67.tools.fastlane.app
-          unless identifiers.any? { |a| a.include?(params[:app_identifier]) }
-            Helper::CodesigningHelper.generate_provisioning_profile(params, prov_type)
-          end
+        unless found_profile
+          uuid = Helper::CodesigningHelper.generate_provisioning_profile(params, prov_type)
+          Helper::CodesigningHelper.fill_environment(params, uuid)
+
+          # We have to remove the provisioning profile path from the lane context
+          # as the temporary folder gets deleted
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] = nil
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = nil
         end
 
         Helper::CodesigningHelper.commit_changes(params[:path]) if params[:git_url]
-
-        # We have to remove the provisioning profile path from the lane context
-        # as the temporary folder gets deleted
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] = nil
-        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = nil
 
         Helper.log.info "All required keys, certificates and provisioning profiles are installed 🙌".green
       end

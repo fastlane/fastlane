@@ -21,6 +21,14 @@ module Fastlane
         true
       end
 
+      # Fill in the UUID of the profiles in environment variables, much recycling
+      def self.fill_environment(params, uuid)
+        # instead we specify the UUID of the profiles
+        key = ["sigh", params[:app_identifier], params[:type]].join("_")
+        Helper.log.info "Setting environment variable '#{key}' to '#{uuid}'".green
+        ENV[key] = uuid
+      end
+
       #####################################################
       # @!group Generate missing resources
       #####################################################
@@ -47,6 +55,8 @@ module Fastlane
         })
 
         Actions::SighAction.run(arguments)
+
+        return Actions.lane_context[SharedValues::SIGH_UDID]
       end
 
       #####################################################
