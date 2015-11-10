@@ -21,7 +21,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Creates or updates an item within your Podio app.'
+        'Creates or updates an item within your Podio app'
       end
 
       def self.details
@@ -29,7 +29,7 @@ module Fastlane
         (see https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-).
         Pass in dictionary with field keys and their values.
         Field key is located under Modify app -> Advanced -> Developer -> External ID
-        (see https://developers.podio.com/examples/items)."
+        (see https://developers.podio.com/examples/items)"
       end
 
       def self.available_options
