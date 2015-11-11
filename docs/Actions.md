@@ -345,6 +345,25 @@ More usage examples (assumes the above .env setup is being used):
 
 See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
 
+### copy_artifacts
+This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
+
+Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list
+
+Example in conjunction with reset_git_repo
+```ruby
+# Move our artifacts to a safe location so TeamCity can pick them up
+copy_artifacts(
+  target_path: 'artifacts',
+  artifacts: ['*.cer', '*.mobileprovision', '*.ipa', '*.dSYM.zip']
+)
+
+# Reset the git repo to a clean state, but leave our artifacts in place
+reset_git_repo(
+  exclude: 'artifacts'
+)
+```
+
 ### clean_build_artifacts
 This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 
