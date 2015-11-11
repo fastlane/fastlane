@@ -8,8 +8,6 @@ module Fastfix
       url = ask("URL: ")
 
       template.gsub!("[[GIT_URL]]", url)
-      require 'pry'
-      binding.pry
       File.write(path, template)
       puts "Successfully created '#{path}'. Open the file using a code editor.".green
     end

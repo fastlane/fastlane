@@ -1,6 +1,6 @@
-git_url [[GIT_URL]]
+git_url "[[GIT_URL]]"
 
-type "appstore" # appstore, adhoc, development or enterprise
+type "appstore" # The default type, can be: appstore, adhoc, development or enterprise
 
 # app_identifier "tools.fastlane.app" 
 
