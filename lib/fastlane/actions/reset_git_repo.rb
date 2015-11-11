@@ -54,8 +54,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :skip_clean,
                                        env_name: "FL_RESET_GIT_SKIP_CLEAN",
-                                       description: "Skip 'git clean' to avoid removing untracked files like `.env`. Optional, defaults to false",
-                                       optional: true,
+                                       description: "Skip 'git clean' to avoid removing untracked files like `.env`. Defaults to false",
                                        is_string: false,
                                        default_value: false)
         ]
