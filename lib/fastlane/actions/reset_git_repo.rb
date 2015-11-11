@@ -10,7 +10,13 @@ module Fastlane
 
           if (paths || []).count == 0
             Actions.sh('git reset --hard HEAD')
-            Actions.sh('git clean -qfdx') unless params[:skip_clean]
+
+            clean_options = ['q', 'f', 'd']
+            clean_options << 'x' if params[:disregard_gitignore]
+            clean_command = 'git clean' + ' -' + clean_options.join
+            
+            Actions.sh(clean_command) unless params[:skip_clean]
+
             Helper.log.info 'Git repo was reset and cleaned back to a pristine state.'.green
           else
             paths.each do |path|
@@ -57,7 +63,13 @@ module Fastlane
                                        description: "Skip 'git clean' to avoid removing untracked files like `.env`. Optional, defaults to false",
                                        optional: true,
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :disregard_gitignore,
+                                       env_name: "FL_RESET_GIT_DISREGARD_GITIGNORE",
+                                       description: "Setting this to true will clean the whole repository, ignoring anything in your local .gitignore. Set this to true if you want the equivalent of a fresh clone, and for all untracked and ignore files to also be removed",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: true)
         ]
       end
 
