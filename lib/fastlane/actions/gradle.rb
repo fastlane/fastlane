@@ -16,9 +16,17 @@ module Fastlane
         return result unless task.start_with?("assemble")
 
         # We built our app. Store the path to the apk
-        flavor = task.match(/assemble(\w*)/)
-        if flavor and flavor[1]
-          flavor = flavor[1].downcase # Release => release
+        if params[:flavor]
+          flavor = params[:flavor].split(",").join("-")
+        else
+          f = task.match(/assemble(\w*)/)
+          if f
+            flavor = f[1]
+          end
+        end
+
+        if flavor
+          flavor = flavor.downcase # Release => release
           apk_path = Dir[File.join("app", "build", "outputs", "apk", "*-#{flavor}.apk")].last
           if apk_path
             Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
@@ -60,6 +68,11 @@ module Fastlane
                                        description: "All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`",
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :flavor,
+                                      env_name: "FL_GRADLE_FLAVOR",
+                                      description: "The gradle flavor you want to execute that is separated by ','",
+                                      optional: true,
+                                      is_string: true),
           FastlaneCore::ConfigItem.new(key: :gradle_path,
                                        env_name: "FL_GRADLE_PATH",
                                        description: "The path to your `gradlew`",
