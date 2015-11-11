@@ -21,3 +21,5 @@ fastlane/screenshots/*/*-landscape_framed.png
 # scan temporary files
 fastlane/test_output
 ```
+
+It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the screenshots whenever they are needed.
