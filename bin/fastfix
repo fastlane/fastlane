@@ -43,6 +43,23 @@ class FastfixApplication
       end
     end
 
+    command :init do |c|
+      c.syntax = 'fastfix init'
+      c.description = 'Create the Fixfile for you'
+      c.action do |args, options|
+        containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+        path = File.join(containing, "Fixfile")
+
+        if File.exist?(path)
+          puts "You already got a Fixfile in this directory".yellow
+          return 0
+        end
+
+        require 'fastfix/setup'
+        Fastfix::Setup.new.run(path)
+      end
+    end
+
     default_command :run
 
     run!

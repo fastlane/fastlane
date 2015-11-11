@@ -1,0 +1,7 @@
+git_url [[GIT_URL]]
+
+type "appstore" # appstore, adhoc, development or enterprise
+
+# app_identifier "tools.fastlane.app" 
+
+# For all available options run `fastfix --help`
