@@ -7,7 +7,7 @@ module Sigh
       # get the command line inputs and parse those into the vars we need...
       ipa, signing_identity, provisioning_profiles = get_inputs(options, args)
 
-      # ... then invoke out programmatic interface with these vars
+      # ... then invoke our programmatic interface with these vars
       resign(ipa, signing_identity, provisioning_profiles)
     end
 
