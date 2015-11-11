@@ -21,7 +21,7 @@ module Fastlane
 
         # call our command
         Actions.sh(command)
-        
+
         Helper.log.info 'Build artifacts sucesfully copied!'.green
       end
 
