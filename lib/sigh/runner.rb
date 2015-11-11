@@ -121,11 +121,11 @@ module Sigh
       # Filter them
       certificates = certificates.find_all do |c|
         if Sigh.config[:cert_id]
-          next unless (c.id == Sigh.config[:cert_id].strip)
+          next unless c.id == Sigh.config[:cert_id].strip
         end
 
         if Sigh.config[:cert_owner_name]
-          next unless (c.owner_name.strip == Sigh.config[:cert_owner_name].strip)
+          next unless c.owner_name.strip == Sigh.config[:cert_owner_name].strip
         end
 
         true
