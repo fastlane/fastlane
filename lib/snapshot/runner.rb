@@ -22,7 +22,7 @@ module Snapshot
 
       self.number_of_retries = 0
       errors = []
-      launch_arguments_set = Snapshot.config[:launchArguments].map.with_index { |e, i| [i, e]}
+      launch_arguments_set = Snapshot.config[:launchArguments].map.with_index { |e, i| [i, e] }
       Snapshot.config[:devices].each do |device|
         launch_arguments_set.each do |launch_arguments|
           Snapshot.config[:languages].each do |language|
