@@ -41,7 +41,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :files,
                                        env_name: "FL_RESET_GIT_FILES",
-                                       description: "Array of files the changes should be discarded from. If not given, all files will be discarded",
+                                       description: "Array of files the changes should be discarded. If not given, all files will be discarded",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
