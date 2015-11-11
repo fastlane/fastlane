@@ -1,6 +1,8 @@
 module Fastfix
   class Runner
     def run(params)
+      FastlaneCore::PrintTable.print_values(config: params,
+                                             title: "Summary for fastfix #{Fastfix::VERSION}")
 
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"
