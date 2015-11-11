@@ -1,7 +1,6 @@
 module Fastfix
   class Runner
     def run(params)
-      params.load_configuration_file("Fixfile")
 
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"

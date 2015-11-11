@@ -23,7 +23,7 @@ module Fastfix
                                      description: "Create a development certificate instead of a distribution one",
                                      is_string: true,
                                      short_option: "-y",
-                                     default_value: 'appstore',
+                                     default_value: 'development',
                                      verify_block: proc do |value|
                                        supported = %w(appstore adhoc development enterprise)
                                        unless supported.include?(value)

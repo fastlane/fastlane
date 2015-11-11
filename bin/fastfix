@@ -26,6 +26,7 @@ class FastfixApplication
 
       c.action do |args, options|
         params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+        params.load_configuration_file("Fixfile")
         Fastfix::Runner.new.run(params)
       end
     end
@@ -35,9 +36,9 @@ class FastfixApplication
         c.syntax = "fastfix #{type}"
 
         c.action do |args, options|
-          h = options.__hash__
-          h[:type] = type.to_s
-          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, h)
+          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+          params.load_configuration_file("Fixfile") # this has to be done *before* overwriting the value
+          params[:type] = type.to_s
           Fastfix::Runner.new.run(params)
         end
       end
