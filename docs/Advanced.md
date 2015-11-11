@@ -230,4 +230,5 @@ If you use git it is recommended that you keep the `fastlane` configuration file
 # frameit generated screenshots
 /fastlane/screenshots/*/*-portrait_framed.png
 /fastlane/screenshots/*/*-landscape_framed.png
+/fastlane/screenshots/*-*/
 ```
