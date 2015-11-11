@@ -48,8 +48,10 @@ module WatchBuild
                             execute: "open '#{url}'")
 
       Helper.log.info "Successfully finished processing the build".green
-      Helper.log.info "You can now tweet: "
-      Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+      if minutes > 0 # it's 0 minutes if there was no new build uploaded
+        Helper.log.info "You can now tweet: "
+        Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+      end
       Helper.log.info url
     end
 
