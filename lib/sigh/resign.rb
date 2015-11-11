@@ -32,7 +32,7 @@ module Sigh
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        provisioning_options,# we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
+        provisioning_options, # we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
         ipa.shellescape
       ].join(' ')
 
