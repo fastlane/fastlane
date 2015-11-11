@@ -16,6 +16,7 @@ class ExampleUITests: XCTestCase {
         
         let app = XCUIApplication()
         setLanguage(app)
+        setLaunchArguments(app)
         app.launch()
     }
     
