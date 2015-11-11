@@ -72,13 +72,29 @@ module Spaceship
         end
       end
 
+      # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
+      def latest_build
+        @builds.max_by(&:upload_date)
+      end
+
       # @param (testing_type) internal or external
-      def update_testing_status!(new_value, testing_type)
+      def update_testing_status!(new_value, testing_type, build = nil)
         data = client.build_trains(self.application.apple_id, testing_type)
+
+        build ||= latest_build if testing_type == 'external'
 
         data['trains'].each do |train|
           train["#{testing_type}Testing"]['value'] = false
           train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
+
+          # also update the builds
+          train['builds'].each do |b|
+            next if b["#{testing_type}Testing"].nil?
+            next if build.nil?
+            next if b["buildVersion"] != build.build_version
+            b["#{testing_type}Testing"]['value'] = false
+            b["#{testing_type}Testing"]['value'] = new_value if b['trainVersion'] == version_string
+          end
         end
 
         result = client.update_build_trains!(application.apple_id, testing_type, data)
