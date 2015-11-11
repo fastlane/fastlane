@@ -7,7 +7,7 @@ module Sigh
       # get the command line inputs and parse those into the vars we need...
       ipa, signing_identity, provisioning_profiles = get_inputs(options, args)
 
-      # ... then invoke out programmatic interface with these vars
+      # ... then invoke our programmatic interface with these vars
       resign(ipa, signing_identity, provisioning_profiles)
     end
 
@@ -26,13 +26,13 @@ module Sigh
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
 
-      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.join('=')}" }.join(' ')
+      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
 
       command = [
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        provisioning_options.shellescape,
+        provisioning_options, # we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
         ipa.shellescape
       ].join(' ')
 
