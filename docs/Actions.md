@@ -758,9 +758,9 @@ Upload your zipped app to Appetize.io
 
 ```ruby
 appetize(
-    api_token: 'yourapitoken',
-    url: 'https://example.com/your/zipped/app.zip',
-    private_key: 'yourprivatekey'
+  api_token: 'yourapitoken',
+  url: 'https://example.com/your/zipped/app.zip',
+  private_key: 'yourprivatekey'
 )
 ```
 

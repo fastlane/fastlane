@@ -29,17 +29,16 @@ module Fastlane
             url: options[:url],
             platform: 'ios'
         }
+
         params.merge!(privateKey: options[:private_key]) unless options[:private_key].nil?
         req.body = JSON.generate(params)
         response = https.request(req)
-        if parse_response(response)
-          Helper.log.info "App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}"
-          Helper.log.info "Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}"
-          Helper.log.info "App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}"
-          Helper.log.info "Build successfully uploaded to Appetize.io".green
-        else
-          raise 'Error when trying to upload ipa to Appetize.io'.red
-        end
+
+        raise 'Error when trying to upload ipa to Appetize.io'.red unless parse_response(response)
+        Helper.log.info "App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}"
+        Helper.log.info "Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}"
+        Helper.log.info "App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}"
+        Helper.log.info "Build successfully uploaded to Appetize.io".green
       end
 
       def self.parse_response(response)
@@ -48,15 +47,16 @@ module Fastlane
         manage_url = body['manageURL']
         private_key = body['privateKey']
         public_key = body['publicKey']
+
         Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY] = private_key
         Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
         Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
-        true
+        return true
       rescue
         Helper.log.fatal "Error uploading to Appetize.io: #{response.body}".red
         help_message(response)
-        false
+        return false
       end
       private_class_method :parse_response
 
@@ -101,10 +101,11 @@ module Fastlane
       end
 
       def self.output
-        [['APPETIZE_PRIVATE_KEY', 'a string that is used to prove "ownership" of your app - save this so that you may subsequently update the app'],
-         ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app'],
-         ['APPETIZE_APP_URL', 'a page to test and share your app'],
-         ['APPETIZE_MANAGE_URL', 'a page to manage your app']
+        [
+          ['APPETIZE_PRIVATE_KEY', 'a string that is used to prove "ownership" of your app - save this so that you may subsequently update the app'],
+          ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app'],
+          ['APPETIZE_APP_URL', 'a page to test and share your app'],
+          ['APPETIZE_MANAGE_URL', 'a page to manage your app']
         ]
       end
 
