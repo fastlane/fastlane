@@ -26,7 +26,7 @@ module Fastlane
             clean_command += ' ' + params[:exclude].map { |exclude| '-e ' + exclude.shellescape }.join(' ') unless params[:exclude].count == 0
 
             Actions.sh(clean_command) unless params[:skip_clean]
-            
+
             Helper.log.info 'Git repo was reset and cleaned back to a pristine state.'.green
           else
             paths.each do |path|
@@ -82,7 +82,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: "FL_RESET_GIT_EXCLUDE",
-                                       description: "You can pass a string, or array of, file pattern(s) here which you want to have survive the cleaning process, and remain on disk. E.g. to leave the `artifacts` directory you would specify `exclude: 'artifacts'`. Make sure this pattern is also in your gitignore! See the gitignore documentation for what can go into a single pattern",
+                                       description: "You can pass a string, or array of, file pattern(s) here which you want to have survive the cleaning process, and remain on disk. E.g. to leave the `artifacts` directory you would specify `exclude: 'artifacts'`. Make sure this pattern is also in your gitignore! See the gitignore documentation for info on patterns",
                                        is_string: false,
                                        optional: true)
         ]
