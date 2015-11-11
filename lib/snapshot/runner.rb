@@ -22,15 +22,18 @@ module Snapshot
 
       self.number_of_retries = 0
       errors = []
+      launch_arguments_set = Snapshot.config[:launchArguments].map.with_index { |e, i| [i, e]}
       Snapshot.config[:devices].each do |device|
-        Snapshot.config[:languages].each do |language|
-          begin
-            launch(language, device)
-          rescue => ex
-            Helper.log.error ex # we should to show right here as well
-            errors << ex
+        launch_arguments_set.each do |launch_arguments|
+          Snapshot.config[:languages].each do |language|
+            begin
+              launch(language, device, launch_arguments)
+            rescue => ex
+              Helper.log.error ex # we should to show right here as well
+              errors << ex
 
-            raise ex if Snapshot.config[:stop_after_first_error]
+              raise ex if Snapshot.config[:stop_after_first_error]
+            end
           end
         end
       end
@@ -41,16 +44,17 @@ module Snapshot
       ReportsGenerator.new.generate
     end
 
-    def launch(language, device_type)
+    def launch(language, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(screenshots_path)
       FileUtils.mkdir_p(screenshots_path)
 
       File.write("/tmp/language.txt", language)
+      File.write("/tmp/snapshot-launchArguments.txt", launch_arguments.last)
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
-      Helper.log_alert("#{device_type} - #{language}")
+      Helper.log_alert("#{device_type} - #{language} - #{launch_arguments.last}")
 
       prefix_hash = [
         {
@@ -74,7 +78,7 @@ module Snapshot
 
                                                 self.number_of_retries += 1
                                                 if self.number_of_retries < 20
-                                                  launch(language, device_type)
+                                                  launch(language, device_type, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   raise "Too many errors... no more retries...".red
@@ -82,7 +86,7 @@ module Snapshot
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
-      Collector.fetch_screenshots(raw_output, language, device_type)
+      Collector.fetch_screenshots(raw_output, language, device_type, launch_arguments.first)
     end
 
     def clear_previous_screenshots

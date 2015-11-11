@@ -1,7 +1,7 @@
 module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector
-    def self.fetch_screenshots(output, language, device_type)
+    def self.fetch_screenshots(output, language, device_type, launch_arguments_index)
       # Documentation about how this works in the project README
       containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
       attachments_path = File.join(containing, "Attachments")
@@ -21,7 +21,7 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        output_path = File.join(language_folder, [device_name, name].join("-") + ".png")
+        output_path = File.join(language_folder, [device_name, launch_arguments_index, name].join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
           Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
