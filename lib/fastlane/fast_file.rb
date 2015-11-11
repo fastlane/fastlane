@@ -216,12 +216,14 @@ module Fastlane
       raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
+        require 'tmpdir'
+
         collector.did_launch_action(:import_from_git)
 
         # Checkout the repo
         repo_name = url.split("/").last
 
-        tmp_path = File.join("/tmp", "fl_clones_#{Time.now.to_f}")
+        tmp_path = Dir.mktmpdir("fl_clone")
         clone_folder = File.join(tmp_path, repo_name)
 
         branch_option = ""
