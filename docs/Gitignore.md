@@ -10,13 +10,8 @@ fastlane/report.xml
 fastlane/Preview.html
 
 # snapshot generated screenshots
-fastlane/screenshots/*/*-portrait.png
-fastlane/screenshots/*/*-landscape.png
+fastlane/screenshots/**/*.png
 fastlane/screenshots/screenshots.html
-
-# frameit generated screenshots
-fastlane/screenshots/*/*-portrait_framed.png
-fastlane/screenshots/*/*-landscape_framed.png
 
 # scan temporary files
 fastlane/test_output
