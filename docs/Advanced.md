@@ -221,6 +221,7 @@ If you use git it is recommended that you keep the `fastlane` configuration file
 /fastlane/report.xml
 # deliver temporary error output
 /fastlane/Error*.png
+/fastlane/test_output
 # deliver temporary preview output
 /fastlane/Preview.html
 # snapshot generated screenshots
