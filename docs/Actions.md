@@ -1078,6 +1078,7 @@ push_git_tags
 
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
+Untracked files like `.env` will also be deleted, unless `:skip_clean` is true.
 
 It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:
 
@@ -1089,6 +1090,7 @@ Also useful for putting in your `error` block, to bring things back to a pristin
 ```ruby
 reset_git_repo
 reset_git_repo :force # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+reset_git_repo :skip_clean # If you want 'git clean' to be skipped, thus NOT deleting untracked files like '.env'. Optional, defaults to false.
 
 # You can also specify a list of files that should be resetted.
 reset_git_repo(
