@@ -18,11 +18,10 @@ module Sigh
     end
 
     def download_profile(profile)
-      output = Sigh.config[:output_path] || "/tmp"
-
+      FileUtils.mkdir_p(Sigh.config[:output_path])
       profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision" # default name
 
-      output_path = File.join(output, profile_name)
+      output_path = File.join(Sigh.config[:output_path], profile_name)
       File.open(output_path, "wb") do |f|
         f.write(profile.download)
       end

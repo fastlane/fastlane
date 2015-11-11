@@ -62,10 +62,7 @@ module Sigh
                                      short_option: "-o",
                                      env_name: "SIGH_OUTPUT_PATH",
                                      description: "Directory in which the profile should be stored",
-                                     default_value: ".",
-                                     verify_block: proc do |value|
-                                       raise "Could not find output directory '#{value}'".red unless File.exist?(value)
-                                     end),
+                                     default_value: "."),
         FastlaneCore::ConfigItem.new(key: :cert_id,
                                      short_option: "-i",
                                      env_name: "SIGH_CERTIFICATE_ID",
