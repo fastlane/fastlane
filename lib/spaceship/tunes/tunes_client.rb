@@ -38,33 +38,39 @@ module Spaceship
       "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
-    # Fetches the latest login URL from iTunes Connect
-    def login_url
-      cache_path = "/tmp/spaceship_itc_login_url.txt"
-      begin
-        cached = File.read(cache_path)
-      rescue Errno::ENOENT
-      end
-      return cached if cached
+    # returns wosinst, wosid and itctx
+    def login_overhead_cookies(myacinfo)
+      return @login_overhead_cookies if @login_overhead_cookies
 
-      host = "https://itunesconnect.apple.com"
-      begin
-        url = host + request(:get, self.class.hostname).body.match(%r{action="(/WebObjects/iTunesConnect.woa/wo/.*)"})[1]
-        raise "" unless url.length > 0
+      response = request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext") # for woinst and wosid
+      cookies = {
+        woinst: response['Set-Cookie'].match(/woinst=([^;]*)/)[1],
+        wosid: response['Set-Cookie'].match(/wosid=([^;]*)/)[1],
+        myacinfo: myacinfo
+      }
 
-        File.write(cache_path, url)
-        return url
-      rescue => ex
-        puts ex
-        raise "Could not fetch the login URL from iTunes Connect, the server might be down"
+      # The second request has to be after getting the woinst and wois
+      woa = request(:get) do |req|
+        req.url "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa"
+        req.headers["Cookie"] = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
       end
+      cookies[:itctx] = woa['Set-Cookie'].match(/itctx=([^;]*)/)[1]
+
+      return @login_overhead_cookies ||= cookies
     end
 
     def send_login_request(user, password)
-      response = request(:post, login_url, {
-        theAccountName: user,
-        theAccountPW: password
-      })
+      data = {
+        accountName: user,
+        password: password,
+        rememberMe: true
+      }
+
+      response = request(:post) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/signin"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
 
       if response['Set-Cookie'] =~ /myacinfo=(\w+);/
         # To use the session properly we'll need the following cookies:
@@ -74,16 +80,11 @@ module Spaceship
         #  - itctx
         begin
           re = response['Set-Cookie']
+          myacinfo = re.match(/myacinfo=([^;]*)/)[1]
+          cookies = login_overhead_cookies(myacinfo)
 
-          to_use = [
-            "myacinfo=" + re.match(/myacinfo=([^;]*)/)[1],
-            "woinst=" + re.match(/woinst=([^;]*)/)[1],
-            "itctx=" + re.match(/itctx=([^;]*)/)[1],
-            "wosid=" + re.match(/wosid=([^;]*)/)[1]
-          ]
-
-          @cookie = to_use.join(';')
-        rescue
+          @cookie = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
+        rescue => ex
           raise ITunesConnectError.new, [response.body, response['Set-Cookie']].join("\n")
         end
 
