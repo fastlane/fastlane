@@ -8,38 +8,37 @@ module Fastlane
         api_key = params[:api_token]
         store_id = params[:store_id]
 
-        if request_email? api_key, store_id
+        if request_email?(api_key, store_id)
           auth = create_an_account params[:email]
           api_key = auth['api_key']
           store_id = auth['store_id']
-          return if error_detected auth['errors']
+          return if error_detected(auth['errors'])
         end
 
-        binary = normalize_binary_name params[:binary]
-        remove_extra_screenshots_file params[:screenshots]
-        binary_url = get_binary_link binary, api_key, store_id, params[:group_ids]
+        binary = normalize_binary_name(params[:binary])
+        remove_extra_screenshots_file(params[:screenshots])
+        binary_url = get_binary_link(binary, api_key, store_id, params[:group_ids])
         return if binary_url.nil?
-        screenshots_url = get_screenshots_links api_key, store_id, params[:screenshots], params[:locale], params[:device]
-        upload_on_appaloosa api_key, store_id, binary_url, screenshots_url, params[:group_ids]
-        reset_original_binary_names binary, params[:binary]
+        screenshots_url = get_screenshots_links(api_key, store_id, params[:screenshots], params[:locale], params[:device])
+        upload_on_appaloosa(api_key, store_id, binary_url, screenshots_url, params[:group_ids])
+        reset_original_binary_names(binary, params[:binary])
       end
 
       def self.get_binary_link(binary, api_key, store_id, group_ids)
-        key_s3 = upload_on_s3 binary, store_id, group_ids
+        key_s3 = upload_on_s3(binary, api_key, store_id, group_ids)
         return if key_s3.nil?
-        get_s3_url api_key, store_id, key_s3
+        get_s3_url(api_key, store_id, key_s3)
       end
 
-      def self.upload_on_s3(file, store_id, group_ids = '')
+      def self.upload_on_s3(file, api_key, store_id, group_ids = '')
         file_name = file.split('/').last
-        response = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/fastlane",
-                            json: { store_id: store_id,
-                                    file: file_name,
+        response = HTTP.get("#{APPALOOSA_SERVER}/web_services/presign_form",
+                            json: { file: file_name,
                                     group_ids: group_ids })
         if response.status == 404
           return nil if error_detected("A problem occurred with your API token and your store id. Please try again.")
         end
-        json_res = JSON.parse response
+        json_res = JSON.parse(response)
         return if error_detected json_res['errors']
         url = json_res['s3_sign']
         path = json_res['path']
@@ -53,12 +52,12 @@ module Fastlane
       end
 
       def self.get_s3_url(api_key, store_id, path)
-        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/fastlane/url_for_download",
+        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/web_services/url_for_download",
                                json: { store_id: store_id,
                                        api_key: api_key,
                                        key: path })
-        json_res = JSON.parse binary_path
-        return if error_detected json_res['errors']
+        json_res = JSON.parse(binary_path)
+        return if error_detected(json_res['errors'])
         json_res['binary_url']
       end
 
@@ -78,8 +77,8 @@ module Fastlane
       end
 
       def self.create_an_account(email)
-        response = HTTP.post("#{APPALOOSA_SERVER}/fastlane/create_an_account", form: { email: email })
-        JSON.parse response
+        response = HTTP.post("#{APPALOOSA_SERVER}/web_services/create_an_account", form: { email: email })
+        JSON.parse(response)
       end
 
       def self.request_email?(api_key, store_id)
@@ -90,7 +89,7 @@ module Fastlane
         return if screenshots.nil?
         list = []
         list << screenshots.map do |screen|
-          upload_on_s3 screen, store_id
+          upload_on_s3(screen, store_id)
         end
       end
 
@@ -98,15 +97,15 @@ module Fastlane
         return if uploaded_screenshots.nil?
         urls = []
         urls << uploaded_screenshots.flatten.map do |url|
-          get_s3_url api_key, store_id, url
+          get_s3_url(api_key, store_id, url)
         end
       end
 
       def self.get_screenshots_links(api_key, store_id, screenshots_path, locale, device)
-        screenshots = get_screenshots screenshots_path, locale, device
+        screenshots = get_screenshots(screenshots_path, locale, device)
         return if screenshots.nil?
-        uploaded = upload_screenshots screenshots, store_id
-        links = get_uploaded_links uploaded, api_key, store_id
+        uploaded = upload_screenshots(screenshots, store_id)
+        links = get_uploaded_links(uploaded, api_key, store_id)
         links.kind_of?(Array) ? links.flatten : nil
       end
 
@@ -126,7 +125,7 @@ module Fastlane
       end
 
       def self.upload_on_appaloosa(api_key, store_id, binary_path, screenshots, group_ids)
-        screenshots = all_screenshots_links screenshots
+        screenshots = all_screenshots_links(screenshots)
         response = HTTP.post("#{APPALOOSA_SERVER}/#{store_id}/applications/upload",
                              json: { store_id: store_id,
                                      api_key: api_key,
@@ -141,7 +140,7 @@ module Fastlane
                                        provider: 'fastlane'
                                      }
                                    })
-        json_res = JSON.parse response
+        json_res = JSON.parse(response)
         Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
       end
 
@@ -189,7 +188,7 @@ module Fastlane
       end
 
       def self.details
-        'You can use this action to do cool things...'
+        'Appaloosa is a private mobile application store. This action offers a quick deployment on the platform. You can create an account, push to your existing account, or manage your user groups. We accept iOS and Android applications. Have questions? Contact support@appaloosa-store.com'
       end
 
       def self.available_options
