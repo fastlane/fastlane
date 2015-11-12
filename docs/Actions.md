@@ -1290,25 +1290,21 @@ ENV['TESTMUNK_EMAIL'] = 'email@email.com'
 testmunk
 ```
 
-### [Podio item](http://podio.com)
-Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see https://developers.podio.com. To find out how to get your identifying field (external ID) and general info about Podio item see https://developers.podio.com/examples/items
+### [Podio](http://podio.com)
+Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items). 
 
 ```ruby
-ENV["PODIO_ITEM_CLIENT_ID"] = "Client ID for Podio API"
-ENV["PODIO_ITEM_CLIENT_SECRET"] = "Client secret for Podio API "
-ENV["PODIO_ITEM_APP_ID"] = "App ID of the app you intend to authenticate with"
-ENV["PODIO_ITEM_APP_TOKEN"] = "App token of the app you intend to authenticate with"
 ENV["PODIO_ITEM_IDENTIFYING_FIELD"] = "String specifying the field key used for identification of an item"
 
-  podio_item(
-      identifying_value: "Your unique value",
-      other_fields: {
-        "field1" => "fieldValue",
-        "field2" => "fieldValue2",
-        #...as many field as your Podio app has
-      }
-    )
+podio_item(
+  identifying_value: "Your unique value",
+  other_fields: {
+    "field1" => "fieldValue",
+    "field2" => "fieldValue2"
+  }
+)
 ```
+To see all environment values, please run ```fastlane action podio_item```.
 
 ## Other
 
