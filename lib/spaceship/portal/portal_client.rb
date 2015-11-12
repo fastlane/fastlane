@@ -225,14 +225,14 @@ module Spaceship
       end
     end
 
-    def devices_by_class(deviceClass)
+    def devices_by_class(device_class)
       paging do |page_number|
         r = request(:post, 'account/ios/device/listDevices.action', {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
           sort: 'name=asc',
-          deviceClasses: deviceClass
+          deviceClasses: device_class
         })
         parse_response(r, 'devices')
       end

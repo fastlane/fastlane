@@ -84,7 +84,7 @@ module Spaceship
           cookies = login_overhead_cookies(myacinfo)
 
           @cookie = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
-        rescue => ex
+        rescue
           raise ITunesConnectError.new, [response.body, response['Set-Cookie']].join("\n")
         end
 
@@ -500,7 +500,6 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    # rubocop:disable Metrics/AbcSize
     def submit_testflight_build_for_review!( # Required:
                                             app_id: nil,
                                             train: nil,
@@ -573,7 +572,6 @@ module Spaceship
         handle_itc_response(r.body)
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     #####################################################
     # @!group Submit for Review

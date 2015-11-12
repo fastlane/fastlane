@@ -203,7 +203,7 @@ module Spaceship
       @attributes ||= []
       par = []
 
-      par = (self.superclass.attributes || []) unless (self == Base)
+      par = (self.superclass.attributes || []) unless self == Base
 
       @attributes + par
     end
