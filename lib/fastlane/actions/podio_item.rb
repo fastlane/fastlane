@@ -41,7 +41,6 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "No Client ID for Podio given, pass using `client_id: 'id'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :client_secret,
                                        env_name: 'PODIO_ITEM_CLIENT_SECRET',
                                        description: 'Client secret for Podio API (see https://developers.podio.com/api-key)',
@@ -49,7 +48,6 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "No Client Secret for Podio given, pass using `client_secret: 'secret'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :app_id,
                                        env_name: 'PODIO_ITEM_APP_ID',
                                        description: 'App ID of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)',
@@ -57,7 +55,6 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "No App ID for Podio given, pass using `app_id: 'id'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :app_token,
                                        env_name: 'PODIO_ITEM_APP_TOKEN',
                                        description: 'App token of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)',
@@ -65,7 +62,6 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "No App token for Podio given, pass using `app_token: 'token'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :identifying_field,
                                        env_name: 'PODIO_ITEM_IDENTIFYING_FIELD',
                                        description: 'String specifying the field key used for identification of an item',
@@ -73,14 +69,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "No Identifying field given, pass using `identifying_field: 'field name'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :identifying_value,
                                        description: 'String uniquely specifying an item within the app',
                                        is_string: true,
                                        verify_block: proc do |value|
                                          raise "No Identifying value given, pass using `identifying_value: 'unique value'`".red unless value && !value.empty?
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :other_fields,
                                        description: 'Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items',
                                        is_string: false,
