@@ -213,6 +213,12 @@ def adp_stub_download_certificate_failure
     to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
 end
 
+def adp_stub_download_provisioning_profile_failure
+  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=2MAY7NPHRU&teamId=XXXXXXXXXX").
+    with(headers: { 'Cookie' => 'myacinfo=abcdef;' }).
+    to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
