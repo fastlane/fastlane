@@ -28,8 +28,6 @@ Additionally, to an Xcode installation, you also need the Xcode command line too
 
     xcode-select --install
 
-    sudo xcodebuild -license accept
-
 ### [fastlane](https://github.com/KrauseFx/fastlane)
 
 Install the gem and all its dependencies (this might take a few minutes).
