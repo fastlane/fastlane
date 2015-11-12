@@ -72,6 +72,7 @@ module Fastlane
 
           Helper.log.info "You are using legacy `shenzhen` to build your app".yellow
           Helper.log.info "It is recommended to upgrade to `gym`".yellow
+          Helper.log.info "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile".yellow
           Helper.log.info "https://github.com/fastlane/gym".yellow
         rescue => ex
           [
