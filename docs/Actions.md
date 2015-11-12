@@ -1047,6 +1047,15 @@ commit_version_bump(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### number_of_commits
+
+You can use this action to get the number of commits of this repo. This is useful if you want to set the build number to the number of commits.
+
+```ruby
+build_number = number_of_commits
+increment_build_number(build_number: build_number)
+```
+
 ### add_git_tag
 This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
 
