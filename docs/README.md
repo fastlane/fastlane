@@ -76,3 +76,12 @@ Just run `fastlane new_action`. Then enter the name of the action and edit the g
 From then on, you can just start using your action in your `Fastfile`.
 
 If you think your extension can be used by other developers as well, let me know, and we can bundle it with `fastlane`.
+
+To call another action from within your action, use the following code:
+
+```ruby
+  Fastlane::Actions::PromptAction(text: "Please input your password:", 
+                                   key: 123)
+```
+
+In general, think twice before you do this, most of the times, these action should be separate. Only call actions from within action if it makes sense.
