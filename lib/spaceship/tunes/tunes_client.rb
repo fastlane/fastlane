@@ -252,8 +252,8 @@ module Spaceship
       handle_itc_response(data)
     end
 
-    def get_resolution_center(app_id)
-      r = request(:get, "ra/apps/#{app_id}/resolutionCenter?v=latest")
+    def get_resolution_center(app_id, platform)
+      r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter?v=latest")
       parse_response(r, 'data')
     end
 
