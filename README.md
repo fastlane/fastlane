@@ -69,7 +69,7 @@ To run the modified version of the tool, run the following in the project direct
 
 # Debugging
 
-I personally use a plain Sublime Text with a terminal. Debuggin is pretty, just insert the following code to where you want to jump in:
+I personally use a plain Sublime Text with a terminal. Debugging is pretty easy, just insert the following code to where you want to jump in:
 
 ```ruby
 require 'pry'
