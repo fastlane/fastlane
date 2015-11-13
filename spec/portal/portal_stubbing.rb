@@ -206,6 +206,19 @@ def adp_stub_app_groups
     to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
+def adp_stub_download_certificate_failure
+  stub_request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action').
+    with(body: { "displayId" => "XC5PH8DAAA", "type" => "R58UK2EAAA", "teamId" => "XXXXXXXXXX" },
+         headers: { 'Cookie' => 'myacinfo=abcdef;' }).
+    to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+end
+
+def adp_stub_download_provisioning_profile_failure
+  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=2MAY7NPHRU&teamId=XXXXXXXXXX").
+    with(headers: { 'Cookie' => 'myacinfo=abcdef;' }).
+    to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|

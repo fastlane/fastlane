@@ -287,10 +287,10 @@ module Spaceship
         type: type
       })
       a = parse_response(r)
-      if a.include?("Apple Inc")
+      if r.success? && a.include?("Apple Inc")
         return a
       else
-        raise "Couldn't download provisioning profile, got this instead: #{a}"
+        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
       end
     end
 
@@ -338,10 +338,10 @@ module Spaceship
         displayId: profile_id
       })
       a = parse_response(r)
-      if a.include?("DOCTYPE plist PUBLIC")
+      if r.success? && a.include?("DOCTYPE plist PUBLIC")
         return a
       else
-        raise "Couldn't download provisioning profile, got this instead: #{a}"
+        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
       end
     end
 
