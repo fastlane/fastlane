@@ -54,7 +54,7 @@ module Spaceship
         req.url "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa"
         req.headers["Cookie"] = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
       end
-      
+
       unless woa['Set-Cookie'].include?("itctx")
         raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
       end
