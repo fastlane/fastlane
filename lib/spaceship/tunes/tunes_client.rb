@@ -59,6 +59,13 @@ module Spaceship
       return @login_overhead_cookies ||= cookies
     end
 
+    def service_key
+      return @service_key if @service_key
+      # We need a service key from a JS file to properly auth
+      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
+      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
+    end
+
     def send_login_request(user, password)
       data = {
         accountName: user,
@@ -67,7 +74,7 @@ module Spaceship
       }
 
       response = request(:post) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth/signin"
+        req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
