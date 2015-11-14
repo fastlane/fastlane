@@ -75,7 +75,7 @@ module Deliver
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options) # to login...
 
-          path = (FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.')
+          path = Deliver.config[:screenshots_path]
 
           Deliver::DownloadScreenshots.run(options, path)
         end
@@ -90,8 +90,8 @@ module Deliver
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options) # to login...
 
-          path = (FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.')
-
+          path = Deliver.config[:metadata_path] 
+          
           res = ENV["DELIVER_FORCE_OVERWRITE"]
           res ||= agree("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}/metadata'? (y/n)", true)
           if res
