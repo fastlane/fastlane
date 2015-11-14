@@ -91,7 +91,7 @@ To get a list of all available parameters:
     -z, --app_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
     -y, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
     -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
-    -c, --company_name STRING The name of your comapny. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
+    -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
     -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
     -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
     -b, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
