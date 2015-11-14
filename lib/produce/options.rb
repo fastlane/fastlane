@@ -43,7 +43,7 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :company_name,
                                      short_option: "-c",
                                      env_name: "PRODUCE_COMPANY_NAME",
-                                     description: "The name of your comapny. Only required if it's the first app you create",
+                                     description: "The name of your company. Only required if it's the first app you create",
                                      optional: true,
                                      verify_block: proc do |language|
                                      end),
