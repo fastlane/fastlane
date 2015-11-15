@@ -96,11 +96,22 @@ module Frameit
         image.resize "#{frame_width}x"
       end
 
-      @image = put_device_into_background(background)
+      bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
+      bottom_space -= 40 if screenshot.portrait? # even more for portrait mode
+
+      if screenshot.mini?
+        # Such small devices need special treatment
+        bottom_space -= 50 if screenshot.portrait?
+        bottom_space += 65 unless screenshot.portrait?
+      end
+
+      self.top_space_above_device = frame_padding
 
       if fetch_config['title']
-        @image = add_title
+        background = put_title_into_background(background)
       end
+
+      @image = put_device_into_background(background)
 
       image
     end
@@ -124,16 +135,6 @@ module Frameit
 
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
-      bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
-      bottom_space -= 40 if screenshot.portrait? # even more for portrait mode
-
-      if screenshot.mini?
-        # Such small devices need special treatment
-        bottom_space -= 50 if screenshot.portrait?
-        bottom_space += 65 unless screenshot.portrait?
-      end
-
-      self.top_space_above_device = background.height - image.height - bottom_space
 
       @image = background.composite(image, "png") do |c|
         c.compose "Over"
@@ -153,8 +154,9 @@ module Frameit
 
     # Add the title above the device
     # rubocop:disable Metrics/AbcSize
-    def add_title
-      title_images = build_title_images(image.width)
+    def put_title_into_background(background)
+      title_images = build_title_images(image.width, image.height)
+
       keyword = title_images[:keyword]
       title = title_images[:title]
 
@@ -177,12 +179,15 @@ module Frameit
         sum_width *= smaller
       end
 
-      top_space = (top_space_above_device / 2.0 - (actual_font_size / 2.0 * smaller)).round # centered
-      left_space = (image.width / 2.0 - sum_width / 2.0).round
+      vertical_padding = frame_padding
+      top_space = vertical_padding
+      left_space = (background.width / 2.0 - sum_width / 2.0).round
+
+      self.top_space_above_device += title.height + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
-        @image = image.composite(keyword, "png") do |c|
+        background = background.composite(keyword, "png") do |c|
           c.compose "Over"
           c.geometry "+#{left_space}+#{top_space}"
         end
@@ -191,16 +196,16 @@ module Frameit
       end
 
       # Then, put the title on top of the screenshot next to the keyword
-      @image = image.composite(title, "png") do |c|
+      background = background.composite(title, "png") do |c|
         c.compose "Over"
         c.geometry "+#{left_space}+#{top_space}"
       end
-      image
+      background
     end
     # rubocop:enable Metrics/AbcSize
 
     def actual_font_size
-      [top_space_above_device / 3.0, @image.width / 30.0].max.round
+      [@image.width / 10.0].max.round
     end
 
     # The space between the keyword and the title
@@ -209,23 +214,25 @@ module Frameit
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image
-    def build_title_images(max_width)
+    def build_title_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
       words.each do |key|
         # Create empty background
         empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
-        image_height = actual_font_size * 2 # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
+        image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
         title_image.combine_options do |i|
-          # * 2.0 as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize "#{max_width * 2.0}x#{image_height}!" # `!` says it should ignore the ratio
+          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
+          i.resize "#{max_width * 5.0}x#{image_height}!" # `!` says it should ignore the ratio
         end
 
         current_font = font(key)
         text = fetch_text(key)
         Helper.log.debug "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
         Helper.log.debug "Adding text '#{text}'" if $verbose
+
+        text.gsub! '\n', "\n"
 
         # Add the actual title
         title_image.combine_options do |i|
@@ -267,7 +274,7 @@ module Frameit
       end
 
       # No string files, fallback to Framefile config
-      result = fetch_config[type.to_s]['text']
+      result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
       Helper.log.debug "Falling back to default text as there was nothing specified in the .strings file" if $verbose
 
       if !result and type == :title
