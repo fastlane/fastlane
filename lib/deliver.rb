@@ -17,7 +17,6 @@ require 'fastlane_core'
 
 module Deliver
   class << self
-    attr_accessor :config
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
