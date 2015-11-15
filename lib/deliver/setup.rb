@@ -65,7 +65,7 @@ module Deliver
           content = app_details.send(key)
         end
 
-        resulting_path = File.join(containing, "#{key}.txt")
+        resulting_path = File.join(deliver_path, "#{key}.txt")
         File.write(resulting_path, content)
         Helper.log.debug "Writing to '#{resulting_path}'"
       end
