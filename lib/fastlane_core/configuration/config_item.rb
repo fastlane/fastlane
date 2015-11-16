@@ -20,7 +20,7 @@ module FastlaneCore
         raise "short_option must be a String of length 1" unless short_option.kind_of? String and short_option.delete('-').length == 1
       end
       if description
-        raise "Do not let descriptions end with a '.', since it's used for user inputs as well".red if (description[-1] == '.')
+        raise "Do not let descriptions end with a '.', since it's used for user inputs as well".red if description[-1] == '.'
       end
 
       @key = key
