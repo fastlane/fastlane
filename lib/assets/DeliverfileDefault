@@ -8,6 +8,3 @@
 
 app_identifier "[[APP_IDENTIFIER]]" # The bundle identifier of your app
 username "[[USERNAME]]" # your Apple ID user
-
-metadata_path "./metadata"
-screenshots_path "./screenshots"
