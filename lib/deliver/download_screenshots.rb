@@ -20,7 +20,7 @@ module Deliver
 
           Helper.log.info "Downloading existing screenshot '#{file_name}'"
 
-          containing_folder = File.join(folder_path, "screenshots", screenshot.language)
+          containing_folder = File.join(folder_path, screenshot.language)
           begin
             FileUtils.mkdir_p(containing_folder)
           rescue
