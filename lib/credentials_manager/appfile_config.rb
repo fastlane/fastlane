@@ -67,6 +67,14 @@ module CredentialsManager
       setter(:apple_id, *args, &block)
     end
 
+    def apple_dev_portal_id(*args, &block)
+      setter(:apple_dev_portal_id, *args, &block)
+    end
+
+    def itunes_connect_id(*args, &block)
+      setter(:itunes_connect_id, *args, &block)
+    end
+
     def team_id(*args, &block)
       setter(:team_id, *args, &block)
     end
