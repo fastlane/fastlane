@@ -40,6 +40,7 @@ module Deliver
 
     def generate_metadata_files(v, deliver_path)
       app_details = v.application.details
+      containing = File.join(deliver_path, 'metadata')
 
       # All the localised metadata
       (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
@@ -50,7 +51,7 @@ module Deliver
             content = app_details.send(key)[language]
           end
 
-          resulting_path = File.join(deliver_path, language, "#{key}.txt")
+          resulting_path = File.join(containing, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
           Helper.log.debug "Writing to '#{resulting_path}'"
@@ -65,7 +66,7 @@ module Deliver
           content = app_details.send(key)
         end
 
-        resulting_path = File.join(deliver_path, "#{key}.txt")
+        resulting_path = File.join(containing, "#{key}.txt")
         File.write(resulting_path, content)
         Helper.log.debug "Writing to '#{resulting_path}'"
       end
