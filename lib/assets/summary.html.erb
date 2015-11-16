@@ -115,6 +115,10 @@
           <div id="app-name">
             <%= language %>: <%= @options[:name][language] %>
           </div>
+        <% else %>
+          <div id="app-name">
+            <%= language %>
+          </div>
         <% end %>
 
         <div id="app-urls">
