@@ -16,6 +16,8 @@ module FastlaneCore
           break
         end
         puts "\nUpdate using 'sudo gem update #{gem_name.downcase}'".green
+      rescue
+        # Something went wrong, we don't care so much about this
       end
 
       def releases(gem_name)
