@@ -11,7 +11,7 @@ module Frameit
       ]
       joiner = "_"
 
-      if screenshot.device_name.include?('iPad')
+      if screenshot.device_name.include?('iPad') || screenshot.device_name.include?('6s')
         parts = [
           screenshot.device_name,
           (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver"),
