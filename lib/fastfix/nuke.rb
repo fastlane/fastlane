@@ -9,14 +9,16 @@ module Fastfix
 
     def run(params)
       self.params = params
+      self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
+                                         hide_keys: [:app_identifier],
                                              title: "Summary for fastfix nuke #{Fastfix::VERSION}")
 
       prepare_list
       print_tables
 
-      Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above? (y/n)".red)
-      return unless agree("", true)
+      Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above?".red)
+      return unless agree("(y/n)", true)
 
       nuke_it_now!
 
@@ -28,7 +30,7 @@ module Fastfix
       Helper.log.info "Fetching certificates and profiles..."
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"
-      prov_type = params[:type]
+      prov_type = params[:type].to_sym
 
       Spaceship.login(params[:username])
       Spaceship.select_team
@@ -41,15 +43,15 @@ module Fastfix
     def print_tables
       if self.certs.count > 0
         puts Terminal::Table.new({
-          title: "Certificates that are going to be revoked".red,
-          headings: ["Name", "ID", "Expires"],
-          rows: self.certs.collect { |c| [c.name, c.id, c.expires.strftime("%Y-%m-%d")] },
+          title: "Certificates that are going to be revoked".green,
+          headings: ["Name", "ID", "Type", "Expires"],
+          rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] },
         })
       end
 
       if self.profiles.count > 0
         puts Terminal::Table.new({
-          title: "Provisioning Profiles that are going to be revoked".red,
+          title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
           rows: self.profiles.collect do |p| 
             status = p.status == 'Active' ? p.status.green : p.status.red
@@ -61,7 +63,19 @@ module Fastfix
     end
 
     def nuke_it_now!
-      # TODO
+      Helper.log_alert "Deleting #{self.profiles.count} provisioning profiles..."
+      self.profiles.each do |profile|
+        Helper.log.info "Deleting profile '#{profile.name}' (#{profile.id})..."
+        profile.delete!
+        Helper.log.info "Successfully deleted profile".green
+      end
+
+      Helper.log_alert "Deleting #{self.certs.count} certificates..."
+      self.certs.each do |cert|
+        Helper.log.info "Revoking certificate '#{cert.name}' (#{cert.id})..."
+        cert.revoke!
+        Helper.log.info "Successfully deleted certificate".green
+      end
     end
 
     private

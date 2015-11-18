@@ -7,7 +7,7 @@ module Fastfix
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"
 
-      prov_type = params[:type]
+      prov_type = params[:type].to_sym
 
       params[:path] = GitHelper.clone(params[:git_url]) if params[:git_url]
 
