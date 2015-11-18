@@ -273,6 +273,8 @@ module Spaceship
         ['ios', 'osx'].include? p['platformString']
       end
 
+      raise "Could not find platform ios or osx for app #{app_id}" unless platform
+
       version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
       return nil unless version
       version_id = version['id']
