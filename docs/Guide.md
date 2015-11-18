@@ -6,7 +6,7 @@ It will help you set up all needed build tools. I tested everything with a fresh
 <p align="center">
     <a href="#installation">Installation</a> &bull; 
     <a href="#setting-up-fastlane">Setting up</a> &bull; 
-    <a href="#example-project">Example Project</a> &bull; 
+    <a href="#example-projects">Example Project</a> &bull; 
     <a href="#help">Help</a>
 </p>
 -------
