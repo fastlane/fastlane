@@ -43,7 +43,25 @@ module Fastfix
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      env_name: "FASTFIX_KEYCHAIN_NAME",
                                      description: "Keychain the items should be imported to",
-                                     default_value: "login.keychain")
+                                     default_value: "login.keychain"),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-b",
+                                     env_name: "FASTFIX_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "FASTFIX_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                     end)
       ]
     end
   end
