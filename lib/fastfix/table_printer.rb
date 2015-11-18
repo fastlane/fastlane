@@ -1,7 +1,6 @@
 module Fastfix
   class TablePrinter
     def self.print_summary(params, uuid)
-      require 'terminal-table'
       rows = []
 
       rows << ["App Identifier", params[:app_identifier]]
