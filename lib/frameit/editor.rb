@@ -96,15 +96,6 @@ module Frameit
         image.resize "#{frame_width}x"
       end
 
-      bottom_space = -(image.height / 10).round # to be just a bit below the image bottom
-      bottom_space -= 40 if screenshot.portrait? # even more for portrait mode
-
-      if screenshot.mini?
-        # Such small devices need special treatment
-        bottom_space -= 50 if screenshot.portrait?
-        bottom_space += 65 unless screenshot.portrait?
-      end
-
       self.top_space_above_device = vertical_frame_padding
 
       if fetch_config['title']
@@ -119,7 +110,7 @@ module Frameit
     # Horizontal adding around the frames
     def horizontal_frame_padding
       padding = fetch_config['padding']
-      if !padding.kind_of?(Integer)
+      unless padding.kind_of?(Integer)
         padding = padding.split('x')[0].to_i
       end
       return scale_padding(padding)
@@ -128,13 +119,13 @@ module Frameit
     # Vertical adding around the frames
     def vertical_frame_padding
       padding = fetch_config['padding']
-      if !padding.kind_of?(Integer)
+      unless padding.kind_of?(Integer)
         padding = padding.split('x')[1].to_i
       end
       return scale_padding(padding)
     end
 
-    def scale_padding padding
+    def scale_padding(padding)
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
@@ -170,7 +161,6 @@ module Frameit
     end
 
     # Add the title above the device
-    # rubocop:disable Metrics/AbcSize
     def put_title_into_background(background)
       title_images = build_title_images(image.width, image.height)
 
@@ -219,7 +209,6 @@ module Frameit
       end
       background
     end
-    # rubocop:enable Metrics/AbcSize
 
     def actual_font_size
       [@image.width / 10.0].max.round
@@ -294,7 +283,7 @@ module Frameit
       result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
       Helper.log.debug "Falling back to default text as there was nothing specified in the .strings file" if $verbose
 
-      if !result and type == :title
+      if type == :title and !result
         # title is mandatory
         raise "Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json".red
       end
