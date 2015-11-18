@@ -45,6 +45,8 @@ module Spaceship
         if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif (response.body || "").include?("Verify your identity")
+          raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
         else
           info = [response.body, response['Set-Cookie']]
           raise UnexpectedResponse.new, info.join("\n")
