@@ -4,28 +4,23 @@ def itc_read_fixture_file(filename)
   File.read(File.join('spec', 'tunes', 'fixtures', filename))
 end
 
-def itc_user_agent # as this might change
-  'spaceship'
-end
-
-def itc_cookie
-  'myacinfo=DAWTKN;woinst=3363;itctx=abc:def;wosid=xBJMOVttbAQ1Cwlt8ktafw'
-end
-
 def itc_stub_login
   # Retrieving the current login URL
+
+  stub_request(:get, 'https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js').
+    to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa").
     to_return(status: 200, body: "")
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext").
     to_return(status: 200, body: "")
 
   # Actual login
-  stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
+  stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=22d448248055bab0dc197c6271d738c3").
     with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
     to_return(status: 200, body: '{}')
 
   # Failed login attempts
-  stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
+  stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=22d448248055bab0dc197c6271d738c3").
     with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
     to_return(status: 401, body: '{}')
 end
@@ -125,6 +120,9 @@ def itc_stub_resolution_center
   # Called from the specs to simulate invalid server responses
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/resolutionCenter?v=latest").
     to_return(status: 200, body: itc_read_fixture_file('app_resolution_center.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/resolutionCenter?v=latest").
+    to_return(status: 200, body: itc_read_fixture_file('app_resolution_center.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
 def itc_stub_build_trains
@@ -164,6 +162,8 @@ end
 def itc_stub_resolution_center_valid
   # Called from the specs to simulate valid server responses
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/resolutionCenter?v=latest").
+    to_return(status: 200, body: itc_read_fixture_file('app_resolution_center_valid.json'), headers: { 'Content-Type' => 'application/json' })
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/resolutionCenter?v=latest").
     to_return(status: 200, body: itc_read_fixture_file('app_resolution_center_valid.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
