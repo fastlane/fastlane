@@ -21,7 +21,7 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        output_path = File.join(language_folder, [device_name, launch_arguments_index, name].join("-") + ".png")
+        output_path = File.join(language_folder, [device_name, launch_arguments_index, name].compact.join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
           Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
