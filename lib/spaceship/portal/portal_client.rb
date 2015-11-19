@@ -292,7 +292,7 @@ module Spaceship
       if r.success? && a.include?("Apple Inc")
         return a
       else
-        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
+        raise UnexpectedResponse.new, "Couldn't download certificate, got this instead: #{a}"
       end
     end
 
