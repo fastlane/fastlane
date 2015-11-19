@@ -80,10 +80,10 @@ module Fastlane
 
       def self.handle_params_transition(options)
         options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
-        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow
+        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow if options[:mailgun_sandbox_postmaster]
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
-        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow
+        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow if options[:mailgun_apikey]
       end
 
       def self.mailgunit(options)
