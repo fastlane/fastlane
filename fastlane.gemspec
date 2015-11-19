@@ -35,18 +35,18 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastlane_core', '>= 0.26.3', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.10.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.14.0', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.14.2', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.5.0', '< 2.0.0'
-  spec.add_dependency 'snapshot', '>= 1.0.4', '< 2.0.0'
-  spec.add_dependency 'frameit', '>= 2.2.2', '< 3.0.0'
-  spec.add_dependency 'pem', '>= 1.0.0', '< 2.0.0'
-  spec.add_dependency 'cert', '>= 1.1.0', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.5.1', '< 2.0.0'
+  spec.add_dependency 'snapshot', '>= 1.1.1', '< 2.0.0'
+  spec.add_dependency 'frameit', '>= 2.3.0', '< 3.0.0'
+  spec.add_dependency 'pem', '>= 1.0.1', '< 2.0.0'
+  spec.add_dependency 'cert', '>= 1.2.3', '< 2.0.0'
   spec.add_dependency 'sigh', '>= 1.1.3', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.0.0', '< 2.0.0'
-  spec.add_dependency 'gym', '>= 1.1.1', '< 2.0.0'
-  spec.add_dependency 'pilot', '>= 1.0.0', '< 2.0.0'
+  spec.add_dependency 'gym', '>= 1.1.5', '< 2.0.0'
+  spec.add_dependency 'pilot', '>= 1.0.1', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.2.1', '< 1.0.0'
   spec.add_dependency 'scan', '>= 0.3.0', '< 1.0.0'
 
