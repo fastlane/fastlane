@@ -47,6 +47,8 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
     {
         let path = "/tmp/snapshot-launchArguments.txt"
         
+        app.launchArguments += ["-FASTLANE_SNAPSHOT", "1"]
+
         do {
             let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
