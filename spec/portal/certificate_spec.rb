@@ -70,7 +70,7 @@ describe Spaceship::Certificate do
     it "handles failed download request" do
       adp_stub_download_certificate_failure
 
-      error_text = /^Couldn't download provisioning profile, got this instead:/
+      error_text = /^Couldn't download certificate, got this instead:/
       expect do
         cert.download
       end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
