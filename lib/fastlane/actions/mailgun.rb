@@ -103,8 +103,8 @@ module Fastlane
           message: options[:message],
           app_link: options[:app_link]
         }
-        hash[:success] = options[:success] if options[:success]
-        hash[:ci_build_link] = options[:success] if options[:ci_build_link]
+        hash[:success] = options[:success]
+        hash[:ci_build_link] = options[:ci_build_link]
         Fastlane::ErbTemplateHelper.render(
           Fastlane::ErbTemplateHelper.load("mailgun_html_template"),
           hash
