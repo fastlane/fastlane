@@ -104,7 +104,7 @@ module Fastlane
     def self.safe_require(path)
       require path
       true
-    rescue Exception => exception
+    rescue StandardError => exception
       message = "\n---------------------------------------------"
       message << "\nError loading the plugin with path `#{path}`.\n"
       message << "\n#{exception.class} - #{exception.message}"
