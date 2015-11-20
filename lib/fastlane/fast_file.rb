@@ -134,7 +134,10 @@ module Fastlane
       class_name = method_str.fastlane_class + 'Action'
       class_ref = nil
       begin
-        class_ref = Fastlane::Actions.const_get(class_name)
+        puts "class_name = #{class_name}"
+        class_ref = Fastlane::Action.repository.find do |r|
+          r.to_s.include?(class_name)
+        end
       rescue NameError
         # Action not found
         # Is there a lane under this name?
@@ -181,6 +184,11 @@ module Fastlane
       Actions.execute_action(command) do
         Actions.sh_no_action(command)
       end
+    end
+
+    #Include a fastlane plugin
+    def plugin(plugin)
+      Actions.plugin(plugin)
     end
 
     def desc(string)
