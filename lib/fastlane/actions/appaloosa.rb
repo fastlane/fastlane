@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class AppaloosaAction < Action
-      APPALOOSA_SERVER = 'http://appaloosa-int.herokuapp.com/api/v1'
+      APPALOOSA_SERVER = 'https://appaloosa-store.com/api/v1'
       def self.run(params)
         require 'http'
 
@@ -32,12 +32,10 @@ module Fastlane
 
       def self.upload_on_s3(file, api_key, store_id, group_ids = '')
         file_name = file.split('/').last
-        response = HTTP.get("#{APPALOOSA_SERVER}/web_services/presign_form",
+        response = HTTP.get("#{APPALOOSA_SERVER}/upload_services/presign_form",
                             json: { file: file_name,
+                                    store_id: store_id,
                                     group_ids: group_ids })
-        if response.status == 404
-          return nil if error_detected("A problem occurred with your API token and your store id. Please try again.")
-        end
         json_res = JSON.parse(response)
         return if error_detected json_res['errors']
         url = json_res['s3_sign']
@@ -52,10 +50,13 @@ module Fastlane
       end
 
       def self.get_s3_url(api_key, store_id, path)
-        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/web_services/url_for_download",
+        binary_path = HTTP.get("#{APPALOOSA_SERVER}/#{store_id}/upload_services/url_for_download",
                                json: { store_id: store_id,
                                        api_key: api_key,
                                        key: path })
+        if binary_path.status == 404
+          return nil if error_detected("A problem occurred with your API token and your store id. Please try again.")
+        end
         json_res = JSON.parse(binary_path)
         return if error_detected(json_res['errors'])
         json_res['binary_url']
@@ -77,7 +78,7 @@ module Fastlane
       end
 
       def self.create_an_account(email)
-        response = HTTP.post("#{APPALOOSA_SERVER}/web_services/create_an_account", form: { email: email })
+        response = HTTP.post("#{APPALOOSA_SERVER}/upload_services/create_an_account", form: { email: email })
         JSON.parse(response)
       end
 
@@ -85,11 +86,11 @@ module Fastlane
         api_key.size == 0 && store_id.size == 0
       end
 
-      def self.upload_screenshots(screenshots, store_id)
+      def self.upload_screenshots(screenshots, api_key, store_id)
         return if screenshots.nil?
         list = []
         list << screenshots.map do |screen|
-          upload_on_s3(screen, store_id)
+          upload_on_s3(screen, api_key, store_id)
         end
       end
 
@@ -104,7 +105,7 @@ module Fastlane
       def self.get_screenshots_links(api_key, store_id, screenshots_path, locale, device)
         screenshots = get_screenshots(screenshots_path, locale, device)
         return if screenshots.nil?
-        uploaded = upload_screenshots(screenshots, store_id)
+        uploaded = upload_screenshots(screenshots, api_key, store_id)
         links = get_uploaded_links(uploaded, api_key, store_id)
         links.kind_of?(Array) ? links.flatten : nil
       end
@@ -141,7 +142,11 @@ module Fastlane
                                      }
                                    })
         json_res = JSON.parse(response)
-        Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
+        if json_res['errors']
+          Helper.log.info "App: #{json_res['errors']}".red
+        else
+          Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
+        end
       end
 
       def self.all_screenshots_links(screenshots)
