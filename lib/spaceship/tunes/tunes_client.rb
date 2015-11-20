@@ -562,11 +562,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def submit_testflight_build_for_review!( # Required:
-                                            app_id: nil,
-                                            train: nil,
-                                            build_number: nil,
-
+    def submit_testflight_build_for_review!(app_id:, train:, build_number:,
                                             # Required Metadata:
                                             changelog: nil,
                                             description: nil,
@@ -584,14 +580,7 @@ module Spaceship
                                             review_password: nil,
                                             encryption: false)
 
-      start_url = "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
-      r = request(:get) do |req|
-        req.url start_url
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
-
-      build_info = r.body['data']
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number)
       # Now fill in the values provided by the user
 
       # First the localised values:
@@ -612,27 +601,45 @@ module Spaceship
       build_info['testInfo']['reviewPassword']['value'] = review_password
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url start_url
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+
         req.body = build_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
 
       encryption_info = r.body['data']
-      if encryption_info['exportComplianceRequired']
-        # only sometimes this is required
+      update_encryption_compliance(app_id: app_id,
+                                   train: train,
+                                   build_number: build_number,
+                                   encryption_info: encryption_info,
+                                   encryption: encryption)
+    end
 
-        encryption_info['usesEncryption']['value'] = encryption
-        encryption_info['encryptionUpdated']['value'] = encryption
-
-        r = request(:post) do |req|
-          req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
-          req.body = encryption_info.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-
-        handle_itc_response(r.body)
+    def get_build_info_for_review(app_id:, train:, build_number:)
+      r = request(:get) do |req|
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.headers['Content-Type'] = 'application/json'
       end
+      handle_itc_response(r.body)
+
+      r.body['data']
+    end
+
+    def update_encryption_compliance(app_id:, train:, build_number:, encryption_info:, encryption:)
+      return unless encryption_info['exportComplianceRequired']
+      # only sometimes this is required
+
+      encryption_info['usesEncryption']['value'] = encryption
+      encryption_info['encryptionUpdated']['value'] = encryption
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
+        req.body = encryption_info.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body)
     end
 
     #####################################################
