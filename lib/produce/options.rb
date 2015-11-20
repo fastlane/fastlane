@@ -6,7 +6,7 @@ module Produce
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-      
+
       [
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
