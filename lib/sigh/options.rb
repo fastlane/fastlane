@@ -4,7 +4,10 @@ require 'credentials_manager'
 module Sigh
   class Options
     def self.available_options
-      @@options ||= [
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
+      [
         FastlaneCore::ConfigItem.new(key: :adhoc,
                                      env_name: "SIGH_AD_HOC",
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
@@ -34,7 +37,7 @@ module Sigh
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "SIGH_TEAM_ID",
