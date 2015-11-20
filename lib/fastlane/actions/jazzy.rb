@@ -15,7 +15,6 @@ module Fastlane
       end
 
       def self.details
-        
       end
 
       def self.available_options
@@ -24,7 +23,6 @@ module Fastlane
       end
 
       def self.output
-        
       end
 
       def self.return_value
