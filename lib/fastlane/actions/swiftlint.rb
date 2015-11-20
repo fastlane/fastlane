@@ -1,9 +1,9 @@
 module Fastlane
   module Actions
-    class JazzyAction < Action
+    class SwiftlintAction < Action
       def self.run(params)
-        Actions.verify_gem!('jazzy')
-        Actions.sh("jazzy")
+        raise "You have to install swiftlint using `brew install swiftlint`".red if `which swiftlint`.to_s.length == 0
+        Actions.sh("swiftlint")
       end
 
       #####################################################
@@ -11,7 +11,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Generate docs using Jazzy"
+        "Run swift code validation using SwiftLint"
       end
 
       def self.details
