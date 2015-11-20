@@ -12,7 +12,7 @@ module Snapshot
       File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))
       File.write(File.join(path, 'SnapshotHelper.swift'), File.read("#{gem_path}/lib/assets/SnapshotHelper.swift"))
 
-      puts "Successfully created SnapshotHelper.js '#{File.join(path, 'SnapshotHelper.swift')}'".green
+      puts "Successfully created SnapshotHelper.swift '#{File.join(path, 'SnapshotHelper.swift')}'".green
       puts "Successfully created new Snapfile at '#{snapfile_path}'".green
 
       puts "-------------------------------------------------------".yellow
