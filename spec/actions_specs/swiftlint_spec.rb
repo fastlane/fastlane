@@ -6,7 +6,7 @@ describe Fastlane do
           swiftlint
         end").runner.execute(:test)
 
-        expect(result).to eq("swftlint")
+        expect(result).to eq("swiftlint")
       end
     end
   end
