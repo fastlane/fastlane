@@ -28,7 +28,7 @@ module Gym
       def watchkit?
         Dir["#{PackageCommandGenerator.appfile_path}/**/*.plist"].any? do |plist_path|
           `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == 'true'
-        end
+        end && !(Gym::XcodebuildFixes.watchkit2?)
       end
     end
   end
