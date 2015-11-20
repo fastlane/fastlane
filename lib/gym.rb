@@ -34,6 +34,7 @@ module Gym
       # Import all the fixes
       require 'gym/xcodebuild_fixes/swift_fix'
       require 'gym/xcodebuild_fixes/watchkit_fix'
+      require 'gym/xcodebuild_fixes/watchkit2_fix'
       require 'gym/xcodebuild_fixes/package_application_fix'
     end
   end
