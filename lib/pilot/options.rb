@@ -4,12 +4,15 @@ require "credentials_manager"
 module Pilot
   class Options
     def self.available_options
-      @options ||= [
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
+      [
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "PILOT_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "PILOT_APP_IDENTIFIER",
