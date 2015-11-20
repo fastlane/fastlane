@@ -12,7 +12,7 @@ module Produce
                                      short_option: "-u",
                                      env_name: "PRODUCE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user,
+                                     default_value: user),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      short_option: "-a",
