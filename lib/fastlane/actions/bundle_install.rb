@@ -26,7 +26,7 @@ module Fastlane
           cmd << "--without #{params[:without]}" if params[:without]
           cmd << "--with #{params[:with]}" if params[:with]
 
-          Actions.sh(cmd.join(' '))
+          return sh(cmd.join(' '))
         else
           Helper.log.info "No Gemfile found"
         end
@@ -39,7 +39,7 @@ module Fastlane
         possible_gemfiles.insert(0, params[:gemfile]) if params[:gemfile]
         possible_gemfiles.each do |gemfile|
           gemfile = File.absolute_path(gemfile)
-          return true if File.exist? gemfile
+          return true if File.exist?(gemfile)
           Helper.log.info "Gemfile not found at: '#{gemfile}'"
         end
         return false
