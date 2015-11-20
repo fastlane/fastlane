@@ -11,6 +11,7 @@ require 'deliver/upload_assets'
 require 'deliver/submit_for_review'
 require 'deliver/app_screenshot'
 require 'deliver/html_generator'
+require 'deliver/loader'
 
 require 'spaceship'
 require 'fastlane_core'

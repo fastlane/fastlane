@@ -95,11 +95,8 @@ module Deliver
       return if options[:skip_metadata]
 
       # Load localised data
-      Dir.glob(File.join(options[:metadata_path], "*")).each do |lng_folder|
-        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
-
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
         language = File.basename(lng_folder)
-
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lng_folder, "#{key}.txt")
           next unless File.exist?(path)
