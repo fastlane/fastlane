@@ -7,8 +7,6 @@ module Spaceship
 
     attr_reader :du_client
 
-    attr_accessor :myacinfo
-
     def initialize
       super
 
@@ -94,8 +92,8 @@ module Spaceship
         #  - itctx
         begin
           re = response['Set-Cookie']
-          @myacinfo = re.match(/myacinfo=([^;]*)/)[1]
-          cookies = login_overhead_cookies(@myacinfo)
+          myacinfo = re.match(/myacinfo=([^;]*)/)[1]
+          cookies = login_overhead_cookies(myacinfo)
 
           @cookie = cookies.collect { |k, v| "#{k}=#{v}; " }.join("")
         rescue
