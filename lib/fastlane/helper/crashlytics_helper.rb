@@ -4,7 +4,6 @@ module Fastlane
       class << self
         def generate_ios_command(params)
           raise "No value found for 'crashlytics_path'" unless params[:crashlytics_path]
-          raise "The crashlytics bundle must be of type .framework" unless params[:crashlytics_path].end_with?(".framework") || Helper.test?
 
           command = []
           command << File.join(params[:crashlytics_path], 'submit')
