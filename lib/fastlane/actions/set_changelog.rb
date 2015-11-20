@@ -74,6 +74,9 @@ module Fastlane
       end
 
       def self.available_options
+        user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
+        user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
         [
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
@@ -84,7 +87,7 @@ module Fastlane
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_SET_CHANGELOG_VERSION",
                                        description: "The version number to create/update",

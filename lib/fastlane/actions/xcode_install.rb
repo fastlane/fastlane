@@ -40,6 +40,9 @@ module Fastlane
       end
 
       def self.available_options
+        user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+        user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
         [
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
@@ -50,7 +53,7 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "XCODE_INSTALL_USER",
                                        description: "Your Apple ID Username",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                       default_value: user),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-b",
                                        env_name: "XCODE_INSTALL_TEAM_ID",
