@@ -185,7 +185,7 @@ module Fastlane
       end
     end
 
-    #Include a fastlane plugin
+    # Include a fastlane plugin
     def plugin(plugin)
       Actions.plugin(plugin)
     end
