@@ -562,7 +562,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def submit_testflight_build_for_review!(app_id:, train:, build_number:,
+    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil,
                                             # Required Metadata:
                                             changelog: nil,
                                             description: nil,
@@ -616,7 +616,7 @@ module Spaceship
                                    encryption: encryption)
     end
 
-    def get_build_info_for_review(app_id:, train:, build_number:)
+    def get_build_info_for_review(app_id: nil, train: nil, build_number: nil)
       r = request(:get) do |req|
         req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
         req.headers['Content-Type'] = 'application/json'
@@ -626,7 +626,7 @@ module Spaceship
       r.body['data']
     end
 
-    def update_encryption_compliance(app_id:, train:, build_number:, encryption_info:, encryption:)
+    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, encryption_info: nil, encryption: nil)
       return unless encryption_info['exportComplianceRequired']
       # only sometimes this is required
 
