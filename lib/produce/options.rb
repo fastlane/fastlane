@@ -4,12 +4,15 @@ require 'credentials_manager'
 module Produce
   class Options
     def self.available_options
-      @@options ||= [
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      
+      [
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "PRODUCE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user,
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      short_option: "-a",
@@ -44,9 +47,7 @@ module Produce
                                      short_option: "-c",
                                      env_name: "PRODUCE_COMPANY_NAME",
                                      description: "The name of your company. Only required if it's the first app you create",
-                                     optional: true,
-                                     verify_block: proc do |language|
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
                                      env_name: "PRODUCE_SKIP_ITC",
