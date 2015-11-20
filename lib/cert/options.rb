@@ -22,7 +22,7 @@ module Cert
                                      short_option: "-u",
                                      env_name: "CERT_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user,
+                                     default_value: user),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
