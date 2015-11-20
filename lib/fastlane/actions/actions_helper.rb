@@ -76,6 +76,10 @@ module Fastlane
       end
     end
 
+    def self.load_plugins
+      PluginManager.load_plugins('fastlane')
+    end
+
     def self.load_external_actions(path)
       raise 'You need to pass a valid path' unless File.exist?(path)
 

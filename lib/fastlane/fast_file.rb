@@ -185,11 +185,6 @@ module Fastlane
       end
     end
 
-    # Include a fastlane plugin
-    def plugin(plugin)
-      Actions.plugin(plugin)
-    end
-
     def desc(string)
       desc_collection << string
     end

@@ -1,5 +1,6 @@
 require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/plugin'
+require 'fastlane/plugin_manager'
 require 'fastlane/version'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
@@ -23,6 +24,7 @@ module Fastlane
 
   Fastlane::Actions.load_default_actions
   Fastlane::Actions.load_helpers
+  Fastlane::Actions.load_plugins
 
   if Fastlane::FastlaneFolder.path
     actions_path = File.join(Fastlane::FastlaneFolder.path, 'actions')
