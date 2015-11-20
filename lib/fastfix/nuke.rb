@@ -17,12 +17,16 @@ module Fastfix
       prepare_list
       print_tables
 
-      Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above?".red)
-      return unless agree("(y/n)", true)
+      if (self.certs + self.profiles).count > 0
+        Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above?".red)
+        return unless agree("(y/n)", true)
 
-      nuke_it_now!
+        nuke_it_now!
 
-      Helper.log.info "Successfully cleaned your account ♻️".green
+        Helper.log.info "Successfully cleaned your account ♻️".green
+      else
+        Helper.log.info "No relevant certificates or provisioning profiles found, nothing to do here :)".green
+      end
     end
 
     # Collect all the certs/profiles

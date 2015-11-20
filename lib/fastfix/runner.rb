@@ -18,7 +18,7 @@ module Fastfix
       profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
       if certs.count == 0 or keys.count == 0
-        Helper.log.error "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
+        Helper.log.info "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         Generator.generate_certificate(params, cert_type)
       else
         cert = certs.last
