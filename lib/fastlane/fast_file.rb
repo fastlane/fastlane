@@ -135,7 +135,7 @@ module Fastlane
       class_ref = nil
       begin
         puts "class_name = #{class_name}"
-        class_ref = Fastlane::Action.repository.find do |r|
+        class_ref = Fastlane::Action.repository.detect do |r|
           r.to_s.include?(class_name)
         end
       rescue NameError
