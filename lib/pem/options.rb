@@ -4,7 +4,10 @@ require 'credentials_manager'
 module PEM
   class Options
     def self.available_options
-      @@options ||= [
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
+      [
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "PEM_DEVELOPMENT",
                                      description: "Renew the development push certificate instead of the production one",
@@ -35,7 +38,7 @@ module PEM
                                      short_option: "-u",
                                      env_name: "PEM_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user,
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "PEM_TEAM_ID",
