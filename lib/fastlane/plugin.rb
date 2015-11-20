@@ -7,7 +7,6 @@ module Fastlane
 
       def inherited(klass)
         repository << klass
-        puts "Loaded Plugin #{klass}" #TODO: In the real implementation we would make this only happen to those loaded via fastfile
       end
     end
 
