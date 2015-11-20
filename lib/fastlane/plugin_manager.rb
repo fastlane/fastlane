@@ -104,14 +104,6 @@ module Fastlane
     def self.safe_require(path)
       require path
       true
-    rescue StandardError => exception
-      message = "\n---------------------------------------------"
-      message << "\nError loading the plugin with path `#{path}`.\n"
-      message << "\n#{exception.class} - #{exception.message}"
-      message << "\n#{exception.backtrace.join("\n")}"
-      message << "\n---------------------------------------------\n"
-      puts message.ansi.yellow
-      false
     end
     # rubocop:enable RescueException
 
