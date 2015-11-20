@@ -4,6 +4,9 @@ require 'credentials_manager'
 module Fastfix
   class Options
     def self.available_options
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
       [
         FastlaneCore::ConfigItem.new(key: :path,
                                      env_name: "FASTFIX_PATH",
@@ -39,7 +42,7 @@ module Fastfix
                                      short_option: "-u",
                                      env_name: "FASTFIX_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)),
+                                     default_value: user),
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      env_name: "FASTFIX_KEYCHAIN_NAME",
                                      description: "Keychain the items should be imported to",
