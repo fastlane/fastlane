@@ -11,7 +11,7 @@ module Fastlane
     end
 
     def self.included(klass)
-      klass.extend ClassMethods  # Somewhat controversial
+      klass.extend ClassMethods
     end
   end
 end
