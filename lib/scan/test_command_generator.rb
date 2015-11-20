@@ -4,7 +4,7 @@ module Scan
     class << self
       def generate
         parts = prefix
-        parts << "xcodebuild"
+        parts << "env NSUnbufferedIO=YES xcodebuild"
         parts += options
         parts += actions
         parts += suffix
