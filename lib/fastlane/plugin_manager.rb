@@ -60,7 +60,7 @@ module Fastlane
       end if matches.count == 1
       unless spec
         warn '[!] Unable to load a specification for the plugin ' \
-          "`#{path}`".ansi.yellow
+          "`#{path}`".yellow
       end
       spec
     end
