@@ -9,7 +9,11 @@ module Fastfix
 
       prov_type = params[:type].to_sym
 
-      params[:path] = GitHelper.clone(params[:git_url]) if params[:git_url]
+      if params[:git_url]
+        params[:path] = GitHelper.clone(params[:git_url])
+      else
+        Helper.log.info "It is recommended to use a separate Git Repo to store your certificates and profiles. Specify one using the `git_url` option.".yellow
+      end
 
       certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]

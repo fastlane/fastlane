@@ -5,7 +5,7 @@ module Fastfix
 
       Helper.log.info "Please create a new, private git repository".yellow
       Helper.log.info "to store the certificates and profiles there".yellow
-      url = ask("URL: ")
+      url = ask("URL of the Git Repo: ")
 
       template.gsub!("[[GIT_URL]]", url)
       File.write(path, template)
