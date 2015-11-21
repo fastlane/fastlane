@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+# Originally from https://github.com/CocoaPods/CLAide/blob/master/lib/claide/command/plugin_manager.rb
+
 module Fastlane
   # Handles plugin related logic logic for the `Action` class.
   #
