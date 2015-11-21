@@ -77,7 +77,9 @@ module Fastlane
     end
 
     def self.load_plugins
-      PluginManager.load_plugins('fastlane')
+      PluginManager.load_plugins('fastlane').each do |p|
+        require p
+      end
     end
 
     def self.load_external_actions(path)
