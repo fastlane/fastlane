@@ -4,11 +4,12 @@ module Fastfix
     attr_accessor :params
 
     attr_accessor :certs
-
     attr_accessor :profiles
+    attr_accessor :files
 
     def run(params)
       self.params = params
+      self.params[:path] = GitHelper.clone(self.params[:git_url])
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier],
@@ -17,7 +18,7 @@ module Fastfix
       prepare_list
       print_tables
 
-      if (self.certs + self.profiles).count > 0
+      if (self.certs + self.profiles + self.files).count > 0
         Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above?".red)
         return unless agree("(y/n)", true)
 
@@ -41,6 +42,13 @@ module Fastfix
 
       self.certs = certificate_type(cert_type).all
       self.profiles = profile_type(prov_type).all
+
+      if params[:git_url] # we don't want to delete files from a directory that might not be in git...
+        certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
+        keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
+        profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+        self.files = certs + keys + profiles
+      end
     end
 
     # Print tables to ask the user
@@ -64,21 +72,45 @@ module Fastfix
           end
         })
       end
+
+      if self.files.count > 0
+        puts Terminal::Table.new({
+          title: "Files that are going to be deleted".green,
+          headings: ["Type", "File Name"],
+          rows: self.files.collect do |f| 
+            components = f.split(File::SEPARATOR)[-3..-1]
+            [components[0..1].join(" "), components[2]]
+          end
+        })
+      end
     end
 
     def nuke_it_now!
-      Helper.log_alert "Deleting #{self.profiles.count} provisioning profiles..."
+      Helper.log_alert "Deleting #{self.profiles.count} provisioning profiles..." unless self.profiles.count == 0
       self.profiles.each do |profile|
         Helper.log.info "Deleting profile '#{profile.name}' (#{profile.id})..."
         profile.delete!
         Helper.log.info "Successfully deleted profile".green
       end
 
-      Helper.log_alert "Deleting #{self.certs.count} certificates..."
+      Helper.log_alert "Revoking #{self.certs.count} certificates..." unless self.certs.count == 0
       self.certs.each do |cert|
         Helper.log.info "Revoking certificate '#{cert.name}' (#{cert.id})..."
         cert.revoke!
         Helper.log.info "Successfully deleted certificate".green
+      end
+
+      if self.files.count > 0
+        Helper.log_alert "Deleting #{self.files.count} files from the git repo..."
+        self.files.each do |file|
+          Helper.log.info "Deleting file '#{File.basename(file)}'..."
+          File.delete(file)
+          Helper.log.info "Successfully deleted file".green
+        end
+
+        # Now we need to commit and push all this too
+        message = ["[fastlane]", "Nuked", "files", "for", params[:type].to_s].join(" ")
+        GitHelper.commit_changes(params[:path], message)
       end
     end
 
