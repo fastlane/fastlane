@@ -7,7 +7,6 @@ module Fastlane
 
       def inherited(klass)
         repository << klass
-        puts "Registered #{klass}"
       end
     end
 
