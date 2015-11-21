@@ -30,15 +30,14 @@ fastlane automatically pre-fills environment variables to enable proper code sig
 ### How does it work (seen from the user)
 
 ```ruby
-  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: "development")
-  setup_codesigning(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
+  fastfix(git_url: "https://github.com/fastlane/certificates", type: "development")
+  fastfix(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
 ```
 
 The user specifies 3 things only:
-- The Git Repo to store the certificates in (optional, by default this would store the profiles in the same repo as the app itself)
+- The Git Repo to store the certificates in
 - The type of the profile (App Store, Ad Hoc, Development or Enterprise)
 - The app’s bundle identifier
-
 
 ### Result
 
