@@ -34,7 +34,7 @@ module FastlaneCore
       if self.config.all_keys.include? method_sym
         value = arguments.first || (block.call if block_given?) # this is either a block or a value
         if value
-          self.config[method_sym] = value
+          self.config[method_sym] = value if self.config._values[method_sym].to_s.length == 0
         end
       else
         # We can't set this value, maybe the tool using this configuration system has its own

@@ -187,6 +187,11 @@ module FastlaneCore
       @values
     end
 
+    # Direct access to the values, without iterating through all items
+    def _values
+      @values
+    end
+
     def all_keys
       @available_options.collect(&:key)
     end
