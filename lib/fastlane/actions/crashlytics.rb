@@ -60,12 +60,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
                                        end),
-
           # General
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
                                        description: "Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)",
-                                       default_value: Dir["./Pods/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last,
+                                       default_value: Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find crashlytics at path '#{File.expand_path(value)}'`".red unless File.exist?(File.expand_path(value))
