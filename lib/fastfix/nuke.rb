@@ -19,7 +19,13 @@ module Fastfix
       print_tables
 
       if (self.certs + self.profiles + self.files).count > 0
-        Helper.log_alert("Are you sure you want to complete delete and revoke all the certificates and provisioning profiles listed above?".red)
+        Helper.log.info "---".red
+        Helper.log.info "Are you sure you want to completely delete and revoke all the".red
+        Helper.log.info "certificates and provisioning profiles listed above? (y/n)".red
+        if params[:type] == "appstore" or params[:type] == "adhoc"
+          Helper.log.info "Warning: By nuking AppStore/AdHoc profiles, the distribution certificate gets revoked!".red
+        end
+        Helper.log.info "---".red
         return unless agree("(y/n)", true)
 
         nuke_it_now!
