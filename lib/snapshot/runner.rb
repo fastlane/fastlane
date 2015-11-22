@@ -46,7 +46,7 @@ module Snapshot
 
     def config_launch_arguments
       launch_arguments = Array(Snapshot.config[:launchArguments])
-      if (launch_arguments.count == 1)
+      if launch_arguments.count == 1
         [launch_arguments]
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
