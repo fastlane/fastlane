@@ -76,7 +76,7 @@ fastfix(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_
 
 If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `fastfix nuke` command.
 
-To revoke all certificates and provisioning profiles for a specific app / environment run
+To revoke all certificates and provisioning profiles for a specific environment.
 
 ```sh
 fastfix nuke development
@@ -85,6 +85,24 @@ fastfix nuke appstore
 ```
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
+
+## Setup Xcode project
+
+To make sure Xcode is using the right provisioning profile for each target, don't use the `Automatic` feature for the profile selection.
+
+`fastfix` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
+
+![assets/UDIDPrint.png](assets/UDIDPrint.png)
+
+Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`. 
+
+```
+$(sigh_tools.fastlane.app_development)
+# in general
+$(sigh_[bundle.identifier].[distributiontype])
+```
+
+![assets/XcodeProjectSettings.png](assets/XcodeProjectSettings.png)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
