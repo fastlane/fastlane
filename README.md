@@ -92,17 +92,15 @@ To make sure Xcode is using the right provisioning profile for each target, don'
 
 `fastfix` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
 
-![assets/UDIDPrint.png](assets/UDIDPrint.png)
+<img src="assets/UDIDPrint.png" width="700" />
 
-Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`. 
+Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
 
 ```
 $(sigh_tools.fastlane.app_development)
-# in general
-$(sigh_[bundle.identifier].[distributiontype])
 ```
 
-![assets/XcodeProjectSettings.png](assets/XcodeProjectSettings.png)
+<img src="assets/XcodeProjectSettings.png" width="700" />
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
