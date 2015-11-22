@@ -64,7 +64,12 @@ module Fastfix
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :force,
+                                     env_name: "FASTFIX_FORCE",
+                                     description: "Renew provisioning profiles regardless of its state",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end

@@ -38,7 +38,9 @@ module Fastfix
 
       # Install the provisioning profiles
       profile = profiles.last
-      profile ||= Generator.generate_provisioning_profile(params, prov_type)
+      if profile.nil? or params[:force]
+        profile = Generator.generate_provisioning_profile(params, prov_type)
+      end
 
       FastlaneCore::ProvisioningProfile.install(profile)
 
