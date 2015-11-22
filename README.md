@@ -13,37 +13,78 @@ fastfix
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastfix/blob/master/LICENSE)
 
-### The Issue
+-------
+<p align="center">
+    <a href="#why">Why?</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#how-does-it-work">How does it work?</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
+    <a href="#need-help">Need help?</a>
+</p>
 
-To deploy an app to the App Store or beta testing service, the developer needs to sign the app. Most teams have separate code signing identities for every single developer in the team, resulting in dozens of profiles and a lot of duplicates.
-If the team decides to use one code signing identity across the whole team, there is no way to sync the profiles and keys between the various machines. You have to manually export them using Xcode and transfer them between the Macs every time you change something. 
+-------
 
-### The Solution
+<h5 align="center"><code>fastfix</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
-Store the certificates and profiles in a separate git repo. Have one code signing identity for the whole team. When running fastlane it will automatically fetch the latest certificates from the remote git repo and install it on the local machine. If some profile is missing, fastlane will automatically generate them for the user.
+## Why fastfix?
 
-### The Goal
+TODO
 
-It is a declarative approach: the user doesn’t have to know how code signing works. The user shouldn’t have to think about the underlying technology and certificates. All the user cares about is to sign the application.
-fastlane automatically pre-fills environment variables to enable proper code signing with multiple targets (e.g. WatchKit)
+### Why not let Xcode handle all this
 
-### How does it work (seen from the user)
+- You have full control over what happens
+- You have access to all the certificates and profiles, which are all securely stored in git
+- Xcode sometimes revokes your certificates
+- TODO
 
-```ruby
-  fastfix(git_url: "https://github.com/fastlane/certificates", type: "development")
-  fastfix(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
+## Installation
+
+```
+sudo gem install fastfix
 ```
 
-The user specifies 3 things only:
-- The Git Repo to store the certificates in
-- The type of the profile (App Store, Ad Hoc, Development or Enterprise)
-- The app’s bundle identifier
+Make sure, you have the latest version of the Xcode command line tools installed:
 
-### Result
+    xcode-select --install
 
-See the attached screenshot: the repo contains all required certificates and profiles to sign the application.
+## Usage
 
-Using this technique **we solved code signing**! It’s going to be huge!
+### Setup
+
+Create a new private git repo and run
+
+```
+fastfix init
+```
+
+You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. 
+
+### Run
+
+Add `fastfix` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
+
+```ruby
+fastfix(type: "appstore")
+
+fastfix(git_url: "https://github.com/fastlane/certificates", type: "development")
+
+fastfix(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
+```
+
+### Nuke
+
+If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `fastfix nuke` command.
+
+To revoke all certificates and provisioning profiles for a specific app / environment run
+
+```sh
+fastfix nuke development
+fastfix nuke adhoc
+fastfix nuke appstore
+```
+
+You'll have to confirm a list of profiles / certificates that will be deleted.
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
