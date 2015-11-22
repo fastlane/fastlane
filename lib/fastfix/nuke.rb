@@ -102,8 +102,18 @@ module Fastfix
 
       if self.files.count > 0
         Helper.log_alert "Deleting #{self.files.count} files from the git repo..."
+
         self.files.each do |file|
           Helper.log.info "Deleting file '#{File.basename(file)}'..."
+
+          # Check if the profile is installed on the local machine
+          if file.end_with?("mobileprovision")
+            parsed = FastlaneCore::ProvisioningProfile.parse(file)
+            uuid = parsed["UUID"]
+            path = Dir[File.join(FastlaneCore::ProvisioningProfile.profiles_path, "#{uuid}.mobileprovision")].last
+            File.delete(path) if path
+          end
+
           File.delete(file)
           Helper.log.info "Successfully deleted file".green
         end
