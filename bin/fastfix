@@ -61,13 +61,16 @@ class FastfixApplication
       end
     end
 
-    command :nuke do |c|
-      c.syntax = 'fastfix nuke'
-      c.description = 'Delete all certificates and provisioning profiles from the Apple Dev Poratl'
-      c.action do |args, options|
-        params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
-        params.load_configuration_file("Fixfile")
-        Fastfix::Nuke.new.run(params)
+    [:appstore, :adhoc, :development, :enterprise].each do |type|
+      command "nuke #{type}" do |c|
+        c.syntax = "fastfix nuke #{type}"
+        c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal (#{type})"
+        c.action do |args, options|
+          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+          params.load_configuration_file("Fixfile")
+          params[:type] = type.to_s
+          Fastfix::Nuke.new.run(params)
+        end
       end
     end
 
