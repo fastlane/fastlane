@@ -9,7 +9,7 @@ module Fastfix
 
     def run(params)
       self.params = params
-      self.params[:path] = GitHelper.clone(self.params[:git_url])
+      self.params[:path] = GitHelper.clone(self.params[:git_url]) if self.params[:git_url]
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier],
