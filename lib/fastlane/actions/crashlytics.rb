@@ -27,7 +27,7 @@ module Fastlane
           raise "You have to either pass an ipa or an apk file to the Crashlytics action".red
         end
 
-        Helper.log.info 'Uploading the IPA to Crashlytics Beta. Time for some ☕️.'.green
+        Helper.log.info 'Uploading the build to Crashlytics Beta. Time for some ☕️.'.green
         Helper.log.debug command.join(" ") if $verbose
         Actions.sh command.join(" ")
 
