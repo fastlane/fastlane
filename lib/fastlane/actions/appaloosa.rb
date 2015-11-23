@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class AppaloosaAction < Action
-      APPALOOSA_SERVER = 'https://appaloosa-store.com/api/v1'
+      APPALOOSA_SERVER = 'https://www.appaloosa-store.com/api/v1'
       def self.run(params)
         require 'http'
 
