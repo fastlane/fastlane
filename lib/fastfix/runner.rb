@@ -9,11 +9,8 @@ module Fastfix
 
       prov_type = params[:type].to_sym
 
-      if params[:git_url]
-        params[:path] = GitHelper.clone(params[:git_url])
-      else
-        Helper.log.info "It is recommended to use a separate Git Repo to store your certificates and profiles. Specify one using the `git_url` option.".yellow
-      end
+      params[:path] = GitHelper.clone(params[:git_url])
+      Encrypt.new.decrypt_repo(params)
 
       certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
@@ -48,10 +45,10 @@ module Fastfix
       uuid = parsed["UUID"]
       Utils.fill_environment(params, uuid)
 
-      if params[:git_url]
-        message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:path], message)
-      end
+      Encrypt.new.encrypt_repo(params)
+
+      message = GitHelper.generate_commit_message(params)
+      GitHelper.commit_changes(params[:path], message)
 
       TablePrinter.print_summary(params, uuid)
 

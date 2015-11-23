@@ -16,7 +16,7 @@ module Fastfix
         FastlaneCore::ConfigItem.new(key: :git_url,
                                      env_name: "FASTFIX_GIT_URl",
                                      description: "URL to the git repo containing all the certificates",
-                                     optional: true,
+                                     optional: false,
                                      short_option: "-r",
                                      verify_block: proc do |value|
                                        # TODO
