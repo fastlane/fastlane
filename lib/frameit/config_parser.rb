@@ -85,7 +85,7 @@ module Frameit
           end
 
           if key == 'padding'
-            raise "padding must be type integer" unless value.kind_of? Integer
+            raise "padding must be type integer or pair of integers of format 'AxB'" unless value.kind_of?(Integer) || value.split('x').length == 2
           end
         end
       end
