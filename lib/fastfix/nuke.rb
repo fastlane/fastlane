@@ -9,7 +9,7 @@ module Fastfix
 
     def run(params)
       self.params = params
-      self.params[:path] = GitHelper.clone(self.params[:git_url]) if self.params[:git_url]
+      self.params[:path] = GitHelper.clone(self.params[:git_url])
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier],
@@ -49,12 +49,10 @@ module Fastfix
       self.certs = certificate_type(cert_type).all
       self.profiles = profile_type(prov_type).all
 
-      if params[:git_url] # we don't want to delete files from a directory that might not be in git...
-        certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
-        keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
-        profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
-        self.files = certs + keys + profiles
-      end
+      certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
+      profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+      self.files = certs + keys + profiles
     end
 
     # Print tables to ask the user
