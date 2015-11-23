@@ -90,7 +90,7 @@ v.copyright = "#{Time.now.year} Felix Krause"
 v.description.languages # => ["German", "English"]
 
 # Update localised app metadata
-v.description["English"] = "App Description"
+v.description["en-US"] = "App Description"
 
 # set the app age rating
 v.set_rating({
