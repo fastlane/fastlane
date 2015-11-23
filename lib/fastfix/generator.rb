@@ -29,7 +29,8 @@ module Fastfix
         adhoc: params[:type] == 'adhoc',
         development: params[:type] == 'development',
         output_path: File.join(params[:path], "profiles", prov_type.to_s),
-        username: params[:username]
+        username: params[:username],
+        force: params[:force]
       })
 
       Sigh.config = arguments
