@@ -8,11 +8,6 @@ module Fastfix
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
-        FastlaneCore::ConfigItem.new(key: :path,
-                                     env_name: "FASTFIX_PATH",
-                                     description: "Path to the certificates directory",
-                                     default_value: File.join('fastlane', 'certificates'),
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :git_url,
                                      env_name: "FASTFIX_GIT_URl",
                                      description: "URL to the git repo containing all the certificates",
@@ -69,7 +64,13 @@ module Fastfix
                                      env_name: "FASTFIX_FORCE",
                                      description: "Renew provisioning profiles regardless of its state",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :path,
+                                     description: "Path to the temporary cloned certificates directory",
+                                     verify_block: proc do |value|
+                                      raise "Specify the `git_url` instead of the `path`".red unless value.start_with?("/var/folders")
+                                     end,
+                                     optional: true)
       ]
     end
   end
