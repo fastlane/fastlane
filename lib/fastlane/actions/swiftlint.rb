@@ -2,7 +2,9 @@ module Fastlane
   module Actions
     class SwiftlintAction < Action
       def self.run(params)
-        raise "You have to install swiftlint using `brew install swiftlint`".red if `which swiftlint`.to_s.length == 0
+        if `which swiftlint`.to_s.length == 0 and !Helper.test?
+          raise "You have to install swiftlint using `brew install swiftlint`".red
+        end
         Actions.sh("swiftlint")
       end
 
