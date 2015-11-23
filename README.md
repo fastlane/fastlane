@@ -67,9 +67,12 @@ Add `fastfix` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
 ```ruby
 fastfix(type: "appstore")
 
-fastfix(git_url: "https://github.com/fastlane/certificates", type: "development")
+fastfix(git_url: "https://github.com/fastlane/certificates", 
+        type: "development")
 
-fastfix(git_url: "https://github.com/fastlane/certificates", type: "adhoc", app_identifier: "tools.fastlane.app")
+fastfix(git_url: "https://github.com/fastlane/certificates", 
+        type: "adhoc", 
+        app_identifier: "tools.fastlane.app")
 ```
 
 ### Setup Xcode project
