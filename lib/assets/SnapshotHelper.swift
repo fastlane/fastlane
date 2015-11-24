@@ -46,10 +46,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
         }
         print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
         
-        let view = XCUIApplication()
-        let start = view.coordinateWithNormalizedOffset(CGVectorMake(32.10, 30000))
-        let finish = view.coordinateWithNormalizedOffset(CGVectorMake(31, 30000))
-        start.pressForDuration(0, thenDragToCoordinate: finish)
+        XCUIDevice.sharedDevice().orientation = .Unknown
         sleep(1)
     }
     
