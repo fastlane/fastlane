@@ -40,7 +40,6 @@ describe FastlaneCore do
 
       devices = FastlaneCore::Simulator.all
       expect(devices.count).to eq(4)
-      puts "devices: #{devices}"
 
       expect(devices[0]).to have_attributes(
         name: "iPhone 4s", ios_version: "8.1",
