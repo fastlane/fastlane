@@ -196,7 +196,7 @@ module FastlaneCore
       end
 
       begin
-        result = @build_settings.split("\n").find { |c| c.include? key }
+        result = @build_settings.split("\n").find { |c| c.split(" = ").first.strip == key }
         return result.split(" = ").last
       rescue => ex
         return nil if optional # an optional value, we really don't care if something goes wrong
