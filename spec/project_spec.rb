@@ -74,5 +74,16 @@ describe FastlaneCore do
         expect(@project.schemes).to eq(["Mac"])
       end
     end
+
+    describe "Build Settings" do
+      before do
+        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        @project = FastlaneCore::Project.new(options)
+      end
+
+      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
+        expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
+      end
+    end
   end
 end
