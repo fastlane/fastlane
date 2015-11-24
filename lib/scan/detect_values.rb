@@ -39,9 +39,14 @@ module Scan
         end
       end
 
+      min_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET").split(".").first.to_i
+
+      # Filter out any simulators that are not the same major version of our deployment target
+      sims = FastlaneCore::Simulator.all.select { |s| s.ios_version.to_i >= min_target }
+      
       # An iPhone 5s is reasonable small and useful for tests
-      found = FastlaneCore::Simulator.all.find { |d| d.name == "iPhone 5s" }
-      found ||= FastlaneCore::Simulator.all.first # anything is better than nothing
+      found = sims.find { |d| d.name == "iPhone 5s" }
+      found ||= sims.first # anything is better than nothing
 
       Scan.device = found
 
