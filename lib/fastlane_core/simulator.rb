@@ -39,6 +39,37 @@ module FastlaneCore
       def clear_cache
         @devices = nil
       end
+
+      # The code below works from Xcode 7 on
+      # def all
+      #   Helper.log.info "Fetching available devices" if $verbose
+
+      #   @devices = []
+      #   output = ''
+      #   Open3.popen3('xcrun simctl list devices --json') do |stdin, stdout, stderr, wait_thr|
+      #     output = stdout.read
+      #   end
+
+      #   begin
+      #     data = JSON.parse(output)
+      #   rescue => ex
+      #     Helper.log.error ex
+      #     Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
+      #     raise "xcrun simctl not working.".red
+      #   end
+
+      #   data["devices"].each do |ios_version, l|
+      #     l.each do |device|
+      #       next if device['availability'].include?("unavailable")
+      #       next unless ios_version.include?("iOS")
+
+      #       os = ios_version.gsub("iOS ", "").strip
+      #       @devices << Device.new(name: device['name'], ios_version: os, udid: device['udid'])
+      #     end
+      #   end
+
+      #   return @devices
+      # end
     end
 
     # Use the UDID for the given device when setting the destination
