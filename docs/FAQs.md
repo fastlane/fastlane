@@ -58,12 +58,12 @@ You can also references these environment variables almost anywhere in `fastlane
 
 You can even define a lane to perform actions on multiple targets:
 
-
-  desc "Deploy both versions"
-  lane :deploy_all do
+```
+desc "Deploy both versions"
+lane :deploy_all do
     sh "fastlane deploy --env paid"
     sh "fastlane deploy --env free"
-  end
-
+end
+```
 
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
