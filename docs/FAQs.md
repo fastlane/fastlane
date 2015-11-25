@@ -56,4 +56,14 @@ Ex: `fastlane build --env app2` will use `.env.app2`
 
 You can also references these environment variables almost anywhere in `fastlane`. 
 
+You can even define a lane to perform actions on multiple targets:
+
+
+  desc "Deploy both versions"
+  lane :deploy_all do
+    sh "fastlane deploy --env paid"
+    sh "fastlane deploy --env free"
+  end
+
+
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
