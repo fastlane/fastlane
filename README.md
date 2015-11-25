@@ -168,7 +168,7 @@ lane :appstore do
     app_identifier: 'com.krausefx.app',
     app_name: 'MyApp',
     language: 'English',
-    version: '1.0',
+    app_version: '1.0',
     sku: 123,
     team_name: 'SunApps GmbH' # only necessary when in multiple teams
   )
