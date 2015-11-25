@@ -36,6 +36,8 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 # Getting started
 
+Make sure you have `bundler` installed using `gem install bundler`
+
 Clone the `countdown` repo
 
 ```
