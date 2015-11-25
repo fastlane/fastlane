@@ -10,7 +10,6 @@ module Fastfix
       prov_type = params[:type].to_sym
 
       params[:path] = GitHelper.clone(params[:git_url])
-      Encrypt.new.decrypt_repo(params)
 
       certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
@@ -44,8 +43,6 @@ module Fastfix
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
       Utils.fill_environment(params, uuid)
-
-      Encrypt.new.encrypt_repo(params)
 
       message = GitHelper.generate_commit_message(params)
       GitHelper.commit_changes(params[:path], message)

@@ -52,7 +52,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 ### Setup
 
-Create a new private git repo and run
+Create a new private git repo and run the following in your project folder
 
 ```
 fastfix init

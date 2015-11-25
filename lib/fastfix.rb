@@ -6,7 +6,6 @@ require 'fastfix/utils'
 require 'fastfix/table_printer'
 require 'fastfix/git_helper'
 require 'fastfix/generator'
-require 'fastfix/encrypt'
 
 require 'fastlane_core'
 require 'terminal-table'
