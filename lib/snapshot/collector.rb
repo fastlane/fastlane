@@ -46,7 +46,7 @@ module Snapshot
             (subtest["Subtests"] || []).each do |subtest2|
               (subtest2["Subtests"] || []).each do |subtest3|
                 (subtest3["ActivitySummaries"] || []).each do |activity|
-                  # We now check if it's the drag gesture with a negative value
+                  # We now check if it's the rotation gesture, because that's the only thing we care about
                   was_snapshot = activity["Title"] == "Set device orientation to Unknown"
                   activities << activity if was_snapshot
                 end
