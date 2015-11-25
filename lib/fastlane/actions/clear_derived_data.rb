@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         path = File.expand_path("~/Library/Developer/Xcode/DerivedData")
         FileUtils.rm_rf(path) if File.directory?(path)
-        Helper.log.info "Successfully cleraed Derived Data ♻️".green
+        Helper.log.info "Successfully cleared Derived Data ♻️".green
       end
 
       #####################################################
