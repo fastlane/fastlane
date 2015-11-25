@@ -46,8 +46,8 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = false)
         }
         print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
         
+        sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown
-        sleep(1)
     }
     
     class func waitForLoadingIndicatorToDisappear()
