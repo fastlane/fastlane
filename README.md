@@ -51,7 +51,7 @@ cd countdown
 [sudo] rake bootstrap
 ```
 
-If you don't use [rbenv](https://github.com/sstephenson/rbenv) or [rvm](https://rvm.io/) you might need to run `sudo rake bootstrap` to not run into a permission error.
+If you don't use [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/) you might need to run `sudo rake bootstrap` to not run into a permission error.
 
 Before working on something, make sure to have pulled the latest changes. To pull the changes of all repos, go to the `countdown` directory and run
 
