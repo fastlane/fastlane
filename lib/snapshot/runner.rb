@@ -97,10 +97,12 @@ module Snapshot
       end
     end
 
+    # rubocop:disable Style/Next
     def verify_helper_is_current
       helper_files = Update.find_helper
       helper_files.each do |path|
         content = File.read(path)
+
         if content.include?("start.pressForDuration(0, thenDragToCoordinate: finish)")
           Helper.log.error "Your '#{path}' is outdated, please run `snapshot update`".red
           Helper.log.error "to update your Helper file".red
@@ -108,5 +110,6 @@ module Snapshot
         end
       end
     end
+    # rubocop:enable Style/Next
   end
 end

@@ -1,6 +1,6 @@
 module Snapshot
   module Fixes
-    # This fix is needed due to a bug in UI Tests that creates invalid screenshots when the 
+    # This fix is needed due to a bug in UI Tests that creates invalid screenshots when the
     # simulator is not scaled to a 100%
     # Issue: https://github.com/fastlane/snapshot/issues/249
     # Radar: https://openradar.appspot.com/radar?id=6127019184095232
@@ -13,9 +13,9 @@ module Snapshot
         Helper.log.debug "Patching '#{config_path}' to scale simulator to 100%"
 
         FastlaneCore::Simulator.all.each do |simulator|
-          simulator_name = simulator.name.gsub(" ", "-")
+          simulator_name = simulator.name.tr(" ", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
-          
+
           command = "defaults write '#{config_path}' '#{key}' '1.0'"
           puts command.yellow if $debug
           `#{command}`
