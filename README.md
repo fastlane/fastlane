@@ -243,6 +243,18 @@ snapshot reset_simulators
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
+## Update snapshot helpers
+
+Some updates require the helper files to be updated. `snapshot` will automatically warn you and tell you how to update.
+
+Basically you can run 
+
+```
+snapshot update
+```
+
+to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift).
+
 # How does it work?
 
 The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different approach:

@@ -49,6 +49,16 @@ class SnapshotApplication
       end
     end
 
+    command :update do |c|
+      c.syntax = 'snapshot update'
+      c.description = "Updates your SnapshotHelper.swift to the latest version"
+
+      c.action do |args, options|
+        require 'snapshot/update'
+        Snapshot::Update.new.update
+      end
+    end
+
     command :reset_simulators do |c|
       c.syntax = 'snapshot reset_simulators'
       c.description = "This will remove all your existing simulators and re-create new ones"
