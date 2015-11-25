@@ -28,7 +28,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
     class func setLanguage(app: XCUIApplication)
     {
         let path = "/tmp/language.txt"
-        
+
         do {
             let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             deviceLanguage = locale.substringToIndex(locale.startIndex.advancedBy(2, limit:locale.endIndex))
@@ -60,3 +60,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
         }
     }
 }
+
+// Please don't remove the lines below
+// They are used to detect outdated configuration files
+// SnapshotHelperVersion [[1.0]]

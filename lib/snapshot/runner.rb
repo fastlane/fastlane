@@ -14,6 +14,8 @@ module Snapshot
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
+      verify_helper_is_current
+
       FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
@@ -90,6 +92,18 @@ module Snapshot
       path = File.join(".", Snapshot.config[:output_directory], "*", "*.png")
       Dir[path].each do |current|
         File.delete(current)
+      end
+    end
+
+    def verify_helper_is_current
+      helper_files = Update.find_helper
+      helper_files.each do |path|
+        content = File.read(path)
+        if content.include?("start.pressForDuration(0, thenDragToCoordinate: finish)")
+          Helper.log.error "Your '#{path}' is outdated, please run `snapshot update`".red
+          Helper.log.error "to update your Helper file".red
+          raise "Please update your Snapshot Helper file".red
+        end
       end
     end
   end
