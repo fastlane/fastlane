@@ -50,6 +50,8 @@ module Snapshot
 
       File.write("/tmp/language.txt", language)
 
+      Fixes::SimulatorZoomFix.patch
+
       command = TestCommandGenerator.generate(device_type: device_type)
 
       Helper.log_alert("#{device_type} - #{language}")
