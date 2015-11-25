@@ -13,7 +13,7 @@ module Snapshot
         Helper.log.debug "Patching '#{config_path}' to scale simulator to 100%"
 
         FastlaneCore::Simulator.all.each do |simulator|
-          simulator_name = simulator.name.tr(" ", "-")
+          simulator_name = simulator.name.tr("\s", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 
           command = "defaults write '#{config_path}' '#{key}' '1.0'"
