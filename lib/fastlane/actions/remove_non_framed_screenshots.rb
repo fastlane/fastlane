@@ -25,7 +25,7 @@ module Fastlane
                                        description: "Path to screenshots folder",
                                        is_string: true,
                                        default_value: "fastlane/screenshots/",
-                                       optional: true), 
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :backgroundImage,
                                        env_name: "FL_BACKGROUND_IMAGE_NAME",
                                        description: "Name of background image",
