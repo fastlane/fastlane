@@ -47,7 +47,7 @@ module Snapshot
               (subtest2["Subtests"] || []).each do |subtest3|
                 (subtest3["ActivitySummaries"] || []).each do |activity|
                   # We now check if it's the drag gesture with a negative value
-                  was_snapshot = activity["Title"].match(/Press and drag from Target Application.*\[32.10.*\].*/)
+                  was_snapshot = activity["Title"] == "Set device orientation to Unknown"
                   activities << activity if was_snapshot
                 end
               end
@@ -61,7 +61,7 @@ module Snapshot
       to_store = [] # contains the names of all the attachments we want to use
       activities.each do |activity|
         # We do care about this, all "Long press Target" events mean screenshots
-        attachment_entry = activity["SubActivities"].last # the latest event is fine
+        attachment_entry = activity
         to_store << attachment_entry["Attachments"].last["FileName"]
       end
 
