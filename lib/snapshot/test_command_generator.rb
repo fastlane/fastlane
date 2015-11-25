@@ -70,7 +70,7 @@ module Snapshot
 
         device_udid = nil
         FastlaneCore::Simulator.all.each do |sim|
-          device_udid = sim.udid if sim.name.strip == device.strip
+          device_udid = sim.udid if sim.name.strip == device.strip and sim.ios_version == Snapshot.config[:ios_version]
         end
 
         value = "platform=iOS Simulator,id=#{device_udid},OS=#{Snapshot.config[:ios_version]}"
