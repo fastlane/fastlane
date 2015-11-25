@@ -143,6 +143,24 @@ For a list of available parameters and commands run
 
     sigh --help
 
+
+### Use with [`fastlane`](https://github.com/fastlane/fastlane)
+
+`sigh` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane) in combination with [`cert`](https://github.com/fastlane/cert).
+
+Update your `Fastfile` to contain the following code:
+
+```ruby
+lane :beta do
+  cert
+  sigh(force: true)
+end
+```
+
+`force: true` will make sure to re-generate the provisioning profile on each run.
+This will result in `sigh` always using the correct signing certificate, which is installed on the local machine.
+
+
 # Repair
 
 `sigh` can automatically repair all your existing provisioning profiles which are expired or just invalid.
