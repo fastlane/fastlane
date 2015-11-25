@@ -16,7 +16,7 @@ func setLanguage(app: XCUIApplication)
     Snapshot.setLanguage(app)
 }
 
-func snapshot(name: String, waitForLoadingIndicator: Bool = true)
+func snapshot(name: String, waitForLoadingIndicator: Bool = false)
 {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
