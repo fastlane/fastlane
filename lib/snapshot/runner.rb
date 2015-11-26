@@ -45,7 +45,8 @@ module Snapshot
     end
 
     def config_launch_arguments
-      launch_arguments = Array(Snapshot.config[:launchArguments])
+      launch_arguments = Array(Snapshot.config[:launch_arguments])
+      # if more than 1 set of arguments, use a tuple with an index
       if launch_arguments.count == 1
         [launch_arguments]
       else
@@ -59,7 +60,7 @@ module Snapshot
       FileUtils.mkdir_p(screenshots_path)
 
       File.write("/tmp/language.txt", language)
-      File.write("/tmp/snapshot-launchArguments.txt", launch_arguments.last)
+      File.write("/tmp/snapshot-launch_arguments.txt", launch_arguments.last)
 
       command = TestCommandGenerator.generate(device_type: device_type)
 

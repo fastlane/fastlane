@@ -45,7 +45,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
 
     class func setLaunchArguments(app: XCUIApplication)
     {
-        let path = "/tmp/snapshot-launchArguments.txt"
+        let path = "/tmp/snapshot-launch_arguments.txt"
         
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "1"]
 
@@ -58,7 +58,7 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = true)
             }
             app.launchArguments += results
         } catch {
-            print("Couldn't detect/set launchArguments...")
+            print("Couldn't detect/set launch_arguments...")
         }
     }
     
