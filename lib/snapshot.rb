@@ -10,6 +10,8 @@ require 'snapshot/test_command_generator'
 require 'snapshot/error_handler'
 require 'snapshot/collector'
 require 'snapshot/options'
+require 'snapshot/update'
+require 'snapshot/fixes/simulator_zoom_fix'
 
 require 'fastlane_core'
 

@@ -14,6 +14,8 @@ module Snapshot
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
+      verify_helper_is_current
+
       FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
@@ -62,6 +64,8 @@ module Snapshot
       File.write("/tmp/language.txt", language)
       File.write("/tmp/snapshot-launch_arguments.txt", launch_arguments.last)
 
+      Fixes::SimulatorZoomFix.patch
+
       command = TestCommandGenerator.generate(device_type: device_type)
 
       Helper.log_alert("#{device_type} - #{language} - #{launch_arguments.last}")
@@ -106,5 +110,20 @@ module Snapshot
         File.delete(current)
       end
     end
+
+    # rubocop:disable Style/Next
+    def verify_helper_is_current
+      helper_files = Update.find_helper
+      helper_files.each do |path|
+        content = File.read(path)
+
+        if content.include?("start.pressForDuration(0, thenDragToCoordinate: finish)")
+          Helper.log.error "Your '#{path}' is outdated, please run `snapshot update`".red
+          Helper.log.error "to update your Helper file".red
+          raise "Please update your Snapshot Helper file".red
+        end
+      end
+    end
+    # rubocop:enable Style/Next
   end
 end
