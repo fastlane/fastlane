@@ -21,6 +21,12 @@ func setLaunchArguments(app: XCUIApplication)
     Snapshot.setLaunchArguments(app)
 }
 
+func setupSnapshot(app: XCUIApplication)
+{
+    setLanguage(app)
+    setLaunchArguments(app)
+}
+
 func snapshot(name: String, waitForLoadingIndicator: Bool = true)
 {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
