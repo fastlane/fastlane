@@ -856,6 +856,16 @@ update_info_plist(
 )
 ```
 
+## update_url_schemes
+
+This action allows you to update the URL schemes of the app before building it.
+For example, you can use this to set a different url scheme for the alpha
+or beta version of the app.
+
+```ruby
+update_url_schemes path: 'path/to/Info.plist', url_schemes: ['myawesomeapp']
+```
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
