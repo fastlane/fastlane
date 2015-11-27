@@ -5,9 +5,10 @@ describe Fastlane do
         ENV.delete "CRASHLYTICS_API_TOKEN"
         ENV.delete "CRASHLYTICS_BUILD_SECRET"
         ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
+        @crashlytics_bundle = "Crashlytics.framework/submit"
       end
 
-      describe "Android", nower: true do
+      describe "Android" do
         describe "Valid parameters" do
           it "works with valid parameters" do
             command = Fastlane::FastFile.new.parse('lane :test do
@@ -54,7 +55,7 @@ describe Fastlane do
               })
             end").runner.execute(:test)
 
-            expect(command).to eq(["./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+            expect(command).to eq([@crashlytics_bundle,
                                    "wadus",
                                    "secret",
                                    "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -74,7 +75,7 @@ describe Fastlane do
               })
             end").runner.execute(:test)
 
-            ["./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+            [@crashlytics_bundle,
              "wadus",
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -97,7 +98,7 @@ describe Fastlane do
             end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -119,7 +120,7 @@ describe Fastlane do
               end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -141,7 +142,7 @@ describe Fastlane do
             end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -163,7 +164,7 @@ describe Fastlane do
               end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -186,7 +187,7 @@ describe Fastlane do
             end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -211,7 +212,7 @@ describe Fastlane do
               end").runner.execute(:test)
 
             expect(command).to eq([
-              "./fastlane/spec/fixtures/fastfiles/Fastfile1/submit",
+              @crashlytics_bundle,
               "wadus",
               "secret",
               "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
@@ -224,6 +225,7 @@ describe Fastlane do
         end
 
         describe "Invalid Parameters" do
+          # If this test fails, there might be a Crashlytics.framework somewhere in the .. directory
           it "raises an error if no crashlytics path was given" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
