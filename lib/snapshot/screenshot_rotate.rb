@@ -5,7 +5,7 @@ module Snapshot
   class ScreenshotRotate
     # @param (String) The path in which the screenshots are located in
     def run(path)
-      Helper.log.debug "Going to rotate screenshots from generated png files"
+      Helper.log.debug "Rotating the screenshots (if necessary)"
       rotate(path)
     end
 
@@ -22,19 +22,17 @@ module Snapshot
           command = "sips -r 180 '#{file}'"
         end
 
-        # Only rotate if we need to
-        if command
-          PTY.spawn( command ) do |r, w, pid|
-            r.sync
-            r.each do |line|
-              # We need to read this otherwise things hang
-            end
-            ::Process.wait pid
-          end
-        end
+        next unless command
 
+        # Only rotate if we need to
+        PTY.spawn(command) do |r, w, pid|
+          r.sync
+          r.each do |line|
+            # We need to read this otherwise things hang
+          end
+          ::Process.wait pid
+        end
       end
     end
-
   end
 end
