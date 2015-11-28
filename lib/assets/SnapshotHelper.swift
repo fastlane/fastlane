@@ -38,7 +38,8 @@ class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear()
         }
         
-        print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
+        let orientation = XCUIDevice.sharedDevice().orientation.isPortrait ? "portrait" : "landscape"
+        print("snapshot: \(name)-\(orientation)") // more information about this, check out https://github.com/krausefx/snapshot
         
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown
@@ -56,4 +57,4 @@ class Snapshot: NSObject {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [[1.0]]
+// SnapshotHelperVersion [[1.1]]
