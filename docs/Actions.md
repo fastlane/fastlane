@@ -1167,6 +1167,15 @@ import_from_git(
 )
 ```
 
+### last_git_commit
+
+Get information about the last git commit, returns the author and the git message.
+
+```ruby
+last_commit = last_git_commit
+crashlytics(notes: last_commit[:message])
+```
+
 ## Using mercurial
 
 ### hg_ensure_clean_status
