@@ -60,7 +60,6 @@ module Snapshot
 
       to_store = [] # contains the names of all the attachments we want to use
       activities.each do |activity|
-        # We do care about this, all "Long press Target" events mean screenshots
         attachment_entry = activity
         to_store << attachment_entry["Attachments"].last["FileName"]
       end
