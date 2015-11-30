@@ -863,7 +863,8 @@ For example, you can use this to set a different url scheme for the alpha
 or beta version of the app.
 
 ```ruby
-update_url_schemes path: 'path/to/Info.plist', url_schemes: ['myawesomeapp']
+update_url_schemes(path: "path/to/Info.plist", 
+            url_schemes: ["com.myapp"])
 ```
 
 ## Developer Portal
