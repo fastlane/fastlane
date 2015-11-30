@@ -1172,8 +1172,9 @@ import_from_git(
 Get information about the last git commit, returns the author and the git message.
 
 ```ruby
-last_commit = last_git_commit
-crashlytics(notes: last_commit[:message])
+commit = last_git_commit
+crashlytics(notes: commit[:message])
+puts commit[:author]
 ```
 
 ## Using mercurial
