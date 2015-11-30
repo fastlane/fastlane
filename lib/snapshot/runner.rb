@@ -45,7 +45,8 @@ module Snapshot
 
     def launch(language, device_type)
       screenshots_path = TestCommandGenerator.derived_data_path
-      FileUtils.rm_rf(screenshots_path)
+      FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
+      FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
       FileUtils.mkdir_p(screenshots_path)
 
       File.write("/tmp/language.txt", language)
