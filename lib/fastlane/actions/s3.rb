@@ -110,7 +110,7 @@ module Fastlane
         bundle_id, bundle_version, title, full_version = get_ipa_info(ipa_file)
 
         # Creating plist and html names
-        plist_file_name = "#{url_part}#{title}.plist"
+        plist_file_name = "#{url_part}#{title.delete(' ')}.plist"
         plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
 
         html_file_name ||= "index.html"
