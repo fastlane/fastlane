@@ -23,15 +23,26 @@ module Fastlane
             env_name: 'FL_UPDATE_URL_SCHEMES_PATH',
             description: 'The Plist file\'s path',
             is_string: true,
-            verify_block: verify_path_block
+            optional: false,
+            verify_block: proc do |path|
+              raise "Could not find plist at path '#{path}'".red unless File.exist?(path)
+            end
           ),
 
           FastlaneCore::ConfigItem.new(
             key: :url_schemes,
-            env_name: "FL_UPDATE_URL_SCHEMES_URL_SCHEMES",
+            env_name: "FL_UPDATE_URL_SCHEMES_SCHEMES",
             description: 'The new URL schemes',
             is_string: false,
-            verify_block: verify_url_schemes_block
+            optional: false,
+            verify_block: proc do |url_schemes|
+              string = "The URL schemes must be an array of strings, got '#{url_schemes}'.".red
+              raise string unless url_schemes.kind_of?(Array)
+
+              url_schemes.each do |url_scheme|
+                raise string unless url_scheme.kind_of?(String)
+              end
+            end
           )
         ]
       end
@@ -46,23 +57,6 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
-      end
-
-      def self.verify_path_block
-        lambda do |path|
-          raise "Could not find plist at path '#{path}'".red unless File.exist?(path)
-        end
-      end
-
-      def self.verify_url_schemes_block
-        lambda do |url_schemes|
-          string = "The URL schemes must be an array of strings, got '#{url_schemes}'.".red
-          raise string unless url_schemes.kind_of?(Array)
-
-          url_schemes.each do |url_scheme|
-            raise string unless url_scheme.kind_of?(String)
-          end
-        end
       end
     end
   end
