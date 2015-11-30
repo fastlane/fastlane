@@ -709,7 +709,7 @@ This action creates a new release for your repository on GitHub and can also upl
 ```ruby
 github_release = set_github_release(
   repository_name: "krausefx/fastlane",
-  api_token: ENV['GITHUB_TOKEN']
+  api_token: ENV['GITHUB_TOKEN'],
   name: "Super New actions",
   tag_name: "v1.22.0",
   description: File.read("changelog"),
