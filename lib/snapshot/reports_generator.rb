@@ -13,12 +13,13 @@ module Snapshot
       Dir[File.join(screens_path, "*")].sort.each do |language_folder|
         language = File.basename(language_folder)
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
-       	   ["portrait", "landscape"].each do |orientation|	
+        ["portrait", "landscape"].each do |orientation|
+        	  if File.basename(screenshot).include?orientation
+              	output_name += " (#{orientation.capitalize})"
+              end	
 	          available_devices.each do |key_name, output_name|
     	        next unless File.basename(screenshot).include?key_name
-				  if File.basename(screenshot).include?orientation
-              		output_name += " (#{orientation.capitalize})"
-              	  end
+
         	    # This screenshot is from this device
             	@data[language] ||= {}
             	@data[language][output_name] ||= []
