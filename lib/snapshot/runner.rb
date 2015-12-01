@@ -41,6 +41,9 @@ module Snapshot
 
       # Generate HTML report
       ReportsGenerator.new.generate
+
+      # Clear the Derived Data
+      FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
     end
 
     def launch(language, device_type)
