@@ -1,7 +1,7 @@
 module Match
   class Setup
     def run(path)
-      template = File.read("#{Helper.gem_path('match')}/lib/assets/FixfileTemplate")
+      template = File.read("#{Helper.gem_path('match')}/lib/assets/MatchfileTemplate")
 
       Helper.log.info "Please create a new, private git repository".yellow
       Helper.log.info "to store the certificates and profiles there".yellow

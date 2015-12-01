@@ -26,7 +26,7 @@ class MatchApplication
 
       c.action do |args, options|
         params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-        params.load_configuration_file("Fixfile")
+        params.load_configuration_file("Matchfile")
         Match::Runner.new.run(params)
       end
     end
@@ -37,7 +37,7 @@ class MatchApplication
 
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-          params.load_configuration_file("Fixfile") # this has to be done *before* overwriting the value
+          params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
           params[:type] = type.to_s
           Match::Runner.new.run(params)
         end
@@ -46,13 +46,13 @@ class MatchApplication
 
     command :init do |c|
       c.syntax = 'match init'
-      c.description = 'Create the Fixfile for you'
+      c.description = 'Create the Matchfile for you'
       c.action do |args, options|
         containing = (File.directory?("fastlane") ? 'fastlane' : '.')
-        path = File.join(containing, "Fixfile")
+        path = File.join(containing, "Matchfile")
 
         if File.exist?(path)
-          puts "You already got a Fixfile in this directory".yellow
+          puts "You already got a Matchfile in this directory".yellow
           return 0
         end
 
@@ -67,7 +67,7 @@ class MatchApplication
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal (#{type})"
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-          params.load_configuration_file("Fixfile")
+          params.load_configuration_file("Matchfile")
           params[:type] = type.to_s
           Match::Nuke.new.run(params)
         end
