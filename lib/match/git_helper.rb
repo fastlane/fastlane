@@ -9,6 +9,8 @@ module Match
       Helper.log.info command.yellow
       puts `#{command}`
 
+      copy_readme(@dir)
+
       return @dir
     end
 
@@ -36,6 +38,12 @@ module Match
           puts `#{command}`
         end
       end
+    end
+
+    # Copies the README.md into the git repo
+    def self.copy_readme(directory)
+      template = File.read("#{Helper.gem_path('match')}/lib/assets/READMETemplate.md")
+      File.write(File.join(directory, "README.md"), template)
     end
   end
 end
