@@ -6,9 +6,16 @@ module Fastlane
 
     class SlatherAction < Action
       def self.run(params)
-        Actions.verify_gem!('slather')
+        #This will fail if using Bundler. Skip the check rather than needing to
+        # require bundler
+        use_bundler = params[:use_bundle_exec]
+        if ! use_bundler
+          Actions.verify_gem!('slather')
+        end
 
-        command = "slather coverage "
+        command = ""
+        command += "bundle exec " if use_bundler
+        command += "slather coverage "
         command += " --build-directory #{params[:build_directory]}" if params[:build_directory]
         command += " --input-format #{params[:input_format]}" if params[:input_format]
         command += " --scheme #{params[:scheme]}" if params[:scheme]
@@ -128,7 +135,12 @@ Slather is available at https://github.com/venmo/slather
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        env_name: "FL_SLATHER_IGNORE",
                                        description: "Tell slather to ignore files matching a path",
-                                       optional: true)
+                                       optional: true),
+         FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
+                                      env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
+                                      description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
+                                      is_string: false,
+                                      default_value: false),
         ]
       end
 
