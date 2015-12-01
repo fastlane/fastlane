@@ -35,6 +35,7 @@ module Sigh
         end
       else
         Helper.log.info "No existing profiles, creating a new one for you".yellow
+        ensure_app_exists!
         profile = create_profile!
       end
 
@@ -166,6 +167,24 @@ module Sigh
 
       Helper.log.info "Successfully downloaded provisioning profile...".green
       return output_path
+    end
+
+    # Makes sure the current App ID exists. If not, it will show an appropriate error message
+    def ensure_app_exists!
+      return if Spaceship::App.find(Sigh.config[:app_identifier])
+
+      Helper.log.info ""
+      Helper.log.info "==========================================".yellow
+      Helper.log.info "Could not find App ID with bundle identifier '#{Sigh.config[:app_identifier]}'"
+      Helper.log.info "You can easily generate a new App ID on the Developer Portal using 'produce':"
+      Helper.log.info ""
+      Helper.log.info "produce -u #{Sigh.config[:username]} -a #{Sigh.config[:app_identifier]} --skip_itc".yellow
+      Helper.log.info ""
+      Helper.log.info "You will be asked for any missing information, like the full name of your app"
+      Helper.log.info "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
+      Helper.log.info "==========================================".yellow
+      Helper.log.info ""
+      raise "Could not find App with App Identifier '#{Sigh.config[:app_identifier]}}'"
     end
   end
 end
