@@ -9,6 +9,8 @@ module Match
       Helper.log.info command.yellow
       puts `#{command}`
 
+      raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
+
       copy_readme(@dir)
 
       return @dir
