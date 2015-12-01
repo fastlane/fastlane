@@ -107,7 +107,7 @@ match bootstrap --git_url https://github.com/fastlane/certificates
 
 ### Nuke
 
-If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `match nuke` command.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command.
 
 To revoke all certificates and provisioning profiles for a specific environment.
 
