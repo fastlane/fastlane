@@ -1,7 +1,7 @@
 module Match
   class Utils
-    def self.import(params, item_path)
-      command = "security import #{item_path.shellescape} -k ~/Library/Keychains/#{params[:keychain_name].shellescape}"
+    def self.import(item_path, keychain)
+      command = "security import #{item_path.shellescape} -k ~/Library/Keychains/#{keychain.shellescape}"
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
       command << " -T /usr/bin/security"
       begin

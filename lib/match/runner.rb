@@ -25,11 +25,11 @@ module Match
         if FastlaneCore::CertChecker.installed?(cert)
           Helper.log.info "Certificate '#{cert}' is already installed on this machine"
         else
-          Utils.import(params, cert)
+          Utils.import(cert, params[:keychain_name])
         end
 
         # Import the private key
-        Utils.import(params, keys.last)
+        Utils.import(keys.last, params[:keychain_name])
       end
 
       # Install the provisioning profiles
