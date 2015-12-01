@@ -38,17 +38,21 @@ module FastlaneCore
         parse(path).fetch("UUID")
       end
 
+      def profiles_path
+        path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
+        # If the directory doesn't exist, create it first
+        unless File.directory?(path)
+          FileUtils.mkdir_p(path)
+        end
+
+        return path
+      end
+
       # Installs a provisioning profile for Xcode to use
       def install(path)
         Helper.log.info "Installing provisioning profile..."
-        profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
         profile_filename = uuid(path) + ".mobileprovision"
-        destination = profile_path + profile_filename
-
-        # If the directory doesn't exist, create it first
-        unless File.directory?(profile_path)
-          FileUtils.mkdir_p(profile_path)
-        end
+        destination = File.join(profiles_path, profile_filename)
 
         if path != destination
           # copy to Xcode provisioning profile directory
