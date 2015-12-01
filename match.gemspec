@@ -22,8 +22,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core', '>= 0.19.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'sigh', '>= 1.1.2', '< 2.0.0'
-  spec.add_dependency 'cert', '>= 1.2.1', '< 2.0.0'
+  spec.add_dependency 'sigh', '>= 1.1.4', '< 2.0.0'
+  spec.add_dependency 'cert', '>= 1.2.4', '< 2.0.0'
 
   spec.add_dependency 'security', '>= 0.1.3', '< 1.0.0'
 
