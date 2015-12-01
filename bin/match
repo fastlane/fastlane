@@ -61,6 +61,14 @@ class MatchApplication
       end
     end
 
+
+    command "nuke" do |c|
+      c.syntax = "match nuke"
+      c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
+      c.action do |args, options|
+        puts "Please run `match nuke [type] instead, allowed values: appstore, adhoc and development".red
+      end
+    end
     [:appstore, :adhoc, :development, :enterprise].each do |type|
       command "nuke #{type}" do |c|
         c.syntax = "match nuke #{type}"
