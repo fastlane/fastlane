@@ -91,6 +91,20 @@ $(sigh_tools.fastlane.app_development)
 
 <img src="assets/XcodeProjectSettings.png" width="700" />
 
+### Install profiles on a new computer
+
+To install all certificates and provisioning profiles on a new machine, just run
+
+```
+match bootstrap
+```
+
+Note: If you run the above command in the project directory containing the `Matchfile`, you won't be asked for the `git_url`, otherwise you can also pass it using
+
+```
+match bootstrap --git_url https://github.com/fastlane/certificates
+```
+
 ### Nuke
 
 If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `match nuke` command.

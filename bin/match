@@ -61,6 +61,20 @@ class MatchApplication
       end
     end
 
+    command :bootstrap do |c|
+      c.syntax = 'match bootstrap'
+      c.description = 'Install all the available certificates and profiles on the local machine'
+      c.action do |args, options|
+        containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+        path = File.join(containing, "Matchfile")
+
+        params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+        params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+
+        require 'match/bootstrap'
+        Match::Bootstrap.new.run(git_url: params[:git_url], keychain: params[:keychain_name])
+      end
+    end
 
     command "nuke" do |c|
       c.syntax = "match nuke"
@@ -69,6 +83,7 @@ class MatchApplication
         puts "Please run `match nuke [type] instead, allowed values: appstore, adhoc and development".red
       end
     end
+
     [:appstore, :adhoc, :development, :enterprise].each do |type|
       command "nuke #{type}" do |c|
         c.syntax = "match nuke #{type}"
