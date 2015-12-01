@@ -2,12 +2,7 @@ module Fastlane
   module Actions
     class ClearDerivedDataAction < Action
       def self.run(options)
-        if options[:derived_data_path]
-          path = File.expand_path(options[:derived_data_path])
-        else
-          path = File.expand_path("~/Library/Developer/Xcode/DerivedData")
-        end
-
+        path = File.expand_path(options[:derived_data_path])
         Helper.log.info "Derived Data path located at: #{path}"
         FileUtils.rm_rf(path) if File.directory?(path)
         Helper.log.info "Successfully cleared Derived Data ♻️".green
@@ -30,7 +25,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "DERIVED_DATA_PATH",
                                        description: "Custom path for derivedData",
-                                       default_value: nil, optional: true)
+                                       default_value: "~/Library/Developer/Xcode/DerivedData", 
+                                       optional: true)
         ]
       end
 
