@@ -26,11 +26,12 @@ describe Fastlane do
       end
 
       it "raises an exception when the given path is invalid (absolute)" do
+        path = "/tmp/asdf#{Time.now.to_i}"
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-            import('/tmp/asdf')
+            import('#{path}')
           end").runner.execute(:test)
-        end.to raise_error("Could not find Fastfile at path '/tmp/asdf'".red)
+        end.to raise_error("Could not find Fastfile at path '#{path}'".red)
       end
 
       it "raises an exception when the given path is invalid (relative)" do

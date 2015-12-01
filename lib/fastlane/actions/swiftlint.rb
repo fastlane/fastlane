@@ -1,10 +1,11 @@
 module Fastlane
   module Actions
-    class ClearDerivedDataAction < Action
+    class SwiftlintAction < Action
       def self.run(params)
-        path = File.expand_path("~/Library/Developer/Xcode/DerivedData")
-        FileUtils.rm_rf(path) if File.directory?(path)
-        Helper.log.info "Successfully cleared Derived Data ♻️".green
+        if `which swiftlint`.to_s.length == 0 and !Helper.test?
+          raise "You have to install swiftlint using `brew install swiftlint`".red
+        end
+        Actions.sh("swiftlint")
       end
 
       #####################################################
@@ -12,18 +13,21 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Deletes the Xcode Derived Data"
+        "Run swift code validation using SwiftLint"
       end
 
       def self.details
-        "Deletes the Derived Data from '~/Library/Developer/Xcode/DerivedData'"
       end
 
       def self.available_options
-        []
+        [
+        ]
       end
 
       def self.output
+      end
+
+      def self.return_value
       end
 
       def self.authors

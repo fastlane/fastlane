@@ -55,6 +55,9 @@ module Fastlane
       end
 
       def self.available_options
+        user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+        user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
         [
           FastlaneCore::ConfigItem.new(key: :devices,
                                        env_name: "FL_REGISTER_DEVICES_DEVICES",
@@ -75,7 +78,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:apple_id))
+                                       default_value: user)
         ]
       end
 

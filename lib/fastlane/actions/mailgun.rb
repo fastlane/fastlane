@@ -9,7 +9,7 @@ module Fastlane
       end
 
       def self.run(options)
-        require 'rest_client'
+        Actions.verify_gem!('rest-client')
         handle_params_transition(options)
         mailgunit(options)
       end
@@ -80,10 +80,10 @@ module Fastlane
 
       def self.handle_params_transition(options)
         options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
-        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow
+        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow if options[:mailgun_sandbox_postmaster]
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
-        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow
+        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow if options[:mailgun_apikey]
       end
 
       def self.mailgunit(options)
@@ -103,8 +103,8 @@ module Fastlane
           message: options[:message],
           app_link: options[:app_link]
         }
-        hash[:success] = options[:success] if options[:success]
-        hash[:ci_build_link] = options[:success] if options[:ci_build_link]
+        hash[:success] = options[:success]
+        hash[:ci_build_link] = options[:ci_build_link]
         Fastlane::ErbTemplateHelper.render(
           Fastlane::ErbTemplateHelper.load("mailgun_html_template"),
           hash

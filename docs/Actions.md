@@ -345,6 +345,25 @@ More usage examples (assumes the above .env setup is being used):
 
 See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
 
+### copy_artifacts
+This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
+
+Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list
+
+Example in conjunction with reset_git_repo
+```ruby
+# Move our artifacts to a safe location so TeamCity can pick them up
+copy_artifacts(
+  target_path: 'artifacts',
+  artifacts: ['*.cer', '*.mobileprovision', '*.ipa', '*.dSYM.zip']
+)
+
+# Reset the git repo to a clean state, but leave our artifacts in place
+reset_git_repo(
+  exclude: 'artifacts'
+)
+```
+
 ### clean_build_artifacts
 This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 
@@ -690,7 +709,7 @@ This action creates a new release for your repository on GitHub and can also upl
 ```ruby
 github_release = set_github_release(
   repository_name: "krausefx/fastlane",
-  api_token: ENV['GITHUB_TOKEN']
+  api_token: ENV['GITHUB_TOKEN'],
   name: "Super New actions",
   tag_name: "v1.22.0",
   description: File.read("changelog"),
@@ -730,6 +749,18 @@ nexus_upload(
   endpoint: "http://localhost:8081",
   username: "admin",
   password: "admin123"
+)
+```
+
+### [Appetize.io](https://appetize.io/)
+
+Upload your zipped app to Appetize.io
+
+```ruby
+appetize(
+  api_token: 'yourapitoken',
+  url: 'https://example.com/your/zipped/app.zip',
+  private_key: 'yourprivatekey'
 )
 ```
 
@@ -823,6 +854,17 @@ update_info_plist(
   plist_path: "path/to/Info.plist",
   display_name: "MyApp-Beta"
 )
+```
+
+## update_url_schemes
+
+This action allows you to update the URL schemes of the app before building it.
+For example, you can use this to set a different url scheme for the alpha
+or beta version of the app.
+
+```ruby
+update_url_schemes(path: "path/to/Info.plist", 
+            url_schemes: ["com.myapp"])
 ```
 
 ## Developer Portal
@@ -1016,6 +1058,15 @@ commit_version_bump(
 
 [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
+### number_of_commits
+
+You can use this action to get the number of commits of this repo. This is useful if you want to set the build number to the number of commits.
+
+```ruby
+build_number = number_of_commits
+increment_build_number(build_number: build_number)
+```
+
 ### add_git_tag
 This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
 
@@ -1078,6 +1129,7 @@ push_git_tags
 
 ### reset_git_repo
 This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run.
+Untracked files like `.env` will also be deleted, unless `:skip_clean` is true.
 
 It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:
 
@@ -1088,7 +1140,8 @@ Also useful for putting in your `error` block, to bring things back to a pristin
 
 ```ruby
 reset_git_repo
-reset_git_repo :force # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+reset_git_repo(force: true) # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
+reset_git_repo(skip_clean: true) # If you want 'git clean' to be skipped, thus NOT deleting untracked files like '.env'. Optional, defaults to false.
 
 # You can also specify a list of files that should be resetted.
 reset_git_repo(
@@ -1123,6 +1176,16 @@ import_from_git(
   branch: 'HEAD', # The branch to checkout on the repository. Defaults to `HEAD`.
   path: 'fastlane/Fastfile' # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
 )
+```
+
+### last_git_commit
+
+Get information about the last git commit, returns the author and the git message.
+
+```ruby
+commit = last_git_commit
+crashlytics(notes: commit[:message])
+puts commit[:author]
 ```
 
 ## Using mercurial
@@ -1330,6 +1393,25 @@ end
 ```
 
 ## Misc
+
+### appledoc
+
+Generate Apple-like source code documentation from specially formatted source code comments.
+
+```ruby
+appledoc(
+  project_name: "MyProjectName",
+  project_company: "Company Name",
+  input: "MyProjectSources",
+  ignore: [
+    'ignore/path/1',
+    'ingore/path/2'
+  ],
+  options: "--keep-intermediate-files --search-undocumented-doc",
+  warnings: "--warn-missing-output-path --warn-missing-company-id"
+)
+```
+Use `appledoc --help` to see the list of all command line options.
 
 ### download
 

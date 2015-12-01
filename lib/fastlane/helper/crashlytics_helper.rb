@@ -4,10 +4,12 @@ module Fastlane
       class << self
         def generate_ios_command(params)
           raise "No value found for 'crashlytics_path'" unless params[:crashlytics_path]
-          raise "The crashlytics bundle must be of type .framework" unless params[:crashlytics_path].end_with?(".framework") || Helper.test?
+          submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
+          submit_binary ||= "Crashlytics.framework/submit" if Helper.test?
+          raise "Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'" unless submit_binary
 
           command = []
-          command << File.join(params[:crashlytics_path], 'submit')
+          command << submit_binary
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"

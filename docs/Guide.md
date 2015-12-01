@@ -6,7 +6,7 @@ It will help you set up all needed build tools. I tested everything with a fresh
 <p align="center">
     <a href="#installation">Installation</a> &bull; 
     <a href="#setting-up-fastlane">Setting up</a> &bull; 
-    <a href="#example-project">Example Project</a> &bull; 
+    <a href="#example-projects">Example Project</a> &bull; 
     <a href="#help">Help</a>
 </p>
 -------
@@ -78,7 +78,7 @@ For example, try running the following (depending on what you plan on using):
 - [snapshot](https://github.com/KrauseFx/snapshot)
 - [sigh](https://github.com/KrauseFx/sigh)
 - [frameit](https://github.com/KrauseFx/frameit)
-- [xctool](https://github.com/facebook/xctool) (which you should [configure correctly](https://github.com/krausefx/fastlane#xctool))
+- [xctool](https://github.com/facebook/xctool) (which you should [configure correctly](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#xctool))
 
 All those tools have detailed instructions on how to set them up. It's easier to set them up now, than later.
 

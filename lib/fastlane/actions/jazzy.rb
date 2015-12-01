@@ -1,10 +1,9 @@
 module Fastlane
   module Actions
-    class ClearDerivedDataAction < Action
+    class JazzyAction < Action
       def self.run(params)
-        path = File.expand_path("~/Library/Developer/Xcode/DerivedData")
-        FileUtils.rm_rf(path) if File.directory?(path)
-        Helper.log.info "Successfully cleared Derived Data ♻️".green
+        Actions.verify_gem!('jazzy')
+        Actions.sh("jazzy")
       end
 
       #####################################################
@@ -12,18 +11,21 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Deletes the Xcode Derived Data"
+        "Generate docs using Jazzy"
       end
 
       def self.details
-        "Deletes the Derived Data from '~/Library/Developer/Xcode/DerivedData'"
       end
 
       def self.available_options
-        []
+        [
+        ]
       end
 
       def self.output
+      end
+
+      def self.return_value
       end
 
       def self.authors

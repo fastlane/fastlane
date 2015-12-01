@@ -87,7 +87,7 @@ module Fastlane
           Helper.log.info "Cleaning up old versions..."
           cleaner.options[:args] = all_updated_tools.map(&:name)
           cleaner.execute
-          Helper.log.info "fastlane.tools succesfully updated! I will now restart myself... 😴"
+          Helper.log.info "fastlane.tools successfully updated! I will now restart myself... 😴"
 
           # Set no_update to true so we don't try to update again
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
