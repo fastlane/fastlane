@@ -5,16 +5,17 @@ module Fastlane
     end
 
     class SlatherAction < Action
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
-        #This will fail if using Bundler. Skip the check rather than needing to
+        # This will fail if using Bundler. Skip the check rather than needing to
         # require bundler
-        use_bundler = params[:use_bundle_exec]
-        if ! use_bundler
+        unless params[:use_bundle_exec]
           Actions.verify_gem!('slather')
         end
 
         command = ""
-        command += "bundle exec " if use_bundler
+        command += "bundle exec " if params[:use_bundle_exec]
         command += "slather coverage "
         command += " --build-directory #{params[:build_directory]}" if params[:build_directory]
         command += " --input-format #{params[:input_format]}" if params[:input_format]
@@ -136,11 +137,11 @@ Slather is available at https://github.com/venmo/slather
                                        env_name: "FL_SLATHER_IGNORE",
                                        description: "Tell slather to ignore files matching a path",
                                        optional: true),
-         FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
+          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
                                       description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
                                       is_string: false,
-                                      default_value: false),
+                                      default_value: false)
         ]
       end
 
