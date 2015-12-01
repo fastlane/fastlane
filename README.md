@@ -7,11 +7,11 @@
 </h3>
 
 
-fastfix
+match
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastfix/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/match/blob/master/LICENSE)
 
 -------
 <p align="center">
@@ -25,9 +25,9 @@ fastfix
 
 -------
 
-<h5 align="center"><code>fastfix</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
-## Why fastfix?
+## Why match?
 
 TODO
 
@@ -41,7 +41,7 @@ TODO
 ## Installation
 
 ```
-sudo gem install fastfix
+sudo gem install match
 ```
 
 Make sure, you have the latest version of the Xcode command line tools installed:
@@ -55,22 +55,22 @@ Make sure, you have the latest version of the Xcode command line tools installed
 Create a new private git repo and run the following in your project folder
 
 ```
-fastfix init
+match init
 ```
 
 You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. 
 
 ### Run
 
-Add `fastfix` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
+Add `match` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
 
 ```ruby
-fastfix(type: "appstore")
+match(type: "appstore")
 
-fastfix(git_url: "https://github.com/fastlane/certificates", 
+match(git_url: "https://github.com/fastlane/certificates", 
         type: "development")
 
-fastfix(git_url: "https://github.com/fastlane/certificates", 
+match(git_url: "https://github.com/fastlane/certificates", 
         type: "adhoc", 
         app_identifier: "tools.fastlane.app")
 ```
@@ -79,7 +79,7 @@ fastfix(git_url: "https://github.com/fastlane/certificates",
 
 To make sure Xcode is using the right provisioning profile for each target, don't use the `Automatic` feature for the profile selection.
 
-`fastfix` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
+`match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
 
 <img src="assets/UDIDPrint.png" width="700" />
 
@@ -93,14 +93,14 @@ $(sigh_tools.fastlane.app_development)
 
 ### Nuke
 
-If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `fastfix nuke` command.
+If you never cared about code signing and have a completely messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles and certificates, you should use the `match nuke` command.
 
 To revoke all certificates and provisioning profiles for a specific environment.
 
 ```sh
-fastfix nuke development
-fastfix nuke adhoc
-fastfix nuke appstore
+match nuke development
+match nuke adhoc
+match nuke appstore
 ```
 
 You'll have to confirm a list of profiles / certificates that will be deleted.

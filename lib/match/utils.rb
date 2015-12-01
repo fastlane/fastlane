@@ -1,4 +1,4 @@
-module Fastfix
+module Match
   class Utils
     def self.import(params, item_path)
       command = "security import #{item_path.shellescape} -k ~/Library/Keychains/#{params[:keychain_name].shellescape}"

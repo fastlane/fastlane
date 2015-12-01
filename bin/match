@@ -2,50 +2,50 @@
 
 $:.push File.expand_path("../../lib", __FILE__)
 
-require 'fastfix'
+require 'match'
 require 'commander'
 
 HighLine.track_eof = false
 
-class FastfixApplication
+class MatchApplication
   include Commander::Methods
 
   def run
-    program :version, Fastfix::VERSION
-    program :description, Fastfix::DESCRIPTION
-    program :help, 'Author', 'Felix Krause <fastfix@krausefx.com>'
+    program :version, Match::VERSION
+    program :description, Match::DESCRIPTION
+    program :help, 'Author', 'Felix Krause <match@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
-    program :help, 'GitHub', 'https://github.com/fastlane/fastfix'
+    program :help, 'GitHub', 'https://github.com/fastlane/match'
     program :help_formatter, :compact
 
-    FastlaneCore::CommanderGenerator.new.generate(Fastfix::Options.available_options)
+    FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
 
     command :run do |c|
-      c.syntax = 'fastfix'
+      c.syntax = 'match'
       c.description = 'TODO'
 
       c.action do |args, options|
-        params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+        params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
         params.load_configuration_file("Fixfile")
-        Fastfix::Runner.new.run(params)
+        Match::Runner.new.run(params)
       end
     end
 
     [:appstore, :adhoc, :development, :enterprise].each do |type|
       command type do |c|
-        c.syntax = "fastfix #{type}"
+        c.syntax = "match #{type}"
 
         c.action do |args, options|
-          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Fixfile") # this has to be done *before* overwriting the value
           params[:type] = type.to_s
-          Fastfix::Runner.new.run(params)
+          Match::Runner.new.run(params)
         end
       end
     end
 
     command :init do |c|
-      c.syntax = 'fastfix init'
+      c.syntax = 'match init'
       c.description = 'Create the Fixfile for you'
       c.action do |args, options|
         containing = (File.directory?("fastlane") ? 'fastlane' : '.')
@@ -56,20 +56,20 @@ class FastfixApplication
           return 0
         end
 
-        require 'fastfix/setup'
-        Fastfix::Setup.new.run(path)
+        require 'match/setup'
+        Match::Setup.new.run(path)
       end
     end
 
     [:appstore, :adhoc, :development, :enterprise].each do |type|
       command "nuke #{type}" do |c|
-        c.syntax = "fastfix nuke #{type}"
+        c.syntax = "match nuke #{type}"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal (#{type})"
         c.action do |args, options|
-          params = FastlaneCore::Configuration.create(Fastfix::Options.available_options, options.__hash__)
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Fixfile")
           params[:type] = type.to_s
-          Fastfix::Nuke.new.run(params)
+          Match::Nuke.new.run(params)
         end
       end
     end
@@ -81,8 +81,8 @@ class FastfixApplication
 end
 
 begin
-  # FastlaneCore::UpdateChecker.start_looking_for_update('fastfix')
-  FastfixApplication.new.run
+  # FastlaneCore::UpdateChecker.start_looking_for_update('match')
+  MatchApplication.new.run
 ensure
-  # FastlaneCore::UpdateChecker.show_update_status('fastfix', Fastfix::VERSION)
+  # FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
 end

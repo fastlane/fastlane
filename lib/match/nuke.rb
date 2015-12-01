@@ -1,5 +1,5 @@
 require 'pry'
-module Fastfix
+module Match
   class Nuke
     attr_accessor :params
 
@@ -13,7 +13,7 @@ module Fastfix
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier],
-                                             title: "Summary for fastfix nuke #{Fastfix::VERSION}")
+                                             title: "Summary for match nuke #{Match::VERSION}")
 
       prepare_list
       print_tables
@@ -61,7 +61,7 @@ module Fastfix
         puts Terminal::Table.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
-          rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] },
+          rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
         })
       end
 
@@ -69,7 +69,7 @@ module Fastfix
         puts Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
-          rows: self.profiles.collect do |p| 
+          rows: self.profiles.collect do |p|
             status = p.status == 'Active' ? p.status.green : p.status.red
 
             [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
@@ -81,7 +81,7 @@ module Fastfix
         puts Terminal::Table.new({
           title: "Files that are going to be deleted".green,
           headings: ["Type", "File Name"],
-          rows: self.files.collect do |f| 
+          rows: self.files.collect do |f|
             components = f.split(File::SEPARATOR)[-3..-1]
             [components[0..1].join(" "), components[2]]
           end

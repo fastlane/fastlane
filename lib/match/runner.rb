@@ -1,8 +1,8 @@
-module Fastfix
+module Match
   class Runner
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
-                                             title: "Summary for fastfix #{Fastfix::VERSION}")
+                                             title: "Summary for match #{Match::VERSION}")
 
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"

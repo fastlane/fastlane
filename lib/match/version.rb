@@ -1,4 +1,4 @@
-module Fastfix
+module Match
   VERSION = "0.0.1"
   DESCRIPTION = "Code signing done right"
 end

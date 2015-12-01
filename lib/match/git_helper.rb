@@ -1,4 +1,4 @@
-module Fastfix
+module Match
   class GitHelper
     def self.clone(git_url)
       return @dir if @dir

@@ -1,4 +1,4 @@
-module Fastfix
+module Match
   class TablePrinter
     def self.print_summary(params, uuid)
       rows = []

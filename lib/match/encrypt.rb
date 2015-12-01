@@ -1,14 +1,14 @@
-module Fastfix
+module Match
   class Encrypt
     require 'encrypted_strings'
     require 'security'
 
     def server_name(git_url)
-      ["fastfix", git_url].join("_")
+      ["match", git_url].join("_")
     end
 
     def password(git_url)
-      @password ||= ENV["FASTFIX_PASSWORD"]
+      @password ||= ENV["MATCH_PASSWORD"]
       unless @password
         item = Security::InternetPassword.find(server: server_name(git_url))
         @password = item.password if item
@@ -42,7 +42,7 @@ module Fastfix
         content = File.read(path)
         begin
           decrypted = content.decrypt(:symmetric, password: password(params[:git_url]))
-        rescue => ex
+        rescue
           Helper.log.error "Couldn't decrypt the repo, please make sure you enter the right password!".red
           clear_password(params[:git_url])
           decrypt_repo(params)

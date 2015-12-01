@@ -1,4 +1,4 @@
-module Fastfix
+module Match
   # Generate missing resources
   class Generator
     def self.generate_certificate(params, cert_type)

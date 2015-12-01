@@ -1,21 +1,21 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fastfix/version'
+require 'match/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "fastfix"
-  spec.version       = Fastfix::VERSION
+  spec.name          = "match"
+  spec.version       = Match::VERSION
   spec.authors       = ["Felix Krause"]
-  spec.email         = ["fastfix@krausefx.com"]
-  spec.summary       = Fastfix::DESCRIPTION
-  spec.description   = Fastfix::DESCRIPTION
+  spec.email         = ["match@krausefx.com"]
+  spec.summary       = Match::DESCRIPTION
+  spec.description   = Match::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w( bin/fastfix README.md LICENSE )
+  spec.files = Dir["lib/**/*"] + %w( bin/match README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
