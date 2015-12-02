@@ -14,7 +14,7 @@ module Match
                                      optional: false,
                                      short_option: "-r",
                                      verify_block: proc do |value|
-                                       unless value.start_with?("https://") || value.start_with?("git://")
+                                       unless value.start_with?("https://") || value.start_with?("git")
                                          raise "git_url must start with either https:// or git://".red
                                        end
                                      end),

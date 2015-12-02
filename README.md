@@ -72,7 +72,7 @@ Create a new private git repo and run the following in your project folder
 match init
 ```
 
-You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. `match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder). 
 
