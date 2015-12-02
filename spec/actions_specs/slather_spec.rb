@@ -4,6 +4,7 @@ describe Fastlane do
       it "works with all parameters" do
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
+            use_bundle_exec: false,
             build_directory: 'foo',
             input_format: 'bah',
             scheme: 'Foo',
@@ -25,6 +26,33 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("slather coverage  --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --ignore nothing foo.xcodeproj")
+      end
+
+      it "works with bundle" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            use_bundle_exec: true,
+            build_directory: 'foo',
+            input_format: 'bah',
+            scheme: 'Foo',
+            buildkite: true,
+            jenkins: true,
+            travis: true,
+            circleci: true,
+            coveralls: true,
+            simple_output: true,
+            gutter_json: true,
+            cobertura_xml: true,
+            html: true,
+            show: true,
+            source_directory: 'baz',
+            output_directory: '123',
+            ignore: 'nothing',
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec slather coverage  --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --ignore nothing foo.xcodeproj")
       end
 
       it "requires project to be specified" do
