@@ -21,6 +21,7 @@ A new approach to code signing: Share one code signing identity across your deve
     <a href="#why-match">Why?</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
+    <a href="#secure">Is this secure?</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -163,6 +164,36 @@ match nuke appstore
 ```
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
+
+## Is this secure?
+
+Storing your private keys in a git repo might sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusion: 
+
+#### What can happen when someone steals my private key?
+
+If attackers have your certificate and provisioning profile, they can codesign an application with the same bundle identifier. 
+
+What's the worst that can happen for each of the profile types?
+
+##### App Store Profiles
+
+An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review (which takes around 7 days). Attackers can only submit an app for review, if they also have your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
+
+##### Development and Ad Hoc Profiles
+
+In general those profiles are harmless as they can only be used to install a signed application on a small subset of devices. To add new devices, the attacker also needs your Apple Developer Portal credentials (which are not stored in git, but in your local keychain). 
+
+##### Enterprise Profiles
+
+Attackers can use an In-House profile to distribute signed application to a potentially unlimited number of devices. All this runs under your company name and it will eventually lead to Apple revoking your In-House account. It is very easy to revoke a certificate to remotely break the app on all devices.
+
+Because of the potentially dangerous nature of In-House profiles we decided to not allow the use of `match` with enterprise accounts.
+
+##### To sum up
+
+- You have full control over the access list of your git repo, no third party service involved
+- Even if your certificates get leaked, they can't be used to cause any harm without your login credentials
+- `match` doesn't support In-House Enterprise profiles as they could potentially cause damage
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
