@@ -867,6 +867,18 @@ update_url_schemes(path: "path/to/Info.plist",
             url_schemes: ["com.myapp"])
 ```
 
+### update_app_identifier
+
+Update an app identifier by either setting `CFBundleIdentifier` or `PRODUCT_BUNDLE_IDENTIFIER`, depending on which is already in use.
+
+```ruby
+update_app_identifier(
+  xcodeproj: 'Example.xcodeproj', # Optional path to xcodeproj, will use the first .xcodeproj if not set
+  plist_path: 'Example/Info.plist', # Path to info plist file, relative to xcodeproj
+  app_identifier: 'com.test.example' # The App Identifier
+)
+```
+
 ## Developer Portal
 
 ### [sigh](https://github.com/KrauseFx/sigh)
