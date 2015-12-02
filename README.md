@@ -11,6 +11,8 @@ match
 ============
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/match/blob/master/LICENSE)
+[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
+[![Build Status](https://img.shields.io/travis/fastlane/match/master.svg?style=flat)](https://travis-ci.org/fastlane/match)
 
 ###### Easily sync your certificates and profiles across your team using git
 
