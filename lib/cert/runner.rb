@@ -42,7 +42,6 @@ module Cert
           Helper.log.info "Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.".green
 
           return path
-
         elsif File.exist?(private_key_path)
           KeychainImporter.import_file(private_key_path)
           KeychainImporter.import_file(path)
@@ -53,10 +52,11 @@ module Cert
           Helper.log.info "Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.".green
 
           return path
-
         else
           Helper.log.info "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
+
+        File.delete(path) # as apparantly this certificate is pretty useless without a private key
       end
 
       Helper.log.info "Couldn't find an existing certificate... creating a new one"
