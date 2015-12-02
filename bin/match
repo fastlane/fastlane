@@ -31,7 +31,7 @@ class MatchApplication
       end
     end
 
-    [:appstore, :adhoc, :development, :enterprise].each do |type|
+    Match.environments.each do |type|
       command type do |c|
         c.syntax = "match #{type}"
 
@@ -81,7 +81,7 @@ class MatchApplication
       end
     end
 
-    [:appstore, :adhoc, :development, :enterprise].each do |type|
+    Match.environments.each do |type|
       command "nuke #{type}" do |c|
         c.syntax = "match nuke #{type}"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal (#{type})"

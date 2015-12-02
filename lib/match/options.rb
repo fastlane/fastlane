@@ -25,9 +25,8 @@ module Match
                                      short_option: "-y",
                                      default_value: 'appstore',
                                      verify_block: proc do |value|
-                                       supported = %w(appstore adhoc development enterprise)
-                                       unless supported.include?(value)
-                                         raise "Unsupported environment #{value}, must be in #{supported.join(', ')}".red
+                                       unless Match.environments.include?(value)
+                                         raise "Unsupported environment #{value}, must be in #{Match.environments.join(', ')}".red
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,

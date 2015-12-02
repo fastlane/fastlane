@@ -13,4 +13,8 @@ require 'spaceship'
 
 module Match
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+
+  def self.environments
+    [:appstore, :adhoc, :development]
+  end
 end

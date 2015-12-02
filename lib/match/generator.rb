@@ -22,7 +22,7 @@ module Match
     def self.generate_provisioning_profile(params, prov_type)
       require 'sigh'
 
-      prov_type = :enterprise if ENV["SIGH_PROFILE_ENTERPRISE"]
+      # prov_type = :enterprise if ENV["SIGH_PROFILE_ENTERPRISE"] # comment out if we ever decide to support enterprise profiles
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: params[:app_identifier],
