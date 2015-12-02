@@ -1,17 +1,55 @@
 module Fastlane
   module Actions
-    # Get the author name of the last git commit
+    def self.git_log_between(pretty_format, from, to)
+      Actions.sh("git log --pretty=#{pretty_format} #{from}...#{to}", log: false).chomp
+    end
+
+    def self.last_git_tag_name(match_lightweight = true)
+      command = ['git describe']
+      command << '--tags' if match_lightweight
+      command << '--abbrev=0'
+      Actions.sh(command.join(' '), log: false).chomp
+    end
+
+    def self.last_git_commit_dict
+      {
+          author: last_git_commit_formatted_with('%an'),
+          message: last_git_commit_formatted_with('%B')
+      }
+    end
+
+    # Gets the last git commit information formatted into a String by the provided
+    # pretty format String. See the git-log documentation for valid format placeholders
+    def self.last_git_commit_formatted_with(pretty_format)
+      Actions.sh("git log -1 --pretty=#{pretty_format}", log: false).chomp
+    end
+
+    # Get the author email of the last git commit
+    # <b>DEPRECATED:</b> Use <tt>git_author_email</tt> instead.
     def self.git_author
-      s = `git log --name-status HEAD^..HEAD`
-      s = s.match(/Author:.*<(.*)>/)[1]
+      Helper.log.warn '`git_author` is deprecated. Please use `git_author_email` instead.'.red
+      git_author_email
+    end
+
+    # Get the author email of the last git commit
+    def self.git_author_email
+      s = last_git_commit_formatted_with('%ae')
       return s if s.to_s.length > 0
       return nil
     rescue
       return nil
     end
 
+    # Returns the unwrapped subject and body of the last commit
+    # <b>DEPRECATED:</b> Use <tt>last_git_commit_message</tt> instead.
     def self.last_git_commit
-      s = `git log -1 --pretty=%B`.strip
+      Helper.log.warn '`last_git_commit` is deprecated. Please use `last_git_commit_message` instead.'.red
+      last_git_commit_message
+    end
+
+    # Returns the unwrapped subject and body of the last commit
+    def self.last_git_commit_message
+      s = last_git_commit_formatted_with('%B').strip
       return s if s.to_s.length > 0
       nil
     end

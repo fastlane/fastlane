@@ -2,10 +2,7 @@ module Fastlane
   module Actions
     class LastGitCommitAction < Action
       def self.run(params)
-        message = sh "git log -1 --pretty=%B"
-        author = sh "git log -1 --pretty=%an"
-
-        {author: author, message: message}
+        Actions.last_git_commit_dict
       end
 
       #####################################################
