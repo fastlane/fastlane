@@ -38,7 +38,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 > You have to manually renew and download the latest provisioning profiles every time we add a new device or a certificate expires. Additionally you have to spend a lot of time when setting up a new machine. 
 
-Solution
+**A new approach**
 
 > What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
 
@@ -80,11 +80,18 @@ After running `match init` you can run the following to generate new certificate
 
 ```
 match appstore
-
+```
+```
 match development
 ```
 
 This will create a new certificate and provisioning profile (if required) and store them in your git repo. If you previously ran `match` it will automatically install the existing profiles from the git repo.
+
+For a list of all available options run
+
+```
+match --help
+```
 
 #### fastlane
 
