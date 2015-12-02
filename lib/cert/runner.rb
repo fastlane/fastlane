@@ -85,7 +85,10 @@ module Cert
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
-        Helper.log.error "Could not create another certificate, reached the maximum number of available certificates.".red
+        if ex.to_s.include?("You already have a current")
+          Helper.log.error "Could not create another certificate, reached the maximum number of available certificates.".red
+        end
+
         raise ex
       end
 
