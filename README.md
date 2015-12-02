@@ -47,7 +47,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 - You have access to all the certificates and profiles, which are all securely stored in git
 - You share one code signing identity across the team to have less certificates and profiles
 - Xcode can often revoke certificates and break your set up causing failed builds
-- It's better to be explicit about what profiles to use instead of using the `Automatic` setting
+- It's better to be explicit about what profiles to use instead of using the `Automatic` setting for more predictable build artifacts
 - It just works™
 
 ## Installation
@@ -85,7 +85,7 @@ username "user@fastlane.tools"
 
 ### Run
 
-> Before running `match` the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
+> Before running `match` for the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
 
 After running `match init` you can run the following to generate new certificates and profiles:
 
@@ -134,7 +134,7 @@ match(app_identifier: "tools.fastlane.app", type: "appstore")
 match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 ```
 
-`match` will even use the same one git repository for all bundle identifiers.
+`match` can even use the same one git repository for all bundle identifiers.
 
 ### Setup Xcode project
 
@@ -142,7 +142,7 @@ To make sure Xcode is using the right provisioning profile for each target, don'
 
 Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode). The `Fix Issue` button sometimes revokes your existing certificates, which will invalidate your provisioning profiles.
 
-#### For building with fastlane
+#### To build from the command line using [fastlane](https://fastlane.tools)
 
 `match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
 
@@ -150,13 +150,13 @@ Additionally it is recommended to disable the `Fix Issue` button using the [FixC
 
 Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
 
-```
-$(sigh_tools.fastlane.app_development)
-```
-
 <img src="assets/XcodeProjectSettings.png" width="700" />
 
-#### For building from Xcode manually
+Profile environment variables are named after `$(sigh_<bundle_identifier>_<profile_type>)`
+
+e.g. `$(sigh_tools.fastlane.app_development)`
+
+#### To build from Xcode manually
 
 This is useful when installing your application on your device using the Development profile. 
 
@@ -178,7 +178,7 @@ match bootstrap --git_url https://github.com/fastlane/certificates
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command. After clearing your account you should run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
