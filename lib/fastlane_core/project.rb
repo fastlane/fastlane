@@ -167,8 +167,14 @@ module FastlaneCore
       false
     end
 
+    def tvos?
+      return true if build_settings(key: "PLATFORM_NAME").to_s.include? "appletv"
+      return true if build_settings(key: "PLATFORM_DISPLAY_NAME").to_s.include? "tvOS"
+      false
+    end
+
     def ios?
-      !mac?
+      !mac? && !tvos?
     end
 
     def xcodebuild_parameters
