@@ -19,13 +19,18 @@ module Cert
       Spaceship.select_team
       Helper.log.info "Successfully logged in"
 
-      cert_path = find_existing_cert
-      if cert_path.nil? || Cert.config[:force]
-        if create_certificate # no certificate here, creating a new one
-          return # success
-        else
-          raise "Something went wrong when trying to create a new certificate..."
-        end
+      should_create = Cert.config[:force]
+      unless should_create
+        cert_path = find_existing_cert
+        should_create = cert_path.nil?
+      end
+
+      return unless should_create
+
+      if create_certificate # no certificate here, creating a new one
+        return # success
+      else
+        raise "Something went wrong when trying to create a new certificate..."
       end
     end
 
