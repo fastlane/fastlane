@@ -70,6 +70,14 @@ match init
 
 You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. `match init` won't read or modify your certificates or profiles.
 
+This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder). Example content:
+```ruby
+git_url "https://github.com/fastlane/certificates"
+
+app_identifier "tools.fastlane.app" 
+username "user@fastlane.tools"
+```
+
 ### Run
 
 Before running `match` the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
