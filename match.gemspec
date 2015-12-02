@@ -25,8 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sigh', '>= 1.1.4', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.2.4', '< 2.0.0'
 
-  spec.add_dependency 'security', '>= 0.1.3', '< 1.0.0'
-
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
