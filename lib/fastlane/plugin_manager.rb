@@ -2,8 +2,8 @@
 
 # Originally from https://github.com/CocoaPods/CLAide/blob/master/lib/claide/command/plugin_manager.rb
 #
-# Copyright (c) 2011 - 2012 Eloy Durán <eloy.de.enige[at]gmail.com>
-# Copyright (c)        2012 Fabio Pelosin <fabiopelosin[at]gmail.com>
+# Copyright (c) 2011 - 2012 Eloy Duran <eloy.de.enige@gmail.com>
+# Copyright (c)        2012 Fabio Pelosin <fabiopelosin@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
