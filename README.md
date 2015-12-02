@@ -31,6 +31,7 @@ sigh
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/sigh/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
+[![Build Status](https://img.shields.io/travis/fastlane/sigh/master.svg?style=flat)](https://travis-ci.org/fastlane/sigh)
 
 ###### Because you would rather spend your time building stuff than fighting provisioning
 
