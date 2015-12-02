@@ -15,6 +15,8 @@ module Match
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
 
   def self.environments
-    [:appstore, :adhoc, :development]
+    envs = [:appstore, :adhoc, :development]
+    envs << :enterprise if ENV["MATCH_FORCE_ENTERPRISE"]
+    return evns
   end
 end
