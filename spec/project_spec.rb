@@ -39,6 +39,10 @@ describe FastlaneCore do
       it "#ios?" do
         expect(@project.ios?).to eq(true)
       end
+
+      it "#tvos?" do
+        expect(@project.tvos?).to eq(false)
+      end
     end
 
     describe "Valid CocoaPods Project" do
@@ -70,8 +74,35 @@ describe FastlaneCore do
         expect(@project.ios?).to eq(false)
       end
 
+      it "#tvos?" do
+        expect(@project.tvos?).to eq(false)
+      end
+
       it "schemes" do
         expect(@project.schemes).to eq(["Mac"])
+      end
+    end
+
+    describe "TVOS Project" do
+      before do
+        options = { project: "./spec/fixtures/projects/ExampleTVOS.xcodeproj" }
+        @project = FastlaneCore::Project.new(options)
+      end
+
+      it "#mac?" do
+        expect(@project.mac?).to eq(false)
+      end
+
+      it "#ios?" do
+        expect(@project.ios?).to eq(false)
+      end
+
+      it "#tvos?" do
+        expect(@project.tvos?).to eq(true)
+      end
+
+      it "schemes" do
+        expect(@project.schemes).to eq(["ExampleTVOS"])
       end
     end
 
