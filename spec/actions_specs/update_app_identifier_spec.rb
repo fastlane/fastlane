@@ -1,6 +1,11 @@
 require 'xcodeproj'
 include Xcodeproj
 
+module Xcodeproj
+  class Project
+  end
+end
+
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update App Identifier Integration" do
@@ -52,11 +57,6 @@ describe Fastlane do
         stub_object = ['object']
         stub_settings = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
 
-        module Xcodeproj
-          class Project
-          end
-        end
-
         expect(Xcodeproj::Project).to receive(:open).with('/tmp/fastlane/tests/fastlane/bundle.xcodeproj').and_return(stub_project)
         expect(stub_project).to receive(:objects).and_return(stub_object)
         expect(stub_object).to receive(:select).and_return([stub_configuration])
@@ -79,11 +79,6 @@ describe Fastlane do
         stub_project = 'stub project'
         stub_configuration = 'stub config'
         stub_object = ['object']
-
-        module Xcodeproj
-          class Project
-          end
-        end
 
         expect(Xcodeproj::Project).to receive(:open).with('/tmp/fastlane/tests/fastlane/bundle.xcodeproj').and_return(stub_project)
         expect(stub_project).to receive(:objects).and_return(stub_object)
