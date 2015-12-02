@@ -22,27 +22,33 @@ module Deliver
 
       # Now, fill in the new ones
       indized = {} # per language and device type
-      screenshots.each do |screenshot|
-        indized[screenshot.language] ||= {}
-        indized[screenshot.language][screenshot.device_type] ||= 0
-        indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
 
-        index = indized[screenshot.language][screenshot.device_type]
+      screenshots_per_language = screenshots.group_by(&:language)
+      screenshots_per_language.each do |language, screenshots_for_language|
+        Helper.log.info "Uploading #{screenshots_for_language.length} screenshots for language #{language}"
+        screenshots_for_language.each do |screenshot|
+          indized[screenshot.language] ||= {}
+          indized[screenshot.language][screenshot.device_type] ||= 0
+          indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
 
-        if index > 5
-          Helper.log.error "Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'"
-          next
+          index = indized[screenshot.language][screenshot.device_type]
+
+          if index > 5
+            Helper.log.error "Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'"
+            next
+          end
+
+          Helper.log.info "Uploading '#{screenshot.path}'..."
+          v.upload_screenshot!(screenshot.path,
+                               index,
+                               screenshot.language,
+                               screenshot.device_type)
         end
-
-        Helper.log.info "Uploading '#{screenshot.path}'..."
-        v.upload_screenshot!(screenshot.path,
-                             index,
-                             screenshot.language,
-                             screenshot.device_type)
+        # ideally we should only save once, but itunes server can't cope it seems
+        # so we save per language. See issue #349
+        Helper.log.info "Saving changes"
+        v.save!
       end
-
-      Helper.log.info "Saving changes"
-      v.save!
       Helper.log.info "Successfully uploaded screenshots to iTunes Connect".green
     end
 
