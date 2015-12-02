@@ -4,7 +4,7 @@ There are multiple ways of doing code signing right. Letting Xcode automatically
 
 ### Easy Solution: Static Setting
 
-In your project file set the correct `Provisioning Profile` and use the the `gym` integration in `fastlane`.
+In your project file set the correct `Provisioning Profile` and use the `gym` integration in `fastlane`.
 
 **Disadvantages**: As soon as your provisioning profile changes, you'll have to update your project file. Therefore not a long-term solution.
 
