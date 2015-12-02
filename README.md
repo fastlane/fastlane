@@ -18,11 +18,9 @@ A new approach to code signing: Share one code signing identity across your deve
 
 -------
 <p align="center">
-    <a href="#why">Why?</a> &bull; 
+    <a href="#why-match">Why?</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
