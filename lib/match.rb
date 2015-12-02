@@ -17,6 +17,6 @@ module Match
   def self.environments
     envs = [:appstore, :adhoc, :development]
     envs << :enterprise if ENV["MATCH_FORCE_ENTERPRISE"]
-    return evns
+    return envs
   end
 end
