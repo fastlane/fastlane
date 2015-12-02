@@ -10,21 +10,20 @@ module Fastlane
       end
 
       show_infos
-      response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
-      return unless response
 
       # rubocop:disable Lint/RescueException
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
+        setup_default_project
         copy_existing_files
-        generate_appfile
+        default_generate_appfile
         detect_installed_tools # after copying the existing files
-        ask_to_enable_other_tools
+        default_enable_other_tools
         FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
-        generate_fastfile
+        default_generate_fastfile
         show_analytics
         Helper.log.info 'Successfully finished setting up fastlane'.green
-      rescue Exception => ex # this will also be caused by Ctrl + C
+      rescue => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
         # and restore previous files
         Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
@@ -32,6 +31,26 @@ module Fastlane
         raise ex
       end
       # rubocop:enable Lint/RescueException
+    end
+
+    def setup_default_project
+      config = {}
+      FastlaneCore::Project.detect_projects(config)
+      @project = FastlaneCore::Project.new(config)
+      @project.default_app_identifier
+      @project.default_app_name
+      ask_for_apple_id
+      print_config_table
+    end
+
+    def print_config_table
+      rows = []
+      rows << ["apple_id", @apple_id]
+      rows << ["app_name", @project.default_app_name]
+      rows << ["app_id", @project.default_app_identifier]
+      @project.options.each { |k, v| rows << [k, v] }
+      require 'terminal-table'
+      puts Terminal::Table.new(rows: rows, title: "Default Values")
     end
 
     def show_infos
@@ -57,19 +76,46 @@ module Fastlane
       end
     end
 
-    def generate_appfile
-      Helper.log.info '------------------------------'
-      Helper.log.info 'To not re-enter your username and app identifier every time you run one of the fastlane tools or fastlane, these will be stored from now on.'.green
+    def default_generate_appfile
+      # get the proper xcodeproj/workspace and determine the bundle_id
+      # team ID
+      create_appfile(@project.default_app_identifier)
+    end
 
-      app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
-      apple_id = ask('Your Apple ID (fastlane@krausefx.com): '.yellow)
+    def ask_for_apple_id
+      @apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
+    end
 
+    def create_appfile(app_identifier)
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
-      template.gsub!('[[APPLE_ID]]', apple_id)
+      template.gsub!('[[APPLE_ID]]', @apple_id)
       path = File.join(folder, 'Appfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
+    end
+
+    def default_run_produce
+      Helper.log.info "Running produce..."
+      require 'produce'
+      config = {}
+      FastlaneCore::Project.detect_projects(config)
+      project = FastlaneCore::Project.new(config)
+
+      produce_options_hash = {
+        app_name: project.default_app_name
+      }
+      Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
+      begin
+        ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
+      rescue => exception
+        if exception.to_s.include?("The App Name you entered has already been used")
+          Helper.log.info "It looks like that #{project.default_app_name} has already been taken, please enter an alternative.".yellow
+          Produce.config[:app_name] = ask("App Name: ".yellow)
+          Produce.config[:skip_devcenter] = true
+          ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
+        end
+      end
     end
 
     def detect_installed_tools
@@ -82,41 +128,47 @@ module Fastlane
       @tools[:sigh] = false
     end
 
-    def ask_to_enable_other_tools
-      if @tools[:deliver] # deliver already enabled
-        Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
-      else
-        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
-          Helper.log.info "Loading up 'deliver', this might take a few seconds"
-          require 'deliver'
-          require 'deliver/setup'
-          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
-          Deliver::Runner.new(options) # to login...
-          Deliver::Setup.new.run(options)
-
-          @tools[:deliver] = true
-        end
-      end
-
-      unless @tools[:snapshot]
-        if Helper.mac? and agree("Do you want to setup 'snapshot', which will help you to automatically take screenshots of your iOS app in all languages/devices? (y/n)".yellow, true)
-          Helper.log.info "Loading up 'snapshot', this might take a few seconds"
-
-          require 'snapshot'
-          require 'snapshot/setup'
-          Snapshot::Setup.create(folder)
-
-          @tools[:snapshot] = true
-        end
-      end
-
-      @tools[:sigh] = true if agree("Do you want to use 'sigh', which will maintain and download the provisioning profile for your app? (y/n)".yellow, true)
+    def default_enable_other_tools
+      enable_deliver
+      enable_sigh
     end
 
-    def generate_fastfile
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplate")
+    def enable_sigh
+      @tools[:sigh] = true
+    end
 
-      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip
+    def enable_snapshot
+      Helper.log.info "Loading up 'snapshot', this might take a few seconds"
+
+      require 'snapshot'
+      require 'snapshot/setup'
+      Snapshot::Setup.create(folder)
+
+      @tools[:snapshot] = true
+    end
+
+    def enable_deliver
+      Helper.log.info "Loading up 'deliver', this might take a few seconds"
+      require 'deliver'
+      require 'deliver/setup'
+      options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+      Deliver::Runner.new(options) # to login...
+      Deliver::Setup.new.run(options)
+
+      @tools[:deliver] = true
+    end
+
+    def default_generate_fastfile
+      config = {}
+      FastlaneCore::Project.detect_projects(config)
+      project = FastlaneCore::Project.new(config)
+      generate_fastfile(scheme: project.schemes.first)
+    end
+
+    def generate_fastfile(scheme: nil)
+      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
+
+      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else

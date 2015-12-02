@@ -22,7 +22,7 @@ module Fastlane
       else
         raise "Couldn't find platform '#{platform}'"
       end
-      ask_for_crash_reporting
+      FastlaneCore::CrashReporting.enable
     end
 
     def is_ios?
