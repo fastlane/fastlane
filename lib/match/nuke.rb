@@ -57,12 +57,14 @@ module Match
 
     # Print tables to ask the user
     def print_tables
+      puts ""
       if self.certs.count > 0
         puts Terminal::Table.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
           rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
         })
+        puts ""
       end
 
       if self.profiles.count > 0
@@ -75,6 +77,7 @@ module Match
             [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
           end
         })
+        puts ""
       end
 
       if self.files.count > 0
@@ -86,6 +89,7 @@ module Match
             [components[0..1].join(" "), components[2]]
           end
         })
+        puts ""
       end
     end
 
