@@ -1200,6 +1200,21 @@ crashlytics(notes: commit[:message])
 puts commit[:author]
 ```
 
+### create_pull_request
+
+Create a new pull request. 
+
+```ruby
+create_pull_request(
+  api_token: ENV['GITHUB_TOKEN'],
+  repo: 'fastlane/fastlane',
+  title: 'Amazing new feature',
+  head: 'my-feature',           # optional, defaults to current branch name.
+  base: 'master',               # optional, defaults to 'master'.
+  body: 'Please pull this in!'  # optional
+)
+```
+
 ## Using mercurial
 
 ### hg_ensure_clean_status
