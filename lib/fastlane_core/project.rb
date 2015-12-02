@@ -151,6 +151,10 @@ module FastlaneCore
       results
     end
 
+    def app_identifier
+      build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+    end
+
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
