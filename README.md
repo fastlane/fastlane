@@ -21,7 +21,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
     <a href="#why-match">Why?</a> &bull; 
     <a href="#installation">Installation</a> &bull; 
     <a href="#usage">Usage</a> &bull; 
-    <a href="#secure">Is this secure?</a> &bull; 
+    <a href="#is-this-secure">Is this secure?</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
