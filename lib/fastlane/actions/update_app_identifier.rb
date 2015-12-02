@@ -7,11 +7,8 @@ module Fastlane
 
         identifier_key = 'PRODUCT_BUNDLE_IDENTIFIER'
 
-        # Assign folder from parameter or search for xcodeproj file
-        folder = params[:xcodeproj] || Dir['*.xcodeproj'].first
-
         # Read existing plist file
-        info_plist_path = File.join(folder, '..', params[:plist_path])
+        info_plist_path = File.join(params[:xcodeproj], '..', params[:plist_path])
         raise "Couldn't find info plist file at path '#{params[:plist_path]}'".red unless File.exist?(info_plist_path)
         plist = Plist.parse_xml(info_plist_path)
 
@@ -55,7 +52,7 @@ module Fastlane
       end
 
       def self.description
-        'Update an app identifier'
+        "Update the project's bundle identifier"
       end
 
       def self.available_options
@@ -63,7 +60,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PROJECT_PATH",
                                        description: "Path to your Xcode project",
-                                       optional: true,
+                                       default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
                                          raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
                                          raise "Could not find Xcode project".red unless File.exist?(value)
@@ -76,7 +73,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',
-                                       description: 'The App Identifier of your app',
+                                       description: 'The app Identifier you want to set',
                                        default_value: ENV['PRODUCE_APP_IDENTIFIER'])
         ]
       end
