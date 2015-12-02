@@ -44,6 +44,9 @@ module Snapshot
 
       # Generate HTML report
       ReportsGenerator.new.generate
+
+      # Clear the Derived Data
+      FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
     end
 
     def config_launch_arguments
@@ -58,7 +61,8 @@ module Snapshot
 
     def launch(language, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
-      FileUtils.rm_rf(screenshots_path)
+      FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
+      FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
       FileUtils.mkdir_p(screenshots_path)
 
       File.write("/tmp/language.txt", language)
