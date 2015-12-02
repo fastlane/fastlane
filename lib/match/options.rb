@@ -15,7 +15,7 @@ module Match
                                      short_option: "-r",
                                      verify_block: proc do |value|
                                        unless value.start_with?("https://") || value.start_with?("git://")
-                                        raise "git_url must start with either https:// or git://".red
+                                         raise "git_url must start with either https:// or git://".red
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :type,

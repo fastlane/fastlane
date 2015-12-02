@@ -105,30 +105,34 @@ module Match
       end
 
       if self.files.count > 0
-        Helper.log_alert "Deleting #{self.files.count} files from the git repo..."
-
-        self.files.each do |file|
-          Helper.log.info "Deleting file '#{File.basename(file)}'..."
-
-          # Check if the profile is installed on the local machine
-          if file.end_with?("mobileprovision")
-            parsed = FastlaneCore::ProvisioningProfile.parse(file)
-            uuid = parsed["UUID"]
-            path = Dir[File.join(FastlaneCore::ProvisioningProfile.profiles_path, "#{uuid}.mobileprovision")].last
-            File.delete(path) if path
-          end
-
-          File.delete(file)
-          Helper.log.info "Successfully deleted file".green
-        end
-
-        # Now we need to commit and push all this too
-        message = ["[fastlane]", "Nuked", "files", "for", params[:type].to_s].join(" ")
-        GitHelper.commit_changes(params[:path], message)
+        delete_files!
       end
+
+      # Now we need to commit and push all this too
+      message = ["[fastlane]", "Nuked", "files", "for", params[:type].to_s].join(" ")
+      GitHelper.commit_changes(params[:path], message)
     end
 
     private
+
+    def delete_files!
+      Helper.log_alert "Deleting #{self.files.count} files from the git repo..."
+
+      self.files.each do |file|
+        Helper.log.info "Deleting file '#{File.basename(file)}'..."
+
+        # Check if the profile is installed on the local machine
+        if file.end_with?("mobileprovision")
+          parsed = FastlaneCore::ProvisioningProfile.parse(file)
+          uuid = parsed["UUID"]
+          path = Dir[File.join(FastlaneCore::ProvisioningProfile.profiles_path, "#{uuid}.mobileprovision")].last
+          File.delete(path) if path
+        end
+
+        File.delete(file)
+        Helper.log.info "Successfully deleted file".green
+      end
+    end
 
     # The kind of certificate we're interested in
     def certificate_type(type)
