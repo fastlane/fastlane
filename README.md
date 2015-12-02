@@ -10,8 +10,11 @@
 match
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/match/blob/master/LICENSE)
+
+###### Easily sync your certificates and profiles across your team using git
+
+A new approach to code signing: Share one code signing identity across your development team to simplify your codesigning setup.
 
 -------
 <p align="center">
@@ -29,14 +32,23 @@ match
 
 ## Why match?
 
-TODO
+Before starting to use `match`, make sure to read the [codesigning.guide](https://codesigning.guide) 
 
-### Why not let Xcode handle all this
+> When deploying an app to the App Store, beta testing service or even installing it on a device, most development teams have separate code signing identities for every member. This results in dozens of profiles including a lot of duplicates.
+
+> You have to manually renew and download the latest provisioning profiles every time we add a new device or a certificate expires. Additionally you have to spend a lot of time when setting up a new machine. 
+
+Solution
+
+> What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
+
+### Why not let Xcode handle all this?
 
 - You have full control over what happens
 - You have access to all the certificates and profiles, which are all securely stored in git
+- You share one code signing identity across the team to have less certificates and profiles
 - Xcode sometimes revokes your certificates
-- TODO
+- It just works™
 
 ## Installation
 
@@ -58,9 +70,23 @@ Create a new private git repo and run the following in your project folder
 match init
 ```
 
-You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. 
+You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git://` URL. `match init` won't read or modify your certificates or profiles.
 
 ### Run
+
+Before running `match` the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
+
+After running `match init` you can run the following to generate new certificates and profiles:
+
+```
+match appstore
+
+match development
+```
+
+This will create a new certificate and provisioning profile (if required) and store them in your git repo. If you previously ran `match` it will automatically install the existing profiles from the git repo.
+
+#### fastlane
 
 Add `match` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
 
@@ -68,11 +94,15 @@ Add `match` to your `Fastfile` (part of [fastlane](https://fastlane.tools))
 match(type: "appstore")
 
 match(git_url: "https://github.com/fastlane/certificates", 
-        type: "development")
+      type: "development")
 
 match(git_url: "https://github.com/fastlane/certificates", 
-        type: "adhoc", 
-        app_identifier: "tools.fastlane.app")
+      type: "adhoc", 
+      app_identifier: "tools.fastlane.app")
+
+# `match` should be called before building the app
+gym
+...
 ```
 
 ### Setup Xcode project
@@ -90,6 +120,8 @@ $(sigh_tools.fastlane.app_development)
 ```
 
 <img src="assets/XcodeProjectSettings.png" width="700" />
+
+Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode).
 
 ### Install profiles on a new computer
 
