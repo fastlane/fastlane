@@ -9,28 +9,24 @@ module Fastlane
         require 'excon'
         require 'base64'
 
-        repo = params[:repo]
-        head = params[:head] || Actions.git_branch
-        base = params[:base] || 'master'
+        Helper.log.info "Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'"
 
-        Helper.log.info "Creating new pull request from '#{head}' to branch '#{base}' of '#{repo}'"
-
-        url = "https://api.github.com/repos/#{repo}/pulls"
+        url = "https://api.github.com/repos/#{params[:repo]}/pulls"
         headers = { 'User-Agent' => 'fastlane-create_pull_request' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
 
-        body = {
+        data = {
           'title' => params[:title],
-          'head' => head,
-          'base' => base
+          'head' => params[:head],
+          'base' => params[:base]
         }
 
-        body['body'] = params[:body] if params[:body]
+        data['body'] = params[:body] if params[:body]
 
-        response = Excon.post url, headers: headers, body: body.to_json
+        response = Excon.post(url, headers: headers, body: data.to_json)
 
         if response[:status] == 201
-          body = JSON.parse response.body
+          body = JSON.parse(response.body)
           number = body['number']
           html_url = body['html_url']
           Helper.log.info "Successfully created pull request ##{number}. You can see it at '#{html_url}'".green
@@ -38,7 +34,7 @@ module Fastlane
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
         else
           if response[:status] != 200
-            Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+            Helper.log.error "GitHub responded with #{response[:status]}: #{response[:body]}".red
           end
         end
       end
@@ -77,17 +73,19 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
                                        description: "The name of the branch where your changes are implemented (defaults to the current branch name)",
                                        is_string: true,
+                                       default_value: Actions.git_branch,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :base,
                                        env_name: "GITHUB_PULL_REQUEST_BASE",
                                        description: "The name of the branch you want your changes pulled into (defaults to `master`)",
                                        is_string: true,
+                                       default_value: 'master',
                                        optional: true)
         ]
       end
 
       def self.author
-        "seei"
+        ["seei"]
       end
 
       def self.is_supported?(platform)
