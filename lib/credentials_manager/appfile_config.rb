@@ -75,12 +75,22 @@ module CredentialsManager
       setter(:itunes_connect_id, *args, &block)
     end
 
+    # Developer Portal
     def team_id(*args, &block)
       setter(:team_id, *args, &block)
     end
 
     def team_name(*args, &block)
       setter(:team_name, *args, &block)
+    end
+
+    # iTunes Connect
+    def itc_team_id(*args, &block)
+      setter(:itc_team_id, *args, &block)
+    end
+
+    def itc_team_name(*args, &block)
+      setter(:itc_team_name, *args, &block)
     end
 
     # Android
