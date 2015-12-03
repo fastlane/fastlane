@@ -38,11 +38,91 @@ module Spaceship
       "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
+    # @return (Array) A list of all available teams
+    def teams
+      return @teams if @teams
+      r = request(:get, "ra/user/detail")
+      @teams = parse_response(r, 'data')['associatedAccounts']
+    end
+
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+    end
+
+    # Set a new team ID which will be used from now on
+    def team_id=(t_id)
+      r = request(:post) do |req|
+        req.url "ra/v1/session/webSession"
+        req.body = { contentProviderId: t_id }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      unless r.headers['Set-Cookie'].to_s.include?("itctx")
+        raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
+      end
+
+      itctx_regex = /itctx=([^;]*)/
+      new_itctx = r.headers['Set-Cookie'].match(itctx_regex).to_s
+
+      @cookie = @cookie.gsub(itctx_regex, new_itctx)
+      handle_itc_response(r.body)
+
+      @current_team_id = t_id
+    end
+
+    # Shows a team selection for the user in the terminal. This should not be
+    # called on CI systems
+    def select_team
+      t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
+      t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
+
+      if t_name.length > 0
+        teams.each do |t|
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].downcase == t_name.downcase
+        end
+      end
+
+      if t_id.length > 0
+        # actually set the team id here
+        self.team_id = t_id
+        return
+      end
+
+      # user didn't specify a team... #thisiswhywecanthavenicethings
+      loop do
+        puts "Multiple teams found, please enter the number of the team you want to use: "
+        teams.each_with_index do |team, i|
+          puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
+        end
+
+        selected = ($stdin.gets || '').strip.to_i - 1
+        team_to_use = teams[selected] if selected >= 0
+
+        if team_to_use
+          self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
+          break
+        end
+      end
+    end
+
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
+    end
+
     # returns wosinst, wosid and itctx
     def login_overhead_cookies(myacinfo)
       return @login_overhead_cookies if @login_overhead_cookies
 
-      response = request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext") # for woinst and wosid
+      response = request(:get, "route?noext") # for woinst and wosid
       cookies = {
         woinst: response['Set-Cookie'].match(/woinst=([^;]*)/)[1],
         wosid: response['Set-Cookie'].match(/wosid=([^;]*)/)[1],

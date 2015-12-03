@@ -13,6 +13,8 @@ In general the classes are pre-fixed with the `Tunes` module.
 
 ```ruby
 Spaceship::Tunes.login("felix@krausefx.com", "password")
+
+Spaceship::Tunes.select_team # call this method to let the user select a team
 ```
 
 ## Applications
