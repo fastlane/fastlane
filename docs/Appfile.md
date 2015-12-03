@@ -12,6 +12,19 @@ apple_id "felix@krausefx.com" # Your Apple email address
 # team selection in case you're in multiple teams
 # team_name "Felix Krause"
 # team_id "Q2CBPJ58CA"
+
+# To select a team for iTunes Connect use
+# itc_team_name "Company Name"
+# itc_team_id "18742801"
+```
+
+If you have different credentials for iTunes Connect and the Apple Developer Portal use the following code:
+
+```ruby
+app_identifier "tools.fastlane.app"       # The bundle identifier of your app
+
+apple_dev_portal_id "portal@company.com"  # Apple Developer Account
+itunes_connect_id "tunes@company.com"     # iTunes Connect Account
 ```
 
 If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_platform` and/or `for_lane` block declaration. 
