@@ -18,7 +18,6 @@ module FastlaneCore
         Helper.log.info command.yellow.strip if print_command
 
         if print_all and loading # this is only used to show the "Loading text"...
-          clear_display
           puts loading.cyan
         end
 
@@ -37,11 +36,8 @@ module FastlaneCore
                 line = element[:prefix] + line if element[:block] && element[:block].call(line)
               end
 
-              # The actual output here, first clear and then print out 3 lines
-              clear_display
               puts line
             end
-            clear_display # IMPORTANT: This has to be *before* the Process.wait
             Process.wait(pid)
           end
         rescue => ex
@@ -63,15 +59,6 @@ module FastlaneCore
         end
 
         return output.join("\n")
-      end
-
-      def clear_display
-        return if Helper.ci?
-        return if Helper.test?
-
-        if Helper.iterm?
-          system("clear")
-        end
       end
     end
   end
