@@ -72,7 +72,7 @@ module Snapshot
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
-      Helper.log_alert("#{device_type} - #{language} - #{launch_arguments.last}")
+      Helper.log_alert("#{device_type} - #{language}")
 
       prefix_hash = [
         {
