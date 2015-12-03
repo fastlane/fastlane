@@ -78,6 +78,25 @@ module Pilot
                                      is_string: false,
                                      verify_block: proc do |value|
                                        raise "Please enter a valid positive number of seconds" unless value.to_i > 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-q",
+                                     env_name: "PILOT_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-r",
+                                     env_name: "PILOT_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
                                      end)
 
       ]

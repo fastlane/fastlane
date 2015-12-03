@@ -13,6 +13,7 @@ module Pilot
 
       Helper.log.info "Login to iTunes Connect (#{config[:username]})"
       Spaceship::Tunes.login(config[:username])
+      Spaceship::Tunes.select_team
       Helper.log.info "Login successful"
     end
 
