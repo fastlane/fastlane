@@ -86,6 +86,25 @@ module Deliver
                                      description: "Extra information for the submission (e.g. third party content)",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-k",
+                                     env_name: "DELIVER_TEAM_ID",
+                                     description: "The ID of your team if you're in multiple teams",
+                                     optional: true,
+                                     is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-e",
+                                     env_name: "DELIVER_TEAM_NAME",
+                                     description: "The name of your team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                     end),
 
         # App Metadata
         # Non Localised

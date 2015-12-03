@@ -12,6 +12,7 @@ module Deliver
     def login
       Helper.log.info "Login to iTunes Connect (#{options[:username]})"
       Spaceship::Tunes.login(options[:username])
+      Spaceship::Tunes.select_team
       Helper.log.info "Login successful"
     end
 

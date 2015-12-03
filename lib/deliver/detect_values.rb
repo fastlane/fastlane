@@ -25,7 +25,7 @@ module Deliver
       if app
         options[:app] = app
       else
-        raise "Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account".red
+        raise "Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})".red
       end
     end
 
