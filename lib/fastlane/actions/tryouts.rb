@@ -52,7 +52,7 @@ module Fastlane
           req.headers['Authorization'] = params[:api_token]
           req.body = options
         end
-        
+
         post_request.on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
