@@ -12,6 +12,10 @@ apple_id "felix@krausefx.com" # Your Apple email address
 # team selection in case you're in multiple teams
 # team_name "Felix Krause"
 # team_id "Q2CBPJ58CA"
+
+# To select a team for iTunes Connect use
+# itc_team_name "Company Name"
+# itc_team_id "18742801"
 ```
 
 If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_platform` and/or `for_lane` block declaration. 
