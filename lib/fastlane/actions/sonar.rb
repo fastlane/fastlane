@@ -20,7 +20,7 @@ module Fastlane
         command = [
           command_prefix,
           'sonar-runner',
-          sonar_runner_args,
+          sonar_runner_args
         ].join(' ')
 
         Action.sh command
@@ -32,7 +32,7 @@ module Fastlane
 
       #####################################################
       # @!group Documentation
-      ##################################################### 
+      #####################################################
 
       def self.description
         "Invokes sonar-runner to programmatically run SonarQube analysis"
@@ -46,7 +46,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :project_configuration_path,
                                         env_name: "FL_SONAR_RUNNER_PROPERTIES_PATH",
-                                        description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", #default is enforced by sonar-runner binary
+                                        description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", # default is enforced by sonar-runner binary
                                         optional: true,
                                         verify_block: proc do |value|
                                           raise "Couldn't find file at path '#{value}'".red unless value.nil? or File.exist?(value)
