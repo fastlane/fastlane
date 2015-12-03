@@ -63,7 +63,7 @@ module Deliver
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"))
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, '*_framed.#{extensions}')).count > 0
+        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}")).count > 0
 
         files.each do |path|
           if prefer_framed && !path.downcase.include?("_framed.#{extensions}") && !path.downcase.include?("watch")
