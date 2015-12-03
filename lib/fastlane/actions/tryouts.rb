@@ -1,6 +1,3 @@
-require 'faraday'
-require 'faraday_middleware'
-
 module Fastlane
   module Actions
     module SharedValues
@@ -27,6 +24,9 @@ module Fastlane
       end
 
       def self.upload_build(params)
+        require 'faraday'
+        require 'faraday_middleware'
+
         connection = Faraday.new(:url => TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_identifier]) do |builder|
           builder.request :multipart
           builder.request :url_encoded
