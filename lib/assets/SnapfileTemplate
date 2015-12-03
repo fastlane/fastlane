@@ -16,13 +16,8 @@ languages([
   "it-IT"
 ])
 
-# Arguments to pass to the app on launch. Use '-key value' to set NSUserDefaults.
-# launch_arguments("-myUserDefault myValue")
-# or do multiple runs with different arguments
-# launch_arguments([
-#	"-favColor red",
-#   "-favColor blue"
-# ])
+# Arguments to pass to the app on launch. See https://github.com/fastlane/snapshot#launch_arguments
+# launch_arguments("-favColor red")
 
 # The name of the scheme which contains the UI Tests
 # scheme "SchemeName"
