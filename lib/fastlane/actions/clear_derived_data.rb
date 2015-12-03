@@ -25,8 +25,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "DERIVED_DATA_PATH",
                                        description: "Custom path for derivedData",
-                                       default_value: "~/Library/Developer/Xcode/DerivedData",
-                                       optional: true)
+                                       default_value: "~/Library/Developer/Xcode/DerivedData")
         ]
       end
 
