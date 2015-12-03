@@ -27,10 +27,11 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(:url => TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_identifier]) do |builder|
+        url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_identifier]
+        connection = Faraday.new(url) do |builder|
           builder.request :multipart
           builder.request :url_encoded
-          builder.response :json, :content_type => /\bjson$/
+          builder.response :json, content_type: /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
         end
@@ -47,10 +48,12 @@ module Fastlane
         options[:notify] = params[:notify]
         options[:status] = params[:status]
 
-        connection.post do |req|
+        post_request = connection.post do |req|
           req.headers['Authorization'] = params[:api_token]
           req.body = options
-        end.on_complete do |env|
+        end
+        
+        post_request.on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
       end
@@ -95,11 +98,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notify,
                                      env_name: "TRYOUTS_NOTIFY",
                                      description: "Notify testers? 1 for yes",
-                                     default_value: "1",),
+                                     default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                      env_name: "TRYOUTS_STATUS",
                                      description: "2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update",
-                                     default_value: "2"),
+                                     default_value: "2")
         ]
       end
 
