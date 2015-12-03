@@ -11,17 +11,14 @@ import XCTest
 
 var deviceLanguage = ""
 
+@available(*, deprecated, message="use setupSnapshot: instead")
 func setLanguage(app: XCUIApplication) {
-    Snapshot.setLanguage(app)
-}
-
-func setLaunchArguments(app: XCUIApplication) {
-    Snapshot.setLaunchArguments(app)
+    setupSnapshot(app)
 }
 
 func setupSnapshot(app: XCUIApplication) {
-    setLanguage(app)
-    setLaunchArguments(app)
+    Snapshot.setLanguage(app)
+    Snapshot.setLaunchArguments(app)
 }
 
 func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
