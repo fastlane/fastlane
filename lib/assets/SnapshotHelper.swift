@@ -45,7 +45,7 @@ class Snapshot: NSObject {
     class func setLaunchArguments(app: XCUIApplication) {
         let path = "/tmp/snapshot-launch_arguments.txt"
         
-        app.launchArguments += ["-FASTLANE_SNAPSHOT", "1"]
+        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES"]
         
         do {
             let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
