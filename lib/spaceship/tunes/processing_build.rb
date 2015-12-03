@@ -15,7 +15,7 @@ module Spaceship
       attr_accessor :upload_date
 
       attr_mapping(
-        'state' => :state,
+        'processingState' => :state,
         'uploadDate' => :upload_date
       )
 

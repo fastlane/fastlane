@@ -70,6 +70,11 @@ module Spaceship
           attrs.merge!(build_train: self)
           Tunes::Build.factory(attrs)
         end
+
+        # since buildsInProcessing appears empty, fallback to also including processing state from @builds
+        @builds.each do |build|
+          @processing_builds << build if build.processing == true && build.valid == true
+        end
       end
 
       # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
