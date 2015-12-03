@@ -136,12 +136,6 @@ Spaceship.certificate.production.create!(csr: csr)
 Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
-**Note:** If the above requests don't work, you need to add this before actually creating the certificate. This is due to how the `csrf` token work:
-
-```ruby
-Spaceship.certificate.all
-```
-
 ## Provisioning Profiles
 
 ### Receiving profiles

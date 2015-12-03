@@ -271,6 +271,12 @@ module Spaceship
     end
 
     def create_certificate!(type, csr, app_id = nil)
+      if csrf_tokens.count == 0
+        # If we directly create a new certificate without querying anything before
+        # we don't have a valid csrf token, that's why we have to do at least one request
+        certificates([Certificate::CERTIFICATE_TYPE_IDS.keys.first])
+      end
+
       r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
         type: type,
