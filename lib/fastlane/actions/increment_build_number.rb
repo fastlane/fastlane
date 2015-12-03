@@ -61,7 +61,7 @@ module Fastlane
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
                                          raise "Could not find Xcode project".red if !File.exist?(value) and !Helper.is_test?
                                        end)
         ]

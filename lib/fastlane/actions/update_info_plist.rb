@@ -54,7 +54,7 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
                                          raise "Could not find Xcode project".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :plist_path,
