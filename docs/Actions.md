@@ -764,6 +764,22 @@ appetize(
 )
 ```
 
+### [Tryouts.io](https://tryouts.io/)
+
+Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
+
+```ruby
+tryouts(
+  api_token: "...",
+  app_identifier: "application-hash",
+  build_file: "test.ipa",
+)
+```
+
+Additionally you can specify `status`, `notify` and `notes_path` or notes`.
+
+For more information about the available options, check out `fastlane action tryouts` or head over to [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release) for our complete API docs.
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
