@@ -88,6 +88,8 @@ module Spaceship
         end
       end
 
+      t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
+
       if t_id.length > 0
         # actually set the team id here
         self.team_id = t_id
