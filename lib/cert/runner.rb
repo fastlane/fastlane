@@ -7,6 +7,7 @@ module Cert
 
       installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"])
       raise "Could not find the newly generated certificate installed" unless installed
+      return ENV["CER_FILE_PATH"]
     end
 
     def run
