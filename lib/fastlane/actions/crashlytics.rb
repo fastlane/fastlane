@@ -7,16 +7,16 @@ module Fastlane
 
         params.values # to validate all inputs before looking for the ipa/apk
 
+        # We need to store notes in a file, because the crashlytics CLI (iOS) says so
         if params[:notes]
-          require 'tempfile'
-          # We need to store it in a file, because the crashlytics CLI (iOS) says so
-          Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
+          Helper.log.error "Overwriting :notes_path, because you have :notes" if params[:notes_path]
 
-          changelog = Tempfile.new('changelog')
-          changelog.write(params[:notes])
-          changelog.close
+          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
+        elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
+          Helper.log.info "Sending FL_CHANGELOG as release notes to Beta by Crashlytics"
 
-          params[:notes_path] = changelog.path # we can only set it *after* writing the file there as it gets validated
+          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
+            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog').path
         end
 
         if params[:ipa_path]
