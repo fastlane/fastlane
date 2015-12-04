@@ -31,7 +31,7 @@ describe Fastlane do
         FileUtils.cp_r(source, destination)
       end
 
-      if Helper.mac?
+      if FastlaneCore::Helper.mac?
         it "updates the info plist when product bundle identifier not in use" do
           plist = create_plist_with_identifier('tools.fastlane.example')
 
