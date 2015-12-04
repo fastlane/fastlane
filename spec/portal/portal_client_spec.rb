@@ -30,9 +30,9 @@ describe Spaceship::Client do
   end
 
   describe '#login' do
-    it 'returns the session cookie' do
-      subject.login(username, password)
-      expect(subject.cookie).to eq('myacinfo=abcdef;')
+    it 'sets the session cookies' do
+      response = subject.login(username, password)
+      expect(response.env.request_headers['Cookie']).to eq('myacinfo=abcdef')
     end
 
     it 'raises an exception if authentication failed' do
@@ -73,7 +73,7 @@ describe Spaceship::Client do
       it "uses the stored token for all upcoming requests" do
         # Temporary stub a request to require the csrf_tokens
         stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-          with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc' }, headers: { 'Cookie' => 'myacinfo=abcdef;', 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
+          with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc' }, headers: { 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
           to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
 
         # Hard code the tokens
