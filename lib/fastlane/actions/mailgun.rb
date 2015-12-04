@@ -98,8 +98,8 @@ module Fastlane
 
       def self.mail_teplate(options)
         hash = {
-          author: Actions.git_author,
-          last_commit: Actions.last_git_commit,
+          author: Actions.git_author_email,
+          last_commit: Actions.last_git_commit_message,
           message: options[:message],
           app_link: options[:app_link]
         }
