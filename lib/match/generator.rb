@@ -29,7 +29,7 @@ module Match
       prov_type = :enterprise if ENV["MATCH_FORCE_ENTERPRISE"] && ENV["SIGH_PROFILE_ENTERPRISE"]
       certificate_id = File.basename(cert_path).gsub(".cer", "")
       profile_name = ["match", profile_type_name(prov_type), params[:app_identifier]].join(" ")
-      
+
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: params[:app_identifier],
         adhoc: prov_type == :adhoc,
