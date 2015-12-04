@@ -73,13 +73,13 @@ module Fastlane
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        description: "Crashlytics Beta API Token",
                                        verify_block: proc do |value|
-                                         raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                         raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
                                        verify_block: proc do |value|
-                                         raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value and !value.empty?
+                                         raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
