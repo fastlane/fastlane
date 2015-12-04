@@ -2,17 +2,20 @@ require 'pry'
 module Match
   class Nuke
     attr_accessor :params
+    attr_accessor :type
 
     attr_accessor :certs
     attr_accessor :profiles
     attr_accessor :files
 
-    def run(params)
+    def run(params, type: nil)
       self.params = params
+      self.type = type
+
       self.params[:path] = GitHelper.clone(self.params[:git_url])
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:app_identifier],
+                                         hide_keys: [:app_identifier, :path],
                                              title: "Summary for match nuke #{Match::VERSION}")
 
       prepare_list
@@ -22,15 +25,14 @@ module Match
         Helper.log.info "---".red
         Helper.log.info "Are you sure you want to completely delete and revoke all the".red
         Helper.log.info "certificates and provisioning profiles listed above? (y/n)".red
-        if params[:type] == "appstore" or params[:type] == "adhoc"
-          Helper.log.info "Warning: By nuking AppStore/AdHoc profiles, the distribution certificate gets revoked!".red
-        end
+        Helper.log.info "Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted".red if type == "distribution"
         Helper.log.info "---".red
-        return unless agree("(y/n)", true)
-
-        nuke_it_now!
-
-        Helper.log.info "Successfully cleaned your account ♻️".green
+        if agree("(y/n)", true)
+          nuke_it_now!
+          Helper.log.info "Successfully cleaned your account ♻️".green
+        else
+          Helper.log.info "Cancelled nuking #thanks 🏠 👨 ‍👩 ‍👧".green
+        end
       else
         Helper.log.info "No relevant certificates or provisioning profiles found, nothing to do here :)".green
       end
@@ -39,19 +41,27 @@ module Match
     # Collect all the certs/profiles
     def prepare_list
       Helper.log.info "Fetching certificates and profiles..."
-      cert_type = :distribution
-      cert_type = :development if params[:type] == "development"
-      prov_type = params[:type].to_sym
+      cert_type = type.to_sym
+      
+      prov_types = [:development]
+      prov_types = [:appstore, :adhoc] if cert_type == :distribution
 
       Spaceship.login(params[:username])
       Spaceship.select_team
 
       self.certs = certificate_type(cert_type).all
-      self.profiles = profile_type(prov_type).all
+      self.profiles = []
+      prov_types.each do |prov_type|
+        self.profiles += profile_type(prov_type).all
+      end
 
       certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
-      profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+      profiles = []
+      prov_types.each do |prov_type|
+        profiles += Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+      end
+
       self.files = certs + keys + profiles
     end
 
@@ -86,7 +96,11 @@ module Match
           headings: ["Type", "File Name"],
           rows: self.files.collect do |f|
             components = f.split(File::SEPARATOR)[-3..-1]
-            [components[0..1].join(" "), components[2]]
+
+            # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
+            file_type = components[0..1].reverse.join(" ")[0..-2]
+
+            [file_type, components[2]]
           end
         })
         puts ""
@@ -113,7 +127,7 @@ module Match
       end
 
       # Now we need to commit and push all this too
-      message = ["[fastlane]", "Nuked", "files", "for", params[:type].to_s].join(" ")
+      message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
       GitHelper.commit_changes(params[:path], message)
     end
 
@@ -150,7 +164,7 @@ module Match
     # The kind of provisioning profile we're interested in
     def profile_type(type)
       profile_type = Spaceship.provisioning_profile.app_store
-      # profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
+      profile_type = Spaceship.provisioning_profile.in_house if ENV["MATCH_FORCE_ENTERPRISE"] && Spaceship.client.in_house?
       profile_type = Spaceship.provisioning_profile.ad_hoc if type == :adhoc
       profile_type = Spaceship.provisioning_profile.development if type == :development
 

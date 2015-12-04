@@ -69,7 +69,7 @@ class MatchApplication
       c.description = 'Install all the available certificates and profiles on the local machine'
       c.action do |args, options|
         params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-        params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+        params.load_configuration_file("Matchfile")
 
         require 'match/bootstrap'
         Match::Bootstrap.new.run(git_url: params[:git_url], keychain: params[:keychain_name])
@@ -77,22 +77,22 @@ class MatchApplication
     end
 
     command "nuke" do |c|
+      # We have this empty command here, since otherwise the normal `match` command will be executed
       c.syntax = "match nuke"
       c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
       c.action do |args, options|
-        puts "Please run `match nuke [type] instead, allowed values: appstore, adhoc and development".red
+        puts "Please run `match nuke [type] instead, allowed values: distribution and development".red
       end
     end
 
-    Match.environments.each do |type|
+    ["development", "distribution"].each do |type|
       command "nuke #{type}" do |c|
         c.syntax = "match nuke #{type}"
-        c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal (#{type})"
+        c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal of the type #{type}"
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
-          params[:type] = type.to_s
-          Match::Nuke.new.run(params)
+          Match::Nuke.new.run(params, type: type.to_s)
         end
       end
     end

@@ -18,7 +18,7 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a>
 </p>
 -------
 
@@ -213,8 +213,7 @@ To revoke all certificates and provisioning profiles for a specific environment:
 
 ```sh
 match nuke development
-match nuke adhoc
-match nuke appstore
+match nuke distribution
 ```
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
