@@ -247,7 +247,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 - You have full control over the access list of your git repo, no third party service involved
 - Even if your certificates got leaked, they can't be used to cause any harm without your login credentials
 - `match` doesn't support In-House Enterprise profiles as they are harder to control
-- If you use GitHub or Bitbucket we encourage to enable 2 factor authentification for all accounts that have access to the certificates repo.
+- If you use GitHub or Bitbucket we encourage to enable 2 factor authentication for all accounts that have access to the certificates repo.
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
