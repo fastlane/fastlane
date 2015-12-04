@@ -66,7 +66,9 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 ### Setup
 
-Create a new private git repo and run the following in your project folder
+Create a new, private git repo (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
+
+Run the following in your project folder to start using `match`:
 
 ```
 match init
