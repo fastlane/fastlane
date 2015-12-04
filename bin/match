@@ -24,7 +24,7 @@ class MatchApplication
 
     command :run do |c|
       c.syntax = 'match'
-      c.description = 'TODO'
+      c.description = Match::DESCRIPTION
 
       c.action do |args, options|
         params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -36,6 +36,7 @@ class MatchApplication
     Match.environments.each do |type|
       command type do |c|
         c.syntax = "match #{type}"
+        c.description = "Run match for a #{type} provisioning profile"
 
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
