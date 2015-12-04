@@ -156,23 +156,23 @@ module Fastlane
         end
 
         # git_author
-        if Actions.git_author && should_add_payload[:git_author]
+        if Actions.git_author_email && should_add_payload[:git_author]
           if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
               title: 'Git Author',
-              value: Actions.git_author,
+              value: Actions.git_author_email,
               short: true
             }
           end
         end
 
         # last_git_commit
-        if Actions.last_git_commit && should_add_payload[:last_git_commit]
+        if Actions.last_git_commit_message && should_add_payload[:last_git_commit]
           slack_attachment[:fields] << {
             title: 'Git Commit',
-            value: Actions.last_git_commit,
+            value: Actions.last_git_commit_message,
             short: false
           }
         end
