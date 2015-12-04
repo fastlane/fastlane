@@ -138,10 +138,6 @@ module Spaceship
       request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
       response = request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
 
-      unless response['Set-Cookie'].include?("itctx")
-        raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
-      end
-
       case response.status
       when 403, 401
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -153,6 +149,8 @@ module Spaceship
         elsif (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif (response['Set-Cookie'] || "").include?("itctx")
+          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
           raise ITunesConnectError.new, info.join("\n")
