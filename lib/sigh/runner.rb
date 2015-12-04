@@ -70,7 +70,11 @@ module Sigh
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
         filtered = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
-        results = filtered if (filtered || []).count > 0
+        if Sigh.config[:ignore_profiles_with_different_name]
+          results = filtered
+        else
+          results = filtered if (filtered || []).count > 0
+        end
       end
 
       return results if Sigh.config[:skip_certificate_verification]
