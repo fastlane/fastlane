@@ -2,6 +2,7 @@ module Match
   class Runner
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
+                                         hide_keys: [:path],
                                              title: "Summary for match #{Match::VERSION}")
 
       cert_type = :distribution
