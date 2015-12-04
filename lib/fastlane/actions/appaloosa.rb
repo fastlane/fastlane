@@ -193,7 +193,10 @@ module Fastlane
       end
 
       def self.details
-        'Appaloosa is a private mobile application store. This action offers a quick deployment on the platform. You can create an account, push to your existing account, or manage your user groups. We accept iOS and Android applications. Have questions? Contact support@appaloosa-store.com'
+        [
+          "Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.",
+          "You can create an account, push to your existing account, or manage your user groups. We accept iOS, Mac and Android applications."
+        ].join(" ")
       end
 
       def self.available_options
