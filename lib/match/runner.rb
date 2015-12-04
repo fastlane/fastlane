@@ -19,13 +19,13 @@ module Match
 
       if certs.count == 0 or keys.count == 0
         Helper.log.info "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
-        Generator.generate_certificate(params, cert_type)
+        cert_path = Generator.generate_certificate(params, cert_type)
       else
-        cert = certs.last
-        if FastlaneCore::CertChecker.installed?(cert)
-          Helper.log.info "Certificate '#{cert}' is already installed on this machine"
+        cert_path = certs.last
+        if FastlaneCore::CertChecker.installed?(cert_path)
+          Helper.log.info "Certificate '#{cert_path}' is already installed on this machine"
         else
-          Utils.import(cert, params[:keychain_name])
+          Utils.import(cert_path, params[:keychain_name])
         end
 
         # Import the private key
@@ -35,7 +35,7 @@ module Match
       # Install the provisioning profiles
       profile = profiles.last
       if profile.nil? or params[:force]
-        profile = Generator.generate_provisioning_profile(params, prov_type)
+        profile = Generator.generate_provisioning_profile(params, prov_type, cert_path)
       end
 
       FastlaneCore::ProvisioningProfile.install(profile)
