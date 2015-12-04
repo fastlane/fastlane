@@ -22,13 +22,15 @@ module Match
         cert_path = Generator.generate_certificate(params, cert_type)
       else
         cert_path = certs.last
+        Helper.log.info "Installing certificate..."
         if FastlaneCore::CertChecker.installed?(cert_path)
-          Helper.log.info "Certificate '#{cert_path}' is already installed on this machine"
+          Helper.log.info "Certificate '#{File.basename(cert_path)}' is already installed on this machine" if $verbose
         else
           Utils.import(cert_path, params[:keychain_name])
         end
 
         # Import the private key
+        # there seems to be no good way to check if it's already installed - so just install it
         Utils.import(keys.last, params[:keychain_name])
       end
 

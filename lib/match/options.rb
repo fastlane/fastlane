@@ -30,10 +30,10 @@ module Match
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                   short_option: "-a",
-                                   env_name: "MATCH_APP_IDENTIFIER",
-                                   description: "The bundle identifier of your app",
-                                   default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     short_option: "-a",
+                                     env_name: "MATCH_APP_IDENTIFIER",
+                                     description: "The bundle identifier of your app",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "MATCH_USERNAME",
@@ -62,13 +62,21 @@ module Match
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value
                                      end),
+        FastlaneCore::ConfigItem.new(key: :verbose,
+                                     env_name: "MATCH_VERBOSE",
+                                     description: "Print out extra information and all commands",
+                                     is_string: false,
+                                     default_value: false,
+                                     verify_block: proc do |value|
+                                      $verbose = true if value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "MATCH_FORCE",
                                      description: "Renew the provisioning profiles every time you run match",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :path,
-                                     description: "Path to the temporary cloned certificates directory",
+                                     description: nil,
                                      verify_block: proc do |value|
                                        raise "Specify the `git_url` instead of the `path`".red unless value.start_with?("/var/folders")
                                      end,

@@ -102,6 +102,12 @@ This will create a new certificate and provisioning profile (if required) and st
 
 The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
 
+To get a more detailed output of what `match` is doing use
+
+```
+match --verbose
+```
+
 For a list of all available options run
 
 ```
