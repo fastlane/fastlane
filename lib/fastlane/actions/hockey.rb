@@ -88,7 +88,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "FL_HOCKEY_NOTES",
                                        description: "Beta Notes",
-                                       default_value: "No changelog given"),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
                                        description: "Notify testers? 1 for yes",
