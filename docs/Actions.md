@@ -1390,6 +1390,22 @@ ENV['TESTMUNK_EMAIL'] = 'email@email.com'
 testmunk
 ```
 
+### [Podio](http://podio.com)
+Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items). 
+
+```ruby
+ENV["PODIO_ITEM_IDENTIFYING_FIELD"] = "String specifying the field key used for identification of an item"
+
+podio_item(
+  identifying_value: "Your unique value",
+  other_fields: {
+    "field1" => "fieldValue",
+    "field2" => "fieldValue2"
+  }
+)
+```
+To see all environment values, please run ```fastlane action podio_item```.
+
 ## Other
 
 ### update_fastlane
