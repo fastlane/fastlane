@@ -27,7 +27,6 @@ module Fastlane
       end
 
       dot_env = Helper.is_test? ? nil : options.env
-
       Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
     end
 

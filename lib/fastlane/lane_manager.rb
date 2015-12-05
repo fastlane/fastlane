@@ -13,21 +13,24 @@ module Fastlane
 
       is_platform = false
       begin
-        is_platform = ff.is_platform_block? lane
-      rescue
+        is_platform = ff.is_platform_block?(lane)
+      rescue # rescue, because this raises an exception if it can't be found at all
       end
 
-      unless is_platform # rescue, because this raises an exception if it can't be found at all
+      unless is_platform
         # maybe the user specified a default platform
         # We'll only do this, if the lane specified isn't a platform, as we want to list all platforms then
 
-        platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
+        # Make sure that's not a lane without a platform
+        unless ff.runner.available_lanes.include?(lane)
+          platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
+        end
       end
 
       if !platform and lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
-        if ff.is_platform_block? lane
+        if ff.is_platform_block?(lane)
           platform = lane
           lane = nil
         end
