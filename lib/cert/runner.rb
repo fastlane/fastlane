@@ -13,7 +13,7 @@ module Cert
     def run
       FileUtils.mkdir_p(Cert.config[:output_path])
 
-      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [], title: "Summary for cert #{Cert::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Cert::VERSION}")
 
       Helper.log.info "Starting login with user '#{Cert.config[:username]}'"
       Spaceship.login(Cert.config[:username], nil)
