@@ -152,6 +152,12 @@ describe Fastlane do
         expect(File.exist?('/tmp/fastlane/test')).to eq(true)
       end
 
+      it "allows calling a lane directly even with a default_platform" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
+        result = ff.runner.execute(:test)
+        expect(result.to_i).to be > 10
+      end
+
       describe "supports switching lanes" do
         it "use case 1: passing parameters to another lane and getting the result" do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')

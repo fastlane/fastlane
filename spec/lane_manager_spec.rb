@@ -35,6 +35,18 @@ describe Fastlane do
           expect(lanes[:ios][:crashy].description).to eq(["This action does nothing", "but crash"])
           expect(lanes[:ios][:empty].description).to eq([])
         end
+
+        it "supports running a lane without a platform even when there is a default_platform" do
+          path = "/tmp/fastlane/tests.txt"
+          File.delete(path) if File.exist?(path)
+          expect(File.exist?(path)).to eq(false)
+
+          ff = Fastlane::LaneManager.cruise_lane(nil, 'test')
+
+          expect(File.exist?(path)).to eq(true)
+          expect(ff.runner.current_lane).to eq(:test)
+          expect(ff.runner.current_platform).to eq(nil)
+        end
       end
     end
   end
