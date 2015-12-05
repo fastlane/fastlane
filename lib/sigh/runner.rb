@@ -8,7 +8,7 @@ module Sigh
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
       FastlaneCore::PrintTable.print_values(config: Sigh.config,
-                                         hide_keys: [],
+                                         hide_keys: [:output_path],
                                              title: "Summary for sigh #{Sigh::VERSION}")
 
       Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
