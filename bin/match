@@ -59,7 +59,6 @@ class MatchApplication
           return 0
         end
 
-        require 'match/setup'
         Match::Setup.new.run(path)
       end
     end

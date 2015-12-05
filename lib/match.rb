@@ -6,6 +6,7 @@ require 'match/utils'
 require 'match/table_printer'
 require 'match/git_helper'
 require 'match/generator'
+require 'match/setup'
 
 require 'fastlane_core'
 require 'terminal-table'
