@@ -4,7 +4,7 @@ module Fastlane
       # JUnit file documentation: http://llg.cubic.org/docs/junit/
       # And http://nelsonwells.net/2012/09/how-jenkins-ci-parses-and-displays-junit-output/
 
-      containing_folder = Fastlane::FastlaneFolder.path || Dir.pwd
+      containing_folder = ENV['FL_REPORT_PATH'] || Fastlane::FastlaneFolder.path || Dir.pwd
       path = File.join(containing_folder, 'report.xml')
 
       @steps = results
