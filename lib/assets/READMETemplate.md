@@ -12,7 +12,7 @@ Do not modify this file, as it gets overwritten every time you run `match`.
 sudo gem install match
 ```
 
-Make sure, you have the latest version of the Xcode command line tools installed:
+Make sure you have the latest version of the Xcode command line tools installed:
 
 ```
 xcode-select --install
