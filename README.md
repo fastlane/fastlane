@@ -156,7 +156,19 @@ For a list of all available options run
 match --help
 ```
 
-<img src="assets/github_repo.png" width="450" />
+
+##### Git Repo
+
+After running `match` for the first time, your git repo will contain 2 directories:
+
+- The `certs` folder contains all certificates with their private keys
+- The `profiles` folder contains all provisioning profiles
+
+Additionally, `match` creates a nice repo `README.md` for you, to make it easy for new users to onboard:
+
+<p align="center">
+  <img src="assets/github_repo.png" width="700" />
+</p>
 
 #### fastlane
 
