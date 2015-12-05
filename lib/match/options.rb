@@ -78,7 +78,9 @@ module Match
         FastlaneCore::ConfigItem.new(key: :path,
                                      description: nil,
                                      verify_block: proc do |value|
-                                       raise "Specify the `git_url` instead of the `path`".red unless value.start_with?("/var/folders")
+                                       unless Helper.test?
+                                         raise "Specify the `git_url` instead of the `path`".red unless value.start_with?("/var/folders")
+                                       end
                                      end,
                                      optional: true)
       ]
