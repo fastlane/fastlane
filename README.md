@@ -84,8 +84,6 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 :recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force`
 :busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
-:cookie:  | Automatically pre-fills environment variables ready to be used in your Xcode project
-:page_facing_up: | Store your configuration in git in a `Matchfile`
 :sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/gym) and other build tools 
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
