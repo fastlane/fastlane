@@ -56,7 +56,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 > When deploying an app to the App Store, beta testing service or even installing it on a device, most development teams have separate code signing identities for every member. This results in dozens of profiles including a lot of duplicates.
 
-> You have to manually renew and download the latest provisioning profiles every time we add a new device or a certificate expires. Additionally you have to spend a lot of time when setting up a new machine. 
+> You have to manually renew and download the latest provisioning profiles every time you add a new device or a certificate expires. Additionally you have to spend a lot of time when setting up a new machine. 
 
 **A new approach**
 
@@ -66,7 +66,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 - You have full control over what happens
 - You have access to all the certificates and profiles, which are all securely stored in git
-- You share one code signing identity across the team to have less certificates and profiles
+- You share one code signing identity across the team to have fewer certificates and profiles
 - Xcode sometimes revokes certificates which breaks your setup causing failed builds
 - More predictable builds by settings profiles in an explicit way instead of using the `Automatic` setting
 - It just works™
