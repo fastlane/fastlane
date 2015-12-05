@@ -222,9 +222,9 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 Storing your private keys in a git repo might sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusion: 
 
-#### What can happen if someone steals my private key?
+#### What could happen if someone stole a private key?
 
-If attackers have your certificate and provisioning profile, they could codesign an application with the same bundle identifier. 
+If attackers would have your certificate and provisioning profile, they could codesign an application with the same bundle identifier. 
 
 What's the worst that could happen for each of the profile types?
 
