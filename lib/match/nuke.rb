@@ -41,7 +41,7 @@ module Match
     def prepare_list
       Helper.log.info "Fetching certificates and profiles..."
       cert_type = type.to_sym
-      
+
       prov_types = [:development]
       prov_types = [:appstore, :adhoc] if cert_type == :distribution
 

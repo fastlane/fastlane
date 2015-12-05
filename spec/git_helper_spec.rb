@@ -18,18 +18,18 @@ describe Match do
         git_url = "https://github.com/fastlane/certificates"
         command = "git clone '#{git_url}' '#{path}' --depth 1"
         to_params = {
-          command: command, 
-          print_all: nil, 
+          command: command,
+          print_all: nil,
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor). 
-                      to receive(:execute).
-                      with(to_params).
-                      and_return(nil)
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
 
         result = Match::GitHelper.clone(git_url)
-        expect(result).to match(/\/var\/folders.*/)
+        expect(result).to match(%r{\/var\/folders.*})
         expect(File.directory?(result)).to eq(true)
       end
     end

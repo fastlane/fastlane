@@ -6,8 +6,8 @@ module Match
       @dir = Dir.mktmpdir
       command = "git clone '#{git_url}' '#{@dir}' --depth 1"
       Helper.log.info "Cloning remote git repo..."
-      FastlaneCore::CommandExecutor.execute(command: command, 
-                                          print_all: $verbose, 
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: $verbose,
                                       print_command: $verbose)
 
       raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
@@ -37,8 +37,8 @@ module Match
         commands << "git push origin master"
 
         commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command, 
-                                              print_all: $verbose, 
+          FastlaneCore::CommandExecutor.execute(command: command,
+                                              print_all: $verbose,
                                           print_command: $verbose)
         end
       end

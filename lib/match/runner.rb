@@ -24,6 +24,7 @@ module Match
       else
         cert_path = certs.last
         Helper.log.info "Installing certificate..."
+
         if FastlaneCore::CertChecker.installed?(cert_path)
           Helper.log.info "Certificate '#{File.basename(cert_path)}' is already installed on this machine" if $verbose
         else
