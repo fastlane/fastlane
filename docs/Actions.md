@@ -418,6 +418,16 @@ splunkmint(
 
 If you use `gym` the `dsym` parameter is optional.
 
+### recreate_schemes
+
+Recreate not shared Xcode project schemes.
+
+```ruby
+recreate_schemes(
+	project: './path/to/MyApp.xcodeproj'
+)
+```
+
 ## Testing
 
 ### [scan](https://github.com/KrauseFx/scan)
