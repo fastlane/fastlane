@@ -93,6 +93,8 @@ Run the following in your project folder to start using `match`:
 match init
 ```
 
+<img src="assets/match_init.gif" width="550" />
+
 You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder). 
@@ -118,6 +120,8 @@ match appstore
 ```
 match development
 ```
+
+<img src="assets/match_appstore_small.gif" width="550" />
 
 This will create a new certificate and provisioning profile (if required) and store them in your git repo. If you previously ran `match` it will automatically install the existing profiles from the git repo.
 
@@ -199,6 +203,8 @@ To install all certificates and provisioning profiles on a new machine, just run
 match bootstrap
 ```
 
+<img src="assets/match_bootstrap.gif" width="550" />
+
 Note: If you run the above command in the project directory containing the `Matchfile`, you won't be asked for the `git_url`, otherwise you can also pass it using
 
 ```
@@ -215,6 +221,8 @@ To revoke all certificates and provisioning profiles for a specific environment:
 match nuke development
 match nuke distribution
 ```
+
+<img src="assets/match_nuke.gif" width="550" />
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
 
