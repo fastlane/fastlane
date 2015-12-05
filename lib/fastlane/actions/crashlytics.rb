@@ -9,7 +9,7 @@ module Fastlane
 
         # We need to store notes in a file, because the crashlytics CLI (iOS) says so
         if params[:notes]
-          Helper.log.error "Overwriting :notes_path, because you have :notes" if params[:notes_path]
+          Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
         elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
