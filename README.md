@@ -25,7 +25,7 @@ fastlane
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/fastlane/fastlane/master.svg?style=flat)](https://travis-ci.org/fastlane/fastlane)
 
-######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [xctool](https://github.com/facebook/xctool).
+######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
 Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
 
@@ -57,7 +57,7 @@ You define a `lane` like this (more details about the commands in the [Actions](
 lane :appstore do
   increment_build_number
   cocoapods
-  xctool
+  scan
   snapshot
   sigh
   deliver
