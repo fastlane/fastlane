@@ -156,6 +156,8 @@ For a list of all available options run
 match --help
 ```
 
+<img src="assets/github_repo.png" width="450" />
+
 #### fastlane
 
 Add `match` to your `Fastfile` to automatically fetch the latest code signing certificates before building your app with [fastlane](https://fastlane.tools).
