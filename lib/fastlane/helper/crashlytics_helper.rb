@@ -79,6 +79,15 @@ module Fastlane
 
           return jar_path
         end
+
+        def write_to_tempfile(value, tempfilename)
+          require 'tempfile'
+
+          Tempfile.new(tempfilename).tap do |t|
+            t.write(value)
+            t.close
+          end
+        end
       end
     end
   end
