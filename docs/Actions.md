@@ -420,7 +420,7 @@ If you use `gym` the `dsym` parameter is optional.
 
 ### recreate_schemes
 
-Recreate not shared Xcode project schemes.
+Recreate shared Xcode project schemes if the `Shared` checkbox was not enabled.
 
 ```ruby
 recreate_schemes(
