@@ -152,14 +152,14 @@ Here a few links to get started:
 **Swift**
 ```swift
 let app = XCUIApplication()
-setLanguage(app)
+setupSnapshot(app)
 app.launch()
 ```
 
 **Objective C**
 ```objective-c
 XCUIApplication *app = [[XCUIApplication alloc] init];
-[Snapshot setLanguage:app];
+[Snapshot setupSnapshot:app];
 [app launch];
 ```
 
@@ -225,6 +225,8 @@ languages([
   "es-ES"
 ])
 
+launch_arguments("-username Felix")
+
 # The directory in which the screenshots should be stored
 output_directory './screenshots'
 
@@ -254,6 +256,31 @@ snapshot update
 ```
 
 to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift).
+
+## Launch Arguments
+
+You can provide additional arguments to your app on launch. These strings will be available in your code through `NSProcessInfo.processInfo().arguments`. Alternatively use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+
+`snapshot` includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by `snapshot`.
+
+```swift
+if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
+    // runtime check that we are in snapshot mode
+}
+
+username.text = NSUserDefaults.standardUserDefaults().stringForKey("username")
+// username.text = "Felix"
+```
+
+Specify multiple argument strings and `snapshot` will generate screenshots for each combination of arguments, devices, and languages. This is useful for comparing the same screenshots with different feature flags, dynamic text sizes, and different data sets.
+
+```ruby
+# Snapfile for A/B Test Comparison
+launch_arguments([
+  "-secretFeatureEnabled YES",
+  "-secretFeatureEnabled NO"
+])
+```
 
 # How does it work?
 

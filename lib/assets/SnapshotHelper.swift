@@ -11,8 +11,14 @@ import XCTest
 
 var deviceLanguage = ""
 
+@available(*, deprecated, message="use setupSnapshot: instead")
 func setLanguage(app: XCUIApplication) {
+    setupSnapshot(app)
+}
+
+func setupSnapshot(app: XCUIApplication) {
     Snapshot.setLanguage(app)
+    Snapshot.setLaunchArguments(app)
 }
 
 func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
@@ -30,6 +36,24 @@ class Snapshot: NSObject {
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))", "-AppleLocale", "\"\(locale)\"", "-ui_testing"]
         } catch {
             print("Couldn't detect/set language...")
+        }
+    }
+    
+    class func setLaunchArguments(app: XCUIApplication) {
+        let path = "/tmp/snapshot-launch_arguments.txt"
+        
+        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES"]
+        
+        do {
+            let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
+            let matches = regex.matchesInString(launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
+            let results = matches.map { result -> String in
+                (launchArguments as NSString).substringWithRange(result.range)
+            }
+            app.launchArguments += results
+        } catch {
+            print("Couldn't detect/set launch_arguments...")
         }
     }
     

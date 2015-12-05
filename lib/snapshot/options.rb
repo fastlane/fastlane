@@ -47,6 +47,13 @@ module Snapshot
                                      default_value: [
                                        'en-US'
                                      ]),
+        FastlaneCore::ConfigItem.new(key: :launch_arguments,
+                                     env_name: 'SNAPSHOT_LAUNCH_ARGUMENTS',
+                                     description: "A list of launch arguments which should be used",
+                                     is_string: false,
+                                     default_value: [
+                                       ''
+                                     ]),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SNAPSHOT_OUTPUT_DIRECTORY",

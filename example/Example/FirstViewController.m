@@ -10,13 +10,19 @@
 
 @interface FirstViewController ()
 
+@property (strong, nonatomic) IBOutlet UILabel *titleLabel;
+
 @end
 
 @implementation FirstViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    NSString *title = [[NSUserDefaults standardUserDefaults] stringForKey:@"userTitle"];
+    if (title) {
+        self.titleLabel.text = title;
+    }
 }
 
 - (void)didReceiveMemoryWarning {
