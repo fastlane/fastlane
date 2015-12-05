@@ -67,9 +67,28 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 - You have full control over what happens
 - You have access to all the certificates and profiles, which are all securely stored in git
 - You share one code signing identity across the team to have less certificates and profiles
-- Xcode can often revoke certificates and break your set up causing failed builds
-- It's better to be explicit about what profiles to use instead of using the `Automatic` setting for more predictable build artifacts
+- Xcode sometimes revokes certificates which breaks your setup causing failed builds
+- More predictable builds by settings profiles in an explicit way instead of using the `Automatic` setting
 - It just works™
+
+### What does `match` do for you?
+
+              |  match
+--------------------------|------------------------------------------------------------
+:arrows_counterclockwise:  | Automatically sync your iOS keys and profiles across all your team members using git
+:package:  | Handle all the heavy lifting of creating and storing your certificates and profiles
+:computer:  | Setup codesigning on a new machine in under a minute
+:dart:  | Designed to work with apps with multiple targets and bundle identifiers
+:lock: | You have full control over your files and git repo, no third party service involved
+:sparkles: | Provisioning profile will always match the correct certificate
+:boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
+:recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force`
+:busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
+:cookie:  | Automatically pre-fills environment variables ready to be used in your Xcode project
+:page_facing_up: | Store your configuration in git in a `Matchfile`
+:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/gym) and other build tools 
+
+For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
 ## Installation
 
