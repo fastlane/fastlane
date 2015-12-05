@@ -8,7 +8,7 @@ module Produce
 
       Spaceship::Tunes.login(Produce.config[:username], nil)
       Spaceship::Tunes.client.select_team
-      
+
       create_new_app
     end
 
