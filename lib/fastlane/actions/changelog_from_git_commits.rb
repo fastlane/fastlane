@@ -16,7 +16,7 @@ module Fastlane
 
         Helper.log.info "Collecting Git commits between #{from} and #{to}".green
 
-        changelog = Actions.git_log_between(params[:pretty], from, to)
+        changelog = Actions.git_log_between(params[:pretty], from, to).gsub("\n\n", "\n") # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
         changelog
