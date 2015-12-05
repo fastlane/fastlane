@@ -16,7 +16,7 @@ module Match
         FastlaneCore::ProvisioningProfile.install(path)
       end
 
-      Helper.log.info "All keys, certificates and provisioning profiles are installed 🙌".green
+      Helper.log.info "Successfully installed all keys, certificates and provisioning profiles 🙌".green
     end
   end
 end

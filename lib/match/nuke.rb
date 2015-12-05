@@ -1,4 +1,3 @@
-require 'pry'
 module Match
   class Nuke
     attr_accessor :params

@@ -14,6 +14,7 @@ module Match
       puts "You can now run `match development`, `match adhoc` and `fastlane appstore`"
       puts "On the first run for each environment it will create the provisioning profiles and"
       puts "certificates for you. From then on, it will automatically import the existing profiles."
+      puts "For more information visit https://github.com/fastlane/match"
     end
   end
 end
