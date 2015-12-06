@@ -9,7 +9,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <b>PEM</b> &bull; 
+  <b>pem</b> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -25,7 +25,7 @@
   <img src="assets/pem.png" height="110">
 </p>
 
-PEM
+pem
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
@@ -36,7 +36,7 @@ PEM
 
 Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server? 
 
-`PEM` does all that for, just by running `pem`.
+`pem` does all that for, just by running `pem`.
 
 To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/sigh).
 
@@ -54,7 +54,7 @@ Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/Kr
 
 -------
 
-<h5 align="center"><code>PEM</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
@@ -84,9 +84,9 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```PEM``` will never revoke your existing certificates. 
+```pem``` will never revoke your existing certificates. 
 
-If you already have a push certificate enabled, which is active for at least 30 more days, `PEM` will not create a new certificate. If you still want to create one, use the `force`:
+If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
     pem --force
 
@@ -119,10 +119,10 @@ Run `pem --help` to get a list of available environment variables.
 
 # How does it work?
 
-`PEM` uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
+`pem` uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
 
 ## How is my password stored?
-```PEM``` uses the [password manager](https://github.com/fastlane/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/credentials_manager) for more information.
+```pem``` uses the [password manager](https://github.com/fastlane/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/credentials_manager) for more information.
 
 # Tips
 
