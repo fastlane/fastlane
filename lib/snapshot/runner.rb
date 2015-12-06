@@ -70,6 +70,9 @@ module Snapshot
 
       Fixes::SimulatorZoomFix.patch
 
+      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+      `xcrun simctl shutdown booted`
+
       command = TestCommandGenerator.generate(device_type: device_type)
 
       Helper.log_alert("#{device_type} - #{language}")
