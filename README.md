@@ -194,6 +194,12 @@ There are a lot of options available that define how to build your app, for exam
 snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
 ``` 
 
+Reinstall the app before running `snapshot`
+
+```sh
+snapshot --reinstall_app --app_identifier "tools.fastlane.app"
+```
+
 For a list for all available options run
 
 ```sh
