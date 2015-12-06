@@ -24,21 +24,27 @@ module Snapshot
 
       self.number_of_retries = 0
       errors = []
+      results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
       Snapshot.config[:devices].each do |device|
         launch_arguments_set.each do |launch_arguments|
           Snapshot.config[:languages].each do |language|
+            results[device] ||= {}
+
             begin
               launch(language, device, launch_arguments)
+              results[device][language] = true
             rescue => ex
               Helper.log.error ex # we should to show right here as well
               errors << ex
-
+              results[device][language] = false
               raise ex if Snapshot.config[:stop_after_first_error]
             end
           end
         end
       end
+
+      print_results(results)
 
       raise errors.join('; ') if errors.count > 0
 
@@ -57,6 +63,28 @@ module Snapshot
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
       end
+    end
+
+    def print_results(results)
+      return if results.count == 0
+
+      rows = []
+      results.each do |device, languages|
+        current = [device]
+        languages.each do |language, value|
+          current << (value == true ? " 💚" : " ❌")
+        end
+        rows << current
+      end
+
+      params = {
+        rows: rows,
+        headings: ["Device"] + results.values.first.keys,
+        title: "snapshot results"
+      }
+      puts ""
+      puts Terminal::Table.new(params)
+      puts ""
     end
 
     def launch(language, device_type, launch_arguments)
