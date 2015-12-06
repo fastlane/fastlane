@@ -8,7 +8,7 @@ module Snapshot
     class SimulatorZoomFix
       def self.patch
         # First we need to kill the simulator
-        `killall iOS Simulator &> /dev/null`
+        Snapshot.kill_simulator
 
         Helper.log.debug "Patching '#{config_path}' to scale simulator to 100%"
 

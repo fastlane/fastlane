@@ -32,6 +32,10 @@ module Snapshot
     def snapfile_name
       "Snapfile"
     end
+
+    def kill_simulator
+      `killall iOS Simulator &> /dev/null`
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
