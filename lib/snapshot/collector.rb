@@ -21,8 +21,9 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        # compact filename in case launch arguments has no index
-        output_path = File.join(language_folder, [device_name, launch_arguments_index, name].compact.join("-") + ".png")
+        components = [device_name, launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
+
+        output_path = File.join(language_folder, components.join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
           Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
