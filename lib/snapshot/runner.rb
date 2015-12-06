@@ -99,18 +99,9 @@ module Snapshot
       Fixes::SimulatorZoomFix.patch
 
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
-      `xcrun simctl shutdown booted`
+      `xcrun simctl shutdown booted &> /dev/null`
 
-      if Snapshot.config[:uninstall_app]
-        device_udid = TestCommandGenerator.device_udid(device_type)
-        app_identifier = Snapshot.config[:app_identifier]
-
-        Helper.log.info "Launch Simulator #{device_type}".yellow
-        `xcrun instruments -w #{device_udid} &> /dev/null`
-
-        Helper.log.info "Uninstall application #{app_identifier}".yellow
-        `xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null`
-      end
+      uninstall_app(device_type) if Snapshot.config[:reinstall_app]
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
@@ -147,6 +138,17 @@ module Snapshot
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
       Collector.fetch_screenshots(raw_output, language, device_type, launch_arguments.first)
+    end
+
+    def uninstall_app(device_type)
+      Helper.log.debug "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      Helper.log.info "Launch Simulator #{device_type}".yellow
+      `xcrun instruments -w #{device_udid} &> /dev/null`
+
+      Helper.log.info "Uninstall application #{Snapshot.config[:app_identifier]}".yellow
+      `xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null`
     end
 
     def clear_previous_screenshots

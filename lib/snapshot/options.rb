@@ -1,4 +1,5 @@
 require 'fastlane_core'
+require 'credentials_manager'
 
 module Snapshot
   class Options
@@ -77,14 +78,14 @@ module Snapshot
                                      description: "Enabling this option will automatically clear previously generated screenshots before running snapshot",
                                      default_value: false,
                                      is_string: false),
-        FastlaneCore::ConfigItem.new(key: :uninstall_app,
-                                     env_name: 'SNAPSHOT_UNINSTALL_APP',
-                                     description: "Enabling this option will automatically uninstall application before running snapshot",
+        FastlaneCore::ConfigItem.new(key: :reinstall_app,
+                                     env_name: 'SNAPSHOT_REINSTALL_APP',
+                                     description: "Enabling this option will automatically uninstall the application before running it",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SNAPSHOT_APP_IDENTIFIER',
-                                     description: "The bundle identifier of the app to uninstall",
+                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      default_value: ENV["SNAPSHOT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
 
         # Everything around building

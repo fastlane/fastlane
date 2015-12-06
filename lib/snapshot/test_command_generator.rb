@@ -35,9 +35,6 @@ module Snapshot
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-        # options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        # options << "-archivePath '#{archive_path}'"
-        # options << config[:xcargs] if config[:xcargs]
 
         options
       end
