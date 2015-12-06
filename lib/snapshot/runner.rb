@@ -101,6 +101,17 @@ module Snapshot
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
       `xcrun simctl shutdown booted`
 
+      if Snapshot.config[:uninstall_app]
+        device_udid = TestCommandGenerator.device_udid(device_type)
+        app_identifier = Snapshot.config[:app_identifier]
+
+        Helper.log.info "Launch Simulator #{device_type}".yellow
+        `xcrun instruments -w #{device_udid} &> /dev/null`
+
+        Helper.log.info "Uninstall application #{app_identifier}".yellow
+        `xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null`
+      end
+
       command = TestCommandGenerator.generate(device_type: device_type)
 
       Helper.log_alert("#{device_type} - #{language}")
