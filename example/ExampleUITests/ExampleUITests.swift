@@ -15,8 +15,7 @@ class ExampleUITests: XCTestCase {
         super.setUp()
         
         let app = XCUIApplication()
-        setLanguage(app)
-        setLaunchArguments(app)
+        setupSnapshot(app)
         app.launch()
     }
     

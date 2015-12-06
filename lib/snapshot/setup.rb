@@ -19,10 +19,10 @@ module Snapshot
       puts "Open your Xcode project and make sure to do the following:".yellow
       puts "1) Add the ./SnapshotHelper.swift to your UI Test target".yellow
       puts "   You can move the file anywhere you want".yellow
-      puts "2) Call `setLanguage(app)` when launching your app".yellow
+      puts "2) Call `setupSnapshot(app)` when launching your app".yellow
       puts ""
       puts "  let app = XCUIApplication()"
-      puts "  setLanguage(app)"
+      puts "  setupSnapshot(app)"
       puts "  app.launch()"
       puts ""
       puts "3) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
