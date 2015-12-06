@@ -200,7 +200,9 @@ For a list for all available options run
 snapshot --help
 ```
 
-<img src="assets/testSummary.png">
+After running `snapshot` you will get a nice summary:
+
+<img src="assets/testSummary.png" width="500">
 
 ## Snapfile
 
