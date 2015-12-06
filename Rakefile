@@ -29,14 +29,14 @@ task :clone do
 	end
 end
 
-desc "Run `bundle install` for all the gems."
+desc "Run `bundle update` for all the gems."
 task :bundle do
 	GEMS.each do |repo|
-		sh "cd #{repo} && bundle install"
+		sh "cd #{repo} && bundle update"
 	end
 end
 
-desc "Run `bundle install` and `rake install` for all the gems."
+desc "Run `bundle update` and `rake install` for all the gems."
 task :install => :bundle do
 	GEMS.each do |repo|
 		sh "cd #{repo} && rake install"
