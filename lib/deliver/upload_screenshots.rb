@@ -65,12 +65,15 @@ module Deliver
 
         language = File.basename(lng_folder)
         files.each do |path|
-          if prefer_framed && !path.downcase.include?("_framed.#{extensions}") && !path.downcase.include?("watch")
-            next
-          end
-
-          if !prefer_framed && path.downcase.include?("_framed.#{extensions}")
-            next
+          if path.downcase.include?("_framed.")
+            # That's cool
+          else
+            if path.downcase.include?("watch")
+              # Watch doesn't support frames (yet)
+            else
+              # That might not be cool... if that screenshot is not framed but we only want framed
+              next if prefer_framed
+            end
           end
 
           screenshots << AppScreenshot.new(path, language)
