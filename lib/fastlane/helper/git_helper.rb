@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     def self.git_log_between(pretty_format, from, to)
       Actions.sh("git log --pretty=#{pretty_format} #{from}...#{to}", log: false).chomp
+    rescue
+      nil
     end
 
     def self.last_git_tag_name(match_lightweight = true)
@@ -9,9 +11,13 @@ module Fastlane
       command << '--tags' if match_lightweight
       command << '--abbrev=0'
       Actions.sh(command.join(' '), log: false).chomp
+    rescue
+      nil
     end
 
     def self.last_git_commit_dict
+      return nil if last_git_commit_formatted_with('%an').nil?
+
       {
           author: last_git_commit_formatted_with('%an'),
           message: last_git_commit_formatted_with('%B')
@@ -22,6 +28,8 @@ module Fastlane
     # pretty format String. See the git-log documentation for valid format placeholders
     def self.last_git_commit_formatted_with(pretty_format)
       Actions.sh("git log -1 --pretty=#{pretty_format}", log: false).chomp
+    rescue
+      nil
     end
 
     # Get the author email of the last git commit
@@ -36,8 +44,6 @@ module Fastlane
       s = last_git_commit_formatted_with('%ae')
       return s if s.to_s.length > 0
       return nil
-    rescue
-      return nil
     end
 
     # Returns the unwrapped subject and body of the last commit
@@ -49,7 +55,7 @@ module Fastlane
 
     # Returns the unwrapped subject and body of the last commit
     def self.last_git_commit_message
-      s = last_git_commit_formatted_with('%B').strip
+      s = (last_git_commit_formatted_with('%B') || "").strip
       return s if s.to_s.length > 0
       nil
     end
@@ -57,8 +63,10 @@ module Fastlane
     # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
       return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-      s = `git rev-parse --abbrev-ref HEAD`
+      s = Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
       return s.to_s.strip if s.to_s.length > 0
+      nil
+    rescue
       nil
     end
   end
