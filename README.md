@@ -200,6 +200,8 @@ For a list for all available options run
 snapshot --help
 ```
 
+<img src="assets/testSummary.png">
+
 ## Snapfile
 
 All of the available options can also be stored in a configuration file called the `Snapfile`. Since most values will not change often for your project, it is recommended to store them there:
