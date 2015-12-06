@@ -424,7 +424,7 @@ Recreate shared Xcode project schemes if the `Shared` checkbox was not enabled.
 
 ```ruby
 recreate_schemes(
-	project: './path/to/MyApp.xcodeproj'
+  project: './path/to/MyApp.xcodeproj'
 )
 ```
 
