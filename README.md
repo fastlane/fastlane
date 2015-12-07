@@ -136,7 +136,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 That's all you need to run your tests. If you want more control, here are some available parameters:
 
-    scan --workspace "Example.xcworkspace" --scheme "AppName" --clean
+    scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 
 If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
 
