@@ -774,6 +774,27 @@ appetize(
 )
 ```
 
+### [appaloosa](https://www.appaloosa-store.com)
+​
+Upload your ipa or apk to your private store on Appaloosa.
+​
+Add the `appaloosa` action after the `ipa` step or use it with your existing `apk`.
+​
+You can add some options:
+```ruby
+appaloosa(
+  binary: '/path/to/binary.ipa', # path tor your IPA or APK
+  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered 
+  api_token: 'your_api_key', # only if already registered
+  group_ids: '1, 2, 3', # User groups visibility, default: 'everybody'
+  # screenshots: after snapshot step:
+  locale: 'en-US', # When multiple values are specified in the Snapfile, we default to 'en-US'.
+  device: 'iPhone6', # By default, the screenshots from the last device will be used.
+  # or you can specify your own screenshots folder :
+  screenshots: '/path/to_your/screenshots' # path to the screenshots folder of your choice
+  )
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
