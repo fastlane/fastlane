@@ -1515,7 +1515,7 @@ version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
 version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
 ```
 
-### get_info_plist
+### get_info_plist_value
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
 
@@ -1524,7 +1524,7 @@ identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier
 puts identifier # => com.krausefx.app
 ```
 
-### set_info_plist
+### set_info_plist_value
 
 Set a value of a plist file. You can use this action to update the bundle identifier of your app
 
