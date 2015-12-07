@@ -9,7 +9,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <b>sigh</b> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -217,7 +217,7 @@ If you're using [cert](https://github.com/fastlane/cert) in combination with [fa
 - [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/fastlane/PEM): Automatically generate and renew your push notification profiles
+- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
 - [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
