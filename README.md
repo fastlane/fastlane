@@ -9,7 +9,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <b>snapshot</b> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
