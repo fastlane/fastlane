@@ -57,7 +57,7 @@ module FastlaneCore
     #####################################################
 
     def crash(exception)
-      # todo: we should highlight the most important line
+      # TODO: we should highlight the most important line
       raise exception
     end
 

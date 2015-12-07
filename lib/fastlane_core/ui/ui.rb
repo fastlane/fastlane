@@ -6,7 +6,7 @@ module FastlaneCore
       end
     end
 
-    def self.method_missing(method_sym, *args, &block)
+    def self.method_missing(method_sym, *args, &_block)
       raise "Only pass exactly one parameter to UI".red if args.length != 1
 
       # not using `responds` beacuse we don't care about methods like .to_s and so on
@@ -20,3 +20,22 @@ end
 
 require 'fastlane_core/ui/interface'
 require 'fastlane_core/ui/terminal'
+
+# Disabling colors
+
+if ENV["FASTLANE_DISABLE_COLORS"]
+  require 'colored'
+
+  class String
+    Colored::COLORS.keys.each do |color|
+      define_method(color) do
+        self # do nothing with the string, but return it
+      end
+    end
+    Colored::EXTRAS.keys.each do |extra|
+      define_method(extra) do
+        self # do nothing with the string, but return it
+      end
+    end
+  end
+end
