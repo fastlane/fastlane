@@ -1004,6 +1004,21 @@ register_devices(
 
 ## Using git
 
+### changelog_from_git_commits
+This action turns your git commit history into formatted changelog text.
+
+```ruby
+# Collects commits since your last tag and returns a concatenation of their subjects and bodies
+changelog_from_git_commits 
+
+# Advanced options
+changelog_from_git_commits(
+  between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
+  pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+  match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+)
+```
+
 ### ensure_git_branch
 This action will check if your git repo is checked out to a specific branch. You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
 
