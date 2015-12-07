@@ -46,6 +46,14 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
+    # Level Command Output: Print the output of a command with 
+    #   this method
+    #
+    #   By default those messages shown in magenta
+    def command_output(_message)
+      not_implemented(__method__)
+    end
+
     # Level Verbose: Print out additional information for the
     #   users that are interested. Will only be printed when
     #   $verbose = true

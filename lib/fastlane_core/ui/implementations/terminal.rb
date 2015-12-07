@@ -48,6 +48,10 @@ module FastlaneCore
       log.info("$ #{message}".cyan.underline)
     end
 
+    def command_output(message)
+      log.info("> #{message}".magenta)
+    end
+
     def verbose(message)
       log.debug(message) if $verbose
     end
