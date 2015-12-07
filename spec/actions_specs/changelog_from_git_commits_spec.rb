@@ -6,7 +6,7 @@ describe Fastlane do
           changelog_from_git_commits
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=%B git describe --tags --abbrev=0...HEAD")
+        expect(result).to eq("git log --pretty=\"%B\" git describe --tags --abbrev=0...HEAD")
       end
 
       it "Uses the provided pretty format to collect log messages" do
@@ -14,7 +14,7 @@ describe Fastlane do
           changelog_from_git_commits(pretty: '%s%n%b')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=%s%n%b git describe --tags --abbrev=0...HEAD")
+        expect(result).to eq("git log --pretty=\"%s%n%b\" git describe --tags --abbrev=0...HEAD")
       end
 
       it "Does not match lightweight tags when searching for the last one if so requested" do
@@ -22,7 +22,7 @@ describe Fastlane do
           changelog_from_git_commits(match_lightweight_tag: false)
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=%B git describe --abbrev=0...HEAD")
+        expect(result).to eq("git log --pretty=\"%B\" git describe --abbrev=0...HEAD")
       end
 
       it "Collects logs in the specified revision range if specified" do
@@ -30,7 +30,7 @@ describe Fastlane do
           changelog_from_git_commits(between: ['abcd', '1234'])
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=%B abcd...1234")
+        expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
       end
 
       it "Does not accept a string value for between" do
