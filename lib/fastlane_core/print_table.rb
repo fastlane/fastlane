@@ -8,7 +8,7 @@ module FastlaneCore
         rows = []
 
         config.available_options.each do |config_item|
-          value = config[config_item.key]
+          value = config._values[config_item.key] # using `_values` here to not ask the user for missing values at this point
           next if value.nil?
           next if value.to_s == ""
           next if hide_keys.include?(config_item.key)
