@@ -9,7 +9,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
   <b>frameit</b> &bull; 
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -229,7 +229,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`PEM`](https://github.com/fastlane/PEM): Automatically generate and renew your push notification profiles
+- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
