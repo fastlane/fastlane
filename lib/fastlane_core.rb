@@ -15,6 +15,7 @@ require 'fastlane_core/print_table'
 require 'fastlane_core/project'
 require 'fastlane_core/simulator'
 require 'fastlane_core/crash_reporting/crash_reporting'
+require 'fastlane_core/ui/ui'
 
 # Third Party code
 require 'colored'
