@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.verify_sonar_runner_binary
-        raise "You have to install sonar-runner using `brew install sonar-runner`".red unless `which sonar-runner`.to_s.length > 0 or !Helper.test?
+        raise "You have to install sonar-runner using `brew install sonar-runner`".red unless `which sonar-runner`.to_s.length > 0
       end
 
       #####################################################
