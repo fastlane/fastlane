@@ -1,5 +1,6 @@
 module Match
   class Runner
+    # rubocop:disable Metrics/AbcSize
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:path],
@@ -49,11 +50,12 @@ module Match
       Utils.fill_environment(params, uuid)
 
       message = GitHelper.generate_commit_message(params)
-      GitHelper.commit_changes(params[:path], message)
+      GitHelper.commit_changes(params[:path], message, params[:git_url])
 
       TablePrinter.print_summary(params, uuid)
 
       Helper.log.info "All required keys, certificates and provisioning profiles are installed 🙌".green
     end
+    # rubocop:enable Metrics/AbcSize
   end
 end

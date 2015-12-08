@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency 'security' # Mac OS Keychain manager
+
   spec.add_dependency 'fastlane_core', '>= 0.27.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'sigh', '>= 1.2.0', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.2.7', '< 2.0.0'

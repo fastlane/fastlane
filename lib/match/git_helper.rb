@@ -13,6 +13,7 @@ module Match
       raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
 
       copy_readme(@dir)
+      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url)
 
       return @dir
     end
@@ -28,9 +29,12 @@ module Match
       ].join(" ")
     end
 
-    def self.commit_changes(path, message)
+    def self.commit_changes(path, message, git_url)
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
+
+        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+
         commands = []
         commands << "git add -A"
         commands << "git commit -m '#{message}'"

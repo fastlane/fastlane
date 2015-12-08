@@ -127,7 +127,7 @@ module Match
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:path], message)
+      GitHelper.commit_changes(params[:path], message, self.params[:git_url])
     end
 
     private

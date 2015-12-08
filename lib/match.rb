@@ -7,6 +7,7 @@ require 'match/table_printer'
 require 'match/git_helper'
 require 'match/generator'
 require 'match/setup'
+require 'match/encrypt'
 
 require 'fastlane_core'
 require 'terminal-table'
