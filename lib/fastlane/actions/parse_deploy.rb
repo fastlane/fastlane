@@ -52,7 +52,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Deploy Parse Cloud code."
+        "Deploy Parse Cloud code"
       end
 
       def self.details
