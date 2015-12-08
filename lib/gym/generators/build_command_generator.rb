@@ -58,7 +58,11 @@ module Gym
       end
 
       def pipe
-        ["| tee '#{xcodebuild_log_path}' | xcpretty"]
+        pipe = []
+        pipe << "| tee '#{xcodebuild_log_path}' | xcpretty"
+        pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
+
+        pipe
       end
 
       def xcodebuild_log_path
