@@ -2,6 +2,7 @@ module Match
   class Runner
     # rubocop:disable Metrics/AbcSize
     def run(params)
+      changes_to_commit = false
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:path],
                                              title: "Summary for match #{Match::VERSION}")
@@ -22,6 +23,7 @@ module Match
       if certs.count == 0 or keys.count == 0
         Helper.log.info "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         cert_path = Generator.generate_certificate(params, cert_type)
+        changes_to_commit = true
       else
         cert_path = certs.last
         Helper.log.info "Installing certificate..."
@@ -41,6 +43,7 @@ module Match
       profile = profiles.last
       if profile.nil? or params[:force]
         profile = Generator.generate_provisioning_profile(params, prov_type, cert_path)
+        changes_to_commit = true
       end
 
       FastlaneCore::ProvisioningProfile.install(profile)
@@ -49,8 +52,10 @@ module Match
       uuid = parsed["UUID"]
       Utils.fill_environment(params, uuid)
 
-      message = GitHelper.generate_commit_message(params)
-      GitHelper.commit_changes(params[:path], message, params[:git_url])
+      if changes_to_commit
+        message = GitHelper.generate_commit_message(params)
+        GitHelper.commit_changes(params[:path], message, params[:git_url])
+      end
 
       TablePrinter.print_summary(params, uuid)
 
