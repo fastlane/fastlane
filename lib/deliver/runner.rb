@@ -49,6 +49,7 @@ module Deliver
       # First, collect all the things for the HTML Report
       screenshots = UploadScreenshots.new.collect_screenshots(options)
       UploadMetadata.new.load_from_filesystem(options)
+      UploadMetadata.new.assign_defaults(options)
 
       # Validate
       validate_html(screenshots)

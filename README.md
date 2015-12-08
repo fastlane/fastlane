@@ -176,6 +176,51 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms, pt-BR, el, es-ES, it, fr-CA, es-MX, pt-PT, vi, th, ja, fr-FR, da, tr, en-GB
 ```
 
+## Default values
+
+Deliver has a special `default` language code which allows you to provide values that are not localised, and which will be used as defaults when you don’t provide a specific localised value.
+
+You can use this either in json within your deliverfile, or as a folder in your metadata file.
+
+Imagine that you have localised data for the following language codes:  ```en-US, de-DE, el, it```
+
+You can set the following in your deliverfile
+
+```
+release_notes({
+  'default' => "Shiny and new”,
+  'de-DE' => "glänzend und neu"
+})
+```
+
+Deliver will use "Shiny and new" for en-US, el and it.
+
+It will use "glänzend und neu" for de-DE.
+
+You can do the same with folders
+
+```
+   default
+      keywords.txt     
+      marketing_url.txt
+      name.txt
+      privacy_url.txt
+      support_url.txt
+      release_notes.txt
+   en-US
+      description.txt
+   de-DE
+      description.txt
+   el
+      description.txt
+   it
+      description.txt
+```
+
+In this case, default values for keywords, urls, name and release notes are used in all localisations, but each language has a fully localised description
+
+
+
 ## Automatically create screenshots
 
 If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/snapshot), check out [fastlane](https://fastlane.tools)!
