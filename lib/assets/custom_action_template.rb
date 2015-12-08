@@ -25,12 +25,14 @@ module Fastlane
       #####################################################
 
       def self.description
+        # Give a short description (<= 80 characters) for this action
+        # Note: should not end with trailing punctuation (e.g., `.`)
         "A short description with <= 80 characters of what this action does"
       end
 
       def self.details
         # Optional:
-        # this is your change to provide a more detailed description of this action
+        # this is your chance to provide a more detailed description of this action
         "You can use this action to do cool things..."
       end
 
