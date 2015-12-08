@@ -159,7 +159,7 @@ module Gym
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      is_string: false
-                                     )
+                                    )
       ]
     end
   end
