@@ -159,7 +159,7 @@ module Match
     def certificate_type(type)
       cert_type = Spaceship.certificate.production
       cert_type = Spaceship.certificate.development if type == :development
-      # cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+      cert_type = Spaceship.certificate.in_house if ENV["MATCH_FORCE_ENTERPRISE"] && Spaceship.client.in_house?
 
       cert_type
     end
