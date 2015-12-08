@@ -217,6 +217,19 @@ resign(
 )
 ```
 
+You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.
+
+```ruby
+resign(
+  ipa: 'path/to/ipa', # can omit if using the `ipa` action
+  signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
+  provisioning_profile: {
+  	'com.example.awesome-app' => 'path/to/profile',
+  	'com.example.awesome-app.app-extension' => 'path/to/app-extension/profile'
+  }
+)
+```
+
 ### `create_keychain`
 
 Create a new keychain, which can then be used to import certificates.

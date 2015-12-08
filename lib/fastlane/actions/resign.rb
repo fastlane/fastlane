@@ -24,10 +24,10 @@ module Fastlane
           "profile. You can do so by passing an array of provisiong profile strings or a",
           "hash that associates provisioning profile values to bundle identifier keys.",
           "",
-          "resign ipa: 'path', signing_identity: 'identity', provisioning_profile: {",
-          "  'com.example.awesome-app' => 'App.mobileprovision',",
-          "  'com.example.awesome-app.app-extension' => 'Extension.mobileprovision'",
-          "}"
+          "resign(ipa: \"path\", signing_identity: \"identity\", provisioning_profile: {",
+          "  \"com.example.awesome-app\" => \"App.mobileprovision\",",
+          "  \"com.example.awesome-app.app-extension\" => \"Extension.mobileprovision\"",
+          "})"
         ].join("\n")
       end
 
