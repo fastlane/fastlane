@@ -20,26 +20,30 @@ module Match
       prepare_list
       print_tables
 
+      if params[:readonly]
+        UI.user_error!("`match nuke` doesn't delete anything when running with --readonly enabled")
+      end
+
       if (self.certs + self.profiles + self.files).count > 0
-        Helper.log.info "---".red
-        Helper.log.info "Are you sure you want to completely delete and revoke all the".red
-        Helper.log.info "certificates and provisioning profiles listed above? (y/n)".red
-        Helper.log.info "Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted".red if type == "distribution"
-        Helper.log.info "---".red
+        UI.error "---"
+        UI.error "Are you sure you want to completely delete and revoke all the"
+        UI.error "certificates and provisioning profiles listed above? (y/n)"
+        UI.error "Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted" if type == "distribution"
+        UI.error "---"
         if agree("(y/n)", true)
           nuke_it_now!
-          Helper.log.info "Successfully cleaned your account ♻️".green
+          UI.success "Successfully cleaned your account ♻️"
         else
-          Helper.log.info "Cancelled nuking #thanks 🏠 👨 ‍👩 ‍👧".green
+          UI.success "Cancelled nuking #thanks 🏠 👨 ‍👩 ‍👧"
         end
       else
-        Helper.log.info "No relevant certificates or provisioning profiles found, nothing to do here :)".green
+        UI.success "No relevant certificates or provisioning profiles found, nothing to do here :)"
       end
     end
 
     # Collect all the certs/profiles
     def prepare_list
-      Helper.log.info "Fetching certificates and profiles..."
+      UI.message "Fetching certificates and profiles..."
       cert_type = type.to_sym
 
       prov_types = [:development]
@@ -107,18 +111,18 @@ module Match
     end
 
     def nuke_it_now!
-      Helper.log_alert "Deleting #{self.profiles.count} provisioning profiles..." unless self.profiles.count == 0
+      UI.header "Deleting #{self.profiles.count} provisioning profiles..." unless self.profiles.count == 0
       self.profiles.each do |profile|
-        Helper.log.info "Deleting profile '#{profile.name}' (#{profile.id})..."
+        UI.message "Deleting profile '#{profile.name}' (#{profile.id})..."
         profile.delete!
-        Helper.log.info "Successfully deleted profile".green
+        UI.success "Successfully deleted profile"
       end
 
-      Helper.log_alert "Revoking #{self.certs.count} certificates..." unless self.certs.count == 0
+      UI.header "Revoking #{self.certs.count} certificates..." unless self.certs.count == 0
       self.certs.each do |cert|
-        Helper.log.info "Revoking certificate '#{cert.name}' (#{cert.id})..."
+        UI.message "Revoking certificate '#{cert.name}' (#{cert.id})..."
         cert.revoke!
-        Helper.log.info "Successfully deleted certificate".green
+        UI.success "Successfully deleted certificate"
       end
 
       if self.files.count > 0
@@ -133,10 +137,10 @@ module Match
     private
 
     def delete_files!
-      Helper.log_alert "Deleting #{self.files.count} files from the git repo..."
+      UI.header "Deleting #{self.files.count} files from the git repo..."
 
       self.files.each do |file|
-        Helper.log.info "Deleting file '#{File.basename(file)}'..."
+        UI.message "Deleting file '#{File.basename(file)}'..."
 
         # Check if the profile is installed on the local machine
         if file.end_with?("mobileprovision")
@@ -147,7 +151,7 @@ module Match
         end
 
         File.delete(file)
-        Helper.log.info "Successfully deleted file".green
+        UI.success "Successfully deleted file"
       end
     end
 

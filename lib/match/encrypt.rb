@@ -14,7 +14,7 @@ module Match
       end
 
       unless @password
-        Helper.log.info "Enter the password that should be used to encrypt/decrypt your certificates".yellow
+        UI.important "Enter the password that should be used to encrypt/decrypt your certificates"
         while @password.to_s.length == 0
           @password = ask("Passphrase for Git Repo: ".yellow)  { |q| q.echo = "*" }
         end
@@ -35,9 +35,9 @@ module Match
         crypt(path: current,
           password: password(git_url),
             encrypt: true)
-        Helper.log.info "🔒  Encrypted '#{File.basename(current)}'".green if $verbose
+        UI.success "🔒  Encrypted '#{File.basename(current)}'" if $verbose
       end
-      Helper.log.info "🔒  Successfully encrypted certificates repo".green
+      UI.success "🔒  Successfully encrypted certificates repo"
     end
 
     def decrypt_repo(path: nil, git_url: nil)
@@ -47,14 +47,14 @@ module Match
             password: password(git_url),
              encrypt: false)
         rescue
-          Helper.log.error "Couldn't decrypt the repo, please make sure you enter the right password!".red
+          UI.error "Couldn't decrypt the repo, please make sure you enter the right password!"
           clear_password(git_url)
           decrypt_repo(path: path, git_url: git_url)
           return
         end
-        Helper.log.info "🔓  Decrypted '#{File.basename(current)}'".green if $verbose
+        UI.success "🔓  Decrypted '#{File.basename(current)}'" if $verbose
       end
-      Helper.log.info "🔓  Successfully decrypted certificates repo".green
+      UI.success "🔓  Successfully decrypted certificates repo"
     end
 
     private

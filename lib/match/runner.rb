@@ -21,16 +21,16 @@ module Match
       profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
       if certs.count == 0 or keys.count == 0
-        Helper.log.info "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
-        raise "No code signing identity found and can not create a new one because you enabled `readonly`".red if params[:readonly]
+        UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
+        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
         changes_to_commit = true
       else
         cert_path = certs.last
-        Helper.log.info "Installing certificate..."
+        UI.message "Installing certificate..."
 
         if FastlaneCore::CertChecker.installed?(cert_path)
-          Helper.log.info "Certificate '#{File.basename(cert_path)}' is already installed on this machine" if $verbose
+          UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
         else
           Utils.import(cert_path, params[:keychain_name])
         end
@@ -43,7 +43,7 @@ module Match
       # Install the provisioning profiles
       profile = profiles.last
       if profile.nil? or params[:force]
-        raise "No matching provisioning profiles found and can not create a new one because you enabled `readonly`".red if params[:readonly]
+        UI.crash!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
         profile = Generator.generate_provisioning_profile(params, prov_type, cert_path)
         changes_to_commit = true
       end
@@ -61,7 +61,7 @@ module Match
 
       TablePrinter.print_summary(params, uuid)
 
-      Helper.log.info "All required keys, certificates and provisioning profiles are installed 🙌".green
+      UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
     end
     # rubocop:enable Metrics/AbcSize
   end

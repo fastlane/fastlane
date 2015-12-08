@@ -57,7 +57,7 @@ class MatchApplication
         path = File.join(containing, "Matchfile")
 
         if File.exist?(path)
-          puts "You already got a Matchfile in this directory".yellow
+          FastlaneCore::UI.user_error!("You already got a Matchfile in this directory")
           return 0
         end
 
@@ -70,7 +70,7 @@ class MatchApplication
       c.syntax = "match nuke"
       c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
       c.action do |args, options|
-        puts "Please run `match nuke [type], allowed values: distribution and development".red
+        FastlaneCore::UI.user_error!("Please run `match nuke [type], allowed values: distribution and development")
       end
     end
 

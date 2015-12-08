@@ -5,7 +5,7 @@ module Match
 
       @dir = Dir.mktmpdir
       command = "git clone '#{git_url}' '#{@dir}' --depth 1"
-      Helper.log.info "Cloning remote git repo..."
+      UI.message "Cloning remote git repo..."
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: $verbose,
                                       print_command: $verbose)
@@ -39,6 +39,8 @@ module Match
         commands << "git add -A"
         commands << "git commit -m '#{message}'"
         commands << "git push origin master"
+
+        UI.message "Pushing changes to remote git repo..."
 
         commands.each do |command|
           FastlaneCore::CommandExecutor.execute(command: command,
