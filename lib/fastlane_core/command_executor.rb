@@ -15,10 +15,10 @@ module FastlaneCore
 
         output = []
         command = command.join(" ") if command.kind_of?(Array)
-        Helper.log.info command.yellow.strip if print_command
+        UI.command(command.yellow) if print_command
 
         if print_all and loading # this is only used to show the "Loading text"...
-          puts loading.cyan
+          UI.command_output(loading)
         end
 
         begin
@@ -29,14 +29,12 @@ module FastlaneCore
 
               next unless print_all
 
-              line = line.cyan
-
               # Prefix the current line with a string
               prefix.each do |element|
                 line = element[:prefix] + line if element[:block] && element[:block].call(line)
               end
 
-              puts line
+              UI.command_output(line)
             end
             Process.wait(pid)
           end
@@ -54,7 +52,7 @@ module FastlaneCore
         if status != 0
           o = output.join("\n")
           puts o # the user has the right to see the raw output
-          Helper.log.info "Exit status: #{status}"
+          UI.error "Exit status: #{status}"
           error.call(o, status)
         end
 

@@ -46,7 +46,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    # Level Command Output: Print the output of a command with 
+    # Level Command Output: Print the output of a command with
     #   this method
     #
     #   By default those messages shown in magenta

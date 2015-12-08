@@ -16,6 +16,7 @@ module FastlaneCore
       @log.formatter = proc do |severity, datetime, progname, msg|
         string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
         string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
+
         string += "#{msg}\n"
 
         string
@@ -49,7 +50,10 @@ module FastlaneCore
     end
 
     def command_output(message)
-      log.info("> #{message}".magenta)
+      actual = message.split("\r").last # as clearing the line will remove the `>` and the time stamp
+      actual.split("\n").each do |msg|
+        log.info("> #{msg}".magenta)
+      end
     end
 
     def verbose(message)
