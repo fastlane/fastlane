@@ -8,7 +8,8 @@ module Fastlane
       def self.run(params)
         parse_application = params[:application]
         parse_directory = params[:parse_directory]
-
+        release_notes = params[:release_notes]
+        
         if !parse_application || parse_application.empty?
             deploy_info = "the default application"
         else
@@ -16,11 +17,20 @@ module Fastlane
         end
         Helper.log.info "Deploying Parse cloud files to #{deploy_info} ⛅️".green
         
+        
         parse_path = File.expand_path(parse_directory)
         exit_code = 1
         if File.exist?(parse_path)
             Dir.chdir(parse_path) do
-                system("Parse deploy #{parse_application}")
+                command = "Parse deploy"
+                if parse_application && !parse_application.empty?
+                    command << " #{parse_application}"
+                end
+                if release_notes && !release_notes.empty?
+                    command << " --description=\"#{release_notes}\""
+                end
+                Helper.log.info "Deploy command: #{command}".blue
+                system(command)
                 exit_code = $?.exitstatus
             end
         else
@@ -48,7 +58,7 @@ module Fastlane
       end
 
       def self.details
-        "Deploy Parse `cloud` and `public` code to Parse Cloud. \nYou can specify the target application and the path to your Parse directory."
+        "Deploy Parse `cloud` and `public` code to Parse Cloud. \nYou can specify the target application, release notes, and the path to your Parse directory."
       end
 
       def self.available_options
@@ -64,7 +74,12 @@ module Fastlane
                                        description: "Directory in your project that holds your Parse code",
                                        is_string: true,
                                        optional: false,
-                                       default_value: "./Parse/")
+                                       default_value: "./Parse/"),
+          FastlaneCore::ConfigItem.new(key: :release_notes,
+                                       env_name: "FL_PARSE_DEPLOY_RELEASE_NOTES",
+                                       description: "Release notes for any changes",
+                                       is_string: true,
+                                       optional: true)
         ]
       end
 
