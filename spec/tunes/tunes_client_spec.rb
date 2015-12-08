@@ -11,8 +11,11 @@ describe Spaceship::TunesClient do
 
   describe 'client' do
     it 'exposes the session cookie' do
-      subject.login('bad-username', 'bad-password') rescue nil
-      expect(subject.cookie).to eq('session=invalid')
+      begin
+        subject.login('bad-username', 'bad-password')
+      rescue Spaceship::Client::InvalidUserCredentialsError
+        expect(subject.cookie).to eq('session=invalid')
+      end
     end
   end
 
