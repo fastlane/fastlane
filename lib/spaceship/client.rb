@@ -84,7 +84,7 @@ module Spaceship
     # /tmp/spaceship[time].log by default
     def logger
       unless @logger
-        if $verbose || ENV["VERBOSE"]
+        if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
