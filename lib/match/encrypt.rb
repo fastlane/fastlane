@@ -16,7 +16,7 @@ module Match
       unless @password
         UI.important "Enter the password that should be used to encrypt/decrypt your certificates"
         while @password.to_s.length == 0
-          @password = ask("Passphrase for Git Repo: ".yellow)  { |q| q.echo = "*" }
+          @password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
         end
         Security::InternetPassword.add(server_name(git_url), "", @password)
       end

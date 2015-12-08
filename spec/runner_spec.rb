@@ -38,7 +38,7 @@ describe Match do
 
       expect(Match::GitHelper).to receive(:clone).with(git_url).and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain).and_return(nil)
-      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated tools.fastlane.app for appstore", git_url)
+      expect(Match::GitHelper).to_not receive(:commit_changes)
 
       # To also install the certificate, fake that
       expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path).and_return(false)

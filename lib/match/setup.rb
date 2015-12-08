@@ -12,9 +12,9 @@ module Match
       UI.success "Successfully created '#{path}'. Open the file using a code editor."
 
       UI.important "You can now run `match development`, `match adhoc` and `fastlane appstore`"
-      UI.info "On the first run for each environment it will create the provisioning profiles and"
-      UI.info "certificates for you. From then on, it will automatically import the existing profiles."
-      UI.info "For more information visit https://github.com/fastlane/match"
+      UI.message "On the first run for each environment it will create the provisioning profiles and"
+      UI.message "certificates for you. From then on, it will automatically import the existing profiles."
+      UI.message "For more information visit https://github.com/fastlane/match"
     end
   end
 end
