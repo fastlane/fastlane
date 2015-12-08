@@ -82,7 +82,7 @@ class MatchApplication
       c.syntax = "match nuke"
       c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
       c.action do |args, options|
-        puts "Please run `match nuke [type] instead, allowed values: distribution and development".red
+        puts "Please run `match nuke [type], allowed values: distribution and development".red
       end
     end
 
