@@ -158,6 +158,19 @@ For a list of all available options run
 match --help
 ```
 
+#### New machine
+
+To set up the certificates and provisioning profiles on a new machine, you just run the same command using
+
+```
+match appstore
+```
+
+You can also run `match` in a `readonly` mode to be sure to not create any missing certificates or profiles. 
+
+```
+match development --readonly
+```
 
 ##### Git Repo
 

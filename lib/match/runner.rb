@@ -22,6 +22,7 @@ module Match
 
       if certs.count == 0 or keys.count == 0
         Helper.log.info "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
+        raise "No code signing identity found and can not create a new one because you enabled `readonly`".red if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
         changes_to_commit = true
       else
@@ -42,6 +43,7 @@ module Match
       # Install the provisioning profiles
       profile = profiles.last
       if profile.nil? or params[:force]
+        raise "No matching provisioning profiles found and can not create a new one because you enabled `readonly`".red if params[:readonly]
         profile = Generator.generate_provisioning_profile(params, prov_type, cert_path)
         changes_to_commit = true
       end

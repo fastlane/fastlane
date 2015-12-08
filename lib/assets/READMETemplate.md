@@ -24,7 +24,11 @@ Navigate to your project folder and run
 
 ```
 match appstore
+```
+```
 match adhoc
+```
+```
 match development
 ```
 
