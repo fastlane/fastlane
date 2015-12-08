@@ -75,7 +75,7 @@ module FastlaneCore
 
     # Pass an exception to this method to exit the program
     #   using the given exception
-    def crash(_exception)
+    def crash!(_exception)
       not_implemented(__method__)
     end
 
@@ -84,7 +84,7 @@ module FastlaneCore
     #        or invalid user credentials
     # This will show the error message, but doesn't show the full
     #   stack trace
-    def user_error(_error_message)
+    def user_error!(_error_message)
       not_implemented(__method__)
     end
 

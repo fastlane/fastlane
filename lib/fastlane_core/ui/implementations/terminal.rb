@@ -67,11 +67,11 @@ module FastlaneCore
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
-    def crash(exception)
+    def crash!(exception)
       if exception.kind_of?(String)
         raise exception.red
       elsif exception.kind_of?(Exception)
-        # From http://stackoverflow.com/a/4789702/445598
+        # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
         begin
           raise exception
@@ -83,7 +83,7 @@ module FastlaneCore
       end
     end
 
-    def user_error(error_message)
+    def user_error!(error_message)
       if $verbose
         # On verbose we want to see the full stack trace
         raise error_message.to_s.red
