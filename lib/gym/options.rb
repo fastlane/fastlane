@@ -158,7 +158,6 @@ module Gym
                                      env_name: "SUPPRESS_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     default_value: false,
                                      is_string: false
                                      )
       ]
