@@ -23,7 +23,7 @@ module Match
                                      description: "Create a development certificate instead of a distribution one",
                                      is_string: true,
                                      short_option: "-y",
-                                     default_value: 'appstore',
+                                     default_value: 'development',
                                      verify_block: proc do |value|
                                        unless Match.environments.include?(value)
                                          raise "Unsupported environment #{value}, must be in #{Match.environments.join(', ')}".red
