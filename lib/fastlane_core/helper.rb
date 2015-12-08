@@ -45,6 +45,13 @@ module FastlaneCore
       Helper.log.info(("-" * i).green)
     end
 
+    # Runs a given command using backticks (`)
+    # and prints them out using the UI.command method
+    def self.backticks(command)
+      UI.command(command)
+      `#{command}`
+    end
+
     # @return true if the currently running program is a unit test
     def self.test?
       defined?SpecHelper
