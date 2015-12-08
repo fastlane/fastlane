@@ -104,6 +104,8 @@ Make sure you have the latest version of the Xcode command line tools installed:
 
 Create a new, private git repo (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
 
+Additionally, create a new, shared Apple Developer account, something like `office@company.com` that will be shared across your team from now on (for more information visit [https://codesigning.guide](https://codesigning.guide))
+
 Run the following in your project folder to start using `match`:
 
 ```
