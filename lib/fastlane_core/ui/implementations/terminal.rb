@@ -32,7 +32,7 @@ module FastlaneCore
       log.error(message.red)
     end
 
-    def warn(message)
+    def important(message)
       log.warn(message.yellow)
     end
 
@@ -54,6 +54,13 @@ module FastlaneCore
 
     def verbose(message)
       log.debug(message) if $verbose
+    end
+
+    def header(message)
+      i = message.length + 8
+      Helper.log.info(("-" * i).green)
+      Helper.log.info(("--- " + message + " ---").green)
+      Helper.log.info(("-" * i).green)
     end
 
     #####################################################

@@ -15,12 +15,12 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    # Level Warning: Can be used to show warnings to the user
+    # Level Important: Can be used to show warnings to the user
     #   not necessarly negative, but something the user should
     #   be aware of.
     #
     #   By default those messages are shown in yellow
-    def warn(_message)
+    def important(_message)
       not_implemented(__method__)
     end
 
@@ -60,6 +60,12 @@ module FastlaneCore
     #
     #   By default those messages are shown in white
     def verbose(_message)
+      not_implemented(__method__)
+    end
+
+    # Print a header = a text in a box
+    #   use this if this message is really important
+    def header(_message)
       not_implemented(__method__)
     end
 
