@@ -20,6 +20,8 @@ class MatchApplication
     program :help, 'GitHub', 'https://github.com/fastlane/match'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
 
     command :run do |c|
