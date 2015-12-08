@@ -259,6 +259,8 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 ## Is this secure?
 
+Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.
+
 Storing your private keys in a git repo might sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusion: 
 
 #### What could happen if someone stole a private key?
