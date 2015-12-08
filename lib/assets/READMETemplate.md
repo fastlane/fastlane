@@ -23,7 +23,9 @@ xcode-select --install
 Navigate to your project folder and run
 
 ```
-match bootstrap
+match appstore
+match adhoc
+match development
 ```
 
 For more information open [fastlane match git repo](https://github.com/fastlane/match)

@@ -228,22 +228,6 @@ This is useful when installing your application on your device using the Develop
 
 You can statically select the right provisioning profile in your Xcode project (the name should be `tools.fastlane.app Development`).
 
-### Install profiles on a new computer
-
-To install all certificates and provisioning profiles on a new machine, just run
-
-```
-match bootstrap
-```
-
-<img src="assets/match_bootstrap.gif" width="550" />
-
-Note: If you run the above command in the project directory containing the `Matchfile`, you won't be asked for the `git_url`, otherwise you can also pass it using
-
-```
-match bootstrap --git_url https://github.com/fastlane/certificates
-```
-
 ### Nuke
 
 If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
