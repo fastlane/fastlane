@@ -9,44 +9,42 @@ module Fastlane
         parse_application = params[:application]
         parse_directory = params[:parse_directory]
         release_notes = params[:release_notes]
-        
+
         if !parse_application || parse_application.empty?
-            deploy_info = "the default application"
+          deploy_info = "the default application"
         else
-            deploy_info = "#{parse_application}"
+          deploy_info = "#{parse_application}"
         end
         Helper.log.info "Deploying Parse cloud files to #{deploy_info} ⛅️".green
-        
-        
+
         parse_path = File.expand_path(parse_directory)
         exit_code = 1
         if File.exist?(parse_path)
-            Dir.chdir(parse_path) do
-                command = "Parse deploy"
-                if parse_application && !parse_application.empty?
-                    command << " #{parse_application}"
-                end
-                if release_notes && !release_notes.empty?
-                    command << " --description=\"#{release_notes}\""
-                end
-                Helper.log.info "Deploy command: #{command}".blue
-                system(command)
-                exit_code = $?.exitstatus
+          Dir.chdir(parse_path) do
+            command = "Parse deploy"
+            if parse_application && !parse_application.empty?
+              command << " #{parse_application}"
             end
+            if release_notes && !release_notes.empty?
+              command << " --description=\"#{release_notes}\""
+            end
+            Helper.log.info "Deploy command: #{command}".blue
+            system(command)
+            exit_code = $?.exitstatus
+          end
         else
-            raise "Skipping Parse deploy: Parse directory not found at path `#{parse_path}`".yellow
+          raise "Skipping Parse deploy: Parse directory not found at path `#{parse_path}`".yellow
         end
 
         Actions.lane_context[SharedValues::PARSE_DEPLOY_EXIT_STATUS] = exit_code
 
         if exit_code != 0
-            raise "Parse deploy failed with exit code #{exit_code}.".red
+          raise "Parse deploy failed with exit code #{exit_code}.".red
         end
 
         Helper.log.info "Finished deploying Parse to #{deploy_info} ☀️.".green
 
         return exit_code
-
       end
 
       #####################################################
