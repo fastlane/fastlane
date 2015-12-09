@@ -10,7 +10,7 @@ module Fastlane
         parse_directory = params[:parse_directory]
         release_notes = params[:release_notes]
 
-        if !parse_application || parse_application.empty?
+        if parse_application.to_s.length == 0
           deploy_info = "the default application"
         else
           deploy_info = "#{parse_application}"
