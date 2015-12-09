@@ -12,6 +12,8 @@ module Match
       self.type = type
 
       params[:workspace] = GitHelper.clone(params[:git_url])
+
+      had_app_identifier = self.params[:app_identifier]
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier, :workspace],
@@ -29,6 +31,7 @@ module Match
         UI.error "Are you sure you want to completely delete and revoke all the"
         UI.error "certificates and provisioning profiles listed above? (y/n)"
         UI.error "Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted" if type == "distribution"
+        UI.error "Warning: The :app_identifier value will be ignored - this will all delete profiles for all your apps!" if had_app_identifier
         UI.error "---"
         if agree("(y/n)", true)
           nuke_it_now!
@@ -37,7 +40,7 @@ module Match
           UI.success "Cancelled nuking #thanks 🏠 👨 ‍👩 ‍👧"
         end
       else
-        UI.success "No relevant certificates or provisioning profiles found, nothing to do here :)"
+        UI.success "No relevant certificates or provisioning profiles found, nothing to nuke here :)"
       end
     end
 
@@ -58,11 +61,11 @@ module Match
         self.profiles += profile_type(prov_type).all
       end
 
-      certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(params[:workspace], "**", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(params[:workspace], "**", cert_type.to_s, "*.p12")]
       profiles = []
       prov_types.each do |prov_type|
-        profiles += Dir[File.join(params[:path], "**", prov_type.to_s, "*.mobileprovision")]
+        profiles += Dir[File.join(params[:workspace], "**", prov_type.to_s, "*.mobileprovision")]
       end
 
       self.files = certs + keys + profiles
@@ -131,7 +134,7 @@ module Match
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:path], message, self.params[:git_url])
+      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url])
     end
 
     private
