@@ -48,6 +48,13 @@ module Match
                                           print_command: $verbose)
         end
       end
+      @dir = nil
+    end
+
+    def self.clear_changes
+      FileUtils.rm_rf(@dir)
+      UI.success "🔒  Successfully encrypted certificates repo" # so the user is happy
+      @dir = nil
     end
 
     # Copies the README.md into the git repo
