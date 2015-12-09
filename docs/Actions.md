@@ -774,6 +774,25 @@ appetize(
 )
 ```
 
+### [Parse Cloud Code Deploy](https://www.parse.com/docs/cloudcode/guide#command-line-deploying)
+This will deploy server-side code to Parse Cloud from your local Parse installation.
+
+```ruby
+parse_deploy
+```
+
+You can pass all options listed in `parse_deploy --help` in `fastlane`:
+
+```ruby
+parse_deploy(
+  application: "My Parse Application",
+  parse_directory: './Parse/',
+  release_notes: "Release notes"
+)
+```
+
+Uses the [Parse command line tool](https://parse.com/docs/cloudcode/guide#command-line) and project configurations in the Parse directory.
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
