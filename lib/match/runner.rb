@@ -4,7 +4,7 @@ module Match
     def run(params)
       changes_to_commit = false
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:path],
+                                         hide_keys: [:workspace],
                                              title: "Summary for match #{Match::VERSION}")
 
       cert_type = :distribution
@@ -12,13 +12,13 @@ module Match
 
       prov_type = params[:type].to_sym
 
-      params[:path] = GitHelper.clone(params[:git_url])
+      params[:workspace] = GitHelper.clone(params[:git_url])
 
-      certs = Dir[File.join(params[:path], "**", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(params[:path], "**", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
 
       profile_name = [prov_type.to_s, params[:app_identifier]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      profiles = Dir[File.join(params[:path], "**", prov_type.to_s, "#{profile_name}.mobileprovision")]
+      profiles = Dir[File.join(params[:workspace], "profiles", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
       if certs.count == 0 or keys.count == 0
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
@@ -56,7 +56,7 @@ module Match
 
       if changes_to_commit
         message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:path], message, params[:git_url])
+        GitHelper.commit_changes(params[:workspace], message, params[:git_url])
       end
 
       TablePrinter.print_summary(params, uuid)

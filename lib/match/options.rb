@@ -80,7 +80,7 @@ module Match
                                      description: "Renew the provisioning profiles every time you run match",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :path,
+        FastlaneCore::ConfigItem.new(key: :workspace,
                                      description: nil,
                                      verify_block: proc do |value|
                                        unless Helper.test?

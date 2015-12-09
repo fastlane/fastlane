@@ -11,10 +11,10 @@ module Match
       self.params = params
       self.type = type
 
-      self.params[:path] = GitHelper.clone(self.params[:git_url])
+      params[:workspace] = GitHelper.clone(params[:git_url])
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:app_identifier, :path],
+                                         hide_keys: [:app_identifier, :workspace],
                                              title: "Summary for match nuke #{Match::VERSION}")
 
       prepare_list

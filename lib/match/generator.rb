@@ -3,7 +3,7 @@ module Match
   class Generator
     def self.generate_certificate(params, cert_type)
       require 'cert'
-      output_path = File.join(params[:path], "certs", cert_type.to_s)
+      output_path = File.join(params[:workspace], "certs", cert_type.to_s)
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
@@ -16,7 +16,7 @@ module Match
       cert_path = Cert::Runner.new.launch
 
       # We don't care about the signing request
-      Dir[File.join(params[:path], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
+      Dir[File.join(params[:workspace], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
 
       # we need to return the path
       return cert_path
@@ -34,7 +34,7 @@ module Match
         app_identifier: params[:app_identifier],
         adhoc: prov_type == :adhoc,
         development: prov_type == :development,
-        output_path: File.join(params[:path], "profiles", prov_type.to_s),
+        output_path: File.join(params[:workspace], "profiles", prov_type.to_s),
         username: params[:username],
         force: true,
         cert_id: certificate_id,
