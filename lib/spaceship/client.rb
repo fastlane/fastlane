@@ -64,11 +64,12 @@ module Spaceship
     end
 
     def initialize
+      @cookie = HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
-        c.use :cookie_jar
+        c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
@@ -98,6 +99,14 @@ module Spaceship
       end
 
       @logger
+    end
+
+    ##
+    # Return the session cookie.
+    #
+    # @return (String) the cookie-string in the RFC6265 format: https://tools.ietf.org/html/rfc6265#section-4.2.1
+    def cookie
+      @cookie.map(&:to_s).join(';')
     end
 
     #####################################################

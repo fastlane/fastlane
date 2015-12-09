@@ -22,7 +22,7 @@ def itc_stub_login
   # Failed login attempts
   stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
     with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
-    to_return(status: 401, body: '{}')
+    to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
 end
 
 def itc_stub_applications

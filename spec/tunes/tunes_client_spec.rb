@@ -9,6 +9,16 @@ describe Spaceship::TunesClient do
     end
   end
 
+  describe 'client' do
+    it 'exposes the session cookie' do
+      begin
+        subject.login('bad-username', 'bad-password')
+      rescue Spaceship::Client::InvalidUserCredentialsError
+        expect(subject.cookie).to eq('session=invalid')
+      end
+    end
+  end
+
   describe "Logged in" do
     subject { Spaceship::Tunes.client }
     let(:username) { 'spaceship@krausefx.com' }
