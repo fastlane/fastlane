@@ -7,18 +7,18 @@ module Match
     end
 
     def password(git_url)
-      @password ||= ENV["MATCH_PASSWORD"]
-      unless @password
+      password ||= ENV["MATCH_PASSWORD"]
+      unless password
         item = Security::InternetPassword.find(server: server_name(git_url))
-        @password = item.password if item
+        password = item.password if item
       end
 
-      unless @password
+      unless password
         UI.important "Enter the password that should be used to encrypt/decrypt your certificates"
-        while @password.to_s.length == 0
-          @password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
+        while password.to_s.length == 0
+          password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
         end
-        Security::InternetPassword.add(server_name(git_url), "", @password)
+        Security::InternetPassword.add(server_name(git_url), "", password)
       end
 
       return @password
@@ -27,7 +27,6 @@ module Match
     # removes the password from the keychain again
     def clear_password(git_url)
       Security::InternetPassword.delete(server: server_name(git_url))
-      @password = nil
     end
 
     def encrypt_repo(path: nil, git_url: nil)
