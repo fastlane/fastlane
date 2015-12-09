@@ -86,6 +86,7 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SNAPSHOT_APP_IDENTIFIER',
                                      short_option: "-a",
+                                     optional: true,
                                      description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      default_value: ENV["SNAPSHOT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
 
