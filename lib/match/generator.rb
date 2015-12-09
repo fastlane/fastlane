@@ -13,7 +13,16 @@ module Match
       })
 
       Cert.config = arguments
-      cert_path = Cert::Runner.new.launch
+
+      begin
+        cert_path = Cert::Runner.new.launch
+      rescue => ex
+        if ex.to_s.include?("You already have a current")
+          UI.user_error!("Could not create a new certificate as you reached the maximum number of certificates for this account. You can use the `match nuke` command to revoke your existing certificates. More information https://github.com/fastlane/match")
+        else
+          raise ex
+        end
+      end
 
       # We don't care about the signing request
       Dir[File.join(params[:workspace], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
