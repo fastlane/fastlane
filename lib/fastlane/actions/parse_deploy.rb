@@ -52,11 +52,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Deploy Parse Cloud code"
+        "Deploy server-side code to Parse Cloud"
       end
 
       def self.details
-        "Deploy Parse `cloud` and `public` code to Parse Cloud. \nYou can specify the target application, release notes, and the path to your Parse directory."
+        "Deploy server-side Parse `cloud` and `public` code to Parse Cloud. \nYou can specify the target application, release notes, and the path to your Parse directory."
       end
 
       def self.available_options
