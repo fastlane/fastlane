@@ -13,7 +13,7 @@ module FastlaneCore
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string (String) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, optional: false)
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, is_array: false, optional: false)
       raise "key must be a symbol" unless key.kind_of? Symbol
       raise "env_name must be a String" unless (env_name || '').kind_of? String
       if short_option
@@ -30,6 +30,7 @@ module FastlaneCore
       @default_value = default_value
       @verify_block = verify_block
       @is_string = is_string
+      @is_array = is_array
       @optional = optional
     end
 
@@ -46,6 +47,9 @@ module FastlaneCore
       if value
         if @is_string
           raise "'#{self.key}' value must be a String! Found #{value.class} instead.".red unless value.kind_of? String
+        elsif @is_array
+          # if we've been told that this option is an array, delimit elements by comma
+          value = value.split(',')
         end
 
         if @verify_block

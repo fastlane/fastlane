@@ -59,6 +59,23 @@ describe FastlaneCore do
         end.to raise_error "Multiple entries for short_option '-f' found!".red
       end
 
+      it "parses if an array if the option is specified" do
+        verify_block = proc do |value|
+          raise 'Fail the test!' unless value.kind_of? Array
+        end
+
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   is_array: true,
+                                                   is_string: false,
+                                                   verify_block: verify_block)
+
+        expect do
+          FastlaneCore::Configuration.create([config_item], { foo: 'abc,123,xyz,456' })
+        end.to_not raise_error
+      end
+
       it "verifies the default value as well" do
         c = FastlaneCore::ConfigItem.new(key: :output,
                                   env_name: "SIGH_OUTPUT_PATH",
