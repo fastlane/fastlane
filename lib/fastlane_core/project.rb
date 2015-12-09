@@ -156,6 +156,15 @@ module FastlaneCore
       default_build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER", scheme: scheme)
     end
 
+    def default_app_name
+      if is_workspace
+        scheme = schemes.first
+        return default_build_settings(key: "PRODUCT_NAME", scheme: scheme)
+      else
+        return app_name
+      end
+    end
+
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
