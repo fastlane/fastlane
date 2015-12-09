@@ -19,6 +19,7 @@ describe Fastlane do
 
         require 'fastlane/actions/slack'
         arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'http://127.0.0.1',
           message: message,
           success: false,
           channel: channel,
@@ -57,6 +58,7 @@ describe Fastlane do
 
         require 'fastlane/actions/slack'
         arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'http://127.0.0.1',
           message: message,
           success: false,
           channel: channel,
