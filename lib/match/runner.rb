@@ -8,16 +8,16 @@ module Match
                                              title: "Summary for match #{Match::VERSION}")
 
       params[:workspace] = GitHelper.clone(params[:git_url])
-      spaceship = SpaceshipEnsure.new(params[:username])
+      spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
       # Certificate
       cert_id = certificate(params: params)
-      spaceship.certificate_exists(params, cert_id)
+      spaceship.certificate_exists(params, cert_id) if spaceship
 
       # Provisioning Profile
       uuid = profile(params: params, 
                      certificate_id: cert_id)
-      spaceship.profile_exists(params, uuid)
+      spaceship.profile_exists(params, uuid) if spaceship
 
       # Done
       if self.changes_to_commit
