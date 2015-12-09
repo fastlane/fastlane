@@ -8,6 +8,7 @@ require 'match/git_helper'
 require 'match/generator'
 require 'match/setup'
 require 'match/encrypt'
+require 'match/spaceship_ensure'
 
 require 'fastlane_core'
 require 'terminal-table'

@@ -6,7 +6,7 @@ module Match
       command << " -T /usr/bin/security"
       command << "&> /dev/null" # we couldn't care less about the output
 
-      Helper.backticks(command)
+      Helper.backticks(command, print: $verbose)
     end
 
     # Fill in the UUID of the profiles in environment variables, much recycling
