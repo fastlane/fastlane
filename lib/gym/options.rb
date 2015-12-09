@@ -152,7 +152,14 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     short_option: "-r",
+                                     env_name: "SUPPRESS_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     optional: true,
+                                     is_string: false
+                                    )
       ]
     end
   end
