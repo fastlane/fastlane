@@ -6,6 +6,18 @@ module Match
       Spaceship.select_team
     end
 
+    def bundle_identifier_exists(params)
+      found = Spaceship.app.find(params[:app_identifier])
+      return if found
+
+      require 'sigh'
+      Sigh::Runner.new.print_produce_command({
+        username: params[:username],
+        app_identifier: params[:app_identifier]
+      })
+      UI.user_error!("Couldn't find bundle identifier '#{params[:app_identifier]}' for the user '#{params[:username]}'")
+    end
+
     def certificate_exists(params, certificate_id)
       found = Spaceship.certificate.all.find do |cert|
         cert.id == certificate_id

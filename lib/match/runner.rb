@@ -10,6 +10,9 @@ module Match
       params[:workspace] = GitHelper.clone(params[:git_url])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
+      # Verify the App ID (as we don't want 'match' to fail at a later point)
+      spaceship.bundle_identifier_exists(params) if spaceship
+
       # Certificate
       cert_id = certificate(params: params)
       spaceship.certificate_exists(params, cert_id) if spaceship
