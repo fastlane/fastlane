@@ -187,6 +187,8 @@ The nice thing about using `match` is that it enables you to give developers acc
 
 If you decide to run `match` without access to the developer portal, make sure to use the `--readonly` option, as the certificates will be verified against the Developer Portal otherwise.
 
+The advantage of this approach is that no one in your team will revoke a certificate by mistake. Additionally it is recommended to install the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode) to disable the `Fix Issue` button.
+
 #### Git Repo
 
 After running `match` for the first time, your git repo will contain 2 directories:
