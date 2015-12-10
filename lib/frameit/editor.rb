@@ -275,7 +275,7 @@ module Frameit
       strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
       if File.exist? strings_path
         parsed = StringsParser.parse(strings_path)
-        result = parsed.find { |k, v| screenshot.path.include? k }
+        result = parsed.find { |k, v| screenshot.path.upcase.include? k.upcase }
         return result.last if result
       end
 
