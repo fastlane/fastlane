@@ -23,6 +23,8 @@ class FastlaneApplication
     program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     always_trace!
 
     command :trigger do |c|
@@ -106,7 +108,8 @@ class FastlaneApplication
 
       c.action do |args, options|
         require 'fastlane/one_off'
-        Fastlane::OneOff.execute(args: args)
+        result = Fastlane::OneOff.execute(args: args)
+        puts "Result: #{result}".green if result
       end
     end
 

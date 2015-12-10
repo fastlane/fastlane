@@ -25,13 +25,7 @@ module Fastlane
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
-        url = ENV['SLACK_URL']
-        unless url
-          Helper.log.fatal "Please add 'ENV[\"SLACK_URL\"] = \"https://hooks.slack.com/services/...\"' to your Fastfile's `before_all` section.".red
-          raise 'No SLACK_URL given.'.red
-        end
-
-        notifier = Slack::Notifier.new(url)
+        notifier = Slack::Notifier.new(options[:slack_url])
 
         notifier.username = 'fastlane'
         if options[:channel].to_s.length > 0

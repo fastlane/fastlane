@@ -5,7 +5,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull;
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull;
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull;
+  <a href="https://github.com/fastlane/pem">pem</a> &bull;
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -13,7 +13,8 @@
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a>
+  <a href="https://github.com/fastlane/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a>
 </p>
 -------
 
@@ -157,7 +158,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
+- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
@@ -166,6 +167,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
+- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
 
 ## Statistics
 
