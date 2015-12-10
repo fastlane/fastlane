@@ -16,14 +16,14 @@ module CredentialsManager
       return @user
     end
 
-    def password
+    def password(ask_if_missing: true)
       @password ||= ENV["FASTLANE_PASSWORD"]
       @password ||= ENV["DELIVER_PASSWORD"]
       unless @password
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
       end
-      ask_for_login while @password.to_s.length == 0
+      ask_for_login while (ask_if_missing and @password.to_s.length == 0)
       return @password
     end
 
