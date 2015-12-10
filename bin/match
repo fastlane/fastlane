@@ -97,8 +97,8 @@ class MatchApplication
 end
 
 begin
-  # FastlaneCore::UpdateChecker.start_looking_for_update('match')
+  FastlaneCore::UpdateChecker.start_looking_for_update('match')
   MatchApplication.new.run
 ensure
-  # FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
+  FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
 end
