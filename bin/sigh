@@ -23,6 +23,8 @@ class SighApplication
     program :help, 'GitHub', 'https://github.com/krausefx/sigh'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
 
     command :renew do |c|
