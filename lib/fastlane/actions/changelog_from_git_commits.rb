@@ -16,7 +16,8 @@ module Fastlane
 
         Helper.log.info "Collecting Git commits between #{from} and #{to}".green
 
-        changelog = Actions.git_log_between(params[:pretty], from, to).gsub("\n\n", "\n") # as there are duplicate newlines
+        changelog = Actions.git_log_between(params[:pretty], from, to)
+        changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
         changelog
@@ -41,7 +42,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :between,
-                                       env_name: 'FL_GIT_COLLECT_MESSAGES_BETWEEN',
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN',
                                        description: 'Array containing two Git revision values between which to collect messages',
                                        optional: true,
                                        is_string: false,
@@ -50,13 +51,13 @@ module Fastlane
                                          raise ":between must be an array of size 2".red unless (value || []).size == 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
-                                       env_name: 'FL_GIT_COLLECT_MESSAGES_PRETTY',
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
                                        description: 'The format applied to each commit while generating the collected value',
                                        optional: true,
                                        default_value: '%B',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :match_lightweight_tag,
-                                       env_name: 'FL_GIT_COLLECT_MESSAGES_MATCH_LIGHTWEIGHT_TAG',
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MATCH_LIGHTWEIGHT_TAG',
                                        description: 'Whether or not to match a lightweight tag when searching for the last one',
                                        optional: true,
                                        default_value: true,
