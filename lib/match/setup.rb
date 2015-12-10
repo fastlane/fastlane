@@ -9,7 +9,7 @@ module Match
 
       template.gsub!("[[GIT_URL]]", url)
       File.write(path, template)
-      UI.success "Successfully created '#{path}'. Open the file using a code editor."
+      UI.success "Successfully created '#{path}'. You can open the file using a code editor."
 
       UI.important "You can now run `match development`, `match adhoc` and `fastlane appstore`"
       UI.message "On the first run for each environment it will create the provisioning profiles and"
