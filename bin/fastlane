@@ -106,7 +106,8 @@ class FastlaneApplication
 
       c.action do |args, options|
         require 'fastlane/one_off'
-        Fastlane::OneOff.execute(args: args)
+        result = Fastlane::OneOff.execute(args: args)
+        puts "Result: #{result}".green if result
       end
     end
 
