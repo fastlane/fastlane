@@ -1,6 +1,7 @@
 require 'logger'
 
 module FastlaneCore
+  # rubocop:disable Metrics/ModuleLength
   module Helper
     # Logging happens using this method
     def self.log
@@ -150,4 +151,5 @@ module FastlaneCore
       end
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
