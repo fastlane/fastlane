@@ -60,7 +60,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 **A new approach**
 
-> What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
+> Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues. What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
 
 ### Why not let Xcode handle all this?
 
@@ -102,11 +102,11 @@ Make sure you have the latest version of the Xcode command line tools installed:
 
 ### Setup
 
-Create a new, private git repo (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
+1. Create a **new, private git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
 
-Additionally, create a new, shared Apple Developer account, something like `office@company.com` that will be shared across your team from now on (for more information visit [https://codesigning.guide](https://codesigning.guide))
+2. Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [https://codesigning.guide](https://codesigning.guide))
 
-Run the following in your project folder to start using `match`:
+3. Run the following in your project folder to start using `match`:
 
 ```
 match init
@@ -158,6 +158,10 @@ For a list of all available options run
 match --help
 ```
 
+#### Passphrase
+
+When running `match` for the first time on a new machine, it will ask you for the passphrase for the git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`.Make sure to remember the password, as you'll need it when you run match on a different machine
+
 #### New machine
 
 To set up the certificates and provisioning profiles on a new machine, you just run the same command using
@@ -172,7 +176,18 @@ You can also run `match` in a `readonly` mode to be sure to not create any missi
 match development --readonly
 ```
 
-##### Git Repo
+#### Access Control
+
+The nice thing about using `match` is that it enables you to give developers access to the code signing certificates without having to give them access to the Developer Portal:
+
+1. Run `match` to store the certificates in a git repo
+2. Grant access to the git repo to your developers and give them the passphrase
+3. The developers can now run `match` which will install the latest code signing profiles so they can build and sign the application without having to have access to the developer portal
+4. Every time you run `match` to update the profiles (e.g. add a new device), all your developers will automatically get the latest profiles when running `match`
+
+If you decide to run `match` without access to the developer portal, make sure to use the `--readonly` option, as the certificates will be verified against the Developer Portal otherwise.
+
+#### Git Repo
 
 After running `match` for the first time, your git repo will contain 2 directories:
 
@@ -243,7 +258,7 @@ You can statically select the right provisioning profile in your Xcode project (
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
