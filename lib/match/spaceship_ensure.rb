@@ -15,6 +15,7 @@ module Match
         UI.important("More information https://github.com/fastlane/match#access-control")
       end
 
+      UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
       Spaceship.login(user)
       Spaceship.select_team
     end
@@ -29,6 +30,7 @@ module Match
         app_identifier: params[:app_identifier]
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
+      UI.error("================================================================")
       UI.error("Make sure to run `match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{params[:app_identifier]}' for the user '#{params[:username]}'")
     end
