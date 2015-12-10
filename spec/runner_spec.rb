@@ -15,14 +15,21 @@ describe Match do
 
       expect(Match::GitHelper).to receive(:clone).with(git_url).and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution).and_return(cert_path)
-      expect(Match::Generator).to receive(:generate_provisioning_profile).with(config, :appstore, cert_path).and_return(profile_path)
+      expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
+                                                                            prov_type: :appstore,
+                                                                       certificate_id: "something").and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path)
       expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated tools.fastlane.app for appstore", git_url)
+
+      spaceship = "spaceship"
+      expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to receive(:certificate_exists).and_return(true)
+      expect(spaceship).to receive(:profile_exists).and_return(true)
 
       Match::Runner.new.run(config)
     end
 
-    it "uses existing certificates and profiles if they exist", now: true do
+    it "uses existing certificates and profiles if they exist" do
       git_url = "https://github.com/fastlane/certificates"
       values = {
         app_identifier: "tools.fastlane.app",
@@ -43,6 +50,11 @@ describe Match do
       # To also install the certificate, fake that
       expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path).and_return(false)
       expect(Match::Utils).to receive(:import).with(cert_path, keychain).and_return(nil)
+
+      spaceship = "spaceship"
+      expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to receive(:certificate_exists).and_return(true)
+      expect(spaceship).to receive(:profile_exists).and_return(true)
 
       Match::Runner.new.run(config)
     end
