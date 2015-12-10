@@ -80,7 +80,7 @@ module FastlaneCore
         begin
           raise exception
         rescue => ex
-          raise $!, ex.message.red, $!.backtrace
+          raise $!, "[!] #{ex.message}".red, $!.backtrace
         end
       else
         raise exception # we're just raising whatever we have here #yolo
@@ -88,11 +88,12 @@ module FastlaneCore
     end
 
     def user_error!(error_message)
+      error_message = "[!] #{error_message}".red
       if $verbose
         # On verbose we want to see the full stack trace
-        raise error_message.to_s.red
+        raise error_message
       else
-        abort(error_message.to_s.red)
+        abort(error_message)
       end
     end
   end
