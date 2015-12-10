@@ -17,8 +17,7 @@ func setLanguage(app: XCUIApplication) {
 }
 
 func setupSnapshot(app: XCUIApplication) {
-    Snapshot.setLanguage(app)
-    Snapshot.setLaunchArguments(app)
+    Snapshot.setupSnapshot(app)
 }
 
 func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
@@ -26,10 +25,15 @@ func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
 }
 
 class Snapshot: NSObject {
-    
+
+    class func setupSnapshot(app: XCUIApplication) {
+        setLanguage(app)
+        setLaunchArguments(app)
+    }
+
     class func setLanguage(app: XCUIApplication) {
         let path = "/tmp/language.txt"
-        
+
         do {
             let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             deviceLanguage = locale.substringToIndex(locale.startIndex.advancedBy(2, limit:locale.endIndex))
@@ -38,12 +42,12 @@ class Snapshot: NSObject {
             print("Couldn't detect/set language...")
         }
     }
-    
+
     class func setLaunchArguments(app: XCUIApplication) {
         let path = "/tmp/snapshot-launch_arguments.txt"
-        
+
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES"]
-        
+
         do {
             let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
@@ -56,18 +60,18 @@ class Snapshot: NSObject {
             print("Couldn't detect/set launch_arguments...")
         }
     }
-    
+
     class func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
-        
+
         print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
-        
+
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown
     }
-    
+
     class func waitForLoadingIndicatorToDisappear() {
         let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
         
