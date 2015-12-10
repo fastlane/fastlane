@@ -778,15 +778,10 @@ appetize(
 This will deploy server-side code to Parse Cloud from your local Parse installation.
 
 ```ruby
-parse_deploy
-```
-
-You can pass all options listed in `parse_deploy --help` in `fastlane`:
-
-```ruby
+parse_deploy # deploy the default Parse application with no release notes
 parse_deploy(
   application: "My Parse Application",
-  parse_directory: './Parse/',
+  parse_directory: './Path/to/Parse/', 
   release_notes: "Release notes"
 )
 ```
