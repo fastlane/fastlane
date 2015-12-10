@@ -28,6 +28,10 @@ class MatchApplication
       c.description = Match::DESCRIPTION
 
       c.action do |args, options|
+        if args.count > 0
+          FastlaneCore::UI.user_error!("Please run `match [type]`, allowed values: development, adhoc or appstore")
+        end
+
         params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
         params.load_configuration_file("Matchfile")
         Match::Runner.new.run(params)
