@@ -104,7 +104,7 @@ Make sure you have the latest version of the Xcode command line tools installed:
 
 1. Create a **new, private git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
 
-2. Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [https://codesigning.guide](https://codesigning.guide))
+2. Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [codesigning.guide](https://codesigning.guide))
 
 3. Run the following in your project folder to start using `match`:
 
@@ -202,7 +202,7 @@ Additionally, `match` creates a nice repo `README.md` for you, to make it easy f
 
 #### fastlane
 
-Add `match` to your `Fastfile` to automatically fetch the latest code signing certificates before building your app with [fastlane](https://fastlane.tools).
+Add `match` to your `Fastfile` to automatically fetch the latest code signing certificates with [fastlane](https://fastlane.tools).
 
 ```ruby
 match(type: "appstore")
@@ -303,6 +303,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 - Even if your certificates got leaked, they can't be used to cause any harm without your login credentials
 - `match` doesn't support In-House Enterprise profiles as they are harder to control
 - If you use GitHub or Bitbucket we encourage to enable 2 factor authentication for all accounts that have access to the certificates repo.
+- The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/match)
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
