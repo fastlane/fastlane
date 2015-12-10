@@ -56,11 +56,11 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 > When deploying an app to the App Store, beta testing service or even installing it on a device, most development teams have separate code signing identities for every member. This results in dozens of profiles including a lot of duplicates.
 
-> You have to manually renew and download the latest provisioning profiles every time you add a new device or a certificate expires. Additionally you have to spend a lot of time when setting up a new machine. 
+> You have to manually renew and download the latest set of provisioning profiles every time you add a new device or a certificate expires. Additionally this requires spending a lot of time when setting up a new machine that will build your app.
 
 **A new approach**
 
-> Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues. What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
+> Share one code signing identity across your development team to simplify your setup and prevent code signing issues. What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
 
 ### Why not let Xcode handle all this?
 
@@ -196,7 +196,7 @@ After running `match` for the first time, your git repo will contain 2 directori
 - The `certs` folder contains all certificates with their private keys
 - The `profiles` folder contains all provisioning profiles
 
-Additionally, `match` creates a nice repo `README.md` for you, to make it easy for new users to onboard:
+Additionally, `match` creates a nice repo `README.md` for you, making it easy to onboard new team members:
 
 <p align="center">
   <img src="assets/github_repo.png" width="700" />
@@ -236,7 +236,7 @@ match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 
 To make sure Xcode is using the right provisioning profile for each target, don't use the `Automatic` feature for the profile selection.
 
-Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode). The `Fix Issue` button sometimes revokes your existing certificates, which will invalidate your provisioning profiles.
+Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode). The `Fix Issue` button can revoke your existing certificates, which will invalidate your provisioning profiles.
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
@@ -302,9 +302,9 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 ##### To sum up
 
 - You have full control over the access list of your git repo, no third party service involved
-- Even if your certificates got leaked, they can't be used to cause any harm without your login credentials
-- `match` doesn't support In-House Enterprise profiles as they are harder to control
-- If you use GitHub or Bitbucket we encourage to enable 2 factor authentication for all accounts that have access to the certificates repo.
+- Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
+- `match` does not currently support In-House Enterprise profiles as they are harder to control
+- If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo.
 - The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/match)
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
