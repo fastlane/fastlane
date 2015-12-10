@@ -164,13 +164,13 @@ When running `match` for the first time on a new machine, it will ask you for th
 
 #### New machine
 
-To set up the certificates and provisioning profiles on a new machine, you just run the same command using
+To set up the certificates and provisioning profiles on a new machine, you just run the same command using:
 
 ```
-match appstore
+match development
 ```
 
-You can also run `match` in a `readonly` mode to be sure to not create any missing certificates or profiles. 
+You can also run `match` in a `readonly` mode to be sure it won't create any new certificates or profiles. 
 
 ```
 match development --readonly
@@ -178,14 +178,14 @@ match development --readonly
 
 #### Access Control
 
-The nice thing about using `match` is that it enables you to give developers access to the code signing certificates without having to give them access to the Developer Portal:
+A benefit of using `match` is that it enables you to give the developers of your team access to the code signing certificates without having to give everyone access to the Developer Portal:
 
 1. Run `match` to store the certificates in a git repo
 2. Grant access to the git repo to your developers and give them the passphrase
 3. The developers can now run `match` which will install the latest code signing profiles so they can build and sign the application without having to have access to the developer portal
 4. Every time you run `match` to update the profiles (e.g. add a new device), all your developers will automatically get the latest profiles when running `match`
 
-If you decide to run `match` without access to the developer portal, make sure to use the `--readonly` option, as the certificates will be verified against the Developer Portal otherwise.
+If you decide to run `match` without access to the developer portal, make sure to use the `--readonly` option so that the commands don't ask you for the password to the developer portal.
 
 The advantage of this approach is that no one in your team will revoke a certificate by mistake. Additionally it is recommended to install the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode) to disable the `Fix Issue` button.
 
@@ -256,7 +256,7 @@ e.g. `$(sigh_tools.fastlane.app_development)`
 
 This is useful when installing your application on your device using the Development profile. 
 
-You can statically select the right provisioning profile in your Xcode project (the name should be `tools.fastlane.app Development`).
+You can statically select the right provisioning profile in your Xcode project (the name will be `tools.fastlane.app Development`).
 
 ### Nuke
 
@@ -277,7 +277,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.
 
-Storing your private keys in a git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusion: 
+Storing your private keys in a git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions: 
 
 #### What could happen if someone stole a private key?
 
