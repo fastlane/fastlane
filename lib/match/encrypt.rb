@@ -14,7 +14,9 @@ module Match
       end
 
       unless password
-        UI.important "Enter the password that should be used to encrypt/decrypt your certificates"
+        UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
+        UI.important "This passphrase is specific per repository and will be stored in your local keychain"
+        UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
         while password.to_s.length == 0
           password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
         end

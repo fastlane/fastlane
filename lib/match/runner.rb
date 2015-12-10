@@ -15,7 +15,7 @@ module Match
       spaceship.certificate_exists(params, cert_id) if spaceship
 
       # Provisioning Profile
-      uuid = profile(params: params, 
+      uuid = profile(params: params,
                      certificate_id: cert_id)
       spaceship.profile_exists(params, uuid) if spaceship
 
@@ -72,8 +72,8 @@ module Match
       profile = profiles.last
       if profile.nil? or params[:force]
         UI.crash!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        profile = Generator.generate_provisioning_profile(params: params, 
-                                                       prov_type: prov_type, 
+        profile = Generator.generate_provisioning_profile(params: params,
+                                                       prov_type: prov_type,
                                                   certificate_id: certificate_id)
         self.changes_to_commit = true
       end
