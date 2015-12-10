@@ -2,7 +2,7 @@ module FastlaneCore
   class UI
     class << self
       def current
-        @current ||= Terminal.new
+        @current ||= Shell.new
       end
     end
 

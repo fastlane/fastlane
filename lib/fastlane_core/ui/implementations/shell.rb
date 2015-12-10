@@ -1,7 +1,7 @@
 module FastlaneCore
-  # Terminal is the terminal output of things
+  # Shell is the terminal output of things
   # For documentation for each of the methods open `interface.rb`
-  class Terminal < Interface
+  class Shell < Interface
     def log
       return @log if @log
 
