@@ -21,7 +21,7 @@ module Fastlane
         exit_code = 1
         if File.exist?(parse_path)
           Dir.chdir(parse_path) do
-            raise "Please install `parse` using `curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash`" unless !`which parse`.empty?
+            raise "Please install `parse` using `curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash`" if `which parse`.empty?
             command = "parse deploy"
             if parse_application && !parse_application.empty?
               command << " #{parse_application}"
