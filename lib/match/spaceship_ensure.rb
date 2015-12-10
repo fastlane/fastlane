@@ -2,6 +2,19 @@ module Match
   # Ensures the certificate and profiles are also available on iTunes Connect
   class SpaceshipEnsure
     def initialize(user)
+      # We'll try to manually fetch the password
+      # to tell the user that a password is optional
+      require 'credentials_manager'
+
+      keychain_entry = CredentialsManager::AccountManager.new(user: user)
+
+      if keychain_entry.password(ask_if_missing: false).to_s.length == 0
+        UI.important("You can also run `match` in readonly mode to not require any access to the")
+        UI.important("Developer Portal. This way you only share the keys and credentials")
+        UI.command("match --readonly")
+        UI.important("More information https://github.com/fastlane/match#access-control")
+      end
+
       Spaceship.login(user)
       Spaceship.select_team
     end
@@ -15,6 +28,8 @@ module Match
         username: params[:username],
         app_identifier: params[:app_identifier]
       })
+      UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
+      UI.error("Make sure to run `match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{params[:app_identifier]}' for the user '#{params[:username]}'")
     end
 
