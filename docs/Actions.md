@@ -891,6 +891,17 @@ update_app_identifier(
 
 ## Developer Portal
 
+### [match](https://github.com/fastlane/match)
+
+Check out [codesigning.guide](https://codesigning.guide) for more information about the concept of [match](https://github.com/fastlane/match).
+
+`match` allows you to easily sync your certificates and profiles across your team using git. More information on [GitHub](https://github.com/fastlane/match).
+
+```ruby
+match(type: "appstore", app_identifier: "tools.fastlane.app")
+match(type: "development", readonly: true)
+```
+
 ### [sigh](https://github.com/KrauseFx/sigh)
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
