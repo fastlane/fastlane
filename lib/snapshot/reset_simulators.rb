@@ -6,7 +6,7 @@ module Snapshot
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       sure = true if ENV["SNAPSHOT_FORCE_DELETE"]
-      sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! (y/n)".red, true) unless sure
+      sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! This doesn't include WatchOS and tvOS (y/n)".red, true) unless sure
       raise "User cancelled action" unless sure
 
       all_devices = `xcrun simctl list devices`
