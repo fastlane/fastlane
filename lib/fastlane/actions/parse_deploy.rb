@@ -21,14 +21,15 @@ module Fastlane
         exit_code = 1
         if File.exist?(parse_path)
           Dir.chdir(parse_path) do
-            command = "Parse deploy"
+            raise "Please install `parse` using `curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash`" unless !`which parse`.empty?
+            command = "parse deploy"
             if parse_application && !parse_application.empty?
               command << " #{parse_application}"
             end
             if release_notes && !release_notes.empty?
               command << " --description=\"#{release_notes}\""
             end
-            Helper.log.info "Deploy command: #{command}".blue
+            Helper.log.info "#{command}".yellow
             system(command)
             exit_code = $?.exitstatus
           end
