@@ -79,7 +79,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :package:  | Handle all the heavy lifting of creating and storing your certificates and profiles
 :computer:  | Setup codesigning on a new machine in under a minute
 :dart:  | Designed to work with apps with multiple targets and bundle identifiers
-:lock: | You have full control over your files and git repo, no third party service involved
+:lock: | You have full control over your files and Git repo, no third party service involved
 :sparkles: | Provisioning profile will always match the correct certificate
 :boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 :recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force`
@@ -102,7 +102,7 @@ Make sure you have the latest version of the Xcode command line tools installed:
 
 ### Setup
 
-1. Create a **new, private git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
+1. Create a **new, private Git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
 
 2. Optional: Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [codesigning.guide](https://codesigning.guide))
 
@@ -114,7 +114,7 @@ match init
 
 <img src="assets/match_init.gif" width="550" />
 
-You'll be asked to enter the URL to your git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder). 
 
@@ -142,7 +142,7 @@ match development
 
 <img src="assets/match_appstore_small.gif" width="550" />
 
-This will create a new certificate and provisioning profile (if required) and store them in your git repo. If you previously ran `match` it will automatically install the existing profiles from the git repo.
+This will create a new certificate and provisioning profile (if required) and store them in your Git repo. If you previously ran `match` it will automatically install the existing profiles from the Git repo.
 
 The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
 
@@ -160,7 +160,7 @@ match --help
 
 #### Passphrase
 
-When running `match` for the first time on a new machine, it will ask you for the passphrase for the git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`.Make sure to remember the password, as you'll need it when you run match on a different machine
+When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`.Make sure to remember the password, as you'll need it when you run match on a different machine
 
 #### New machine
 
@@ -180,8 +180,8 @@ match development --readonly
 
 A benefit of using `match` is that it enables you to give the developers of your team access to the code signing certificates without having to give everyone access to the Developer Portal:
 
-1. Run `match` to store the certificates in a git repo
-2. Grant access to the git repo to your developers and give them the passphrase
+1. Run `match` to store the certificates in a Git repo
+2. Grant access to the Git repo to your developers and give them the passphrase
 3. The developers can now run `match` which will install the latest code signing profiles so they can build and sign the application without having to have access to the developer portal
 4. Every time you run `match` to update the profiles (e.g. add a new device), all your developers will automatically get the latest profiles when running `match`
 
@@ -191,7 +191,7 @@ The advantage of this approach is that no one in your team will revoke a certifi
 
 #### Git Repo
 
-After running `match` for the first time, your git repo will contain 2 directories:
+After running `match` for the first time, your Git repo will contain 2 directories:
 
 - The `certs` folder contains all certificates with their private keys
 - The `profiles` folder contains all provisioning profiles
@@ -230,7 +230,7 @@ match(app_identifier: "tools.fastlane.app", type: "appstore")
 match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 ```
 
-`match` can even use the same one git repository for all bundle identifiers.
+`match` can even use the same one Git repository for all bundle identifiers.
 
 ### Setup Xcode project
 
@@ -277,7 +277,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.
 
-Storing your private keys in a git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions: 
+Storing your private keys in a Git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions: 
 
 #### What could happen if someone stole a private key?
 
@@ -301,10 +301,10 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 
 ##### To sum up
 
-- You have full control over the access list of your git repo, no third party service involved
+- You have full control over the access list of your Git repo, no third party service involved
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
 - `match` does not currently support In-House Enterprise profiles as they are harder to control
-- If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo.
+- If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
 - The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/match)
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
