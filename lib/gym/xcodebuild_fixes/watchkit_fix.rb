@@ -3,7 +3,7 @@ module Gym
     class << self
       # Determine whether this app has WatchKit support and manually package up the WatchKit framework
       def watchkit_fix
-        return unless watchkit?
+        return unless should_apply_watchkit1_fix?
 
         Helper.log.info "Adding WatchKit support" if $verbose
 
@@ -29,6 +29,11 @@ module Gym
         Dir["#{PackageCommandGenerator.appfile_path}/**/*.plist"].any? do |plist_path|
           `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == 'true'
         end
+      end
+
+      # Should only be applied if watchkit app is not a watchkit2 app
+      def should_apply_watchkit1_fix?
+        watchkit? && !(Gym::XcodebuildFixes.watchkit2?)
       end
     end
   end

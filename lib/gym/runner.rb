@@ -67,6 +67,7 @@ module Gym
       return unless Gym.config[:use_legacy_build_api]
       Gym::XcodebuildFixes.swift_library_fix
       Gym::XcodebuildFixes.watchkit_fix
+      Gym::XcodebuildFixes.watchkit2_fix
     end
 
     # Builds the app and prepares the archive
