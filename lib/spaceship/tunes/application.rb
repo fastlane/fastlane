@@ -206,7 +206,7 @@ module Spaceship
           Tunes::ProcessingBuild.factory(attrs)
         end
 
-        builds.delete_if { |a| a.state == "invalidBinary" }
+        builds.delete_if { |a| a.state.include?("invalidBinary") }
 
         builds
       end
@@ -220,7 +220,7 @@ module Spaceship
           Tunes::ProcessingBuild.factory(attrs)
         end
 
-        builds.delete_if { |a| a.state != "invalidBinary" }
+        builds.delete_if { |a| !a.state.include?("invalidBinary") }
 
         builds
       end
