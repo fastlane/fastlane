@@ -9,7 +9,7 @@ module Snapshot
       sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! (y/n)".red, true) unless sure
       raise "User cancelled action" unless sure
 
-      get_devices.each do |device|
+      devices.each do |device|
         _, name, id = device
         puts "Removing device #{name} (#{id})"
         `xcrun simctl delete #{id}`
@@ -35,8 +35,9 @@ module Snapshot
         end
       end
 
-      phones, watches = [], []
-      get_devices.each do |device|
+      phones = []
+      watches = []
+      devices.each do |device|
         _, name, id = device
         phones << id if name.start_with?('iPhone 6')
         watches << id if name.end_with?('mm')
@@ -46,8 +47,6 @@ module Snapshot
       `xcrun simctl pair #{watches.last} #{phones.last}`
     end
 
-    private
-
     def self.create(device_type, os_versions, os_name = 'iOS')
       os_versions.each do |os_version|
         puts "Creating #{device_type} for #{os_name} version #{os_version}"
@@ -56,10 +55,10 @@ module Snapshot
     end
 
     def self.filter_runtimes(all_runtimes, os = 'iOS')
-      all_runtimes.select{ |r| r[/^#{os}/] }.map { |r| r.split(' ')[1] }
+      all_runtimes.select { |r| r[/^#{os}/] }.map { |r| r.split(' ')[1] }
     end
 
-    def self.get_devices()
+    def self.devices
       all_devices = `xcrun simctl list devices`
       # == Devices ==
       # -- iOS 9.0 --
@@ -69,9 +68,11 @@ module Snapshot
       # -- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-8-4 --
       #   iPhone 4s (FE9D6F85-1C51-4FE6-8597-FCAB5286B869) (Shutdown) (unavailable, runtime profile not found)
 
-      all_devices.lines.map do |line|
+      result = all_devices.lines.map do |line|
         (line.match(/\s+([\w\s]+)\s\(([\w\-]+)\)/) || []).to_a
-      end.select { |parsed| parsed.length == 3 } # we don't care about those headers
+      end
+
+      result.select { |parsed| parsed.length == 3 } # we don't care about those headers
     end
   end
 end
