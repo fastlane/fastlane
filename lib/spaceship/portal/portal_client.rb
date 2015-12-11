@@ -122,7 +122,7 @@ module Spaceship
     end
 
     def details_for_app(app)
-      r = request(:post, "#{platform_slug(app.mac?)}/identifiers/getAppIdDetail.action", {
+      r = request(:post, "account/#{platform_slug(app.mac?)}/identifiers/getAppIdDetail.action", {
         teamId: team_id,
         appIdId: app.app_id
       })
