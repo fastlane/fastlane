@@ -159,9 +159,7 @@ module Spaceship
         "W0EURJRMC5" => DeveloperIDApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIDApplication,
-        # "FUOY7LWJET" => WebsitePush,
-        # "3T2ZP62QW8" => ?
+        "DIVN2GW3XT" => DeveloperIDApplication
       }
 
       CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
