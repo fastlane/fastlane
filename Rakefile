@@ -165,6 +165,14 @@ task :autopush do
   end
 end
 
+desc 'show repos with checked-out feature-branches'
+task :features do
+  (['.'] + GEMS + RAILS).each do |repo|
+    branch = `cd #{repo} && git symbolic-ref HEAD 2>/dev/null | awk -F/ {'print $NF'}`
+    puts "#{repo}\n  -> #{branch}" unless branch.include? 'master'
+  end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
