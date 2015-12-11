@@ -130,7 +130,7 @@ module Spaceship
       #  if everything is alright, the result will be
       #  `{"sectionErrorKeys"=>[], "sectionInfoKeys"=>[], "sectionWarningKeys"=>[], "replyConstraints"=>{"minLength"=>1, "maxLength"=>4000}, "appNotes"=>{"threads"=>[]}, "betaNotes"=>{"threads"=>[]}, "appMessages"=>{"threads"=>[]}}`
       def resolution_center
-        client.get_resolution_center(apple_id)
+        client.get_resolution_center(apple_id, platform)
       end
 
       def details

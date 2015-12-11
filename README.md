@@ -9,7 +9,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -17,7 +17,8 @@
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a>
+  <a href="https://github.com/fastlane/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a>
 </p>
 -------
 
@@ -154,7 +155,7 @@ I won't go into too much technical details about the various API endpoints, but 
  - Managing apps
  - Managing beta testers
  - Submitting updates to review
- - Manaing app metadata
+ - Managing app metadata
 - `https://du-itc.itunesconnect.apple.com`:
  - Upload icons, screenshots, trailers ...
 

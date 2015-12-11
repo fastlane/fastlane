@@ -566,7 +566,7 @@ module Spaceship
         expected_resolution = TunesClient.video_preview_resolution_for(device, is_portrait)
         actual_resolution = Utilities.resolution(preview_screenshot_path)
         orientation = is_portrait ? "portrait" : "landscape"
-        raise "Invalid #{orientation} screenshot resolution for device #{device}. Should be #{expected_resolution}" unless (actual_resolution == expected_resolution)
+        raise "Invalid #{orientation} screenshot resolution for device #{device}. Should be #{expected_resolution}" unless actual_resolution == expected_resolution
       end
 
       def raw_data_details

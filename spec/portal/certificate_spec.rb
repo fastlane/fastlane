@@ -66,6 +66,15 @@ describe Spaceship::Certificate do
       x509 = OpenSSL::X509::Certificate.new(cert.download)
       expect(x509.issuer.to_s).to match('Apple Worldwide Developer Relations')
     end
+
+    it "handles failed download request" do
+      adp_stub_download_certificate_failure
+
+      error_text = /^Couldn't download certificate, got this instead:/
+      expect do
+        cert.download
+      end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+    end
   end
 
   describe '#revoke' do

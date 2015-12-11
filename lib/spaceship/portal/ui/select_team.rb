@@ -43,8 +43,8 @@ module Spaceship
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
             # There are 2 different values - one from the login page one from the Dev Team Page
-            return team['teamId'] if (team['teamId'].strip == team_id)
-            return team['teamId'] if (team['currentTeamMember']['teamMemberId'].to_s.strip == team_id)
+            return team['teamId'] if team['teamId'].strip == team_id
+            return team['teamId'] if team['currentTeamMember']['teamMemberId'].to_s.strip == team_id
           end
           puts "Couldn't find team with ID '#{team_id}'"
         end
@@ -52,7 +52,7 @@ module Spaceship
         if team_name.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
-            return team['teamId'] if (team['name'].strip == team_name)
+            return team['teamId'] if team['name'].strip == team_name
           end
           puts "Couldn't find team with Name '#{team_name}'"
         end

@@ -90,6 +90,16 @@ describe Spaceship::ProvisioningProfile do
       expect(xml['AppIDName']).to eq("SunApp Setup")
       expect(xml['TeamName']).to eq("SunApps GmbH")
     end
+
+    it "handles failed download request" do
+      adp_stub_download_provisioning_profile_failure
+      profile = Spaceship::ProvisioningProfile.all.first
+
+      error_text = /^Couldn't download provisioning profile, got this instead:/
+      expect do
+        profile.download
+      end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+    end
   end
 
   describe '#valid?' do

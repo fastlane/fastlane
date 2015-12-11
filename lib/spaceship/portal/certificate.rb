@@ -234,7 +234,7 @@ module Spaceship
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
         def all(mac: false)
-          if (self == Certificate) # are we the base-class?
+          if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
           else

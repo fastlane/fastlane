@@ -1,6 +1,7 @@
 require 'faraday' # HTTP Client
 require 'logger'
 require 'faraday_middleware'
+require 'faraday-cookie_jar'
 require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
@@ -14,9 +15,9 @@ end
 module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
+    USER_AGENT = "Spaceship #{Spaceship::VERSION}"
 
     attr_reader :client
-    attr_accessor :cookie
 
     # The user that is currently logged in
     attr_accessor :user
@@ -63,10 +64,12 @@ module Spaceship
     end
 
     def initialize
+      @cookie = HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
+        c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
@@ -82,7 +85,7 @@ module Spaceship
     # /tmp/spaceship[time].log by default
     def logger
       unless @logger
-        if $verbose || ENV["VERBOSE"]
+        if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
@@ -96,6 +99,14 @@ module Spaceship
       end
 
       @logger
+    end
+
+    ##
+    # Return the session cookie.
+    #
+    # @return (String) the cookie-string in the RFC6265 format: https://tools.ietf.org/html/rfc6265#section-4.2.1
+    def cookie
+      @cookie.map(&:to_s).join(';')
     end
 
     #####################################################
@@ -169,11 +180,6 @@ module Spaceship
       end
     end
 
-    # @return (Bool) Do we have a valid session?
-    def session?
-      !!@cookie
-    end
-
     def with_retry(tries = 5, &block)
       return block.call
     rescue Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
@@ -204,11 +210,8 @@ module Spaceship
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
-      if session?
-        headers.merge!({ 'Cookie' => cookie })
-        headers.merge!(csrf_tokens)
-      end
-      headers.merge!({ 'User-Agent' => 'spaceship' })
+      headers.merge!(csrf_tokens)
+      headers.merge!({ 'User-Agent' => USER_AGENT })
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)

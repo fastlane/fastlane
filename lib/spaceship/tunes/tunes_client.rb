@@ -38,60 +38,119 @@ module Spaceship
       "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
-    # Fetches the latest login URL from iTunes Connect
-    def login_url
-      cache_path = "/tmp/spaceship_itc_login_url.txt"
-      begin
-        cached = File.read(cache_path)
-      rescue Errno::ENOENT
+    # @return (Array) A list of all available teams
+    def teams
+      return @teams if @teams
+      r = request(:get, "ra/user/detail")
+      @teams = parse_response(r, 'data')['associatedAccounts']
+    end
+
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
       end
-      return cached if cached
+      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+    end
 
-      host = "https://itunesconnect.apple.com"
-      begin
-        url = host + request(:get, self.class.hostname).body.match(%r{action="(/WebObjects/iTunesConnect.woa/wo/.*)"})[1]
-        raise "" unless url.length > 0
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      response = request(:post) do |req|
+        req.url "ra/v1/session/webSession"
+        req.body = { contentProviderId: team_id }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
 
-        File.write(cache_path, url)
-        return url
-      rescue => ex
-        puts ex
-        raise "Could not fetch the login URL from iTunes Connect, the server might be down"
+      handle_itc_response(response.body)
+
+      @current_team_id = team_id
+    end
+
+    # Shows a team selection for the user in the terminal. This should not be
+    # called on CI systems
+    def select_team
+      t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
+      t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
+
+      if t_name.length > 0
+        teams.each do |t|
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].downcase == t_name.downcase
+        end
+      end
+
+      t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
+
+      if t_id.length > 0
+        # actually set the team id here
+        self.team_id = t_id
+        return
+      end
+
+      # user didn't specify a team... #thisiswhywecanthavenicethings
+      loop do
+        puts "Multiple teams found, please enter the number of the team you want to use: "
+        teams.each_with_index do |team, i|
+          puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
+        end
+
+        selected = ($stdin.gets || '').strip.to_i - 1
+        team_to_use = teams[selected] if selected >= 0
+
+        if team_to_use
+          self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
+          break
+        end
       end
     end
 
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
+    end
+
+    def service_key
+      return @service_key if @service_key
+      # We need a service key from a JS file to properly auth
+      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
+      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
+    end
+
     def send_login_request(user, password)
-      response = request(:post, login_url, {
-        theAccountName: user,
-        theAccountPW: password
-      })
+      data = {
+        accountName: user,
+        password: password,
+        rememberMe: true
+      }
 
-      if response['Set-Cookie'] =~ /myacinfo=(\w+);/
-        # To use the session properly we'll need the following cookies:
-        #  - myacinfo
-        #  - woinst
-        #  - wosid
-        #  - itctx
-        begin
-          re = response['Set-Cookie']
+      response = request(:post) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['Accept'] = 'application/json, text/javascript'
+      end
 
-          to_use = [
-            "myacinfo=" + re.match(/myacinfo=([^;]*)/)[1],
-            "woinst=" + re.match(/woinst=([^;]*)/)[1],
-            "itctx=" + re.match(/itctx=([^;]*)/)[1],
-            "wosid=" + re.match(/wosid=([^;]*)/)[1]
-          ]
+      # get woinst, wois, and itctx cookie values
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
 
-          @cookie = to_use.join(';')
-        rescue
-          raise ITunesConnectError.new, [response.body, response['Set-Cookie']].join("\n")
-        end
-
-        return @client
+      case response.status
+      when 403, 401
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      when 200
+        return response
       else
-        if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
+        if response["Location"] == "/auth" # redirect to 2 step auth page
+          raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
+        elsif (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif (response['Set-Cookie'] || "").include?("itctx")
+          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
           raise ITunesConnectError.new, info.join("\n")
@@ -237,8 +296,8 @@ module Spaceship
       handle_itc_response(data)
     end
 
-    def get_resolution_center(app_id)
-      r = request(:get, "ra/apps/#{app_id}/resolutionCenter?v=latest")
+    def get_resolution_center(app_id, platform)
+      r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter?v=latest")
       parse_response(r, 'data')
     end
 
@@ -255,8 +314,10 @@ module Spaceship
 
       # We only support platforms that exist ATM
       platform = platforms.find do |p|
-        ['ios', 'osx', 'appletvos'].include? p['platformString']
+        ['ios', 'osx'].include? p['platformString']
       end
+
+      raise "Could not find platform ios or osx for app #{app_id}" unless platform
 
       version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
       return nil unless version
@@ -499,12 +560,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    def submit_testflight_build_for_review!( # Required:
-                                            app_id: nil,
-                                            train: nil,
-                                            build_number: nil,
-
+    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil,
                                             # Required Metadata:
                                             changelog: nil,
                                             description: nil,
@@ -514,6 +570,7 @@ module Spaceship
                                             last_name: nil,
                                             review_email: nil,
                                             phone_number: nil,
+                                            significant_change: false,
 
                                             # Optional Metadata:
                                             privacy_policy_url: nil,
@@ -521,14 +578,7 @@ module Spaceship
                                             review_password: nil,
                                             encryption: false)
 
-      start_url = "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
-      r = request(:get) do |req|
-        req.url start_url
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
-
-      build_info = r.body['data']
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number)
       # Now fill in the values provided by the user
 
       # First the localised values:
@@ -540,6 +590,7 @@ module Spaceship
         current['privacyPolicyUrl']['value'] = privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
+      build_info['significantChange']['value'] = significant_change
       build_info['testInfo']['reviewFirstName']['value'] = first_name
       build_info['testInfo']['reviewLastName']['value'] = last_name
       build_info['testInfo']['reviewPhone']['value'] = phone_number
@@ -548,28 +599,46 @@ module Spaceship
       build_info['testInfo']['reviewPassword']['value'] = review_password
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url start_url
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+
         req.body = build_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
 
       encryption_info = r.body['data']
-      if encryption_info['exportComplianceRequired']
-        # only sometimes this is required
-
-        encryption_info['usesEncryption']['value'] = encryption
-
-        r = request(:post) do |req|
-          req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
-          req.body = encryption_info.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-
-        handle_itc_response(r.body)
-      end
+      update_encryption_compliance(app_id: app_id,
+                                   train: train,
+                                   build_number: build_number,
+                                   encryption_info: encryption_info,
+                                   encryption: encryption)
     end
-    # rubocop:enable Metrics/AbcSize
+
+    def get_build_info_for_review(app_id: nil, train: nil, build_number: nil)
+      r = request(:get) do |req|
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+
+      r.body['data']
+    end
+
+    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, encryption_info: nil, encryption: nil)
+      return unless encryption_info['exportComplianceRequired']
+      # only sometimes this is required
+
+      encryption_info['usesEncryption']['value'] = encryption
+      encryption_info['encryptionUpdated']['value'] = encryption
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
+        req.body = encryption_info.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(r.body)
+    end
 
     #####################################################
     # @!group Submit for Review

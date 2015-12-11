@@ -13,6 +13,8 @@ In general the classes are pre-fixed with the `Tunes` module.
 
 ```ruby
 Spaceship::Tunes.login("felix@krausefx.com", "password")
+
+Spaceship::Tunes.select_team # call this method to let the user select a team
 ```
 
 ## Applications
@@ -90,7 +92,7 @@ v.copyright = "#{Time.now.year} Felix Krause"
 v.description.languages # => ["German", "English"]
 
 # Update localised app metadata
-v.description["English"] = "App Description"
+v.description["en-US"] = "App Description"
 
 # set the app age rating
 v.set_rating({
@@ -224,6 +226,7 @@ parameters = {
   last_name: "Krause",
   review_email: "contact@company.com",
   phone_number: "0123456789",
+  significant_change: false,
 
   # Optional Metadata:
   privacy_policy_url: nil,

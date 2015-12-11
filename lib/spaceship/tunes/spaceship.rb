@@ -21,6 +21,14 @@ module Spaceship
       def login(user = nil, password = nil)
         @client = TunesClient.login(user, password)
       end
+
+      # Open up the team selection for the user (if necessary).
+      #
+      # If the user is in multiple teams, a team selection is shown.
+      # The user can then select a team by entering the number
+      def select_team
+        @client.select_team
+      end
     end
   end
 end
