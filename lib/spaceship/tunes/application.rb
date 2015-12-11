@@ -206,7 +206,21 @@ module Spaceship
           Tunes::ProcessingBuild.factory(attrs)
         end
 
-        builds.delete_if { |a| a.state == "ITC.apps.betaProcessingStatus.InvalidBinary" }
+        builds.delete_if { |a| a.state == "invalidBinary" }
+
+        builds
+      end
+
+      # @return [Array]A list of binaries which are in the invalid state
+      def invalid_builds
+        data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
+
+        builds = data.fetch('processingBuilds', []).collect do |attrs|
+          attrs.merge!(build_train: self)
+          Tunes::ProcessingBuild.factory(attrs)
+        end
+
+        builds.delete_if { |a| a.state != "invalidBinary" }
 
         builds
       end
