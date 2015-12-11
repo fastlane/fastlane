@@ -25,6 +25,7 @@ describe Match do
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists).and_return(true)
       expect(spaceship).to receive(:profile_exists).and_return(true)
+      expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
     end
@@ -55,6 +56,7 @@ describe Match do
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists).and_return(true)
       expect(spaceship).to receive(:profile_exists).and_return(true)
+      expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
     end
