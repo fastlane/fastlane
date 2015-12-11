@@ -253,10 +253,17 @@ If you run into any issues you can use the `verbose` mode to get a more detailed
 
 ## Firewall Issues
 
-`pilot` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol using
+`pilot` uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
 
 ```
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
+```
+
+If you are using from a Fastlane [Action](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#pilot), use
+
+```
+ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
+pilot...
 ```
 
 ## How is my password stored?
