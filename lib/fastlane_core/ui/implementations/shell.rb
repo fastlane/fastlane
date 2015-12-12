@@ -68,6 +68,27 @@ module FastlaneCore
     end
 
     #####################################################
+    # @!group Errors: Inputs
+    #####################################################
+
+    def input(message)
+      ask(message)
+    end
+
+    def confirm(message)
+      agree("#{message} (y/n)", true)
+    end
+
+    def select(message, options)
+      important(message)
+      choose(*(options))
+    end
+
+    def password(message)
+      ask(message.yellow) { |q| q.echo = "*" }
+    end
+
+    #####################################################
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
