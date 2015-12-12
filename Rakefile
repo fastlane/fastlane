@@ -46,5 +46,5 @@ task :ci do
   UI = FastlaneCore::UI
 
   ENV["TRAVIS"] = "1"
-  project = UI.select("Select your project: ", ["Test Project", "Test Workspace"])
+  UI.select("Select your project: ", ["Test Project", "Test Workspace"])
 end
