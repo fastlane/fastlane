@@ -192,12 +192,13 @@ module Spaceship
         # @param devices (Array) (optional): An array of Device objects that should be used in this profile.
         #  It is recommend to not pass devices as spaceship will automatically add all devices for AdHoc
         #  and Development profiles and add none for AppStore and Enterprise Profiles
+        # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [])
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
-          app = Spaceship::App.find(bundle_id)
+          app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
           # Fill in sensible default values
@@ -214,7 +215,11 @@ module Spaceship
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
-              devices = Spaceship::Device.all_for_profile_type(self.type)
+              if mac
+                devices = Spaceship::Device.all_macs
+              else
+                devices = Spaceship::Device.all_for_profile_type(self.type)
+              end
             end
           end
 
@@ -223,7 +228,8 @@ module Spaceship
                                                 self.type,
                                                 app.app_id,
                                                 certificate_parameter,
-                                                devices.map(&:id))
+                                                devices.map(&:id),
+                                                mac: mac)
           end
 
           self.new(profile)
@@ -232,8 +238,8 @@ module Spaceship
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all
-          profiles = client.provisioning_profiles.map do |profile|
+        def all(mac: false)
+          profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
           end
 
@@ -252,8 +258,8 @@ module Spaceship
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id(bundle_id)
-          all.find_all do |profile|
+        def find_by_bundle_id(bundle_id, mac: false)
+          all(mac: mac).find_all do |profile|
             profile.app.bundle_id == bundle_id
           end
         end
@@ -295,12 +301,12 @@ module Spaceship
       # @example
       #  File.write("path.mobileprovision", profile.download)
       def download
-        client.download_provisioning_profile(self.id)
+        client.download_provisioning_profile(self.id, mac: mac?)
       end
 
       # Delete the provisioning profile
       def delete!
-        client.delete_provisioning_profile!(self.id)
+        client.delete_provisioning_profile!(self.id, mac: mac?)
       end
 
       # Repair an existing provisioning profile
@@ -318,12 +324,20 @@ module Spaceship
       #  the repair method will generate a profile with a new ID
       def update!
         unless certificate_valid?
-          if self.kind_of? Development
-            self.certificates = [Spaceship::Certificate::Development.all.first]
-          elsif self.kind_of? InHouse
-            self.certificates = [Spaceship::Certificate::InHouse.all.first]
+          if mac?
+            if self.kind_of? Development
+              self.certificates = [Spaceship::Certificate::MacDevelopment.all.first]
+            else
+              self.certificates = [Spaceship::Certificate::MacAppDistribution.all.first]
+            end
           else
-            self.certificates = [Spaceship::Certificate::Production.all.first]
+            if self.kind_of? Development
+              self.certificates = [Spaceship::Certificate::Development.all.first]
+            elsif self.kind_of? InHouse
+              self.certificates = [Spaceship::Certificate::InHouse.all.first]
+            else
+              self.certificates = [Spaceship::Certificate::Production.all.first]
+            end
           end
         end
 
@@ -334,12 +348,13 @@ module Spaceship
             distribution_method,
             app.app_id,
             certificates.map(&:id),
-            devices.map(&:id)
+            devices.map(&:id),
+            mac: mac?
           )
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
-        profile = Spaceship::ProvisioningProfile.all.find do |p|
+        profile = Spaceship::ProvisioningProfile.all(mac: mac?).find do |p|
           p.name == self.name # we can use the name as it's valid
         end
 
@@ -351,7 +366,7 @@ module Spaceship
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
-          if Spaceship::Certificate.all.collect(&:id).include?(c.id)
+          if Spaceship::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
             return true
           end
         end
@@ -366,6 +381,11 @@ module Spaceship
       # @return (Bool) Is this profile managed by Xcode?
       def managed_by_xcode?
         managing_app == 'Xcode'
+      end
+
+      # @return (Bool) Is this a Mac provisioning profile?
+      def mac?
+        platform == 'mac'
       end
     end
   end

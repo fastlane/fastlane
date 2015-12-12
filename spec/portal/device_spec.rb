@@ -83,7 +83,7 @@ describe Spaceship::Device do
 
   describe "#create" do
     it "should create and return a new device" do
-      expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b").and_return({})
+      expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", mac: false).and_return({})
       device = Spaceship::Device.create!(name: "Demo Device", udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
     end
 
@@ -106,7 +106,7 @@ describe Spaceship::Device do
     end
 
     it "doesn't raise an exception if the device name is already registererd" do
-      expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c").and_return({})
+      expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", mac: false).and_return({})
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
     end
   end
