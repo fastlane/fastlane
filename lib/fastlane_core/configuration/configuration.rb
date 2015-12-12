@@ -82,7 +82,9 @@ module FastlaneCore
         next unless item.verify_block && item.default_value
 
         begin
-          item.verify_block.call(item.default_value)
+          unless @values[item.key] # this is important to not verify if there already is a value there
+            item.verify_block.call(item.default_value)
+          end
         rescue => ex
           Helper.log.fatal ex
           raise "Invalid default value for #{item.key}, doesn't match verify_block".red

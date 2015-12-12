@@ -109,7 +109,7 @@ module FastlaneCore
     end
 
     def user_error!(error_message)
-      error_message = "[!] #{error_message}".red
+      error_message = "\n[!] #{error_message}".red
       if $verbose
         # On verbose we want to see the full stack trace
         raise error_message
