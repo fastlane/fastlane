@@ -27,7 +27,7 @@ task :messages do
   UI.important "Make sure to use Windows"
   UI.header "Inputs: "
 
-  pw = UI.password("Your password please: ")
+  UI.password("Your password please: ")
   name = UI.input("What's your name? ")
   if UI.confirm("Are you '#{name}'?")
     UI.success "Oh yeah"
