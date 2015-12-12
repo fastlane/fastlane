@@ -27,7 +27,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns value from config.xml of your cordova project as native Ruby data structures"
+        "Returns value from config.xml of your cordova project"
       end
 
       def self.details
