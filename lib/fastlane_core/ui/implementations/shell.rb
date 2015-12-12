@@ -71,20 +71,33 @@ module FastlaneCore
     # @!group Errors: Inputs
     #####################################################
 
+    def interactive?
+      interactive = true
+      interactive = false if $stdout.isatty == false
+      interactive = false if Helper.ci?
+      return interactive
+    end
+
     def input(message)
+      verify_interactive!(message)
       ask(message)
     end
 
     def confirm(message)
+      verify_interactive!(message)
       agree("#{message} (y/n)", true)
     end
 
     def select(message, options)
+      verify_interactive!(message)
+
       important(message)
       choose(*(options))
     end
 
     def password(message)
+      verify_interactive!(message)
+
       ask(message.yellow) { |q| q.echo = "*" }
     end
 
@@ -116,6 +129,14 @@ module FastlaneCore
       else
         abort(error_message)
       end
+    end
+
+    private
+
+    def verify_interactive!(message)
+      return if interactive?
+      important(message)
+      crash!("Could not retrieve response as fastlane runs in non-interactive mode")
     end
   end
 end

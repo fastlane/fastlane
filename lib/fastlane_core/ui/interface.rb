@@ -73,6 +73,11 @@ module FastlaneCore
     # @!group Errors: Inputs
     #####################################################
 
+    # Is is possible to ask the user questions?
+    def interactive?(_message)
+      not_implemented(__method__)
+    end
+
     # get a standard text input (single line)
     def input(_message)
       not_implemented(__method__)

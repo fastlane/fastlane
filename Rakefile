@@ -39,3 +39,12 @@ task :messages do
 
   UI.success("Okay #{name}, you selected '#{project}'")
 end
+
+# How does a crash look like on a CI server when a value is missing?
+task :ci do
+  require 'fastlane_core'
+  UI = FastlaneCore::UI
+
+  ENV["TRAVIS"] = "1"
+  project = UI.select("Select your project: ", ["Test Project", "Test Workspace"])
+end
