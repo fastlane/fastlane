@@ -29,7 +29,6 @@ describe Match do
           and_return(nil)
 
         result = Match::GitHelper.clone(git_url)
-        expect(result).to match(%r{\/var\/folders.*})
         expect(File.directory?(result)).to eq(true)
       end
     end
