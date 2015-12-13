@@ -75,5 +75,3 @@ Set the `FASTLANE_DISABLE_COLORS` environment variable to disable ANSI colors (e
 ```
 export FASTLANE_DISABLE_COLORS=1
 ```
-
-This environment variable is not yet supported for all tools, and will be rolled out over the next few weeks.
