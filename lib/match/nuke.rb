@@ -117,14 +117,22 @@ module Match
       UI.header "Deleting #{self.profiles.count} provisioning profiles..." unless self.profiles.count == 0
       self.profiles.each do |profile|
         UI.message "Deleting profile '#{profile.name}' (#{profile.id})..."
-        profile.delete!
+        begin
+          profile.delete!
+        rescue => ex
+          UI.message(ex.to_s)
+        end
         UI.success "Successfully deleted profile"
       end
 
       UI.header "Revoking #{self.certs.count} certificates..." unless self.certs.count == 0
       self.certs.each do |cert|
         UI.message "Revoking certificate '#{cert.name}' (#{cert.id})..."
-        cert.revoke!
+        begin
+          cert.revoke!
+        rescue => ex
+          UI.message(ex.to_s)
+        end
         UI.success "Successfully deleted certificate"
       end
 
