@@ -10,7 +10,7 @@ HighLine.track_eof = false
 class MatchApplication
   include Commander::Methods
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength
   def run
     program :version, Match::VERSION
     program :description, Match::DESCRIPTION
@@ -93,7 +93,7 @@ class MatchApplication
 
     run!
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:enable Metrics/MethodLength
 end
 
 begin
