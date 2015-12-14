@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class RubocopAction < Action
       def self.run(params)
-        sh "rubocop"
+        sh "rubocop -D"
       end
 
       #####################################################

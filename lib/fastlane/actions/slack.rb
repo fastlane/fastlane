@@ -25,13 +25,7 @@ module Fastlane
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
-        url = ENV['SLACK_URL']
-        unless url
-          Helper.log.fatal "Please add 'ENV[\"SLACK_URL\"] = \"https://hooks.slack.com/services/...\"' to your Fastfile's `before_all` section.".red
-          raise 'No SLACK_URL given.'.red
-        end
-
-        notifier = Slack::Notifier.new(url)
+        notifier = Slack::Notifier.new(options[:slack_url])
 
         notifier.username = 'fastlane'
         if options[:channel].to_s.length > 0
@@ -156,23 +150,23 @@ module Fastlane
         end
 
         # git_author
-        if Actions.git_author && should_add_payload[:git_author]
+        if Actions.git_author_email && should_add_payload[:git_author]
           if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
               title: 'Git Author',
-              value: Actions.git_author,
+              value: Actions.git_author_email,
               short: true
             }
           end
         end
 
         # last_git_commit
-        if Actions.last_git_commit && should_add_payload[:last_git_commit]
+        if Actions.last_git_commit_message && should_add_payload[:last_git_commit]
           slack_attachment[:fields] << {
             title: 'Git Commit',
-            value: Actions.last_git_commit,
+            value: Actions.last_git_commit_message,
             short: false
           }
         end

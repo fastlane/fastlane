@@ -68,6 +68,16 @@ lane :calculate do |options|
 end
 ```
 
+## Run actions directly
+
+If you just want to try an action without adding them to your `Fastfile` yet, you can use
+
+```sh
+fastlane run notification message:"My Text" title:"The Title"
+```
+
+To get the avaiable options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
+
 ## Shell values
 You can get value from shell commands:
 ```ruby

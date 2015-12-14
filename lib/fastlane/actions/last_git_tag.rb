@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class LastGitTagAction < Action
       def self.run(params)
-        sh "git describe --tags --abbrev=0"
+        Actions.last_git_tag_name
       end
 
       #####################################################

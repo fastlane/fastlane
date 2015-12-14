@@ -105,20 +105,12 @@ verify_xcode
 snapshot
 ```
 
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
+Other options (`snapshot --help`)
 
 ```ruby
 snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+  skip_open_summary: true,
+  clean: true
 )
 ```
 
@@ -417,6 +409,16 @@ splunkmint(
 ```
 
 If you use `gym` the `dsym` parameter is optional.
+
+### recreate_schemes
+
+Recreate shared Xcode project schemes if the `Shared` checkbox was not enabled.
+
+```ruby
+recreate_schemes(
+  project: './path/to/MyApp.xcodeproj'
+)
+```
 
 ## Testing
 
@@ -764,6 +766,27 @@ appetize(
 )
 ```
 
+### [appaloosa](https://www.appaloosa-store.com)
+​
+Upload your ipa or apk to your private store on Appaloosa.
+​
+Add the `appaloosa` action after the `ipa` step or use it with your existing `apk`.
+​
+You can add some options:
+```ruby
+appaloosa(
+  binary: '/path/to/binary.ipa', # path tor your IPA or APK
+  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered 
+  api_token: 'your_api_key', # only if already registered
+  group_ids: '112, 232, 387', # User group_ids visibility, if it's not specified we 'll publish the app for all users in your store'
+  # screenshots: after snapshot step:
+  locale: 'en-US', # When multiple values are specified in the Snapfile, we default to 'en-US'.
+  device: 'iPhone6', # By default, the screenshots from the last device will be used.
+  # or you can specify your own screenshots folder :
+  screenshots: '/path/to_your/screenshots' # path to the screenshots folder of your choice
+  )
+```
+
 ### [Tryouts.io](https://tryouts.io/)
 
 Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
@@ -897,6 +920,17 @@ update_app_identifier(
 
 ## Developer Portal
 
+### [match](https://github.com/fastlane/match)
+
+Check out [codesigning.guide](https://codesigning.guide) for more information about the concept of [match](https://github.com/fastlane/match).
+
+`match` allows you to easily sync your certificates and profiles across your team using git. More information on [GitHub](https://github.com/fastlane/match).
+
+```ruby
+match(type: "appstore", app_identifier: "tools.fastlane.app")
+match(type: "development", readonly: true)
+```
+
 ### [sigh](https://github.com/KrauseFx/sigh)
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
@@ -1009,6 +1043,21 @@ register_devices(
 ```
 
 ## Using git
+
+### changelog_from_git_commits
+This action turns your git commit history into formatted changelog text.
+
+```ruby
+# Collects commits since your last tag and returns a concatenation of their subjects and bodies
+changelog_from_git_commits 
+
+# Advanced options
+changelog_from_git_commits(
+  between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
+  pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+  match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+)
+```
 
 ### ensure_git_branch
 This action will check if your git repo is checked out to a specific branch. You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
@@ -1406,6 +1455,22 @@ ENV['TESTMUNK_EMAIL'] = 'email@email.com'
 testmunk
 ```
 
+### [Podio](http://podio.com)
+Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items). 
+
+```ruby
+ENV["PODIO_ITEM_IDENTIFYING_FIELD"] = "String specifying the field key used for identification of an item"
+
+podio_item(
+  identifying_value: "Your unique value",
+  other_fields: {
+    "field1" => "fieldValue",
+    "field2" => "fieldValue2"
+  }
+)
+```
+To see all environment values, please run ```fastlane action podio_item```.
+
 ## Other
 
 ### update_fastlane
@@ -1434,6 +1499,20 @@ before_all do
   ...
 end
 ```
+
+### sonar
+
+This action will execute `sonar-runner` to run SonarQube analysis on your source code. 
+
+```ruby
+sonar(
+  project_key: "name.gretzki.awesomeApp",
+  project_version: "1.0",
+  project_name: "iOS - AwesomeApp",
+  sources_path: File.expand_path("../AwesomeApp")
+)
+```
+It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
 
 ## Misc
 
@@ -1490,7 +1569,7 @@ version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
 version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
 ```
 
-### get_info_plist
+### get_info_plist_value
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
 
@@ -1499,7 +1578,7 @@ identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier
 puts identifier # => com.krausefx.app
 ```
 
-### set_info_plist
+### set_info_plist_value
 
 Set a value of a plist file. You can use this action to update the bundle identifier of your app
 

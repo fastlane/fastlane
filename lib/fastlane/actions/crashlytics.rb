@@ -7,16 +7,16 @@ module Fastlane
 
         params.values # to validate all inputs before looking for the ipa/apk
 
+        # We need to store notes in a file, because the crashlytics CLI (iOS) says so
         if params[:notes]
-          require 'tempfile'
-          # We need to store it in a file, because the crashlytics CLI (iOS) says so
           Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
 
-          changelog = Tempfile.new('changelog')
-          changelog.write(params[:notes])
-          changelog.close
+          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
+        elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
+          Helper.log.info "Sending FL_CHANGELOG as release notes to Beta by Crashlytics"
 
-          params[:notes_path] = changelog.path # we can only set it *after* writing the file there as it gets validated
+          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
+            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog').path
         end
 
         if params[:ipa_path]
@@ -73,13 +73,13 @@ module Fastlane
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        description: "Crashlytics Beta API Token",
                                        verify_block: proc do |value|
-                                         raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                         raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
                                        verify_block: proc do |value|
-                                         raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value and !value.empty?
+                                         raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
