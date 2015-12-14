@@ -94,6 +94,20 @@ This will do a few things:
 
 The tests are executed using `fastlane` :rocket:
 
+To run only a subset of the tests, you can add the `now: true` keyword to the test
+
+```ruby
+it "raises an exception if it rains", now: true do
+  ...
+end
+```
+
+and then run these tests only using
+
+```ruby
+rspec -t now
+```
+
 # Running the local code
 
 Run your local copy using
