@@ -177,6 +177,12 @@ module Spaceship
 
       params.merge!(ident_params)
 
+      if csrf_tokens.count == 0
+        # If we directly create a new app without querying anything before
+        # we don't have a valid csrf token, that's why we have to do at least one request
+        apps
+      end
+
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
     end
@@ -340,6 +346,12 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
+      if csrf_tokens.count == 0
+        # If we directly create a new profile without querying anything before
+        # we don't have a valid csrf token, that's why we have to do at least one request
+        provisioning_profiles
+      end
+
       r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileName: name,
