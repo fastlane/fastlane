@@ -809,7 +809,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the build number without modifying it
 
 ```ruby
-version = get_build_number(xcodeproj: "Project.xcodeproj")
+build_number = get_build_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
