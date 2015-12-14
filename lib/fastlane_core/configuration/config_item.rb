@@ -47,7 +47,7 @@ module FastlaneCore
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value
-        if data_type == String
+        if string?
           raise "'#{self.key}' value must be a String! Found #{value.class} instead.".red unless value.kind_of? String
         end
 
