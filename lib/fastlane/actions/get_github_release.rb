@@ -46,7 +46,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This will verify if a given release version is avialable on GitHub"
+        "This will verify if a given release version is available on GitHub"
       end
 
       def self.details
