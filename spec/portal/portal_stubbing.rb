@@ -57,18 +57,18 @@ def adp_stub_provisioning
 
   # Name is free
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-    with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => ["C8DL7464RQ"], "deviceIds" => ["C8DLAAAARQ"], "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX" }).
+    with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX" }).
     to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
 
   # Name already taken
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-    with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => ["C8DL7464RQ"], "deviceIds" => ["C8DLAAAARQ"], "distributionType" => "limited", "provisioningProfileName" => "taken", "teamId" => "XXXXXXXXXX" }).
-    to_return(status: 200, body: adp_read_fixture_file("create_profile_name_taken.txt"), headers: {})
+    with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "taken", "teamId" => "XXXXXXXXXX" }).
+    to_return(status: 200, body: adp_read_fixture_file("create_profile_name_taken.txt"))
 
   # Repair Profiles
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
-    with(body: { "appIdId" => "572XTN75U2", "certificateIds" => ["XC5PH8D47H"], "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX" }).
-    to_return(status: 200, body: adp_read_fixture_file('repair_profile_success.json'), headers: {})
+    with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX" }).
+    to_return(status: 200, body: adp_read_fixture_file('repair_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
 
   # Delete Profiles
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").

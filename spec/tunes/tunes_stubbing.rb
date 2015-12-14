@@ -11,7 +11,7 @@ def itc_stub_login
     to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa").
     to_return(status: 200, body: "")
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext").
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext=true").
     to_return(status: 200, body: "")
 
   # Actual login

@@ -41,7 +41,7 @@ describe Spaceship::Tunes::Build do
       expect(build.crash_count).to eq(0)
     end
 
-    describe "#testing_status", now: true do
+    describe "#testing_status" do
       before do
         now = Time.at(1_444_440_842)
         allow(Time).to receive(:now) { now }
