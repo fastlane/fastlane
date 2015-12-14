@@ -1747,5 +1747,5 @@ puts identifier # => tools.fastlane.cordova
 
 # path defaults to ./config.xml
 name = cordova_get_config_value(path: 'cordova/config.xml', key: 'name').first
-puts name.first # => Cordova App
+puts name # => Cordova App
 ```
