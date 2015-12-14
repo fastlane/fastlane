@@ -67,3 +67,11 @@ end
 ```
 
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
+
+### Disable colored output
+
+Set the `FASTLANE_DISABLE_COLORS` environment variable to disable ANSI colors (e.g. for CI machines)
+
+```
+export FASTLANE_DISABLE_COLORS=1
+```

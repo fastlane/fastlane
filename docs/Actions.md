@@ -105,20 +105,12 @@ verify_xcode
 snapshot
 ```
 
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
+Other options (`snapshot --help`)
 
 ```ruby
 snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+  skip_open_summary: true,
+  clean: true
 )
 ```
 
@@ -795,6 +787,20 @@ appaloosa(
   )
 ```
 
+### [Tryouts.io](https://tryouts.io/)
+
+Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
+
+```ruby
+tryouts(
+  api_token: "...",
+  app_id: "application-id",
+  build_file: "test.ipa",
+)
+```
+
+For more information about the available options, run `fastlane action tryouts` or check out the [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release).
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -817,7 +823,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the build number without modifying it
 
 ```ruby
-version = get_build_number(xcodeproj: "Project.xcodeproj")
+build_number = get_build_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -1492,6 +1498,20 @@ before_all do
 end
 ```
 
+### sonar
+
+This action will execute `sonar-runner` to run SonarQube analysis on your source code. 
+
+```ruby
+sonar(
+  project_key: "name.gretzki.awesomeApp",
+  project_version: "1.0",
+  project_name: "iOS - AwesomeApp",
+  sources_path: File.expand_path("../AwesomeApp")
+)
+```
+It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
+
 ## Misc
 
 ### appledoc
@@ -1547,7 +1567,7 @@ version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
 version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
 ```
 
-### get_info_plist
+### get_info_plist_value
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
 
@@ -1556,7 +1576,7 @@ identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier
 puts identifier # => com.krausefx.app
 ```
 
-### set_info_plist
+### set_info_plist_value
 
 Set a value of a plist file. You can use this action to update the bundle identifier of your app
 
