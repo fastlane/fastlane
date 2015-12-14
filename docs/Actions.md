@@ -794,7 +794,7 @@ Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
 ```ruby
 tryouts(
   api_token: "...",
-  app_identifier: "application-hash",
+  app_id: "application-id",
   build_file: "test.ipa",
 )
 ```
