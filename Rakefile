@@ -165,6 +165,15 @@ task :autopush do
   end
 end
 
+task :rubygems_admins do
+  names = ["KrauseFx", "ohayon", "samrobbins", "hemal", "asfalcone", "mpirri", "mfurtak"]
+  GEMS.each do |gem_name|
+    names.each do |name|
+      puts `gem owner #{gem_name} -a #{name}`
+    end
+  end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
