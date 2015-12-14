@@ -12,12 +12,7 @@ module Match
                                      env_name: "MATCH_GIT_URL",
                                      description: "URL to the git repo containing all the certificates",
                                      optional: false,
-                                     short_option: "-r",
-                                     verify_block: proc do |value|
-                                       unless value.match("^(https|ssh)://") || value.start_with?("git")
-                                         raise "git_url must start with https://, ssh:// or git".red
-                                       end
-                                     end),
+                                     short_option: "-r"),
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
                                      description: "Create a development certificate instead of a distribution one",
