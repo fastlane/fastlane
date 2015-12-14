@@ -66,8 +66,10 @@ module FastlaneCore
 
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
-      case data_type
-      when Array
+      # We must cast the type to String before comparing because of the way that Ruby
+      # handles class comparisons
+      case data_type.to_s
+      when 'Array'
         value = value.split(',')
       else
         # Special treatment if the user specififed true, false or YES, NO

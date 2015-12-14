@@ -87,6 +87,17 @@ describe FastlaneCore do
         expect(config_item.data_type).to eq(String)
       end
 
+      it "auto converts value to Array" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   type: Array)
+
+        value = config_item.auto_convert_value('5,4,3,2,1')
+
+        expect(value).to eq(['5', '4', '3', '2', '1'])
+      end
+
       it "verifies the default value as well" do
         c = FastlaneCore::ConfigItem.new(key: :output,
                                   env_name: "SIGH_OUTPUT_PATH",
