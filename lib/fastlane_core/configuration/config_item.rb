@@ -85,7 +85,11 @@ module FastlaneCore
 
     # Determines the defined data type of this ConfigItem
     def data_type
-      @data_type ? @data_type : (@is_string ? String : nil)
+      if @data_type
+        @data_type
+      else
+        (@is_string ? String : nil)
+      end
     end
 
     # Replaces the attr_accessor, but maintains the same interface
