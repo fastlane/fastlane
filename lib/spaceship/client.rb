@@ -247,12 +247,10 @@ module Spaceship
     end
 
     def parse_response(response, expected_key = nil)
-      content = if response.body
+      if response.body
         # If we have an `expected_key`, select that from response.body Hash
         # Else, don't.
-        expected_key ? response.body[expected_key] : response.body
-      else
-        nil
+        content = expected_key ? response.body[expected_key] : response.body
       end
 
       if content.nil?
