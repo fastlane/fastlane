@@ -3,6 +3,10 @@ require 'open3'
 module FastlaneCore
   class Simulator
     class << self
+      def requested_os_type
+        'iOS'
+      end
+
       def all
         Helper.log.info "Fetching available devices" if $verbose
 
@@ -27,7 +31,7 @@ module FastlaneCore
             # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)
             # iPad Air 2 (4F3B8059-03FD-4D72-99C0-6E9BBEE2A9CE) (Shutdown) (unavailable, device type profile not found)
             match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \((?:[^\(]+)\)(.*unavailable.*)?/)
-            if match && !match[3] && os_type == 'iOS'
+            if match && !match[3] && os_type == requested_os_type
               @devices << Device.new(name: match[1], ios_version: os_version, udid: match[2])
             end
           end
@@ -58,12 +62,12 @@ module FastlaneCore
       #     raise "xcrun simctl not working.".red
       #   end
 
-      #   data["devices"].each do |ios_version, l|
+      #   data["devices"].each do |os_version, l|
       #     l.each do |device|
       #       next if device['availability'].include?("unavailable")
-      #       next unless ios_version.include?("iOS")
+      #       next unless os_version.include?(requested_os_type)
 
-      #       os = ios_version.gsub("iOS ", "").strip
+      #       os = os_version.gsub(requested_os_type + " ", "").strip
       #       @devices << Device.new(name: device['name'], ios_version: os, udid: device['udid'])
       #     end
       #   end
@@ -97,6 +101,14 @@ module FastlaneCore
 
       def to_s
         self.name
+      end
+    end
+  end
+
+  class SimulatorTV < Simulator
+    class << self
+      def requested_os_type
+        'tvOS'
       end
     end
   end

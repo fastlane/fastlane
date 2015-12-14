@@ -33,7 +33,7 @@ describe FastlaneCore do
       end.to raise_error("xcrun simctl not working.".red)
     end
 
-    it "properly parses the simctl output and generates Device objects" do
+    it "properly parses the simctl output and generates Device objects for iOS" do
       response = "response"
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -56,6 +56,20 @@ describe FastlaneCore do
       expect(devices[3]).to have_attributes(
         name: "iPad Air 2", ios_version: "9.1",
         udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA"
+      )
+    end
+
+    it "properly parses the simctl output and generates Device objects for tvOS" do
+      response = "response"
+      expect(response).to receive(:read).and_return(@valid_simulators)
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+
+      devices = FastlaneCore::SimulatorTV.all
+      expect(devices.count).to eq(1)
+
+      expect(devices[0]).to have_attributes(
+        name: "Apple TV 1080p", ios_version: "9.0",
+        udid: "D239A51B-A61C-4B60-B4D6-B7EC16595128"
       )
     end
   end
