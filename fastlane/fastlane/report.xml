@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="fastlane">
+  <testsuite name="run">
+    
+      
+      <testcase name="0: update_fastlane" time="0.000302">
+        
+      </testcase>
+    
+      
+      <testcase name="1: Switch to detect_tool lane" time="0.000421">
+        
+      </testcase>
+    
+      
+      <testcase name="2: Switch to validate_repo lane" time="0.000481">
+        
+      </testcase>
+    
+      
+      <testcase name="3: ensure_no_debug_code" time="0.019677">
+        
+      </testcase>
+    
+      
+      <testcase name="4: ensure_no_debug_code" time="0.013017">
+        
+      </testcase>
+    
+      
+      <testcase name="5: ensure_no_debug_code" time="0.018887">
+        
+      </testcase>
+    
+      
+      <testcase name="6: ensure_no_debug_code" time="0.013476">
+        
+      </testcase>
+    
+      
+      <testcase name="7: Switch to no_binary lane" time="0.000648">
+        
+      </testcase>
+    
+      
+      <testcase name="8: ../bin/fastlane --help" time="1.36176">
+        
+      </testcase>
+    
+      
+      <testcase name="9: cd .. &amp;&amp; bundle install" time="1.12028">
+        
+      </testcase>
+    
+      
+      <testcase name="10: cd .. &amp;&amp; rake install" time="5.382695">
+        
+      </testcase>
+    
+      
+      <testcase name="11: cd .. &amp;&amp; bundle exec rspec" time="8.365733">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>
