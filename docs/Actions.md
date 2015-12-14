@@ -778,7 +778,7 @@ appetize(
 ​
 Upload your ipa or apk to your private store on Appaloosa.
 ​
-Add the `appaloosa` action after the `ipa` step or use it with your existing `apk`.
+Add the `appaloosa` action after the `gym` step or use it with your existing `apk`.
 ​
 You can add some options:
 ```ruby
