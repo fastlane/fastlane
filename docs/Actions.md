@@ -23,6 +23,7 @@ import './path/to/other/Fastfile'
 - [Using git](#using-git)
 - [Using mercurial](#using-mercurial)
 - [Notifications](#notifications)
+- [Other](#other)
 - [Misc](#misc)
 
 ## Building
@@ -1483,6 +1484,20 @@ before_all do
   ...
 end
 ```
+
+### sonar
+
+This action will execute `sonar-runner` to run SonarQube analysis on your source code. 
+
+```ruby
+sonar(
+  project_key: "name.gretzki.awesomeApp",
+  project_version: "1.0",
+  project_name: "iOS - AwesomeApp",
+  sources_path: File.expand_path("../AwesomeApp")
+)
+```
+It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
 
 ## Misc
 
