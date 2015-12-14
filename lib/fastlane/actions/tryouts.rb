@@ -27,7 +27,7 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_identifier]
+        url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_id]
         connection = Faraday.new(url) do |builder|
           builder.request :multipart
           builder.request :url_encoded
@@ -45,8 +45,8 @@ module Fastlane
           options[:notes] = params[:notes] if params[:notes]
         end
 
-        options[:notify] = params[:notify]
-        options[:status] = params[:status]
+        options[:notify] = params[:notify].to_s
+        options[:status] = params[:status].to_s
 
         post_request = connection.post do |req|
           req.headers['Authorization'] = params[:api_token]
@@ -64,11 +64,11 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :app_identifier,
+          FastlaneCore::ConfigItem.new(key: :app_id,
                                      env_name: "TRYOUTS_APP_ID",
                                      description: "Tryouts application hash",
                                      verify_block: proc do |value|
-                                       raise "No application identifier for Tryouts given, pass using `app_identifier: 'application hash'`".red unless value and !value.empty?
+                                       raise "No application identifier for Tryouts given, pass using `app_id: 'application id'`".red unless value and !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                      env_name: "TRYOUTS_API_TOKEN",
@@ -97,12 +97,18 @@ module Fastlane
                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :notify,
                                      env_name: "TRYOUTS_NOTIFY",
-                                     description: "Notify testers? 1 for yes",
-                                     default_value: "1"),
+                                     description: "Notify testers? 0 for no",
+                                     is_string: false,
+                                     default_value: 1),
           FastlaneCore::ConfigItem.new(key: :status,
                                      env_name: "TRYOUTS_STATUS",
                                      description: "2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update",
-                                     default_value: "2")
+                                     verify_block: proc do |value|
+                                       available_options = ["1", "2"]
+                                       raise "'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}".red unless available_options.include?(value.to_s)
+                                     end,
+                                     is_string: false,
+                                     default_value: 2)
         ]
       end
 
