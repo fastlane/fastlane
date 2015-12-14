@@ -36,6 +36,7 @@ module Snapshot
               results[device][language] = true
             rescue => ex
               Helper.log.error ex # we should to show right here as well
+              Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}"
               errors << ex
               results[device][language] = false
               raise ex if Snapshot.config[:stop_after_first_error]
