@@ -181,7 +181,7 @@ If you generated your `ipa` file but want to apply a different code signing onto
 
 You can pass more information using the command line:
 
-    sigh resign ./path/app.ipa -i "iPhone Distribution: Felix Krause" -n "my.mobileprovision"
+    sigh resign ./path/app.ipa --signing_identity "iPhone Distribution: Felix Krause" -n "my.mobileprovision"
 
 # Manage
 
