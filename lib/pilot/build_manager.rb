@@ -106,7 +106,8 @@ module Pilot
       uploaded_build.update_build_information!(whats_new: options[:changelog])
 
       # Submit for internal beta testing
-      uploaded_build.build_train.update_testing_status!(true, 'external')
+      type = options[:distribute_external] ? 'external' : 'internal'
+      uploaded_build.build_train.update_testing_status!(true, type)
       return true
     end
   end
