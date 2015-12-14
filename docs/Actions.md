@@ -787,6 +787,20 @@ appaloosa(
   )
 ```
 
+### [Tryouts.io](https://tryouts.io/)
+
+Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
+
+```ruby
+tryouts(
+  api_token: "...",
+  app_id: "application-id",
+  build_file: "test.ipa",
+)
+```
+
+For more information about the available options, run `fastlane action tryouts` or check out the [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release).
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
