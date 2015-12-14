@@ -1,8 +1,6 @@
-gems = %w(fastlane)
+gem = ENV['GEM']
 
-gems.each do |gem|
-  Dir.chdir(gem) do
-    system('bundle install')
-    system('bundle exec fastlane test')
-  end
+Dir.chdir(gem) do
+  system('bundle install')
+  system('bundle exec fastlane test')
 end
