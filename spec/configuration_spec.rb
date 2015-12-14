@@ -59,21 +59,32 @@ describe FastlaneCore do
         end.to raise_error "Multiple entries for short_option '-f' found!".red
       end
 
-      it "parses if an array if the option is specified" do
-        verify_block = proc do |value|
-          raise 'Fail the test!' unless value.kind_of? Array
-        end
-
+      it "sets the data type correctly if `is_string` is not set but type is specified" do
         config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                    short_option: '-f',
                                                    description: 'foo',
-                                                   is_array: true,
-                                                   is_string: false,
-                                                   verify_block: verify_block)
+                                                   type: Array)
 
-        expect do
-          FastlaneCore::Configuration.create([config_item], { foo: 'abc,123,xyz,456' })
-        end.to_not raise_error
+        expect(config_item.data_type).to eq(Array)
+      end
+
+      it "sets the data type correctly if `is_string` is set but the type is specified" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   is_string: true,
+                                                   type: Array)
+
+        expect(config_item.data_type).to eq(Array)
+      end
+
+      it "sets the data type correctly if `is_string` is set but the type is not specified" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   is_string: true)
+
+        expect(config_item.data_type).to eq(String)
       end
 
       it "verifies the default value as well" do
