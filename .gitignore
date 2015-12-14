@@ -26,7 +26,7 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
-Gemfile.lock
+/fastlane/Gemfile.lock
 .ruby-version
 .ruby-gemset
 
@@ -38,7 +38,7 @@ assets/fastlane_ultra_large.png
 # Added by Felix
 /*.itmsp
 .idea
-spec/fixtures/*.itmsp/*.png
-/integration
-spec/fixtures/fastfiles/report.xml
-fastlane/report.xml
+/fastlane/fastlane/spec/fixtures/*.itmsp/*.png
+/fastlane/fastlane/integration
+/fastlane/fastlane/spec/fixtures/fastfiles/report.xml
+/fastlane/fastlane/report.xml
