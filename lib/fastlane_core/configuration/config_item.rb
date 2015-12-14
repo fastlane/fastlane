@@ -89,7 +89,7 @@ module FastlaneCore
     end
 
     # Replaces the attr_accessor, but maintains the same interface
-    def is_string
+    def string?
       data_type == String
     end
 

@@ -13,8 +13,8 @@ module FastlaneCore
       options.each do |option|
         next if option.description.to_s.length == 0 # "private" options
 
-        appendix = (option.is_string ? "STRING" : "")
-        type = (option.is_string ? String : nil)
+        appendix = (option.string? ? "STRING" : "")
+        type = (option.string? ? String : nil)
         short_option = option.short_option
 
         raise "Short option #{short_option} already taken for key #{option.key}".red if short_codes.include? short_option
