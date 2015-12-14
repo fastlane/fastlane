@@ -799,9 +799,7 @@ tryouts(
 )
 ```
 
-Additionally you can specify `status`, `notify` and `notes_path` or `notes`.
-
-For more information about the available options, check out `fastlane action tryouts` or head over to [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release) for our complete API docs.
+For more information about the available options, run `fastlane action tryouts` or check out the [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release).
 
 ## Modifying Project
 
