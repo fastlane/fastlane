@@ -23,7 +23,6 @@ import './path/to/other/Fastfile'
 - [Using git](#using-git)
 - [Using mercurial](#using-mercurial)
 - [Notifications](#notifications)
-- [Other](#other)
 - [Misc](#misc)
 
 ## Building
