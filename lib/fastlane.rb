@@ -19,6 +19,7 @@ require 'fastlane_core'
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+  UI = FastlaneCore::UI
 
   Fastlane::Actions.load_default_actions
   Fastlane::Actions.load_helpers
