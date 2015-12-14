@@ -52,7 +52,9 @@ module Match
     end
 
     def self.clear_changes
-      FileUtils.rm_rf(@dir) if @dir # @dir might be nil in tests
+      return unless @dir
+
+      FileUtils.rm_rf(@dir)
       UI.success "🔒  Successfully encrypted certificates repo" # so the user is happy
       @dir = nil
     end

@@ -26,13 +26,13 @@ module Match
       if self.changes_to_commit
         message = GitHelper.generate_commit_message(params)
         GitHelper.commit_changes(params[:workspace], message, params[:git_url])
-      else
-        GitHelper.clear_changes
       end
 
       TablePrinter.print_summary(params, uuid)
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
+    ensure
+      GitHelper.clear_changes
     end
 
     def certificate(params: nil)
