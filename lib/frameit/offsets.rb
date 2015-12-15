@@ -15,8 +15,8 @@ module Frameit
           }
         when size::IOS_47
           return {
-            'offset' => '+40+153',
-            'width' => 532
+            'offset' => "+43+154",
+            'width' => 530
           }
         when size::IOS_40
           return {
