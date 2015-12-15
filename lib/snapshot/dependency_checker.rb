@@ -19,7 +19,7 @@ module Snapshot
 
       if Snapshot::LatestIosVersion.version.to_f < 9 # to_f is bad, but should be good enough
         Helper.log.fatal '#############################################################'
-        Helper.log.fatal "# Your xcode-select Xcode version is below 9.0"
+        Helper.log.fatal "# Your xcode-select Xcode version is below 7.0"
         Helper.log.fatal "# To use snapshot 1.0 and above you need at least iOS 9"
         Helper.log.fatal "# Set the path to the Xcode version that supports UI Tests"
         Helper.log.fatal "# or downgrade to versions older than snapshot 1.0"
