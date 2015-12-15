@@ -57,7 +57,7 @@ module Pilot
 
       if tester
         tester.delete!
-        Helper.log.info "Successully removed tester #{tester.email}".green
+        Helper.log.info "Successfully removed tester #{tester.email}".green
       else
         Helper.log.error "Tester not found: #{config[:email]}".red
       end
