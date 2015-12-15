@@ -21,7 +21,7 @@ module Pilot
           uploaded_build = wait_for_processing_build
           distribute_build(uploaded_build, options)
 
-          Helper.log.info "Successfully distribute build to beta testers 🚀"
+          Helper.log.info "Successfully distributed build to beta testers 🚀"
         end
       else
         raise "Error uploading ipa file, more information see above".red
