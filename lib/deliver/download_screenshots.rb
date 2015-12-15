@@ -20,7 +20,14 @@ module Deliver
 
           Helper.log.info "Downloading existing screenshot '#{file_name}'"
 
-          containing_folder = File.join(folder_path, "screenshots", screenshot.language)
+          # If the screen shot is for an appleTV we need to store it in a way that we'll know it's an appleTV
+          # screen shot later as the screen size is the same as an iPhone 6 Plus in landscape.
+          if screenshot.device_type == "appleTV"
+            containing_folder = File.join(folder_path, "screenshots", "appleTV", screenshot.language)
+          else
+            containing_folder = File.join(folder_path, "screenshots", screenshot.language)
+          end
+
           begin
             FileUtils.mkdir_p(containing_folder)
           rescue
