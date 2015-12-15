@@ -84,6 +84,16 @@ You can get value from shell commands:
 output = sh("pod update")
 ```
 
+## Priorities of parameters and options
+
+The order in which `fastlane` tools take their values from
+
+1. CLI parameter (e.g. `gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
+1. Environment variable (e.g. `GYM_SCHEME`)
+1. Tool specific config file (e.g. `Gymfile` containing `scheme 'Example'`)
+1. Default value (which might be taken from the `Appfile`, e.g. `app_identifier` from the `Appfile`)
+1. If this value is required, you'll be asked for it (e.g. you have multiple schemes, you'll be asked for it)
+
 ## Importing another Fastfile
 
 Within your `Fastfile` you can import another `Fastfile` using 2 methods:
