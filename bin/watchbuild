@@ -4,7 +4,6 @@ $:.push File.expand_path("../../lib", __FILE__)
 
 require 'watchbuild'
 require 'commander'
-require 'credentials_manager/password_manager'
 require 'credentials_manager/appfile_config'
 require 'watchbuild/options'
 
