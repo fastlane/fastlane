@@ -70,6 +70,37 @@ module FastlaneCore
     end
 
     #####################################################
+    # @!group Errors: Inputs
+    #####################################################
+
+    # Is is possible to ask the user questions?
+    def interactive?(_message)
+      not_implemented(__method__)
+    end
+
+    # get a standard text input (single line)
+    def input(_message)
+      not_implemented(__method__)
+    end
+
+    # A simple yes or no question
+    def confirm(_message)
+      not_implemented(__method__)
+    end
+
+    # Let the user select one out of x items
+    # return value is the value of the option the user chose
+    def select(_message, _options)
+      not_implemented(__method__)
+    end
+
+    # Password input for the user, text field shouldn't show
+    # plain text
+    def password(_message)
+      not_implemented(__method__)
+    end
+
+    #####################################################
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
