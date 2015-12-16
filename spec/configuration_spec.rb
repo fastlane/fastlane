@@ -98,6 +98,28 @@ describe FastlaneCore do
         expect(value).to eq(['5', '4', '3', '2', '1'])
       end
 
+      it "auto converts string values to Integers" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   type: Integer)
+
+        value = config_item.auto_convert_value('987')
+
+        expect(value).to eq(987)
+      end
+
+      it "auto converts string values to Floats" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   type: Float)
+
+        value = config_item.auto_convert_value('9.91')
+
+        expect(value).to eq(9.91)
+      end
+
       it "verifies the default value as well" do
         c = FastlaneCore::ConfigItem.new(key: :output,
                                   env_name: "SIGH_OUTPUT_PATH",

@@ -66,21 +66,25 @@ module FastlaneCore
 
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
-      # We must cast the type to String before comparing because of the way that Ruby
-      # handles class comparisons
-      case data_type.to_s
-      when 'Array'
-        value = value.to_s.split(',')
+      # Weird because of https://stackoverflow.com/questions/9537895/using-a-class-object-in-case-statement
+
+      case
+      when data_type == Array
+        return value.to_s.split(',')
+      when data_type == Integer
+        return value.to_i
+      when data_type == Float
+        return value.to_f
       else
         # Special treatment if the user specififed true, false or YES, NO
         if %w(YES yes true).include?(value)
-          value = true
+          return true
         elsif %w(NO no false).include?(value)
-          value = false
+          return false
         end
       end
 
-      return value
+      return value # fallback to not doing anything
     end
 
     # Determines the defined data type of this ConfigItem
