@@ -17,7 +17,8 @@
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a>
+  <a href="https://github.com/fastlane/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a>
 </p>
 -------
 
@@ -68,17 +69,19 @@ Install the gem
 
     sudo gem install supply
 
-## Setup
+## Setup a Google Developers Service Account
 
 - Open the [Google Play Console](https://play.google.com/apps/publish/)
-- Open _Settings => API-Access_
-- Create a new Service Account - follow the link of the dialog
-- Create new Client ID
-- Select _Service Account_
-- Click _Generate new P12 key_ and store the downloaded file
-- Make a note of the _Email address_ underneath _Service account_ - this is the issuer which you will need later
-- Back on the Google Play developer console, click on _Grant Access_ for the newly added service account
-- Choose _Release Manager_ from the dropdown and confirm
+- Select **Settings** tab, followed by the **API access** tab
+- Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
+- Click **Add credentials** and select **Service account**
+- Select **P12** as the Key type and click **Create**
+- Make a note of the file name of the P12 file downloaded to your computer, and close the dialog
+- Make a note of the **Email address** under **Service accounts** - this is the issuer which you will need later
+- Back on the Google Play developer console, click **Done** to close the dialog
+- Click on **Grant Access** for the newly added service account
+- In the **Invite a New User** dialog, paste the service account email address you noted earlier into the **Email address** field
+- Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
 
 ## Quick Start
 
@@ -148,6 +151,7 @@ Note that these will replace the current images and screenshots on the play stor
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
+- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
