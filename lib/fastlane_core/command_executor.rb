@@ -44,7 +44,11 @@ module FastlaneCore
           output << ex.to_s
           o = output.join("\n")
           puts o
-          error.call(o, nil)
+          if error
+            error.call(o, nil)
+          else
+            raise ex
+          end
         end
 
         # Exit status for build command, should be 0 if build succeeded
@@ -53,7 +57,11 @@ module FastlaneCore
           o = output.join("\n")
           puts o # the user has the right to see the raw output
           UI.error "Exit status: #{status}"
-          error.call(o, status)
+          if error
+            error.call(o, status)
+          else
+            raise "Exit status: #{status}"
+          end
         end
 
         return output.join("\n")
