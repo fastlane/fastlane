@@ -101,7 +101,7 @@ module Fastlane
                                      env_name: "INSTALLR_ADD",
                                      description: "Groups to add (e.g. 'exec,ops')",
                                      is_string: true,
-                                     optional: true),
+                                     optional: true)
         ]
       end
 
