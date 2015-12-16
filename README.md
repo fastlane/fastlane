@@ -131,6 +131,7 @@ And you can supply screenshots by creating directories with the following names,
 - `sevenInchScreenshots/` (7-inch tablets)
 - `tenInchScreenshots/` (10-inch tablets)
 - `tvScreenshots/`
+- `wearScreenshots/`
 
 Note that these will replace the current images and screenshots on the play store listing, not add to them.
 
