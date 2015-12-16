@@ -25,6 +25,10 @@ module FastlaneCore
         raise "Do not let descriptions end with a '.', since it's used for user inputs as well".red if description[-1] == '.'
       end
 
+      if type.to_s.length > 0 and short_option.to_s.length == 0
+        raise "Type '#{type}' for key '#{key}' requires a short option"
+      end
+
       @key = key
       @env_name = env_name
       @description = description
@@ -77,6 +81,7 @@ module FastlaneCore
         return value.to_f
       else
         # Special treatment if the user specififed true, false or YES, NO
+        # There is no boolean typoe, so we just do it here
         if %w(YES yes true).include?(value)
           return true
         elsif %w(NO no false).include?(value)
