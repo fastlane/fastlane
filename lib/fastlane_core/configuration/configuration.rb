@@ -135,7 +135,7 @@ module FastlaneCore
       end
 
       value = option.default_value if value.nil?
-      value = nil if value.nil? and !option.is_string # by default boolean flags are false
+      value = nil if value.nil? and !option.string? # by default boolean flags are false
 
       return value unless value.nil? # we already have a value
       return value if option.optional # as this value is not required, just return what we have
