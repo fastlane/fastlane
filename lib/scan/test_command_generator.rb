@@ -61,7 +61,7 @@ module Scan
         # During building we just show the output in the terminal
         # Check out the ReportCollector class for more xcpretty things
         formatter = []
-        if ENV.key?["TRAVIS"]
+        if ENV.key?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
           Helper.log.info "Automatically switched to Travis formatter".green
         end
