@@ -25,10 +25,14 @@ module WatchBuild
       raise "Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}".red unless app
 
       loop do
-        build = find_build
-        return build if build.processing == false
-
-        Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
+        begin
+          build = find_build
+          return build if build.processing == false
+          Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
+        rescue => ex
+          Helper.log.error ex
+          Helper.log.info "Something failed... trying again to recover"
+        end
         sleep 30
       end
       nil
@@ -44,8 +48,10 @@ module WatchBuild
                             execute: "open '#{url}'")
 
       Helper.log.info "Successfully finished processing the build".green
-      Helper.log.info "You can now tweet: "
-      Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+      if minutes > 0 # it's 0 minutes if there was no new build uploaded
+        Helper.log.info "You can now tweet: "
+        Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+      end
       Helper.log.info url
     end
 
