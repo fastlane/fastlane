@@ -151,20 +151,6 @@ module FastlaneCore
       results
     end
 
-    def default_app_identifier
-      scheme = schemes.first if is_workspace
-      default_build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER", scheme: scheme)
-    end
-
-    def default_app_name
-      if is_workspace
-        scheme = schemes.first
-        return default_build_settings(key: "PRODUCT_NAME", scheme: scheme)
-      else
-        return app_name
-      end
-    end
-
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
@@ -226,11 +212,6 @@ module FastlaneCore
       end
 
       nil
-    end
-
-    def default_build_settings(key: nil, optional: true, silent: false, scheme: nil)
-      options[:scheme] = scheme if scheme
-      build_settings(key: key, optional: optional, silent: silent)
     end
 
     def raw_info(silent: false)
