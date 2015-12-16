@@ -1,5 +1,5 @@
 
-GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild)
+GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match)
 RAILS = %w(boarding refresher enhancer)
 
 #####################################################
@@ -165,11 +165,20 @@ task :autopush do
   end
 end
 
+task :rubygems_admins do
+  names = ["KrauseFx", "ohayon", "samrobbins", "hemal", "asfalcone", "mpirri", "mfurtak"]
+  GEMS.each do |gem_name|
+    names.each do |name|
+      puts `gem owner #{gem_name} -a #{name}`
+    end
+  end
+end
+
 desc 'show repos with checked-out feature-branches'
 task :features do
   (['.'] + GEMS + RAILS).each do |repo|
     branch = `cd #{repo} && git symbolic-ref HEAD 2>/dev/null | awk -F/ {'print $NF'}`
-    puts "#{repo}\n  -> #{branch}" unless branch.include? 'master'
+    puts "#{repo}\n  -> #{branch}" unless branch.include?('master')
   end
 end
 
