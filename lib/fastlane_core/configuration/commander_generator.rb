@@ -14,7 +14,7 @@ module FastlaneCore
         next if option.description.to_s.length == 0 # "private" options
 
         appendix = (option.string? ? "STRING" : "")
-        type = (option.string? ? String : nil)
+        type = option.data_type
         short_option = option.short_option
 
         raise "Short option #{short_option} already taken for key #{option.key}".red if short_codes.include? short_option
