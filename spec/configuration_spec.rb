@@ -87,15 +87,39 @@ describe FastlaneCore do
         expect(config_item.data_type).to eq(String)
       end
 
-      it "auto converts value to Array" do
+      it "returns Array default values correctly" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   type: Array,
+                                                   optional: true,
+                                                   default_value: ['5', '4', '3', '2', '1'])
+        config = FastlaneCore::Configuration.create([config_item], {})
+
+        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+      end
+
+      it "returns Array input values correctly" do
         config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                    short_option: '-f',
                                                    description: 'foo',
                                                    type: Array)
+        config = FastlaneCore::Configuration.create([config_item], { foo: ['5', '4', '3', '2', '1'] })
 
-        value = config_item.auto_convert_value('5,4,3,2,1')
+        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+      end
 
-        expect(value).to eq(['5', '4', '3', '2', '1'])
+      it "returns Array environment variable values correctly" do
+        ENV["FOO"] = '5,4,3,2,1'
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   env_name: 'FOO',
+                                                   type: Array)
+        config = FastlaneCore::Configuration.create([config_item], {})
+
+        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+        ENV.delete("FOO")
       end
 
       it "auto converts string values to Integers" do
