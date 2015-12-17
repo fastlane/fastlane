@@ -1,10 +1,12 @@
 module Match
   class GitHelper
-    def self.clone(git_url)
+    def self.clone(git_url, shallow_clone)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
-      command = "git clone '#{git_url}' '#{@dir}' --depth 1"
+      command = "git clone '#{git_url}' '#{@dir}'"
+      command << " --depth 1" if shallow_clone
+
       UI.message "Cloning remote git repo..."
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: $verbose,
