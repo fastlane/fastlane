@@ -1,4 +1,3 @@
-require 'credentials_manager/password_manager'
 require 'credentials_manager/account_manager'
 require 'credentials_manager/appfile_config'
 
