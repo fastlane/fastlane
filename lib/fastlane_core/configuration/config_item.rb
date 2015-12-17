@@ -74,7 +74,7 @@ module FastlaneCore
 
       case
       when data_type == Array
-        return value.to_s.split(',')
+        return value.split(',') if value.kind_of?(String)
       when data_type == Integer
         return value.to_i
       when data_type == Float
