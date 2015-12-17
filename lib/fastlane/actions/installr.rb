@@ -98,7 +98,7 @@ module Fastlane
 
       def self.output
         [
-          ['INSTALLR_BUILD_INFORMATION', 'Contains release info like :addData. See http://help.installrapp.com/api/']
+          ['INSTALLR_BUILD_INFORMATION', 'Contains release info like :appData. See http://help.installrapp.com/api/']
         ]
       end
 
