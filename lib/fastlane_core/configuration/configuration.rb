@@ -120,7 +120,8 @@ module FastlaneCore
     #####################################################
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
-    def fetch(key)
+    # if 'ask' is true and the value is not present, the user will be prompted to provide a value
+    def fetch(key, ask: true)
       raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?(Symbol)
 
       option = option_for_key(key)
@@ -150,7 +151,7 @@ module FastlaneCore
         raise "No value found for '#{key}'"
       end
 
-      while value.nil?
+      while ask && value.nil?
         Helper.log.info "To not be asked about this value, you can specify it using '#{option.key}'".yellow
         value = ask("#{option.description}: ")
         # Also store this value to use it from now on
