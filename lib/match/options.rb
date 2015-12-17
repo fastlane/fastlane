@@ -79,7 +79,7 @@ module Match
                                      env_name: "MATCH_SHALLOW_CLONE",
                                      description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
                                      is_string: false,
-                                     default_value: false),
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      description: nil,
                                      verify_block: proc do |value|
