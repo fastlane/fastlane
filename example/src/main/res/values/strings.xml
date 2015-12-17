@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Locale Tester</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello">Hello</string>
+</resources>

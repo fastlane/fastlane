@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('chiizu-release.aar'))

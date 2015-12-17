@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'chiizu'
+require 'commander'
+
+HighLine.track_eof = false
+
+class ChiizuApplication
+  include Commander::Methods
+
+  def run
+    program :version, Chiizu::VERSION
+    program :description, 'CLI for \'chiizu\' - Automate taking localized screenshots of your Android app on emulators or real devices'
+    program :help, 'Authors', 'Andrea Falcone <afalcone@twitter.com>, Michael Furtak <mfurtak@twitter.com>'
+    program :help, 'Website', 'https://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/fastlane/chiizu'
+    program :help_formatter, :compact
+
+    global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+
+    always_trace!
+
+    FastlaneCore::CommanderGenerator.new.generate(Chiizu::Options.available_options)
+
+    command :run do |c|
+      c.syntax = 'chiizu'
+      c.description = 'Take new screenshots based on the Chiizufile.'
+
+      c.action do |args, options|
+        o = options.__hash__.dup
+        o.delete(:verbose)
+        Chiizu.config = FastlaneCore::Configuration.create(Chiizu::Options.available_options, o)
+
+        Chiizu::DependencyChecker.check_dependencies
+        Chiizu::Runner.new.work
+      end
+    end
+
+    command :init do |c|
+      c.syntax = 'chiizu init'
+      c.description = "Creates a new Snapfile in the current directory"
+
+      c.action do |args, options|
+        require 'chiizu/setup'
+        path = (Chiizu::Helper.fastlane_enabled? ? './fastlane' : '.')
+        Chiizu::Setup.create(path)
+      end
+    end
+
+    default_command :run
+
+    run!
+  end
+end
+
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('chiizu')
+  ChiizuApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('chiizu', Chiizu::VERSION)
+end

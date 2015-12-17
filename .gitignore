@@ -1,0 +1,12 @@
+build
+
+example/.gradle
+example/build
+example/fastlane/screenshots
+example/*.iml
+
+chiizu-lib/build
+
+.gradle
+
+local.properties
