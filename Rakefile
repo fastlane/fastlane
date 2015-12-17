@@ -90,7 +90,10 @@ end
 task :test_all do
   GEMS.reverse_each do |repo|
     box "Testing #{repo}"
-    sh "cd #{repo} && rspec && rubocop"
+    Dir.chdir(repo) do
+      sh "bundle exec rspec"
+      sh "rubocop"
+    end
   end
 end
 
