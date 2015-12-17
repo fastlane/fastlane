@@ -31,6 +31,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.watch_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb//0x0ss.jpg')
       expect(version.watch_app_icon.original_file_name).to eq('OriginalName.png')
       expect(version.transit_app_file).to eq(nil)
+      expect(version.platform).to eq("ios")
     end
 
     it "parses the localized values correctly" do

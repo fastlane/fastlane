@@ -51,9 +51,30 @@
         "supportedHardware": ["iphone"],
         "issuesCount": 0
       }
+    },{
+      "type": "APP",
+      "platformString": "appletvos",
+      "inFlightVersion": {
+        "type": "APP",
+        "id": "814995239",
+        "version": "1.0",
+        "state": "prepareForUpload",
+        "stateKey": "prepareForUpload",
+        "stateGroup": "preRelease",
+        "largeAppIcon": {
+          "assetToken": null,
+          "sortOrder": null,
+          "url": null,
+          "thumbNailUrl": null,
+          "originalFileName": null
+        },
+        "supportedHardware": ["iphone"],
+        "issuesCount": 0
+      },
+      "deliverableVersion": null
     }],
-    "allowedNewVersionPlatforms": ["appletvos"],
-    "submittablePlatforms": ["ios", "osx"],
+    "allowedNewVersionPlatforms": [],
+    "submittablePlatforms": ["ios", "osx", "appletvos"],
     "appStoreUrl": "https://itunes.apple.com/us/app/why-new-itc-2/id1039164429?ls=1&mt=8",
     "analyticsUrl": null,
     "salesAndTrendsUrl": null,

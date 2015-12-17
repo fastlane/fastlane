@@ -8,6 +8,9 @@ module Spaceship
       #   this version is for
       attr_accessor :application
 
+      # @return (String) The platform value of this version.
+      attr_accessor :platform
+
       # @return (String) The version number of this version
       attr_accessor :version
 
@@ -114,6 +117,7 @@ module Spaceship
 
       attr_mapping({
         'appType' => :app_type,
+        'platform' => :platform,
         'canBetaTest' => :can_beta_test,
         'canPrepareForUpload' => :can_prepare_for_upload,
         'canRejectVersion' => :can_reject_version,
