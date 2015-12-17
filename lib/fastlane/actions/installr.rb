@@ -37,10 +37,8 @@ module Fastlane
         options = {}
         options[:qqfile] = Faraday::UploadIO.new(params[:ipa], 'application/octet-stream')
 
-        if params[:notes_path]
-          options[:releaseNotes] = File.read(params[:notes_path])
-        else
-          options[:releaseNotes] = params[:notes] if params[:notes]
+        if params[:notes]
+          options[:releaseNotes] = params[:notes]
         end
 
         if params[:notify]
@@ -84,13 +82,6 @@ module Fastlane
                                      env_name: "INSTALLR_NOTES",
                                      description: "Release notes",
                                      is_string: true,
-                                     optional: true),
-          FastlaneCore::ConfigItem.new(key: :notes_path,
-                                     env_name: "INSTALLR_NOTES_PATH",
-                                     description: "Release notes text file path. Overrides the :notes paramether",
-                                     verify_block: proc do |value|
-                                       raise "Couldn't find notes file at path '#{value}'".red unless File.exist?(value)
-                                     end,
                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :notify,
                                      env_name: "INSTALLR_NOTIFY",
