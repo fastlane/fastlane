@@ -10,7 +10,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -79,6 +79,48 @@ binding.pry
 ```
 
 You then jump into an interactive debugger that allows you to print out variables, call methods and much more. Continue running the original script using `control` + `d`
+
+# Interacting with the user
+
+You'll see some old code still using `puts` or `Helper.log.info` to print out values. From now, please only use the new `UI` class to interact with the user (both input and output)
+
+```
+UI.message "Neutral message (usually white)"
+UI.success "Succesully finished processing (usually green)"
+UI.error "Wahaha, what's going on here! (usually red)"
+UI.important "Make sure to use Windows (usually yellow)"
+
+UI.header "Inputs" # a big box
+
+name = UI.input("What's your name? ")
+if UI.confirm("Are you '#{name}'?")
+  UI.success "Oh yeah"
+else
+  UI.error "Wups, invalid"
+end
+
+UI.password("Your password please: ") # password inputs are hidden
+
+# A "Dropdown" for the user
+project = UI.select("Select your project: ", ["Test Project", "Test Workspace"])
+
+UI.success("Okay #{name}, you selected '#{project}'")
+
+# To run a command use
+FastlaneCore::CommandExecutor.execute(command: "ls",
+                                    print_all: true,
+                                        error: proc do |error_output|
+                                          # handle error here
+                                        end)
+
+# or if you just want to receive a simple value 
+# use this only if the command doesn't take long
+diff = Helper.backticks("git diff")
+```
+
+The output will look like this
+
+![assets/UI.png](assets/UI.png)
 
 # Running tests
 
