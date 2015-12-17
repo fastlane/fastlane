@@ -16,6 +16,7 @@ describe Match do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/certificates"
+        shallow_clone = true
         command = "git clone '#{git_url}' '#{path}' --depth 1"
         to_params = {
           command: command,
@@ -24,12 +25,37 @@ describe Match do
         }
 
         expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        to receive(:execute).
+        with(to_params).
+        and_return(nil)
 
-        result = Match::GitHelper.clone(git_url)
+        result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
+      end
+
+      it "clones the repo (not shallow)" do
+        path = Dir.mktmpdir # to have access to the actual path
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        git_url = "https://github.com/fastlane/certificates"
+        shallow_clone = false
+        command = "git clone '#{git_url}' '#{path}'"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+        to receive(:execute).
+        with(to_params).
+        and_return(nil)
+
+        result = Match::GitHelper.clone(git_url, shallow_clone)
+        expect(File.directory?(result)).to eq(true)
+      end
+
+      after(:each) do
+        Match::GitHelper.clear_changes
       end
     end
   end
