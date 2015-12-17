@@ -18,7 +18,8 @@
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a>
+  <a href="https://github.com/fastlane/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a> 
 </p>
 -------
 
@@ -84,7 +85,7 @@ You then jump into an interactive debugger that allows you to print out variable
 
 You'll see some old code still using `puts` or `Helper.log.info` to print out values. From now, please only use the new `UI` class to interact with the user (both input and output)
 
-```
+```ruby
 UI.message "Neutral message (usually white)"
 UI.success "Succesully finished processing (usually green)"
 UI.error "Wahaha, what's going on here! (usually red)"
@@ -120,7 +121,7 @@ diff = Helper.backticks("git diff")
 
 The output will look like this
 
-![assets/UI.png](assets/UI.png)
+<img src="assets/UI.png" width="550" />
 
 # Running tests
 
