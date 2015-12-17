@@ -814,6 +814,22 @@ tryouts(
 
 For more information about the available options, run `fastlane action tryouts` or check out the [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release).
 
+### [Installr](https://www.installrapp.com)
+
+Upload your iOS build to [Installr](https://www.installrapp.com)
+
+```ruby
+installr(
+  api_token: "...",
+  ipa: "test.ipa",
+  notes: "The next great version of the app!",
+  notify: "dev,qa"
+  add: "exec,ops"
+)
+```
+
+For more information about the available options, run `fastlane action installr` or check out the [Installr Documentation](http://help.installrapp.com/api/).
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
