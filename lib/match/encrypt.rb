@@ -23,7 +23,7 @@ module Match
         Security::InternetPassword.add(server_name(git_url), "", password)
       end
 
-      return @password
+      return password
     end
 
     # removes the password from the keychain again
@@ -68,6 +68,10 @@ module Match
     end
 
     def crypt(path: nil, password: nil, encrypt: true)
+      if password.to_s.strip.length == 0
+        UI.error "No password supplied"
+        raise "No password supplied"
+      end
       tmpfile = File.join(Dir.mktmpdir, "temporary")
       command = ["openssl aes-256-cbc"]
       command << "-k \"#{password}\""
