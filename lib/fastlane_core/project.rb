@@ -121,6 +121,20 @@ module FastlaneCore
       parsed_info.configurations
     end
 
+    # Returns bundle_id and sets the scheme for xcrun
+    def default_app_identifier
+      default_build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+    end
+
+    # Returns app name and sets the scheme for xcrun
+    def default_app_name
+      if is_workspace
+        return default_build_settings(key: "PRODUCT_NAME")
+      else
+        return app_name
+      end
+    end
+
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
@@ -182,6 +196,12 @@ module FastlaneCore
       end
 
       nil
+    end
+
+    # Returns the build settings and sets the default scheme to the options hash
+    def default_build_settings(key: nil, optional: true, silent: false)
+      options[:scheme] = schemes.first if is_workspace
+      build_settings(key: key, optional: optional, silent: silent)
     end
 
     def raw_info(silent: false)
