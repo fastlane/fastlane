@@ -158,13 +158,13 @@ match --help
 ```
 
 #### Handle multiple targets
+
 If you have several targets with different bundle id's - you have to init provision profile for each other:
 
 ```
 match appstore -a tools.fastlane.app
 match appstore -a tools.fastlane.app.watchkitapp
 ```
-
 
 #### Passphrase
 
