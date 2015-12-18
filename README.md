@@ -130,7 +130,7 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/docs).
 
-There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/162d756dfda7b84e97d4) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
+There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
 ## Available commands
 
