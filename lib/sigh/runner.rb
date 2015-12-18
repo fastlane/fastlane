@@ -34,7 +34,7 @@ module Sigh
           profile = profile.update! # assign it, as it's a new profile
         end
       else
-        Helper.log.info "No existing profiles, creating a new one for you".yellow
+        Helper.log.info "No existing profiles found, that match the certificates you have installed, creating a new one for you".yellow
         ensure_app_exists!
         profile = create_profile!
       end
