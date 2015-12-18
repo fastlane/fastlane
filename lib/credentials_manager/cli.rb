@@ -20,7 +20,8 @@ module CredentialsManager
         c.option '--password password', String, 'Password to add.'
 
         c.action do |args, options|
-          username, password = options.username, options.password
+          username = options.username
+          password = options.password
 
           if username.nil?
             raise 'You must specify a username'
@@ -31,7 +32,6 @@ module CredentialsManager
 
             puts "Credential #{username}:#{'*' * password.length} added to keychain."
           end
-
         end
       end
 
