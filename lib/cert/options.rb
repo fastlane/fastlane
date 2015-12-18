@@ -50,10 +50,10 @@ module Cert
                                      short_option: "-k",
                                      env_name: "CERT_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
-                                     optional: true,
+                                     default_value: "#{Dir.home}/Library/Keychains/login.keychain",
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
-                                       raise "Keychain not found at path '#{value}'".red unless File.exist? value
+                                       raise "Keychain not found at path '#{value}'".red unless File.exist?(value)
                                      end)
       ]
     end
