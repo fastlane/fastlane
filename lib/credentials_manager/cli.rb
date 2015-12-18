@@ -25,7 +25,17 @@ module CredentialsManager
 
     # Perform actions based on data
     def execute
-      # puts @options
+      case @command
+      when :add
+        CredentialsManager::AccountManager.new(
+          user: @options[:username],
+          password: @options[:password]
+        ).add_to_keychain
+      when :remove
+        CredentialsManager::AccountManager.new(
+          user: @options[:username]
+        ).remove_from_keychain
+      end
     end
 
     private

@@ -41,6 +41,15 @@ module CredentialsManager
       false
     end
 
+    def add_to_keychain
+      Security::InternetPassword.add(server_name, user, password)
+    end
+
+    def remove_from_keychain
+      Security::InternetPassword.delete(server: server_name)
+      @password = nil
+    end
+
     private
 
     def ask_for_login
@@ -64,17 +73,12 @@ module CredentialsManager
       return true if (/darwin/ =~ RUBY_PLATFORM).nil? # mac?, since we don't have access to the helper here
 
       # Now we store this information in the keychain
-      if Security::InternetPassword.add(server_name, user, password)
+      if add_to_keychain
         return true
       else
         puts "Could not store password in keychain".red
         return false
       end
-    end
-
-    def remove_from_keychain
-      Security::InternetPassword.delete(server: server_name)
-      @password = nil
     end
 
     def server_name
