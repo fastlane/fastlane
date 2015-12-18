@@ -12,23 +12,23 @@ module Produce
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
       if app_exists?
-        Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center".green
+        UI.success "[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center"
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
         app_name = valid_name_for(Produce.config[:app_name])
-        Helper.log.info "Creating new app '#{app_name}' on the Apple Dev Center".green
+        UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name)
 
-        Helper.log.info "Created app #{app.app_id}"
+        UI.message "Created app #{app.app_id}"
 
-        raise "Something went wrong when creating the new app - it's not listed in the apps list" unless app_exists?
+        UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless app_exists?
 
         ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
 
-        Helper.log.info "Finished creating new app '#{app_name}' on the Dev Center".green
+        UI.success "Finished creating new app '#{app_name}' on the Dev Center"
       end
 
       return true

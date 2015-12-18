@@ -15,10 +15,10 @@ module Produce
     def create_new_app
       application = fetch_application
       if application
-        Helper.log.info "[iTC] App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on iTunes Connect".green
+        UI.success "[iTC] App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on iTunes Connect"
         # Nothing to do here
       else
-        Helper.log.info "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect".green
+        UI.success "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect"
 
         Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
 
@@ -30,9 +30,9 @@ module Produce
                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
                                               company_name: Produce.config[:company_name])
         application = fetch_application
-        raise "Something went wrong when creating the new app - it's not listed in the App's list" unless application
+        UI.crash!("Something went wrong when creating the new app - it's not listed in the App's list") unless application
 
-        Helper.log.info "Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}".green
+        UI.success "Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}"
       end
 
       return Spaceship::Application.find(@full_bundle_identifier).apple_id
@@ -62,7 +62,7 @@ module Produce
       @language = converted if converted # overwrite it with the actual value
 
       unless AvailableDefaultLanguages.all_languages.include?(@language)
-        raise "Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}".red
+        UI.user_error!("Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}")
       end
 
       return @language
