@@ -79,7 +79,7 @@ module Match
                                      description: nil,
                                      verify_block: proc do |value|
                                        unless Helper.test?
-                                         if value.start_with?("/var/folders") or value.include?("tmp/")
+                                         if value.start_with?("/var/folders") or value.include?("tmp/") or value.include?("temp/")
                                            # that's fine
                                          else
                                            raise "Specify the `git_url` instead of the `path`".red
