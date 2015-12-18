@@ -51,8 +51,9 @@ module FastlaneCore
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value
-        if string?
-          raise "'#{self.key}' value must be a String! Found #{value.class} instead.".red unless value.kind_of? String
+        # Verify that value is the type that we're expecting, if we are expecting a type
+        if data_type && !value.kind_of?(data_type)
+          raise "'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.".red
         end
 
         if @verify_block

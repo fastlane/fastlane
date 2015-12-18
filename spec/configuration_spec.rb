@@ -144,6 +144,17 @@ describe FastlaneCore do
         expect(value).to eq(9.91)
       end
 
+      it "raises an exception if the data type is not as expected" do
+        config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                   short_option: '-f',
+                                                   description: 'foo',
+                                                   type: Float)
+
+        expect do
+          config_item.valid?('ABC')
+        end.to raise_error
+      end
+
       it "verifies the default value as well" do
         c = FastlaneCore::ConfigItem.new(key: :output,
                                   env_name: "SIGH_OUTPUT_PATH",
