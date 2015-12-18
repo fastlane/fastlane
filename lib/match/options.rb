@@ -75,6 +75,11 @@ module Match
                                      description: "Renew the provisioning profiles every time you run match",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :shallow_clone,
+                                     env_name: "MATCH_SHALLOW_CLONE",
+                                     description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
+                                     is_string: false,
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      description: nil,
                                      verify_block: proc do |value|
