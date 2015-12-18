@@ -257,7 +257,7 @@ e.g. `$(sigh_tools.fastlane.app_development)`
 
 This is useful when installing your application on your device using the Development profile. 
 
-You can statically select the right provisioning profile in your Xcode project (the name will be `tools.fastlane.app Development`).
+You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
 ### Nuke
 
