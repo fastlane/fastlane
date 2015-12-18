@@ -13,6 +13,7 @@ module Cert
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+  UI = FastlaneCore::UI
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
 end
