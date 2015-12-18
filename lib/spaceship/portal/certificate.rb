@@ -144,7 +144,7 @@ module Spaceship
         "9RQEK7MSXA" => InHouse,
         "LA30L5BJEU" => Certificate,
         "BKLRAVXMGM" => DevelopmentPush,
-        "3BQKVH9I2X" => ProductionPush,
+        "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => WebsitePush,

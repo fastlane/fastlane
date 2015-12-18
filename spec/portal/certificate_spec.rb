@@ -87,7 +87,7 @@ describe Spaceship::Certificate do
 
   describe '#create' do
     it 'should create and return a new certificate' do
-      expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
+      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
@@ -96,7 +96,7 @@ describe Spaceship::Certificate do
     end
 
     it 'should create a new certificate using a CSR from a file' do
-      expect(client).to receive(:create_certificate!).with('3BQKVH9I2X', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
+      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
         JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
