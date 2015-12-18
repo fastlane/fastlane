@@ -25,6 +25,7 @@ module Chiizu
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+  UI = FastlaneCore::UI
 
   Chiizu::DependencyChecker.check_dependencies
 end
