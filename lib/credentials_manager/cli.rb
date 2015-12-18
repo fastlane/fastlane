@@ -31,6 +31,8 @@ module CredentialsManager
           user: @options[:username],
           password: @options[:password]
         ).add_to_keychain
+
+        puts "Credential #{@options[:username]}:#{'*' * @options[:password].length} added to keychain."
       when :remove
         CredentialsManager::AccountManager.new(
           user: @options[:username]
