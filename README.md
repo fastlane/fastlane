@@ -157,6 +157,15 @@ For a list of all available options run
 match --help
 ```
 
+#### Handle multiple targets
+If you have several targets with different bundle id's - you have to init provision profile for each other:
+
+```
+match appstore -a tools.fastlane.app
+match appstore -a tools.fastlane.app.watchkitapp
+```
+
+
 #### Passphrase
 
 When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`.Make sure to remember the password, as you'll need it when you run match on a different machine
