@@ -159,7 +159,7 @@ match --help
 
 #### Handle multiple targets
 
-If you have several targets with different bundle id's - you have to init provision profile for each other:
+If you have several targets with different bundle identifiers, call `match` for each of them:
 
 ```
 match appstore -a tools.fastlane.app
