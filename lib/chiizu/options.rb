@@ -11,7 +11,7 @@ module Chiizu
                                      description: "A list of locales which should be used",
                                      short_option: "-q",
                                      type: Array,
-                                     default_value: ['en-US','fr-FR','ja-JP']),
+                                     default_value: ['en-US']),
         FastlaneCore::ConfigItem.new(key: :clear_previous_screenshots,
                                      env_name: 'CHIIZU_CLEAR_PREVIOUS_SCREENSHOTS',
                                      description: "Enabling this option will automatically clear previously generated screenshots before running chiizu",
@@ -37,8 +37,24 @@ module Chiizu
                                      env_name: 'CHIIZU_TESTS_PACKAGE_NAME',
                                      optional: true,
                                      description: "The package name of the tests bundle (e.g. com.yourcompany.yourapp.test)"),
-        # TODO need better default value calculation here
-
+        FastlaneCore::ConfigItem.new(key: :use_tests_in_packages,
+                                     env_name: 'CHIIZU_USE_TESTS_IN_PACKAGES',
+                                     optional: true,
+                                     short_option: "-p",
+                                     type: Array,
+                                     description: "Only run tests in these Java packages"),
+        FastlaneCore::ConfigItem.new(key: :use_tests_in_classes,
+                                     env_name: 'CHIIZU_USE_TESTS_IN_CLASSES',
+                                     optional: true,
+                                     short_option: "-l",
+                                     type: Array,
+                                     description: "Only run tests in these Java classes"),
+        FastlaneCore::ConfigItem.new(key: :ending_locale,
+                                     env_name: 'CHIIZU_ENDING_LOCALE',
+                                     optional: true,
+                                     is_string: true,
+                                     default_value: 'en-US',
+                                     description: "Return the device to this locale after running tests"),
         FastlaneCore::ConfigItem.new(key: :app_apk_path,
                                      env_name: 'CHIIZU_APP_APK_PATH',
                                      optional: true,
@@ -56,15 +72,7 @@ module Chiizu
                                      default_value:  Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
                                        raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
-                                     end),
-
-        # Everything around building
-        FastlaneCore::ConfigItem.new(key: :clean,
-                                     short_option: "-c",
-                                     env_name: "CHIIZU_CLEAN",
-                                     description: "Should the project be cleaned before building it?",
-                                     is_string: false,
-                                     default_value: false)
+                                     end)
       ]
     end
   end
