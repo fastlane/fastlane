@@ -16,19 +16,22 @@ module Scan
 
       Scan.project.select_scheme
 
-      default_device if Scan.project.ios?
+      default_device_ios if Scan.project.ios?
+      default_device_tvos if Scan.project.tvos?
       detect_destination
 
       return config
     end
 
-    def self.default_device
+    def self.default_device_ios
       config = Scan.config
 
       if config[:device] # make sure it actually exists
         device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
 
-        found = FastlaneCore::Simulator.all.find { |d| (d.name + " " + d.ios_version).include? device }
+        found = FastlaneCore::Simulator.all.find do |d|
+          (d.name + " " + d.ios_version).include? device
+        end
 
         if found
           Scan.device = found
@@ -56,6 +59,42 @@ module Scan
       raise "No simulators found".red unless Scan.device
     end
 
+    def self.default_device_tvos
+      config = Scan.config
+
+      if config[:device] # make sure it actually exists
+        device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
+
+        found = FastlaneCore::SimulatorTV.all.find do |d|
+          (d.name + " " + d.tvos_version).include? device
+        end
+
+        if found
+          Scan.device = found
+          return
+        else
+          Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+        end
+      end
+
+      sims = FastlaneCore::SimulatorTV.all
+      xcode_target = Scan.project.build_settings(key: "TVOS_DEPLOYMENT_TARGET")
+
+      # Filter out any simulators that are not the same major version of our deployment target
+      if xcode_target.to_s.length > 0
+        min_target = xcode_target.split(".").first.to_i
+        sims = sims.select { |s| s.ios_version.to_i >= min_target }
+      end
+
+      # Apple TV 1080p is useful for tests
+      found = sims.find { |d| d.name == "Apple TV 1080p" }
+      found ||= sims.first # anything is better than nothing
+
+      Scan.device = found
+
+      raise "No simulators found".red unless Scan.device
+    end
+
     # Is it an iOS device or a Mac?
     def self.detect_destination
       if Scan.config[:destination]
@@ -69,6 +108,8 @@ module Scan
       # building up the destination now
       if Scan.project.ios?
         Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.device.udid}"
+      elsif Scan.project.tvos?
+        Scan.config[:destination] = "platform=tvOS Simulator,id=#{Scan.device.udid}"
       else
         Scan.config[:destination] = "platform=OS X"
       end
