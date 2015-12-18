@@ -2,6 +2,8 @@ require 'credentials_manager/version'
 
 module CredentialsManager
   class CLI
+    VALID_COMMANDS = %i(add remove)
+
     REQUIRED_PARAMS = {
       add: %i(username password),
       remove: %i(username)
@@ -14,13 +16,14 @@ module CredentialsManager
       begin
         parse
         validate
-      rescue OptionParser::MissingArgument => ex
+      rescue => ex
         # If we have a missing argument, print out the help
         puts ex.message.capitalize
         puts parser
       end
     end
 
+    # Perform actions based on data
     def execute
       # puts @options
     end
@@ -66,8 +69,21 @@ module CredentialsManager
       end
     end
 
-    # Ensure that all required paramters are present
+    # Perform all necessary validations
     def validate
+      validate_command
+      validate_options
+    end
+
+    # Ensure that the entered command is valid
+    def validate_command
+      unless VALID_COMMANDS.include? @command
+        raise "#{@command} is not a valid command. Must be one of #{VALID_COMMANDS.join(', ')}"
+      end
+    end
+
+    # Ensure that all required paramters are present
+    def validate_options
       # Required parameters that were not specified
       diff = REQUIRED_PARAMS[@command] - @options.keys
 
