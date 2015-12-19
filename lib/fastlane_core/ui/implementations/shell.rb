@@ -52,7 +52,8 @@ module FastlaneCore
     def command_output(message)
       actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
-        log.info("> #{msg}".magenta)
+        prefix = msg.include?("▸") ? "" : "▸"
+        log.info(prefix + " " + msg.magenta)
       end
     end
 
