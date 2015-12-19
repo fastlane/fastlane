@@ -31,10 +31,10 @@ module Snapshot
                                      end),
         FastlaneCore::ConfigItem.new(key: :devices,
                                      description: "A list of devices you want to take the screenshots from",
-                                     is_string: false,
+                                     short_option: "-d",
+                                     type: Array,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Devices must be an array" unless value.kind_of?(Array)
                                        available = FastlaneCore::Simulator.all
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
@@ -44,17 +44,15 @@ module Snapshot
                                      end),
         FastlaneCore::ConfigItem.new(key: :languages,
                                      description: "A list of languages which should be used",
-                                     is_string: false,
-                                     default_value: [
-                                       'en-US'
-                                     ]),
+                                     short_option: "-g",
+                                     type: Array,
+                                     default_value: ['en-US']),
         FastlaneCore::ConfigItem.new(key: :launch_arguments,
                                      env_name: 'SNAPSHOT_LAUNCH_ARGUMENTS',
                                      description: "A list of launch arguments which should be used",
-                                     is_string: false,
-                                     default_value: [
-                                       ''
-                                     ]),
+                                     short_option: "-m",
+                                     type: Array,
+                                     default_value: ['']),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SNAPSHOT_OUTPUT_DIRECTORY",
