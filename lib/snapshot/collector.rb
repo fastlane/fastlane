@@ -40,8 +40,7 @@ module Snapshot
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
       Helper.log.info "Loading up '#{plist_path}'..." if $verbose
       report = Plist.parse_xml(plist_path)
-
-      activities = []
+      
       to_store = [] # contains the names of all the attachments we want to use
       count = 0
       report["TestableSummaries"].each do |summary|
@@ -63,7 +62,6 @@ module Snapshot
       end
 
       Helper.log.info "Found #{count} screenshots..."
-      
       Helper.log.info "Found #{to_store.join(', ')}" if $verbose
       return to_store
     end
