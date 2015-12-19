@@ -66,6 +66,10 @@ module Scan
           Helper.log.info "Automatically switched to Travis formatter".green
         end
 
+        if ENV["FASTLANE_DISABLE_COLORS"]
+          formatter << "--no-color"
+        end
+
         if Scan.config[:output_style] == 'basic'
           formatter << "--no-utf"
         end
