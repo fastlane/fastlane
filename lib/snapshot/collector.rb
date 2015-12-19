@@ -42,6 +42,8 @@ module Snapshot
       report = Plist.parse_xml(plist_path)
 
       activities = []
+      to_store = [] # contains the names of all the attachments we want to use
+      count = 0
       report["TestableSummaries"].each do |summary|
         (summary["Tests"] || []).each do |test|
           (test["Subtests"] || []).each do |subtest|
@@ -49,8 +51,10 @@ module Snapshot
               (subtest2["Subtests"] || []).each do |subtest3|
                 (subtest3["ActivitySummaries"] || []).each do |activity|
                   # We now check if it's the rotation gesture, because that's the only thing we care about
-                  was_snapshot = activity["Title"] == "Set device orientation to Unknown"
-                  activities << activity if was_snapshot
+                  if activity["Title"] == "Set device orientation to Unknown"
+                    to_store << activity["Attachments"].last["FileName"]
+                    count += 1
+                  end
                 end
               end
             end
@@ -58,14 +62,8 @@ module Snapshot
         end
       end
 
-      Helper.log.info "Found #{activities.count} screenshots..."
-
-      to_store = [] # contains the names of all the attachments we want to use
-      activities.each do |activity|
-        attachment_entry = activity
-        to_store << attachment_entry["Attachments"].last["FileName"]
-      end
-
+      Helper.log.info "Found #{count} screenshots..."
+      
       Helper.log.info "Found #{to_store.join(', ')}" if $verbose
       return to_store
     end
