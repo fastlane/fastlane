@@ -81,8 +81,8 @@ module Gym
                                                 ErrorHandler.handle_build_error(output)
                                               end)
 
-      Helper.log.info("Successfully stored the archive. You can find it in the Xcode Organizer.".green)
-      Helper.log.info("Stored the archive in: ".green + BuildCommandGenerator.archive_path) if $verbose
+      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer."
+      UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
 
     # Makes sure the archive is there and valid
@@ -112,18 +112,15 @@ module Gym
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
 
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
-
-      Helper.log.info "Compressing #{available_dsyms.count} dSYM(s)"
+      UI.message "Compressing #{available_dsyms.count} dSYM(s)" unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
       command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.log.info command.yellow unless Gym.config[:silent]
-      command_result = `#{command}`
-      Helper.log.info command_result if $verbose
+      Helper.backticks(command, print: !Gym.config[:silent]) 
 
       puts "" # new line
 
-      Helper.log.info "Successfully exported and compressed dSYM file".green
+      UI.success "Successfully exported and compressed dSYM file"
     end
 
     # Moves over the binary and dsym file to the output directory
@@ -132,21 +129,21 @@ module Gym
       FileUtils.mv(PackageCommandGenerator.ipa_path, File.expand_path(Gym.config[:output_directory]), force: true)
       ipa_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path)))
 
-      Helper.log.info "Successfully exported and signed the ipa file:".green
-      Helper.log.info ipa_path
+      UI.success "Successfully exported and signed the ipa file:"
+      UI.message ipa_path
       ipa_path
     end
 
     # Move the .app from the archive into the output directory
     def move_mac_app
       app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
-      raise "Couldn't find application in '#{BuildCommandGenerator.archive_path}'".red unless app_path
+      UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
 
       FileUtils.mv(app_path, File.expand_path(Gym.config[:output_directory]), force: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
 
-      Helper.log.info "Successfully exported the .app file:".green
-      Helper.log.info app_path
+      UI.success "Successfully exported the .app file:"
+      UI.message app_path
       app_path
     end
 

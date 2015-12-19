@@ -14,7 +14,7 @@ module Gym
 
         return if check_for_swift PackageCommandGenerator
 
-        Helper.log.info "Packaging up the Swift Framework as the current app is a Swift app" if $verbose
+        UI.verbose "Packaging up the Swift Framework as the current app is a Swift app"
         ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
 
         Dir.mktmpdir do |tmpdir|
@@ -49,7 +49,7 @@ module Gym
       # @param the PackageCommandGenerator
       # @return true if swift
       def check_for_swift(pcg)
-        Helper.log.info "Checking for Swift framework" if $verbose
+        UI.verbose "Checking for Swift framework"
         default_swift_libs = "#{pcg.appfile_path}/Frameworks/libswift.*" # note the extra ., this is a string representation of a regexp
         zip_entries_matching(pcg.ipa_path, /#{default_swift_libs}/).count > 0
       end

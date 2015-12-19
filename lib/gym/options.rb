@@ -92,7 +92,7 @@ module Gym
                                      is_string: false,
                                      verify_block: proc do |value|
                                        if value
-                                         Helper.log.info "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816".red
+                                         UI.important "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816"
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_method,

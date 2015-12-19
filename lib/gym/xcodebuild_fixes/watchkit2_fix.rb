@@ -5,7 +5,7 @@ module Gym
       def watchkit2_fix
         return unless watchkit2?
 
-        Helper.log.info "Adding WatchKit2 support" if $verbose
+        UI.verbose "Adding WatchKit2 support"
 
         Dir.mktmpdir do |tmpdir|
           # Make watchkit support directory
@@ -20,7 +20,7 @@ module Gym
             abort unless system %(zip --recurse-paths "#{PackageCommandGenerator.ipa_path}" "WatchKitSupport2" > /dev/null)
           end
 
-          Helper.log.info "Successfully added WatchKit2 support" if $verbose
+          UI.verbose "Successfully added WatchKit2 support"
         end
       end
 
