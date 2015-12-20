@@ -89,6 +89,11 @@ module FastlaneCore
     end
     # rubocop:enable Style/PredicateName
 
+    # Do we want to disable the colored output?
+    def colors_disabled?
+      ENV["FASTLANE_DISABLE_COLORS"]
+    end
+
     # Does the user use the Mac stock terminal
     def self.mac_stock_terminal?
       !!ENV["TERM_PROGRAM_VERSION"]

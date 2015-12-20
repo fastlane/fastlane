@@ -23,4 +23,4 @@ Dir[File.expand_path('implementations/*.rb', File.dirname(__FILE__))].each do |f
   require file
 end
 
-require 'fastlane_core/ui/disable_colors' if ENV["FASTLANE_DISABLE_COLORS"]
+require 'fastlane_core/ui/disable_colors' if Helper.colors_disabled?
