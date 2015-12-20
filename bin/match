@@ -9,8 +9,10 @@ HighLine.track_eof = false
 
 class MatchApplication
   include Commander::Methods
+  UI = FastlaneCore::UI
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize
   def run
     program :version, Match::VERSION
     program :description, Match::DESCRIPTION
@@ -68,6 +70,18 @@ class MatchApplication
       end
     end
 
+    command :change_password do |c|
+      c.syntax = 'match change_password'
+      c.description = 'Re-encrypt all files with a different password'
+      c.action do |args, options|
+        params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+        params.load_configuration_file("Matchfile")
+
+        Match::ChangePassword.update(params: params)
+        UI.success "Successfully changed the password. Make sure to update the password on all your clients and servers"
+      end
+    end
+
     command "nuke" do |c|
       # We have this empty command here, since otherwise the normal `match` command will be executed
       c.syntax = "match nuke"
@@ -94,6 +108,7 @@ class MatchApplication
     run!
   end
   # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/AbcSize
 end
 
 begin

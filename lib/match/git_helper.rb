@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone)
+    def self.clone(git_url, shallow_clone, manual_password: nil)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -15,7 +15,16 @@ module Match
       raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
 
       copy_readme(@dir)
-      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url)
+
+      if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil?
+        UI.important "Migrating to new match..."
+        ChangePassword.update(params: { git_url: git_url,
+                                 shallow_clone: shallow_clone },
+                                          from: "",
+                                            to: Encrypt.new.password(git_url))
+        return self.clone(git_url, shallow_clone)
+      end
+      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
 
       return @dir
     end
@@ -31,11 +40,19 @@ module Match
       ].join(" ")
     end
 
+    def self.match_version(workspace)
+      path = File.join(workspace, "match_version.txt")
+      if File.exist?(path)
+        Gem::Version.new(File.read(path))
+      end
+    end
+
     def self.commit_changes(path, message, git_url)
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
         Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+        File.write("match_version.txt", Match::VERSION) # unencrypted
 
         commands = []
         commands << "git add -A"
@@ -50,6 +67,7 @@ module Match
                                           print_command: $verbose)
         end
       end
+      FileUtils.rm_rf(path)
       @dir = nil
     end
 

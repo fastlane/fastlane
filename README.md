@@ -283,6 +283,16 @@ match nuke distribution
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
 
+### Change Password
+
+To change the password of your repo and therefore decrypting and encrypting all files run
+
+```
+match change_password
+```
+
+You'll be asked for the new password on all your machines on the next run.
+
 ## Is this secure?
 
 Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.

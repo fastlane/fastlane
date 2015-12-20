@@ -7,7 +7,7 @@ module Match
     end
 
     def password(git_url)
-      password ||= ENV["MATCH_PASSWORD"]
+      password = ENV["MATCH_PASSWORD"]
       unless password
         item = Security::InternetPassword.find(server: server_name(git_url))
         password = item.password if item
@@ -20,10 +20,14 @@ module Match
         while password.to_s.length == 0
           password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
         end
-        Security::InternetPassword.add(server_name(git_url), "", password)
+        store_password(git_url, password)
       end
 
       return password
+    end
+
+    def store_password(git_url, password)
+      Security::InternetPassword.add(server_name(git_url), "", password)
     end
 
     # removes the password from the keychain again
@@ -35,20 +39,21 @@ module Match
       iterate(path) do |current|
         crypt(path: current,
           password: password(git_url),
-            encrypt: true)
+           encrypt: true)
         UI.success "🔒  Encrypted '#{File.basename(current)}'" if $verbose
       end
       UI.success "🔒  Successfully encrypted certificates repo"
     end
 
-    def decrypt_repo(path: nil, git_url: nil)
+    def decrypt_repo(path: nil, git_url: nil, manual_password: nil)
       iterate(path) do |current|
         begin
           crypt(path: current,
-            password: password(git_url),
+            password: manual_password || password(git_url),
              encrypt: false)
         rescue
           UI.error "Couldn't decrypt the repo, please make sure you enter the right password!"
+          UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
           clear_password(git_url)
           decrypt_repo(path: path, git_url: git_url)
           return
@@ -69,9 +74,9 @@ module Match
 
     def crypt(path: nil, password: nil, encrypt: true)
       if password.to_s.strip.length == 0
-        UI.error "No password supplied"
-        raise "No password supplied"
+        UI.user_error!("No password supplied")
       end
+
       tmpfile = File.join(Dir.mktmpdir, "temporary")
       command = ["openssl aes-256-cbc"]
       command << "-k \"#{password}\""
@@ -81,6 +86,7 @@ module Match
       command << "-d" unless encrypt
       command << "&> /dev/null" unless $verbose # to show show an error message is something goes wrong
       success = system(command.join(' '))
+
       raise "Error decrypting '#{path}'" unless success
       FileUtils.mv(tmpfile, path)
     end
