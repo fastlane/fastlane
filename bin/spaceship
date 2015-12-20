@@ -46,3 +46,5 @@ puts "Just enter the commands and confirm with Enter".green
 # rubocop:disable Lint/Debugger
 binding.pry(quiet: true)
 # rubocop:enable Lint/Debugger
+
+puts "" # Fixes https://github.com/fastlane/spaceship/issues/203
