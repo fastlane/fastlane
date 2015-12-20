@@ -60,6 +60,7 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee '#{xcodebuild_log_path}' | xcpretty"
+        pipe << "--no-color" if ENV["FASTLANE_DISABLE_COLORS"]
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
 
         pipe
