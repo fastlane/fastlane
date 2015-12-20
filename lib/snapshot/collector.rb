@@ -40,7 +40,7 @@ module Snapshot
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
       Helper.log.info "Loading up '#{plist_path}'..." if $verbose
       report = Plist.parse_xml(plist_path)
-      
+
       to_store = [] # contains the names of all the attachments we want to use
       report["TestableSummaries"].each do |summary|
         (summary["Tests"] || []).each do |test|
