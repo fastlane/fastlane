@@ -25,9 +25,9 @@ describe Match do
         }
 
         expect(FastlaneCore::CommandExecutor).
-        to receive(:execute).
-        with(to_params).
-        and_return(nil)
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
@@ -46,9 +46,9 @@ describe Match do
         }
 
         expect(FastlaneCore::CommandExecutor).
-        to receive(:execute).
-        with(to_params).
-        and_return(nil)
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
