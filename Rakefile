@@ -43,10 +43,12 @@ end
 desc 'Show the un-commited changes from all repos'
 task :diff do
   (GEMS + RAILS).each do |repo|
-    output = `cd #{repo} && git diff --stat` # not using `sh` as it gets you into its own view
-    if (output || '').length > 0
-      box repo
-      puts output
+    Dir.chdir(repo) do
+      output = `git diff --stat` # not using `sh` as it gets you into its own view
+      if (output || '').length > 0
+        box repo
+        puts output
+      end
     end
   end
 end
