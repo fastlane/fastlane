@@ -58,7 +58,31 @@ module Supply
                                      verify_block: proc do |value|
                                        raise "Could not find apk file at path '#{value}'".red unless File.exist?(value)
                                        raise "apk file is not an apk".red unless value.end_with?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_APK",
+                                     optional: true,
+                                     description: "Whether to skip uploading APK",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_metadata,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_METADATA",
+                                     optional: true,
+                                     description: "Whether to skip uploading metadata",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_images,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_IMAGES",
+                                     optional: true,
+                                     description: "Whether to skip uploading images, screenshots not included",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_screenshots,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_SCREENSHOTS",
+                                     optional: true,
+                                     description: "Whether to skip uploading SCREENSHOTS",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
