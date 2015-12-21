@@ -35,6 +35,14 @@ This will install your Gemfile by executing `bundle install`
 bundle_install
 ```
 
+### [Xcake](https://github.com/jcampbell05/xcake/)
+
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+
+```ruby
+xcake # this will run xcake
+```
+
 ### [CocoaPods](http://cocoapods.org)
 
 If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
@@ -191,7 +199,7 @@ update_app_group_identifiers(
 
 ### [xcode_install](https://github.com/neonichu/xcode-install)
 
-Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. 
+Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem.
 
 This will make sure to use the correct Xcode for later actions.
 
@@ -415,7 +423,7 @@ Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbol
 
 ```ruby
 splunkmint(
-	dsym: "My.app.dSYM.zip", 
+	dsym: "My.app.dSYM.zip",
 	api_key: "43564d3a",
 	api_token: "e05456234c4869fb7e0b61"
 )
@@ -719,7 +727,7 @@ You can store the changelog in `./fastlane/changelog.txt` and it will automatica
 
 ### [GitHub Releases](https://github.com)
 
-This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc. 
+This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc.
 
 ```ruby
 github_release = set_github_release(
@@ -756,9 +764,9 @@ Upload your ipa, or any other file you want, to Sonatype Nexus platform.
 
 ```ruby
 nexus_upload(
-  file: "/path/to/file.ipa", 
-  repo_id: "artefacts", 
-  repo_group_id: "com.fastlane", 
+  file: "/path/to/file.ipa",
+  repo_id: "artefacts",
+  repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
   endpoint: "http://localhost:8081",
