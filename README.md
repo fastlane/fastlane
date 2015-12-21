@@ -142,7 +142,7 @@ Here a few links to get started:
 - Run `snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
 - (Objective C only) add the bridging header to your test class. 
- - `#import “MYUITests-Swift.h"`
+ - `#import "MYUITests-Swift.h"`
  - The bridging header is named after your test target with -Swift.h appended.
 - In your UI Test class, click the `Record` button on the bottom left and record your interaction
 - To take a snapshot, call the following between interactions
