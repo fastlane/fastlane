@@ -569,6 +569,22 @@ ensure_no_debug_code(text: "NSLog",
                 extension: "m")
 ```
 
+### [Appium](http://appium.io/)
+
+Run UI testing by `Appium::Driver` with RSpec.
+
+```ruby
+appium(
+  app_path:  "appium/apps/TargetApp.app",
+  spec_path: "appium/spec",
+  platform:  "iOS",
+  caps: {
+    versionNumber: "9.1",
+    deviceName:    "iPhone 6"
+  }
+)
+```
+
 ## Deploying
 
 ### [pilot](https://github.com/fastlane/pilot)
@@ -947,7 +963,7 @@ For example, you can use this to set a different url scheme for the alpha
 or beta version of the app.
 
 ```ruby
-update_url_schemes(path: "path/to/Info.plist", 
+update_url_schemes(path: "path/to/Info.plist",
             url_schemes: ["com.myapp"])
 ```
 
