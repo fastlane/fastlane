@@ -35,14 +35,6 @@ This will install your Gemfile by executing `bundle install`
 bundle_install
 ```
 
-### [Xcake](https://github.com/jcampbell05/xcake/)
-
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
-
-```ruby
-xcake # this will run xcake
-```
-
 ### [CocoaPods](http://cocoapods.org)
 
 If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
@@ -212,6 +204,14 @@ Use this command if you are supporting multiple versions of Xcode
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
+```
+
+### [Xcake](https://github.com/jcampbell05/xcake/)
+
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+
+```ruby
+xcake
 ```
 
 ### [resign](https://github.com/krausefx/sigh#resign)
