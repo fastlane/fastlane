@@ -14,9 +14,7 @@ module Match
 
       raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
 
-      copy_readme(@dir)
-
-      if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil?
+      if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil? and File.exist?(File.join(@dir, "README.md"))
         UI.important "Migrating to new match..."
         ChangePassword.update(params: { git_url: git_url,
                                  shallow_clone: shallow_clone },
@@ -24,6 +22,8 @@ module Match
                                             to: Encrypt.new.password(git_url))
         return self.clone(git_url, shallow_clone)
       end
+
+      copy_readme(@dir)
       Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
 
       return @dir
