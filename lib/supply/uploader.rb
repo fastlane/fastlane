@@ -13,13 +13,13 @@ module Supply
 
           listing = client.listing_for_language(language)
 
-          upload_metadata(language, listing)
-          upload_images(language)
-          upload_screenshots(language)
+          upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
+          upload_images(language) unless Supply.config[:skip_upload_images]
+          upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
         end
       end
 
-      upload_binary
+      upload_binary unless Supply.config[:skip_upload_apk]
 
       Helper.log.info "Uploading all changes to Google Play..."
       client.commit_current_edit!
