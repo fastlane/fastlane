@@ -90,7 +90,7 @@ module FastlaneCore
     # rubocop:enable Style/PredicateName
 
     # Do we want to disable the colored output?
-    def colors_disabled?
+    def self.colors_disabled?
       ENV["FASTLANE_DISABLE_COLORS"]
     end
 
