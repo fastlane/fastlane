@@ -64,8 +64,7 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
                                        description: "API Key for TestFairy", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         raise "No API key for TestFairy given, pass using `api_key: 'key'`".red unless (value and not value.empty?)
-                                           # raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         raise "No API key for TestFairy given, pass using `api_key: 'key'`".red unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
