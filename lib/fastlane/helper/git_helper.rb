@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     def self.git_log_between(pretty_format, from, to)
-      Actions.sh("git log --pretty=\"#{pretty_format}\" #{from}...#{to}", log: false).chomp
+      Actions.sh("git log --pretty=\"#{pretty_format}\" #{from.shellescape}...#{to.shellescape}", log: false).chomp
     rescue
       nil
     end

@@ -555,6 +555,16 @@ oclint(
 )  
 ```
 
+### [SwiftLint](https://github.com/realm/SwiftLint)
+Run SwiftLint for your project.
+
+```
+swiftlint(
+  output_file: 'swiftlint.result.json', # The path of the output file (optional)
+  config_file: '.swiftlint-ci.yml'      # The path of the configuration file (optional)
+)
+```
+
 ### `ensure_no_debug_code`
 
 You don't want any debug code to slip into production. You can use the `ensure_no_debug_code` action to make sure no debug code is in your code base before deploying it:
@@ -567,6 +577,22 @@ ensure_no_debug_code(text: "// TODO")
 ensure_no_debug_code(text: "NSLog",
                      path: "./lib",
                 extension: "m")
+```
+
+### [Appium](http://appium.io/)
+
+Run UI testing by `Appium::Driver` with RSpec.
+
+```ruby
+appium(
+  app_path:  "appium/apps/TargetApp.app",
+  spec_path: "appium/spec",
+  platform:  "iOS",
+  caps: {
+    versionNumber: "9.1",
+    deviceName:    "iPhone 6"
+  }
+)
 ```
 
 ## Deploying
@@ -947,7 +973,7 @@ For example, you can use this to set a different url scheme for the alpha
 or beta version of the app.
 
 ```ruby
-update_url_schemes(path: "path/to/Info.plist", 
+update_url_schemes(path: "path/to/Info.plist",
             url_schemes: ["com.myapp"])
 ```
 
