@@ -72,6 +72,22 @@ describe Fastlane do
 
         expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
       end
+
+      it "Uses pattern matching for tag name if requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(tag_match_pattern: '*1.8*')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\=\\\\\\*1.8\\\\\\*\\ --max-count\\=1\\`...HEAD")
+      end
+
+      it "Does not use pattern matching for tag name if so requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits()
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
     end
   end
 end
