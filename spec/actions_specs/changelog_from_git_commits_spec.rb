@@ -56,6 +56,22 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error(":between must be an array of size 2".red)
       end
+
+      it "Uses pattern matching for tag name if requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(match_pattern: '*1.8*')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ --abbrev\\=0\\ --match\\ \\*1.8\\*...HEAD")
+      end
+
+      it "Does not use pattern matching for tag name if so requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits()
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ --abbrev\\=0...HEAD")
+      end
     end
   end
 end

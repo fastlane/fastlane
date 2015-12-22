@@ -6,10 +6,11 @@ module Fastlane
       nil
     end
 
-    def self.last_git_tag_name(match_lightweight = true)
+    def self.last_git_tag_name(match_lightweight = true, match_pattern = nil)
       command = ['git describe']
       command << '--tags' if match_lightweight
       command << '--abbrev=0'
+      command << "--match #{match_pattern}" if match_pattern
       Actions.sh(command.join(' '), log: false).chomp
     rescue
       nil

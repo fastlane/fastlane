@@ -1126,6 +1126,7 @@ changelog_from_git_commits
 changelog_from_git_commits(
   between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
   pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+  match_pattern: nil, # Optional, lets you search for a tag name that matches a glov(7) pattern
   match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
 )
 ```

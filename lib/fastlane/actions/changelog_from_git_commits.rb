@@ -9,7 +9,7 @@ module Fastlane
         if params[:between]
           from, to = params[:between]
         else
-          from = Actions.last_git_tag_name(params[:match_lightweight_tag])
+          from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:match_pattern])
           Helper.log.debug "Found the last Git tag: #{from}"
           to = 'HEAD'
         end
@@ -56,6 +56,12 @@ module Fastlane
                                        optional: true,
                                        default_value: '%B',
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :match_pattern,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MATCH_PATTERN',
+                                       description: 'Whether or not to match a glob(7) pattern in tag name',
+                                       optional: true,
+                                       default_value: nil,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :match_lightweight_tag,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MATCH_LIGHTWEIGHT_TAG',
                                        description: 'Whether or not to match a lightweight tag when searching for the last one',
