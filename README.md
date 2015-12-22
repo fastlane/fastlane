@@ -112,6 +112,15 @@ To get a list of available options run:
     pem --help
     
 
+### Note about empty `p12` passwords and Keychain Access.app
+
+`pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password. 
+While the file is valid, Mac OSX's Keychain Access will not allow you to open the file without specifing a passphrase.
+
+Instead, you may verify the file is valid using OpenSSL:
+
+    openssl pkcs12 -info -in my.p12
+
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Environment Variables
