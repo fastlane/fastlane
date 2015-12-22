@@ -14,13 +14,13 @@ module Fastlane
       def self.run(params)
         require 'shenzhen'
         require 'shenzhen/plugins/testfairy'
-        
+
         Helper.log.info 'Starting with ipa upload to TestFairy...'.green
 
         client = Shenzhen::Plugins::TestFairy::Client.new(
           params[:api_key]
         )
-        
+
         return params[:ipa] if Helper.test?
 
         response = client.upload_build(params[:ipa], params.values)
@@ -35,7 +35,7 @@ module Fastlane
       #####################################################
       # @!group Documentation
       #####################################################
-      
+
       def self.parse_response(response)
         if response.body && response.body.key?('status') && response.body['status'] == 'ok'
           build_url = response.body['build_url']
@@ -45,34 +45,34 @@ module Fastlane
           return true
         else
           Helper.log.fatal "Error uploading to TestFairy: #{response.body}".red
-          
+
           return false
         end
       end
       private_class_method :parse_response
-      
+
       def self.description
         'Upload a new build to TestFairy'
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
                                        description: "API Key for TestFairy", # a short description of this parameter
                                        verify_block: proc do |value|
-                                          raise "No API key for TestFairy given, pass using `api_key: 'key'`".red unless (value and not value.empty?)
-                                          # raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                         raise "No API key for TestFairy given, pass using `api_key: 'key'`".red unless (value and not value.empty?)
+                                           # raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
                                        description: 'Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :comment,
                                        env_name: "FL_TESTFAIRY_COMMENT",
@@ -89,25 +89,19 @@ module Fastlane
         ]
       end
 
-      def self.return_value
-        # If you method provides a return value, you can describe here what it does
-      end
-
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["taka0125"]
       end
 
       def self.is_supported?(platform)
         # you can do things like
-        # 
+        #
         #  true
-        # 
+        #
         #  platform == :ios
-        # 
+        #
         #  [:ios, :mac].include?(platform)
-        # 
-
+        #
         platform == :ios
       end
     end

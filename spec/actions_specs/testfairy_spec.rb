@@ -8,7 +8,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      
+
       it "raises an error if no api key was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -18,7 +18,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      
+
       it "raises an error if no ipa path was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -28,7 +28,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      
+
       it "raises an error if the given ipa path was not found" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -39,7 +39,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      
+
       it "works with valid parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
