@@ -19,6 +19,11 @@ module Match
         UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
         while password.to_s.length == 0
           password = ask("Passphrase for Git Repo: ".yellow) { |q| q.echo = "*" }
+          password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
+          if password != password2
+            UI.error("Passhprases differ. Try again")
+            password = ""
+          end
         end
         store_password(git_url, password)
       end
