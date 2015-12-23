@@ -11,7 +11,7 @@ module Match
       GitHelper.commit_changes(workspace, message, params[:git_url])
     end
 
-    def self.ask_password(msg="Passphrase for Git Repo: ")
+    def self.ask_password(msg = "Passphrase for Git Repo: ")
       password = ""
       while password.to_s.length == 0
         password = ask(msg.yellow) { |q| q.echo = "*" }

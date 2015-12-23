@@ -17,7 +17,7 @@ module Match
         UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
         UI.important "This passphrase is specific per repository and will be stored in your local keychain"
         UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
-        password = ChangePassword.ask_password()
+        password = ChangePassword.ask_password
         store_password(git_url, password)
       end
 
