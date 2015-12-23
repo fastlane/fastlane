@@ -678,6 +678,32 @@ appium(
 )
 ```
 
+### Run in simulator
+
+Build & install and launch your app on iOS Simulator.
+
+Extremely useful for QA teams where manual testing is done per device / iOS version.
+This actions takes device criteria and tries to find a matching device to run with.
+In ambiguous cases, it displays an interactive menu for the user to choose from.
+
+```ruby
+run_in_simulator(
+  scheme:  "MySchemeName", # required
+
+  workspace: "MyWorkspace.xcworkspace" # optional workspace
+  project: "MyProject.xcodeproj" # optional project
+  build_artifacts_path: "path/to/build_artifacts", # optional custom path for build artifacts
+  app_file_path: "path/to/MyApp.app", # if you already have a (correctly) built .app file
+  clean: true, # set this to false if you want to leave the build artifacts, incl. the .app file. defaults to true
+
+  # optional device filtering, run `xcrun instruments -s devices` to see full list
+  device_name: "iPhone 5", # use this device name to filter among available devices. see exact_device_name
+  ios_version:  "9.2",
+  device_id: "SOME_LONG_UDID",
+  exact_device_name: false # set this to false if you want 'iPhone 5' to be accepted exactly, without 'iPhone 5s'. defaults to true
+)
+```
+
 ## Deploying
 
 ### [pilot](https://github.com/fastlane/pilot)
