@@ -1,3 +1,23 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+  - [](#)
+  - [</p>](#p)
+  - [Notes about this guide](#notes-about-this-guide)
+  - [Installation](#installation)
+    - [[fastlane](https://github.com/KrauseFx/fastlane)](#fastlanehttpsgithubcomkrausefxfastlane)
+  - [Setting up `fastlane`](#setting-up-fastlane)
+    - [Individual Tools](#individual-tools)
+    - [Enable `Instruments` CLI](#enable-instruments-cli)
+    - [Configure the `Fastfile`](#configure-the-fastfile)
+    - [Use your existing build scripts](#use-your-existing-build-scripts)
+    - [Create your own actions (build steps)](#create-your-own-actions-build-steps)
+- [Example projects](#example-projects)
+- [Help](#help)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 This guide will help you set up Continuous Delivery for your iOS project. 
 
 It will help you set up all needed build tools. I tested everything with a fresh Yosemite installation.

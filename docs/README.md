@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Documentation](#documentation)
+  - [Fastfile](#fastfile)
+    - [`before_all` block](#before_all-block)
+    - [`after_all` block](#after_all-block)
+    - [`error` block](#error-block)
+  - [Extensions](#extensions)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Documentation
 
 - [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started. 

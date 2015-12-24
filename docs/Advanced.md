@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Advanced fastlane](#advanced-fastlane)
+  - [Passing Parameters](#passing-parameters)
+  - [Switching lanes](#switching-lanes)
+  - [Returning values](#returning-values)
+  - [Run actions directly](#run-actions-directly)
+  - [Shell values](#shell-values)
+  - [Priorities of parameters and options](#priorities-of-parameters-and-options)
+  - [Importing another Fastfile](#importing-another-fastfile)
+    - [`import`](#import)
+    - [`import_from_git`](#import_from_git)
+    - [Note](#note)
+  - [Environment Variables](#environment-variables)
+  - [Lane Context](#lane-context)
+  - [Private lanes](#private-lanes)
+  - [Hide the `fastlane` folder](#hide-the-fastlane-folder)
+  - [Load own actions from external folder](#load-own-actions-from-external-folder)
+  - [The Appfile](#the-appfile)
+  - [Skip update check when launching `fastlane`](#skip-update-check-when-launching-fastlane)
+  - [Gitignore](#gitignore)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Advanced fastlane
 
 ## Passing Parameters
