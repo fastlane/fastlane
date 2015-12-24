@@ -12,7 +12,7 @@ module Gym
 
       FileUtils.mkdir_p(Gym.config[:output_directory])
 
-      if Gym.project.ios?
+      if Gym.project.ios? || Gym.project.tvos?
         package_app
         fix_package
         compress_and_move_dsym
