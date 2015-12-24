@@ -1,6 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [FAQs](#faqs)
     - [I'm getting an SSL error](#im-getting-an-ssl-error)
@@ -9,7 +6,6 @@
     - [Multiple targets of the same underlying app](#multiple-targets-of-the-same-underlying-app)
     - [Disable colored output](#disable-colored-output)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 FAQs
 =====

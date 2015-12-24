@@ -1,6 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
   - [](#)
   - [</p>](#p)
@@ -16,7 +13,6 @@
 - [Example projects](#example-projects)
 - [Help](#help)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 This guide will help you set up Continuous Delivery for your iOS project. 
 

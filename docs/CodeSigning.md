@@ -1,13 +1,9 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [CodeSigning](#codesigning)
     - [Easy Solution: Static Setting](#easy-solution-static-setting)
     - [Best Solution: Using environment variables](#best-solution-using-environment-variables)
     - [Hacky Solution: Modify the Xcode project](#hacky-solution-modify-the-xcode-project)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # CodeSigning
 

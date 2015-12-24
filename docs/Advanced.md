@@ -1,6 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Advanced fastlane](#advanced-fastlane)
   - [Passing Parameters](#passing-parameters)
@@ -22,7 +19,6 @@
   - [Skip update check when launching `fastlane`](#skip-update-check-when-launching-fastlane)
   - [Gitignore](#gitignore)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Advanced fastlane
 
