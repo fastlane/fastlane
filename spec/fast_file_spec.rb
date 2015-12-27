@@ -158,6 +158,30 @@ describe Fastlane do
         expect(result.to_i).to be > 10
       end
 
+      it "Parameters are also passed to the before_all, after_all" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        time = Time.now.to_i.to_s
+
+        ff.runner.execute(:something, nil, {value: time })
+
+        expect(File.read("/tmp/before_all.txt")).to eq(time)
+        expect(File.read("/tmp/after_all.txt")).to eq(time)
+        File.delete("/tmp/before_all.txt")
+        File.delete("/tmp/after_all.txt")
+      end
+
+      it "Parameters are also passed to the error block" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        time = Time.now.to_i.to_s
+
+        expect do
+          ff.runner.execute(:crash, nil, {value: time })
+        end.to raise_error # since we cause a crash
+
+        expect(File.read("/tmp/error.txt")).to eq(time)
+        File.delete("/tmp/error.txt")
+      end
+
       describe "supports switching lanes" do
         it "use case 1: passing parameters to another lane and getting the result" do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')

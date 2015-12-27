@@ -13,6 +13,10 @@ fastlane deploy submit:false build_number:24
 To access those values, change your lane declaration to also include `|options|`
 
 ```ruby
+before_all do |lane, options|
+  ...
+end
+
 lane :deploy do |options|
   ...
   if options[:submit]
@@ -21,6 +25,16 @@ lane :deploy do |options|
   ...
   increment_build_number(build_number: options[:build_number])
   ...
+end
+
+after_all do |lane, options|
+  ...
+end
+
+error do |lane, exception, options|
+  if options[:debug]
+    puts "Hi :)"
+  end
 end
 ```
 
