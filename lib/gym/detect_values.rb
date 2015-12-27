@@ -6,12 +6,15 @@ module Gym
     def self.set_additional_default_values
       config = Gym.config
 
-      FastlaneCore::Project.detect_projects(config)
+      # First, try loading the Gymfile from the current directory
+      config.load_configuration_file(Gym.gymfile_name)
 
+      # Detect the project
+      FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
       detect_provisioning_profile
 
-      # Go into the project's folder
+      # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
         config.load_configuration_file(Gym.gymfile_name)
       end
