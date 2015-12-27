@@ -8,7 +8,6 @@ module Fastlane
       def self.run(params)
         lane_name = params[:lane_name].delete(' ') # no spaces allowed
 
-        # TODO: Perhaps pattern creation should be refactored out of `add_git_tag`?
         tag_pattern = params[:pattern] || "#{params[:grouping]}/#{lane_name}/#{params[:prefix]}*"
         Helper.log.info "Searching for last tag matching pattern: '#{tag_pattern}'"
 
