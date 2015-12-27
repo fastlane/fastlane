@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      FL_CHANGELOG = :FL_CHANGELOG
+      CHANGELOG = :CHANGELOG
     end
 
     class ChangelogFromLastTagAction < Action
@@ -24,7 +24,7 @@ module Fastlane
         to = 'HEAD'
         Helper.log.info "Collecting Git commits between #{from} and #{to}".green
         changelog = Actions.git_log_between(params[:pretty], from, to)
-        Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
+        Actions.lane_context[SharedValues::CHANGELOG] = changelog
 
         changelog
       end
@@ -34,11 +34,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This generates the CHANGELOG from the commits since your last tag."
+        "This generates the CHANGELOG from the commits since your last tag"
       end
 
       def self.details
-        "This action uses the same pattern system as the `add_git_tag` action."
+        "This action uses the same pattern system as the `add_git_tag` action"
       end
 
       def self.available_options
@@ -70,12 +70,12 @@ module Fastlane
 
       def self.output
         [
-          ['FL_CHANGELOG', 'The changelog String generated from the collected Git commit messages']
+          ['CHANGELOG', 'The changelog String generated from the collected Git commit messages']
         ]
       end
 
       def self.return_value
-        "Returns a string containing your CHANGELOG."
+        "Returns a string containing your CHANGELOG"
       end
 
       def self.authors
