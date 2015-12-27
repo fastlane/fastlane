@@ -1130,6 +1130,27 @@ changelog_from_git_commits(
 )
 ```
 
+### changelog_from_last_tag
+This action turns your git commit history into formatted changelog text. This works similarly to
+[changelog_from_git_commits](#changelog_from_git_commits) except it uses the same pattern system as [add_git_tag](#add_git_tag).
+This can be useful if you have different tags for different lanes or groupings (as with [add_git_tag](#add_git_tag))
+and want to grab the all the commit messages since that last tag in the pattern. If no tag can be
+found matching this pattern, the tag returned by `git_last_tag` is used instead.
+
+```ruby
+# Collects commits since the last tag matching the pattern and returns a concatenation of their subjects and bodies
+changelog_from_last_tag
+
+# Advanced options
+changelog_from_last_tag(
+  pattern: 'release*', # Optional, lets you specify the pattern to match. Will override all pattern options.
+  grouping: 'builds', # Optional, lets you specify the grouping to use in the pattern. Defaults to add_git_tag pattern of 'builds'.
+  lane_name: 'appstore', # Optional, lets you specify the lane name to use in the pattern. Defaults to add_git_tag pattern of current lane.
+  prefix: 'v', # Optional, lets you specify the prefix to use in the pattern. Defaults to add_git_tag pattern of no prefix.
+  pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+)
+```
+
 ### ensure_git_branch
 This action will check if your git repo is checked out to a specific branch. You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
 
