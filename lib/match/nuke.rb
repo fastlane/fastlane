@@ -31,7 +31,7 @@ module Match
         UI.error "Are you sure you want to completely delete and revoke all the"
         UI.error "certificates and provisioning profiles listed above? (y/n)"
         UI.error "Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted" if type == "distribution"
-        UI.error "Warning: The :app_identifier value will be ignored - this will all delete profiles for all your apps!" if had_app_identifier
+        UI.error "Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!" if had_app_identifier
         UI.error "---"
         if agree("(y/n)", true)
           nuke_it_now!
