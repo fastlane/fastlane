@@ -18,7 +18,6 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/AbcSize
     def execute(lane, platform = nil, parameters = nil)
       raise "No lane given" unless lane
