@@ -177,6 +177,17 @@ To sync the latest `rubocop` rules to all repos, run `rake fetch_rubocop` in the
 
 The configuration is always directly taken from the local `fastlane` repository..
 
+# Submit a pull request
+
+To submit the changes to the fastlane main repo, you have to do the following:
+
+- Open the GitHub page of the repository you changed (e.g. [https://github.com/fastlane/gym](https://github.com/fastlane/gym))
+- Click on `Fork` on the top right
+- On your terminal, navigate to the project you modified and run `git remote add upstream https://github.com/[my_user]/[tool_name]` (or use the `git` URL if you use private key auth)
+- Commit your changes
+- Run `git push upstream master`
+- Open `https://github.com/fastlane/[tool_name]` in your browser and click the green "Create Pull Request" button
+
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
 
