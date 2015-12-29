@@ -2,6 +2,7 @@ module Match
   class ChangePassword
     def self.update(params: nil, from: nil, to: nil)
       to ||= ChangePassword.ask_password("New passphrase for Git Repo: ")
+      from ||= ChangePassword.ask_password("Old passphrase for Git Repo: ")
       GitHelper.clear_changes
       workspace = GitHelper.clone(params[:git_url], params[:shallow_clone], manual_password: from)
       Encrypt.new.clear_password(params[:git_url])
@@ -12,8 +13,8 @@ module Match
     end
 
     def self.ask_password(msg = "Passphrase for Git Repo: ")
-      password = ""
-      while password.to_s.length == 0
+      password = nil
+      while password == nil
         password = ask(msg.yellow) { |q| q.echo = "*" }
         password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
         if password != password2
