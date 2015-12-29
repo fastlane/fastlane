@@ -70,6 +70,9 @@ module Fastlane
         project       = ENV["XCODE_PROJECT"]
         buildlog_path = ENV["XCODE_BUILDLOG_PATH"]
 
+        # Set derived data path.
+        params[:derivedDataPath] ||= ENV["XCODE_DERIVED_DATA_PATH"]
+
         # Append slash to build path, if needed
         if build_path && !build_path.end_with?("/")
           build_path += "/"
