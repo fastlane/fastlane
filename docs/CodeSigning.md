@@ -25,7 +25,7 @@ In your `Fastfile`, add the following between your `sigh` and `gym` call:
 ```ruby
 sigh
 
-# use the UID of the newly created provisioning profile
+# use the UUID of the newly created provisioning profile
 ENV["PROFILE_UUID"] = lane_context[SharedValues::SIGH_UDID]
 
 gym(scheme: "Release")
