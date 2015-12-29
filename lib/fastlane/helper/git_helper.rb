@@ -9,7 +9,7 @@ module Fastlane
     def self.last_git_tag_name(match_lightweight = true)
       command = ['git describe']
       command << '--tags' if match_lightweight
-      command << '--abbrev=0'
+      command << '`git rev-list --tags --max-count=1`'
       Actions.sh(command.join(' '), log: false).chomp
     rescue
       nil
