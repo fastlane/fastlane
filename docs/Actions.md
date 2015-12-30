@@ -864,6 +864,20 @@ installr(
 
 For more information about the available options, run `fastlane action installr` or check out the [Installr Documentation](http://help.installrapp.com/api/).
 
+### [TestFairy](https://testfairy.com/)
+
+Upload your iOS build to [TestFairy](https://testfairy.com/)
+
+You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/).
+
+```ruby
+testfairy(
+  api_key: '...',
+  ipa: './ipa_file.ipa',
+  comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
