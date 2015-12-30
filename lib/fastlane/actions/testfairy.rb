@@ -4,12 +4,6 @@ module Fastlane
       TESTFAIRY_BUILD_URL = :TESTFAIRY_BUILD_URL
     end
 
-    # To share this integration with the other fastlane users:
-    # - Fork https://github.com/KrauseFx/fastlane
-    # - Clone the forked repository
-    # - Move this integration into lib/fastlane/actions
-    # - Commit, push and submit the pull request
-
     class TestfairyAction < Action
       def self.run(params)
         require 'shenzhen'
@@ -56,9 +50,6 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
@@ -81,8 +72,6 @@ module Fastlane
       end
 
       def self.output
-        # Define the shared values you are going to provide
-        # Example
         [
           ['TESTFAIRY_BUILD_URL', 'URL of the newly uploaded build']
         ]
@@ -93,14 +82,6 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        # you can do things like
-        #
-        #  true
-        #
-        #  platform == :ios
-        #
-        #  [:ios, :mac].include?(platform)
-        #
         platform == :ios
       end
     end
