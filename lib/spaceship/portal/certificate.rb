@@ -66,6 +66,9 @@ module Spaceship
       #   "5QPB9NHCEI"
       attr_accessor :type_display_id
 
+      # @return (Bool) Whether or not the certificate can be downloaded
+      attr_accessor :can_download
+
       attr_mapping({
         'certificateId' => :id,
         'name' => :name,
@@ -75,7 +78,8 @@ module Spaceship
         'ownerType' => :owner_type,
         'ownerName' => :owner_name,
         'ownerId' => :owner_id,
-        'certificateTypeDisplayId' => :type_display_id
+        'certificateTypeDisplayId' => :type_display_id,
+        'canDownload' => :can_download
       })
 
       #####################################################
