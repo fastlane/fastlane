@@ -37,6 +37,10 @@ module Cert
 
     def find_existing_cert
       certificates.each do |certificate|
+        unless certificate.can_download
+          next
+        end
+
         path = store_certificate(certificate)
         private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
 
