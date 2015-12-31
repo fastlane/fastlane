@@ -99,7 +99,7 @@ You only have to do this once per computer.
 - Press ```Enter```. The [Apple page](https://developer.apple.com/app-store/marketing/guidelines/#images) to download the images should open in your browser.
 - Download the devices you want to use
 - Press ```Enter```
-- Unzip and move the content of the zip files to ```~/.frameit/device_frames```
+- Unzip and move the content of the zip files to ```~/.frameit/devices_frames```
 - Press ```Enter```
   
 # Usage
