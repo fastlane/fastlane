@@ -1,8 +1,8 @@
 module Match
   class ChangePassword
     def self.update(params: nil, from: nil, to: nil)
-      to ||= ChangePassword.ask_password("New passphrase for Git Repo: ")
-      from ||= ChangePassword.ask_password("Old passphrase for Git Repo: ")
+      to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: false)
+      from ||= ChangePassword.ask_password(message: "Old passphrase for Git Repo: ", confirm: true)
       GitHelper.clear_changes
       workspace = GitHelper.clone(params[:git_url], params[:shallow_clone], manual_password: from)
       Encrypt.new.clear_password(params[:git_url])
@@ -12,17 +12,15 @@ module Match
       GitHelper.commit_changes(workspace, message, params[:git_url])
     end
 
-    def self.ask_password(msg = "Passphrase for Git Repo: ")
-      password = nil
-      while password == nil
-        password = ask(msg.yellow) { |q| q.echo = "*" }
+    def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
+      loop do
+        password = ask(message.yellow) { |q| q.echo = "*" }
         password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
-        if password != password2
-          UI.error("Passhprases differ. Try again")
-          password = ""
+        if password == password2
+          return password
         end
+        UI.error("Passhprases differ. Try again")
       end
-      password
     end
   end
 end
