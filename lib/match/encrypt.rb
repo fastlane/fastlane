@@ -71,7 +71,7 @@ module Match
     end
 
     def crypt(path: nil, password: nil, encrypt: true)
-      if password.to_s.strip.length == 0
+      if password.to_s.strip.length == 0 && encrypt
         UI.user_error!("No password supplied")
       end
 
