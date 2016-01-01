@@ -15,8 +15,12 @@ module Match
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
       loop do
         password = ask(message.yellow) { |q| q.echo = "*" }
-        password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
-        if password == password2
+        if confirm
+          password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
+          if password == password2
+            return password
+          end
+        else
           return password
         end
         UI.error("Passhprases differ. Try again")
