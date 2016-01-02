@@ -56,6 +56,14 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error(":between must be an array of size 2".red)
       end
+
+      it "Does not include merge commits in the list of commits" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(include_merges: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ --abbrev\\=0...HEAD --no-merges")
+      end
     end
   end
 end
