@@ -38,6 +38,7 @@ module Match
     def certificate(params: nil)
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"
+      cert_type = :enterprise if Match.enterprise? && params[:type] == "enterprise"
 
       certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]

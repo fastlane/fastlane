@@ -21,7 +21,11 @@ module Match
 
   def self.environments
     envs = %w(appstore adhoc development)
-    envs << "enterprise" if ENV["MATCH_FORCE_ENTERPRISE"]
+    envs << "enterprise" if self.enterprise?
     return envs
+  end
+
+  def self.enterprise?
+    ENV["MATCH_FORCE_ENTERPRISE"]
   end
 end
