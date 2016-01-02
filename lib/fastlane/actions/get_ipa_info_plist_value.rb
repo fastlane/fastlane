@@ -8,7 +8,8 @@ module Fastlane
       def self.run(params)
         ipa = File.expand_path(params[:ipa])
         key = params[:key]
-        value = sh("/usr/libexec/PlistBuddy -c Print:#{key}: /dev/stdin <<< `unzip -p #{ipa} Payload/*.app/Info.plist`").strip
+        plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa)
+        value = plist[key]
 
         Actions.lane_context[SharedValues::GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE] = value
 
