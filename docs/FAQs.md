@@ -75,3 +75,8 @@ Set the `FASTLANE_DISABLE_COLORS` environment variable to disable ANSI colors (e
 ```
 export FASTLANE_DISABLE_COLORS=1
 ```
+
+### "User interaction is not allowed" when using `fastlane` via SSH
+
+This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](http://stackoverflow.com/a/22637896/445598).
+
