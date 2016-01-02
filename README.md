@@ -270,7 +270,7 @@ You can statically select the right provisioning profile in your Xcode project (
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
