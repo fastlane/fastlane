@@ -45,6 +45,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :to,
                                        env_name: "MAILGUN_TO",
                                        description: "Destination of your mail"),
+          FastlaneCore::ConfigItem.new(key: :from,
+                                       env_name: "MAILGUN_FROM",
+                                       optional: true,
+                                       description: "Mailgun Sandbox",
+                                       default_value: "fastlane build"),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "MAILGUN_MESSAGE",
                                        description: "Message of your mail"),
@@ -89,7 +94,7 @@ module Fastlane
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-                        from: "Mailgun Sandbox<#{options[:postmaster]}>",
+                        from: "#{options[:from]}<#{options[:postmaster]}>",
                         to: "#{options[:to]}",
                         subject: options[:subject],
                         html: mail_teplate(options)
