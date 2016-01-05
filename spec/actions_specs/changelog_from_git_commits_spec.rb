@@ -6,7 +6,7 @@ describe Fastlane do
           changelog_from_git_commits
         end").runner.execute(:test)
 
-        expect(result).to eq("endgit log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
       end
 
       it "Uses the provided pretty format to collect log messages" do
@@ -22,7 +22,7 @@ describe Fastlane do
           changelog_from_git_commits(match_lightweight_tag: false)
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")          
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
       end
 
       it "Collects logs in the specified revision range if specified" do
