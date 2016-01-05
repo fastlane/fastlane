@@ -126,6 +126,10 @@ app_identifier "tools.fastlane.app"
 username "user@fastlane.tools"
 ```
 
+#### Important: Use one git repo per team
+
+`match` was designed to have one git repository per Apple account. If you work in multiple teams, please create one repo for each of them. More information on [codesigning.guide](https://codesigning.guide)
+
 ### Run
 
 > Before running `match` for the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
