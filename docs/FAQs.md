@@ -23,7 +23,7 @@ For more information about the recommended setup with Jenkins open the [Jenkins 
 
 ### Code signing issues
 
-There is a separate [guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) available about how to setup code signing.
+Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/match).
 
 ### Multiple targets of the same underlying app
 
