@@ -191,7 +191,7 @@ update_app_group_identifiers(
 
 ### [xcode_install](https://github.com/neonichu/xcode-install)
 
-Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. 
+Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem.
 
 This will make sure to use the correct Xcode for later actions.
 
@@ -204,6 +204,14 @@ Use this command if you are supporting multiple versions of Xcode
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
+```
+
+### [Xcake](https://github.com/jcampbell05/xcake/)
+
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+
+```ruby
+xcake
 ```
 
 ### [resign](https://github.com/krausefx/sigh#resign)
@@ -415,7 +423,7 @@ Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbol
 
 ```ruby
 splunkmint(
-	dsym: "My.app.dSYM.zip", 
+	dsym: "My.app.dSYM.zip",
 	api_key: "43564d3a",
 	api_token: "e05456234c4869fb7e0b61"
 )
@@ -547,6 +555,16 @@ oclint(
 )  
 ```
 
+### [SwiftLint](https://github.com/realm/SwiftLint)
+Run SwiftLint for your project.
+
+```
+swiftlint(
+  output_file: 'swiftlint.result.json', # The path of the output file (optional)
+  config_file: '.swiftlint-ci.yml'      # The path of the configuration file (optional)
+)
+```
+
 ### `ensure_no_debug_code`
 
 You don't want any debug code to slip into production. You can use the `ensure_no_debug_code` action to make sure no debug code is in your code base before deploying it:
@@ -559,6 +577,22 @@ ensure_no_debug_code(text: "// TODO")
 ensure_no_debug_code(text: "NSLog",
                      path: "./lib",
                 extension: "m")
+```
+
+### [Appium](http://appium.io/)
+
+Run UI testing by `Appium::Driver` with RSpec.
+
+```ruby
+appium(
+  app_path:  "appium/apps/TargetApp.app",
+  spec_path: "appium/spec",
+  platform:  "iOS",
+  caps: {
+    versionNumber: "9.1",
+    deviceName:    "iPhone 6"
+  }
+)
 ```
 
 ## Deploying
@@ -719,7 +753,7 @@ You can store the changelog in `./fastlane/changelog.txt` and it will automatica
 
 ### [GitHub Releases](https://github.com)
 
-This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc. 
+This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc.
 
 ```ruby
 github_release = set_github_release(
@@ -756,9 +790,9 @@ Upload your ipa, or any other file you want, to Sonatype Nexus platform.
 
 ```ruby
 nexus_upload(
-  file: "/path/to/file.ipa", 
-  repo_id: "artefacts", 
-  repo_group_id: "com.fastlane", 
+  file: "/path/to/file.ipa",
+  repo_id: "artefacts",
+  repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
   endpoint: "http://localhost:8081",
@@ -829,6 +863,20 @@ installr(
 ```
 
 For more information about the available options, run `fastlane action installr` or check out the [Installr Documentation](http://help.installrapp.com/api/).
+
+### [TestFairy](https://testfairy.com/)
+
+Upload your iOS build to [TestFairy](https://testfairy.com/)
+
+You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/).
+
+```ruby
+testfairy(
+  api_key: '...',
+  ipa: './ipa_file.ipa',
+  comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+)
+```
 
 ## Modifying Project
 
@@ -939,7 +987,7 @@ For example, you can use this to set a different url scheme for the alpha
 or beta version of the app.
 
 ```ruby
-update_url_schemes(path: "path/to/Info.plist", 
+update_url_schemes(path: "path/to/Info.plist",
             url_schemes: ["com.myapp"])
 ```
 
@@ -1093,6 +1141,7 @@ changelog_from_git_commits(
   between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
   pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
   match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+  include_merges: true # Optional, lets you filter out merge commits
 )
 ```
 

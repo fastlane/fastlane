@@ -44,7 +44,7 @@ class FastlaneApplication
 
     command :init do |c|
       c.syntax = 'fastlane init'
-      c.description = 'Helps you setting up fastlane based on your existing tools.'
+      c.description = 'Helps you with your initial fastlane setup'
 
       c.action do |args, options|
         Fastlane::Setup.new.run
