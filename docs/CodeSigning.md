@@ -1,14 +1,28 @@
 # CodeSigning
 
+Check out the official `fastlane` code signing guide: [https://codesigning.guide](https://codesigning.guide) for a detailed description on how to setup codesigning in teams.
+
+It is recommended to use [match](https://github.com/fastlane/match) to generate and maintain your certificates and provisioning profiles. 
+
+-------------------
+## Deprecated
+
+Manul code signing methods
+
+Below some alternative methods
+
+
+-------------------
+
 There are multiple ways of doing code signing right. Letting Xcode automatically choose the provisioning profile is **not** one of them.
 
-### Easy Solution: Static Setting
+### (Deprecated) Easy Solution: Static Setting
 
 In your project file set the correct `Provisioning Profile` and use the `gym` integration in `fastlane`.
 
 **Disadvantages**: As soon as your provisioning profile changes, you'll have to update your project file. Therefore not a long-term solution.
 
-### Best Solution: Using environment variables
+### (Deprecated) Using environment variables
 
 By choosing `Automatic` the underlying value in your project file is just empty. Open your `project.pbxproj` and look for
 ```
@@ -25,7 +39,7 @@ In your `Fastfile`, add the following between your `sigh` and `gym` call:
 ```ruby
 sigh
 
-# use the UID of the newly created provisioning profile
+# use the UDID of the newly created provisioning profile
 ENV["PROFILE_UUID"] = lane_context[SharedValues::SIGH_UDID]
 
 gym(scheme: "Release")
@@ -37,7 +51,7 @@ Check out the [MindNode Setup](https://github.com/fastlane/examples/blob/master/
 
 To be sure to have a valid code signing identity installed as well, you can add a `cert` call before the `sigh` action.
 
-### Hacky Solution: Modify the Xcode project
+### (Deprecated) Hacky Solution: Modify the Xcode project
 Using the [update_project_provisioning](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#update_project_provisioning) action you can modify your Xcode project's targets to use a specific provisioning profile. 
 
 ```ruby

@@ -13,6 +13,10 @@ fastlane deploy submit:false build_number:24
 To access those values, change your lane declaration to also include `|options|`
 
 ```ruby
+before_all do |lane, options|
+  ...
+end
+
 lane :deploy do |options|
   ...
   if options[:submit]
@@ -21,6 +25,16 @@ lane :deploy do |options|
   ...
   increment_build_number(build_number: options[:build_number])
   ...
+end
+
+after_all do |lane, options|
+  ...
+end
+
+error do |lane, exception, options|
+  if options[:debug]
+    puts "Hi :)"
+  end
 end
 ```
 
@@ -83,6 +97,16 @@ You can get value from shell commands:
 ```ruby
 output = sh("pod update")
 ```
+
+## Priorities of parameters and options
+
+The order in which `fastlane` tools take their values from
+
+1. CLI parameter (e.g. `gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
+1. Environment variable (e.g. `GYM_SCHEME`)
+1. Tool specific config file (e.g. `Gymfile` containing `scheme 'Example'`)
+1. Default value (which might be taken from the `Appfile`, e.g. `app_identifier` from the `Appfile`)
+1. If this value is required, you'll be asked for it (e.g. you have multiple schemes, you'll be asked for it)
 
 ## Importing another Fastfile
 

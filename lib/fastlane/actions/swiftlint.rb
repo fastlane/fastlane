@@ -5,7 +5,11 @@ module Fastlane
         if `which swiftlint`.to_s.length == 0 and !Helper.test?
           raise "You have to install swiftlint using `brew install swiftlint`".red
         end
-        Actions.sh("swiftlint")
+
+        command = 'swiftlint lint'
+        command << " --config #{params[:config_file]}" if params[:config_file]
+        command << " > #{params[:output_file]}" if params[:output_file]
+        Actions.sh(command)
       end
 
       #####################################################
@@ -21,6 +25,12 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :output_file,
+                                       description: 'Path to output SwiftLint result',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :config_file,
+                                       description: 'Custom configuration file of SwiftLint',
+                                       optional: true)
         ]
       end
 

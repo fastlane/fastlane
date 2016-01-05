@@ -105,20 +105,12 @@ verify_xcode
 snapshot
 ```
 
-To make `snapshot` work without user interaction, follow the [CI-Guide of `snapshot`](https://github.com/KrauseFx/snapshot#run-in-continuous-integration).
-
-To skip cleaning the project on every build use ```snapshot(noclean: true)```.
-
-To show the output of `UIAutomation` use ```snapshot(verbose: true)```.
-
-Other options
+Other options (`snapshot --help`)
 
 ```ruby
 snapshot(
-  nobuild: true, # Skip building and use a pre-built .app under your 'build_dir'
-  noclean: true, # Skip cleaning
-  verbose: true, # Show output of UIAutomation
-  snapshot_file_path: './folder/containing/Snapfile' # Specify a path to the directory containing the Snapfile
+  skip_open_summary: true,
+  clean: true
 )
 ```
 
@@ -199,7 +191,7 @@ update_app_group_identifiers(
 
 ### [xcode_install](https://github.com/neonichu/xcode-install)
 
-Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. 
+Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem.
 
 This will make sure to use the correct Xcode for later actions.
 
@@ -214,6 +206,14 @@ Use this command if you are supporting multiple versions of Xcode
 xcode_select "/Applications/Xcode6.1.app"
 ```
 
+### [Xcake](https://github.com/jcampbell05/xcake/)
+
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+
+```ruby
+xcake
+```
+
 ### [resign](https://github.com/krausefx/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
@@ -224,6 +224,19 @@ resign(
   ipa: 'path/to/ipa', # can omit if using the `ipa` action
   signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
   provisioning_profile: 'path/to/profile', # can omit if using the `sigh` action
+)
+```
+
+You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.
+
+```ruby
+resign(
+  ipa: 'path/to/ipa', # can omit if using the `ipa` action
+  signing_identity: 'iPhone Distribution: Luka Mirosevic (0123456789)',
+  provisioning_profile: {
+  	'com.example.awesome-app' => 'path/to/profile',
+  	'com.example.awesome-app.app-extension' => 'path/to/app-extension/profile'
+  }
 )
 ```
 
@@ -410,7 +423,7 @@ Uploads dSYM.zip file to [Splunk MINT](https://mint.splunk.com) for crash symbol
 
 ```ruby
 splunkmint(
-	dsym: "My.app.dSYM.zip", 
+	dsym: "My.app.dSYM.zip",
 	api_key: "43564d3a",
 	api_token: "e05456234c4869fb7e0b61"
 )
@@ -542,6 +555,16 @@ oclint(
 )  
 ```
 
+### [SwiftLint](https://github.com/realm/SwiftLint)
+Run SwiftLint for your project.
+
+```
+swiftlint(
+  output_file: 'swiftlint.result.json', # The path of the output file (optional)
+  config_file: '.swiftlint-ci.yml'      # The path of the configuration file (optional)
+)
+```
+
 ### `ensure_no_debug_code`
 
 You don't want any debug code to slip into production. You can use the `ensure_no_debug_code` action to make sure no debug code is in your code base before deploying it:
@@ -554,6 +577,22 @@ ensure_no_debug_code(text: "// TODO")
 ensure_no_debug_code(text: "NSLog",
                      path: "./lib",
                 extension: "m")
+```
+
+### [Appium](http://appium.io/)
+
+Run UI testing by `Appium::Driver` with RSpec.
+
+```ruby
+appium(
+  app_path:  "appium/apps/TargetApp.app",
+  spec_path: "appium/spec",
+  platform:  "iOS",
+  caps: {
+    versionNumber: "9.1",
+    deviceName:    "iPhone 6"
+  }
+)
 ```
 
 ## Deploying
@@ -714,7 +753,7 @@ You can store the changelog in `./fastlane/changelog.txt` and it will automatica
 
 ### [GitHub Releases](https://github.com)
 
-This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc. 
+This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc.
 
 ```ruby
 github_release = set_github_release(
@@ -751,9 +790,9 @@ Upload your ipa, or any other file you want, to Sonatype Nexus platform.
 
 ```ruby
 nexus_upload(
-  file: "/path/to/file.ipa", 
-  repo_id: "artefacts", 
-  repo_group_id: "com.fastlane", 
+  file: "/path/to/file.ipa",
+  repo_id: "artefacts",
+  repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
   endpoint: "http://localhost:8081",
@@ -788,6 +827,71 @@ parse_deploy(
 
 Uses the [Parse command line tool](https://parse.com/docs/cloudcode/guide#command-line) and project configurations in the Parse directory.
 
+### [appaloosa](https://www.appaloosa-store.com)
+​
+Upload your ipa or apk to your private store on Appaloosa.
+​
+Add the `appaloosa` action after the `gym` step or use it with your existing `apk`.
+​
+You can add some options:
+```ruby
+appaloosa(
+  binary: '/path/to/binary.ipa', # path tor your IPA or APK
+  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered 
+  api_token: 'your_api_key', # only if already registered
+  group_ids: '112, 232, 387', # User group_ids visibility, if it's not specified we 'll publish the app for all users in your store'
+  # screenshots: after snapshot step:
+  locale: 'en-US', # When multiple values are specified in the Snapfile, we default to 'en-US'.
+  device: 'iPhone6', # By default, the screenshots from the last device will be used.
+  # or you can specify your own screenshots folder :
+  screenshots: '/path/to_your/screenshots' # path to the screenshots folder of your choice
+  )
+```
+
+### [Tryouts.io](https://tryouts.io/)
+
+Upload your Android or iOS build to [Tryouts.io](https://tryouts.io/)
+
+```ruby
+tryouts(
+  api_token: "...",
+  app_id: "application-id",
+  build_file: "test.ipa",
+)
+```
+
+For more information about the available options, run `fastlane action tryouts` or check out the [Tryouts Documentation](http://tryouts.readthedocs.org/en/latest/releases.html#create-release).
+
+### [Installr](https://www.installrapp.com)
+
+Upload your iOS build to [Installr](https://www.installrapp.com)
+
+```ruby
+installr(
+  api_token: "...",
+  ipa: "test.ipa",
+  notes: "The next great version of the app!",
+  notify: "dev,qa"
+  add: "exec,ops"
+)
+```
+
+For more information about the available options, run `fastlane action installr` or check out the [Installr Documentation](http://help.installrapp.com/api/).
+
+### [TestFairy](https://testfairy.com/)
+
+Upload your iOS build to [TestFairy](https://testfairy.com/)
+
+You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/).
+
+```ruby
+testfairy(
+  api_key: '...',
+  ipa: './ipa_file.ipa',
+  comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -810,7 +914,7 @@ See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fa
 You can also only receive the build number without modifying it
 
 ```ruby
-version = get_build_number(xcodeproj: "Project.xcodeproj")
+build_number = get_build_number(xcodeproj: "Project.xcodeproj")
 ```
 
 ### [increment_version_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
@@ -855,6 +959,16 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There are no options currently available for this action.
 
+### update_project_team
+This action allows you to modify the developer team. This may be useful if you want to use a different team for alpha, beta or distribution.
+
+```ruby
+update_project_team(
+  path: "Example.xcodeproj",
+  teamid: "A3ZZVJ7CNY"
+)
+```
+
 ## update_info_plist
 
 This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
@@ -887,7 +1001,7 @@ For example, you can use this to set a different url scheme for the alpha
 or beta version of the app.
 
 ```ruby
-update_url_schemes(path: "path/to/Info.plist", 
+update_url_schemes(path: "path/to/Info.plist",
             url_schemes: ["com.myapp"])
 ```
 
@@ -1041,6 +1155,7 @@ changelog_from_git_commits(
   between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
   pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
   match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+  include_merges: true # Optional, lets you filter out merge commits
 )
 ```
 
@@ -1485,6 +1600,20 @@ before_all do
 end
 ```
 
+### sonar
+
+This action will execute `sonar-runner` to run SonarQube analysis on your source code. 
+
+```ruby
+sonar(
+  project_key: "name.gretzki.awesomeApp",
+  project_version: "1.0",
+  project_name: "iOS - AwesomeApp",
+  sources_path: File.expand_path("../AwesomeApp")
+)
+```
+It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
+
 ## Misc
 
 ### appledoc
@@ -1540,7 +1669,7 @@ version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
 version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
 ```
 
-### get_info_plist
+### get_info_plist_value
 
 Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
 
@@ -1549,7 +1678,7 @@ identifier = get_info_plist_value(path: './Info.plist', key: 'CFBundleIdentifier
 puts identifier # => com.krausefx.app
 ```
 
-### set_info_plist
+### set_info_plist_value
 
 Set a value of a plist file. You can use this action to update the bundle identifier of your app
 
