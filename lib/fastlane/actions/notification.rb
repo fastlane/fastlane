@@ -45,7 +45,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :sound,
                                        description: "The name of a sound to play when the notification appears (names are listed in Sound Preferences)",
-                                       optional: true),
+                                       optional: true)
         ]
       end
 
