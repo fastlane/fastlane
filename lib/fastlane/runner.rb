@@ -124,7 +124,7 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
 
       begin
-        Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
+        #Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           Actions.execute_action(class_ref.step_text) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
@@ -141,7 +141,7 @@ module Fastlane
 
             class_ref.run(arguments)
           end
-        end
+        #end
       rescue => ex
         collector.did_raise_error(method_sym)
         raise ex
