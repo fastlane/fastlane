@@ -6,7 +6,7 @@ describe Fastlane do
           last_git_tag
         end").runner.execute(:test)
 
-        expect(result).to eq("git describe --tags --abbrev=0")
+        expect(result).to eq("git describe --tags `git rev-list --tags --max-count=1`")
       end
     end
   end
