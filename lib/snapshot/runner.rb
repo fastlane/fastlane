@@ -32,8 +32,7 @@ module Snapshot
             results[device] ||= {}
 
             begin
-              launch(language, device, launch_arguments)
-              results[device][language] = true
+              results[device][language] = launch(language, device, launch_arguments)
             rescue => ex
               Helper.log.error ex # we should to show right here as well
               Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}"
@@ -138,7 +137,7 @@ module Snapshot
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
-      Collector.fetch_screenshots(raw_output, language, device_type, launch_arguments.first)
+      return Collector.fetch_screenshots(raw_output, language, device_type, launch_arguments.first)
     end
 
     def uninstall_app(device_type)
