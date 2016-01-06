@@ -1483,6 +1483,7 @@ mailgun(
   postmaster: "MY_POSTMASTER",
   apikey: "MY_API_KEY",
   to: "DESTINATION_EMAIL",
+  from: "My awesome app",
   success: true,
   message: "Mail Body",
   app_link: "http://www.myapplink.com",
