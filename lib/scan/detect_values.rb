@@ -6,10 +6,14 @@ module Scan
     def self.set_additional_default_values
       config = Scan.config
 
+      # First, try loading the Scanfile from the current directory
+      config.load_configuration_file(Scan.scanfile_name)
+
+      # Detect the project
       FastlaneCore::Project.detect_projects(config)
       Scan.project = FastlaneCore::Project.new(config)
 
-      # Go into the project's folder
+      # Go into the project's folder, as there might be a Snapfile there
       Dir.chdir(File.expand_path("..", Scan.project.path)) do
         config.load_configuration_file(Scan.scanfile_name)
       end
