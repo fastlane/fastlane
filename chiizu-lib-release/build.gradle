@@ -1,2 +1,2 @@
 configurations.create("default")
-artifacts.add("default", file('chiizu-release.aar'))
+artifacts.add("default", file('chiizu-lib-release.aar'))
