@@ -35,15 +35,12 @@ chiizu
 
 ###### Automate taking localized screenshots of your Android app
 
-You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
-
-It's hard to get everything right!
+You have to manually create screenshots for all of the locales that your app supports! It's hard to get everything right!
 
 - New screenshots with every (design) update
 - No loading indicators
 - Same content / screens
-- [Clean Status Bar](#use-a-clean-status-bar)
-- Uploading screenshots ([`supply`](https://github.com/fastlane/supply) is your friend)
+- Uploading screenshots ([supply](https://github.com/fastlane/supply) is your friend)
 
 `chiizu` runs completely in the background - you can do something else, while your computer takes the screenshots for you.
 
@@ -68,19 +65,14 @@ Get in contact with us on Twitter: [@FastlaneTools](https://twitter.com/Fastlane
 # Features
 - Create hundreds of screenshots in multiple languages on emulators or real devices
 - Configure it once, store the configuration in git
-- Do something else, while the computer takes the screenshots for you
+- Do something else while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/supply)
-- Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-After `chiizu` successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
-
-![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
-
 ## Why?
 
-This tool automatically switches the language and device type and runs UI Tests for every combination.
+This tool automatically runs UI tests to capture screenshots for every locale you support and pulls them from the device to your test machine.
 
 ### Why should I automate this process?
 
@@ -94,55 +86,83 @@ This tool automatically switches the language and device type and runs UI Tests 
 
 # Installation
 
-Install the gem
+1. Clone the repo with `git clone git@github.com:fastlane/chiizu.git`
+1. Import the Chiizu library AAR into your Android Studio project
+    1. Right click on your root project and select New > Module
+<p align="center">
+  <img src="assets/new-module.png" height="666">
+</p>
+    1. Select **Import .JAR/.AAR Package** from the New Module dialog
+<p align="center">
+  <img src="assets/import-dialog.png" height="622">
+</p>
+    1. Pick `[path_to_chiizu_repo]/chiizu-lib-release/chiizu-lib-release.aar` and click **Finish**
+    1. Add `androidTestCompile project(':chiizu-lib-release')` to your app's **build.gradle** dependencies
 
-    sudo gem install chiizu
-    
+
 # UI Tests
 
-## Getting started
+The `/example` directory in the chiizu repository contains a simple Android app project that shows how to use JUnit 3 or 4 and Espresso with the chiizu Java library to capture screenshots during a UI test run.
+
+- Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing
+- When using JUnit 3
+    - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());` in `setUp()`
+    - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());` in `tearDown()`
+    - Use `Lens.screenshot(activity, "tag");` to capture screenshots at the appropriate points in your tests
+- When using JUnit 4
+    - Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
+    - Use `Lens.screenshot(activity, "tag");` to capture screenshots at the appropriate points in your tests
+
+Using JUnit 4 is preferable because of its ability to perform actions before and after the entire test class is run. This means you will change the device's locale far fewer times when compared with JUnit 3 running those commands before and after each test method.
+
+- Ensure that the following permissions exist in your test **AndroidManifest.xml**
+
+```xml
+<!-- Allows unlocking your device and activating its screen so UI tests can succeed -->
+<uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+<uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+<!-- Allows for storing and retrieving screenshots -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+<!-- Allows changing locales -->
+<uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+```
 
 # Quick Start
 
-# Usage
+## Usage
 
-```sh
-chiizu
-```
+- Create your APKs with `./gradlew assembleDebug assembleAndroidTest`
+- Run `[path_to_chiizu_repo]/bin/chiizu` in your app project directory
+    - You will be prompted to provide any required parameters which are not in your **Chiizufile** or provided as command line arguments
 
 ## Chiizufile
 
-All of the available options can also be stored in a configuration file called the `Chiizufile`. Since most values will not change often for your project, it is recommended to store them there:
+You can get an example file generated by running `chiizu init`.
 
-First make sure to have a `Chiizufile` (you get it for free when running `chiizu init`)
+All of the available options can also be stored in a configuration file called the `Chiizufile`. Since most values will not change often for your project, it is recommended to store them there. 
 
-The `Chiizufile` can contain all the options that are also available on `chiizu --help`
+The `Chiizufile` is written in Ruby, so you may find it helpful to change your editor to perform Ruby syntax highlighting for it.
 
 ```ruby
-# TODO update for chiizu syntax
+# remove the leading '#' to uncomment lines
 
-devices([
-  "iPhone 6",
-  "iPhone 6 Plus",
-  "iPhone 5",
-  "iPhone 4s"
-])
+# app_package_name 'your.app.package'
+# use_tests_in_packages ['your.screenshot.tests.package']
 
-languages([
-  "en-US",
-  "de-DE",
-  "es-ES"
-])
+# app_apk_path 'path/to/your/app.apk'
+# tests_apk_path 'path/to/your/tests.apk'
 
-launch_arguments("-username Felix")
+locales ['en-US', 'fr-FR', 'it-IT']
 
-# The directory in which the screenshots should be stored
-output_directory './screenshots'
+# clear all previously generated screenshots in your local output directory before creating new ones
+clear_previous_screenshots
 
-clear_previous_screenshots true
+# For more information about all available options run
+#   chiizu --help
 ```
-
-# How does it work?
 
 # Tips
 
@@ -154,22 +174,10 @@ clear_previous_screenshots true
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-## Frame the screenshots
-
-If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://github.com/fastlane/frameit).
-
-## Available language codes
-```ruby
-ALL_LANGUAGES = ["da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "id", "it", "ja", "ko", "ms", "nl", "no", "pt-BR", "pt-PT", "ru", "sv", "th", "tr", "vi", "zh-Hans", "zh-Hant"]
-```
-
-## Editing the `Chiizufile`
-Change syntax highlighting to *Ruby*.
-
 # Need help?
-Please submit an issue on GitHub and provide information about your setup
+Please submit an issue on GitHub and provide information about your setup.
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
-> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+> This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

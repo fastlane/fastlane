@@ -98,7 +98,7 @@ module Chiizu
                               "-e endingLocale #{config[:ending_locale].gsub("-", "_")}"]
         instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
         instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
-        instrument_command << "#{config[:tests_package_name]}/android.support.test.runner.AndroidJUnitRunner"
+        instrument_command << "#{config[:tests_package_name]}/#{config[:test_instrumentation_runner]}"
 
         executor.execute(command: instrument_command.join(" \\\n"),
                        print_all: true,

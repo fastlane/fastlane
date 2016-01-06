@@ -30,7 +30,6 @@ module Chiizu
         FastlaneCore::ConfigItem.new(key: :app_package_name,
                                      env_name: 'CHIIZU_APP_PACKAGE_NAME',
                                      short_option: "-a",
-                                     optional: true,
                                      description: "The package name of the app under test (e.g. com.yourcompany.yourapp)",
                                      default_value: ENV["CHIIZU_APP_PACKAGE_NAME"] || CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :tests_package_name,
@@ -49,6 +48,11 @@ module Chiizu
                                      short_option: "-l",
                                      type: Array,
                                      description: "Only run tests in these Java classes"),
+        FastlaneCore::ConfigItem.new(key: :test_instrumentation_runner,
+                                     env_name: 'CHIIZU_TEST_INSTRUMENTATION_RUNNER',
+                                     optional: true,
+                                     default_value: 'android.support.test.runner.AndroidJUnitRunner',
+                                     description: "The fully qualified class name of your test instrumentation runner"),
         FastlaneCore::ConfigItem.new(key: :ending_locale,
                                      env_name: 'CHIIZU_ENDING_LOCALE',
                                      optional: true,
@@ -60,7 +64,7 @@ module Chiizu
                                      optional: true,
                                      description: "The path to the APK for the app under test",
                                      short_option: "-k",
-                                     default_value:  Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
+                                     default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
                                      verify_block: proc do |value|
                                        raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
                                      end),
@@ -69,7 +73,7 @@ module Chiizu
                                      optional: true,
                                      description: "The path to the APK for the the tests bundle",
                                      short_option: "-b",
-                                     default_value:  Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
+                                     default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
                                        raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
                                      end)
