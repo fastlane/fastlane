@@ -4,10 +4,19 @@ module Fastlane
       def self.run(params)
         require 'terminal-notifier'
 
-        if params[:subtitle]
+        if params[:subtitle] && params[:sound]
           TerminalNotifier.notify(params[:message],
                                   title: params[:title],
-                               subtitle: params[:subtitle])
+                                  subtitle: params[:subtitle],
+                                  sound: params[:sound])
+        elsif params[:subtitle]
+          TerminalNotifier.notify(params[:message],
+                                  title: params[:title],
+                                  subtitle: params[:subtitle])
+        elsif params[:sound]
+          TerminalNotifier.notify(params[:message],
+                                  title: params[:title],
+                                  sound: params[:sound])
         else
           # It should look nice without a subtitle too
           TerminalNotifier.notify(params[:message],
@@ -20,7 +29,7 @@ module Fastlane
       end
 
       def self.author
-        ["champo", "cbowns", "KrauseFx"]
+        ["champo", "cbowns", "KrauseFx", "amarcadet"]
       end
 
       def self.available_options
@@ -33,7 +42,10 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The message to display in the notification",
-                                       optional: false)
+                                       optional: false),
+          FastlaneCore::ConfigItem.new(key: :sound,
+                                       description: "The name of a sound to play when the notification appears (names are listed in Sound Preferences)",
+                                       optional: true),
         ]
       end
 
