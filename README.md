@@ -84,9 +84,13 @@ This tool automatically runs UI tests to capture screenshots for every locale yo
 - Keep your screenshots perfectly up-to-date with every app update. Your customers deserve it!
 - Found a UI mistake after completing the process? Just correct it and re-run the script!
 
-# Installation
+# [ALPHA] Installation
+
+Once released, installation will be as simple as running `gem install chiizu`, and referencing a published Android AAR, but for now please follow these alpha testing steps:
 
 1. Clone the repo with `git clone git@github.com:fastlane/chiizu.git`
+1. `cd` into your chiizu repo directory and run `rake install`
+    1. You may need to run `rbenv rehash` or similar to discover the new `chiizu` binary if you use a Ruby version manager
 1. Import the Chiizu library AAR into your Android Studio project
     1. Right click on your root project and select New > Module
 <p align="center">
@@ -98,7 +102,6 @@ This tool automatically runs UI tests to capture screenshots for every locale yo
 </p>
     1. Pick `[path_to_chiizu_repo]/chiizu-lib-release/chiizu-lib-release.aar` and click **Finish**
     1. Add `androidTestCompile project(':chiizu-lib-release')` to your app's **build.gradle** dependencies
-
 
 # UI Tests
 
@@ -135,7 +138,7 @@ Using JUnit 4 is preferable because of its ability to perform actions before and
 ## Usage
 
 - Create your APKs with `./gradlew assembleDebug assembleAndroidTest`
-- Run `[path_to_chiizu_repo]/bin/chiizu` in your app project directory
+- Run `chiizu` in your app project directory
     - You will be prompted to provide any required parameters which are not in your **Chiizufile** or provided as command line arguments
 
 ## Chiizufile
