@@ -118,7 +118,7 @@ The `/example` directory in the chiizu repository contains a simple Android app 
 
 Using JUnit 4 is preferable because of its ability to perform actions before and after the entire test class is run. This means you will change the device's locale far fewer times when compared with JUnit 3 running those commands before and after each test method.
 
-- Ensure that the following permissions exist in your test **AndroidManifest.xml**
+- Ensure that the following permissions exist in your debug **AndroidManifest.xml**
 
 ```xml
 <!-- Allows unlocking your device and activating its screen so UI tests can succeed -->
