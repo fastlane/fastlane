@@ -82,10 +82,6 @@ For example, try running the following (depending on what you plan on using):
 
 All those tools have detailed instructions on how to set them up. It's easier to set them up now, than later.
 
-### Enable `Instruments` CLI
-
-If you want to use [snapshot](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), please follow [this step](https://github.com/KrauseFx/snapshot#run-in-continuous-integration), to authorize snapshot running using [`fastlane`](https://github.com/KrauseFx/fastlane).
-
 ### Configure the `Fastfile`
 
 First, think about what different builds you'll need. Some ideas:

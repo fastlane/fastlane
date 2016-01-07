@@ -7,6 +7,7 @@ module Fastlane
         end
 
         command = 'swiftlint lint'
+        command << " --strict" if params[:strict]
         command << " --config #{params[:config_file]}" if params[:config_file]
         command << " > #{params[:output_file]}" if params[:output_file]
         Actions.sh(command)
@@ -30,6 +31,11 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :config_file,
                                        description: 'Custom configuration file of SwiftLint',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :strict,
+                                       description: 'Fail on warnings? (true/false)',
+                                       default_value: false,
+                                       is_string: false,
                                        optional: true)
         ]
       end
