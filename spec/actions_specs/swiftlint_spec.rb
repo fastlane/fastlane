@@ -14,6 +14,18 @@ describe Fastlane do
         end
       end
 
+      context "when specify strict options" do
+        it "adds strict option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              strict: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --strict")
+        end
+      end
+
       context "when specify output_file options" do
         it "adds redirect file to command" do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -38,16 +50,17 @@ describe Fastlane do
         end
       end
 
-      context "when specify output_file and config_file options" do
-        it "adds config option and redirect file" do
+      context "when specify output_file, config_file and strict options" do
+        it "adds config option, strict option and redirect file" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
+              strict: true,
               output_file: '#{output_file}',
               config_file: '#{config_file}'
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("swiftlint lint --config #{config_file} > #{output_file}")
+          expect(result).to eq("swiftlint lint --strict --config #{config_file} > #{output_file}")
         end
       end
     end
