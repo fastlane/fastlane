@@ -5,10 +5,6 @@ module Fastlane
         keychain_path = self.expand_keychain_path(params[:path])
         add_to_search_list = params[:add_to_search_list]
 
-        if keychain_path.empty?
-          raise "Could not find the keychain file: #{keychain_path}".red
-        end
-
         # add to search list if not already added
         if add_to_search_list
           add_keychain_to_search_list(keychain_path)
@@ -49,8 +45,8 @@ module Fastlane
             return expanded_location
           end
         end
-
-        return ""
+        
+        raise "Could not find the keychain file in: #{possible_locations}".red
       end
 
       #####################################################
