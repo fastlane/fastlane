@@ -66,7 +66,7 @@ module Scan
           Helper.log.info "Automatically switched to Travis formatter".green
         end
 
-        if ENV["FASTLANE_DISABLE_COLORS"]
+        if Helper.colors_disabled?
           formatter << "--no-color"
         end
 
