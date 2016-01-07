@@ -170,24 +170,25 @@
               </p>
             </div>
           <% elsif @screenshots.count > 0 %>
-            <% last_size = nil %>
             <% sc = @screenshots.find_all { |s| s.language == language } %>
-            <% sc.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+            <% sc_by_size = sc.group_by { |i| i.screen_size } %>
 
-              <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
+            <% sc_by_size.keys.sort.each do |screen_size| %>
+              <% screenshots = sc_by_size[screen_size].sort { |a, b| [a.path] <=> [b.path] } %>
 
-              <% if new_row and last_size != nil %>
-                </div>
+              <% screenshots.each_with_index do |screenshot, index| %>
+
+                <% if index == 0 %>
+              <h4><%= screenshot.formatted_name %></h4>
+              <div class="app-screenshot-row">
+                <% end %>
+
+                <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>"></a>
+
+                <% if index == (screenshots.count - 1) %>
+              </div>
+                <% end %>
               <% end %>
-
-              <% if new_row %>
-                <h4><%= screenshot.formatted_name %></h4>
-                <div class="app-screenshot-row">
-              <% end %>
-              
-              <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>"></a>
-
-              <% last_size = screenshot.screen_size %>
             <% end %>
           <% else %>
             <!-- no screenshots -->
