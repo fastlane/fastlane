@@ -9,6 +9,10 @@ module Snapshot
       to_store = attachments(containing)
       matches = output.scan(/snapshot: (.*)/)
 
+      if to_store.count == 0 && matches.count == 0
+        return false
+      end
+
       if matches.count != to_store.count
         Helper.log.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
       end
@@ -32,6 +36,8 @@ module Snapshot
         end
         FileUtils.cp(from_path, output_path)
       end
+
+      return true
     end
 
     def self.attachments(containing)
