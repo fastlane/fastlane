@@ -45,7 +45,7 @@ module Fastlane
             return expanded_location
           end
         end
-        
+
         raise "Could not find the keychain file in: #{possible_locations}".red
       end
 
