@@ -42,6 +42,12 @@ module Gym
 
         return @patched_package_application_path # Return path to the patched PackageApplication
       end
+
+      # Wrap xcodebuild to work-around ipatool dependecy to system ruby
+      def wrap_xcodebuild
+        require 'fileutils'
+        @wrapped_xcodebuild_path ||= File.join(Helper.gem_path("gym"), "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
+      end
     end
   end
 end
