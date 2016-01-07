@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "CLOC Integration" do
-
       it "does run cloc using only default options" do
         result = Fastlane::FastFile.new.parse("lane :test do
             cloc

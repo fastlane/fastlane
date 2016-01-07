@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     class ClocAction < Action
       def self.run(params)
         cloc_binary = params[:binary_path]
@@ -64,20 +63,11 @@ module Fastlane
                                       env_name: "FL_CLOC_XML",
                                       description: "Should we generate an XML File (if false, it will generate a plain text file)?",
                                       is_string: false,
-                                      default_value: true),
+                                      default_value: true)
         ]
       end
 
-      def self.output
-
-      end
-
-      def self.return_value
-        # If you method provides a return value, you can describe here what it does
-      end
-
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["intere"]
       end
 
