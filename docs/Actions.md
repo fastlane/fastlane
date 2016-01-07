@@ -1164,6 +1164,19 @@ Simple action to get the latest git tag
 last_git_tag
 ```
 
+If you are using this action on a **shallow clone**, *the default with some CI systems like Bamboo*, you need to ensure that you have also have pulled all the git tags appropriately.  Assuming your git repo has the correct remote set you can issue `sh("git fetch --tags")`
+
+```ruby
+  #Only fetch tags if a remote is set
+  remote_count = sh("git remote show | wc -l")
+  if remote_count > 0.to_s
+    sh("git fetch --tags")
+    last_git_tag
+  end
+```
+
+
+
 ### git_branch
 
 Quickly get the name of the branch you're currently in
