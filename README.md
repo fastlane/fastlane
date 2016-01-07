@@ -252,7 +252,7 @@ You can run this command in the terminal to delete and re-create all iOS simulat
 snapshot reset_simulators
 ```
 
-**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird `Instruments` problems when running `snapshot`. 
+**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running `snapshot`. 
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
