@@ -162,9 +162,12 @@ locales ['en-US', 'fr-FR', 'it-IT']
 
 # clear all previously generated screenshots in your local output directory before creating new ones
 clear_previous_screenshots
+```
 
-# For more information about all available options run
-#   chiizu --help
+For more information about all available options run
+
+```
+chiizu --help
 ```
 
 # Tips
