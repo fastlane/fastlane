@@ -121,7 +121,7 @@ module Gym
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
       command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.backticks(command, print: !Gym.config[:silent]) 
+      Helper.backticks(command, print: !Gym.config[:silent])
 
       puts "" # new line
 

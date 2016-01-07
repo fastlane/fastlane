@@ -3,8 +3,8 @@ module Gym
     def work(options)
       Gym.config = options
 
-      FastlaneCore::PrintTable.print_values(config: Gym.config, 
-                                         hide_keys: [], 
+      FastlaneCore::PrintTable.print_values(config: Gym.config,
+                                         hide_keys: [],
                                              title: "Summary for gym #{Gym::VERSION}")
 
       return Runner.new.run
