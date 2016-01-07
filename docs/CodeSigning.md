@@ -1,3 +1,10 @@
+
+- [CodeSigning](#codesigning)
+    - [Easy Solution: Static Setting](#easy-solution-static-setting)
+    - [Best Solution: Using environment variables](#best-solution-using-environment-variables)
+    - [Hacky Solution: Modify the Xcode project](#hacky-solution-modify-the-xcode-project)
+
+
 # CodeSigning
 
 Check out the official `fastlane` code signing guide: [https://codesigning.guide](https://codesigning.guide) for a detailed description on how to setup codesigning in teams.

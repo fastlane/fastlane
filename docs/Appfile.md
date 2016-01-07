@@ -1,3 +1,7 @@
+
+- [Appfile](#appfile)
+
+
 # Appfile
 
 The `Appfile` stores useful information that are used across all `fastlane` tools like your *Apple ID* or the application *Bundle Identifier*, to deploy your lanes faster and tailored on your project needs. 

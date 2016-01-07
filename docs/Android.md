@@ -1,3 +1,18 @@
+
+- [fastlane for Android](#fastlane-for-android)
+  - [Initial setup](#initial-setup)
+    - [Package Name](#package-name)
+    - [Google Play Access](#google-play-access)
+    - [Issuer](#issuer)
+    - [Keyfile](#keyfile)
+    - [Finishing up](#finishing-up)
+    - [Editing the configuration files](#editing-the-configuration-files)
+        - [`fastlane/Fastfile`](#fastlanefastfile)
+        - [`fastlane/Appfile`](#fastlaneappfile)
+        - [`fastlane/metadata/android`](#fastlanemetadataandroid)
+    - [Next Steps](#next-steps)
+
+
 # fastlane for Android
 
 This guide will show you step by step how to get started with `fastlane` for your Android project.

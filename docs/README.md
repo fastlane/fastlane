@@ -1,3 +1,12 @@
+
+- [Documentation](#documentation)
+  - [Fastfile](#fastfile)
+    - [`before_all` block](#before_all-block)
+    - [`after_all` block](#after_all-block)
+    - [`error` block](#error-block)
+  - [Extensions](#extensions)
+
+
 # Documentation
 
 - [fastlane guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Guide.md) to get started. 
