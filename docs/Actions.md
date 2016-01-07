@@ -823,7 +823,7 @@ You can add some options:
 ```ruby
 appaloosa(
   binary: '/path/to/binary.ipa', # path tor your IPA or APK
-  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered 
+  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered
   api_token: 'your_api_key', # only if already registered
   group_ids: '112, 232, 387', # User group_ids visibility, if it's not specified we 'll publish the app for all users in your store'
   # screenshots: after snapshot step:
@@ -1134,7 +1134,7 @@ This action turns your git commit history into formatted changelog text.
 
 ```ruby
 # Collects commits since your last tag and returns a concatenation of their subjects and bodies
-changelog_from_git_commits 
+changelog_from_git_commits
 
 # Advanced options
 changelog_from_git_commits(
@@ -1353,7 +1353,7 @@ puts commit[:author]
 
 ### create_pull_request
 
-Create a new pull request. 
+Create a new pull request.
 
 ```ruby
 create_pull_request(
@@ -1542,7 +1542,7 @@ testmunk
 ```
 
 ### [Podio](http://podio.com)
-Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items). 
+Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items).
 
 ```ruby
 ENV["PODIO_ITEM_IDENTIFYING_FIELD"] = "String specifying the field key used for identification of an item"
@@ -1588,7 +1588,7 @@ end
 
 ### sonar
 
-This action will execute `sonar-runner` to run SonarQube analysis on your source code. 
+This action will execute `sonar-runner` to run SonarQube analysis on your source code.
 
 ```ruby
 sonar(
@@ -1692,6 +1692,15 @@ This can be used to store some generated URL or value for easy copy & paste (e.g
 
 ```ruby
 clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
+```
+
+### cloc
+
+You can generate a Line Count (that is readable by Jenkins - see the SLOCCount Plugin for more details).  This action is a wrapper around the cloc tool: https://github.com/AlDanial/cloc
+
+```ruby
+# Result will be an XML report file: reports/cloc.xml
+cloc(exclude_dir: 'ThirdParty,Resources', output_directory: 'reports', source_directory: 'MyCoolApp')
 ```
 
 ### is_ci?
