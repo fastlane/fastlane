@@ -1,4 +1,5 @@
 require 'zip'
+require 'plist'
 
 module FastlaneCore
   class IpaFileAnalyser
@@ -19,6 +20,7 @@ module FastlaneCore
     def self.fetch_info_plist_file(path)
       Zip::File.open(path) do |zipfile|
         zipfile.each do |file|
+          next if file.name.match(%r{\.app/.+\.app/Info.plist$})
           next unless file.name.include? '.plist' and !['.bundle', '.framework'].any? { |a| file.name.include? a }
 
           # We can not be completely sure, that's the correct plist file, so we have to try
