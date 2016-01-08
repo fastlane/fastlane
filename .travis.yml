@@ -7,4 +7,6 @@ before_install:
 rvm:
   - 2.1.6
   - 2.2.2
-script: bundle exec fastlane test
+script:
+  - danger
+  - bundle exec fastlane test
