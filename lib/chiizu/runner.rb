@@ -120,9 +120,6 @@ module Chiizu
 
       raise errors.join('; ') if errors.count > 0
 
-      # Generate HTML report
-      # ReportsGenerator.new.generate
-
       # Clear the Derived Data
       # FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
 

@@ -2,7 +2,6 @@ require 'fastlane_core'
 
 require 'chiizu/version'
 require 'chiizu/runner'
-require 'chiizu/reports_generator'
 require 'chiizu/detect_values'
 require 'chiizu/dependency_checker'
 require 'chiizu/options'
