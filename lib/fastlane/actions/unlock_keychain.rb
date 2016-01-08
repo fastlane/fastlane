@@ -7,10 +7,6 @@ module Fastlane
         set_default = params[:set_default]
         commands = []
 
-        if keychain_path.empty?
-          raise "Could not find the keychain file: #{keychain_path}".red
-        end
-
         # add to search list if not already added
         if add_to_search_list == true || add_to_search_list == :add
           commands << add_keychain_to_search_list(keychain_path)
@@ -67,7 +63,7 @@ module Fastlane
           end
         end
 
-        return ""
+        raise "Could not find the keychain file in: #{possible_locations}".red
       end
 
       #####################################################
