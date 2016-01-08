@@ -175,20 +175,14 @@
 
             <% sc_by_size.keys.sort.each do |screen_size| %>
               <% screenshots = sc_by_size[screen_size].sort { |a, b| [a.path] <=> [b.path] } %>
-
-              <% screenshots.each_with_index do |screenshot, index| %>
-
-                <% if index == 0 %>
-              <h4><%= screenshot.formatted_name %></h4>
+              <%# we are guaranteed to have at least one element because of the group_by %>
+              <h4><%= screenshots[0].formatted_name %></h4>
               <div class="app-screenshot-row">
-                <% end %>
 
+              <% screenshots.each do |screenshot| %>
                 <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>"></a>
-
-                <% if index == (screenshots.count - 1) %>
-              </div>
-                <% end %>
               <% end %>
+              </div>
             <% end %>
           <% else %>
             <!-- no screenshots -->
