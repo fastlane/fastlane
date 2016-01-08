@@ -184,8 +184,8 @@ To submit the changes to the fastlane main repo, you have to do the following:
 - Open the GitHub page of the repository you changed (e.g. [https://github.com/fastlane/gym](https://github.com/fastlane/gym))
 - Click on `Fork` on the top right
 - On your terminal, navigate to the project you modified and run `git remote add upstream https://github.com/[my_user]/[tool_name]` (or use the `git` URL if you use private key auth)
-- Commit your changes
-- Run `git push upstream master`
+- Squash your commits into one. For example,  to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History) 
+- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
 - Open `https://github.com/fastlane/[tool_name]` in your browser and click the green "Create Pull Request" button
 
 # Need help?
