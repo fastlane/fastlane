@@ -269,7 +269,7 @@ module Spaceship
         #
         #  # Use the signing request to create a new distribution certificate
         #  Spaceship::Certificate::Production.create!(csr: csr)
-        # @return (Device): The newly created device
+        # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
           type = CERTIFICATE_TYPE_IDS.key(self)
 
