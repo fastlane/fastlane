@@ -252,7 +252,13 @@ module FastlaneCore
       command = "xcrun xcodebuild -list #{options.join(' ')}"
       Helper.log.info command.yellow unless silent
 
-      @raw = `#{command}`.to_s
+      # xcode >= 6 might hang here if the user schemes are missing
+      begin
+        require 'timeout'
+        @raw = Timeout.timeout(10) { `#{command}`.to_s }
+      rescue Timeout::Error
+        raise "xcodebuild -list timed-out. You might need to recreate the user schemes. See https://github.com/fastlane/gym/issues/143".red
+      end
 
       raise "Error parsing xcode file using `#{command}`".red if @raw.length == 0
 
