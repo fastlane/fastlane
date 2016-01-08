@@ -82,21 +82,7 @@ module FastlaneCore
 
     # Get all available schemes in an array
     def schemes
-      results = []
-      output = raw_info.split("Schemes:").last.split(":").first
-
-      if raw_info.include?("There are no schemes in workspace") or raw_info.include?("This project contains no schemes")
-        return results
-      end
-
-      output.split("\n").each do |current|
-        current = current.strip
-
-        next if current.length == 0
-        results << current
-      end
-
-      results
+      parsed_info.schemes
     end
 
     # Let the user select a scheme
@@ -132,23 +118,7 @@ module FastlaneCore
 
     # Get all available configurations in an array
     def configurations
-      results = []
-      splitted = raw_info.split("Configurations:")
-      return [] if splitted.count != 2 # probably a CocoaPods project
-
-      output = splitted.last.split(":").first
-      output.split("\n").each_with_index do |current, index|
-        current = current.strip
-
-        if current.length == 0
-          next if index == 0
-          break # as we want to break on the empty line
-        end
-
-        results << current
-      end
-
-      results
+      parsed_info.configurations
     end
 
     def app_name
@@ -263,6 +233,15 @@ module FastlaneCore
       raise "Error parsing xcode file using `#{command}`".red if @raw.length == 0
 
       return @raw
+    end
+
+    private
+
+    def parsed_info
+      unless @parsed_info
+        @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info)
+      end
+      @parsed_info
     end
   end
 end
