@@ -265,6 +265,26 @@ unlock_keychain(
 )
 ```
 
+By default the keychain is added to the existing. To replace them with the selected keychain you may use `:replace`.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret",
+  add_to_search_list: :replace # To only add a keychain use `true` or `:add`.
+)
+```
+
+In addition, the keychain can be selected as a default keychain.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret",
+  set_default: true
+)
+```
+
 If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
 
 ```ruby
