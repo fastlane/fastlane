@@ -83,6 +83,9 @@ module Gym
           print "https://openradar.appspot.com/radar?id=4952000420642816"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         when /IDEDistributionErrorDomain error 1/
+        when /Error Domain=IDEDistributionErrorDomain Code=/
+          standard_output = read_standard_output output
+          print standard_output if standard_output
           print "There was an error exporting your application"
           print "Unfortunately the new Xcode export API is unstable and causes problems on some project"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
@@ -99,7 +102,17 @@ module Gym
         raise "Archive invalid"
       end
 
+      def find_standard_output_path(output)
+        m = /Created bundle at path '(.*)'/.match(output)
+        return File.join(m[1], 'IDEDistribution.standard.log') unless m.nil?
+      end
+
       private
+
+      def read_standard_output(output)
+        path = find_standard_output_path output
+        return File.read(path) if File.exist?(path)
+      end
 
       # Just to make things easier
       def print(text)
