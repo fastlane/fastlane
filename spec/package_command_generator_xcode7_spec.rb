@@ -47,7 +47,7 @@ describe Gym do
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
-      expect(Gym::PackageCommandGeneratorXcode7.temporary_output_path).to match(%r{/tmp/\d+})
+      expect(Gym::PackageCommandGeneratorXcode7.temporary_output_path).to match(%r{#{Dir.tmpdir}/gym.+\.gym_output})
     end
   end
 end
