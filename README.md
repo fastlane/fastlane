@@ -25,7 +25,7 @@
 WatchBuild
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/watchbuild/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/watchbuild.svg?style=flat)](http://rubygems.org/gems/watchbuild)
 
@@ -47,7 +47,7 @@ WatchBuild is a standalone tool and can be used without any of the other [fastla
 
 This tool is not a replacement for [deliver](https://github.com/fastlane/deliver) (Upload metadata and builds to iTunes Connect) or [pilot](https://github.com/fastlane/pilot) (Upload and distribute new builds to TestFlight), but is meant as a small helpful utility with the main purpose to wait for the binary processing to be finished.
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">
