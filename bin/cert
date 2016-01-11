@@ -17,7 +17,7 @@ class CertApplication
     program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
     program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
-    program :help, 'GitHub', 'https://github.com/krausefx/cert'
+    program :help, 'GitHub', 'https://github.com/fastlane/cert'
     program :help_formatter, :compact
 
     FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
