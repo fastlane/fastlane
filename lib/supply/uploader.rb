@@ -69,11 +69,28 @@ module Supply
     def upload_binary
       if Supply.config[:apk]
         Helper.log.info "Preparing apk at path '#{Supply.config[:apk]}' for upload..."
+        apk_version_code = client.upload_apk(Supply.config[:apk])
+
+        Helper.log.info "Updating track '#{Supply.config[:track]}'..."
         if Supply.config[:track].eql? "rollout"
-          client.upload_apk_to_track_with_rollout(Supply.config[:apk], Supply.config[:track], Supply.config[:rollout])
+          client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
         else
-          client.upload_apk_to_track(Supply.config[:apk], Supply.config[:track])
+          client.update_track(Supply.config[:track], 1.0, apk_version_code)
         end
+
+        if metadata_path
+          Dir.foreach(metadata_path) do |language|
+            next if language.start_with?('.') # e.g. . or .. or hidden folders
+
+            path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
+            if File.exist?(path)
+              Helper.log.info "Updating changelog for code version '#{apk_version_code}' and language '#{language}'..."
+              apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
+              client.update_apk_listing_for_language(apk_listing)
+            end
+          end
+        end
+
       else
         Helper.log.info "No apk file found, you can pass the path to your apk using the `apk` option"
       end
