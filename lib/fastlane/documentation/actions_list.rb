@@ -114,7 +114,7 @@ module Fastlane
           puts ""
         end
 
-        puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
+        puts "More information can be found on https://github.com/fastlane/fastlane/blob/master/docs/Actions.md"
         puts "\n"
 
         return # our job is done here

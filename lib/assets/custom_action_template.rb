@@ -5,7 +5,7 @@ module Fastlane
     end
 
     # To share this integration with the other fastlane users:
-    # - Fork https://github.com/KrauseFx/fastlane
+    # - Fork https://github.com/fastlane/fastlane
     # - Clone the forked repository
     # - Move this integration into lib/fastlane/actions
     # - Commit, push and submit the pull request

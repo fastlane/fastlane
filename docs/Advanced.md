@@ -130,7 +130,7 @@ Import from another git repository, which you can use to have one git repo with 
 
 
 ```ruby
-import_from_git(url: 'https://github.com/KrauseFx/fastlane')
+import_from_git(url: 'https://github.com/fastlane/fastlane')
 # or
 import_from_git(url: 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git',
                path: 'fastlane/Fastfile')
@@ -237,7 +237,7 @@ actions_path '../custom_actions_folder/'
 
 ## The Appfile
 
-The documentation was moved to [Appfile.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md).
+The documentation was moved to [Appfile.md](https://github.com/fastlane/fastlane/blob/master/docs/Appfile.md).
 
 ## Skip update check when launching `fastlane`
 
@@ -245,4 +245,4 @@ You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the up
 
 ## Gitignore
 
-The documentation was moved to [Gitignore.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Gitignore.md).
+The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md).

@@ -1,6 +1,6 @@
 # Actions
 
-There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/KrauseFx/fastlane/issues/new).
+There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
 
 To get the most up-to-date information from the command line on your current verion you can also run:
 
@@ -99,7 +99,7 @@ Add this action to your `appstore` lane. Keep in mind this action might take sev
 verify_xcode
 ```
 
-### [snapshot](https://github.com/KrauseFx/snapshot)
+### [snapshot](https://github.com/fastlane/snapshot)
 
 ```ruby
 snapshot
@@ -114,7 +114,7 @@ snapshot(
 )
 ```
 
-Take a look at the [prefilling data guide](https://github.com/KrauseFx/snapshot#prefilling) on the `snapshot` documentation.
+Take a look at the [prefilling data guide](https://github.com/fastlane/snapshot#prefilling) on the `snapshot` documentation.
 
 ### clear_derived_data
 
@@ -128,7 +128,7 @@ clear_derived_data
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
-You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 ipa(
@@ -161,7 +161,7 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) before using this action.
+You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md) before using this action.
 
 Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
@@ -214,7 +214,7 @@ If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake
 xcake
 ```
 
-### [resign](https://github.com/krausefx/sigh#resign)
+### [resign](https://github.com/fastlane/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
 If you have used the `ipa` and `sigh` actions, then this action automatically gets the `ipa` and `provisioning_profile` values respectively from those actions and you don't need to manually set them (although you can always override them).
@@ -315,7 +315,7 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
 such as; archive, build, clean, test, export & more.
 
-You should check out the [code signing guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md).
+You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -408,7 +408,7 @@ clean_build_artifacts
 
 See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) cleans their build artifacts after building and distributing their app.
 
-### [frameit](https://github.com/KrauseFx/frameit)
+### [frameit](https://github.com/fastlane/frameit)
 By default, the device color will be black
 ```ruby
 frameit
@@ -463,7 +463,7 @@ recreate_schemes(
 
 ## Testing
 
-### [scan](https://github.com/KrauseFx/scan)
+### [scan](https://github.com/fastlane/scan)
 
 `scan` makes it super easy to run tests of your iOS and Mac applications
 
@@ -626,7 +626,7 @@ pilot(username: "felix@krausefx.com",
 
 More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/pilot).
 
-### [deliver](https://github.com/KrauseFx/deliver)
+### [deliver](https://github.com/fastlane/deliver)
 ```ruby
 deliver
 ```
@@ -656,7 +656,7 @@ To upload a new binary to Apple TestFlight use the `testflight` action:
 testflight
 ```
 
-This will use [deliver](https://github.com/KrauseFx/deliver) under the hood.
+This will use [deliver](https://github.com/fastlane/deliver) under the hood.
 
 Additionally you can skip the submission of the new binary to the testers to only upload the build:
 
@@ -777,7 +777,7 @@ This action creates a new release for your repository on GitHub and can also upl
 
 ```ruby
 github_release = set_github_release(
-  repository_name: "krausefx/fastlane",
+  repository_name: "fastlane/fastlane",
   api_token: ENV['GITHUB_TOKEN'],
   name: "Super New actions",
   tag_name: "v1.22.0",
@@ -1036,7 +1036,7 @@ match(type: "appstore", app_identifier: "tools.fastlane.app")
 match(type: "development", readonly: true)
 ```
 
-### [sigh](https://github.com/KrauseFx/sigh)
+### [sigh](https://github.com/fastlane/sigh)
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
 ```ruby
@@ -1055,7 +1055,7 @@ sigh(
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `sigh` to automatically retrieve the latest provisioning profile.
 
-### [PEM](https://github.com/KrauseFx/PEM)
+### [PEM](https://github.com/fastlane/PEM)
 
 This will generate a new push profile if necessary (the old one is about to expire).
 
@@ -1081,9 +1081,9 @@ Use the `fastlane action pem` command to view all available options.
 
 [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
-### [cert](https://github.com/KrauseFx/cert)
+### [cert](https://github.com/fastlane/cert)
 
-The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/KrauseFx/cert).
+The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/fastlane/cert).
 
 ```ruby
 cert
@@ -1100,7 +1100,7 @@ cert(
 )
 ```
 
-### [produce](https://github.com/KrauseFx/produce)
+### [produce](https://github.com/fastlane/produce)
 
 Create new apps on iTunes Connect and Apple Developer Portal. If the app already exists, `produce` will not do anything.
 
@@ -1354,7 +1354,7 @@ reset_git_repo(
 You can easily receive information about a specific release from GitHub.com
 
 ```ruby
-release = get_github_release(url: "KrauseFx/fastlane", version: "1.0.0")
+release = get_github_release(url: "fastlane/fastlane", version: "1.0.0")
 puts release['name']
 ```
 
@@ -1368,7 +1368,7 @@ This is useful if you have shared lanes across multiple apps and you want to sto
 
 ```ruby
 import_from_git(
-  url: 'git@github.com:KrauseFx/fastlane.git', # The url of the repository to import the Fastfile from.
+  url: 'git@github.com:fastlane/fastlane.git', # The url of the repository to import the Fastfile from.
   branch: 'HEAD', # The branch to checkout on the repository. Defaults to `HEAD`.
   path: 'fastlane/Fastfile' # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
 )
@@ -1566,7 +1566,7 @@ Display a notification using the OS X notification centre. Uses [terminal-notifi
 [ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
 
 ### [Testmunk](http://testmunk.com)
-Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/KrauseFx/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
+Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/fastlane/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
 
 ```ruby
 ENV['TESTMUNK_EMAIL'] = 'email@email.com'
@@ -1718,7 +1718,7 @@ say "I can speak"
 You can store a string in the clipboard running
 
 ```ruby
-clipboard(value: "https://github.com/KrauseFx/fastlane")
+clipboard(value: "https://github.com/fastlane/fastlane")
 ```
 
 This can be used to store some generated URL or value for easy copy & paste (e.g. the download link):

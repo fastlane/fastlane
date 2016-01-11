@@ -11,4 +11,4 @@ apple_id "[[APPLE_ID]]" # Your Apple email address
 # itc_team_id "18742801
 
 # you can even provide different app identifiers, Apple IDs and team names per lane:
-# https://github.com/KrauseFx/fastlane/blob/master/docs/Appfile.md
+# https://github.com/fastlane/fastlane/blob/master/docs/Appfile.md
