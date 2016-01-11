@@ -79,7 +79,7 @@ module Gym
       def print_legacy_information
         if Gym.config[:provisioning_profile_path]
           UI.important "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-          UI.important "Please follow the Code Signing Guide: https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
         end
       end
     end
