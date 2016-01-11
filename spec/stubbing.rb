@@ -11,6 +11,7 @@ def stub_spaceship
   allow(certificate).to receive(:id).and_return("cert_id")
   allow(certificate).to receive(:download_raw).and_return("download_raw")
   allow(certificate).to receive(:name).and_return("name")
+  allow(certificate).to receive(:can_download).and_return(true)
 
   allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
 end
