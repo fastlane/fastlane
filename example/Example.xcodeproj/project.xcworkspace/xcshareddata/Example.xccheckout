@@ -11,7 +11,7 @@
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>0C13013A15CBECA0A0F90171BFF095518AA5D530</key>
-		<string>https://github.com/KrauseFx/snapshot.git</string>
+		<string>https://github.com/fastlane/snapshot.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>example/Example.xcodeproj</string>
@@ -21,7 +21,7 @@
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/KrauseFx/snapshot.git</string>
+	<string>https://github.com/fastlane/snapshot.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>

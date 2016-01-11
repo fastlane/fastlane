@@ -66,7 +66,7 @@ class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear()
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/krausefx/snapshot
+        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/snapshot
 
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown

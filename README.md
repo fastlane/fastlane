@@ -29,7 +29,7 @@
 snapshot
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/snapshot/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
@@ -49,7 +49,7 @@ More information about [creating perfect screenshots](https://krausefx.com/blog/
 
 `snapshot` runs completely in the background - you can do something else, while your computer takes the screenshots for you.
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 ### Note: New `snapshot` with UI Tests in Xcode 7
 
