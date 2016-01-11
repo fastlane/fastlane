@@ -7,7 +7,7 @@ describe Cert do
 
     it "Successful run" do
       stub_spaceship
-      options = {keychain_path: "." }
+      options = { keychain_path: "." }
       Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
 
       Cert::Runner.new.launch
