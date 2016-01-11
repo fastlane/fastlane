@@ -1877,3 +1877,16 @@ Install an Xcode plugin for the current user
 ```ruby
 install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
 ```
+
+### cordova_get_config_value
+
+Get a value from a config file, which can be used to fetch the app identifier and more information about your app
+
+```ruby
+identifier = cordova_get_config_value(key: 'id')
+puts identifier # => tools.fastlane.cordova
+
+# path defaults to ./config.xml
+name = cordova_get_config_value(path: 'cordova/config.xml', key: 'name').first
+puts name # => Cordova App
+```
