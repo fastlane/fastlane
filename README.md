@@ -28,7 +28,7 @@
 
 Pilot
 ============
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/pilot/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pilot.svg?style=flat)](http://rubygems.org/gems/pilot)
 
@@ -43,7 +43,7 @@ This tool allows you to manage all important features of Apple TestFlight using 
 - Get information about testers, like the registered devices
 - Export and import all your testers
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 `pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
 
