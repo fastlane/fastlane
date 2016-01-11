@@ -135,6 +135,23 @@ And you can supply screenshots by creating directories with the following names,
 
 Note that these will replace the current images and screenshots on the play store listing, not add to them.
 
+## Changelogs (What's new)
+
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+
+```
+└── fastlane
+    └── metadata
+        └── android 
+            ├── en-US
+            │   └── changelogs
+            │       ├── 100000.txt
+            │       └── 100100.txt
+            └── fr-FR
+                └── changelogs
+                    └── 100100.txt
+```
+
 ## Tips
 
 ### [`fastlane`](https://fastlane.tools) Toolchain
