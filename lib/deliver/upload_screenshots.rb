@@ -54,21 +54,33 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
+      return collect_screenshots_for_languages(options[:screenshots_path])
+    end
 
+    def collect_screenshots_for_languages(path)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
-      Loader.language_folders(options[:screenshots_path]).each do |lng_folder|
+
+      Loader.language_folders(path).each do |lng_folder|
+        language = File.basename(lng_folder)
+
+        # Check to see if we need to traverse multiple platforms or just a single platform
+        if language == Loader::APPLE_TV_DIR_NAME
+          screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
+          next
+        end
+
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"))
         next if files.count == 0
 
         prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}")).count > 0
 
         language = File.basename(lng_folder)
-        files.each do |path|
-          if path.downcase.include?("_framed.")
+        files.each do |file_path|
+          if file_path.downcase.include?("_framed.")
             # That's cool
           else
-            if path.downcase.include?("watch")
+            if file_path.downcase.include?("watch")
               # Watch doesn't support frames (yet)
             else
               # That might not be cool... if that screenshot is not framed but we only want framed
@@ -76,7 +88,7 @@ module Deliver
             end
           end
 
-          screenshots << AppScreenshot.new(path, language)
+          screenshots << AppScreenshot.new(file_path, language)
         end
       end
 
