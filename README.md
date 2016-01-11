@@ -29,13 +29,13 @@
 cert
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/KrauseFx/cert/blob/master/LICENSE)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/fastlanetools)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/cert/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
 
 ###### Automatically create and maintain iOS code signing certificates.
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">
