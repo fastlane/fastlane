@@ -21,14 +21,14 @@
 fastlane
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/fastlane/fastlane/master.svg?style=flat)](https://travis-ci.org/fastlane/fastlane)
 
 ######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">

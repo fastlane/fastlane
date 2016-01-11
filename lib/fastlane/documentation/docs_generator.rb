@@ -32,7 +32,7 @@ module Fastlane
 
       output << "Generate this documentation by running `fastlane docs`"
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
-      output << "The documentation of fastlane can be found on [GitHub](https://github.com/KrauseFx/fastlane)"
+      output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane)"
 
       File.write(output_path, output.join("\n"))
       Helper.log.info "Successfully generated documentation to path '#{File.expand_path(output_path)}'".green

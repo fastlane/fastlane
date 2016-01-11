@@ -52,7 +52,7 @@ Check out the [MindNode Setup](https://github.com/fastlane/examples/blob/master/
 To be sure to have a valid code signing identity installed as well, you can add a `cert` call before the `sigh` action.
 
 ### (Deprecated) Hacky Solution: Modify the Xcode project
-Using the [update_project_provisioning](https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#update_project_provisioning) action you can modify your Xcode project's targets to use a specific provisioning profile. 
+Using the [update_project_provisioning](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#update_project_provisioning) action you can modify your Xcode project's targets to use a specific provisioning profile. 
 
 ```ruby
 update_project_provisioning(

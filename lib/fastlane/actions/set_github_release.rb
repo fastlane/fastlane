@@ -171,10 +171,10 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :repository_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
-                                       description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
+                                       description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include? "github.com"
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
+                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.include? "github.com"
+                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",

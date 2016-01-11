@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         Helper.log.info "You shouldn't use update_project_code_signing"
         Helper.log.info "Have you considered using the recommended way to do code sining?"
-        Helper.log.info "https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+        Helper.log.info "https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
 
         path = params[:path]
         path = File.join(path, "project.pbxproj")
