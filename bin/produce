@@ -18,7 +18,7 @@ class ProduceApplication
     program :description, 'CLI for \'produce\''
     program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
-    program :help, 'GitHub', 'https://github.com/krausefx/produce'
+    program :help, 'GitHub', 'https://github.com/fastlane/produce'
     program :help_formatter, :compact
 
     FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
