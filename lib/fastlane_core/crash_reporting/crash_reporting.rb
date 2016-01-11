@@ -28,7 +28,7 @@ module FastlaneCore
         puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
         puts "🔒  The reports will be stored securely on getsentry.com.".yellow
         puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong.".yellow
-        puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
+        puts "🙊  More information about privacy: https://github.com/fastlane/fastlane/releases/tag/1.33.3".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
       end
 
@@ -41,7 +41,7 @@ module FastlaneCore
         puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
         puts "🔒  The reports will be stored securely on getsentry.com".yellow
         puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong".yellow
-        puts "🙊  More information about privacy: https://github.com/KrauseFx/fastlane/releases/tag/1.33.3".yellow
+        puts "🙊  More information about privacy: https://github.com/fastlane/fastlane/releases/tag/1.33.3".yellow
         puts "🌴  You can always disable crash reports at anytime `fastlane disable_crash_reporting`".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
         if agree("Do you want to enable crash reporting? (y/n) ", true)
