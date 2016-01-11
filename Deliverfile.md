@@ -102,9 +102,9 @@ automatic_release false
 ```
 
 ##### app_rating_config_path
-You can set the app age ratings using `deliver`. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/KrauseFx/deliver/blob/master/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
+You can set the app age ratings using `deliver`. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/deliver/blob/master/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
 
-The keys/values on the top allow values from 0-2, and the items on the bottom allow only 0 or 1. More information in the [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md).
+The keys/values on the top allow values from 0-2, and the items on the bottom allow only 0 or 1. More information in the [Reference.md](https://github.com/fastlane/deliver/blob/master/Reference.md).
 
 
 
@@ -171,7 +171,7 @@ copyright "#{Time.now.year} Felix Krause"
 ##### primary_category
 The english name of the category you want to set (e.g. `Business`, `Books`)
 
-See [Reference.md](https://github.com/KrauseFx/deliver/blob/master/Reference.md) for a list of available categories
+See [Reference.md](https://github.com/fastlane/deliver/blob/master/Reference.md) for a list of available categories
 
 ##### secondary_category
 The english name of the secondary category you want to set
