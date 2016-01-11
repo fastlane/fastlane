@@ -17,7 +17,7 @@ class PemApplication
     program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
     program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
-    program :help, 'GitHub', 'https://github.com/krausefx/PEM'
+    program :help, 'GitHub', 'https://github.com/fastlane/PEM'
     program :help_formatter, :compact
 
     FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
