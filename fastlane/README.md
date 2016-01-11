@@ -20,4 +20,4 @@ Does everything that's needed for a release, this includes running tests and ver
 
 Generate this documentation by running `fastlane docs`
 More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools).
-The documentation of fastlane can be found on [GitHub](https://github.com/KrauseFx/fastlane)
+The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane)
