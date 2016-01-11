@@ -21,10 +21,6 @@ module Fastlane
         Actions.sh command
       end
 
-      #####################################################
-      # @!group Documentation
-      #####################################################
-
       def self.description
         "Generates a Code Count that can be read by Jenkins (xml format)"
       end
@@ -34,9 +30,6 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_CLOC_BINARY_PATH",

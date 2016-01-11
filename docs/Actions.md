@@ -1727,9 +1727,9 @@ This can be used to store some generated URL or value for easy copy & paste (e.g
 clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
 ```
 
-### cloc
+### [cloc](https://github.com/AlDanial/cloc)
 
-You can generate a Line Count (that is readable by Jenkins - see the SLOCCount Plugin for more details).  This action is a wrapper around the cloc tool: https://github.com/AlDanial/cloc
+You can generate a Line Count (that is readable by Jenkins - see the [SLOCCount Plugin](https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin) for more details).  This action is a wrapper around the cloc tool:
 
 ```ruby
 # Result will be an XML report file: reports/cloc.xml
