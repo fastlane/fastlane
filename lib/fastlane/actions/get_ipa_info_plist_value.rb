@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.return_value
-        "Returns the value in the .ipa's Info.plit corresponding to the passed in Key"
+        "Returns the value in the .ipa's Info.plist corresponding to the passed in Key"
       end
 
       def self.authors

@@ -265,6 +265,26 @@ unlock_keychain(
 )
 ```
 
+By default the keychain is added to the existing. To replace them with the selected keychain you may use `:replace`.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret",
+  add_to_search_list: :replace # To only add a keychain use `true` or `:add`.
+)
+```
+
+In addition, the keychain can be selected as a default keychain.
+
+```ruby
+unlock_keychain(
+  path: "/path/to/KeychainName.keychain",
+  password: "mysecret",
+  set_default: true
+)
+```
+
 If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
 
 ```ruby
@@ -1177,6 +1197,19 @@ Simple action to get the latest git tag
 ```ruby
 last_git_tag
 ```
+
+If you are using this action on a **shallow clone**, *the default with some CI systems like Bamboo*, you need to ensure that you have also have pulled all the git tags appropriately.  Assuming your git repo has the correct remote set you can issue `sh("git fetch --tags")`
+
+```ruby
+  #Only fetch tags if a remote is set
+  remote_count = sh("git remote show | wc -l")
+  if remote_count > 0.to_s
+    sh("git fetch --tags")
+    last_git_tag
+  end
+```
+
+
 
 ### git_branch
 
