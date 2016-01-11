@@ -3,6 +3,8 @@
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
+require 'tempfile'
+
 module Gym
   # Responsible for building the fully working xcodebuild command
   class PackageCommandGeneratorXcode7
@@ -35,7 +37,7 @@ module Gym
 
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
-        Gym.cache[:temporary_output_path] ||= File.join("/tmp", Time.now.to_i.to_s)
+        Gym.cache[:temporary_output_path] ||= "#{Tempfile.new('gym').path}.gym_output"
       end
 
       def ipa_path
@@ -56,7 +58,7 @@ module Gym
 
       # The path the config file we use to sign our app
       def config_path
-        Gym.cache[:config_path] ||= "/tmp/gym_config_#{Time.now.to_i}.plist"
+        Gym.cache[:config_path] ||= "#{Tempfile.new('gym').path}_config.plist"
         return Gym.cache[:config_path]
       end
 
