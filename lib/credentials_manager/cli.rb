@@ -20,18 +20,12 @@ module CredentialsManager
         c.option '--password password', String, 'Password to add.'
 
         c.action do |args, options|
-          username = options.username
-          password = options.password
+          username = options.username || ask('Username: ')
+          password = options.password || ask('Password: ') { |q| q.echo = '*' }
 
-          if username.nil?
-            raise 'You must specify a username'
-          elsif password.nil?
-            raise 'You must specify a password'
-          else
-            add(username, password)
+          add(username, password)
 
-            puts "Credential #{username}:#{'*' * password.length} added to keychain."
-          end
+          puts "Credential #{username}:#{'*' * password.length} added to keychain."
         end
       end
 
@@ -43,13 +37,9 @@ module CredentialsManager
         c.option '--username username', String, 'Username to remove.'
 
         c.action do |args, options|
-          username = options.username
+          username = options.username || ask('Username: ')
 
-          if username.nil?
-            raise 'You must specify a username'
-          else
-            remove(username)
-          end
+          remove(username)
         end
       end
 
