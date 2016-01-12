@@ -108,6 +108,7 @@ module Scan
                                        raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_url,
+                                     short_option: "-i",
                                      env_name: "SLACK_URL",
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
@@ -115,6 +116,7 @@ module Scan
                                        raise "Invalid URL, must start with https://" unless value.start_with? "https://"
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_channel,
+                                     short_option: "-e",
                                      env_name: "SCAN_SLACK_CHANNEL",
                                      description: "#channel or @username",
                                      optional: true),
