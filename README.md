@@ -5,6 +5,22 @@ CredentialsManager
 
 All code related to your username and password can be found here: [account_manager.rb](https://github.com/fastlane/CredentialsManager/blob/master/lib/credentials_manager/account_manager.rb)
 
+## Usage
+Along with the [Ruby libraries](https://github.com/fastlane/credentials_manager#implementing-a-custom-solution) you can use the command line interface to add credentials to the keychain.
+
+**Adding Credentials**
+```sh
+$ fastlane-credentials add --username tcook
+Password: *********
+Credential tcook:********* added to keychain.
+```
+
+**Removing Credentials**
+```sh
+$ fastlane-credentials remove --username tcook
+password has been deleted.
+```
+
 ## Storing in the keychain
 
 By default, your Apple credentials are stored in the OS X Keychain.
