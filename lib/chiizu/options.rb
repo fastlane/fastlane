@@ -76,7 +76,12 @@ module Chiizu
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
                                        raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :specific_device,
+                                     env_name: 'CHIIZU_SPECIFIC_DEVICE',
+                                     optional: true,
+                                     description: "Use the device or emulator with the given serial number or qualifier",
+                                     short_option: "-s")
       ]
     end
   end
