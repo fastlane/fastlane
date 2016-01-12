@@ -243,6 +243,23 @@ The documentation was moved to [Appfile.md](https://github.com/fastlane/fastlane
 
 You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the update check.
 
+## Adding Credentials
+
+You can add credentials for use by Fastlane to your keychain using the [CredentialsManager](https://github.com/fastlane/credentials_manager) command line interface. This is useful for situations like CI environments.
+
+**Adding a Credential**
+```sh
+$ fastlane-credentials add --username tcook
+Password: *********
+Credential tcook:********* added to keychain.
+```
+
+**Removing a Credential**
+```sh
+$ fastlane-credentials remove --username tcook
+password has been deleted.
+```
+
 ## Gitignore
 
 The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md).
