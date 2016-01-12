@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>deliver - <%= @app_name %></title>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-16">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <style>
-          #app-name {
+          .app-name {
               font-size: 42px;
               font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
               font-weight: 300;
@@ -12,7 +13,7 @@
               margin-right: 25px;
           }
 
-          #app-urls {
+          .app-urls {
               margin-left: 25px;
               font-size: 14px;
               margin-top: 4px;
@@ -40,7 +41,7 @@
               margin-right: 10px;
           }
 
-          #app-keyword {
+          .app-keyword {
               margin-left: 25px;
               margin-right: 25px;
               margin-top: 22px;
@@ -53,24 +54,24 @@
 
 
 
-          #app-description {
+          .app-description {
               margin-left: 25px;
               margin-right: 25px;
               margin-top: 22px;
           }
 
-          #app-description-text {
+          .app-description-text {
               font-weight: 300;
           }
 
-          #app-changelog {
+          .app-changelog {
               margin-left: 25px;
               margin-right: 25px;
               margin-top: 22px;
               font-weight: 300;
           }
 
-          #app-screenshots {
+          .app-screenshots {
               margin-left: 15px;
               margin-right: 15px;
               margin-top: 22px;
@@ -112,16 +113,16 @@
     <body>
       <% @languages.each do |language| %>
         <% if @options[:name] %>
-          <div id="app-name">
+          <div class="app-name">
             <%= language %>: <%= @options[:name][language] %>
           </div>
         <% else %>
-          <div id="app-name">
+          <div class="app-name">
             <%= language %>
           </div>
         <% end %>
 
-        <div id="app-urls">
+        <div class="app-urls">
           <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
             <% value = @options[key][language] if @options[key] %>
@@ -134,7 +135,7 @@
         </div>
         
         <% if @options[:keywords] and @options[:keywords][language] %>
-          <div id="app-keyword">
+          <div class="app-keyword">
               <div class="cat-headline">Keywords</div>
               <ul class="app-keyword-list">
                 <% @options[:keywords][language].split(" ").each do |keyword| %>
@@ -145,22 +146,22 @@
         <% end %>
         
         <% if @options[:description] %>
-          <div id="app-description">
+          <div class="app-description">
                <div class="cat-headline">Description</div>
-               <div id="app-description-text">
+               <div class="app-description-text">
                   <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
                </div>
           </div>
         <% end %>
         
         <% if @options[:release_notes] %>
-          <div id="app-changelog">
+          <div class="app-changelog">
               <div class="cat-headline">Changelog</div>
               <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
           </div>
         <% end %>
         
-        <div id="app-screenshots">
+        <div class="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
           <% if options[:skip_screenshots] %>
@@ -170,24 +171,19 @@
               </p>
             </div>
           <% elsif @screenshots.count > 0 %>
-            <% last_size = nil %>
             <% sc = @screenshots.find_all { |s| s.language == language } %>
-            <% sc.sort {|a, b| [a.screen_size, a.path] <=> [b.screen_size, b.path]}.each do |screenshot| %>
+            <% sc_by_size = sc.group_by { |i| i.screen_size } %>
 
-              <% new_row = (last_size != screenshot.screen_size or last_size == nil) %>
+            <% sc_by_size.keys.sort.each do |screen_size| %>
+              <% screenshots = sc_by_size[screen_size].sort { |a, b| [a.path] <=> [b.path] } %>
+              <%# we are guaranteed to have at least one element because of the group_by %>
+              <h4><%= screenshots[0].formatted_name %></h4>
+              <div class="app-screenshot-row">
 
-              <% if new_row and last_size != nil %>
-                </div>
+              <% screenshots.each_with_index do |screenshot, index| %>
+                <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>" title="Screenshot #<%=index%> for <%=language%>"></a>
               <% end %>
-
-              <% if new_row %>
-                <h4><%= screenshot.formatted_name %></h4>
-                <div class="app-screenshot-row">
-              <% end %>
-              
-              <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>"></a>
-
-              <% last_size = screenshot.screen_size %>
+              </div>
             <% end %>
           <% else %>
             <!-- no screenshots -->
