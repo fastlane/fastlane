@@ -27,7 +27,7 @@ module Snapshot
       puts ""
       puts "3) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
       puts ""
-      puts "More information on GitHub: https://github.com/krausefx/snapshot".green
+      puts "More information on GitHub: https://github.com/fastlane/snapshot".green
     end
   end
 end

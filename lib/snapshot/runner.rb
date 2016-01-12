@@ -9,8 +9,8 @@ module Snapshot
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         Helper.log.warn "Found old snapshot configuration file 'snapshot.js'".red
         Helper.log.warn "You updated to snapshot 1.0 which now uses UI Automation".red
-        Helper.log.warn "Please follow the migration guide: https://github.com/KrauseFx/snapshot/blob/master/MigrationGuide.md".red
-        Helper.log.warn "And read the updated documentation: https://github.com/KrauseFx/snapshot".red
+        Helper.log.warn "Please follow the migration guide: https://github.com/fastlane/snapshot/blob/master/MigrationGuide.md".red
+        Helper.log.warn "And read the updated documentation: https://github.com/fastlane/snapshot".red
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
