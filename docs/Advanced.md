@@ -245,18 +245,18 @@ You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the up
 
 ## Adding Credentials
 
-You can add credentials for use by Fastlane to your keychain using the [CredentialsManager](https://github.com/fastlane/credentials_manager) command line interface. This is useful for situations like CI environments.
+You can add credentials for use by `fastlane` to your keychain using the [CredentialsManager](https://github.com/fastlane/credentials_manager) command line interface. This is useful for situations like CI environments.
 
 **Adding a Credential**
-```sh
-$ fastlane-credentials add --username tcook
+```
+fastlane-credentials add --username felix@krausefx.com
 Password: *********
-Credential tcook:********* added to keychain.
+Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing a Credential**
-```sh
-$ fastlane-credentials remove --username tcook
+```
+fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
