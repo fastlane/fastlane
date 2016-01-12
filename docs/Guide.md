@@ -66,7 +66,7 @@ What did this setup do?
 - Created `fastlane/Appfile`, which stores your *Apple ID* and *Bundle Identifier*.
 - Created `fastlane/Fastfile`, which stores your deployment pipelines.
 
-The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/deliver), [CocoaPods](http://cocoapods.org/), [xctool](https://github.com/facebook/xctool)).
+The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/deliver), [CocoaPods](http://cocoapods.org/)).
 
 ### Individual Tools
 
@@ -78,7 +78,6 @@ For example, try running the following (depending on what you plan on using):
 - [snapshot](https://github.com/fastlane/snapshot)
 - [sigh](https://github.com/fastlane/sigh)
 - [frameit](https://github.com/fastlane/frameit)
-- [xctool](https://github.com/facebook/xctool) (which you should [configure correctly](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#xctool))
 
 All those tools have detailed instructions on how to set them up. It's easier to set them up now, than later.
 
@@ -99,7 +98,6 @@ Depending on your existing setup, it looks similar to this (I removed some lines
 before_all do
   # increment_build_number
   cocoapods
-  xctool "test"
 end
 
 lane :test do 
