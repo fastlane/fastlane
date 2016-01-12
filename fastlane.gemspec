@@ -32,22 +32,22 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcode-install', '~> 1.0.1' # Download new Xcode versions
 
   spec.add_dependency 'fastlane_core', '>= 0.32.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.13.0', '< 1.0.0' # Password Manager
+  spec.add_dependency 'credentials_manager', '>= 0.14.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.19.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.6.5', '< 2.0.0'
-  spec.add_dependency 'snapshot', '>= 1.4.2', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.7.0', '< 2.0.0'
+  spec.add_dependency 'snapshot', '>= 1.4.4', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.4.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.1.1', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.2.7', '< 2.0.0'
-  spec.add_dependency 'sigh', '>= 1.2.1', '< 2.0.0'
+  spec.add_dependency 'sigh', '>= 1.2.2', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.1.0', '< 2.0.0'
-  spec.add_dependency 'gym', '>= 1.1.6', '< 2.0.0'
+  spec.add_dependency 'gym', '>= 1.4.0', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.2.1', '< 2.0.0'
-  spec.add_dependency 'supply', '>= 0.2.2', '< 1.0.0'
-  spec.add_dependency 'scan', '>= 0.3.3', '< 1.0.0'
-  spec.add_dependency 'match', '>= 0.2.2', '< 1.0.0'
+  spec.add_dependency 'supply', '>= 0.3.0', '< 1.0.0'
+  spec.add_dependency 'scan', '>= 0.4.1', '< 1.0.0'
+  spec.add_dependency 'match', '>= 0.2.4', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
