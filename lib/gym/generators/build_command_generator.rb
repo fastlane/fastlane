@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module Gym
   # Responsible for building the fully working xcodebuild command
   class BuildCommandGenerator
@@ -59,7 +61,7 @@ module Gym
 
       def pipe
         pipe = []
-        pipe << "| tee '#{xcodebuild_log_path}' | xcpretty"
+        pipe << "| tee #{xcodebuild_log_path.shellescape} | xcpretty"
         pipe << "--no-color" if Helper.colors_disabled?
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
 
