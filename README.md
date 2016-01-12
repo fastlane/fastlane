@@ -9,14 +9,14 @@ All code related to your username and password can be found here: [account_manag
 Along with the [Ruby libraries](https://github.com/fastlane/credentials_manager#implementing-a-custom-solution) you can use the command line interface to add credentials to the keychain.
 
 **Adding Credentials**
-```sh
+```
 fastlane-credentials add --username felix@krausefx.com
 Password: *********
 Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
-```sh
+```
 fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
