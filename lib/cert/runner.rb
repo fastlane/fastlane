@@ -82,7 +82,7 @@ module Cert
     def certificate_type
       cert_type = Spaceship.certificate.production
       cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-      cert_type = Spaceship.certificate.development if Cert.config[:development] || (Cert.config[:development] && Spaceship.client.in_house?)
+      cert_type = Spaceship.certificate.development if Cert.config[:development]
 
       cert_type
     end
