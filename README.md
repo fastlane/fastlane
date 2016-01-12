@@ -10,14 +10,14 @@ Along with the [Ruby libraries](https://github.com/fastlane/credentials_manager#
 
 **Adding Credentials**
 ```sh
-$ fastlane-credentials add --username tcook
+fastlane-credentials add --username felix@krausefx.com
 Password: *********
-Credential tcook:********* added to keychain.
+Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
 ```sh
-$ fastlane-credentials remove --username tcook
+fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
