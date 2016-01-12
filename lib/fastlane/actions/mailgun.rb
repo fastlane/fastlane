@@ -10,6 +10,7 @@ module Fastlane
 
       def self.run(options)
         Actions.verify_gem!('rest-client')
+        require 'rest-client'
         handle_params_transition(options)
         mailgunit(options)
       end
