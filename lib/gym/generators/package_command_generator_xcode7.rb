@@ -12,7 +12,7 @@ module Gym
       def generate
         print_legacy_information unless Helper.fastlane_enabled?
 
-        parts = ["/usr/bin/xcrun xcodebuild -exportArchive"]
+        parts = ["/usr/bin/xcrun #{XcodebuildFixes.wrap_xcodebuild} -exportArchive"]
         parts += options
         parts += pipe
 

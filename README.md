@@ -204,7 +204,7 @@ After building the archive it is being checked by `gym`. If it's valid, it gets 
 ### Xcode 7 and above
 
 ```
-/usr/bin/xcrun xcodebuild -exportArchive \
+/usr/bin/xcrun path/to/xcbuild-safe.sh -exportArchive \
 -exportOptionsPlist '/tmp/gym_config_1442852529.plist' \
 -archivePath '/Users/fkrause/Library/Developer/Xcode/Archives/2015-09-21/App 2015-09-21 09.21.56.xcarchive' \
 -exportPath '/tmp/1442852529'
@@ -213,6 +213,8 @@ After building the archive it is being checked by `gym`. If it's valid, it gets 
 `gym` makes use of the new Xcode 7 API which allows us to specify the export options using a `plist` file. You can find more information about the available options by running `xcodebuild --help`.
 
 Using this method there are no workarounds for WatchKit or Swift required, as it uses the same technique Xcode uses when exporting your binary.
+
+Note: the [xcbuild-safe.sh script](https://github.com/fastlane/gym/tree/master/lib/assets/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
 
 ### Xcode 6 and below
 
