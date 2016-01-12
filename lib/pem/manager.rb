@@ -68,7 +68,9 @@ module PEM
         end
 
         if PEM.config[:generate_p12]
-          p12_cert_path = File.join(PEM.config[:output_path], "#{filename_base}.p12")
+          output_path = PEM.config[:output_path]
+          FileUtils.mkdir_p(File.expand_path(output_path))
+          p12_cert_path = File.join(output_path, "#{filename_base}.p12")
           p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
           File.write(p12_cert_path, p12.to_der)
           Helper.log.info "p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s
