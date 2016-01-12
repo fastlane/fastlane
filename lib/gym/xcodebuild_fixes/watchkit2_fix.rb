@@ -27,7 +27,7 @@ module Gym
       # Does this application have a WatchKit target
       def watchkit2?
         Dir["#{PackageCommandGenerator.appfile_path}/**/*.plist"].any? do |plist_path|
-          `/usr/libexec/PlistBuddy -c 'Print DTSDKName' '#{plist_path}' 2>&1`.strip == 'watchos2.0'
+          `/usr/libexec/PlistBuddy -c 'Print DTSDKName' '#{plist_path}' 2>&1`.match(/^\s*watchos2\.\d+\s*$/)
         end
       end
     end
