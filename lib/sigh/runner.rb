@@ -164,7 +164,8 @@ module Sigh
       profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
 
-      output_path = File.join('/tmp', profile_name)
+      tmp_path = Dir.mktmpdir("profile_download")
+      output_path = File.join(tmp_path, profile_name)
       File.open(output_path, "wb") do |f|
         f.write(profile.download)
       end
