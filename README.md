@@ -29,7 +29,7 @@
 chiizu
 ============
 
-[![Twitter: @fastlanetools](https://img.shields.io/badge/contact-@fastlanetools-blue.svg?style=flat)](https://twitter.com/fastlanetools)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/chiizu/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/chiizu.svg?style=flat)](http://rubygems.org/gems/chiizu)
 
