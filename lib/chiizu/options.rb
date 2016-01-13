@@ -7,6 +7,15 @@ module Chiizu
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
       @@options ||= [
+        FastlaneCore::ConfigItem.new(key: :android_home,
+                                     short_option: "-n",
+                                     optional: true,
+                                     default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK'],
+                                     description: "Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx"),
+        FastlaneCore::ConfigItem.new(key: :build_tools_version,
+                                     short_option: "-i",
+                                     optional: true,
+                                     description: "The Android build tools version to use, e.g. '23.0.2'"),
         FastlaneCore::ConfigItem.new(key: :locales,
                                      description: "A list of locales which should be used",
                                      short_option: "-q",
