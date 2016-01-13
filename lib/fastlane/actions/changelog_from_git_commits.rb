@@ -48,6 +48,7 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          raise ":between must be of type array".red unless value.kind_of?(Array)
+                                         raise ":between must not contain nil values".red if value.any?(&:nil?)
                                          raise ":between must be an array of size 2".red unless (value || []).size == 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,

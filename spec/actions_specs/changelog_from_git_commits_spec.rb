@@ -49,12 +49,20 @@ describe Fastlane do
         end.to raise_error(":between must be of type array".red)
       end
 
-      it "Does not accept an array of size 1" do
+      it "Does not accept a :between array of size 1" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: ['abcd'])
           end").runner.execute(:test)
         end.to raise_error(":between must be an array of size 2".red)
+      end
+
+      it "Does not accept a :between array with nil values" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(between: ['abcd', nil])
+          end").runner.execute(:test)
+        end.to raise_error(":between must not contain nil values".red)
       end
 
       it "Does not include merge commits in the list of commits" do
