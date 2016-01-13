@@ -596,7 +596,7 @@ module Spaceship
         current['privacyPolicyUrl']['value'] = privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
-      build_info['significantChange'] ||= { value: '' }
+      build_info['significantChange'] ||= {}
       build_info['significantChange']['value'] = significant_change
       build_info['testInfo']['reviewFirstName']['value'] = first_name
       build_info['testInfo']['reviewLastName']['value'] = last_name
@@ -636,7 +636,7 @@ module Spaceship
       # only sometimes this is required
 
       encryption_info['usesEncryption']['value'] = encryption
-      encryption_info['encryptionUpdated'] ||= { value: '' }
+      encryption_info['encryptionUpdated'] ||= {}
       encryption_info['encryptionUpdated']['value'] = encryption
 
       r = request(:post) do |req|
