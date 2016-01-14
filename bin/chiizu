@@ -36,7 +36,7 @@ class ChiizuApplication
                                                                     Chiizu.config[:build_tools_version])
 
         Chiizu::DependencyChecker.check(Chiizu.android_environment)
-        Chiizu::Runner.new.work
+        Chiizu::Runner.new.run
       end
     end
 

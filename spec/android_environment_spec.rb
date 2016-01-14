@@ -4,7 +4,7 @@ describe Chiizu do
       it "finds no useful values" do
         with_env_values('PATH' => 'spec/fixtures/empty_home_empty_path/path') do
           android_env = Chiizu::AndroidEnvironment.new('spec/fixtures/empty_home_empty_path/android_home', nil)
-          
+
           expect(android_env.android_home).to eq('spec/fixtures/empty_home_empty_path/android_home')
           expect(android_env.build_tools_version).to be_nil
           expect(android_env.build_tools_path).to be_nil
