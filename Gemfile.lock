@@ -2,24 +2,7 @@ PATH
   remote: .
   specs:
     chiizu (1.0.0)
-      fastlane_core (>= 0.21.0, < 1.0.0)
-
-PATH
-  remote: ../fastlane_core
-  specs:
-    fastlane_core (0.32.1)
-      babosa
-      colored
-      commander (>= 4.3.5)
-      credentials_manager (>= 0.11.0, < 1.0.0)
-      excon (~> 0.45.0)
-      highline (>= 1.7.2)
-      json
-      multi_json
-      plist (~> 3.1)
-      rubyzip (~> 1.1.6)
-      sentry-raven (~> 0.15)
-      terminal-table (~> 1.4.5)
+      fastlane_core (>= 0.33.0, < 1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -107,6 +90,19 @@ GEM
       xcode-install (~> 1.0.1)
       xcodeproj (>= 0.20, < 1.0.0)
       xcpretty (>= 0.2.1)
+    fastlane_core (0.33.0)
+      babosa
+      colored
+      commander (>= 4.3.5)
+      credentials_manager (>= 0.11.0, < 1.0.0)
+      excon (~> 0.45.0)
+      highline (>= 1.7.2)
+      json
+      multi_json
+      plist (~> 3.1)
+      rubyzip (~> 1.1.6)
+      sentry-raven (~> 0.15)
+      terminal-table (~> 1.4.5)
     frameit (2.4.1)
       deliver (> 0.3)
       fastimage (~> 1.6.3)
@@ -308,7 +304,6 @@ DEPENDENCIES
   chiizu!
   coveralls
   fastlane
-  fastlane_core!
   pry
   rake
   rspec (~> 3.1.0)
