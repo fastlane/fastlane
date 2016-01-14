@@ -32,15 +32,17 @@ class ChiizuApplication
         o = options.__hash__.dup
         o.delete(:verbose)
         Chiizu.config = FastlaneCore::Configuration.create(Chiizu::Options.available_options, o)
+        Chiizu.android_environment = Chiizu::AndroidEnvironment.new(Chiizu.config[:android_home],
+                                                                    Chiizu.config[:build_tools_version])
 
-        Chiizu::DependencyChecker.check_dependencies
+        Chiizu::DependencyChecker.check(Chiizu.android_environment)
         Chiizu::Runner.new.work
       end
     end
 
     command :init do |c|
       c.syntax = 'chiizu init'
-      c.description = "Creates a new Snapfile in the current directory"
+      c.description = "Creates a new Chiizufile in the current directory"
 
       c.action do |args, options|
         require 'chiizu/setup'
