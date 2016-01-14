@@ -16,7 +16,30 @@ module Fastlane
 
         Helper.log.info "Collecting Git commits between #{from} and #{to}".green
 
-        changelog = Actions.git_log_between(params[:pretty], from, to, params[:include_merges])
+        if !params[:include_merges]
+          include_merges = false
+          only_merges = false
+        else
+          case params[:merge_commit_filtering]
+          when "include_merges"
+            include_merges = true
+            only_merges = false
+          when "exclude_merges"
+            include_merges = false
+            only_merges = false
+          when "only_include_merges"
+            include_merges = true
+            only_merges = true
+          end
+        end
+
+        changelog = Actions.git_log_between(
+          params[:pretty],
+          from,
+          to,
+          include_merges,
+          only_merges
+        )
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
@@ -68,7 +91,16 @@ module Fastlane
                                        description: 'Whether or not to include any commits that are merges',
                                        optional: true,
                                        default_value: true,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
+                                       description: 'Merge filtering options "include_merges", "exclude_merges", "only_include_merges"',
+                                       optional: true,
+                                       default_value: "include_merges",
+                                       verify_block: proc do |value|
+                                         raise 'Available values are "include_merges", "exclude_merges", "only_include_merges"' unless ["include_merges", "exclude_merges", "only_include_merges"].include? value
+                                       end
+                                      )
         ]
       end
 

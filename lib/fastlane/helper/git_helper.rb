@@ -1,9 +1,10 @@
 module Fastlane
   module Actions
-    def self.git_log_between(pretty_format, from, to, include_merges)
+    def self.git_log_between(pretty_format, from, to, include_merges, only_merges)
       command = 'git log'
       command << " --pretty=\"#{pretty_format}\" #{from.shellescape}...#{to.shellescape}"
       command << " --no-merges" unless include_merges
+      command << " --merges" if only_merges
       Actions.sh(command, log: false).chomp
     rescue
       nil

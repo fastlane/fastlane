@@ -72,6 +72,30 @@ describe Fastlane do
 
         expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
       end
+
+      it "Only include merge commits if merge_commit_filtering is only_include_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'only_include_merges')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --merges")
+      end
+
+      it "Include merge commits if merge_commit_filtering is include_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'include_merges')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
+
+      it "Does not include merge commits if merge_commit_filtering is exclude_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'exclude_merges')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
+      end
     end
   end
 end
