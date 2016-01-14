@@ -877,7 +877,7 @@ installr(
   api_token: "...",
   ipa: "test.ipa",
   notes: "The next great version of the app!",
-  notify: "dev,qa"
+  notify: "dev,qa",
   add: "exec,ops"
 )
 ```
