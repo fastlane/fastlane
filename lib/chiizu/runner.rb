@@ -30,8 +30,6 @@ module Chiizu
         return
       end
 
-      # TODO: need to handle commands failing
-
       clear_local_previous_screenshots
 
       device_serial = select_device
@@ -57,9 +55,9 @@ module Chiizu
       devices = @executor.execute(command: "adb devices -l", print_all: true, print_command: true).split("\n")
       # the first output by adb devices is "List of devices attached" so remove that
       devices = devices.drop(1)
-      
+
       UI.user_error! 'There are no connected devices or emulators' if devices.empty?
-      
+
       devices.select! { |d| d.include?(@config[:specific_device]) } if @config[:specific_device]
 
       UI.user_error! "No connected devices matched your criteria: #{@config[:specific_device]}" if devices.empty?
@@ -161,16 +159,16 @@ module Chiizu
       @executor.execute(command: "adb -s #{device_serial} pull #{device_screenshots_path}/app_lens #{@config[:output_directory]}",
                         print_all: true,
                         print_command: true,
-                         error: proc do |error_output|
-                            UI.error "Make sure you've used Lens.screenshot() in your tests and that your expected tests are being run."
-                            UI.user_error! "No screenshots were detected 📷❌"
-                         end)
+                        error: proc do |error_output|
+                          UI.error "Make sure you've used Lens.screenshot() in your tests and that your expected tests are being run."
+                          UI.user_error! "No screenshots were detected 📷❌"
+                        end)
     end
 
     def open_screenshots_summary
       unless @config[:skip_open_summary]
         UI.message "Opening screenshots summary"
-        # TODO: this isn't OK on any platform except Mac
+        # MCF: this isn't OK on any platform except Mac
         @executor.execute(command: "open #{@config[:output_directory]}/*/*.png",
                           print_all: false,
                           print_command: true)
