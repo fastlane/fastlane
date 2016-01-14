@@ -1,6 +1,5 @@
 module Chiizu
   class AndroidEnvironment
-
     attr_reader :android_home
     attr_reader :build_tools_version
 
@@ -38,7 +37,7 @@ module Chiizu
 
     def find_build_tools(android_home, build_tools_version)
       return nil unless android_home
-      
+
       build_tools_dir = File.join(android_home, 'build-tools')
 
       return nil unless build_tools_dir && File.directory?(build_tools_dir)
@@ -53,11 +52,17 @@ module Chiizu
     def select_build_tools_version(build_tools_dir)
       # Collect the sub-directories of the build_tools_dir, rejecting any that start with '.' to remove . and ..
       dir_names = Dir.entries(build_tools_dir).select { |e| !e.start_with?('.') && File.directory?(File.join(build_tools_dir, e)) }
-      
+
       # Collect a sorted array of Version objects from the directory names, handling the possibility that some
       # entries may not be valid version names
-      versions = dir_names.map { |d| Gem::Version.new(d) rescue nil }.reject(&:nil?).sort
-      
+      versions = dir_names.map do |d|
+        begin
+          Gem::Version.new(d)
+        rescue
+          nil
+        end
+      end.reject(&:nil?).sort
+
       # We'll take the last entry (highest version number) as the directory name we want
       versions.last.to_s
     end
