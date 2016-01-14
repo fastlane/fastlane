@@ -57,17 +57,12 @@ module Chiizu
       devices = @executor.execute(command: "adb devices -l", print_all: true, print_command: true).split("\n")
       # the first output by adb devices is "List of devices attached" so remove that
       devices = devices.drop(1)
-
-      if devices.empty?
-        UI.error 'There are no connected devices or emulators'
-        return
-      end
-
+      
+      UI.user_error! 'There are no connected devices or emulators' if devices.empty?
+      
       devices.select! { |d| d.include?(@config[:specific_device]) } if @config[:specific_device]
-      if devices.empty?
-        UI.error "No connected devices matched your criteria: #{config[:specific_device]}"
-        return
-      end
+
+      UI.user_error! "No connected devices matched your criteria: #{@config[:specific_device]}" if devices.empty?
 
       if devices.length > 1
         UI.important "Multiple connected devices, selecting the first one"
