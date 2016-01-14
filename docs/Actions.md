@@ -1205,6 +1205,22 @@ Quickly get the name of the branch you're currently in
 git_branch
 ```
 
+
+### git_add
+
+To simply add one file before commit use
+
+```ruby
+git_add(path: "./version.txt")
+```
+
+To add several files before commit use
+
+```ruby
+git_add(path: ["./version.txt", "./changelog.txt"])
+```
+
+
 ### git_commit
 
 To simply commit one file with a certain commit message use
