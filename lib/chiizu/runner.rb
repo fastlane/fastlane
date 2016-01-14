@@ -160,7 +160,11 @@ module Chiizu
       UI.message "Pulling captured screenshots from the device"
       @executor.execute(command: "adb -s #{device_serial} pull #{device_screenshots_path}/app_lens #{@config[:output_directory]}",
                         print_all: true,
-                        print_command: true)
+                        print_command: true,
+                         error: proc do |error_output|
+                            UI.error "Make sure you've used Lens.screenshot() in your tests and that your expected tests are being run."
+                            UI.user_error! "No screenshots were detected 📷❌"
+                         end)
     end
 
     def open_screenshots_summary
