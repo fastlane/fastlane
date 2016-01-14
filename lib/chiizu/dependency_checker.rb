@@ -20,12 +20,12 @@ module Chiizu
       if android_home
         UI.error "The `adb` command could not be found relative to your provided ANDROID_HOME at #{android_home}"
         UI.error "Please ensure that the Android SDK is installed and the platform-tools directory is present"
-        UI.user_error! 'adb command not found'
       else
         UI.error 'The `adb` command could not be found on your PATH'
         UI.error 'Please ensure that the Android SDK is installed and the platform-tools directory is present and on your PATH'
-        UI.user_error! 'adb command not found'
       end
+
+      UI.user_error! 'adb command not found'
     end
 
     def self.check_aapt(android_env)
