@@ -45,7 +45,7 @@ module Fastlane
       end
 
       def self.details
-        "Provides a way to have increment_build_number base the incremented value on the latest value in iTunesConnect by looking up the latest version in TestFlight and the latest build number for that version"
+        "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC."
       end
 
       def self.available_options
