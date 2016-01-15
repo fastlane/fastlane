@@ -294,6 +294,14 @@ unlock_keychain(
 )
 ```
 
+### `get_ipa_info_plist_value`
+
+Returns a value from Info.plist inside a .ipa file
+
+```ruby
+get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")
+```
+
 ### `delete_keychain`
 
 Delete a keychain, can be used after creating one with `create_keychain`.
@@ -663,6 +671,16 @@ Additionally you can skip the submission of the new binary to the testers to onl
 ```ruby
 testflight(skip_deploy: true)
 ```
+
+### `latest_testflight_build_number`
+
+Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
+
+```ruby
+latest_testflight_build_number(version: "1.3")
+```
+
+end
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
@@ -1877,6 +1895,14 @@ Reads in production secrets set in a dotgpg file and puts them in ENV.
 dotgpg_environment(dotgpg_file: './path/to/gpgfile')
 ```
 
+### [Jazzy](https://github.com/Realm/jazzy)
+
+Generate docs using [Jazzy](https://github.com/Realm/jazzy)
+
+```ruby
+jazzy
+```
+
 ### update_info_plist
 
 Update an `Info.plist` with a bundle identifier and display name.
@@ -1890,10 +1916,26 @@ update_info_plist(
 )
 ```
 
+### fastlane_version
+
+Add this to your `Fastfile` to require a certain version of `fastlane`. Use it if you use an action that just recently came out and you need it
+
+```ruby
+fastlane_version "1.50.0"
+```
+
 ### install_xcode_plugin
 
 Install an Xcode plugin for the current user
 
 ```ruby
 install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+```
+
+### opt_out_usage
+
+Add this your `Fastfile` to not send any data to the fastlane web service. You can also use the `FASTLANE_OPT_OUT_USAGE` environment variable. No personal data is shared, more information on [https://github.com/fastlane/enhancer](https://github.com/fastlane/enhancer)
+
+```
+opt_out_usage
 ```
