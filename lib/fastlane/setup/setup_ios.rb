@@ -41,8 +41,8 @@ module Fastlane
       config = {}
       FastlaneCore::Project.detect_projects(config)
       @project = FastlaneCore::Project.new(config)
-      @project.default_app_identifier
-      @project.default_app_name
+      @project.default_app_identifier # These two vars need to be accessed in order to be set
+      @project.default_app_name # They are set as a side effect, this could/should be changed down the road
       ask_for_apple_id
       print_config_table
     end
