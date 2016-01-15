@@ -100,7 +100,7 @@ module Spaceship
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
-        if raw_data['versions'].count == 1
+        if (raw_data['versions'] || []).count == 1
           v = raw_data['versions'].last
           if ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
             return nil
