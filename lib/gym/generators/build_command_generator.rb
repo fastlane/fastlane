@@ -38,6 +38,8 @@ module Gym
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << "-archivePath '#{archive_path}'"
+        options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
+        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
 
         options
@@ -98,6 +100,13 @@ module Gym
           Gym.cache[:archive_path] += ".xcarchive"
         end
         return Gym.cache[:archive_path]
+      end
+
+      def result_bundle_path
+        unless Gym.cache[:result_bundle_path]
+          Gym.cache[:result_bundle_path] = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+        end
+        return Gym.cache[:result_bundle_path]
       end
     end
   end

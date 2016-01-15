@@ -27,7 +27,7 @@ describe Gym do
         "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
         "DEBUG=1 BUNDLE_NAME=Example\\ App",
         :archive,
-        "| tee '#{log_path}' | xcpretty"
+        "| tee #{log_path.shellescape} | xcpretty"
       ])
     end
 
@@ -49,7 +49,7 @@ describe Gym do
           "-destination 'generic/platform=iOS'",
           "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
           :archive,
-          "| tee '#{log_path}' | xcpretty"
+          "| tee #{log_path.shellescape} | xcpretty"
         ])
       end
 
@@ -80,6 +80,52 @@ describe Gym do
       it "#buildlog_path is not used when not provided" do
         result = Gym::BuildCommandGenerator.xcodebuild_log_path
         expect(result.to_s).to include("Library/Logs/gym")
+      end
+    end
+
+    describe "Derived Data Example" do
+      before do
+        options = { project: "./examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      end
+
+      it "uses the correct build command with the example project" do
+        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+          "set -o pipefail &&",
+          "xcodebuild",
+          "-scheme 'Example'",
+          "-project './examples/standard/Example.xcodeproj'",
+          "-destination 'generic/platform=iOS'",
+          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+          "-derivedDataPath '/tmp/my/derived_data'",
+          :archive,
+          "| tee #{log_path.shellescape} | xcpretty"
+        ])
+      end
+    end
+
+    describe "Result Bundle Example" do
+      it "uses the correct build command with the example project" do
+        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+
+        options = { project: "./examples/standard/Example.xcodeproj", result_bundle: true }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+          "set -o pipefail &&",
+          "xcodebuild",
+          "-scheme 'Example'",
+          "-project './examples/standard/Example.xcodeproj'",
+          "-destination 'generic/platform=iOS'",
+          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+          "-resultBundlePath './ExampleProductName.result'",
+          :archive,
+          "| tee #{log_path.shellescape} | xcpretty"
+        ])
       end
     end
   end
