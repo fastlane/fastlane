@@ -303,6 +303,14 @@ Both your keys and provisioning profiles are encrypted using OpenSSL using a pas
 
 Storing your private keys in a Git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions: 
 
+## Manual Decrypt
+
+If you want to manually decrypt a file you can.
+
+```
+openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
+```
+
 #### What could happen if someone stole a private key?
 
 If attackers would have your certificate and provisioning profile, they could codesign an application with the same bundle identifier. 
