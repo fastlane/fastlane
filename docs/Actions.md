@@ -1051,6 +1051,10 @@ badge(custom: "/Users/xxx/Desktop/badge.png") #or
 badge(shield: "Version-0.0.3-blue", no_badge: true)
 ```
 
+**Note** If you want to reset the badge back to default you can use `git checkout -- <path>/Assets.xcassets/`
+
+
+
 ## Developer Portal
 
 ### [match](https://github.com/fastlane/match)
