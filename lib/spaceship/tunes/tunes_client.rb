@@ -528,7 +528,7 @@ module Spaceship
 
     def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil)
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/reject"
+        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/reject"
         req.body = {}.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -606,7 +606,7 @@ module Spaceship
       build_info['testInfo']['reviewPassword']['value'] = review_password
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/start"
 
         req.body = build_info.to_json
         req.headers['Content-Type'] = 'application/json'
@@ -623,7 +623,7 @@ module Spaceship
 
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil)
       r = request(:get) do |req|
-        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/start"
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
@@ -640,7 +640,7 @@ module Spaceship
       encryption_info['encryptionUpdated']['value'] = encryption
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/trains/#{train}/builds/#{build_number}/submit/complete"
+        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/complete"
         req.body = encryption_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
