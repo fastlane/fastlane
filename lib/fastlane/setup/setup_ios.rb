@@ -19,6 +19,7 @@ module Fastlane
           copy_existing_files
           generate_appfile
           detect_installed_tools # after copying the existing files
+          create_app_if_necessary
           enable_deliver
           FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
           generate_fastfile
@@ -99,6 +100,12 @@ module Fastlane
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', @project.default_app_identifier)
       template.gsub!('[[APPLE_ID]]', @apple_id)
+      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', @dev_portal_team)
+      if @itc_team
+        template.gsub!('[[ITC_TEAM]]', "itc_team_id \"#{@itc_team}\" # iTunes Connect Team ID\n")
+      else
+        template.gsub!('[[ITC_TEAM]]', "")
+      end
       path = File.join(folder, 'Appfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
@@ -119,24 +126,25 @@ module Fastlane
       @itc_ref = Spaceship::Application.find(@project.default_app_identifier)
     end
 
-    def create_app
-      Helper.log.info "Running produce..."
+    def create_app_if_necessary
+      UI.important "Creating the app on iTunes Connect and the Apple Developer Portal"
       require 'produce'
-      config = {}
+      config = {} # this has to be done like this
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
 
       produce_options_hash = {
-        app_name: project.default_app_name
+        app_name: project.default_app_name,
+        app_identifier: @project.default_app_identifier
       }
       Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
       begin
         ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
       rescue => exception
         if exception.to_s.include?("The App Name you entered has already been used")
-          Helper.log.info "It looks like that #{project.default_app_name} has already been taken, please enter an alternative.".yellow
+          Helper.log.info "It looks like that #{project.default_app_name} has already been taken by someone else, please enter an alternative.".yellow
           Produce.config[:app_name] = ask("App Name: ".yellow)
-          Produce.config[:skip_devcenter] = true
+          Produce.config[:skip_devcenter] = true # since we failed on iTC
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
         end
       end
