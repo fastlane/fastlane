@@ -136,14 +136,16 @@ module Chiizu
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
-      @executor.execute(command: "adb -s #{device_serial} install -r #{app_apk_path}",
+      apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{app_apk_path}",
                         print_all: true,
                         print_command: true)
+      UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
       UI.message 'Installing tests APK'
-      @executor.execute(command: "adb -s #{device_serial} install -r #{tests_apk_path}",
+      apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{tests_apk_path}",
                         print_all: true,
                         print_command: true)
+      UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")
     end
 
     def grant_permissions(device_serial)
@@ -178,9 +180,11 @@ module Chiizu
         instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
         instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
-        @executor.execute(command: instrument_command.join(" \\\n"),
+        test_output = @executor.execute(command: instrument_command.join(" \\\n"),
                           print_all: true,
                           print_command: true)
+
+        UI.user_error! "Tests failed" if test_output.include?("FAILURES!!!")
       end
     end
 
