@@ -19,7 +19,7 @@ module Fastlane
           copy_existing_files
           default_generate_appfile
           detect_installed_tools # after copying the existing files
-          default_enable_other_tools
+          enable_deliver
           FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
           default_generate_fastfile
           show_analytics
@@ -44,6 +44,7 @@ module Fastlane
       @project.default_app_identifier
       @project.default_app_name
       ask_for_apple_id
+      detect_if_app_is_available
       print_config_table
     end
 
@@ -57,6 +58,14 @@ module Fastlane
       puts ""
       puts Terminal::Table.new(rows: rows, title: "Detected Values")
       puts ""
+
+      unless @itc_ref
+        UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
+      end
+
+      unless @portal_ref
+        UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
+      end
     end
 
     def show_infos
@@ -101,7 +110,22 @@ module Fastlane
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
     end
 
-    def default_run_produce
+    # Detect if the app was created on the Dev Portal / iTC
+    def detect_if_app_is_available
+      require 'spaceship'
+
+      UI.important "Verifying if app is available on the Apple Developer Portal and iTunes Connect..."
+      UI.message "Starting login with user '#{@apple_id}'"
+      Spaceship.login(@apple_id, nil)
+      @dev_portal_team = Spaceship.select_team # TODO: add @dev_portal_team to the Appfile
+      @portal_ref = Spaceship::App.find(@project.default_app_identifier)
+      
+      Spaceship::Tunes.login(@apple_id, nil)
+      @itc_team = Spaceship::Tunes.select_team
+      @itc_ref = Spaceship::Application.find(@project.default_app_identifier)
+    end
+
+    def create_app
       Helper.log.info "Running produce..."
       require 'produce'
       config = {}
@@ -132,15 +156,6 @@ module Fastlane
       @tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
       @tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
       @tools[:sigh] = false
-    end
-
-    def default_enable_other_tools
-      enable_deliver
-      enable_sigh
-    end
-
-    def enable_sigh
-      @tools[:sigh] = true
     end
 
     def enable_snapshot
