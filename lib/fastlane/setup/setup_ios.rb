@@ -14,14 +14,14 @@ module Fastlane
       # rubocop:disable Lint/RescueException
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
-        setup_default_project
+        setup_project
         if UI.confirm("Please confirm the above values")
           copy_existing_files
-          default_generate_appfile
+          generate_appfile
           detect_installed_tools # after copying the existing files
           enable_deliver
           FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
-          default_generate_fastfile
+          generate_fastfile
           show_analytics
         else
           # TODO
@@ -37,7 +37,7 @@ module Fastlane
       # rubocop:enable Lint/RescueException
     end
 
-    def setup_default_project
+    def setup_project
       config = {}
       FastlaneCore::Project.detect_projects(config)
       @project = FastlaneCore::Project.new(config)
@@ -95,7 +95,7 @@ module Fastlane
       @apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
     end
 
-    def default_generate_appfile
+    def generate_appfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
       template.gsub!('[[APP_IDENTIFIER]]', @project.default_app_identifier)
       template.gsub!('[[APPLE_ID]]', @apple_id)
@@ -173,14 +173,8 @@ module Fastlane
       @tools[:deliver] = true
     end
 
-    def default_generate_fastfile
-      config = {}
-      FastlaneCore::Project.detect_projects(config)
-      project = FastlaneCore::Project.new(config)
-      generate_fastfile(scheme: project.schemes.first)
-    end
-
-    def generate_fastfile(scheme: nil)
+    def generate_fastfile
+      scheme = @project.schemes.first
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
 
       scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
