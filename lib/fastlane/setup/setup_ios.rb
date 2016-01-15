@@ -15,13 +15,17 @@ module Fastlane
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
         setup_default_project
-        copy_existing_files
-        default_generate_appfile
-        detect_installed_tools # after copying the existing files
-        default_enable_other_tools
-        FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
-        default_generate_fastfile
-        show_analytics
+        if UI.confirm("Please confirm the above values")
+          copy_existing_files
+          default_generate_appfile
+          detect_installed_tools # after copying the existing files
+          default_enable_other_tools
+          FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
+          default_generate_fastfile
+          show_analytics
+        else
+          # TODO
+        end
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue => ex # this will also be caused by Ctrl + C
         # Something went wrong with the setup, clear the folder again
@@ -45,12 +49,14 @@ module Fastlane
 
     def print_config_table
       rows = []
-      rows << ["apple_id", @apple_id]
-      rows << ["app_name", @project.default_app_name]
-      rows << ["app_id", @project.default_app_identifier]
-      @project.options.each { |k, v| rows << [k, v] }
+      rows << ["Apple ID", @apple_id]
+      rows << ["App Name", @project.default_app_name]
+      rows << ["App Identifier", @project.default_app_identifier]
+      rows << [(@project.is_workspace ? "Workspace" : "Project"), @project.path]
       require 'terminal-table'
-      puts Terminal::Table.new(rows: rows, title: "Default Values")
+      puts ""
+      puts Terminal::Table.new(rows: rows, title: "Detected Values")
+      puts ""
     end
 
     def show_infos
