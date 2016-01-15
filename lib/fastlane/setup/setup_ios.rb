@@ -82,19 +82,13 @@ module Fastlane
       end
     end
 
-    def default_generate_appfile
-      # get the proper xcodeproj/workspace and determine the bundle_id
-      # team ID
-      create_appfile(@project.default_app_identifier)
-    end
-
     def ask_for_apple_id
       @apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
     end
 
-    def create_appfile(app_identifier)
+    def default_generate_appfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
-      template.gsub!('[[APP_IDENTIFIER]]', app_identifier)
+      template.gsub!('[[APP_IDENTIFIER]]', @project.default_app_identifier)
       template.gsub!('[[APPLE_ID]]', @apple_id)
       path = File.join(folder, 'Appfile')
       File.write(path, template)

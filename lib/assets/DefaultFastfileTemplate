@@ -26,6 +26,22 @@ platform :ios do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   end
 
+  desc "Runs all the tests"
+  lane :test do
+    snapshot
+  end
+
+  desc "Submit a new Beta Build to Apple TestFlight"
+  desc "This will also make sure the profile is up to date"
+  lane :beta do
+    sigh
+    gym[[SCHEME]] # Build your app - more options available
+    pilot
+
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
   desc "Deploy a new version to the App Store"
   lane :appstore do
     # snapshot
