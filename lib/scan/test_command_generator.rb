@@ -34,6 +34,8 @@ module Scan
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-destination '#{config[:destination]}'" # generated in `detect_values`
+        options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
+        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << "-enableCodeCoverage YES" if config[:code_coverage]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
@@ -99,6 +101,13 @@ module Scan
           FileUtils.mkdir_p Scan.cache[:build_path]
         end
         Scan.cache[:build_path]
+      end
+
+      def result_bundle_path
+        unless Scan.cache[:result_bundle_path]
+          Scan.cache[:result_bundle_path] = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
+        end
+        return Scan.cache[:result_bundle_path]
       end
     end
   end
