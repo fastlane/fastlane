@@ -1023,6 +1023,16 @@ update_app_identifier(
 )
 ```
 
+### [badge](https://github.com/HazAT/badge)
+
+Modify your app icon and add a badge to it. For more info how to use it see repo.
+
+```ruby
+badge(dark: true) #or
+badge(custom: "/Users/xxx/Desktop/badge.png") #or
+badge(shield: "Version-0.0.3-blue", no_badge: true)
+```
+
 ## Developer Portal
 
 ### [match](https://github.com/fastlane/match)
