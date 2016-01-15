@@ -1204,6 +1204,17 @@ ensure_git_branch(
 )
 ```
 
+### version_from_last_tag
+
+Applies a regex to the git tag list in order to attempt to extract version information from the last tag.  For example if the tag is `Release-0.3` it will parse out a version string of `0.3`
+
+```ruby
+version_from_last_tag
+```
+
+User configurable options include the default version if none can be parsed as well as a custom regex.  See `fastlane action version_from_last_tag` for more details
+
+
 ### last_git_tag
 
 Simple action to get the latest git tag
