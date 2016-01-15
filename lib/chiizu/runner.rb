@@ -1,10 +1,17 @@
 module Chiizu
   class Runner
+    NEEDED_PERMISSIONS = [
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+      'android.permission.CHANGE_CONFIGURATION'
+    ].freeze
+
     attr_accessor :number_of_retries
 
     def initialize
       @executor = FastlaneCore::CommandExecutor
       @config = Chiizu.config
+      @android_env = Chiizu.android_environment
     end
 
     def run
@@ -38,7 +45,12 @@ module Chiizu
 
       clear_device_previous_screenshots(device_serial, device_screenshots_path)
 
-      install_apks(device_serial, app_apk_path, tests_apk_path, discovered_apk_paths)
+      app_apk_path ||= select_app_apk(discovered_apk_paths)
+      tests_apk_path ||= select_tests_apk(discovered_apk_paths)
+
+      validate_apk(app_apk_path)
+
+      install_apks(device_serial, app_apk_path, tests_apk_path)
 
       grant_permissions(device_serial)
 
@@ -72,6 +84,16 @@ module Chiizu
       devices[0].match(/^[\w\-]+/)[0]
     end
 
+    def select_app_apk(discovered_apk_paths)
+      UI.important "To not be asked about this value, you can specify it using 'app_apk_path'"
+      UI.select('Select your debug app APK', discovered_apk_paths)
+    end
+
+    def select_tests_apk(discovered_apk_paths)
+      UI.important "To not be asked about this value, you can specify it using 'tests_apk_path'"
+      UI.select('Select your debug tests APK', discovered_apk_paths)
+    end
+
     def clear_local_previous_screenshots
       if @config[:clear_previous_screenshots]
         UI.message "Clearing output directory of screenshots at #{@config[:output_directory]}"
@@ -94,21 +116,29 @@ module Chiizu
                         print_command: true)
     end
 
-    def install_apks(device_serial, app_apk_path, tests_apk_path, discovered_apk_paths)
-      unless app_apk_path
-        UI.important "To not be asked about this value, you can specify it using 'app_apk_path'"
-        app_apk_path = UI.select('Select your debug app APK', discovered_apk_paths)
+    def validate_apk(app_apk_path)
+      unless @android_env.aapt_path
+        UI.important "The `aapt` command could not be found on your system, so your app APK could not be validated"
+        return
       end
 
+      UI.message 'Validating app APK'
+      apk_permissions = @executor.execute(command: "#{@android_env.aapt_path} dump permissions #{app_apk_path}",
+                                          print_all: true,
+                                          print_command: true)
+
+      missing_permissions = NEEDED_PERMISSIONS.reject { |needed| apk_permissions.include?(needed) }
+
+      if missing_permissions.any?
+        UI.user_error! "The needed permission(s) #{missing_permissions.join(', ')} could not be found in your app APK"
+      end
+    end
+
+    def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
       @executor.execute(command: "adb -s #{device_serial} install -r #{app_apk_path}",
                         print_all: true,
                         print_command: true)
-
-      unless tests_apk_path
-        UI.important "To not be asked about this value, you can specify it using 'tests_apk_path'"
-        tests_apk_path = UI.select('Select your debug tests APK', discovered_apk_paths)
-      end
 
       UI.message 'Installing tests APK'
       @executor.execute(command: "adb -s #{device_serial} install -r #{tests_apk_path}",
@@ -126,7 +156,7 @@ module Chiizu
                                              print_all: true,
                                              print_command: true).to_i
 
-      if (device_api_version >= 23)
+      if device_api_version >= 23
         UI.message 'Granting the permissions necessary to access device external storage'
         @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
                           print_all: true,

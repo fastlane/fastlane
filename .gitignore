@@ -1,12 +1,21 @@
 build
 
+*.iml
+.idea/
+
+report.xml
+
+pkg/
+coverage/
+
 example/.gradle
 example/build
 example/fastlane/screenshots
-example/*.iml
 
 chiizu-lib/build
 
 .gradle
 
 local.properties
+
+Gemfile.lock
