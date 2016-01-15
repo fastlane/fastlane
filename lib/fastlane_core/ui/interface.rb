@@ -106,6 +106,8 @@ module FastlaneCore
 
     # Pass an exception to this method to exit the program
     #   using the given exception
+    # Use this method instead of user_error! if this error is
+    # unexpected, e.g. an invalid server response that shouldn't happen
     def crash!(_exception)
       not_implemented(__method__)
     end
@@ -115,6 +117,8 @@ module FastlaneCore
     #        or invalid user credentials
     # This will show the error message, but doesn't show the full
     #   stack trace
+    # Basically this should be used when you actively catch the error
+    # and want to show a nice error message to the user
     def user_error!(_error_message)
       not_implemented(__method__)
     end
