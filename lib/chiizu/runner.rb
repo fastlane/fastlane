@@ -79,9 +79,11 @@ module Chiizu
         UI.important "To specify which connected device to use, use the -s (specific_device) config option"
       end
 
-      # grab the serial number. the line looks like this:
+      # grab the serial number. the lines of output can look like these:
       # 00c22d4d84aec525       device usb:2148663295X product:bullhead model:Nexus_5X device:bullhead
-      devices[0].match(/^[\w\-]+/)[0]
+      # 192.168.1.100:5555       device usb:2148663295X product:bullhead model:Nexus_5X device:genymotion
+      # emulator-5554       device usb:2148663295X product:bullhead model:Nexus_5X device:emulator
+      devices[0].match(/^\S+/)[0]
     end
 
     def select_app_apk(discovered_apk_paths)
