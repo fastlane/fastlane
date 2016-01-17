@@ -678,6 +678,16 @@ appium(
 )
 ```
 
+### reset_simulator
+Reset simulator by its UDID or name and optional OS version. You can also reset all simulators.
+Reset will force device to shutdown if booted, which is more reliable than `xcrun simctl erase <device>`.
+_Requires Xcode 7+._
+
+```ruby
+reset_simulator(device: "all")
+reset_simulator(device: "iPhone 6 Plus", os: "iOS 9.1")
+```
+
 ## Deploying
 
 ### [pilot](https://github.com/fastlane/pilot)
