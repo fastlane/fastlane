@@ -78,7 +78,7 @@ module Fastlane
       end
 
       def self.find_project_dir(project_name, path)
-        `ls -t #{path}| grep #{project_name} | head -1`.to_s.gsub(/\n/, "")
+        `ls -t #{path}| grep #{project_name} | head -1`.to_s.delete("\n")
       end
 
       def self.exclude_dirs

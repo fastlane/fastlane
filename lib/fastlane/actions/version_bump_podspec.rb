@@ -12,10 +12,10 @@ module Fastlane
 
         version_podspec_file = Helper::PodspecHelper.new(podspec_path)
 
-        if params[:version_number]
-          new_version = params[:version_number]
-        else
-          new_version = version_podspec_file.bump_version(params[:bump_type])
+        new_version = if params[:version_number]
+                        params[:version_number]
+                      else
+                        version_podspec_file.bump_version(params[:bump_type])
         end
 
         version_podspec_file.update_podspec(new_version)

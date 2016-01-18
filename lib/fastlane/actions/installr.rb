@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class InstallrAction < Action
-      INSTALLR_API = "https://www.installrapp.com/apps.json"
+      INSTALLR_API = "https://www.installrapp.com/apps.json".freeze
 
       def self.run(params)
         Helper.log.info 'Upload to Installr has been started. This may take some time.'.green

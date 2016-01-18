@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "#execute_action" do
-      let (:step_name) { "My Step" }
+      let :step_name { "My Step" }
 
       it "stores the action properly" do
         Fastlane::Actions.execute_action(step_name) {}

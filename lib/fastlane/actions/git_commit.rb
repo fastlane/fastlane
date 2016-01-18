@@ -2,10 +2,10 @@ module Fastlane
   module Actions
     class GitCommitAction < Action
       def self.run(params)
-        if params[:path].kind_of?(String)
-          paths = "'#{params[:path]}'"
-        else
-          paths = params[:path].join(" ")
+        paths = if params[:path].kind_of?(String)
+                  "'#{params[:path]}'"
+                else
+                  params[:path].join(" ")
         end
 
         result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")

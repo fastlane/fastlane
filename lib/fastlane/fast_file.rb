@@ -105,7 +105,7 @@ module Fastlane
 
       self.current_platform = platform_name
 
-      block.call
+      yield
 
       self.current_platform = nil
     end

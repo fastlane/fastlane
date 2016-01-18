@@ -9,8 +9,8 @@ describe Fastlane do
     end
 
     describe "Complete setup process" do
-      let (:fixtures) { File.expand_path("./spec/fixtures/setup_workspace/") }
-      let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
+      let :fixtures { File.expand_path("./spec/fixtures/setup_workspace/") }
+      let :workspace { File.expand_path("/tmp/setup_workspace/") }
       before do
         fastlane_folder = File.join(workspace, 'fastlane')
         FileUtils.rm_rf(workspace) if File.directory? workspace

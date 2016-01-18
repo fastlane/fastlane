@@ -2,9 +2,9 @@ module Fastlane
   module Actions
     class AppiumAction < Action
       INVOKE_TIMEOUT = 30
-      APPIUM_PATH_HOMEBREW = '/usr/local/bin/appium'
-      APPIUM_APP_PATH = '/Applications/Appium.app'
-      APPIUM_APP_BUNDLE_PATH = 'Contents/Resources/node_modules/.bin/appium'
+      APPIUM_PATH_HOMEBREW = '/usr/local/bin/appium'.freeze
+      APPIUM_APP_PATH = '/Applications/Appium.app'.freeze
+      APPIUM_APP_BUNDLE_PATH = 'Contents/Resources/node_modules/.bin/appium'.freeze
 
       def self.run(params)
         Actions.verify_gem!('rspec')

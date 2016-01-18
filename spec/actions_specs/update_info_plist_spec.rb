@@ -1,11 +1,11 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:xcodeproj) { "/tmp/fastlane/tests/fastlane/Test.xcodeproj" }
-      let (:plist_path) { "com.test.plist" }
-      let (:app_identifier) { "com.test.plist" }
-      let (:display_name) { "Update Info Plist Test" }
+      let :test_path { "/tmp/fastlane/tests/fastlane" }
+      let :xcodeproj { "/tmp/fastlane/tests/fastlane/Test.xcodeproj" }
+      let :plist_path { "com.test.plist" }
+      let :app_identifier { "com.test.plist" }
+      let :display_name { "Update Info Plist Test" }
 
       before do
         # Set up example info.plist

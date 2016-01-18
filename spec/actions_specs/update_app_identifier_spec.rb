@@ -5,15 +5,15 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update App Identifier Integration" do
       # Variables
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:fixtures_path) { "./spec/fixtures/xcodeproj" }
-      let (:proj_file) { "bundle.xcodeproj" }
-      let (:identifier_key) { 'PRODUCT_BUNDLE_IDENTIFIER' }
+      let :test_path { "/tmp/fastlane/tests/fastlane" }
+      let :fixtures_path { "./spec/fixtures/xcodeproj" }
+      let :proj_file { "bundle.xcodeproj" }
+      let :identifier_key { 'PRODUCT_BUNDLE_IDENTIFIER' }
 
       # Action parameters
-      let (:xcodeproj) { File.join(test_path, proj_file) }
-      let (:plist_path) { "Info.plist" }
-      let (:app_identifier) { "com.test.plist" }
+      let :xcodeproj { File.join(test_path, proj_file) }
+      let :plist_path { "Info.plist" }
+      let :app_identifier { "com.test.plist" }
 
       # Is there a better place for an helper function?
       # Create an Info.plist file with a supplied bundle_identifier parameter

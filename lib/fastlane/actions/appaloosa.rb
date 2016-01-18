@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class AppaloosaAction < Action
-      APPALOOSA_SERVER = 'https://www.appaloosa-store.com/api/v1'
+      APPALOOSA_SERVER = 'https://www.appaloosa-store.com/api/v1'.freeze
       def self.run(params)
         require 'http'
 
@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.reset_original_binary_names(current_name, original_name)
-        File.rename("#{current_name}", "#{original_name}")
+        File.rename(current_name.to_s, original_name.to_s)
       end
 
       def self.remove_extra_screenshots_file(screenshots_env)
@@ -73,7 +73,7 @@ module Fastlane
 
       def self.normalize_binary_name(binary)
         binary_rename = binary.delete(' ')
-        File.rename("#{binary}", "#{binary_rename}")
+        File.rename(binary.to_s, binary_rename.to_s)
         binary_rename
       end
 

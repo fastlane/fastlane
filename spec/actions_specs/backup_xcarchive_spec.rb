@@ -1,12 +1,12 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Backup xcarchive Integration" do
-      let (:source_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:destination_path) { "#{source_path}/dest" }
-      let (:xcarchive_file) { "fake.xcarchive" }
-      let (:zip_file) { "fake.xcarchive.zip" }
-      let (:source_xcarchive_path) { "#{source_path}/#{xcarchive_file}" }
-      let (:file_content) { Time.now.to_s }
+      let :source_path { "/tmp/fastlane/tests/fastlane" }
+      let :destination_path { "#{source_path}/dest" }
+      let :xcarchive_file { "fake.xcarchive" }
+      let :zip_file { "fake.xcarchive.zip" }
+      let :source_xcarchive_path { "#{source_path}/#{xcarchive_file}" }
+      let :file_content { Time.now.to_s }
 
       context "plain backup" do
         before :each do
