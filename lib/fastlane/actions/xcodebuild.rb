@@ -26,22 +26,29 @@ module Fastlane
         configuration: "-configuration",
         derivedDataPath: "-derivedDataPath",
         destination_timeout: "-destination-timeout",
+        dry_run: "-dry-run",
+        enableAddressSanitizer: "-enableAddressSanitizer",
+        enableCodeCoverage: "-enableCodeCoverage",
         export_archive: "-exportArchive",
         export_format: "-exportFormat",
         export_installer_identity: "-exportInstallerIdentity",
+        export_options_plist: "-exportOptionsPlist",
         export_path: "-exportPath",
         export_profile: "-exportProvisioningProfile",
         export_signing_identity: "-exportSigningIdentity",
         export_with_original_signing_identity: "-exportWithOriginalSigningIdentity",
+        hide_shell_script_environment: "-hideShellScriptEnvironment",
+        jobs: "-jobs",
+        parallelize_targets: "-parallelizeTargets",
         project: "-project",
         result_bundle_path: "-resultBundlePath",
         scheme: "-scheme",
         sdk: "-sdk",
         skip_unavailable_actions: "-skipUnavailableActions",
         target: "-target",
+        toolchain: "-toolchain",
         workspace: "-workspace",
-        xcconfig: "-xcconfig",
-        enableCodeCoverage: "-enableCodeCoverage"
+        xcconfig: "-xcconfig"
       }
 
       def self.is_supported?(platform)
@@ -85,17 +92,17 @@ module Fastlane
             # If not passed, retrieve path from previous xcodebuild call
             params[:archive_path] ||= Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE]
 
-            # Default to ipa as export format
-            params[:export_format] ||= "ipa"
-
             # If not passed, construct export path from env vars
             if params[:export_path].nil?
               ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
               params[:export_path] = "#{build_path}#{ipa_filename}"
             end
 
+            # Default to ipa as export format
+            export_format = params[:export_format] || "ipa"
+
             # Store IPA path for later deploy steps (i.e. Crashlytics)
-            Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + params[:export_format].downcase
+            Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + export_format.downcase
           else
             # If not passed, check for archive scheme & workspace/project env vars
             params[:scheme] ||= scheme
@@ -115,6 +122,13 @@ module Fastlane
 
             # Cache path for later xcodebuild calls
             Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = params[:archive_path]
+          end
+
+          if params.key? :enable_address_sanitizer
+            params[:enableAddressSanitizer] = params[:enable_address_sanitizer] ? 'YES' : 'NO'
+          end
+          if params.key? :enable_code_coverage
+            params[:enableCodeCoverage] = params[:enable_code_coverage] ? 'YES' : 'NO'
           end
 
           # Maps parameter hash to CLI args
@@ -465,10 +479,6 @@ module Fastlane
         params_hash = params || {}
         params_hash[:build] = true
         params_hash[:test] = true
-
-        if params.key? :enable_code_coverage
-          params[:enableCodeCoverage] = params[:enable_code_coverage] ? 'YES' : 'NO'
-        end
 
         XcodebuildAction.run(params_hash)
       end
