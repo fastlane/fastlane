@@ -680,7 +680,15 @@ Fetches most recent build number from TestFlight based on the version number. Pr
 latest_testflight_build_number(version: "1.3")
 ```
 
-end
+can be used in combination with `increment_build_number`
+
+```ruby
+latest_testflight_build_number
+  increment_build_number({
+      build_number: lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER]+1
+  })
+```
+
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
