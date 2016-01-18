@@ -24,6 +24,12 @@ ipa "App.ipa"
 
 if you use [fastlane](https://fastlane.tools) the ipa file will automatically be detected.
 
+##### pkg
+A path to a signed pkg file, which will be uploaded. Submission logic of ipa applies to pkg files.
+```ruby
+pkg "MacApp.pkg"
+```
+
 ##### app_version
 
 Optional, as it is usually automatically detected. Specify the version that should be created / edited on iTunes Connect:

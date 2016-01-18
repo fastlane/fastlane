@@ -19,7 +19,7 @@ module Deliver
     def run
       verify_version if options[:app_version].to_s.length > 0
       upload_metadata
-      upload_binary if options[:ipa]
+      upload_binary if options[:ipa] || options[:pkg]
 
       Helper.log.info "Finished the upload to iTunes Connect".green
 
@@ -59,11 +59,19 @@ module Deliver
     # Upload the binary to iTunes Connect
     def upload_binary
       Helper.log.info "Uploading binary to iTunes Connect"
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-        app_id: options[:app].apple_id,
-        ipa_path: options[:ipa],
-        package_path: "/tmp"
-      )
+      if options[:ipa]
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+          app_id: options[:app].apple_id,
+          ipa_path: options[:ipa],
+          package_path: "/tmp"
+        )
+      elsif options[:pkg]
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+          app_id: options[:app].apple_id,
+          pkg_path: options[:pkg],
+          package_path: "/tmp"
+        )
+      end
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username])
       transporter.upload(options[:app].apple_id, package_path)

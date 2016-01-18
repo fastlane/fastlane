@@ -36,7 +36,7 @@ deliver
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
-`deliver` can upload ipa files, app screenshots and more to iTunes Connect from the command line.
+`deliver` can upload ipa or pkg files, app screenshots and more to iTunes Connect from the command line.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
@@ -56,7 +56,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Features
 - Upload hundreds of localised screenshots completely automatically
-- Upload a new ipa file to iTunes Connect without Xcode from any Mac
+- Upload a new ipa/pkg file to iTunes Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to iTunes Connect
 - Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
 - Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
@@ -110,7 +110,13 @@ Provide the path to an `ipa` file to upload and submit your app for review:
 deliver --ipa "App.ipa" --submit_for_review
 ```
 
-If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa` file. 
+or you can specify path to `pkg` file for Mac OS X apps:
+
+```
+deliver --pkg "MacApp.pkg"
+```
+
+If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
 
 This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md)
 
