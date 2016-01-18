@@ -54,9 +54,58 @@ describe FastlaneCore do
                                        short_option: "-f",
                                        description: "bar")
         ]
+
         expect do
           FastlaneCore::Configuration.create(conflicting_options, {})
         end.to raise_error "Multiple entries for short_option '-f' found!".red
+      end
+
+      it "raises an error for unresolved conflict between options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof]),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o")
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'".red
+      end
+
+      it "calls custom conflict handler when conflict happens between two options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o",
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
+                                       end)
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "You can't use option '-b' along with '-f'".red
       end
 
       it "sets the data type correctly if `is_string` is not set but type is specified" do

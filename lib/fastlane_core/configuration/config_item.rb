@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional
+    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -14,7 +14,9 @@ module FastlaneCore
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param type (Class) the data type of this config item. Takes precedence over `is_string`
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: false)
+    # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
+    # @param conflict_block an optional block which is called when options conflict happens
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: false, conflicting_options: nil, conflict_block: nil)
       raise "key must be a symbol" unless key.kind_of? Symbol
       raise "env_name must be a String" unless (env_name || '').kind_of? String
 
@@ -29,6 +31,12 @@ module FastlaneCore
         raise "Type '#{type}' for key '#{key}' requires a short option"
       end
 
+      if conflicting_options
+        conflicting_options.each do |conflicting_option_key|
+          raise "Conflicting option key must be a symbol" unless conflicting_option_key.kind_of? Symbol
+        end
+      end
+
       @key = key
       @env_name = env_name
       @description = description
@@ -38,6 +46,8 @@ module FastlaneCore
       @is_string = is_string
       @data_type = type
       @optional = optional
+      @conflicting_options = conflicting_options
+      @conflict_block = conflict_block
     end
 
     # This will raise an exception if the value is not valid
