@@ -17,6 +17,8 @@ module Snapshot
         case output
         when /com\.apple\.CoreSimulator\.SimError/
           print "The simulator failed to launch - retrying..."
+        when /is not configured for Running/
+          raise TestsFailedException.new, "Scheme is not properly configured, make sure to check out the snapshot README"
         end
       end
 

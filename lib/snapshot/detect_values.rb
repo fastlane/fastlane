@@ -16,7 +16,7 @@ module Snapshot
         config.load_configuration_file(Snapshot.snapfile_name)
       end
 
-      Snapshot.project.select_scheme
+      Snapshot.project.select_scheme(preferred_to_include: "UITests")
 
       # Devices
       unless config[:devices]
