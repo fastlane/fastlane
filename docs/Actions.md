@@ -683,10 +683,9 @@ latest_testflight_build_number(version: "1.3")
 can be used in combination with `increment_build_number`
 
 ```ruby
-latest_testflight_build_number
-  increment_build_number({
-      build_number: lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER]+1
-  })
+increment_build_number({
+  build_number: latest_testflight_build_number + 1
+})
 ```
 
 
