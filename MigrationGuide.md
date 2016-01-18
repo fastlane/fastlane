@@ -13,6 +13,7 @@ Removed     | Use instead              | Note
 `setup_for_language_change` | |
 `teardown_language` | |
 `html_title` | |
+`screenshots_path` | `output_directory` |
 
 **New options:**
 
