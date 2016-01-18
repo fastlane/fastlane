@@ -14,6 +14,7 @@ require 'fastlane/action_collector'
 require 'fastlane/supported_platforms'
 require 'fastlane/configuration_helper'
 require 'fastlane/command_line_handler'
+require 'fastlane/documentation/docs_generator'
 
 require 'fastlane_core'
 

@@ -1,6 +1,8 @@
 module Fastlane
   class DocsGenerator
-    def self.run(output_path, ff)
+    def self.run(ff, output_path: nil)
+      output_path ||= File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
+
       output = ["fastlane documentation"]
       output << "================"
 
@@ -30,12 +32,12 @@ module Fastlane
         output << ""
       end
 
-      output << "Generate this documentation by running `fastlane docs`"
+      output << "This README.md is auto-generated and will be re-generated every time to run [fastlane](https://fastlane.tools)"
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
       output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane)"
 
       File.write(output_path, output.join("\n"))
-      Helper.log.info "Successfully generated documentation to path '#{File.expand_path(output_path)}'".green
+      Helper.log.info "Successfully generated documentation to path '#{File.expand_path(output_path)}'".green if $verbose
     end
 
     #####################################################
@@ -46,6 +48,7 @@ module Fastlane
       pl = pl.to_s
       return "iOS" if pl == 'ios'
       return "Mac" if pl == 'mac'
+      return "Android" if pl == 'android'
 
       return pl
     end

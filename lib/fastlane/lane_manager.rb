@@ -10,6 +10,7 @@ module Fastlane
       raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      Fastlane::DocsGenerator.run(ff)
 
       is_platform = false
       begin
