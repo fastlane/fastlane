@@ -100,7 +100,8 @@ module FastlaneCore
     end
 
     # Let the user select a scheme
-    def select_scheme
+    # Use a scheme containing the preferred_to_include string when multiple schemes were found
+    def select_scheme(preferred_to_include: nil)
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless schemes.include?(options[:scheme].to_s)
@@ -114,13 +115,18 @@ module FastlaneCore
       if schemes.count == 1
         options[:scheme] = schemes.last
       elsif schemes.count > 1
-        if Helper.is_ci?
-          Helper.log.error "Multiple schemes found but you haven't specified one.".red
-          Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-          raise "Multiple schemes found".red
+        preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
+        if preferred.count == 1
+          options[:scheme] = preferred.last
         else
-          puts "Select Scheme: "
-          options[:scheme] = choose(*(schemes))
+          if Helper.is_ci?
+            Helper.log.error "Multiple schemes found but you haven't specified one.".red
+            Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
+            raise "Multiple schemes found".red
+          else
+            puts "Select Scheme: "
+            options[:scheme] = choose(*(schemes))
+          end
         end
       else
         Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
