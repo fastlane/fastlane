@@ -16,7 +16,7 @@ module Fastlane
       ipa: '--ipa',
       xcconfig: '--xcconfig',
       xcargs: '--xcargs'
-    }
+    }.freeze
 
     class IpaAction < Action
 

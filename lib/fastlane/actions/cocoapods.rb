@@ -6,10 +6,10 @@ module Fastlane
         cmd = []
 
         unless params[:podfile].nil?
-          if params[:podfile].end_with?('Podfile')
-            podfile_folder = File.dirname(params[:podfile])
-          else
-            podfile_folder = params[:podfile]
+          podfile_folder = if params[:podfile].end_with?('Podfile')
+                             File.dirname(params[:podfile])
+                           else
+                             params[:podfile]
           end
           cmd << ["cd '#{podfile_folder}' &&"]
         end

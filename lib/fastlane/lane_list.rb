@@ -28,10 +28,10 @@ module Fastlane
           next if lane.is_private
 
           output += "----- fastlane #{lane.pretty_name}".green
-          if lane.description.count > 0
-            output += "\n" + lane.description.join("\n") + "\n\n"
-          else
-            output += "\n\n"
+          output += if lane.description.count > 0
+                      "\n" + lane.description.join("\n") + "\n\n"
+                    else
+                      "\n\n"
           end
         end
       end

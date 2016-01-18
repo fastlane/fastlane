@@ -45,7 +45,7 @@ module Fastlane
         exclude_unreachable_branches: "--exclude-unreachable-branches",
         use_gcov_files: "-g",
         print_summary: "-s"
-      }
+      }.freeze
 
       def self.is_supported?(platform)
         platform == :ios

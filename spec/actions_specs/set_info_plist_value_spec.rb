@@ -1,8 +1,8 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "set_info_plist" do
-      let (:plist_path) { "./fastlane/spec/fixtures/plist/Info.plist" }
-      let (:new_value) { "NewValue#{Time.now.to_i}" }
+      let :plist_path { "./fastlane/spec/fixtures/plist/Info.plist" }
+      let :new_value { "NewValue#{Time.now.to_i}" }
 
       it "stores changes in the plist file" do
         old_value = Fastlane::FastFile.new.parse("lane :test do

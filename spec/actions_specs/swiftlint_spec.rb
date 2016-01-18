@@ -1,8 +1,8 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
-      let (:output_file) { "swiftlint.result.json" }
-      let (:config_file) { ".swiftlint-ci.yml" }
+      let :output_file { "swiftlint.result.json" }
+      let :config_file { ".swiftlint-ci.yml" }
 
       context "default use case" do
         it "default use case" do

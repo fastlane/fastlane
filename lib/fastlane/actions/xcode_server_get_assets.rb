@@ -137,7 +137,7 @@ module Fastlane
               if remaining_bytes && total_bytes
                 Helper.log.info "Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%".yellow
               else
-                Helper.log.error "#{chunk}".red
+                Helper.log.error chunk.to_s.red
               end
               f.write(chunk)
             end
@@ -201,10 +201,10 @@ module Fastlane
           url = url_for_endpoint(endpoint)
           headers = self.headers || {}
 
-          if response_block
-            response = Excon.get(url, response_block: response_block, headers: headers)
-          else
-            response = Excon.get(url, headers: headers)
+          response = if response_block
+                       Excon.get(url, response_block: response_block, headers: headers)
+                     else
+                       Excon.get(url, headers: headers)
           end
 
           return response

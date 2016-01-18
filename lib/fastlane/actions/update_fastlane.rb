@@ -24,7 +24,7 @@ module Fastlane
         "pilot",
         "supply",
         "scan"
-      ]
+      ].freeze
 
       def self.run(options)
         if options[:no_update]

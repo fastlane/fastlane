@@ -27,10 +27,10 @@ module Fastlane
 
         notifier = Slack::Notifier.new(options[:slack_url])
 
-        if options[:username].to_s.length > 0
-          notifier.username = options[:username]
-        else
-          notifier.username = 'fastlane'
+        notifier.username = if options[:username].to_s.length > 0
+                              options[:username]
+                            else
+                              'fastlane'
         end
 
         if options[:channel].to_s.length > 0
@@ -42,12 +42,12 @@ module Fastlane
 
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
-        if options[:icon_url].to_s.length > 0
-          result = notifier.ping '',
+        result = if options[:icon_url].to_s.length > 0
+                   notifier.ping '',
                                  icon_url: options[:icon_url],
                                  attachments: [slack_attachment]
-        else
-          result = notifier.ping '',
+                 else
+                   notifier.ping '',
                                  icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
                                  attachments: [slack_attachment]
         end

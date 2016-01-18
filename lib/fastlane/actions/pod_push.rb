@@ -13,7 +13,7 @@ module Fastlane
           command << " '#{params[:path]}'"
         end
 
-        result = Actions.sh("#{command}")
+        result = Actions.sh(command.to_s)
         Helper.log.info "Successfully pushed Podspec ⬆️ ".green
         return result
       end

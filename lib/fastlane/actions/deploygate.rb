@@ -11,7 +11,7 @@ module Fastlane
     end
 
     class DeploygateAction < Action
-      DEPLOYGATE_URL_BASE = 'https://deploygate.com'
+      DEPLOYGATE_URL_BASE = 'https://deploygate.com'.freeze
 
       def self.is_supported?(platform)
         platform == :ios

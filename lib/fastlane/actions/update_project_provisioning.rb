@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class UpdateProjectProvisioningAction < Action
-      ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
+      ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer".freeze
       def self.run(params)
         Helper.log.info "You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?"
         Helper.log.info "https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
