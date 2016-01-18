@@ -116,7 +116,7 @@ module FastlaneCore
         options[:scheme] = schemes.last
       elsif schemes.count > 1
         preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
-        if preferred.count == 1
+        if preferred_to_include.downcase and preferred.count == 1
           options[:scheme] = preferred.last
         else
           if Helper.is_ci?
