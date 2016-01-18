@@ -101,6 +101,7 @@ module FastlaneCore
 
     # Let the user select a scheme
     # Use a scheme containing the preferred_to_include string when multiple schemes were found
+    # rubocop:disable Metrics/AbcSize
     def select_scheme(preferred_to_include: nil)
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
@@ -135,6 +136,7 @@ module FastlaneCore
         raise "No Schemes found".red
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     # Get all available configurations in an array
     def configurations
