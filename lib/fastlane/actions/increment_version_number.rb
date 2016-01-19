@@ -26,7 +26,7 @@ module Fastlane
         current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
 
         if params[:version_number]
-          Helper.log.debug "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d.\d.\d/)
+          Helper.log.debug "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version =~ /\d.\d.\d/
 
           # Specific version
           next_version_number = params[:version_number]
@@ -34,7 +34,7 @@ module Fastlane
           if Helper.test?
             version_array = [1, 0, 0]
           else
-            raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version.match(/\d+.\d+.\d+/)
+            raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version =~ /\d+.\d+.\d+/
             version_array = current_version.split(".").map(&:to_i)
           end
 
