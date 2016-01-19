@@ -177,7 +177,7 @@ module FastlaneCore
     # Get the build settings for our project
     # this is used to properly get the DerivedData folder
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
-    def build_settings(key: nil, optional: true, silent: false)
+    def build_settings(key: nil, optional: true)
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         command = "xcrun xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
