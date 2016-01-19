@@ -2,7 +2,7 @@ module Deliver
   class Setup
     def run(options)
       containing = (File.directory?("fastlane") ? 'fastlane' : '.')
-      file_path = File.join(deliver_path, 'Deliverfile')
+      file_path = File.join(containing, 'Deliverfile')
       data = generate_deliver_file(containing, options)
       setup_deliver(file_path, data, containing, options)
     end
