@@ -23,7 +23,7 @@ module Match
       spaceship.profile_exists(params, uuid) if spaceship
 
       # Done
-      if self.changes_to_commit
+      if self.changes_to_commit and !params[:readonly]
         message = GitHelper.generate_commit_message(params)
         GitHelper.commit_changes(params[:workspace], message, params[:git_url])
       end
