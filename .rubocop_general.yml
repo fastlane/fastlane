@@ -11,6 +11,13 @@ Lint/UselessAssignment:
   Exclude:
     - 'spec/**/*'
 
+Style/IndentArray:
+  EnforcedStyle: consistent
+  SupportedStyles:
+    - special_inside_parentheses
+    - consistent
+    - align_brackets
+
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/IndentHash:
