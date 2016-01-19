@@ -11,6 +11,9 @@ module Fastlane
     attr_accessor :dev_portal_team
     attr_accessor :itc_team
 
+    attr_accessor :app_identifier
+    attr_accessor :app_name
+
     def run
       if FastlaneFolder.setup? and !Helper.is_test?
         Helper.log.info "Fastlane already set up at path #{folder}".yellow
@@ -37,7 +40,7 @@ module Fastlane
           generate_fastfile
           show_analytics
         else
-          # TODO
+          UI.user_error!("Setup cancelled by user")
         end
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue => ex # this will also be caused by Ctrl + C
@@ -54,15 +57,15 @@ module Fastlane
       config = {}
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
-      self.project.default_app_identifier # These two vars need to be accessed in order to be set
-      self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
+      self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
+      self.app_name = self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
     end
 
     def print_config_table
       rows = []
       rows << ["Apple ID", self.apple_id]
-      rows << ["App Name", self.project.default_app_name]
-      rows << ["App Identifier", self.project.default_app_identifier]
+      rows << ["App Name", self.app_name]
+      rows << ["App Identifier", self.app_identifier]
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
       puts ""
@@ -80,8 +83,6 @@ module Fastlane
 
     def show_infos
       Helper.log.info 'This setup will help you get up and running in no time.'.green
-      Helper.log.info 'First, it will move the config files from `deliver` and `snapshot`'.green
-      Helper.log.info "into the subfolder `fastlane`.\n".green
       Helper.log.info "fastlane will check what tools you're already using and set up".green
       Helper.log.info 'the tool automatically for you. Have fun! '.green
     end
@@ -107,7 +108,7 @@ module Fastlane
 
     def generate_appfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
-      template.gsub!('[[APP_IDENTIFIER]]', self.project.default_app_identifier)
+      template.gsub!('[[APP_IDENTIFIER]]', self.app_identifier)
       template.gsub!('[[APPLE_ID]]', self.apple_id)
       template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team)
       if self.itc_team
@@ -128,11 +129,11 @@ module Fastlane
       UI.message "Starting login with user '#{self.apple_id}'"
       Spaceship.login(self.apple_id, nil)
       self.dev_portal_team = Spaceship.select_team # TODO: add self.dev_portal_team to the Appfile
-      self.portal_ref = Spaceship::App.find(self.project.default_app_identifier)
+      self.portal_ref = Spaceship::App.find(self.app_identifier)
       
       Spaceship::Tunes.login(@apple_id, nil)
       self.itc_team = Spaceship::Tunes.select_team
-      self.itc_ref = Spaceship::Application.find(self.project.default_app_identifier)
+      self.itc_ref = Spaceship::Application.find(self.app_identifier)
     end
 
     def create_app_if_necessary
@@ -143,15 +144,15 @@ module Fastlane
       project = FastlaneCore::Project.new(config)
 
       produce_options_hash = {
-        app_name: project.default_app_name,
-        app_identifier: self.project.default_app_identifier
+        app_name: project.app_name,
+        app_identifier: self.project.app_identifier
       }
       Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
       begin
         ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
       rescue => exception
         if exception.to_s.include?("The App Name you entered has already been used")
-          Helper.log.info "It looks like that #{project.default_app_name} has already been taken by someone else, please enter an alternative.".yellow
+          Helper.log.info "It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.".yellow
           Produce.config[:app_name] = ask("App Name: ".yellow)
           Produce.config[:skip_devcenter] = true # since we failed on iTC
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
