@@ -287,7 +287,7 @@ module Fastlane
             # Add more xcodebuild arguments
             "#{v}"
           end
-        end.compact.sort
+        end.compact
       end
 
       def self.detect_workspace
