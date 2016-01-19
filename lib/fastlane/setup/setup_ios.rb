@@ -145,7 +145,7 @@ module Fastlane
 
       produce_options_hash = {
         app_name: project.app_name,
-        app_identifier: self.project.app_identifier
+        app_identifier: self.app_identifier
       }
       Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
       begin

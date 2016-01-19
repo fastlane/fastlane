@@ -49,7 +49,7 @@ describe Fastlane do
           setup = Fastlane::SetupIos.new
           expect(setup).to receive(:enable_deliver).and_return(nil)
           expect(setup.run).to eq(true)
-          expect(setup.tools).to eq({deliver: true, snapshot: false, cocoapods: true, carthage: false})
+          expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
 
           content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
           expect(content).to include "# update_fastlane"
