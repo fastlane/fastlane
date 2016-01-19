@@ -9,7 +9,13 @@ module Pilot
       start(options)
       require 'csv'
 
-      testers = Spaceship::Tunes::Tester::External.all
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      if app_filter
+        app = Spaceship::Application.find(app_filter)
+        testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
+      else
+        testers = Spaceship::Tunes::Tester::External.all
+      end
 
       file = config[:testers_file_path]
 
