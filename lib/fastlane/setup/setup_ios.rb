@@ -1,7 +1,15 @@
 module Fastlane
   class SetupIos < Setup
     # the tools that are already enabled
-    attr_reader :tools
+    attr_accessor :tools
+    attr_accessor :project
+    attr_accessor :apple_id
+
+    attr_accessor :portal_ref
+    attr_accessor :itc_ref
+
+    attr_accessor :dev_portal_team
+    attr_accessor :itc_team
 
     def run
       if FastlaneFolder.setup? and !Helper.is_test?
@@ -15,6 +23,10 @@ module Fastlane
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
         setup_project
+        ask_for_apple_id
+        detect_if_app_is_available
+        print_config_table
+
         if UI.confirm("Please confirm the above values")
           copy_existing_files
           generate_appfile
@@ -41,30 +53,27 @@ module Fastlane
     def setup_project
       config = {}
       FastlaneCore::Project.detect_projects(config)
-      @project = FastlaneCore::Project.new(config)
-      @project.default_app_identifier # These two vars need to be accessed in order to be set
-      @project.default_app_name # They are set as a side effect, this could/should be changed down the road
-      ask_for_apple_id
-      detect_if_app_is_available
-      print_config_table
+      self.project = FastlaneCore::Project.new(config)
+      self.project.default_app_identifier # These two vars need to be accessed in order to be set
+      self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
     end
 
     def print_config_table
       rows = []
-      rows << ["Apple ID", @apple_id]
-      rows << ["App Name", @project.default_app_name]
-      rows << ["App Identifier", @project.default_app_identifier]
-      rows << [(@project.is_workspace ? "Workspace" : "Project"), @project.path]
+      rows << ["Apple ID", self.apple_id]
+      rows << ["App Name", self.project.default_app_name]
+      rows << ["App Identifier", self.project.default_app_identifier]
+      rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
       puts ""
       puts Terminal::Table.new(rows: rows, title: "Detected Values")
       puts ""
 
-      unless @itc_ref
+      unless self.itc_ref
         UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
       end
 
-      unless @portal_ref
+      unless self.portal_ref
         UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
       end
     end
@@ -93,16 +102,16 @@ module Fastlane
     end
 
     def ask_for_apple_id
-      @apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
+      self.apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
     end
 
     def generate_appfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
-      template.gsub!('[[APP_IDENTIFIER]]', @project.default_app_identifier)
-      template.gsub!('[[APPLE_ID]]', @apple_id)
-      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', @dev_portal_team)
-      if @itc_team
-        template.gsub!('[[ITC_TEAM]]', "itc_team_id \"#{@itc_team}\" # iTunes Connect Team ID\n")
+      template.gsub!('[[APP_IDENTIFIER]]', self.project.default_app_identifier)
+      template.gsub!('[[APPLE_ID]]', self.apple_id)
+      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team)
+      if self.itc_team
+        template.gsub!('[[ITC_TEAM]]', "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n")
       else
         template.gsub!('[[ITC_TEAM]]', "")
       end
@@ -116,14 +125,14 @@ module Fastlane
       require 'spaceship'
 
       UI.important "Verifying if app is available on the Apple Developer Portal and iTunes Connect..."
-      UI.message "Starting login with user '#{@apple_id}'"
-      Spaceship.login(@apple_id, nil)
-      @dev_portal_team = Spaceship.select_team # TODO: add @dev_portal_team to the Appfile
-      @portal_ref = Spaceship::App.find(@project.default_app_identifier)
+      UI.message "Starting login with user '#{self.apple_id}'"
+      Spaceship.login(self.apple_id, nil)
+      self.dev_portal_team = Spaceship.select_team # TODO: add self.dev_portal_team to the Appfile
+      self.portal_ref = Spaceship::App.find(self.project.default_app_identifier)
       
       Spaceship::Tunes.login(@apple_id, nil)
-      @itc_team = Spaceship::Tunes.select_team
-      @itc_ref = Spaceship::Application.find(@project.default_app_identifier)
+      self.itc_team = Spaceship::Tunes.select_team
+      self.itc_ref = Spaceship::Application.find(self.project.default_app_identifier)
     end
 
     def create_app_if_necessary
@@ -135,7 +144,7 @@ module Fastlane
 
       produce_options_hash = {
         app_name: project.default_app_name,
-        app_identifier: @project.default_app_identifier
+        app_identifier: self.project.default_app_identifier
       }
       Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
       begin
@@ -151,13 +160,10 @@ module Fastlane
     end
 
     def detect_installed_tools
-      @tools = {}
-      @tools[:deliver] = File.exist?(File.join(folder, 'Deliverfile'))
-      @tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
-      @tools[:xctool] = File.exist?(File.join(File.expand_path('..', folder), '.xctool-args'))
-      @tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
-      @tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
-      @tools[:sigh] = false
+      self.tools = {}
+      self.tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
+      self.tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
+      self.tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
     end
 
     def enable_deliver
@@ -167,12 +173,10 @@ module Fastlane
       options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
       Deliver::Runner.new(options) # to login...
       Deliver::Setup.new.run(options)
-
-      @tools[:deliver] = true
     end
 
     def generate_fastfile
-      scheme = @project.schemes.first
+      scheme = self.project.schemes.first
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
 
       scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
@@ -182,15 +186,12 @@ module Fastlane
         template.gsub!('[[SCHEME]]', "")
       end
 
-      template.gsub!('deliver', '# deliver') unless @tools[:deliver]
-      template.gsub!('snapshot', '# snapshot') unless @tools[:snapshot]
-      template.gsub!('sigh', '# sigh') unless @tools[:sigh]
-      template.gsub!('xctool', '# xctool') unless @tools[:xctool]
-      template.gsub!('cocoapods', '') unless @tools[:cocoapods]
-      template.gsub!('carthage', '') unless @tools[:carthage]
+      template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
+      template.gsub!('cocoapods', '') unless self.tools[:cocoapods]
+      template.gsub!('carthage', '') unless self.tools[:carthage]
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
-      @tools.each do |key, value|
+      self.tools.each do |key, value|
         Helper.log.info "'#{key}' enabled.".magenta if value
         Helper.log.info "'#{key}' not enabled.".yellow unless value
       end
