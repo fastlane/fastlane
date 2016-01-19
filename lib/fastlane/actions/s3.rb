@@ -126,11 +126,11 @@ module Fastlane
         eth = Fastlane::ErbTemplateHelper
 
         # Creates plist from template
-        if plist_template_path && File.exist?(plist_template_path)
-          plist_template = eth.load_from_path(plist_template_path)
-        else
-          plist_template = eth.load("s3_plist_template")
-        end
+        plist_template = if plist_template_path && File.exist?(plist_template_path)
+                           eth.load_from_path(plist_template_path)
+                         else
+                           eth.load("s3_plist_template")
+                         end
         plist_render = eth.render(plist_template, {
           url: ipa_url,
           bundle_id: bundle_id,
@@ -139,11 +139,11 @@ module Fastlane
         })
 
         # Creates html from template
-        if html_template_path && File.exist?(html_template_path)
-          html_template = eth.load_from_path(html_template_path)
-        else
-          html_template = eth.load("s3_html_template")
-        end
+        html_template = if html_template_path && File.exist?(html_template_path)
+                          eth.load_from_path(html_template_path)
+                        else
+                          eth.load("s3_html_template")
+                        end
         html_render = eth.render(html_template, {
           url: plist_url,
           bundle_id: bundle_id,
@@ -152,11 +152,11 @@ module Fastlane
         })
 
         # Creates version from template
-        if version_template_path && File.exist?(version_template_path)
-          version_template = eth.load_from_path(version_template_path)
-        else
-          version_template = eth.load("s3_version_template")
-        end
+        version_template = if version_template_path && File.exist?(version_template_path)
+                             eth.load_from_path(version_template_path)
+                           else
+                             eth.load("s3_version_template")
+                           end
         version_render = eth.render(version_template, {
           url: plist_url,
           full_version: full_version
@@ -201,18 +201,18 @@ module Fastlane
       def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, s3_region, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
         Actions.verify_gem!('aws-sdk')
         require 'aws-sdk'
-        if s3_region
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key,
-            region: s3_region
-          )
-        else
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key
-          )
-        end
+        s3_client = if s3_region
+                      AWS::S3.new(
+                        access_key_id: s3_access_key,
+                        secret_access_key: s3_secret_access_key,
+                        region: s3_region
+                      )
+                    else
+                      AWS::S3.new(
+                        access_key_id: s3_access_key,
+                        secret_access_key: s3_secret_access_key
+                      )
+                    end
 
         bucket = s3_client.buckets[s3_bucket]
 

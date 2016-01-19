@@ -201,11 +201,11 @@ module Fastlane
           url = url_for_endpoint(endpoint)
           headers = self.headers || {}
 
-          if response_block
-            response = Excon.get(url, response_block: response_block, headers: headers)
-          else
-            response = Excon.get(url, headers: headers)
-          end
+          response = if response_block
+                       Excon.get(url, response_block: response_block, headers: headers)
+                     else
+                       Excon.get(url, headers: headers)
+                     end
 
           return response
         end

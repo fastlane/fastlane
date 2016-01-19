@@ -48,11 +48,11 @@ module Fastlane
           command = 'git rev-parse --short HEAD'
         elsif is_hg?
           Helper.log.info "Detected repo: hg"
-          if params[:use_hg_revision_number]
-            command = 'hg parent --template {rev}'
-          else
-            command = 'hg parent --template "{node|short}"'
-          end
+          command = if params[:use_hg_revision_number]
+                      'hg parent --template {rev}'
+                    else
+                      'hg parent --template "{node|short}"'
+                    end
         else
           raise "No repository detected"
         end

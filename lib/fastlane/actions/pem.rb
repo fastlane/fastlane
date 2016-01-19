@@ -13,11 +13,11 @@ module Fastlane
 
           PEM.config = params
 
-          if Helper.is_test?
-            profile_path = './test.pem'
-          else
-            profile_path = PEM::Manager.start
-          end
+          profile_path = if Helper.is_test?
+                           './test.pem'
+                         else
+                           PEM::Manager.start
+                         end
 
           if success_block and profile_path
             success_block.call(File.expand_path(profile_path)) if success_block
