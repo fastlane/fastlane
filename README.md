@@ -297,6 +297,15 @@ match change_password
 
 You'll be asked for the new password on all your machines on the next run.
 
+### Manual Decrypt
+
+If you want to manually decrypt a file you can.
+
+```
+openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
+```
+
+
 ## Is this secure?
 
 Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.
