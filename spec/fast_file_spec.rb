@@ -20,11 +20,11 @@ describe Fastlane do
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block? 'mac').to eq(true)
+        expect(@ff.is_platform_block?('mac')).to eq(true)
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block? 'test').to eq(false)
+        expect(@ff.is_platform_block?('test')).to eq(false)
       end
 
       it "raises an exception if key doesn't exist at all" do

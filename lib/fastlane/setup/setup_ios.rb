@@ -160,16 +160,6 @@ module Fastlane
       @tools[:sigh] = false
     end
 
-    def enable_snapshot
-      Helper.log.info "Loading up 'snapshot', this might take a few seconds"
-
-      require 'snapshot'
-      require 'snapshot/setup'
-      Snapshot::Setup.create(folder)
-
-      @tools[:snapshot] = true
-    end
-
     def enable_deliver
       Helper.log.info "Loading up 'deliver', this might take a few seconds"
       require 'deliver'

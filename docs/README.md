@@ -2,6 +2,7 @@
 
 - [fastlane guide](https://github.com/fastlane/fastlane/blob/master/docs/Guide.md) to get started. 
 - [Actions.md](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md) for all the built-in integrations
+- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/docs/Bamboo.md) for Bamboo specific help
 - [Code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md) to show you how to do code signing right.
 - [FAQs](https://github.com/fastlane/fastlane/blob/master/docs/FAQs.md) for frequently asked questions
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/docs/Advanced.md) for more advanced settings and tips.

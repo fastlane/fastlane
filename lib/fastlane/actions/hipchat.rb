@@ -42,8 +42,7 @@ module Fastlane
           end
         else
           ########## running on V2 ##########
-          if user?(channel)
-            channel.slice!(0)
+          if user?(channel) # rubocop:disable Style/IfInsideElse
             params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }

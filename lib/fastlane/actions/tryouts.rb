@@ -41,8 +41,8 @@ module Fastlane
 
         if params[:notes_path]
           options[:notes] = File.read(params[:notes_path])
-        else
-          options[:notes] = params[:notes] if params[:notes]
+        elsif params[:notes]
+          options[:notes] = params[:notes]
         end
 
         options[:notify] = params[:notify].to_s
