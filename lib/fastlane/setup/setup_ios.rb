@@ -85,17 +85,15 @@ module Fastlane
     def ask_to_enable_other_tools
       if @tools[:deliver] # deliver already enabled
         Helper.log.info 'Since all files are moved into the `fastlane` subfolder, you have to adapt your Deliverfile'.yellow
-      else
-        if agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
-          Helper.log.info "Loading up 'deliver', this might take a few seconds"
-          require 'deliver'
-          require 'deliver/setup'
-          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
-          Deliver::Runner.new(options) # to login...
-          Deliver::Setup.new.run(options)
+      elsif agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
+        Helper.log.info "Loading up 'deliver', this might take a few seconds"
+        require 'deliver'
+        require 'deliver/setup'
+        options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        Deliver::Runner.new(options) # to login...
+        Deliver::Setup.new.run(options)
 
-          @tools[:deliver] = true
-        end
+        @tools[:deliver] = true
       end
 
       unless @tools[:snapshot]
