@@ -708,10 +708,10 @@ module Spaceship
               value: email
             },
             firstName: {
-              value: first_name
+              value: first_name || ""
             },
             lastName: {
-              value: last_name
+              value: last_name || ""
             },
             testing: {
               value: true
