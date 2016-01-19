@@ -88,7 +88,7 @@ module Fastlane
     end
 
     def files_to_copy
-      ['Deliverfile', 'deliver', 'screenshots']
+      ['Deliverfile', 'deliver', 'screenshots', 'metadata']
     end
 
     def copy_existing_files
