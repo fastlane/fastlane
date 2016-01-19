@@ -1,6 +1,6 @@
 # Customise this file, documentation can be found here:
-# https://github.com/KrauseFx/fastlane/tree/master/docs
-# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md
+# https://github.com/fastlane/fastlane/tree/master/docs
+# All available actions: https://github.com/fastlane/fastlane/blob/master/docs/Actions.md
 # can also be listed using the `fastlane actions` command
 
 # Change the syntax highlighting to Ruby
@@ -20,7 +20,6 @@ fastlane_version "[[FASTLANE_VERSION]]"
 
 default_platform :ios
 
-
 platform :ios do
   before_all do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
@@ -28,24 +27,24 @@ platform :ios do
 
   desc "Runs all the tests"
   lane :test do
-    snapshot
+    scan
   end
 
   desc "Submit a new Beta Build to Apple TestFlight"
   desc "This will also make sure the profile is up to date"
   lane :beta do
-    sigh
+    # match(type: "appstore") # more information: https://codesigning.guide
     gym[[SCHEME]] # Build your app - more options available
     pilot
 
     # sh "your_script.sh"
-    # You can also use other beta testing services here
+    # You can also use other beta testing services here (run `fastlane actions`)
   end
 
   desc "Deploy a new version to the App Store"
   lane :appstore do
+    # match(type: "appstore")
     # snapshot
-    sigh
     gym[[SCHEME]] # Build your app - more options available
     deliver(force: true)
     # frameit
@@ -71,5 +70,5 @@ end
 
 
 
-# More information about multiple platforms in fastlane: https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md
-# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/docs/Platforms.md
+# All available actions: https://github.com/fastlane/fastlane/blob/master/docs/Actions.md
