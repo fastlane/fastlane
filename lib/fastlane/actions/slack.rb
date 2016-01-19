@@ -68,11 +68,11 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_SLACK_USERNAME",
-                                       description: "The username that should be displayed on Slack.",
+                                       description: "The username that should be displayed on Slack",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
-                                       description: "The URL of the icon that should be displayed on Slack.",
+                                       description: "The URL of the icon that should be displayed on Slack",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_SLACK_MESSAGE",
