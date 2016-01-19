@@ -50,7 +50,7 @@ module Fastlane
         warnings: "",
         logformat: "--logformat",
         verbose: "--verbose"
-      }
+      }.freeze
 
       def self.run(params)
         unless Helper.test?

@@ -5,8 +5,8 @@ module Fastlane
     end
 
     class PodioItemAction < Action
-      AUTH_URL = 'https://podio.com/oauth/token'
-      BASE_URL = 'https://api.podio.com'
+      AUTH_URL = 'https://podio.com/oauth/token'.freeze
+      BASE_URL = 'https://api.podio.com'.freeze
 
       def self.run(params)
         require 'rest_client'
