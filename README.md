@@ -37,25 +37,7 @@ chiizu
 
 Chiizu is a commandline tool that automates taking localized screenshots of your Android app. 
 
-[insert gif of commandline output && emulator running tests)]
-
-Get in contact with us on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
-
--------
-<p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#ui-tests">UI Tests</a> &bull; 
-    <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
-    <a href="#how-does-it-work">How?</a> &bull; 
-    <a href="#need-help">Need help?</a>
-</p>
-
--------
-
-<h5 align="center"><code>chiizu</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<img src="assets/running-chiizu.gif" width="640">
 
 ### Why should I automate this process?
 - Create hundreds of screenshots in multiple languages on emulators or real devices, saving you hours
@@ -64,8 +46,6 @@ Get in contact with us on Twitter: [@FastlaneTools](https://twitter.com/Fastlane
 - Keep your screenshots perfectly up-to-date with every app update. Your customers deserve it!
 - Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/supply)
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
-
 # [ALPHA] Installation
 
 Once this tool is officially released, the installation will be as simple as running `gem install chiizu`, and referencing a published Android AAR. For the private alpha, please follow these testing instructions:
@@ -73,8 +53,8 @@ Once this tool is officially released, the installation will be as simple as run
 ##### Command line tool installation 
 1. Clone the repo with `git clone git@github.com:fastlane/chiizu.git`
 1. `cd` into your chiizu repo directory and run `rake install`
-  - You may need to `gem install bundler` if you don't already have bundler
-  - If you're using the default Ruby on Mac OS you may need to use `sudo`
+    - You may need to `gem install bundler` if you don't already have bundler
+    - If you're using the default Ruby on Mac OS you may need to use `sudo`
 1. Run `chiizu init` to complete installation
 
 ##### Java library installation
@@ -177,6 +157,7 @@ There is an [example project](https://github.com/fastlane/screengrab/tree/master
 Using JUnit 4 is preferable because of its ability to perform actions before and after the entire test class is run. This means you will change the device's locale far fewer times when compared with JUnit 3 running those commands before and after each test method.
 
 When using JUnit 3 you'll need to add a bit more code:
+
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());` in `setUp()`
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());` in `tearDown()`
 - Use `Lens.screenshot(activity, "name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
