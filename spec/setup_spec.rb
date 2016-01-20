@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::Setup do
     it "#files_to_copy" do
-      expect(Fastlane::SetupIos.new.files_to_copy).to eq(['Deliverfile', 'deliver', 'screenshots'])
+      expect(Fastlane::SetupIos.new.files_to_copy).to eq(['Deliverfile', 'deliver', 'screenshots', 'metadata'])
     end
 
     it "#show_infos" do
@@ -17,7 +17,7 @@ describe Fastlane do
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
         $terminal = HighLine.new # mock user inputs :)
-        allow($terminal).to receive(:ask).and_return("y\n")
+        allow($terminal).to receive(:ask).and_return("y")
 
         allow(Fastlane::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
 
@@ -25,23 +25,46 @@ describe Fastlane do
       end
 
       it "setup is successful and generated inital Fastfile" do
-        if FastlaneCore::Helper.mac?
-          require 'snapshot'
-          require 'snapshot/setup'
-          expect(Snapshot::Setup).to receive(:create).with("/tmp/setup_workspace/fastlane")
-        end
+        require 'produce'
+
+        expect(Produce::Manager).to receive(:start_producing)
+        allow(FastlaneCore::Helper).to receive(:gem_path).with('fastlane').and_return(File.expand_path(".")) # since we chdir later on
+
+        app = "app"
+
+        dev_team_id = "123123"
+        expect(Spaceship).to receive(:login)
+        expect(Spaceship).to receive(:select_team).and_return(dev_team_id)
+        expect(Spaceship::App).to receive(:find).with("tools.fastlane.app").and_return(app)
+
+        itc_team_id = "itc_321"
+        expect(Spaceship::Tunes).to receive(:login)
+        expect(Spaceship::Tunes).to receive(:select_team).and_return(itc_team_id)
+        expect(Spaceship::Tunes::Application).to receive(:find).with("tools.fastlane.app").and_return(app)
+
+        expect(FastlaneCore::UI).to receive(:confirm).and_return(true)
 
         Fastlane::FastlaneFolder.create_folder!(workspace)
-        setup = Fastlane::SetupIos.new
-        expect(setup.run).to eq(true)
-        expect(setup.tools).to eq({deliver: true, snapshot: FastlaneCore::Helper.mac?, xctool: true, cocoapods: true, sigh: true, carthage: false})
+        Dir.chdir(workspace) do
+          setup = Fastlane::SetupIos.new
+          expect(setup).to receive(:enable_deliver).and_return(nil)
+          expect(setup.run).to eq(true)
+          expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
 
-        content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
-        expect(content).to include "# update_fastlane"
-        expect(content).to include "# opt_out_usage"
-        expect(content).to include "  deliver"
-        expect(content).to include "  xctool"
-        expect(content).to include "gym(scheme: \"y\")"
+          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+          expect(content).to include "# update_fastlane"
+          expect(content).to include "# opt_out_usage"
+          expect(content).to include "deliver"
+          expect(content).to include "scan"
+          expect(content).to include "gym(scheme: \"Example\")"
+
+          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Appfile'))
+
+          expect(content).to include "app_identifier \"tools.fastlane.app\""
+          expect(content).to include "team_id \"#{dev_team_id}\""
+          expect(content).to include "itc_team_id \"#{itc_team_id}\""
+          expect(content).to include "apple_id \"y\""
+        end
       end
 
       after do

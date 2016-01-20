@@ -20,37 +20,33 @@ fastlane_version "[[FASTLANE_VERSION]]"
 
 default_platform :ios
 
-
 platform :ios do
   before_all do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
     cocoapods
     carthage
-    # increment_build_number
-
-    xctool # run the tests of your app
   end
 
   desc "Runs all the tests"
   lane :test do
-    snapshot
+    scan
   end
 
   desc "Submit a new Beta Build to Apple TestFlight"
   desc "This will also make sure the profile is up to date"
   lane :beta do
-    sigh
+    # match(type: "appstore") # more information: https://codesigning.guide
     gym[[SCHEME]] # Build your app - more options available
     pilot
 
     # sh "your_script.sh"
-    # You can also use other beta testing services here
+    # You can also use other beta testing services here (run `fastlane actions`)
   end
 
   desc "Deploy a new version to the App Store"
-  lane :deploy do
+  lane :appstore do
+    # match(type: "appstore")
     snapshot
-    sigh
     gym[[SCHEME]] # Build your app - more options available
     deliver(force: true)
     # frameit
@@ -60,7 +56,7 @@ platform :ios do
 
   after_all do |lane|
     # This block is called, only if the executed lane was successful
-    
+
     # slack(
     #   message: "Successfully deployed new App Update."
     # )
