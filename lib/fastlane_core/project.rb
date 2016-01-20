@@ -200,7 +200,7 @@ module FastlaneCore
     # Returns the build settings and sets the default scheme to the options hash
     def default_build_settings(key: nil, optional: true, silent: false)
       options[:scheme] = schemes.first if is_workspace
-      build_settings(key: key, optional: optional, silent: silent)
+      build_settings(key: key, optional: optional)
     end
 
     def raw_info(silent: false)
