@@ -33,6 +33,24 @@ module Deliver
                                      verify_block: proc do |value|
                                        raise "Could not find ipa file at path '#{value}'".red unless File.exist?(value)
                                        raise "'#{value}' doesn't seem to be an ipa file".red unless value.end_with?(".ipa")
+                                     end,
+                                     conflicting_options: [:pkg],
+                                     conflict_block: proc do |value|
+                                       raise "You can't use 'ipa' and '#{value.key}' options in one run.".red
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :pkg,
+                                     short_option: "-c",
+                                     optional: true,
+                                     env_name: "DELIVER_PKG_PATH",
+                                     description: "Path to your pkg file",
+                                     default_value: Dir["*.pkg"].first,
+                                     verify_block: proc do |value|
+                                       raise "Could not find pkg file at path '#{value}'".red unless File.exist?(value)
+                                       raise "'#{value}' doesn't seem to be a pkg file".red unless value.end_with?(".pkg")
+                                     end,
+                                     conflicting_options: [:ipa],
+                                     conflict_block: proc do |value|
+                                       raise "You can't use 'pkg' and '#{value.key}' options in one run.".red
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
