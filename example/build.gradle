@@ -40,7 +40,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
-    androidTestCompile project(':chiizu-lib')
-//  The following code enables this app to use the pre-compiled chiizu-lib-release.aar, for testing
-//    androidTestCompile project(':chiizu-lib-release')
+    androidTestCompile project(':screengrab-lib')
+//  The following code enables this app to use the pre-compiled screengrab-lib-release.aar, for testing
+//    androidTestCompile project(':screengrab-lib-release')
 }

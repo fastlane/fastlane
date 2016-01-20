@@ -7,7 +7,7 @@
 </h3>
 <p align="center">
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <b>chiizu</b> &bull; 
+  <b>screengrab</b> &bull; 
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
   <a href="https://github.com/fastlane/pem">pem</a> &bull; 
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
@@ -23,21 +23,21 @@
 -------
 
 <p align="center">
-  <img src="assets/chiizu.png" height="110">
+  <img src="assets/screengrab.png" height="110">
 </p>
 
-chiizu
+screengrab
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/chiizu/blob/master/LICENSE)
-[![Gem](https://img.shields.io/gem/v/chiizu.svg?style=flat)](http://rubygems.org/gems/chiizu)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/screengrab/blob/master/LICENSE)
+[![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
 
 ### Automates screenshots of your Android app
 
-Chiizu is a commandline tool that automates taking localized screenshots of your Android app. 
+Screengrab is a commandline tool that automates taking localized screenshots of your Android app. 
 
-<img src="assets/running-chiizu.gif" width="640">
+<img src="assets/running-screengrab.gif" width="640">
 
 ### Why should I automate this process?
 - Create hundreds of screenshots in multiple languages on emulators or real devices, saving you hours
@@ -48,17 +48,17 @@ Chiizu is a commandline tool that automates taking localized screenshots of your
 
 # [ALPHA] Installation
 
-Once this tool is officially released, the installation will be as simple as running `gem install chiizu`, and referencing a published Android AAR. For the private alpha, please follow these testing instructions:
+Once this tool is officially released, the installation will be as simple as running `gem install screengrab`, and referencing a published Android AAR. For the private alpha, please follow these testing instructions:
 
 ##### Command line tool installation 
-1. Clone the repo with `git clone git@github.com:fastlane/chiizu.git`
-1. `cd` into your chiizu repo directory and run `rake install`
+1. Clone the repo with `git clone git@github.com:fastlane/screengrab.git`
+1. `cd` into your screengrab repo directory and run `rake install`
     - You may need to `gem install bundler` if you don't already have bundler
     - If you're using the default Ruby on Mac OS you may need to use `sudo`
-1. Run `chiizu init` to complete installation
+1. Run `screengrab init` to complete installation
 
 ##### Java library installation
-Import the Chiizu library AAR into your Android Studio project
+Import the Screengrab library AAR into your Android Studio project
   1. Right click on your root project and select New > Module
 <p align="center">
   <img src="assets/new-module.png" height="450">
@@ -67,8 +67,8 @@ Import the Chiizu library AAR into your Android Studio project
 <p align="center">
   <img src="assets/import-dialog.png" height="450">
 </p>
-  1. Pick `[path_to_chiizu_repo]/chiizu-lib-release/chiizu-lib-release.aar` and click **Finish**
-  1. Add `androidTestCompile project(':chiizu-lib-release')` to your app's **build.gradle** dependencies
+  1. Pick `[path_to_screengrab_repo]/screengrab-lib-release/screengrab-lib-release.aar` and click **Finish**
+  1. Add `androidTestCompile project(':screengrab-lib-release')` to your app's **build.gradle** dependencies
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**
@@ -89,20 +89,20 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
 1.  Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
-2.  To capture screenshots, add the following to your tests `Lens.screenshot(activity, "name_of_screenshot_here");` on the appropriate screens
+2.  To capture screenshots, add the following to your tests `Screengrab.screenshot(activity, "name_of_screenshot_here");` on the appropriate screens
 
-# Generating Screenshots with Chiizu
-- Then, before running `chiizu` you'll need a debug and test apk
+# Generating Screenshots with Screengrab
+- Then, before running `screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
-- Once complete run `chiizu` in your app project directory to generate screenshots
-    - You will be prompted to provide any required parameters which are not in your **Chiizufile** or provided as command line arguments
-- Your screenshots will be saved in a /screenshots directory in the directory where you ran `chiizu`     
+- Once complete run `screengrab` in your app project directory to generate screenshots
+    - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
+- Your screenshots will be saved in a /screenshots directory in the directory where you ran `screengrab`     
 
-## Advanced Chiizufile Configuration
+## Advanced Screengrabfile Configuration
 
-Running `chiizu init` generated a Chiizufile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there. 
+Running `screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there. 
 
-The `Chiizufile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
+The `Screengrabfile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
 
 ```ruby
 # remove the leading '#' to uncomment lines
@@ -122,7 +122,7 @@ clear_previous_screenshots
 For more information about all available options run
 
 ```
-chiizu --help
+screengrab --help
 ```
 
 # Tips
@@ -143,16 +143,16 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeScreenshot() {
-        Lens.screenshot(activityRule.getActivity(), "before_button_click");
+        Screengrab.screenshot(activityRule.getActivity(), "before_button_click");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Lens.screenshot(activityRule.getActivity(), "after_button_click");
+        Screengrab.screenshot(activityRule.getActivity(), "after_button_click");
     }
 }
 
 ```
-There is an [example project](https://github.com/fastlane/screengrab/tree/master/example/src/androidTest/java/io/fabric/localetester) showing how to use use JUnit 3 or 4 and Espresso with the chiizu Java library to capture screenshots during a UI test run.
+There is an [example project](https://github.com/fastlane/screengrab/tree/master/example/src/androidTest/java/io/fabric/localetester) showing how to use use JUnit 3 or 4 and Espresso with the screengrab Java library to capture screenshots during a UI test run.
 
 Using JUnit 4 is preferable because of its ability to perform actions before and after the entire test class is run. This means you will change the device's locale far fewer times when compared with JUnit 3 running those commands before and after each test method.
 
@@ -160,7 +160,7 @@ When using JUnit 3 you'll need to add a bit more code:
 
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());` in `setUp()`
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());` in `tearDown()`
-- Use `Lens.screenshot(activity, "name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
+- Use `Screengrab.screenshot(activity, "name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
 
 If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup. 
 

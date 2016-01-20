@@ -1,7 +1,7 @@
 require "coveralls"
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-require 'chiizu'
+require 'screengrab'
 require 'webmock'
 
 # This module is only used to check the environment is currently a testing env

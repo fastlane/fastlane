@@ -12,7 +12,7 @@ example/.gradle
 example/build
 example/fastlane/screenshots
 
-chiizu-lib/build
+screengrab-lib/build
 
 .gradle
 

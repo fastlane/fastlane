@@ -2,9 +2,9 @@ package io.fabric.localetester;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import chiizu.lens.Lens;
-import chiizu.locale.LocaleUtil;
-import chiizu.screen.ScreenUtil;
+import tools.fastlane.screengrab.Screengrab;
+import tools.fastlane.screengrab.locale.LocaleUtil;
+import tools.fastlane.screengrab.screen.ScreenUtil;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -30,19 +30,19 @@ public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     public void testTakeScreenshot() {
-        Lens.screenshot(activity, "screenshot1");
+        Screengrab.screenshot(activity, "screenshot1");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Lens.screenshot(activity, "screenshot2");
+        Screengrab.screenshot(activity, "screenshot2");
     }
 
     public void testTakeMoreScreenshots() {
-        Lens.screenshot(activity, "screenshot3");
+        Screengrab.screenshot(activity, "screenshot3");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Lens.screenshot(activity, "screenshot4");
+        Screengrab.screenshot(activity, "screenshot4");
     }
 }
 
