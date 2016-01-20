@@ -12,9 +12,11 @@ module Deliver
 
       if options[:ipa]
         identifier = FastlaneCore::IpaFileAnalyser.fetch_app_identifier(options[:ipa])
-        options[:app_identifier] = identifier if identifier.to_s.length > 0
+      elsif options[:pkg]
+        identifier = FastlaneCore::PkgFileAnalyser.fetch_app_identifier(options[:pkg])
       end
 
+      options[:app_identifier] = identifier if identifier.to_s.length > 0
       options[:app_identifier] ||= ask("The Bundle Identifier of your App: ")
     end
 
@@ -41,6 +43,8 @@ module Deliver
     def find_version(options)
       if options[:ipa]
         options[:app_version] ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
+      elsif options[:pkg]
+        options[:app_version] ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
       end
     end
   end

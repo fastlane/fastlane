@@ -36,7 +36,7 @@ module Deliver
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
           loaded = options.load_configuration_file("Deliverfile")
-          loaded = true if options[:description] || options[:ipa] # do we have *anything* here?
+          loaded = true if options[:description] || options[:ipa] || options[:pkg] # do we have *anything* here?
           unless loaded
             if agree("No deliver configuration found in the current directory. Do you want to setup deliver? (y/n)".yellow, true)
               require 'deliver/setup'
