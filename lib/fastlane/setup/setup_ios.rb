@@ -127,7 +127,7 @@ module Fastlane
       UI.important "Verifying if app is available on the Apple Developer Portal and iTunes Connect..."
       UI.message "Starting login with user '#{self.apple_id}'"
       Spaceship.login(self.apple_id, nil)
-      self.dev_portal_team = Spaceship.select_team # TODO: add self.dev_portal_team to the Appfile
+      self.dev_portal_team = Spaceship.select_team
       self.portal_ref = Spaceship::App.find(self.app_identifier)
 
       Spaceship::Tunes.login(@apple_id, nil)
