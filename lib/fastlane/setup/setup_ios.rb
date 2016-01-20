@@ -22,7 +22,6 @@ module Fastlane
 
       show_infos
 
-      # rubocop:disable Lint/RescueException
       begin
         FastlaneFolder.create_folder! unless Helper.is_test?
         setup_project
@@ -130,7 +129,7 @@ module Fastlane
       Spaceship.login(self.apple_id, nil)
       self.dev_portal_team = Spaceship.select_team # TODO: add self.dev_portal_team to the Appfile
       self.portal_ref = Spaceship::App.find(self.app_identifier)
-      
+
       Spaceship::Tunes.login(@apple_id, nil)
       self.itc_team = Spaceship::Tunes.select_team
       self.itc_ref = Spaceship::Application.find(self.app_identifier)
