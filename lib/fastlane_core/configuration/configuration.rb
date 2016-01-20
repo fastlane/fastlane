@@ -38,6 +38,7 @@ module FastlaneCore
       verify_input_types
       verify_value_exists
       verify_no_duplicates
+      verify_conflicts
       verify_default_value_matches_verify_block
     end
 
@@ -72,6 +73,36 @@ module FastlaneCore
         unless current.short_option.to_s.empty?
           count = @available_options.count { |option| option.short_option == current.short_option }
           raise "Multiple entries for short_option '#{current.short_option}' found!".red if count > 1
+        end
+      end
+    end
+
+    def verify_conflicts
+      option_keys = @values.keys
+
+      option_keys.each do |current|
+        index = @available_options.find_index { |item| item.key == current }
+        current = @available_options[index]
+
+        next if current.conflicting_options.nil?
+
+        conflicts = current.conflicting_options & option_keys
+        next if conflicts.nil?
+
+        conflicts.each do |conflicting_option_key|
+          index = @available_options.find_index { |item| item.key == conflicting_option_key }
+          conflicting_option = @available_options[index]
+
+          if current.conflict_block
+            begin
+              current.conflict_block.call(conflicting_option)
+            rescue => ex
+              Helper.log.fatal "Error resolving conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
+              raise ex
+            end
+          else
+            raise "Unresolved conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
+          end
         end
       end
     end
@@ -112,7 +143,9 @@ module FastlaneCore
       return if paths.count == 0
 
       path = paths.first
-      ConfigurationFile.new(self, path, block_for_missing)
+      configuration_file = ConfigurationFile.new(self, path, block_for_missing)
+      verify_conflicts # important, since user can set conflicting options in configuration file
+      configuration_file
     end
 
     #####################################################
