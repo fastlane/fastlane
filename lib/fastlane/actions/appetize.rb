@@ -8,7 +8,7 @@ module Fastlane
     end
 
     class AppetizeAction < Action
-      APPETIZE_URL_BASE = 'https://api.appetize.io/v1/app/update'
+      APPETIZE_URL_BASE = 'https://api.appetize.io/v1/app/update'.freeze
 
       def self.is_supported?(platform)
         platform == :ios

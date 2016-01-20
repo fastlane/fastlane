@@ -1,6 +1,6 @@
 module Fastlane
   class ActionCollector
-    HOST_URL = "https://fastlane-enhancer.herokuapp.com/"
+    HOST_URL = "https://fastlane-enhancer.herokuapp.com/".freeze
 
     def did_launch_action(name)
       if is_official?(name)

@@ -1,6 +1,6 @@
 module Fastlane
   class FastlaneFolder
-    FOLDER_NAME = 'fastlane'
+    FOLDER_NAME = 'fastlane'.freeze
 
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path

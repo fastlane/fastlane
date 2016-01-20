@@ -23,7 +23,7 @@ module Fastlane
       acl: '--acl',
       source: '--source-dir',
       path: '-P'
-    }
+    }.freeze
 
     class S3Action < Action
       def self.run(config)

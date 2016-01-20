@@ -6,7 +6,7 @@ module Fastlane
     end
     class TryoutsAction < Action
 
-      TRYOUTS_API_BUILD_RELEASE_TEMPLATE = "https://api.tryouts.io/v1/applications/%s/releases/"
+      TRYOUTS_API_BUILD_RELEASE_TEMPLATE = "https://api.tryouts.io/v1/applications/%s/releases/".freeze
 
       def self.run(params)
         Helper.log.info 'Upload to Tryouts has been started. This may take some time.'.green
