@@ -52,6 +52,11 @@ Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - 'spec/**/*'
 
+# the let(:key) { ... } should be allowed in tests
+Style/RedundantParentheses:
+  Exclude:
+    - 'spec/**/*'
+
 # options.rb might be large, we know that
 Metrics/MethodLength:
   Max: 60

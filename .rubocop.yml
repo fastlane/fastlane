@@ -4,7 +4,7 @@
 
 inherit_from: .rubocop_general.yml
 
-# e.g. 
+# e.g.
 # def self.is_supported?(platform)
 # we may never use `platform`
 Lint/UnusedMethodArgument:
@@ -12,6 +12,11 @@ Lint/UnusedMethodArgument:
 
 # the let(:key) { ... }
 Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'spec/**/*'
+
+# the let(:key) { ... }
+Style/RedundantParentheses:
   Exclude:
     - 'spec/**/*'
 
