@@ -57,6 +57,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'rubocop', '~> 0.29'
+  spec.add_development_dependency 'rubocop', '~> 0.35.1'
   spec.add_development_dependency 'appium_lib', '~> 4.1.0'
 end
