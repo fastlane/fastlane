@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
   spec.add_dependency 'xcode-install', '~> 1.0.1' # Download new Xcode versions
 
-  spec.add_dependency 'fastlane_core', '>= 0.34.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.35.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.14.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.19.1', '< 1.0.0' # communication layer with Apple's web services
 
