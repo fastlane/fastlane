@@ -70,8 +70,8 @@ module Chiizu
 
     def select_device
       devices = @executor.execute(command: "adb devices -l", print_all: true, print_command: true).split("\n")
-      # the first output by adb devices is "List of devices attached" so remove that
-      devices = devices.drop(1)
+      # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
+      devices.reject! { |d| d.include?("List of devices attached") ||  d.include?("* daemon")}
 
       UI.user_error! 'There are no connected devices or emulators' if devices.empty?
 
