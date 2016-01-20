@@ -137,7 +137,7 @@ module Fastlane
               if remaining_bytes && total_bytes
                 Helper.log.info "Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%".yellow
               else
-                Helper.log.error "#{chunk}".red
+                Helper.log.error chunk.to_s.red
               end
               f.write(chunk)
             end
