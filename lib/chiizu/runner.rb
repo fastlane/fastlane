@@ -37,6 +37,11 @@ module Chiizu
         return
       end
 
+      if (test_classes_to_use.nil? || test_classes_to_use.empty?) && (test_packages_to_use.nil? || test_packages_to_use.empty?)
+        UI.important 'Limiting the test classes run by `chiizu` to just those that generate screenshots can make runs faster.'
+        UI.important 'Consider using the :use_tests_in_classes or :use_tests_in_packages option, and organize your tests accordingly.'
+      end
+
       clear_local_previous_screenshots
 
       device_serial = select_device
