@@ -1,8 +1,8 @@
 require 'faraday' # HTTP Client
 require 'logger'
 require 'faraday_middleware'
-require 'faraday-cookie_jar'
 require 'spaceship/ui'
+require 'spaceship/helper/cookie_jar_middleware'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 
@@ -66,12 +66,12 @@ module Spaceship
     end
 
     def initialize
-      @cookie = HTTP::CookieJar.new
+      @cookie_jar = CookieJar::Jar.new
       @client = Faraday.new(self.class.hostname) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
-        c.use :cookie_jar, jar: @cookie
+        c.use :cookie_jar, jar: @cookie_jar
         c.adapter Faraday.default_adapter
 
         if ENV['DEBUG']
@@ -108,7 +108,8 @@ module Spaceship
     #
     # @return (String) the cookie-string in the RFC6265 format: https://tools.ietf.org/html/rfc6265#section-4.2.1
     def cookie
-      @cookie.map(&:to_s).join(';')
+      # this gets the cookie for allowed under the entire apple domain
+      @cookie_jar.get_cookie_header('https://apple.com/')
     end
 
     #####################################################
