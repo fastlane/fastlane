@@ -48,6 +48,8 @@ describe Fastlane do
         Dir.chdir(workspace) do
           setup = Fastlane::SetupIos.new
           expect(setup).to receive(:enable_deliver).and_return(nil)
+          allow(setup).to receive(:app_identifier).and_return("tools.fastlane.app") # to also support linux (travis)
+
           expect(setup.run).to eq(true)
           expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
 
