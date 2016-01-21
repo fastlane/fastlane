@@ -187,6 +187,10 @@ Please submit an issue on GitHub and provide information about your setup
 
 Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving `fastlane`. Check out the project pages of the other tools for more sponsors and contributors.
 
+## Code of Conduct
+Help us keep fastlane open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+
+
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
