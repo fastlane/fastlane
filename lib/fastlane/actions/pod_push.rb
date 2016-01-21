@@ -13,6 +13,14 @@ module Fastlane
           command << " '#{params[:path]}'"
         end
 
+        if params[:allow_warnings]
+          command << " --allow-warnings"
+        end
+
+        if params[:sources]
+          command << " --sources=#{params[:sources]}"
+        end
+
         result = Actions.sh("#{command}")
         Helper.log.info "Successfully pushed Podspec ⬆️ ".green
         return result
@@ -41,6 +49,16 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :repo,
                                        description: "The repo you want to push. Pushes to Trunk by default",
+                                       optional: true),
+
+          FastlaneCore::ConfigItem.new(key: :allow_warnings,
+                                       description: "Whether or not to allow warnings in the lint check. Default is false",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
+
+          FastlaneCore::ConfigItem.new(key: :sources,
+                                       description: "The sources from which to pull dependent pods (defaults to https://github.com/CocoaPods/Specs.git). Multiple sources must be comma-delimited",
                                        optional: true)
         ]
       end
@@ -62,3 +80,4 @@ module Fastlane
     end
   end
 end
+
