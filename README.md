@@ -273,6 +273,9 @@ pilot...
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
 
+# Code of Conduct
+Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
