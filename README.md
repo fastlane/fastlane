@@ -186,6 +186,9 @@ The initial release was sponsored by [ZeroPush](https://zeropush.com).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
+# Code of Conduct
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
