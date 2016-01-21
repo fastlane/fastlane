@@ -102,7 +102,11 @@ module FastlaneCore
       if schemes.count == 1
         options[:scheme] = schemes.last
       elsif schemes.count > 1
-        preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
+        preferred = nil
+        if preferred_to_include
+          preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
+        end
+
         if preferred_to_include and preferred.count == 1
           options[:scheme] = preferred.last
         else
