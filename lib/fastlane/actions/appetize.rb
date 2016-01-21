@@ -62,14 +62,14 @@ module Fastlane
 
       def self.help_message(response)
         message =
-            case response.body
-            when 'Invalid token'
-              'Invalid API Token specified.'
-            when 'Error downloading zip file'
-              'URL should be wrong'
-            when 'No app with specified privateKey found'
-              'Invalid privateKey specified'
-            end
+          case response.body
+          when 'Invalid token'
+            'Invalid API Token specified.'
+          when 'Error downloading zip file'
+            'URL should be wrong'
+          when 'No app with specified privateKey found'
+            'Invalid privateKey specified'
+          end
         Helper.log.error message.red if message
       end
       private_class_method :help_message
