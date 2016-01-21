@@ -132,6 +132,13 @@ To get a list of available options run
 deliver --help
 ```
 
+
+Select a previously uploaded build and submit it for review.
+
+```
+deliver submit_build --build_number 830
+```
+
 Check out [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md) for more options.
 
 Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/deliver/blob/master/MigrationGuide.md).
