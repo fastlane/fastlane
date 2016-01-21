@@ -35,7 +35,8 @@ module Match
     def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil)
       require 'sigh'
 
-      prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"]
+      prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"] && !params[:type] == "development"
+      
       profile_name = ["match", profile_type_name(prov_type), params[:app_identifier]].join(" ")
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
