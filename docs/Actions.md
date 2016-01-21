@@ -294,6 +294,14 @@ unlock_keychain(
 )
 ```
 
+### `get_ipa_info_plist_value`
+
+Returns a value from Info.plist inside a .ipa file
+
+```ruby
+get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")
+```
+
 ### `delete_keychain`
 
 Delete a keychain, can be used after creating one with `create_keychain`.
@@ -664,6 +672,23 @@ Additionally you can skip the submission of the new binary to the testers to onl
 testflight(skip_deploy: true)
 ```
 
+### `latest_testflight_build_number`
+
+Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
+
+```ruby
+latest_testflight_build_number(version: "1.3")
+```
+
+can be used in combination with `increment_build_number`
+
+```ruby
+increment_build_number({
+  build_number: latest_testflight_build_number + 1
+})
+```
+
+
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
 hockey(
@@ -1021,6 +1046,16 @@ update_app_identifier(
   plist_path: 'Example/Info.plist', # Path to info plist file, relative to xcodeproj
   app_identifier: 'com.test.example' # The App Identifier
 )
+```
+
+### [badge](https://github.com/HazAT/badge)
+
+Modify your app icon and add a badge to it. For more info how to use it see repo.
+
+```ruby
+badge(dark: true) #or
+badge(custom: "/Users/xxx/Desktop/badge.png") #or
+badge(shield: "Version-0.0.3-blue", no_badge: true)
 ```
 
 ## Developer Portal
@@ -1504,6 +1539,7 @@ mailgun(
   postmaster: "MY_POSTMASTER",
   apikey: "MY_API_KEY",
   to: "DESTINATION_EMAIL",
+  from: "EMAIL_FROM_NAME",
   success: true,
   message: "Mail Body",
   app_link: "http://www.myapplink.com",
@@ -1522,7 +1558,6 @@ Send a message to **room** (by default) or a direct message to **@username** wit
     message: "App successfully released!",
     message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
-    from: "sender name", defaults to "fastlane"
     success: true
   )
 ```
@@ -1867,6 +1902,14 @@ Reads in production secrets set in a dotgpg file and puts them in ENV.
 dotgpg_environment(dotgpg_file: './path/to/gpgfile')
 ```
 
+### [Jazzy](https://github.com/Realm/jazzy)
+
+Generate docs using [Jazzy](https://github.com/Realm/jazzy)
+
+```ruby
+jazzy
+```
+
 ### update_info_plist
 
 Update an `Info.plist` with a bundle identifier and display name.
@@ -1880,10 +1923,26 @@ update_info_plist(
 )
 ```
 
+### fastlane_version
+
+Add this to your `Fastfile` to require a certain version of `fastlane`. Use it if you use an action that just recently came out and you need it
+
+```ruby
+fastlane_version "1.50.0"
+```
+
 ### install_xcode_plugin
 
 Install an Xcode plugin for the current user
 
 ```ruby
 install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+```
+
+### opt_out_usage
+
+Add this your `Fastfile` to not send any data to the fastlane web service. You can also use the `FASTLANE_OPT_OUT_USAGE` environment variable. No personal data is shared, more information on [https://github.com/fastlane/enhancer](https://github.com/fastlane/enhancer)
+
+```
+opt_out_usage
 ```

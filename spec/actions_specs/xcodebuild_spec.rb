@@ -25,13 +25,20 @@ describe Fastlane do
             derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
+            dry_run: true,
+            enable_address_sanitizer: true,
+            enable_code_coverage: true,
             export_archive: true,
             export_format: 'ipa',
             export_installer_identity: true,
+            export_options_plist: '/path/to/plist',
             export_path: './build/MyApp',
             export_profile: 'MyApp Distribution',
             export_signing_identity: 'Distribution: MyCompany, LLC',
             export_with_original_signing_identity: true,
+            hide_shell_script_environment: true,
+            jobs: 5,
+            parallelize_targets: true,
             keychain: '/path/to/My.keychain',
             project: 'MyApp.xcodeproj',
             result_bundle_path: '/result/bundle/path',
@@ -39,6 +46,7 @@ describe Fastlane do
             sdk: 'iphonesimulator',
             skip_unavailable_actions: true,
             target: 'MyAppTarget',
+            toolchain: 'toolchain name',
             workspace: 'MyApp.xcworkspace',
             xcconfig: 'my.xcconfig',
             buildlog_path: 'mypath',
@@ -49,40 +57,15 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-alltargets " \
-          + "-arch \"architecture\" " \
-          + "-archivePath \"./build/MyApp.xcarchive\" " \
-          + "-configuration \"Debug\" " \
-          + "-derivedDataPath \"/derived/data/path\" " \
-          + "-destination \"name=iPhone 5s,OS=8.1\" " \
-          + "-destination-timeout \"240\" " \
-          + "-exportArchive " \
-          + "-exportFormat \"ipa\" " \
-          + "-exportInstallerIdentity " \
-          + "-exportPath \"./build/MyApp\" " \
-          + "-exportProvisioningProfile \"MyApp Distribution\" " \
-          + "-exportSigningIdentity \"Distribution: MyCompany, LLC\" " \
-          + "-exportWithOriginalSigningIdentity " \
-          + "-newArgument YES " \
-          + "-project \"MyApp.xcodeproj\" " \
-          + "-resultBundlePath \"/result/bundle/path\" " \
-          + "-scheme \"MyApp\" " \
-          + "-sdk \"iphonesimulator\" " \
-          + "-skipUnavailableActions " \
-          + "-target \"MyAppTarget\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "-xcconfig \"my.xcconfig\" " \
-          + "OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" " \
-          + "analyze " \
-          + "archive " \
-          + "build " \
-          + "clean " \
-          + "install " \
-          + "installsrc " \
-          + "test " \
-          + "| tee 'mypath/xcodebuild.log' | xcpretty --color --test"
+          "set -o pipefail && xcodebuild analyze archive build clean install installsrc test -arch \"architecture\" " \
+          "-alltargets -archivePath \"./build/MyApp.xcarchive\" -configuration \"Debug\" -derivedDataPath \"/derived/data/path\" " \
+          "-destination \"name=iPhone 5s,OS=8.1\" -destination-timeout \"240\" -dry-run -exportArchive -exportFormat \"ipa\" " \
+          "-exportInstallerIdentity -exportOptionsPlist \"/path/to/plist\" -exportPath \"./build/MyApp\" -exportProvisioningProfile " \
+          "\"MyApp Distribution\" -exportSigningIdentity \"Distribution: MyCompany, LLC\" -exportWithOriginalSigningIdentity " \
+          "-hideShellScriptEnvironment -jobs \"5\" -parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" -project " \
+          "\"MyApp.xcodeproj\" -resultBundlePath \"/result/bundle/path\" -scheme \"MyApp\" -sdk \"iphonesimulator\" -skipUnavailableActions -target " \
+          "\"MyAppTarget\" -toolchain \"toolchain name\" -workspace \"MyApp.xcworkspace\" -xcconfig \"my.xcconfig\" -newArgument YES -enableAddressSanitizer " \
+          "\"YES\" -enableCodeCoverage \"YES\" | tee 'mypath/xcodebuild.log' | xcpretty --color --test"
         )
       end
 
@@ -156,10 +139,9 @@ describe Fastlane do
         expect(result).to eq(
           "set -o pipefail && " \
           + "xcodebuild " \
-          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
-          + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
@@ -174,6 +156,19 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(Fastlane::Actions.lane_context[:IPA_OUTPUT_PATH]).to eq("./build-dir/MyApp.ipa")
+      end
+
+      it "when exporting Mac app, should cache the app path for a later deploy step" do
+        Fastlane::FastFile.new.parse("lane :test do
+          xcodebuild(
+            archive_path: './build-dir/MyApp.xcarchive',
+            export_archive: true,
+            export_format: 'app',
+            export_path: './build-dir/MyApp'
+          )
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[:IPA_OUTPUT_PATH]).to eq("./build-dir/MyApp.app")
       end
 
       context "when using environment variables"
@@ -199,10 +194,10 @@ describe Fastlane do
         expect(result).to eq(
           "set -o pipefail && " \
           + "xcodebuild " \
-          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "archive " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "archive " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
@@ -222,7 +217,6 @@ describe Fastlane do
           + "xcodebuild " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
-          + "-exportFormat \"ipa\" " \
           + "-exportPath \"./build-dir/MyApp\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
@@ -292,27 +286,27 @@ describe Fastlane do
       end
     end
 
-    describe "xcbuild without xpretty and with test" do
-      it "is equivalent to 'xcodebuild build'" do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xcbuild(
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace',
-            raw_buildlog: true,
-            test: true
-          )
-        end").runner.execute(:test)
+    # describe "xcbuild without xpretty and with test" do
+    #   it "is equivalent to 'xcodebuild build'" do
+    #     result = Fastlane::FastFile.new.parse("lane :test do
+    #       xcbuild(
+    #         scheme: 'MyApp',
+    #         workspace: 'MyApp.xcworkspace',
+    #         raw_buildlog: true,
+    #         test: true
+    #       )
+    #     end").runner.execute(:test)
 
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-scheme \"MyApp\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "build test " \
-          + "| tee '#{build_log_path}' "
-        )
-      end
-    end
+    #     expect(result).to eq(
+    #       "set -o pipefail && " \
+    #       + "xcodebuild " \
+    #       + "-scheme \"MyApp\" " \
+    #       + "-workspace \"MyApp.xcworkspace\" " \
+    #       + "build test " \
+    #       + "| tee '#{build_log_path}' "
+    #     )
+    #   end
+    # end
 
     describe "xcbuild without xpretty and with test and reports" do
       it "is equivalent to 'xcodebuild build'" do
@@ -346,26 +340,25 @@ describe Fastlane do
       end
     end
 
-    describe "xcexport" do
-      it "is equivalent to 'xcodebuild -exportArchive'" do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xcexport(
-            archive_path: './build-dir/MyApp.xcarchive',
-            export_path: './build-dir/MyApp',
-          )
-        end").runner.execute(:test)
+    # describe "xcexport" do
+    #   it "is equivalent to 'xcodebuild -exportArchive'" do
+    #     result = Fastlane::FastFile.new.parse("lane :test do
+    #       xcexport(
+    #         archive_path: './build-dir/MyApp.xcarchive',
+    #         export_path: './build-dir/MyApp',
+    #       )
+    #     end").runner.execute(:test)
 
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
-          + "-exportArchive " \
-          + "-exportFormat \"ipa\" " \
-          + "-exportPath \"./build-dir/MyApp\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
-        )
-      end
-    end
+    #     expect(result).to eq(
+    #       "set -o pipefail && " \
+    #       + "xcodebuild " \
+    #       + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+    #       + "-exportArchive " \
+    #       + "-exportPath \"./build-dir/MyApp\" " \
+    #       + "| tee '#{build_log_path}' | xcpretty --color --simple"
+    #     )
+    #   end
+    # end
 
     describe "xctest" do
       it "is equivalent to 'xcodebuild build test'" do
@@ -392,6 +385,58 @@ describe Fastlane do
       end
     end
 
+    # describe "address sanitizer" do
+    #   it "address sanitizer is enabled" do
+    #     result = Fastlane::FastFile.new.parse("lane :test do
+    #       xctest(
+    #         destination: 'name=iPhone 5s,OS=8.1',
+    #         destination_timeout: 240,
+    #         scheme: 'MyApp',
+    #         workspace: 'MyApp.xcworkspace',
+    #         enable_address_sanitizer: true
+    #       )
+    #     end").runner.execute(:test)
+
+    #     expect(result).to eq(
+    #       "set -o pipefail && " \
+    #       + "xcodebuild " \
+    #       + "-destination \"name=iPhone 5s,OS=8.1\" " \
+    #       + "-destination-timeout \"240\" " \
+    #       + "-enableAddressSanitizer \"YES\" " \
+    #       + "-scheme \"MyApp\" " \
+    #       + "-workspace \"MyApp.xcworkspace\" " \
+    #       + "build " \
+    #       + "test " \
+    #       + "| tee '#{build_log_path}' | xcpretty --color --test"
+    #     )
+    #   end
+
+    #   it "address sanitizer is disabled" do
+    #     result = Fastlane::FastFile.new.parse("lane :test do
+    #       xctest(
+    #         destination: 'name=iPhone 5s,OS=8.1',
+    #         destination_timeout: 240,
+    #         scheme: 'MyApp',
+    #         workspace: 'MyApp.xcworkspace',
+    #         enable_address_sanitizer: false
+    #       )
+    #     end").runner.execute(:test)
+
+    #     expect(result).to eq(
+    #       "set -o pipefail && " \
+    #       + "xcodebuild " \
+    #       + "-destination \"name=iPhone 5s,OS=8.1\" " \
+    #       + "-destination-timeout \"240\" " \
+    #       + "-enableAddressSanitizer \"NO\" " \
+    #       + "-scheme \"MyApp\" " \
+    #       + "-workspace \"MyApp.xcworkspace\" " \
+    #       + "build " \
+    #       + "test " \
+    #       + "| tee '#{build_log_path}' | xcpretty --color --test"
+    #     )
+    #   end
+    # end
+
     describe "test code coverage" do
       it "code coverage is enabled" do
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -409,11 +454,11 @@ describe Fastlane do
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
-          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
+          + "-enableCodeCoverage \"YES\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --test"
         )
       end
@@ -434,11 +479,11 @@ describe Fastlane do
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
-          + "-enableCodeCoverage \"NO\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
+          + "-enableCodeCoverage \"NO\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --test"
         )
       end
@@ -608,8 +653,8 @@ describe Fastlane do
         expect(result).to eq(
           "set -o pipefail && " \
           + "xcodebuild " \
-          + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
+          + "-workspace \"MyApp.xcworkspace\" " \
           + "| tee '#{build_log_path}' | xcpretty --color " \
           + "--simple"
         )

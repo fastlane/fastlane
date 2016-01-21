@@ -69,12 +69,10 @@ module Fastlane
       if error
         Helper.log.fatal 'fastlane finished with errors'.red
         raise error
+      elsif duration > 5
+        Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
       else
-        if duration > 5
-          Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
-        else
-          Helper.log.info 'fastlane.tools finished successfully 🎉'.green
-        end
+        Helper.log.info 'fastlane.tools finished successfully 🎉'.green
       end
     end
 

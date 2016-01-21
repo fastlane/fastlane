@@ -31,12 +31,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
   spec.add_dependency 'xcode-install', '~> 1.0.1' # Download new Xcode versions
 
-  spec.add_dependency 'fastlane_core', '>= 0.32.1', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.35.0', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.14.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.19.0', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.19.1', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.7.0', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.8.0', '< 2.0.0'
   spec.add_dependency 'snapshot', '>= 1.4.4', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.4.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.1.1', '< 2.0.0'
@@ -57,6 +57,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'rubocop', '~> 0.29'
+  spec.add_development_dependency 'rubocop', '~> 0.35.1'
   spec.add_development_dependency 'appium_lib', '~> 4.1.0'
 end

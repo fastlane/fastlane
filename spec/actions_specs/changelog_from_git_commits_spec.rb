@@ -65,9 +65,44 @@ describe Fastlane do
         end.to raise_error(":between must not contain nil values".red)
       end
 
+      it "Does not accept an invalid value for :merge_commit_filtering" do
+        values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')
+        error_msg = "Valid values for :merge_commit_filtering are #{values}".red
+
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(merge_commit_filtering: 'invalid')
+          end").runner.execute(:test)
+        end.to raise_error(error_msg)
+      end
+
       it "Does not include merge commits in the list of commits" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(include_merges: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
+      end
+
+      it "Only include merge commits if merge_commit_filtering is only_include_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'only_include_merges')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --merges")
+      end
+
+      it "Include merge commits if merge_commit_filtering is include_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'include_merges')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
+
+      it "Does not include merge commits if merge_commit_filtering is exclude_merges" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(merge_commit_filtering: 'exclude_merges')
         end").runner.execute(:test)
 
         expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")

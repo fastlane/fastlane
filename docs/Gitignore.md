@@ -10,8 +10,7 @@ fastlane/report.xml
 fastlane/Preview.html
 
 # snapshot generated screenshots
-fastlane/screenshots/**/*.png
-fastlane/screenshots/screenshots.html
+fastlane/screenshots
 
 # scan temporary files
 fastlane/test_output

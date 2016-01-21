@@ -1,9 +1,12 @@
 module Fastlane
   module Actions
-    def self.git_log_between(pretty_format, from, to, include_merges)
+    GIT_MERGE_COMMIT_FILTERING_OPTIONS = [:include_merges, :exclude_merges, :only_include_merges].freeze
+
+    def self.git_log_between(pretty_format, from, to, merge_commit_filtering)
       command = 'git log'
       command << " --pretty=\"#{pretty_format}\" #{from.shellescape}...#{to.shellescape}"
-      command << " --no-merges" unless include_merges
+      command << " --no-merges" if merge_commit_filtering == :exclude_merges
+      command << " --merges" if merge_commit_filtering == :only_include_merges
       Actions.sh(command, log: false).chomp
     rescue
       nil

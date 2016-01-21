@@ -15,7 +15,11 @@ module Fastlane
         message_format = options[:message_format]
 
         channel = options[:channel]
-        color = (options[:success] ? 'green' : 'red')
+        if ['yellow', 'red', 'green', 'purple', 'gray', 'random'].include?(options[:custom_color]) == true
+          color = options[:custom_color]
+        else
+          color = (options[:success] ? 'green' : 'red')
+        end
 
         from = options[:from]
 
@@ -43,7 +47,6 @@ module Fastlane
         else
           ########## running on V2 ##########
           if user?(channel)
-            channel.slice!(0)
             params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
@@ -107,6 +110,11 @@ module Fastlane
                                            raise 'No HIPCHAT_API_TOKEN given.'.red
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :custom_color,
+                                       env_name: "FL_HIPCHAT_CUSTOM_COLOR",
+                                       description: "Specify a custom color, this overrides the success boolean. Can be one of 'yellow', 'red', 'green', 'purple', 'gray', or 'random'",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_HIPCHAT_SUCCESS",
                                        description: "Was this build successful? (true/false)",
