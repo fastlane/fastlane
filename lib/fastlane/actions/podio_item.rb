@@ -116,7 +116,7 @@ module Fastlane
             uri = URI.parse(value)
             if uri.kind_of?(URI::HTTP)
               link_embed_id = get_embed_id(auth_config, uri)
-              options[:other_fields].merge!(key => link_embed_id)
+              options[:other_fields][key] = link_embed_id
             end
           end
           update_item(auth_config, item_id, options[:other_fields])

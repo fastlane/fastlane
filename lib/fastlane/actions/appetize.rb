@@ -30,7 +30,7 @@ module Fastlane
             platform: 'ios'
         }
 
-        params.merge!(privateKey: options[:private_key]) unless options[:private_key].nil?
+        params[:privateKey] = options[:private_key] unless options[:private_key].nil?
         req.body = JSON.generate(params)
         response = https.request(req)
 
