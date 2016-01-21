@@ -1547,7 +1547,7 @@ mailgun(
 ```
 
 ### [HipChat](http://www.hipchat.com/)
-Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status. A custom color can also be set.
+Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
 
 ```ruby
   ENV["HIPCHAT_API_TOKEN"] = "Your API token"
@@ -1557,9 +1557,7 @@ Send a message to **room** (by default) or a direct message to **@username** wit
     message: "App successfully released!",
     message_format: "html", # or "text", defaults to "html"
     channel: "Room or @username",
-    from: "sender name", #defaults to "fastlane"
-    success: true,
-    custom_color: 'random' #overrides success param if set
+    success: true
   )
 ```
 
