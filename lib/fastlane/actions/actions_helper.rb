@@ -1,5 +1,3 @@
-require 'pty'
-
 module Fastlane
   module Actions
     module SharedValues
