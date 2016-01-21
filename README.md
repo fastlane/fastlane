@@ -46,6 +46,9 @@ This gem contains all shared classes and code:
 
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
 
+# Code of Conduct
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
