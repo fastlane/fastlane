@@ -71,9 +71,12 @@ module Chiizu
     def select_device
       devices = @executor.execute(command: "adb devices -l", print_all: true, print_command: true).split("\n")
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
-      devices.reject! { |d| d.include?("List of devices attached") ||  d.include?("* daemon")}
+      # devices.reject! { |d| d.include?("List of devices attached") || d.include?("* daemon") || d.include?("unauthorized") || d.include?("offline") }
+      devices.reject! do |device|
+        ['unauthorized', 'offline', '* daemon', 'List of devices attached'].any? { |status| device.include? status }
+      end
 
-      UI.user_error! 'There are no connected devices or emulators' if devices.empty?
+      UI.user_error! 'There are no connected and authorized devices or emulators' if devices.empty?
 
       devices.select! { |d| d.include?(@config[:specific_device]) } if @config[:specific_device]
 
