@@ -8,7 +8,13 @@ module Fastlane
           paths = params[:path].join(" ")
         end
 
-        result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")
+        cmd = ""
+        if params[:add_if_needed]
+          cmd += "git add #{paths} && "
+        end
+        cmd += "git commit -m '#{params[:message]}' #{paths}"
+
+        result = Actions.sh(cmd)
         Helper.log.info "Successfully committed \"#{params[:path]}\" 💾.".green
         return result
       end
@@ -40,7 +46,12 @@ module Fastlane
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
-                                       description: "The commit message that should be used")
+                                       description: "The commit message that should be used"),
+          FastlaneCore::ConfigItem.new(key: :add_if_needed,
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false,
+                                       description: "Flag to add unstaged files to commit. Default value `false`")
         ]
       end
 
