@@ -1,9 +1,9 @@
-describe Chiizu do
-  describe Chiizu::AndroidEnvironment do
+describe Screengrab do
+  describe Screengrab::AndroidEnvironment do
     describe "with an empty ANDROID_HOME and an empty PATH" do
       it "finds no useful values" do
         with_env_values('PATH' => 'spec/fixtures/empty_home_empty_path/path') do
-          android_env = Chiizu::AndroidEnvironment.new('spec/fixtures/empty_home_empty_path/android_home', nil)
+          android_env = Screengrab::AndroidEnvironment.new('spec/fixtures/empty_home_empty_path/android_home', nil)
 
           expect(android_env.android_home).to eq('spec/fixtures/empty_home_empty_path/android_home')
           expect(android_env.build_tools_version).to be_nil
@@ -18,7 +18,7 @@ describe Chiizu do
     describe "with an empty ANDROID_HOME and a complete PATH" do
       it "finds commands on the PATH" do
         with_env_values('PATH' => 'spec/fixtures/empty_home_complete_path/path') do
-          android_env = Chiizu::AndroidEnvironment.new('spec/fixtures/empty_home_complete_path/android_home', nil)
+          android_env = Screengrab::AndroidEnvironment.new('spec/fixtures/empty_home_complete_path/android_home', nil)
 
           expect(android_env.android_home).to eq('spec/fixtures/empty_home_complete_path/android_home')
           expect(android_env.build_tools_version).to be_nil
@@ -33,7 +33,7 @@ describe Chiizu do
     describe "with a complete ANDROID_HOME and a complete PATH and no build tools version specified" do
       it "finds adb in platform-tools and aapt in the highest version build tools dir" do
         with_env_values('PATH' => 'spec/fixtures/complete_home_complete_path/path') do
-          android_env = Chiizu::AndroidEnvironment.new('spec/fixtures/complete_home_complete_path/android_home', nil)
+          android_env = Screengrab::AndroidEnvironment.new('spec/fixtures/complete_home_complete_path/android_home', nil)
 
           expect(android_env.android_home).to eq('spec/fixtures/complete_home_complete_path/android_home')
           expect(android_env.build_tools_version).to be_nil
@@ -48,7 +48,7 @@ describe Chiizu do
     describe "with a complete ANDROID_HOME and a complete PATH and a build tools version specified" do
       it "finds adb in platform-tools and aapt in the specified version build tools dir" do
         with_env_values('PATH' => 'spec/fixtures/complete_home_complete_path/path') do
-          android_env = Chiizu::AndroidEnvironment.new('spec/fixtures/complete_home_complete_path/android_home', '23.0.1')
+          android_env = Screengrab::AndroidEnvironment.new('spec/fixtures/complete_home_complete_path/android_home', '23.0.1')
 
           expect(android_env.android_home).to eq('spec/fixtures/complete_home_complete_path/android_home')
           expect(android_env.build_tools_version).to eq('23.0.1')

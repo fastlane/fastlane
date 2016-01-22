@@ -6,15 +6,15 @@ To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https
 
 Before submitting a new issue, do the following:
 
-- Verify you're runing the latest version by running `chiizu -v` and compare it with the [project page on GitHub](https://github.com/fastlane/chiizu).
-- Make sure to read through the [README](https://github.com/fastlane/chiizu) of the project.
+- Verify you're runing the latest version by running `screengrab -v` and compare it with the [project page on GitHub](https://github.com/fastlane/screengrab).
+- Make sure to read through the [README](https://github.com/fastlane/screengrab) of the project.
 
 
 When submitting a new issue, please provide the following information:
 
-- The full stack trace and output when running `chiizu`.
+- The full stack trace and output when running `screengrab`.
 - The command and parameters you used to launch it.
-- Your `Chiizufile`
+- Your `Screengrabfile`
 
 ### By providing this information it's much faster and easier to help you
 

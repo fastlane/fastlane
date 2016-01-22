@@ -1,1 +1,1 @@
-include ':example', ':chiizu-lib', ':chiizu-lib-release'
+include ':example', ':screengrab-lib', ':screengrab-lib-release'

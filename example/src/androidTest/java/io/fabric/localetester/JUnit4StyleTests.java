@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import chiizu.lens.Lens;
-import chiizu.locale.LocaleTestRule;
-import chiizu.screen.ScreenUtil;
+import tools.fastlane.screengrab.Screengrab;
+import tools.fastlane.screengrab.locale.LocaleTestRule;
+import tools.fastlane.screengrab.screen.ScreenUtil;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -42,19 +42,19 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeScreenshot() {
-        Lens.screenshot(activity, "screenshot1");
+        Screengrab.screenshot(activity, "screenshot1");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Lens.screenshot(activity, "screenshot2");
+        Screengrab.screenshot(activity, "screenshot2");
     }
 
     @Test
     public void testTakeMoreScreenshots() {
-        Lens.screenshot(activity, "screenshot3");
+        Screengrab.screenshot(activity, "screenshot3");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Lens.screenshot(activity, "screenshot4");
+        Screengrab.screenshot(activity, "screenshot4");
     }
 }
