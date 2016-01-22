@@ -15,3 +15,4 @@ ExampleProductName.app.dSYM.zip
 **/*.app
 
 examples/*/test_output/*
+/coverage/
