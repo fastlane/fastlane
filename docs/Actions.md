@@ -356,6 +356,31 @@ xcodebuild(
 To keep your Fastfile lightweight, there are also alias actions available for
 the most common `xcodebuild` operations: `xcarchive`, `xcbuild`, `xcclean`, `xctest` & `xcexport`.
 
+To export the IPA files using `xcodebuild` you can provide `:export_options_plist` as a path to plist file or as a hash of values. To get the list of available keys and values please read help page: `xcodebuild --help`:
+
+```ruby
+xcexport(
+  archive_path: "...",
+  export_options_plist: "/path/to/export_options.plist"
+)
+
+# or
+xcexport(
+  archive_path: "...",
+  export_options_plist: {
+    method: "ad-hoc",
+    thinning: "<thin-for-all-variants>",
+    manifest: {
+      appURL: "https://example.com/path/MyApp Name.ipa",
+      displayImageURL: "https://example.com/display image.png",
+      fullSizeImageURL: "https://example.com/fullSize image.png",
+    }
+  }
+)
+```
+
+When using `:export_options_plist` as hash, the `:teamID` is read from `Appfile`. `:appURL`, `:displayImageURL`, `:fullSizeImageURL`, `:assetPackManifestURL` and `:onDemandResourcesAssetPacksBaseURL` are URI escaped to prevent Xcode errors.
+
 Environment variables may be added to a .env file in place of some parameters:
 
 ```

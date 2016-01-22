@@ -132,6 +132,7 @@ module Fastlane
           end
 
           # Maps parameter hash to CLI args
+          params = export_options_to_plist(params)
           if hash_args = hash_to_args(params)
             xcodebuild_args += hash_args
           end
@@ -264,6 +265,27 @@ module Fastlane
         end
 
         output_result
+      end
+
+      def self.export_options_to_plist(hash)
+        # Extract export options parameters from input options
+        if hash.has_key?(:export_options_plist) && hash[:export_options_plist].is_a?(Hash)
+          export_options = hash[:export_options_plist]
+
+          # Normalize some values
+          export_options[:teamID] = CredentialsManager::AppfileConfig.try_fetch_value(:team_id) if !export_options[:teamID] && CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+          export_options[:onDemandResourcesAssetPacksBaseURL] = URI.escape(export_options[:onDemandResourcesAssetPacksBaseURL]) if export_options[:onDemandResourcesAssetPacksBaseURL]
+          export_options[:manifest][:appURL] = URI.escape(export_options[:manifest][:appURL]) if export_options[:manifest][:appURL]
+          export_options[:manifest][:displayImageURL] = URI.escape(export_options[:manifest][:displayImageURL]) if export_options[:manifest][:displayImageURL]
+          export_options[:manifest][:fullSizeImageURL] = URI.escape(export_options[:manifest][:fullSizeImageURL]) if export_options[:manifest][:fullSizeImageURL]
+          export_options[:manifest][:assetPackManifestURL] = URI.escape(export_options[:manifest][:assetPackManifestURL]) if export_options[:manifest][:assetPackManifestURL]
+
+          # Saves options to plist
+          path = "#{Tempfile.new('exportOptions').path}.plist"
+          File.write(path, export_options.to_plist)
+          hash[:export_options_plist] = path
+        end
+        hash
       end
 
       def self.hash_to_args(hash)
