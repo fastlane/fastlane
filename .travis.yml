@@ -1,6 +1,4 @@
 language: ruby
-osx_image: xcode7.1
-os: osx
 before_install:
   - gem update --system
   - gem install bundler
