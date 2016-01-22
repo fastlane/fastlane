@@ -126,6 +126,8 @@ clear_derived_data
 
 ### ipa
 
+**Note**: This action is deprecated, use [gym](https://github.com/fastlane/gym) instead.
+
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
 You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
@@ -150,7 +152,6 @@ ipa(
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
 The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
-
 
 **Important:**
 
@@ -320,10 +321,10 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 ```
 
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
-Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
-such as; archive, build, clean, test, export & more.
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
+
+Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -385,6 +386,8 @@ More usage examples (assumes the above .env setup is being used):
 ```
 
 See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
+
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
 
 ### copy_artifacts
 This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
@@ -1072,6 +1075,9 @@ match(type: "development", readonly: true)
 ```
 
 ### [sigh](https://github.com/fastlane/sigh)
+
+**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
 ```ruby
@@ -1117,6 +1123,8 @@ Use the `fastlane action pem` command to view all available options.
 [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
 ### [cert](https://github.com/fastlane/cert)
+
+**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
 
 The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/fastlane/cert).
 
