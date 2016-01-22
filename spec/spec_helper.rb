@@ -22,4 +22,9 @@ RSpec.configure do |config|
     ENV.delete 'DELIVER_SKIP_BINARY'
     ENV.delete 'DELIVER_VERSION'
   end
+
+  config.after(:each) do
+    md_path = "spec/fixtures/fastfiles/README.md"
+    File.delete(md_path) if File.exist?(md_path)
+  end
 end
