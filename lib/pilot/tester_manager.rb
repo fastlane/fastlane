@@ -67,9 +67,19 @@ module Pilot
       start(options)
       require 'terminal-table'
 
-      list(Spaceship::Tunes::Tester::Internal.all, "Internal Testers")
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      if app_filter
+        app = Spaceship::Application.find(app_filter)
+        int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
+        ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
+      else
+        int_testers = Spaceship::Tunes::Tester::Internal.all
+        ext_testers = Spaceship::Tunes::Tester::External.all
+      end
+
+      list(int_testers, "Internal Testers")
       puts "" # new line
-      list(Spaceship::Tunes::Tester::External.all, "External Testers")
+      list(ext_testers, "External Testers")
     end
 
     private
