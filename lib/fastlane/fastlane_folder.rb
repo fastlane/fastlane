@@ -4,10 +4,14 @@ module Fastlane
 
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path
-      value ||= "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
-      value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
-      value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
-      value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
+      if ENV['FL_FASTFILE']
+        value = ENV['FL_FASTFILE'] if File.exist?(File.join(ENV['FL_FASTFILE'], 'Fastfile')) # use custom folder if provided
+      else
+        value ||= "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
+        value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
+        value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
+        value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
+      end
 
       value = nil if Helper.is_test? # this is required, as the tests would use the ./fastlane folder otherwise
       return value
