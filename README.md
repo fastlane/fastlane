@@ -144,7 +144,6 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane action [action_name]`: Shows a more detailed description of an action
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
-- `fastlane docs`: Generates a markdown based documentation of all your lanes
 - `fastlane new_action`: Create a new action (integration) for fastlane  
 
 ## Examples
