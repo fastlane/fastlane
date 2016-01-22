@@ -30,7 +30,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        # this is your change to provide a more detailed description of this action
+        # this is your chance to provide a more detailed description of this action
         "You can use this action to do cool things..."
       end
 
