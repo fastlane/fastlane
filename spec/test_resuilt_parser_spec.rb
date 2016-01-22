@@ -17,5 +17,16 @@ describe Scan do
           failures: 1
       })
     end
+
+    it "properly parses the xcodebuild output" do
+      output = "<?xml version='1.0' encoding='UTF-8'?>
+        <testsuites tests='2' failures='1'/>"
+
+      result = Scan::TestResultParser.new.parse_result(output)
+      expect(result).to eq(
+        tests: 2,
+        failures: 1
+      )
+    end
   end
 end
