@@ -15,7 +15,7 @@ describe FastlaneCore do
         stub_const('ENV', { 'TRAVIS' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
-      
+
       it "returns true when building in gitlab-ci" do
         stub_const('ENV', { 'GITLAB_CI' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
