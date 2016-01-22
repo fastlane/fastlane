@@ -154,7 +154,7 @@ end
 
 and then run these tests only using
 
-```ruby
+```sh
 rspec -t now
 ```
 
