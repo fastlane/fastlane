@@ -185,6 +185,9 @@ To define the title and optionally the keyword, put two `.strings` files into th
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
+**Note:** These `.strings` files **MUST** be utf-16 encoded.  If you are having trouble see [issue #49](https://github.com/fastlane/frameit/issues/49)
+
+
 #### Uploading screenshots to iTC
 
 Use [deliver](https://github.com/fastlane/deliver) to upload all screenshots to iTunes Connect completely automatically :rocket:
