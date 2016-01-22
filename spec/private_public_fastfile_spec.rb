@@ -33,7 +33,7 @@ describe Fastlane do
       it "doesn't expose the private lanes in `fastlane docs`" do
         output_path = "/tmp/documentation.md"
         ff = Fastlane::FastFile.new(path)
-        Fastlane::DocsGenerator.run(output_path, ff)
+        Fastlane::DocsGenerator.run(ff, output_path: output_path)
         output = File.read(output_path)
 
         expect(output).to include('sudo gem install fastlane')
