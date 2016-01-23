@@ -2010,3 +2010,7 @@ Add this your `Fastfile` to not send any data to the fastlane web service. You c
 ```
 opt_out_usage
 ```
+
+### skip_docs
+
+Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`

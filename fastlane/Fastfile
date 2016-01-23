@@ -1,4 +1,5 @@
 update_fastlane
+skip_docs
 
 desc "Run bundle install and tests"
 lane :test do

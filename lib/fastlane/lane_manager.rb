@@ -10,7 +10,6 @@ module Fastlane
       raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
-      Fastlane::DocsGenerator.run(ff)
 
       is_platform = false
       begin
@@ -51,6 +50,9 @@ module Fastlane
         Helper.log.fatal ex
         e = ex
       end
+
+      # After running the lanes, since skip_docs might be somewhere in-between
+      Fastlane::DocsGenerator.run(ff) unless ENV["FASTLANE_SKIP_DOCS"]
 
       duration = ((Time.now - started) / 60.0).round
 
