@@ -629,8 +629,13 @@ Run SwiftLint for your project.
 
 ```
 swiftlint(
+  mode: :lint,                          # SwiftLint mode: :lint (default) or :autocorrect
   output_file: 'swiftlint.result.json', # The path of the output file (optional)
-  config_file: '.swiftlint-ci.yml'      # The path of the configuration file (optional)
+  config_file: '.swiftlint-ci.yml',     # The path of the configuration file (optional)
+  files: [                              # List of files to process (optional)
+    'AppDelegate.swift',
+    'path/to/project/Model.swift'
+  ]
 )
 ```
 
