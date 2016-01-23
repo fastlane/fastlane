@@ -53,7 +53,7 @@ module Snapshot
       end
 
       def pipe
-        ["| tee '#{xcodebuild_log_path}' | xcpretty"]
+        ["| tee '#{xcodebuild_log_path}' | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
       def device_udid(device)
