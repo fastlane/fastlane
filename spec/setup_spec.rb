@@ -33,14 +33,15 @@ describe Fastlane do
         app = "app"
 
         dev_team_id = "123123"
+        app_identifier = "tools.fastlane.app"
         expect(Spaceship).to receive(:login)
         expect(Spaceship).to receive(:select_team).and_return(dev_team_id)
-        expect(Spaceship::App).to receive(:find).with("tools.fastlane.app").and_return(app)
+        expect(Spaceship::App).to receive(:find).with(app_identifier).and_return(app)
 
         itc_team_id = "itc_321"
         expect(Spaceship::Tunes).to receive(:login)
         expect(Spaceship::Tunes).to receive(:select_team).and_return(itc_team_id)
-        expect(Spaceship::Tunes::Application).to receive(:find).with("tools.fastlane.app").and_return(app)
+        expect(Spaceship::Tunes::Application).to receive(:find).with(app_identifier).and_return(app)
 
         expect(FastlaneCore::UI).to receive(:confirm).and_return(true)
 
@@ -48,6 +49,15 @@ describe Fastlane do
         Dir.chdir(workspace) do
           setup = Fastlane::SetupIos.new
           expect(setup).to receive(:enable_deliver).and_return(nil)
+          allow(setup).to receive(:app_identifier).and_return(app_identifier) # to also support linux (travis)
+          project = "proj"
+          allow(setup).to receive(:project).and_return(project)
+          allow(project).to receive(:schemes).and_return(["MyScheme"])
+          allow(project).to receive(:default_app_identifier).and_return(app_identifier)
+          allow(project).to receive(:default_app_name).and_return("Project Name")
+          allow(project).to receive(:is_workspace).and_return(false)
+          allow(project).to receive(:path).and_return("./path")
+
           expect(setup.run).to eq(true)
           expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
 
@@ -56,11 +66,11 @@ describe Fastlane do
           expect(content).to include "# opt_out_usage"
           expect(content).to include "deliver"
           expect(content).to include "scan"
-          expect(content).to include "gym(scheme: \"Example\")"
+          expect(content).to include "gym(scheme: \"MyScheme\")"
 
           content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Appfile'))
 
-          expect(content).to include "app_identifier \"tools.fastlane.app\""
+          expect(content).to include "app_identifier \"#{app_identifier}\""
           expect(content).to include "team_id \"#{dev_team_id}\""
           expect(content).to include "itc_team_id \"#{itc_team_id}\""
           expect(content).to include "apple_id \"y\""

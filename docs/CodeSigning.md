@@ -7,7 +7,7 @@ It is recommended to use [match](https://github.com/fastlane/match) to generate 
 -------------------
 ## Deprecated
 
-Manul code signing methods
+Manual code signing methods
 
 Below some alternative methods
 

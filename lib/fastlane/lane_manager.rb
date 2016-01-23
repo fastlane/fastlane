@@ -51,6 +51,9 @@ module Fastlane
         e = ex
       end
 
+      # After running the lanes, since skip_docs might be somewhere in-between
+      Fastlane::DocsGenerator.run(ff) unless ENV["FASTLANE_SKIP_DOCS"]
+
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)

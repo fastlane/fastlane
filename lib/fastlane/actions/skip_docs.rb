@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
-    class RubocopAction < Action
+    class SkipDocsAction < Action
       def self.run(params)
-        sh "bundle exec rubocop -D"
+        ENV["FASTLANE_SKIP_DOCS"] = "1"
       end
 
       #####################################################
@@ -10,11 +10,16 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Runs the code style checks"
+        "Skip the creation of the fastlane/README.md file when running fastlane"
       end
 
       def self.available_options
-        []
+      end
+
+      def self.output
+      end
+
+      def self.return_value
       end
 
       def self.authors

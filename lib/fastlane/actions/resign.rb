@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements])
           Helper.log.info 'Successfully re-signed .ipa 🔏.'.green
         else
           raise 'Failed to re-sign .ipa'.red
@@ -43,6 +43,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :signing_identity,
                                        env_name: "FL_RESIGN_SIGNING_IDENTITY",
                                        description: "Code signing identity to use. e.g. \"iPhone Distribution: Luka Mirosevic (0123456789)\""),
+          FastlaneCore::ConfigItem.new(key: :entitlements,
+                                       env_name: "FL_RESIGN_ENTITLEMENTS",
+                                       description: "Path to the entitlement file to use, e.g. \"myApp/MyApp.entitlements\"",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :provisioning_profile,
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
                                        description: "Path to your provisioning_profile. Optional if you use `sigh`",

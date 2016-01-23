@@ -126,6 +126,8 @@ clear_derived_data
 
 ### ipa
 
+**Note**: This action is deprecated, use [gym](https://github.com/fastlane/gym) instead.
+
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
 You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
@@ -150,7 +152,6 @@ ipa(
 The `ipa` action uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
 The path to the `ipa` is automatically used by `Crashlytics`, `Hockey` and `DeployGate`.
-
 
 **Important:**
 
@@ -320,10 +321,10 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 ```
 
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
-Enables the use of the `xcodebuild` tool within fastlane to perform xcode tasks
-such as; archive, build, clean, test, export & more.
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
+
+Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -355,6 +356,31 @@ xcodebuild(
 To keep your Fastfile lightweight, there are also alias actions available for
 the most common `xcodebuild` operations: `xcarchive`, `xcbuild`, `xcclean`, `xctest` & `xcexport`.
 
+To export the IPA files using `xcodebuild` you can provide `:export_options_plist` as a path to plist file or as a hash of values. To get the list of available keys and values please read help page: `xcodebuild --help`:
+
+```ruby
+xcexport(
+  archive_path: "...",
+  export_options_plist: "/path/to/export_options.plist"
+)
+
+# or
+xcexport(
+  archive_path: "...",
+  export_options_plist: {
+    method: "ad-hoc",
+    thinning: "<thin-for-all-variants>",
+    manifest: {
+      appURL: "https://example.com/path/MyApp Name.ipa",
+      displayImageURL: "https://example.com/display image.png",
+      fullSizeImageURL: "https://example.com/fullSize image.png",
+    }
+  }
+)
+```
+
+When using `:export_options_plist` as hash, the `:teamID` is read from `Appfile`. `:appURL`, `:displayImageURL`, `:fullSizeImageURL`, `:assetPackManifestURL` and `:onDemandResourcesAssetPacksBaseURL` are URI escaped to prevent Xcode errors.
+
 Environment variables may be added to a .env file in place of some parameters:
 
 ```
@@ -385,6 +411,8 @@ More usage examples (assumes the above .env setup is being used):
 ```
 
 See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
+
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
 
 ### copy_artifacts
 This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
@@ -571,15 +599,28 @@ lcov(
 ### [OCLint](http://oclint.org)
 Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
 
-```
+```ruby
 oclint(
-  compile_commands: 'commands.json', # The json compilation database, use xctool reporter 'json-compilation-database'
-  select_reqex: /ViewController.m/,  # Select all files matching this reqex
-  report_type: 'pmd',                # The type of the report (default: html)
-  max_priority_1: 10,                # The max allowed number of priority 1 violations
-  max_priority_2: 100,               # The max allowed number of priority 2 violations
-  max_priority_3: 1000,              # The max allowed number of priority 3 violations
-  rc: 'LONG_LINE=200'                # Override the default behavior of rules
+  compile_commands: 'commands.json',    # The JSON compilation database, use xctool reporter 'json-compilation-database'
+  select_regex: /ViewController.m/,     # Select all files matching this regex
+  exclude_regex: /Test.m/,              # Exclude all files matching this regex
+  report_type: 'pmd',                   # The type of the report (default: html)
+  max_priority_1: 10,                   # The max allowed number of priority 1 violations
+  max_priority_2: 100,                  # The max allowed number of priority 2 violations
+  max_priority_3: 1000,                 # The max allowed number of priority 3 violations
+  thresholds: [                         # Override the default behavior of rules
+    'LONG_LINE=200',
+    'LONG_METHOD=200'
+  ],
+  enable_rules: [                       # List of rules to pick explicitly
+    'DoubleNegative',
+    "SwitchStatementsDon'TNeedDefaultWhenFullyCovered"
+  ],
+  disable_rules: ["GotoStatement"],     # List of rules to disable
+  list_enabled_rules: true,             # List enabled rules
+  enable_clang_static_analyzer: true,   # Enable Clang Static Analyzer, and integrate results into OCLint report
+  enable_global_analysis: true,         # Compile every source, and analyze across global contexts (depends on number of source files, could results in high memory load)
+  allow_duplicated_violations: true     # Allow duplicated violations in the OCLint report
 )  
 ```
 
@@ -1072,6 +1113,9 @@ match(type: "development", readonly: true)
 ```
 
 ### [sigh](https://github.com/fastlane/sigh)
+
+**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
 ```ruby
@@ -1117,6 +1161,8 @@ Use the `fastlane action pem` command to view all available options.
 [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
 ### [cert](https://github.com/fastlane/cert)
+
+**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
 
 The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/fastlane/cert).
 
@@ -1240,6 +1286,22 @@ Quickly get the name of the branch you're currently in
 ```ruby
 git_branch
 ```
+
+
+### git_add
+
+To simply add one file before commit use
+
+```ruby
+git_add(path: "./version.txt")
+```
+
+To add several files before commit use
+
+```ruby
+git_add(path: ["./version.txt", "./changelog.txt"])
+```
+
 
 ### git_commit
 
@@ -1823,6 +1885,9 @@ pod_push(path: 'TSMessages.podspec')
 
 # You may also push to a private repo instead of Trunk
 pod_push(path: 'TSMessages.podspec', repo: 'MyRepo')
+
+# If the podspec has a dependency on another private pod, then you will have to supply the sources you want the podspec to lint with for pod_push to succeed. Read more here - https://github.com/CocoaPods/CocoaPods/issues/2543.
+pod_push(path: 'TMessages.podspec', repo: 'MyRepo', sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
 ```
 
 ### clean_cocoapods_cache
@@ -1946,3 +2011,7 @@ Add this your `Fastfile` to not send any data to the fastlane web service. You c
 ```
 opt_out_usage
 ```
+
+### skip_docs
+
+Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`

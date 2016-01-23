@@ -5,7 +5,7 @@ describe Fastlane do
     it "generates new markdown docs" do
       output_path = "/tmp/documentation.md"
       ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
-      Fastlane::DocsGenerator.run(output_path, ff)
+      Fastlane::DocsGenerator.run(ff, output_path)
 
       output = File.read(output_path)
 
@@ -20,7 +20,6 @@ describe Fastlane do
       expect(output).to include('fastlane mac beta')
       expect(output).to include('https://fastlane.tools')
       expect(output).to include('https://github.com/')
-      expect(output).to include('fastlane docs')
     end
   end
 end

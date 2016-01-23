@@ -108,6 +108,37 @@ describe Fastlane do
         expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
       end
 
+      it "works with export_options_plist as hash" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+        xcodebuild(
+          archive_path: './build-dir/MyApp.xcarchive',
+          export_archive: true,
+          export_options_plist: {
+            method: \"ad-hoc\",
+            thinning: \"<thin-for-all-variants>\",
+            teamID: \"1234567890\",
+            manifest: {
+              appURL: \"https://example.com/path/MyApp Name.ipa\",
+              displayImageURL: \"https://example.com/display image.png\",
+              fullSizeImageURL: \"https://example.com/fullSize image.png\",
+            },
+          }
+        )
+      end").runner.execute(:test)
+
+        expect(result).to start_with(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
+          + "-exportArchive " \
+        )
+        expect(result).to match(/-exportOptionsPlist \".*\.plist\"/)
+        expect(result).to end_with(
+          "-exportPath \"./build-dir/MyApp\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
       it "when archiving, should cache the archive path for a later export step" do
         Fastlane::FastFile.new.parse("lane :test do
         xcodebuild(
