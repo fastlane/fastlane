@@ -85,14 +85,14 @@ module Gym
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
                                      description: "Should the ipa file include symbols?",
-                                     default_value: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :include_bitcode,
                                      short_option: "-z",
                                      env_name: "GYM_INCLUDE_BITCODE",
                                      description: "Should the ipa include bitcode?",
-                                     default_value: false,
-                                     is_string: false),
+                                     is_string: false,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
                                      env_name: "GYM_USE_LEGACY_BUILD_API",
                                      description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
@@ -112,6 +112,15 @@ module Gym
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
                                        UI.user_error!("Unsupported export_method, must be: #{av}") unless av.include?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :export_options,
+                                     env_name: "GYM_EXPORT_OPTIONS",
+                                     description: "Specifies path to export options plist. User xcodebuild -help to print the full set of available options",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:use_legacy_build_api],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
 
         # Very optional

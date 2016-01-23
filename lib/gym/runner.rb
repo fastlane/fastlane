@@ -17,7 +17,13 @@ module Gym
         package_app
         fix_package
         compress_and_move_dsym
-        move_ipa
+        path = move_ipa
+        move_manifest
+        move_app_thinning
+        move_app_thinning_size_report
+        move_apps_folder
+
+        path
       elsif Gym.project.mac?
         compress_and_move_dsym
         copy_mac_app
@@ -146,6 +152,54 @@ module Gym
       UI.success "Successfully exported the .app file:"
       UI.message app_path
       app_path
+    end
+
+    # Move the manifest.plist if exists into the output directory
+    def move_manifest
+      if File.exist?(PackageCommandGenerator.manifest_path)
+        FileUtils.mv(PackageCommandGenerator.manifest_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        manifest_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.manifest_path))
+
+        UI.success "Successfully exported the manifest.plist file:"
+        UI.message manifest_path
+        manifest_path
+      end
+    end
+
+    # Move the app-thinning.plist file into the output directory
+    def move_app_thinning
+      if File.exist?(PackageCommandGenerator.app_thinning_path)
+        FileUtils.mv(PackageCommandGenerator.app_thinning_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        app_thinning_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.app_thinning_path))
+
+        UI.success "Successfully exported the app-thinning.plist file:"
+        UI.message app_thinning_path
+        app_thinning_path
+      end
+    end
+
+    # Move the App Thinning Size Report.txt file into the output directory
+    def move_app_thinning_size_report
+      if File.exist?(PackageCommandGenerator.app_thinning_size_report_path)
+        FileUtils.mv(PackageCommandGenerator.app_thinning_size_report_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        app_thinning_size_report_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.app_thinning_size_report_path))
+
+        UI.success "Successfully exported the App Thinning Size Report.txt file:"
+        UI.message app_thinning_size_report_path
+        app_thinning_size_report_path
+      end
+    end
+
+    # Move the Apps folder to the output directory
+    def move_apps_folder
+      if Dir.exist?(PackageCommandGenerator.apps_path)
+        FileUtils.mv(PackageCommandGenerator.apps_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        apps_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.apps_path))
+
+        UI.success "Successfully exported Apps folder:"
+        UI.message apps_path
+        apps_path
+      end
     end
 
     private
