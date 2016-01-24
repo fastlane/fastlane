@@ -2054,3 +2054,32 @@ opt_out_usage
 ### skip_docs
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
+
+### ssh
+
+Lets you execute a series of commands on a remote host, if one of the commands in command-array returns non 0 - it fails.
+
+```ruby
+ssh(
+  host: "dev.januschka.com",
+  username: "root",
+  commands: [
+    "date",
+    "echo 1 > /tmp/file1"
+  ]
+)
+
+```
+
+if one of the commands fails an exception is raised
+
+
+ssh(
+  host: "dev.januschka.com",
+  username: "root",
+  commands: [
+    "date",
+    "false",
+    "echo 'i wont be executed'"
+  ]
+)
