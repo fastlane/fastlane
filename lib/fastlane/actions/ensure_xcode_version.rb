@@ -16,7 +16,7 @@ module Fastlane
             Helper.log.info("Selected Xcode version is correct: #{selected_version}".green)
         else
             Helper.log.info("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
-            Helper.log.info("To correct this, use xcode_select.")
+            Helper.log.info("To correct this, use: `xcode_select(version: #{required_version})`.")
 
             raise "Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}\n"
         end
