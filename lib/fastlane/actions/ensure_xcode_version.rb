@@ -12,7 +12,7 @@ module Fastlane
 
         versions_match = selected_version == "Xcode #{required_version}"
 
-        raise "Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}" unless versions_match
+        raise "Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}\nTo correct this, use xcode_select." unless versions_match
       end
 
       #####################################################
