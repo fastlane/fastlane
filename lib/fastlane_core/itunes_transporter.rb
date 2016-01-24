@@ -56,12 +56,7 @@ module FastlaneCore
       if result and File.directory? itmsp_path
         Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
       else
-        # rubocop:disable Style/CaseEquality
-        unless /^[0-9a-zA-Z\.\$\_]*$/ === @password
-          Helper.log.error "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
-        end
-        # rubocop:enable Style/CaseEquality
-        Helper.log.fatal "Could not download metadata from iTunes Connect! It's probably related to your password or your internet connection."
+        handle_error(@password)
       end
 
       result
@@ -90,12 +85,23 @@ module FastlaneCore
         Helper.log.info(("-" * 102).green)
 
         FileUtils.rm_rf(dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
+      else
+        handle_error(@password)
       end
 
       result
     end
 
     private
+
+    def handle_error(password)
+      # rubocop:disable Style/CaseEquality
+      unless /^[0-9a-zA-Z\.\$\_]*$/ === password
+        Helper.log.error "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
+      end
+      # rubocop:enable Style/CaseEquality
+      Helper.log.fatal "Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection."
+    end
 
     def execute_transporter(command)
       @errors = []
