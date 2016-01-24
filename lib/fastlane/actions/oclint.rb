@@ -7,6 +7,10 @@ module Fastlane
 
     class OclintAction < Action
       def self.run(params)
+        if `which oclint`.to_s.length == 0 and !Helper.test?
+          raise "You have to install oclint. Fore more details: ".red + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
+        end
+
         compile_commands = params[:compile_commands]
         raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exist?(compile_commands)
 
