@@ -17,9 +17,9 @@ module Fastlane
         command = ""
         command += "bundle exec " if params[:use_bundle_exec]
         command += "slather coverage "
-        command += " --build-directory #{params[:build_directory]}" if params[:build_directory]
+        command += " --build-directory #{params[:build_directory].shellescape}" if params[:build_directory]
         command += " --input-format #{params[:input_format]}" if params[:input_format]
-        command += " --scheme #{params[:scheme]}" if params[:scheme]
+        command += " --scheme #{params[:scheme].shellescape}" if params[:scheme]
         command += " --buildkite" if params[:buildkite]
         command += " --jenkins" if params[:jenkins]
         command += " --travis" if params[:travis]
@@ -30,10 +30,14 @@ module Fastlane
         command += " --cobertura-xml" if params[:cobertura_xml]
         command += " --html" if params[:html]
         command += " --show" if params[:show]
-        command += " --source-directory #{params[:source_directory]}" if params[:source_directory]
-        command += " --output-directory #{params[:output_directory]}" if params[:output_directory]
-        command += " --ignore #{params[:ignore]}" if params[:ignore]
-        command += " #{params[:proj]}"
+        command += " --source-directory #{params[:source_directory].shellescape}" if params[:source_directory]
+        command += " --output-directory #{params[:output_directory].shellescape}" if params[:output_directory]
+        if params[:ignore].kind_of?(String)
+          command += " --ignore #{params[:ignore].shellescape}"
+        elsif params[:ignore].kind_of?(Array)
+          command += " #{params[:ignore].map { |path| "--ignore #{path.shellescape}" }.join(' ')}"
+        end
+        command += " #{params[:proj].shellescape}"
         sh command
       end
 
@@ -135,7 +139,8 @@ Slather is available at https://github.com/venmo/slather
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        env_name: "FL_SLATHER_IGNORE",
-                                       description: "Tell slather to ignore files matching a path",
+                                       description: "Tell slather to ignore files matching a path or any path from an array of paths",
+                                       is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
