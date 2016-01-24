@@ -190,6 +190,15 @@ update_app_group_identifiers(
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
+### ensure_xcode_version
+
+Makes sure a specific version of Xcode is selected to be used to build.
+You can use `ensure_xcode_version` to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.
+
+```ruby
+ensure_xcode_version(version: "7.2")
+```
+
 ### [xcode_install](https://github.com/neonichu/xcode-install)
 
 Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem.
