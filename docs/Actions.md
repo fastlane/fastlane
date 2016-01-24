@@ -1746,6 +1746,33 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ## Misc
 
+### erb
+
+Parses a given ERB template file (passes `placeholders` as a binding), and saves the rendered output to destination.
+if no destination is given, it returns the rendered output as a string.
+
+  * sample erb template:
+
+```ruby
+Variable1 <%= var1 %>
+Variable2 <%= var2 %>
+<% for item in var3 %>
+        <%= item %>
+<% end %>
+```
+
+ ```ruby
+erb(
+  template: "1.erb",
+  destination: "/tmp/rendered.out",
+  placeholders: {
+    :var1 => 123,
+    :var2 => "string",
+    :var3 => ["element1", "element2"]
+  }
+)
+```
+
 ### appledoc
 
 Generate Apple-like source code documentation from specially formatted source code comments.
