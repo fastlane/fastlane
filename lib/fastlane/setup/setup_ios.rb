@@ -28,18 +28,11 @@ module Fastlane
         ask_for_apple_id
         detect_if_app_is_available
         print_config_table
-
+        fastlane_actions_path = File.join(FastlaneFolder.path, 'actions')
         if UI.confirm("Please confirm the above values")
-          copy_existing_files
-          generate_appfile
-          detect_installed_tools # after copying the existing files
-          create_app_if_necessary
-          enable_deliver
-          FileUtils.mkdir(File.join(FastlaneFolder.path, 'actions'))
-          generate_fastfile
-          show_analytics
+          default_setup(path: fastlane_actions_path)
         else
-          UI.user_error!("Setup cancelled by user")
+          manual_setup(path: fastlane_actions_path)
         end
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue => ex # this will also be caused by Ctrl + C
@@ -50,6 +43,43 @@ module Fastlane
         raise ex
       end
       # rubocop:enable Lint/RescueException
+    end
+
+    def default_setup(path: nil)
+      copy_existing_files
+      generate_appfile(manually: false)
+      detect_installed_tools # after copying the existing files
+      if self.itc_ref.nil? && self.portal_ref.nil?
+        create_app_if_necessary
+      end
+      enable_deliver
+      FileUtils.mkdir(path)
+      generate_fastfile(manually: false)
+      show_analytics
+    end
+
+    def manual_setup(path: nil)
+      copy_existing_files
+      generate_appfile(manually: true)
+      detect_installed_tools # after copying the existing files
+      ask_to_enable_other_tools
+      FileUtils.mkdir(path)
+      generate_fastfile(manually: true)
+      show_analytics
+    end
+
+    def ask_to_enable_other_tools
+      if self.itc_ref.nil? && self.portal_ref.nil?
+        wants_to_create_app = agree('Would you like to create your app on iTunes Connect and the Developer Portal?', true)
+        if wants_to_create_app
+          create_app_if_necessary
+          detect_if_app_is_available # check if the app was, in fact, created.
+        end
+      end
+      if self.itc_ref && self.portal_ref
+        wants_to_setup_deliver = agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
+        enable_deliver if wants_to_setup_deliver
+      end
     end
 
     def setup_project
@@ -102,19 +132,28 @@ module Fastlane
     end
 
     def ask_for_apple_id
-      self.apple_id = ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
+      self.apple_id ||= ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
     end
 
-    def generate_appfile
+    def ask_for_app_identifier
+      self.app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
+    end
+
+    def generate_appfile(manually: false)
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
+      if manually
+        ask_for_app_identifier
+        ask_for_apple_id
+      end
+
+      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team) if self.dev_portal_team
+
+      itc_team = self.itc_team ? "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n" : ""
+      template.gsub!('[[ITC_TEAM]]', itc_team)
+
       template.gsub!('[[APP_IDENTIFIER]]', self.app_identifier)
       template.gsub!('[[APPLE_ID]]', self.apple_id)
-      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team)
-      if self.itc_team
-        template.gsub!('[[ITC_TEAM]]', "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n")
-      else
-        template.gsub!('[[ITC_TEAM]]', "")
-      end
+
       path = File.join(folder, 'Appfile')
       File.write(path, template)
       Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
@@ -175,8 +214,9 @@ module Fastlane
       Deliver::Setup.new.run(options)
     end
 
-    def generate_fastfile
-      scheme = self.project.schemes.first
+    def generate_fastfile(manually: false)
+      scheme = self.project.schemes.first unless manually
+
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
 
       scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
