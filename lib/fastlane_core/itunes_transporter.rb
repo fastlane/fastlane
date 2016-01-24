@@ -100,7 +100,7 @@ module FastlaneCore
         Helper.log.error "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
       end
       # rubocop:enable Style/CaseEquality
-      Helper.log.fatal "Could not download metadata from iTunes Connect! It's probably related to your password or your internet connection."
+      Helper.log.fatal "Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection."
     end
 
     def execute_transporter(command)
