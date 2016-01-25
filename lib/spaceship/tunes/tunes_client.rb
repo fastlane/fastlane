@@ -90,7 +90,7 @@ module Spaceship
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
-        puts "Multiple teams found, please enter the number of the team you want to use: "
+        puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
         teams.each_with_index do |team, i|
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
