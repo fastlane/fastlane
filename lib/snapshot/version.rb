@@ -1,4 +1,4 @@
 module Snapshot
-  VERSION = "1.4.5"
+  VERSION = "1.5.0"
   DESCRIPTION = "Automate taking localized screenshots of your iOS app on every device"
 end
