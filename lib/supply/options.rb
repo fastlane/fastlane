@@ -32,10 +32,7 @@ module Supply
                                      short_option: "-m",
                                      optional: true,
                                      description: "Path to the directory containing the metadata files",
-                                     default_value: (Dir["./fastlane/metadata/android"] + Dir["./metadata"]).first,
-                                     verify_block: proc do |value|
-                                       raise "Could not find folder".red unless File.directory? value
-                                     end),
+                                     default_value: (Dir["./fastlane/metadata/android"] + Dir["./metadata"]).first),
         FastlaneCore::ConfigItem.new(key: :key,
                                      env_name: "SUPPLY_KEY",
                                      short_option: "-k",

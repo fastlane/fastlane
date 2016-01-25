@@ -8,6 +8,8 @@ module Supply
       raise "No local metadata found, make sure to run `supply init` to setup supply".red unless metadata_path || Supply.config[:apk]
 
       if metadata_path
+        raise "Could not find folder".red unless File.directory? metadata_path
+
         Dir.foreach(metadata_path) do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
 
