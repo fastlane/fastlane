@@ -62,7 +62,7 @@ module Spaceship
         # User Selection
         loop do
           # Multiple teams, user has to select
-          puts "Multiple teams found, please enter the number of the team you want to use: "
+          puts "Multiple teams found on the Developer Portal, please enter the number of the team you want to use: "
           teams.each_with_index do |team, i|
             puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
           end
