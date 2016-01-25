@@ -1748,12 +1748,11 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ### erb
 
-Parses a given ERB template file (passes `placeholders` as a binding), and saves the rendered output to destination.
-if no destination is given, it returns the rendered output as a string.
+Parses a given ERB template file (passes `placeholders` as a binding), and saves the rendered output to destination. If no destination is given, it returns the rendered output as a string.
 
-  * sample erb template:
+Example `erb` template:
 
-```ruby
+```
 Variable1 <%= var1 %>
 Variable2 <%= var2 %>
 <% for item in var3 %>
@@ -1761,7 +1760,7 @@ Variable2 <%= var2 %>
 <% end %>
 ```
 
- ```ruby
+```ruby
 erb(
   template: "1.erb",
   destination: "/tmp/rendered.out",
