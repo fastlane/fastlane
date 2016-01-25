@@ -54,3 +54,12 @@ app_identifier "net.sunapps.1.beta"
 apple_id "felix@krausefx.com"
 team_id "Q2CBPJ58CC"
 ```
+
+### Accessing from fastlane
+
+If you want to access those values from within your `Fastfile` use
+
+```ruby
+identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+```
