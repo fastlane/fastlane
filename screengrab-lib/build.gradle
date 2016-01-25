@@ -8,6 +8,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        minSdkVersion 8
     }
     buildTypes {
         release {
@@ -16,14 +17,9 @@ android {
     }
 }
 
-
-def supportLibVersion = '23.1.1'
-
 dependencies {
-    compile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.android.support:support-annotations:23.1.1"
     compile 'com.android.support.test:runner:0.4.1'
     compile 'com.android.support.test:rules:0.4.1'
     compile 'com.android.support.test.espresso:espresso-core:2.2.1'
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
