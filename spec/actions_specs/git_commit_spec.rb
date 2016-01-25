@@ -16,6 +16,14 @@ describe Fastlane do
 
         expect(result).to eq("git commit -m 'message' ./fastlane/README.md ./fastlane/LICENSE")
       end
+
+      it "generates the correct git command addition of new files" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_commit(path: './fastlane/README.md', message: 'message', add_if_needed: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git add './fastlane/README.md' && git commit -m 'message' './fastlane/README.md'")
+      end
     end
   end
 end
