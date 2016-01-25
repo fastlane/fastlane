@@ -1746,6 +1746,21 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ## Misc
 
+### twitter
+
+Post a tweet on twitter.
+requires you to setup an app on twitter.com and obtain consumer and access_token
+
+```ruby
+twitter(
+  access_token: "XXXX",
+  access_token_secret: "xxx",
+  consumer_key: "xxx",
+  consumer_secret: "xxx",
+  message: "You rock!"
+)
+```
+
 ### erb
 
 Parses a given ERB template file (passes `placeholders` as a binding), and saves the rendered output to destination. If no destination is given, it returns the rendered output as a string.
