@@ -30,7 +30,12 @@ module Fastlane
         Helper.log.info "Fetching the latest build number for version #{version_number}"
 
         train = app.build_trains[version_number]
-        build_number = train.builds.map(&:build_version).map(&:to_i).sort.last
+        begin
+          build_number = train.builds.map(&:build_version).map(&:to_i).sort.last
+        rescue
+          raise "could not find a build on iTC - and 'initial_build_number' option is not set" unless params[:initial_build_number]
+          build_number = params[:initial_build_number]
+        end
 
         Helper.log.info "Latest upload is build number: #{build_number}"
         Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_number
@@ -66,7 +71,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "LATEST_VERSION",
                                        description: "The version number whose latest build number we want",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :initial_build_number,
+                                       env_name: "INTITIAL_BUILD_NUMBER",
+                                       description: "sets the build number to given value if no build is in current train",
+                                       optional: true,
+                                       is_string: false)
+
         ]
       end
 
