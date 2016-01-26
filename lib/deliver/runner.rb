@@ -19,7 +19,11 @@ module Deliver
     def run
       verify_version if options[:app_version].to_s.length > 0
       upload_metadata
-      upload_binary if options[:ipa] || options[:pkg]
+
+      has_binary = options[:ipa] || options[:pkg]
+      if !options[:skip_upload] && has_binary
+        upload_binary
+      end
 
       Helper.log.info "Finished the upload to iTunes Connect".green
 
