@@ -1,4 +1,18 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+String lookupProperty(Project project, String gradlePropName, String envVarName) {
+    return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -6,8 +20,11 @@ android {
 
     defaultConfig {
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+
+        // TODO get a real version from somewhere
+        versionCode 2
+        versionName "0.1.1"
+
         minSdkVersion 8
     }
     buildTypes {
@@ -15,6 +32,20 @@ android {
             minifyEnabled false
         }
     }
+}
+
+publish {
+    userOrg = 'fastlane'
+    groupId = 'tools.fastlane'
+    artifactId = 'screengrab'
+
+    // TODO get a real version from somewhere
+    publishVersion = '0.1.1'
+    
+    repoName = 'fastlane'
+    website = 'https://github.com/fastlane/screengrab'
+    bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
+    bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
 }
 
 dependencies {
