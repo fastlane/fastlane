@@ -8,7 +8,7 @@ module Supply
       raise "No local metadata found, make sure to run `supply init` to setup supply".red unless metadata_path || Supply.config[:apk]
 
       if metadata_path
-        raise "Could not find folder".red unless File.directory? metadata_path
+        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
 
         Dir.foreach(metadata_path) do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
@@ -111,8 +111,7 @@ module Supply
     private
 
     def client
-      @client ||= Client.new(path_to_key: Supply.config[:key],
-                                   issuer: Supply.config[:issuer])
+      @client ||= Client.make_from_config
     end
 
     def metadata_path

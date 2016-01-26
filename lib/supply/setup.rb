@@ -96,8 +96,7 @@ module Supply
     end
 
     def client
-      @client ||= Client.new(path_to_key: Supply.config[:key],
-                                  issuer: Supply.config[:issuer])
+      @client ||= Client.make_from_config
     end
   end
 end
