@@ -131,8 +131,12 @@ module Fastlane
       self.portal_ref = Spaceship::App.find(self.app_identifier)
 
       Spaceship::Tunes.login(@apple_id, nil)
-      self.itc_team = Spaceship::Tunes.select_team
-      self.itc_ref = Spaceship::Application.find(self.app_identifier)
+      begin
+        self.itc_team = Spaceship::Tunes.select_team
+        self.itc_ref = Spaceship::Application.find(self.app_identifier)
+      rescue Spaceship::Client::UnexpectedResponse
+        UI.message "Unable to access iTunes Connect"
+      end
     end
 
     def create_app_if_necessary
