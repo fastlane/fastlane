@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <b>screengrab</b> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull;
+  <b>screengrab</b> &bull;
+  <a href="https://github.com/fastlane/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
@@ -35,7 +35,7 @@ screengrab
 
 ### Automates screenshots of your Android app
 
-Screengrab is a commandline tool that automates taking localized screenshots of your Android app. 
+Screengrab is a commandline tool that automates taking localized screenshots of your Android app.
 
 <img src="assets/running-screengrab.gif" width="640">
 
@@ -50,7 +50,7 @@ Screengrab is a commandline tool that automates taking localized screenshots of 
 
 Once this tool is officially released, the installation will be as simple as running `gem install screengrab`, and referencing a published Android AAR. For the private alpha, please follow these testing instructions:
 
-##### Command line tool installation 
+##### Command line tool installation
 1. Clone the repo with `git clone git@github.com:fastlane/screengrab.git`
 1. `cd` into your screengrab repo directory and run `rake install`
     - You may need to `gem install bundler` if you don't already have bundler
@@ -89,18 +89,18 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
 1.  Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
-2.  To capture screenshots, add the following to your tests `Screengrab.screenshot(activity, "name_of_screenshot_here");` on the appropriate screens
+2.  To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
 - Then, before running `screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
 - Once complete run `screengrab` in your app project directory to generate screenshots
     - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
-- Your screenshots will be saved in a /screenshots directory in the directory where you ran `screengrab`     
+- Your screenshots will be saved in a /screenshots directory in the directory where you ran `screengrab`
 
 ## Advanced Screengrabfile Configuration
 
-Running `screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there. 
+Running `screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
 
 The `Screengrabfile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
 
@@ -143,11 +143,11 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeScreenshot() {
-        Screengrab.screenshot(activityRule.getActivity(), "before_button_click");
+        Screengrab.screenshot("before_button_click");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Screengrab.screenshot(activityRule.getActivity(), "after_button_click");
+        Screengrab.screenshot("after_button_click");
     }
 }
 
@@ -160,9 +160,9 @@ When using JUnit 3 you'll need to add a bit more code:
 
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());` in `setUp()`
 - Use `LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());` in `tearDown()`
-- Use `Screengrab.screenshot(activity, "name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
+- Use `Screengrab.screenshot("name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
 
-If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup. 
+If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 

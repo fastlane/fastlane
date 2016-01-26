@@ -12,37 +12,33 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    private MainActivity activity;
-
     public JUnit3StyleTests() {
         super(MainActivity.class);
     }
 
     public void setUp() {
         LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());
-        activity = getActivity();
-        ScreenUtil.activateScreenForTesting(activity);
+        ScreenUtil.activateScreenForTesting(getActivity());
     }
 
     public void tearDown() {
-        activity = null;
         LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());
     }
 
     public void testTakeScreenshot() {
-        Screengrab.screenshot(activity, "screenshot1");
+        Screengrab.screenshot("beforeFabClick");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Screengrab.screenshot(activity, "screenshot2");
+        Screengrab.screenshot("afterFabClick");
     }
 
     public void testTakeMoreScreenshots() {
-        Screengrab.screenshot(activity, "screenshot3");
+        Screengrab.screenshot("mainActivity");
 
-        onView(withId(R.id.fab)).perform(click());
+        onView(withId(R.id.nav_button)).perform(click());
 
-        Screengrab.screenshot(activity, "screenshot4");
+        Screengrab.screenshot("anotherActivity");
     }
 }
 

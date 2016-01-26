@@ -10,6 +10,9 @@ import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
 import android.view.View;
 
@@ -19,9 +22,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import tools.fastlane.screengrab.file.Chmod;
@@ -39,21 +46,66 @@ public class Screengrab {
     private static final int FULL_QUALITY = 100;
     private static final String SCREENGRAB_DIR_NAME = "screengrab";
 
-    public static File screenshot(Activity activity, String tag) {
-        if (!TAG_PATTERN.matcher(tag).matches()) {
+    public static File screenshot(String screenshotName) {
+        final Activity activity = getCurrentActivity();
+
+        if (activity == null) {
+            throw new IllegalStateException("Could not find a RESUMED Activity to take screenshot: " + screenshotName);
+        }
+
+        if (!TAG_PATTERN.matcher(screenshotName).matches()) {
             throw new IllegalArgumentException("Tag may only contain the letters a-z, A-Z, the numbers 0-9, " +
                     "underscores, and hyphens");
         }
         try {
             File screenshotDirectory = getFilesDirectory(activity.getApplicationContext(), Locale.getDefault());
-            String screenshotName = System.currentTimeMillis() + NAME_SEPARATOR + tag + EXTENSION;
-            File screenshotFile = new File(screenshotDirectory, screenshotName);
+            String screenshotFileName = System.currentTimeMillis() + NAME_SEPARATOR + screenshotName + EXTENSION;
+            File screenshotFile = new File(screenshotDirectory, screenshotFileName);
             takeScreenshot(activity, screenshotFile);
-            Log.d(TAG, "Captured screenshot \"" + tag + "\"");
+            Log.d(TAG, "Captured screenshot \"" + screenshotFileName + "\"");
             return screenshotFile;
         } catch (Exception e) {
             throw new RuntimeException("Unable to capture screenshot.", e);
         }
+    }
+
+    /**
+     * Blocks for up to 10 seconds waiting for an activity to be in the RESUMED state.
+     *
+     * @return The current activity in the RESUMED state, or <code>null</code> if no activity in
+     * this state could be found before the timeout.
+     */
+    private static Activity getCurrentActivity() {
+        BlockingQueue<Activity> resumedActivity = new ArrayBlockingQueue<>(1);
+
+        try {
+            new Thread(createResumedActivityFinder(resumedActivity)).start();
+            return resumedActivity.poll(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted while waiting for a RESUMED Activity.", e);
+        }
+
+        return null;
+    }
+
+    private static Runnable createResumedActivityFinder(final BlockingQueue<Activity> resumedActivity) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                while (resumedActivity.isEmpty()) {
+                    InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+                        @Override
+                        public void run() {
+                            Iterator<Activity> activities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).iterator();
+
+                            if (activities.hasNext()) {
+                                resumedActivity.add(activities.next());
+                            }
+                        }
+                    });
+                }
+            }
+        };
     }
 
     private static void takeScreenshot(final Activity activity, File file) throws IOException {
