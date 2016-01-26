@@ -8,12 +8,12 @@ Pod::Spec.new do |s|
                    Much bla
                    DESC
 
-  s.homepage          = "https://github.com/KrauseFx/fastlane"
+  s.homepage          = "https://github.com/fastlane/fastlane"
   s.license           = { type: 'MIT', file: 'LICENSE.txt' }
   s.authors           = ["Felix Krause"]
-  s.social_media_url  = "https://twitter.com/KrauseFx"
+  s.social_media_url  = "https://twitter.com/FastlaneTools"
 
-  s.source            = { git: "https://github.com/KrauseFx/fastlane.git", tag: s.version }
+  s.source            = { git: "https://github.com/fastlane/fastlane.git", tag: s.version }
   s.platform          = :ios, 7.0
   s.source_files      = "*.{h,m}"
   s.frameworks        = "UIKit"

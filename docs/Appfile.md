@@ -25,6 +25,9 @@ app_identifier "tools.fastlane.app"       # The bundle identifier of your app
 
 apple_dev_portal_id "portal@company.com"  # Apple Developer Account
 itunes_connect_id "tunes@company.com"     # iTunes Connect Account
+
+team_id "Q2CBPJ58CA" # Developer Portal Team ID
+itc_team_id "18742801" # iTunes Connect Team ID
 ```
 
 If your project has different bundle identifiers per environment (i.e. beta, app store), you can define that by using `for_platform` and/or `for_lane` block declaration. 
@@ -42,7 +45,7 @@ for_platform :ios do
 end
 ```
 
-You only have to use `for_platform` if you're using `platform {platform_name} do` in your `Fastfile`.
+You only have to use `for_platform` if you're using `platform [platform_name] do` in your `Fastfile`.
 
 `fastlane` will always use the lane specific value if given, otherwise fall back to the value on the top of the file. Therefore, while driving the `:beta` lane, this configuration is loaded:
 
@@ -50,4 +53,13 @@ You only have to use `for_platform` if you're using `platform {platform_name} do
 app_identifier "net.sunapps.1.beta"
 apple_id "felix@krausefx.com"
 team_id "Q2CBPJ58CC"
+```
+
+### Accessing from fastlane
+
+If you want to access those values from within your `Fastfile` use
+
+```ruby
+identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
 ```

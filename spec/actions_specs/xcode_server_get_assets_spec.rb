@@ -21,7 +21,7 @@ describe Fastlane do
       it "fails if selected bot doesn't have any integrations" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
         to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
-        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?limit=10").
+        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
         to_return(status: 200, body: "{\"count\":0,\"results\":[]}")
 
         begin
@@ -41,7 +41,7 @@ describe Fastlane do
       it "fails if integration number specified is not available" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
         to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
-        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?limit=10").
+        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
         to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
 
         begin
@@ -62,7 +62,7 @@ describe Fastlane do
       it "fails if assets are not available" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
         to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
-        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?limit=10").
+        stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
         to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
         stub_request(:get, "https://1.2.3.4:20343/api/integrations/0a0fb158e7bf3d06aa87bf96eb001454/assets").
         to_return(status: 500)
@@ -84,7 +84,7 @@ describe Fastlane do
       # it "downloads and unzips the assets that don't contain an xcarchive" do
       #   stub_request(:get, "https://1.2.3.4:20343/api/bots").
       #   to_return(:status => 200, :body => File.read("./spec/fixtures/requests/xcode_server_bots.json"))
-      #   stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?limit=10").
+      #   stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
       #   to_return(:status => 200, :body => File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
       #   stub_request(:get, "https://1.2.3.4:20343/api/integrations/0a0fb158e7bf3d06aa87bf96eb001454/assets").
       #   to_return(:status => 200, :body => File.read("./spec/fixtures/requests/xcs.tar.gz"), :headers => {

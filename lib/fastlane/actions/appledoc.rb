@@ -86,14 +86,12 @@ module Fastlane
             if key != :input
               cli_args << value
             end
-          else
-            if value.kind_of?(Array)
-              value.each do |v|
-                cli_args << cli_param(args, v)
-              end
-            else
-              cli_args << cli_param(args, value)
+          elsif value.kind_of?(Array)
+            value.each do |v|
+              cli_args << cli_param(args, v)
             end
+          else
+            cli_args << cli_param(args, value)
           end
         end
 

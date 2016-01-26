@@ -19,11 +19,11 @@ brew update && brew upgrade openssl
 
 This is usually caused when running Jenkins as its own user. While this is possible, you'll have to take care of creating a temporary Keychain, filling it and then using it when building your application. 
 
-For more information about the recommended setup with Jenkins open the [Jenkins Guide](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md).
+For more information about the recommended setup with Jenkins open the [Jenkins Guide](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md).
 
 ### Code signing issues
 
-There is a separate [guide](https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md) available about how to setup code signing.
+Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/match).
 
 ### Multiple targets of the same underlying app
 
@@ -67,3 +67,16 @@ end
 ```
 
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
+
+### Disable colored output
+
+Set the `FASTLANE_DISABLE_COLORS` environment variable to disable ANSI colors (e.g. for CI machines)
+
+```
+export FASTLANE_DISABLE_COLORS=1
+```
+
+### "User interaction is not allowed" when using `fastlane` via SSH
+
+This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](http://stackoverflow.com/a/22637896/445598).
+

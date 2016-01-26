@@ -2,21 +2,12 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Slack Action" do
       before :each do
-        ENV['SLACK_URL'] = 'http://127.0.0.1'
+        ENV['SLACK_URL'] = 'https://127.0.0.1'
       end
 
       it "trims long messages to show the bottom of the messages" do
         long_text = "a" * 10000
         expect(Fastlane::Actions::SlackAction.trim_message(long_text).length).to eq(7000)
-      end
-
-      it "raises an error if no slack URL is given" do
-        ENV.delete 'SLACK_URL'
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            slack
-          end").runner.execute(:test)
-        end.to raise_exception('No SLACK_URL given.'.red)
       end
 
       it "works so perfect, like Slack does" do
@@ -28,6 +19,7 @@ describe Fastlane do
 
         require 'fastlane/actions/slack'
         arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
           channel: channel,
@@ -66,12 +58,13 @@ describe Fastlane do
 
         require 'fastlane/actions/slack'
         arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
           channel: channel,
           default_payloads: [:lane],
           attachment_properties: {
-            thumb_url: 'http://example.com/path/to/thumb.png',
+            thumb_url: 'https://example.com/path/to/thumb.png',
             fields: [{
               title: 'My Field',
               value: 'My Value',
@@ -91,7 +84,7 @@ describe Fastlane do
         expect(fields[1][:value]).to eq('My Value')
         expect(fields[1][:short]).to eq(true)
 
-        expect(attachments[:thumb_url]).to eq('http://example.com/path/to/thumb.png')
+        expect(attachments[:thumb_url]).to eq('https://example.com/path/to/thumb.png')
       end
     end
   end

@@ -5,7 +5,7 @@
   <a href="https://github.com/fastlane/deliver">deliver</a> &bull;
   <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull;
   <a href="https://github.com/fastlane/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/PEM">PEM</a> &bull;
+  <a href="https://github.com/fastlane/pem">pem</a> &bull;
   <a href="https://github.com/fastlane/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
@@ -13,21 +13,22 @@
   <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a>
+  <a href="https://github.com/fastlane/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/match">match</a>
 </p>
 -------
 
 fastlane
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/travis/fastlane/fastlane/master.svg?style=flat)](https://travis-ci.org/fastlane/fastlane)
 
 ######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
-Get in contact with the developer on Twitter: [@KrauseFx](https://twitter.com/KrauseFx)
+Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">
@@ -129,7 +130,7 @@ The setup assistant will create all the necessary files for you, using the exist
 
 For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/docs).
 
-There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/162d756dfda7b84e97d4) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
+There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
 ## Available commands
 
@@ -143,7 +144,6 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane action [action_name]`: Shows a more detailed description of an action
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
-- `fastlane docs`: Generates a markdown based documentation of all your lanes
 - `fastlane new_action`: Create a new action (integration) for fastlane  
 
 ## Examples
@@ -157,7 +157,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`PEM`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
+- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
 - [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
@@ -166,6 +166,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
+- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
 
 ## Statistics
 
@@ -184,6 +185,9 @@ Please submit an issue on GitHub and provide information about your setup
 ## Special Thanks
 
 Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving `fastlane`. Check out the project pages of the other tools for more sponsors and contributors.
+
+## Code of Conduct
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

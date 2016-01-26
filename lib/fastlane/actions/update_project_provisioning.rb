@@ -8,7 +8,7 @@ module Fastlane
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         Helper.log.info "You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?"
-        Helper.log.info "https://github.com/KrauseFx/fastlane/blob/master/docs/CodeSigning.md"
+        Helper.log.info "https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
@@ -46,7 +46,7 @@ module Fastlane
 
         project = Xcodeproj::Project.open(folder)
         project.targets.each do |target|
-          if !target_filter || target.product_name.match(target_filter) || target.product_type.match(target_filter)
+          if !target_filter || target.product_name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
             Helper.log.info "Updating target #{target.product_name}...".green
           else
             Helper.log.info "Skipping target #{target.product_name} as it doesn't match the filter '#{target_filter}'".yellow

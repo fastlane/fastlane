@@ -20,8 +20,10 @@ class FastlaneApplication
       "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"].join("\n")
     program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
     program :help, 'Website', 'https://fastlane.tools'
-    program :help, 'GitHub', 'https://github.com/krausefx/fastlane'
+    program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
     program :help_formatter, :compact
+
+    global_option('--verbose') { $verbose = true }
 
     always_trace!
 
@@ -42,7 +44,7 @@ class FastlaneApplication
 
     command :init do |c|
       c.syntax = 'fastlane init'
-      c.description = 'Helps you setting up fastlane based on your existing tools.'
+      c.description = 'Helps you with your initial fastlane setup'
 
       c.action do |args, options|
         Fastlane::Setup.new.run
@@ -88,15 +90,9 @@ class FastlaneApplication
       c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
 
       c.action do |args, options|
-        path = File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
-        if File.exist? path and !options.force
-          return nil unless agree('Found existing ./fastlane/README.md. Do you want to overwrite it? (y/n)', true)
-        end
-
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
-
-        require 'fastlane/documentation/docs_generator'
-        Fastlane::DocsGenerator.run(path, ff)
+        FastlaneCore::Helper.log.info "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
+        Fastlane::DocsGenerator.run(ff)
       end
     end
 
@@ -106,7 +102,8 @@ class FastlaneApplication
 
       c.action do |args, options|
         require 'fastlane/one_off'
-        Fastlane::OneOff.execute(args: args)
+        result = Fastlane::OneOff.execute(args: args)
+        puts "Result: #{result}".green if result
       end
     end
 

@@ -25,15 +25,14 @@ module Fastlane
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
-        url = ENV['SLACK_URL']
-        unless url
-          Helper.log.fatal "Please add 'ENV[\"SLACK_URL\"] = \"https://hooks.slack.com/services/...\"' to your Fastfile's `before_all` section.".red
-          raise 'No SLACK_URL given.'.red
+        notifier = Slack::Notifier.new(options[:slack_url])
+
+        if options[:username].to_s.length > 0
+          notifier.username = options[:username]
+        else
+          notifier.username = 'fastlane'
         end
 
-        notifier = Slack::Notifier.new(url)
-
-        notifier.username = 'fastlane'
         if options[:channel].to_s.length > 0
           notifier.channel = options[:channel]
           notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
@@ -43,9 +42,15 @@ module Fastlane
 
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
-        result = notifier.ping '',
-                               icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                               attachments: [slack_attachment]
+        if options[:icon_url].to_s.length > 0
+          result = notifier.ping '',
+                                 icon_url: options[:icon_url],
+                                 attachments: [slack_attachment]
+        else
+          result = notifier.ping '',
+                                 icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+                                 attachments: [slack_attachment]
+        end
 
         if result.code.to_i == 200
           Helper.log.info 'Successfully sent Slack notification'.green
@@ -61,6 +66,14 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :username,
+                                       env_name: "FL_SLACK_USERNAME",
+                                       description: "The username that should be displayed on Slack",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :icon_url,
+                                       env_name: "FL_SLACK_ICON_URL",
+                                       description: "The URL of the icon that should be displayed on Slack",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_SLACK_MESSAGE",
                                        description: "The message that should be displayed on Slack. This supports the standard Slack markup language",

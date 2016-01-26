@@ -241,13 +241,7 @@ module Fastlane
                                        env_name: 'FL_APPALOOSA_DEVICE',
                                        description: 'Select the device format for yours screenshots',
                                        optional: true
-                                      ),
-          FastlaneCore::ConfigItem.new(key: :development,
-                                       env_name: 'FL_APPALOOSA_DEVELOPMENT',
-                                       description: 'Create a development certificate instead of a distribution one',
-                                       is_string: false,
-                                       default_value: false,
-                                       optional: true)
+                                      )
         ]
       end
 

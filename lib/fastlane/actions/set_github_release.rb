@@ -162,7 +162,7 @@ module Fastlane
       def self.details
         "Creates a new release on GitHub. You must provide your GitHub Personal token
         (get one from https://github.com/settings/tokens/new), the repository name
-        and tag name. If the tag doesn't exist, one will be created on the commit or branch passed-in as
+        and tag name. By default that's 'master'. If the tag doesn't exist, one will be created on the commit or branch passed-in as
         commitish. Out parameters provide the release's id, which can be used for later editing and the
         release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter."
       end
@@ -171,10 +171,10 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :repository_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
-                                       description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
+                                       description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include? "github.com"
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
+                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.include? "github.com"
+                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
@@ -193,14 +193,15 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :commitish,
                                        env_name: "FL_SET_GITHUB_RELEASE_COMMITISH",
-                                       description: "If provided tag doesn't exist, a new one will be created on the provided branch/commit",
+                                       description: "Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :description,
                                        env_name: "FL_SET_GITHUB_RELEASE_DESCRIPTION",
                                        description: "Description of this release",
                                        is_string: true,
-                                       optional: true),
+                                       optional: true,
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG]),
           FastlaneCore::ConfigItem.new(key: :is_draft,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_DRAFT",
                                        description: "Whether the release should be marked as draft",

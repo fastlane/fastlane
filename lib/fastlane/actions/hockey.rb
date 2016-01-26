@@ -141,7 +141,11 @@ module Fastlane
                                       env_name: "FL_HOCKEY_UPLOAD_DSYM_ONLY",
                                       description: "Flag to upload only the dSYM file to hockey app",
                                       is_string: false,
-                                      default_value: false)
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :owner_id,
+                                      env_name: "FL_HOCKEY_OWNER_ID",
+                                      description: "ID for the owner of the app",
+                                      optional: true)
         ]
       end
 

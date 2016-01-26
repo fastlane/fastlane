@@ -1,5 +1,3 @@
-require 'pty'
-
 module Fastlane
   module Actions
     module SharedValues
@@ -92,13 +90,13 @@ module Fastlane
             Helper.log.info "Successfully loaded custom action '#{file}'.".green
           else
             Helper.log.error "Could not find method 'run' in class #{class_name}.".red
-            Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
+            Helper.log.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
             raise "Plugin '#{file_name}' is damaged!"
           end
         rescue NameError
           # Action not found
           Helper.log.error "Could not find '#{class_name}' class defined.".red
-          Helper.log.error 'For more information, check out the docs: https://github.com/KrauseFx/fastlane'
+          Helper.log.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
           raise "Plugin '#{file_name}' is damaged!"
         end
       end

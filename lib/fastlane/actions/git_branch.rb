@@ -5,7 +5,9 @@ module Fastlane
 
     class GitBranchAction < Action
       def self.run(params)
-        ENV['GIT_BRANCH'] or `git symbolic-ref HEAD --short 2>/dev/null`.strip
+        return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH']
+        return ENV["TRAVIS_BRANCH"] if ENV["TRAVIS_BRANCH"]
+        `git symbolic-ref HEAD --short 2>/dev/null`.strip
       end
 
       #####################################################

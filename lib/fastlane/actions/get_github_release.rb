@@ -46,7 +46,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This will verify if a given release version is avialable on GitHub"
+        "This will verify if a given release version is available on GitHub"
       end
 
       def self.details
@@ -54,7 +54,7 @@ module Fastlane
               {"url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",
                  "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",
                  "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",
-                 "html_url"=>"https://github.com/KrauseFx/fastlane/releases/tag/1.8.0",
+                 "html_url"=>"https://github.com/fastlane/fastlane/releases/tag/1.8.0",
                  "id"=>1537713,
                  "tag_name"=>"1.8.0",
                  "target_commitish"=>"master",
@@ -66,7 +66,7 @@ module Fastlane
                    "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",
                    "gravatar_id"=>"",
                    "url"=>"https://api.github.com/users/KrauseFx",
-                   "html_url"=>"https://github.com/KrauseFx",
+                   "html_url"=>"https://github.com/fastlane",
                    "followers_url"=>"https://api.github.com/users/KrauseFx/followers",
                    "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",
                    "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",
