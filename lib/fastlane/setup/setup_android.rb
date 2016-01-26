@@ -26,16 +26,13 @@ module Fastlane
 
       package_name = ask('Package Name (com.krausefx.app): '.yellow)
       puts ""
-      puts "To automatically upload builds and metadata to Google Play, fastlane needs an issuer and keyfile".yellow
+      puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
       puts "Feel free to just click Enter to skip not provide certain things"
-      puts "Follow the Setup Guide on how to get the Issuer: https://github.com/fastlane/supply#setup".yellow
-      puts "The issuer email looks like this: 137123276006-aaaeltp0aqgn2opfb7tk46ovaaa3hv1g@developer.gserviceaccount.com".yellow
-      issuer = ask('Issuer: '.yellow)
-      keyfile = ask('Path to the key file: '.yellow)
+      puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/supply#setup".yellow
+      json_key_file = ask('Path to the json secret file: '.yellow)
 
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplateAndroid")
-      template.gsub!('[[ISSUER]]', issuer)
-      template.gsub!('[[KEYFILE]]', keyfile)
+      template.gsub!('[[JSON_KEY_FILE]]', json_key_file)
       template.gsub!('[[PACKAGE_NAME]]', package_name)
       path = File.join(folder, 'Appfile')
       File.write(path, template)
