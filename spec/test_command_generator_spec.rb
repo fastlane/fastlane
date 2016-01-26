@@ -18,7 +18,7 @@ describe Snapshot do
           "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
           :build,
           :test,
-          "| tee '#{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')}' | xcpretty"
+          "| tee '#{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')}' | xcpretty "
         ])
       end
     end
