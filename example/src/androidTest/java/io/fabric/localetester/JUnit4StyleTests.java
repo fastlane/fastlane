@@ -2,7 +2,6 @@ package io.fabric.localetester;
 
 import android.support.test.rule.ActivityTestRule;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -27,34 +26,26 @@ public class JUnit4StyleTests {
     @Rule
     public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
 
-    private MainActivity activity;
-
     @Before
     public void setUp() {
-        activity = activityRule.getActivity();
-        ScreenUtil.activateScreenForTesting(activity);
-    }
-
-    @After
-    public void tearDown() {
-        activity = null;
+        ScreenUtil.activateScreenForTesting(activityRule.getActivity());
     }
 
     @Test
     public void testTakeScreenshot() {
-        Screengrab.screenshot(activity, "screenshot1");
+        Screengrab.screenshot("beforeFabClick");
 
         onView(withId(R.id.fab)).perform(click());
 
-        Screengrab.screenshot(activity, "screenshot2");
+        Screengrab.screenshot("afterFabClick");
     }
 
     @Test
     public void testTakeMoreScreenshots() {
-        Screengrab.screenshot(activity, "screenshot3");
+        Screengrab.screenshot("mainActivity");
 
-        onView(withId(R.id.fab)).perform(click());
+        onView(withId(R.id.nav_button)).perform(click());
 
-        Screengrab.screenshot(activity, "screenshot4");
+        Screengrab.screenshot("anotherActivity");
     }
 }
