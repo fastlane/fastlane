@@ -74,10 +74,13 @@ class Snapshot: NSObject {
 
     class func waitForLoadingIndicatorToDisappear() {
         let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
+        let geofencequery = query.matchingIdentifier("GeofenceLocationTrackingOn")
 
-        let expectedCount = ((UIDevice.currentDevice().userInterfaceIdiom == .Pad) ? 5 : 4)
-
-        while (query.count > UInt(expectedCount)) {
+        var elements = UInt(4);
+        if(UIDevice.currentDevice().userInterfaceIdiom == .Pad){
+            elements = UInt(5);
+        }
+        while (query.count > (elements + geofencequery.count)) {
             sleep(1)
             print("Number of Elements in Status Bar: \(query.count)... waiting for status bar to disappear")
         }
