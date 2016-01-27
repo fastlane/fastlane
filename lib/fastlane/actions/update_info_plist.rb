@@ -8,7 +8,11 @@ module Fastlane
         require 'plist'
 
         # Check if parameters are set
-        if params[:app_identifier] or params[:display_name]
+        if params[:app_identifier] or params[:display_name] or params[:block]
+          if (params[:app_identifier] or params[:display_name]) and params[:block]
+            Helper.log.warn("block parameter can not be specified with app_identifier or display_name")
+            return false
+          end
 
           # Assign folder from parameter or search for xcodeproj file
           folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
@@ -21,6 +25,7 @@ module Fastlane
           # Update plist values
           plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
           plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
+          params[:block].call(plist) if params[:block]
 
           # Write changes to file
           plist_string = Plist::Emit.dump(plist)
@@ -71,7 +76,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: 'FL_UPDATE_PLIST_DISPLAY_NAME',
                                        description: 'The Display Name of your app',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :block,
+                                       is_string: false,
+                                       description: 'A block to process plist with custom logic',
                                        optional: true)
+
         ]
       end
 

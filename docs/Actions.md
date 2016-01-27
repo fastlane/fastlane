@@ -1078,6 +1078,16 @@ update_info_plist(
   plist_path: "path/to/Info.plist",
   display_name: "MyApp-Beta"
 )
+
+# Advanced processing: find URL scheme for particular key and replace value
+update_info_plist(
+  xcodeproj: "path/to/Example.proj",
+  plist_path: "path/to/Info.plist",
+  block: lambda { |plist|
+    urlScheme = plist['CFBundleURLTypes'].find{|scheme| scheme['CFBundleURLName'] == 'com.acme.default-url-handler'}
+    urlScheme[:CFBundleURLSchemes] = ['acme-production']    
+  }
+)
 ```
 
 ## update_url_schemes
