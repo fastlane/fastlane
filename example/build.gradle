@@ -47,8 +47,4 @@ dependencies {
 // for local development
 //
 //    androidTestCompile project(':screengrab-lib')
-
-//  The following code enables this app to use the pre-compiled screengrab-lib-release.aar, for testing
-//
-//    androidTestCompile project(':screengrab-lib-release')
 }
