@@ -46,9 +46,9 @@ Screengrab is a commandline tool that automates taking localized screenshots of 
 - Keep your screenshots perfectly up-to-date with every app update. Your customers deserve it!
 - Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/supply)
 
-# [ALPHA] Installation
+# Installation
 
-Once this tool is officially released, the installation will be as simple as running `gem install screengrab`, and referencing a published Android AAR. For the private alpha, please follow these testing instructions:
+Once this tool is officially released, the installation will be as simple as running `gem install screengrab` For the private alpha, please follow these testing instructions:
 
 ##### Command line tool installation
 1. Clone the repo with `git clone git@github.com:fastlane/screengrab.git`
@@ -57,18 +57,10 @@ Once this tool is officially released, the installation will be as simple as run
     - If you're using the default Ruby on Mac OS you may need to use `sudo`
 1. Run `screengrab init` to complete installation
 
-##### Java library installation
-Import the Screengrab library AAR into your Android Studio project
-  1. Right click on your root project and select New > Module
-<p align="center">
-  <img src="assets/new-module.png" height="450">
-</p>
-  1. Select **Import .JAR/.AAR Package** from the New Module dialog
-<p align="center">
-  <img src="assets/import-dialog.png" height="450">
-</p>
-  1. Pick `[path_to_screengrab_repo]/screengrab-lib-release/screengrab-lib-release.aar` and click **Finish**
-  1. Add `androidTestCompile project(':screengrab-lib-release')` to your app's **build.gradle** dependencies
+##### Gradle dependency
+```java
+  androidTestCompile 'tools.fastlane:screengrab:0.1.1'
+```
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**

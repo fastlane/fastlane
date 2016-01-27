@@ -1,1 +1,1 @@
-include ':example', ':screengrab-lib', ':screengrab-lib-release'
+include ':example', ':screengrab-lib'
