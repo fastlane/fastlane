@@ -2083,3 +2083,47 @@ ssh(
     "echo 'i wont be executed'"
   ]
 )
+
+
+### scp
+
+Allows SCP file transfer.
+
+
+ **Upload file/folder:**
+
+```ruby
+scp(
+  host: "dev.januschka.com",
+  username: "root",
+  upload: {
+    src: "/root/dir1",
+    dst: "/tmp/new_dir"      
+  }
+)
+```
+
+**Download file/folder:**
+
+```ruby
+scp(
+  host: "dev.januschka.com",
+  username: "root",
+  download: {
+    src: "/root/dir1",
+    dst: "/tmp/new_dir"      
+  }
+)
+```
+
+### rsync
+
+a wrapper around rsync, rsync is a tool that lets you synchronize files, including permissions and so on for a more detailed information about rsync please see ***rsync(1)*** manpage.
+
+
+```ruby
+rsync(
+  source: "root@host:/tmp/1.txt",
+  destination: "/tmp/local_file.txt"
+)
+```
