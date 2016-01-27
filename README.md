@@ -108,7 +108,7 @@ The `Screengrabfile` is written in Ruby, so you may find it helpful to use an ed
 locales ['en-US', 'fr-FR', 'it-IT']
 
 # clear all previously generated screenshots in your local output directory before creating new ones
-clear_previous_screenshots
+clear_previous_screenshots true
 ```
 
 For more information about all available options run
