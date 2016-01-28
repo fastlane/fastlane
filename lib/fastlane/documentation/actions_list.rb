@@ -146,7 +146,7 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            key_name = (current.optional ? "" : "* ") + current.key.to_s
+            key_name = (current.optional ? "  " : "* ") + current.key.to_s
             description = (current.description || '') + (current.default_value ? " (default: '#{current.default_value}')" : "")
 
             rows << [key_name.yellow, description, current.env_name]
