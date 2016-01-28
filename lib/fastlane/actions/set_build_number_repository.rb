@@ -36,6 +36,36 @@ module Fastlane
         return false
       end
 
+      def self.git_initial_commit
+        Actions.sh('git rev-list --max-parents=0 --abbrev-commit HEAD').chomp
+      end
+
+      def self.git_tags_matching(matching)
+        tags = Actions.sh('git show-ref --tags').split("\n")
+        tags = tags.map { |tag| tag.split(" ") }
+        if matching
+          tags = tags.select { |shaTag| shaTag[1].start_with? "refs/tags/#{matching}" }
+        end
+        tags.map { |shaTag| shaTag[0] }
+      end
+
+      def self.git_diverging_commit_matching(matching)
+        list = git_tags_matching(matching)
+        if list.empty?
+          git_initial_commit
+        else
+          list.last.split(" ").first
+        end
+      end
+
+      def self.git_commit_count_between(commitA, commitB = "HEAD")
+        Actions.sh("git rev-list #{commitA}..#{commitB} --count").chomp
+      end
+
+      def self.git_abbrev_last_commit
+        Actions.sh('git rev-list --max-count=1 --abbrev=0 --abbrev-commit HEAD').chomp
+      end
+
       def self.run(params)
         if is_svn?
           Helper.log.info "Detected repo: svn"
@@ -45,7 +75,15 @@ module Fastlane
           command = 'git svn info | grep Revision | egrep -o "[0-9]+"'
         elsif is_git?
           Helper.log.info "Detected repo: git"
-          command = 'git rev-parse --short HEAD'
+          tag_prefix = params[:use_git_counts_matching_tag]
+          if tag_prefix
+            major = git_tags_matching(tag_prefix).count
+            minor = git_commit_count_between(git_diverging_commit_matching(tag_prefix))
+            patch = git_abbrev_last_commit.to_i(16)
+            build_number = "#{major}.#{minor}.#{patch}"
+          else
+            command = 'git rev-parse --short HEAD'
+          end
         elsif is_hg?
           Helper.log.info "Detected repo: hg"
           if params[:use_hg_revision_number]
@@ -56,8 +94,9 @@ module Fastlane
         else
           raise "No repository detected"
         end
-
-        build_number = Actions.sh command
+        if build_number.nil?
+          build_number = Actions.sh command
+        end
 
         Fastlane::Actions::IncrementBuildNumberAction.run(build_number: build_number)
       end
@@ -77,7 +116,13 @@ module Fastlane
                                        description: "Use hg revision number instead of hash (ignored for non-hg repos)",
                                        optional: true,
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :use_git_counts_matching_tag,
+                                       env_name: "USE_GIT_COUNTS_MATCHING_TAG",
+                                       description: "Use the number of matching tags as the major version, number of commits since last matching tag as minor version, and a numeric SHA as the patch version",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: nil)
         ]
       end
 
