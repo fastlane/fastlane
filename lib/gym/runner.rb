@@ -8,10 +8,6 @@ module Gym
     def run
       clear_old_files
 
-      if Gym.project.tvos?
-        UI.user_error!("gym doesn't suppoort tvOS projects yet, we're working on adding this feature!")
-      end
-
       build_app
       verify_archive
 
