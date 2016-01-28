@@ -24,7 +24,7 @@ module Gym
         move_ipa
       elsif Gym.project.mac?
         compress_and_move_dsym
-        move_mac_app
+        copy_mac_app
       end
     end
 
@@ -139,12 +139,12 @@ module Gym
       ipa_path
     end
 
-    # Move the .app from the archive into the output directory
-    def move_mac_app
+    # Copies the .app from the archive into the output directory
+    def copy_mac_app
       app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
 
-      FileUtils.mv(app_path, File.expand_path(Gym.config[:output_directory]), force: true)
+      FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
 
       UI.success "Successfully exported the .app file:"
