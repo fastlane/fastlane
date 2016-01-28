@@ -52,6 +52,9 @@ puts data.user
 puts data.password
 ```
 
+# Code of Conduct
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+
 # License
 
 This project is licensed under the terms of the MIT license. See the LICENSE file.
