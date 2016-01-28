@@ -118,7 +118,8 @@ module Spaceship
         parameters = {
           app_id: self.build_train.application.apple_id,
           train: self.build_train.version_string,
-          build_number: self.build_version
+          build_number: self.build_version,
+          platform: self.platform
         }.merge({
           whats_new: whats_new,
           description: description,

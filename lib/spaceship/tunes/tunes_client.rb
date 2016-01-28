@@ -542,8 +542,9 @@ module Spaceship
                                   # optional:
                                   whats_new: nil,
                                   description: nil,
-                                  feedback_email: nil)
-      url = "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/testInformation"
+                                  feedback_email: nil,
+                                  platform: 'ios')
+      url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
       r = request(:get) do |req|
         req.url url
         req.headers['Content-Type'] = 'application/json'
