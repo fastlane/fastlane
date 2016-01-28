@@ -42,7 +42,11 @@ module Supply
       require 'net/http'
 
       IMAGES_TYPES.each do |image_type|
-        next if ['featureGraphic'].include?(image_type) # we don't get all files in full resolution :(
+        if ['featureGraphic'].include?(image_type)
+          # we don't get all files in full resolution :(
+          Helper.log.info "Due to the limit of the Google Play API `supply` can't download your existing feature graphics..."
+          next
+        end
 
         begin
           Helper.log.info "Downloading #{image_type} for #{listing.language}..."
