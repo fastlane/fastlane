@@ -19,7 +19,7 @@ module Fastlane
         flavor = task.match(/assemble(\w*)/)
         if flavor and flavor[1]
           flavor = flavor[1].downcase # Release => release
-          apk_path = Dir[File.join("app", "build", "outputs", "apk", "*-#{flavor}.apk")].last
+          apk_path = Dir[File.join(params[:app_dir], "build", "outputs", "apk", "*-#{flavor}.apk")].last
           if apk_path
             Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
           else
@@ -67,7 +67,13 @@ module Fastlane
                                        default_value: Dir["./gradlew"].last, # Using Dir to be nil when the file doesn't exist (import for validation)
                                        verify_block: proc do |value|
                                          raise "Couldn't find gradlew at path '#{File.expand_path(value)}'".red unless File.exist?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :app_dir,
+                                       env_name: "FL_GRADLE_APP_DIR",
+                                       description: "Application directory name. Default 'app'",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: "app")
         ]
       end
 
