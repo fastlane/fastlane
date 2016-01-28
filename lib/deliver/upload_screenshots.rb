@@ -70,10 +70,10 @@ module Deliver
           next
         end
 
-        files = Dir.glob(File.join(lng_folder, "*.#{extensions}"))
+        files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD)
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}")).count > 0
+        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
 
         language = File.basename(lng_folder)
         files.each do |file_path|
