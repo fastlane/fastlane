@@ -1748,8 +1748,7 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ### twitter
 
-Post a tweet on twitter.
-requires you to setup an app on twitter.com and obtain consumer and access_token
+Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
 
 ```ruby
 twitter(

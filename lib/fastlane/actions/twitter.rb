@@ -23,7 +23,7 @@ module Fastlane
       end
 
       def self.details
-        "Lets you post on twitter"
+        
       end
 
       def self.available_options
