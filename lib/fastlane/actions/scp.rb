@@ -78,14 +78,6 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        type: Hash
-                                      ),
-          FastlaneCore::ConfigItem.new(key: :log,
-                                       short_option: "-l",
-                                       env_name: "FL_SSH_LOG",
-                                       description: "Log Commands",
-                                       optional: true,
-                                       default_value: true,
-                                       is_string: false
                                       )
 
         ]
