@@ -23,7 +23,6 @@ module Fastlane
       end
 
       def self.details
-        
       end
 
       def self.available_options

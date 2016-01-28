@@ -9,6 +9,7 @@ module Fastlane
         ENV["XCODE_INSTALL_USER"] = params[:username]
         ENV["XCODE_INSTALL_TEAM_ID"] = params[:team_id]
 
+        Actions.verify_gem!('xcode-install')
         require 'xcode/install'
         installer = XcodeInstall::Installer.new
 
