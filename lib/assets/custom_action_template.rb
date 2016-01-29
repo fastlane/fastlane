@@ -13,7 +13,7 @@ module Fastlane
     class [[NAME_CLASS]] < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
-        Helper.log.info "Parameter API Token: #{params[:api_token]}"
+        UI.message "Parameter API Token: #{params[:api_token]}"
 
         # sh "shellcommand ./path"
 

@@ -2069,6 +2069,7 @@ opt_out_usage
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
 
+
 ### ssh
 
 Lets you execute a series of commands on a remote host, if one of the commands in command-array returns non 0 - it fails.
@@ -2085,7 +2086,7 @@ ssh(
 
 ```
 
-if one of the commands fails an exception is raised
+If one of the commands fails an exception is raised
 
 
 ssh(
@@ -2103,8 +2104,7 @@ ssh(
 
 Allows SCP file transfer.
 
-
- **Upload file/folder:**
+**Upload file/folder:**
 
 ```ruby
 scp(

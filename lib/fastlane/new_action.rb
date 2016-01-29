@@ -28,7 +28,7 @@ module Fastlane
 
       path = File.join(actions_path, "#{name}.rb")
       File.write(path, template)
-      Helper.log.info "Created new action file '#{path}'. Edit it to implement your custom action.".green
+      UI.success "Created new action file '#{path}'. Edit it to implement your custom action."
     end
 
     def self.name_valid?(name)

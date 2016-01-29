@@ -6,7 +6,10 @@ unless ENV["DEBUG"]
 end
 
 require 'fastlane'
+require 'fastlane_core'
 require 'webmock/rspec'
+
+UI = FastlaneCore::UI
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper

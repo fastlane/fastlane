@@ -26,7 +26,7 @@ describe Fastlane do
               name: ''
             )
             end").runner.execute(:test)
-        end.to raise_error(RuntimeError)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
     end
   end

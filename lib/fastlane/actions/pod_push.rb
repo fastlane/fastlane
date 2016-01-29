@@ -17,6 +17,7 @@ module Fastlane
           sources = params[:sources].join(",")
           command << " --sources='#{sources}'"
         end
+
         if params[:allow_warnings]
           command << " --allow-warnings"
         end

@@ -11,6 +11,7 @@ HighLine.track_eof = false
 
 class FastlaneApplication
   include Commander::Methods
+  UI = FastlaneCore::UI
 
   def run
     program :version, Fastlane::VERSION
@@ -76,11 +77,11 @@ class FastlaneApplication
       c.description = 'Lists all available lanes without description'
       c.action do |args, options|
         ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
-        puts "\nAvailable lanes:".green
+        UI.message "Available lanes:"
         ff.runner.available_lanes.each do |lane|
-          puts "- #{lane}"
+          UI.message "- #{lane}"
         end
-        puts "\nExecute using `fastlane [lane_name]`".yellow
+        UI.important "Execute using `fastlane [lane_name]`"
       end
     end
 
@@ -103,7 +104,7 @@ class FastlaneApplication
       c.action do |args, options|
         require 'fastlane/one_off'
         result = Fastlane::OneOff.execute(args: args)
-        puts "Result: #{result}".green if result
+        UI.success "Result: #{result}" if result
       end
     end
 
@@ -153,8 +154,6 @@ end
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
   FastlaneApplication.new.run
-rescue => ex
-  FastlaneCore::CrashReporting.handle_crash(ex)
 ensure
   FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
 end

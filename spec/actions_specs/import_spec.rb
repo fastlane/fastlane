@@ -22,7 +22,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             import
           end").runner.execute(:test)
-        end.to raise_error("Please pass a path to the `import` action".red)
+        end.to raise_error("Please pass a path to the `import` action")
       end
 
       it "raises an exception when the given path is invalid (absolute)" do
@@ -31,7 +31,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             import('#{path}')
           end").runner.execute(:test)
-        end.to raise_error("Could not find Fastfile at path '#{path}'".red)
+        end.to raise_error("Could not find Fastfile at path '#{path}'")
       end
 
       it "raises an exception when the given path is invalid (relative)" do

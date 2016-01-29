@@ -143,9 +143,9 @@ module Fastlane
                                    })
         json_res = JSON.parse(response)
         if json_res['errors']
-          Helper.log.info "App: #{json_res['errors']}".red
+          UI.error "App: #{json_res['errors']}"
         else
-          Helper.log.info "Binary processing: Check your app': #{json_res['link']}".green
+          UI.success "Binary processing: Check your app': #{json_res['link']}"
         end
       end
 
@@ -172,7 +172,7 @@ module Fastlane
 
       def self.error_detected(errors)
         if errors
-          Helper.log.info("ERROR: #{errors}".red)
+          UI.error("ERROR: #{errors}")
           true
         else
           false
@@ -180,7 +180,7 @@ module Fastlane
       end
 
       def self.warning_detected(warning)
-        Helper.log.info("WARNING: #{warning}".yellow)
+        UI.important("WARNING: #{warning}")
         nil
       end
 
