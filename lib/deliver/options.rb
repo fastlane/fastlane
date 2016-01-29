@@ -60,7 +60,7 @@ module Deliver
                                      short_option: '-w',
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :skip_upload,
+        FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
                                      description: "Skip uploading an ipa or pkg to iTunes Connect",
                                      is_string: false,
                                      default_value: false),

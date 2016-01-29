@@ -21,7 +21,7 @@ module Deliver
       upload_metadata
 
       has_binary = options[:ipa] || options[:pkg]
-      if !options[:skip_upload] && has_binary
+      if !options[:skip_binary_upload] && has_binary
         upload_binary
       end
 
