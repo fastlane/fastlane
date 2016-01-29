@@ -60,6 +60,7 @@ module Snapshot
                                      default_value: output_directory),
         FastlaneCore::ConfigItem.new(key: :ios_version,
                                      description: "By default, the latest version should be used automatically. If you want to change it, do it here",
+                                     short_option: "-i",
                                      default_value: Snapshot::LatestIosVersion.version),
         FastlaneCore::ConfigItem.new(key: :stop_after_first_error,
                                      env_name: 'SNAPSHOT_BREAK_ON_FIRST_ERROR',
