@@ -21,6 +21,8 @@ class ProduceApplication
     program :help, 'GitHub', 'https://github.com/fastlane/produce'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
 
     command :create do |c|
