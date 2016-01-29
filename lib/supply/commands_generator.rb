@@ -27,6 +27,8 @@ module Supply
 
       always_trace!
 
+      global_option('--verbose') { $verbose = true }
+
       command :run do |c|
         c.syntax = 'supply'
         c.description = 'Run a deploy process'
