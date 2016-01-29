@@ -38,15 +38,16 @@ module FastlaneCore
       verify_input_types
       verify_value_exists
       verify_no_duplicates
+      verify_conflicts
       verify_default_value_matches_verify_block
     end
 
     def verify_input_types
-      raise "available_options parameter must be an array of ConfigItems but is #{@available_options.class}".red unless @available_options.kind_of? Array
+      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of? Array
       @available_options.each do |item|
-        raise "available_options parameter must be an array of ConfigItems. Found #{item.class}.".red unless item.kind_of? ConfigItem
+        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
       end
-      raise "values parameter must be a hash".red unless @values.kind_of? Hash
+      UI.user_error!("values parameter must be a hash") unless @values.kind_of? Hash
     end
 
     def verify_value_exists
@@ -58,7 +59,7 @@ module FastlaneCore
         if option
           option.verify!(value) # Call the verify block for it too
         else
-          raise "Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}".red
+          UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
         end
       end
     end
@@ -67,11 +68,41 @@ module FastlaneCore
       # Make sure a key was not used multiple times
       @available_options.each do |current|
         count = @available_options.count { |option| option.key == current.key }
-        raise "Multiple entries for configuration key '#{current.key}' found!".red if count > 1
+        UI.user_error!("Multiple entries for configuration key '#{current.key}' found!") if count > 1
 
         unless current.short_option.to_s.empty?
           count = @available_options.count { |option| option.short_option == current.short_option }
-          raise "Multiple entries for short_option '#{current.short_option}' found!".red if count > 1
+          UI.user_error!("Multiple entries for short_option '#{current.short_option}' found!") if count > 1
+        end
+      end
+    end
+
+    def verify_conflicts
+      option_keys = @values.keys
+
+      option_keys.each do |current|
+        index = @available_options.find_index { |item| item.key == current }
+        current = @available_options[index]
+
+        next if current.conflicting_options.nil?
+
+        conflicts = current.conflicting_options & option_keys
+        next if conflicts.nil?
+
+        conflicts.each do |conflicting_option_key|
+          index = @available_options.find_index { |item| item.key == conflicting_option_key }
+          conflicting_option = @available_options[index]
+
+          if current.conflict_block
+            begin
+              current.conflict_block.call(conflicting_option)
+            rescue => ex
+              Helper.log.fatal "Error resolving conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
+              raise ex
+            end
+          else
+            UI.user_error!("Unresolved conflict between options: '#{current.key}' and '#{conflicting_option.key}'")
+          end
         end
       end
     end
@@ -87,7 +118,7 @@ module FastlaneCore
           end
         rescue => ex
           Helper.log.fatal ex
-          raise "Invalid default value for #{item.key}, doesn't match verify_block".red
+          UI.user_error!("Invalid default value for #{item.key}, doesn't match verify_block")
         end
       end
     end
@@ -112,7 +143,9 @@ module FastlaneCore
       return if paths.count == 0
 
       path = paths.first
-      ConfigurationFile.new(self, path, block_for_missing)
+      configuration_file = ConfigurationFile.new(self, path, block_for_missing)
+      verify_conflicts # important, since user can set conflicting options in configuration file
+      configuration_file
     end
 
     #####################################################
@@ -122,10 +155,10 @@ module FastlaneCore
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
     def fetch(key, ask: true)
-      raise "Key '#{key}' must be a symbol. Example :app_id.".red unless key.kind_of?(Symbol)
+      UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
       option = option_for_key(key)
-      raise "Could not find option for key :#{key}. Available keys: #{@available_options.collect(&:key).join(', ')}".red unless option
+      UI.user_error!("Could not find option for key :#{key}. Available keys: #{@available_options.collect(&:key).join(', ')}") unless option
 
       value = @values[key]
 
@@ -148,7 +181,7 @@ module FastlaneCore
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
         # If this didn't raise an exception, just raise a default one
-        raise "No value found for '#{key}'"
+        UI.user_error!("No value found for '#{key}'")
       end
 
       while ask && value.nil?
@@ -169,11 +202,11 @@ module FastlaneCore
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      raise "Key '#{key}' must be a symbol. Example :#{key}.".red unless key.kind_of? Symbol
+      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of? Symbol
       option = option_for_key(key)
 
       unless option
-        raise "Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}".red
+        UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
       end
 
       option.verify!(value)

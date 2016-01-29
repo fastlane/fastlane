@@ -4,25 +4,25 @@ describe FastlaneCore do
       it "raises an error if no hash is given" do
         expect do
           FastlaneCore::Configuration.create([], "string")
-        end.to raise_error "values parameter must be a hash".red
+        end.to raise_error "values parameter must be a hash"
       end
 
       it "raises an error if no array is given" do
         expect do
           FastlaneCore::Configuration.create("string", {})
-        end.to raise_error "available_options parameter must be an array of ConfigItems but is String".red
+        end.to raise_error "available_options parameter must be an array of ConfigItems but is String"
       end
 
       it "raises an error if array contains invalid elements" do
         expect do
           FastlaneCore::Configuration.create(["string"], {})
-        end.to raise_error "available_options parameter must be an array of ConfigItems. Found String.".red
+        end.to raise_error "available_options parameter must be an array of ConfigItems. Found String."
       end
 
       it "raises an error if the option of a given value is not available" do
         expect do
           FastlaneCore::Configuration.create([], { cert_name: "value" })
-        end.to raise_error "Could not find option 'cert_name' in the list of available options: ".red
+        end.to raise_error "Could not find option 'cert_name' in the list of available options: "
       end
 
       it "raises an error if a description ends with a ." do
@@ -42,7 +42,7 @@ describe FastlaneCore do
                                               FastlaneCore::ConfigItem.new(
                                                 key: :cert_name,
                                            env_name: "asdf")], {})
-        end.to raise_error "Multiple entries for configuration key 'cert_name' found!".red
+        end.to raise_error "Multiple entries for configuration key 'cert_name' found!"
       end
 
       it "raises an error if a a short_option was used twice" do
@@ -54,9 +54,106 @@ describe FastlaneCore do
                                        short_option: "-f",
                                        description: "bar")
         ]
+
         expect do
           FastlaneCore::Configuration.create(conflicting_options, {})
-        end.to raise_error "Multiple entries for short_option '-f' found!".red
+        end.to raise_error "Multiple entries for short_option '-f' found!"
+      end
+
+      it "raises an error for unresolved conflict between options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof]),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o")
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+      end
+
+      it "calls custom conflict handler when conflict happens between two options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-f'"
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o",
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-o'"
+                                       end)
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "You can't use option '-b' along with '-f'"
+      end
+
+      it "raises an error for unresolved conflict between options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof]),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o")
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+      end
+
+      it "calls custom conflict handler when conflict happens between two options" do
+        conflicting_options = [
+          FastlaneCore::ConfigItem.new(key: :foo,
+                                       short_option: "-f",
+                                       conflicting_options: [:bar, :oof],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :bar,
+                                       short_option: "-b"),
+          FastlaneCore::ConfigItem.new(key: :oof,
+                                       short_option: "-o",
+                                       conflict_block: proc do |value|
+                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
+                                       end)
+        ]
+
+        values = {
+            foo: "",
+            bar: ""
+        }
+
+        expect do
+          FastlaneCore::Configuration.create(conflicting_options, values)
+        end.to raise_error "You can't use option '-b' along with '-f'".red
       end
 
       it "sets the data type correctly if `is_string` is not set but type is specified" do
@@ -165,7 +262,7 @@ describe FastlaneCore do
                               end)
         expect do
           @config = FastlaneCore::Configuration.create([c], {})
-        end.to raise_error "Invalid default value for output, doesn't match verify_block".red
+        end.to raise_error "Invalid default value for output, doesn't match verify_block"
       end
 
       it "supports options without 'env_name'" do
@@ -243,7 +340,7 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: proc do |value|
-                                  raise "Could not find output directory '#{value}'".red unless File.exist?(value)
+                                  raise "Could not find output directory '#{value}'" unless File.exist?(value)
                                 end)
           ]
           @values = {
@@ -278,13 +375,13 @@ describe FastlaneCore do
           it "raises an error if a non symbol was given" do
             expect do
               @config.fetch(123)
-            end.to raise_error "Key '123' must be a symbol. Example :app_id.".red
+            end.to raise_error "Key '123' must be a symbol. Example :app_id."
           end
 
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output".red
+            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output"
           end
 
           it "returns the value for the given key if given" do
@@ -305,13 +402,13 @@ describe FastlaneCore do
           it "throws an error if the key doesn't exist" do
             expect do
               @config.set(:non_existing, "value")
-            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output".red)
+            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output")
           end
 
           it "throws an error if it's invalid" do
             expect do
               @config.set(:output, 132)
-            end.to raise_error("'output' value must be a String! Found Fixnum instead.".red)
+            end.to raise_error("'output' value must be a String! Found Fixnum instead.")
           end
 
           it "allows valid updates" do

@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional
+    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -14,7 +14,9 @@ module FastlaneCore
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param type (Class) the data type of this config item. Takes precedence over `is_string`
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: false)
+    # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
+    # @param conflict_block an optional block which is called when options conflict happens
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: false, conflicting_options: nil, conflict_block: nil)
       raise "key must be a symbol" unless key.kind_of? Symbol
       raise "env_name must be a String" unless (env_name || '').kind_of? String
 
@@ -29,6 +31,12 @@ module FastlaneCore
         raise "Type '#{type}' for key '#{key}' requires a short option"
       end
 
+      if conflicting_options
+        conflicting_options.each do |conflicting_option_key|
+          raise "Conflicting option key must be a symbol" unless conflicting_option_key.kind_of? Symbol
+        end
+      end
+
       @key = key
       @env_name = env_name
       @description = description
@@ -38,11 +46,13 @@ module FastlaneCore
       @is_string = is_string
       @data_type = type
       @optional = optional
+      @conflicting_options = conflicting_options
+      @conflict_block = conflict_block
     end
 
     # This will raise an exception if the value is not valid
     def verify!(value)
-      raise "Invalid value '#{value}' for option '#{self}'".red unless valid? value
+      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid? value
       true
     end
 
@@ -53,15 +63,15 @@ module FastlaneCore
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
         if data_type && !value.kind_of?(data_type)
-          raise "'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.".red
+          UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
         end
 
         if @verify_block
           begin
             @verify_block.call(value)
           rescue => ex
-            Helper.log.fatal "Error setting value '#{value}' for option '#{@key}'".red
-            raise ex
+            UI.error "Error setting value '#{value}' for option '#{@key}'"
+            raise Interface::FastlaneError.new, ex.to_s
           end
         end
       end
@@ -72,7 +82,6 @@ module FastlaneCore
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
       # Weird because of https://stackoverflow.com/questions/9537895/using-a-class-object-in-case-statement
-
       case
       when data_type == Array
         return value.split(',') if value.kind_of?(String)

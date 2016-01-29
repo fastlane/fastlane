@@ -27,7 +27,6 @@ module FastlaneCore
         puts "😨  An error occured. Please enable crash reports using `fastlane enable_crash_reporting`.".yellow
         puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
         puts "🔒  The reports will be stored securely on getsentry.com.".yellow
-        puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong.".yellow
         puts "🙊  More information about privacy: https://github.com/fastlane/fastlane/releases/tag/1.33.3".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
       end
@@ -40,7 +39,6 @@ module FastlaneCore
         puts "😃  Enable crash reporting when fastlane experiences a problem?".yellow
         puts "👍  This makes resolving issues much easier and helps improve fastlane.".yellow
         puts "🔒  The reports will be stored securely on getsentry.com".yellow
-        puts "✨  Once crash reporting is enabled, you get a clean output when something goes wrong".yellow
         puts "🙊  More information about privacy: https://github.com/fastlane/fastlane/releases/tag/1.33.3".yellow
         puts "🌴  You can always disable crash reports at anytime `fastlane disable_crash_reporting`".yellow
         puts "-------------------------------------------------------------------------------------------".yellow
@@ -52,13 +50,10 @@ module FastlaneCore
       def handle_crash(ex)
         unless enabled?
           show_message
-          raise ex
         end
 
         raise ex if Helper.test?
-
         send_crash(ex)
-        Kernel.abort # => return status 1, we could pass a message here too, but this would end up with duplicates
       end
 
       def send_crash(ex)

@@ -24,5 +24,8 @@ require 'fastlane_core/ui/ui'
 require 'colored'
 require 'commander'
 
+# after commander import
+require 'fastlane_core/ui/fastlane_runner' # monkey patch
+
 module FastlaneCore
 end
