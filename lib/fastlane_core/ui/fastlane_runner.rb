@@ -43,7 +43,7 @@ module Commander
           abort error_message # without stack trace
         end
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        FastlaneCore::CrashReporting.handle_crash(ex)
+        FastlaneCore::CrashReporting.handle_crash(e)
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
         raise e, "[!] #{e.message}".red, e.backtrace

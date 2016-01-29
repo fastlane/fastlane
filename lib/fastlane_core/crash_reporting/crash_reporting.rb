@@ -50,6 +50,7 @@ module FastlaneCore
       def handle_crash(ex)
         unless enabled?
           show_message
+          return
         end
 
         raise ex if Helper.test?
@@ -76,8 +77,8 @@ module FastlaneCore
         puts "Successfully submitted a crash report. If this is a problem with one of the tools specifically,".yellow
         puts "please submit an issue on GitHub and attach the following number to it: '#{crash.id}'".yellow
         puts "The crash report has been stored locally '#{path}'".yellow
-      rescue => ex
-        Helper.log.debug ex # We don't want crash reporting to cause crash
+      rescue => e
+        Helper.log.debug e # We don't want crash reporting to cause crash
       end
     end
   end
