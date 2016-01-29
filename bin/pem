@@ -20,6 +20,8 @@ class PemApplication
     program :help, 'GitHub', 'https://github.com/fastlane/PEM'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
 
     command :renew do |c|
