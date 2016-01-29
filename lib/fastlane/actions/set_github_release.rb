@@ -96,7 +96,7 @@ module Fastlane
           Dir.mktmpdir do |dir|
             tmpzip = File.join(dir, File.basename(absolute_path) + '.zip')
             name = File.basename(tmpzip)
-            sh "cd \"#{File.dirname(absolute_path)}\"; zip -r \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null"
+            sh "cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null"
             response = self.upload_file(tmpzip, upload_url_template, api_token)
           end
         else
