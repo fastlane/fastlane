@@ -37,7 +37,7 @@ module Fastlane
       output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane)"
 
       File.write(output_path, output.join("\n"))
-      Helper.log.info "Successfully generated documentation to path '#{File.expand_path(output_path)}'".green if $verbose
+      UI.success "Successfully generated documentation to path '#{File.expand_path(output_path)}'" if $verbose
     end
 
     #####################################################

@@ -1756,6 +1756,20 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ## Misc
 
+### twitter
+
+Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
+
+```ruby
+twitter(
+  access_token: "XXXX",
+  access_token_secret: "xxx",
+  consumer_key: "xxx",
+  consumer_secret: "xxx",
+  message: "You rock!"
+)
+```
+
 ### erb
 
 Parses a given ERB template file (passes `placeholders` as a binding), and saves the rendered output to destination. If no destination is given, it returns the rendered output as a string.
@@ -2065,6 +2079,7 @@ opt_out_usage
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
 
+
 ### ssh
 
 Lets you execute a series of commands on a remote host, if one of the commands in command-array returns non 0 - it fails.
@@ -2081,7 +2096,7 @@ ssh(
 
 ```
 
-if one of the commands fails an exception is raised
+If one of the commands fails an exception is raised
 
 
 ssh(
@@ -2099,8 +2114,7 @@ ssh(
 
 Allows SCP file transfer.
 
-
- **Upload file/folder:**
+**Upload file/folder:**
 
 ```ruby
 scp(

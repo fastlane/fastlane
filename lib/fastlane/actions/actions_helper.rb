@@ -31,7 +31,7 @@ module Fastlane
       exc = nil
 
       begin
-        Helper.log_alert("Step: " + step_name) if step_name
+        UI.header("Step: " + step_name) if step_name
         yield
       rescue => ex
         exc = ex
@@ -87,17 +87,17 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            Helper.log.info "Successfully loaded custom action '#{file}'.".green
+            UI.success "Successfully loaded custom action '#{file}'."
           else
-            Helper.log.error "Could not find method 'run' in class #{class_name}.".red
-            Helper.log.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
-            raise "Plugin '#{file_name}' is damaged!"
+            UI.error "Could not find method 'run' in class #{class_name}."
+            UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
+            UI.user_error!("Action '#{file_name}' is damaged!")
           end
         rescue NameError
           # Action not found
-          Helper.log.error "Could not find '#{class_name}' class defined.".red
-          Helper.log.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
-          raise "Plugin '#{file_name}' is damaged!"
+          UI.error "Could not find '#{class_name}' class defined."
+          UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
+          UI.user_error!("Action '#{file_name}' is damaged!")
         end
       end
     end
