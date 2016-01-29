@@ -18,6 +18,7 @@ module Supply
           upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
           upload_images(language) unless Supply.config[:skip_upload_images]
           upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
+          upload_changelogs(language) unless Supply.config[:skip_upload_metadata]
         end
       end
 
@@ -26,6 +27,21 @@ module Supply
       Helper.log.info "Uploading all changes to Google Play..."
       client.commit_current_edit!
       Helper.log.info "Successfully finished the upload to Google Play".green
+    end
+
+    def upload_changelogs(language)
+      client.apks_version_codes.each do |apk_version_code|
+        upload_changelog(language, apk_version_code)
+      end
+    end
+
+    def upload_changelog(language, apk_version_code)
+      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
+      if File.exist?(path)
+        Helper.log.info "Updating changelog for code version '#{apk_version_code}' and language '#{language}'..."
+        apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
+        client.update_apk_listing_for_language(apk_listing)
+      end
     end
 
     def upload_metadata(language, listing)
@@ -83,13 +99,7 @@ module Supply
         if metadata_path
           Dir.foreach(metadata_path) do |language|
             next if language.start_with?('.') # e.g. . or .. or hidden folders
-
-            path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
-            if File.exist?(path)
-              Helper.log.info "Updating changelog for code version '#{apk_version_code}' and language '#{language}'..."
-              apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
-              client.update_apk_listing_for_language(apk_listing)
-            end
+            upload_changelog(language, apk_version_code)
           end
         end
 
