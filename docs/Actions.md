@@ -851,6 +851,17 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
 
+### make_changelog_from_jenkins
+
+Generate a changelog using the Changes section the running Jenkins job.
+
+```ruby
+make_changelog_from_jenkins(
+  # Optional, lets you set a changelog in the case is not generated on Jenkins or if ran outside of Jenkins
+  fallback_changelog: "Bug fixes and performance enhancements"
+)
+```
+
 ### [GitHub Releases](https://github.com)
 
 This action creates a new release for your repository on GitHub and can also upload specified assets like `.ipa`s and `.app`s, binary files, changelogs etc.
