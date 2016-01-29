@@ -20,6 +20,8 @@ class WatchBuildApplication
     program :help, 'GitHub', 'https://github.com/fastlane/watchbuild'
     program :help_formatter, :compact
 
+    global_option('--verbose') { $verbose = true }
+
     FastlaneCore::CommanderGenerator.new.generate(WatchBuild::Options.available_options)
 
     command :run do |c|
