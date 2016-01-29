@@ -107,36 +107,6 @@ module FastlaneCore
       end
     end
 
-    def verify_conflicts
-      option_keys = @values.keys
-
-      option_keys.each do |current|
-        index = @available_options.find_index { |item| item.key == current }
-        current = @available_options[index]
-
-        next if current.conflicting_options.nil?
-
-        conflicts = current.conflicting_options & option_keys
-        next if conflicts.nil?
-
-        conflicts.each do |conflicting_option_key|
-          index = @available_options.find_index { |item| item.key == conflicting_option_key }
-          conflicting_option = @available_options[index]
-
-          if current.conflict_block
-            begin
-              current.conflict_block.call(conflicting_option)
-            rescue => ex
-              Helper.log.fatal "Error resolving conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
-              raise ex
-            end
-          else
-            raise "Unresolved conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
-          end
-        end
-      end
-    end
-
     # Verifies the default value is also valid
     def verify_default_value_matches_verify_block
       @available_options.each do |item|
