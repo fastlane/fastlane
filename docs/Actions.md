@@ -743,6 +743,19 @@ increment_build_number({
 })
 ```
 
+### Local Device
+
+### `install_on_device`
+
+Installs the ipa on the device, if no id is given, the first found iOS device will be used, works via USB or Wi-Fi.
+this requires `ios-deploy` to be installed please have a look at [ios-deploy](https://github.com/phonegap/ios-deploy). to quickly install it, use `npm -g i ios-deploy`
+
+```ruby
+install_on_device(
+  device_id: "a3be6c9ff7e5c3c6028597513243b0f933b876d4"
+  ipa: "./app.ipa"
+)
+```
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
