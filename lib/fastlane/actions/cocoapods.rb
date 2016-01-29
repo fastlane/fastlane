@@ -15,7 +15,11 @@ module Fastlane
         end
 
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
-        cmd << ['pod install']
+        cmd << ['pod']
+
+        cmd << '_' + params[:version] + '_' if params[:version]
+
+        cmd << ['install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
@@ -75,6 +79,14 @@ module Fastlane
                                        is_string: true,
                                        verify_block: proc do |value|
                                          raise "Could not find Podfile".red unless File.exist?(value) || Helper.test?
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       env_name: "FL_COCOAPODS_VERSION",
+                                       description: "Explicitly specify the Cocoapods version to run (must be installed)",
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         raise "Invalid cocoapods version".red unless value.split(".").count == 3
                                        end)
         ]
       end
