@@ -174,7 +174,7 @@ describe FastlaneCore do
 
         expect do
           FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'".red
+        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
       end
 
       it "calls custom conflict handler when conflict happens between two options" do
