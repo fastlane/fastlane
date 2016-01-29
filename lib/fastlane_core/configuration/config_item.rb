@@ -52,7 +52,7 @@ module FastlaneCore
 
     # This will raise an exception if the value is not valid
     def verify!(value)
-      raise "Invalid value '#{value}' for option '#{self}'".red unless valid? value
+      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid? value
       true
     end
 
@@ -63,15 +63,15 @@ module FastlaneCore
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
         if data_type && !value.kind_of?(data_type)
-          raise "'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.".red
+          UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
         end
 
         if @verify_block
           begin
             @verify_block.call(value)
           rescue => ex
-            Helper.log.fatal "Error setting value '#{value}' for option '#{@key}'".red
-            raise ex
+            UI.error "Error setting value '#{value}' for option '#{@key}'"
+            raise Interface::FastlaneError.new, ex.to_s
           end
         end
       end
@@ -82,7 +82,6 @@ module FastlaneCore
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
       # Weird because of https://stackoverflow.com/questions/9537895/using-a-class-object-in-case-statement
-
       case
       when data_type == Array
         return value.split(',') if value.kind_of?(String)

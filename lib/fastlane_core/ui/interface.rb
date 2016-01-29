@@ -104,23 +104,32 @@ module FastlaneCore
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
+    # raised from crash!
+    class FastlaneCrash < StandardError
+    end
+
+    # raised from user_error!
+    class FastlaneError < StandardError
+    end
+
     # Pass an exception to this method to exit the program
     #   using the given exception
     # Use this method instead of user_error! if this error is
     # unexpected, e.g. an invalid server response that shouldn't happen
-    def crash!(_exception)
-      not_implemented(__method__)
+    def crash!(exception)
+      raise FastlaneCrash.new, exception.to_s
     end
 
     # Use this method to exit the program because of an user error
     #   e.g. app doesn't exist on the given Developer Account
     #        or invalid user credentials
+    #        or scan tests fail
     # This will show the error message, but doesn't show the full
     #   stack trace
     # Basically this should be used when you actively catch the error
     # and want to show a nice error message to the user
-    def user_error!(_error_message)
-      not_implemented(__method__)
+    def user_error!(error_message)
+      raise FastlaneError.new, error_message.to_s
     end
 
     #####################################################

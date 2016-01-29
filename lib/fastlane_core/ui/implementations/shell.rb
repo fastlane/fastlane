@@ -102,36 +102,6 @@ module FastlaneCore
       ask(message.yellow) { |q| q.echo = "*" }
     end
 
-    #####################################################
-    # @!group Errors: Different kinds of exceptions
-    #####################################################
-
-    def crash!(exception)
-      if exception.kind_of?(String)
-        raise exception.red
-      elsif exception.kind_of?(Exception)
-        # From https://stackoverflow.com/a/4789702/445598
-        # We do this to make the actual error message red and therefore more visible
-        begin
-          raise exception
-        rescue => ex
-          raise $!, "[!] #{ex.message}".red, $!.backtrace
-        end
-      else
-        raise exception # we're just raising whatever we have here #yolo
-      end
-    end
-
-    def user_error!(error_message)
-      error_message = "\n[!] #{error_message}".red
-      if $verbose
-        # On verbose we want to see the full stack trace
-        raise error_message
-      else
-        abort(error_message)
-      end
-    end
-
     private
 
     def verify_interactive!(message)
