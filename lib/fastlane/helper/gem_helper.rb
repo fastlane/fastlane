@@ -5,6 +5,8 @@ module Fastlane
     def self.verify_gem!(gem_name)
       begin
         Gem::Specification.find_by_name(gem_name)
+        # We don't import this by default, as it's not always the same
+        # also e.g. cocoapods is just required and not imported
       rescue Gem::LoadError
         print_gem_error "Could not find gem '#{gem_name}'"
         print_gem_error ""

@@ -7,7 +7,7 @@ module Fastlane
 
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
 
-        Helper.log.info "Adding git tag '#{tag}' 🎯."
+        UI.message "Adding git tag '#{tag}' 🎯."
         Actions.sh("git tag -am '#{tag} (fastlane)' '#{tag}'")
       end
 

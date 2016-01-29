@@ -20,12 +20,12 @@ module Fastlane
     def did_finish
       return if ENV["FASTLANE_OPT_OUT_USAGE"]
       if !did_show_message? and !Helper.is_ci?
-        Helper.log.debug("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
-        Helper.log.debug("No personal/sensitive data is sent. Only sharing the following:")
-        Helper.log.debug(launches)
-        Helper.log.debug(@error) if @error
-        Helper.log.debug("This information is used to fix failing actions and improve integrations that are often used.")
-        Helper.log.debug("You can disable this by adding `opt_out_usage` to your Fastfile")
+        UI.message("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
+        UI.message("No personal/sensitive data is sent. Only sharing the following:")
+        UI.message(launches)
+        UI.message(@error) if @error
+        UI.message("This information is used to fix failing actions and improve integrations that are often used.")
+        UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
       end
 
       require 'excon'

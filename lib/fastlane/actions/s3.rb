@@ -107,7 +107,12 @@ module Fastlane
         #####################################
 
         # Gets info used for the plist
-        bundle_id, bundle_version, title, full_version = get_ipa_info(ipa_file)
+        info = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa_file)
+
+        bundle_id = info['CFBundleIdentifier']
+        bundle_version = info['CFBundleShortVersionString']
+        title = info['CFBundleName']
+        full_version = "#{bundle_version}.#{info['CFBundleVersion']}"
 
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title.delete(' ')}.plist"
@@ -240,37 +245,15 @@ module Fastlane
       def self.expand_path_with_substitutions_from_ipa_plist(ipa, path)
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
+        info = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa) or return path
 
-        Dir.mktmpdir do |dir|
-          system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
-
-          plist = Dir["#{dir}/**/*.app/Info.plist"].last
-
-          substitutions.uniq.each do |substitution|
-            key = substitution[1...-1]
-            value = Shenzhen::PlistBuddy.print(plist, key)
-
-            path.gsub!(Regexp.new(substitution), value) if value
-          end
+        substitutions.uniq.each do |substitution|
+          key = substitution[1...-1]
+          value = info[key]
+          path.gsub!(Regexp.new(substitution), value) if value
         end
 
         return path
-      end
-
-      def self.get_ipa_info(ipa_file)
-        bundle_id, bundle_version, title, full_version = nil
-        Dir.mktmpdir do |dir|
-          system "unzip -q #{ipa_file} -d #{dir} 2> /dev/null"
-          plist = Dir["#{dir}/**/*.app/Info.plist"].last
-
-          bundle_id = Shenzhen::PlistBuddy.print(plist, 'CFBundleIdentifier')
-          bundle_version = Shenzhen::PlistBuddy.print(plist, 'CFBundleShortVersionString')
-          title = Shenzhen::PlistBuddy.print(plist, 'CFBundleName')
-
-          # This is the string: {CFBundleShortVersionString}.{CFBundleVersion}
-          full_version = bundle_version + '.' + Shenzhen::PlistBuddy.print(plist, 'CFBundleVersion')
-        end
-        return bundle_id, bundle_version, title, full_version
       end
 
       def self.description

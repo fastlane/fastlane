@@ -4,13 +4,13 @@ describe Fastlane do
       it "raises an error if file does not exist" do
         expect do
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/fastfileNotHere')
-        end.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'".red
+        end.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'"
       end
 
       it "raises an error if unknow method is called" do
         expect do
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
-        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/fastlane/fastlane"
       end
     end
 
@@ -20,17 +20,16 @@ describe Fastlane do
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block? 'mac').to eq(true)
+        expect(@ff.is_platform_block?('mac')).to eq(true)
       end
 
       it "return true if it's a platform" do
-        expect(@ff.is_platform_block? 'test').to eq(false)
+        expect(@ff.is_platform_block?('test')).to eq(false)
       end
 
       it "raises an exception if key doesn't exist at all" do
-        expect do
-          @ff.is_platform_block? "asdf"
-        end.to raise_error("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action".red)
+        expect(UI).to receive(:user_error!).with("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action")
+        @ff.is_platform_block? "asdf"
       end
     end
 
@@ -39,10 +38,9 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
       end
 
-      it "raises an error if block is missing" do
-        expect do
-          @ff.lane("my_name")
-        end.to raise_exception "You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.".red
+      it "raises an error if block is missing", nower: true do
+        expect(UI).to receive(:user_error!).with("You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.")
+        @ff.lane(:my_name)
       end
 
       it "takes the block and lane name" do
@@ -51,24 +49,21 @@ describe Fastlane do
       end
 
       it "raises an error if name contains spaces" do
-        expect do
-          @ff.lane :"my name" do
-          end
-        end.to raise_error "lane name must not contain any spaces".red
+        expect(UI).to receive(:user_error!).with("lane name must not contain any spaces")
+        @ff.lane :"my name" do
+        end
       end
 
       it "raises an error if the name is on a black list" do
-        expect do
-          @ff.lane :run do
-          end
-        end.to raise_error "Name 'run' is already taken"
+        expect(UI).to receive(:user_error!).with("Name 'run' is already taken")
+        @ff.lane :run do
+        end
       end
 
       it "raises an error if name is not a symbol" do
-        expect do
-          @ff.lane "string" do
-          end
-        end.to raise_error "lane name must start with :".red
+        expect(UI).to receive(:user_error!).with("lane name must start with :")
+        @ff.lane "string" do
+        end
       end
     end
 
@@ -158,6 +153,30 @@ describe Fastlane do
         expect(result.to_i).to be > 10
       end
 
+      it "Parameters are also passed to the before_all, after_all" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        time = Time.now.to_i.to_s
+
+        ff.runner.execute(:something, nil, {value: time })
+
+        expect(File.read("/tmp/before_all.txt")).to eq(time)
+        expect(File.read("/tmp/after_all.txt")).to eq(time)
+        File.delete("/tmp/before_all.txt")
+        File.delete("/tmp/after_all.txt")
+      end
+
+      it "Parameters are also passed to the error block" do
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        time = Time.now.to_i.to_s
+
+        expect do
+          ff.runner.execute(:crash, nil, {value: time })
+        end.to raise_error # since we cause a crash
+
+        expect(File.read("/tmp/error.txt")).to eq(time)
+        File.delete("/tmp/error.txt")
+      end
+
       describe "supports switching lanes" do
         it "use case 1: passing parameters to another lane and getting the result" do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
@@ -209,7 +228,7 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid, :ios)
-          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/fastlane/fastlane"
         end
 
         it "raises an exception when not passing a hash" do
@@ -250,26 +269,22 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
-        expect do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSytnaxError')
-        end.to raise_error("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'".red)
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile from string" do
-        expect do
-          ff = Fastlane::FastFile.new.parse("lane :test do
-            cases = [:abc,
-          end")
-        end.to raise_error("Syntax error in your Fastfile on line 3: (eval):3: syntax error, unexpected keyword_end, expecting ']'
-          end
-             ^".red)
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 3: (eval):3: syntax error, unexpected keyword_end, expecting ']'\n        end\n           ^")
+
+        ff = Fastlane::FastFile.new.parse("lane :test do
+          cases = [:abc,
+        end")
       end
 
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile')
-        expect do
-          ff.import('./FastfileSytnaxError')
-        end.to raise_error("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'".red)
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        ff.import('./FastfileSytnaxError')
       end
 
       it "raises an error if lane is not available" do
@@ -280,9 +295,8 @@ describe Fastlane do
       end
 
       it "raises an error if the lane name contains spaces" do
-        expect do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
-        end.to raise_error "lane name must not contain any spaces".red
+        expect(UI).to receive(:user_error!).with("lane name must not contain any spaces")
+        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
       end
 
       it "runs pod install" do

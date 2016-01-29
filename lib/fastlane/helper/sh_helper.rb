@@ -16,7 +16,7 @@ module Fastlane
       Encoding.default_internal = Encoding::UTF_8
 
       command = command.join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
-      Helper.log.info ['[SHELL COMMAND]', command.yellow].join(': ') if log
+      UI.command(command) if log
 
       result = ''
       if Helper.test?
@@ -26,7 +26,7 @@ module Fastlane
         IO.popen(command, err: [:child, :out]) do |io|
           io.sync = true
           io.each do |line|
-            Helper.log.info ['[SHELL]', line.strip].join(': ') if log
+            UI.command_output(line.strip) if log
             result << line
           end
           io.close
@@ -37,7 +37,7 @@ module Fastlane
           # this will also append the output to the exception
           message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
           message += "\n#{result}" if log
-          raise message.red
+          UI.crash!(message)
         end
       end
 

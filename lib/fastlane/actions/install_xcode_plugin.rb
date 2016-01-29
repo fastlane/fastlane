@@ -2,9 +2,13 @@ module Fastlane
   module Actions
     class InstallXcodePluginAction < Action
       def self.run(params)
+        require 'fileutils'
+
         zip_path = File.join(Dir.tmpdir, 'plugin.zip')
         sh "curl -Lso #{zip_path} #{params[:url]}"
-        Action.sh "unzip -qo '#{zip_path}' -d '#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins'"
+        plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
+        FileUtils.mkdir_p(plugins_path)
+        Action.sh "unzip -qo '#{zip_path}' -d '#{plugins_path}'"
 
         Helper.log.info("Plugin #{File.basename(params[:url], '.zip')} installed successfully".green)
         Helper.log.info("Please restart Xcode to use the newly installed plugin")

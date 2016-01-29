@@ -19,7 +19,7 @@ module Fastlane
       def self.details
         [
           "It is recommended to store the build configuration in the `.xctool-args` file.",
-          "More information available on GitHub: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#xctool"
+          "More information available on GitHub: https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#xctool"
         ].join(' ')
       end
 

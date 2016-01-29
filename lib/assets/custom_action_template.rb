@@ -5,7 +5,7 @@ module Fastlane
     end
 
     # To share this integration with the other fastlane users:
-    # - Fork https://github.com/KrauseFx/fastlane
+    # - Fork https://github.com/fastlane/fastlane
     # - Clone the forked repository
     # - Move this integration into lib/fastlane/actions
     # - Commit, push and submit the pull request
@@ -13,7 +13,7 @@ module Fastlane
     class [[NAME_CLASS]] < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
-        Helper.log.info "Parameter API Token: #{params[:api_token]}"
+        UI.message "Parameter API Token: #{params[:api_token]}"
 
         # sh "shellcommand ./path"
 
@@ -30,7 +30,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        # this is your change to provide a more detailed description of this action
+        # this is your chance to provide a more detailed description of this action
         "You can use this action to do cool things..."
       end
 

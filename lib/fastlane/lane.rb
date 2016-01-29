@@ -15,13 +15,13 @@ module Fastlane
     attr_accessor :is_private
 
     def initialize(platform: nil, name: nil, description: nil, block: nil, is_private: false)
-      raise "description must be an array" unless description.kind_of? Array
-      raise "lane name must not contain any spaces".red if name.to_s.include? " "
-      raise "lane name must start with :".red unless name.kind_of? Symbol
+      UI.user_error!("description must be an array") unless description.kind_of? Array
+      UI.user_error!("lane name must not contain any spaces") if name.to_s.include? " "
+      UI.user_error!("lane name must start with :") unless name.kind_of? Symbol
 
       if self.class.black_list.include?(name.to_s)
-        Helper.log.error "Lane Name '#{name}' can not be one of the followings: #{self.class.black_list}".red
-        raise "Name '#{name}' is already taken"
+        UI.error "Lane Name '#{name}' can not be one of the followings: #{self.class.black_list}".red
+        UI.user_error!("Name '#{name}' is already taken")
       end
 
       self.platform = platform

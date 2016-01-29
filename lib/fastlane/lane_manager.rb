@@ -45,11 +45,14 @@ module Fastlane
       begin
         ff.runner.execute(lane, platform, parameters)
       rescue => ex
-        Helper.log.info 'Variable Dump:'.yellow
-        Helper.log.info Actions.lane_context
-        Helper.log.fatal ex
+        UI.important 'Variable Dump:'.yellow
+        UI.message Actions.lane_context
+        UI.error ex.to_s
         e = ex
       end
+
+      # After running the lanes, since skip_docs might be somewhere in-between
+      Fastlane::DocsGenerator.run(ff) unless ENV["FASTLANE_SKIP_DOCS"]
 
       duration = ((Time.now - started) / 60.0).round
 
@@ -67,14 +70,12 @@ module Fastlane
       print_table(Fastlane::Actions.executed_actions)
 
       if error
-        Helper.log.fatal 'fastlane finished with errors'.red
+        UI.error 'fastlane finished with errors'
         raise error
+      elsif duration > 5
+        UI.success "fastlane.tools just saved you #{duration} minutes! 🎉"
       else
-        if duration > 5
-          Helper.log.info "fastlane.tools just saved you #{duration} minutes! 🎉".green
-        else
-          Helper.log.info 'fastlane.tools finished successfully 🎉'.green
-        end
+        UI.success 'fastlane.tools finished successfully 🎉'
       end
     end
 
@@ -103,17 +104,17 @@ module Fastlane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
       loop do
-        Helper.log.error "You must provide a lane to drive. Available lanes:"
+        UI.error "You must provide a lane to drive. Available lanes:"
         available = ff.runner.available_lanes(platform)
 
         available.each_with_index do |lane, index|
-          puts "#{index + 1}) #{lane}"
+          UI.message "#{index + 1}) #{lane}"
         end
 
         i = $stdin.gets.strip.to_i - 1
         if i >= 0 and available[i]
           selection = available[i]
-          Helper.log.info "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`".yellow
+          UI.important "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`"
           platform = selection.split(' ')[0]
           lane_name = selection.split(' ')[1]
 
@@ -125,7 +126,7 @@ module Fastlane
           return platform, lane_name # yeah
         end
 
-        Helper.log.error "Invalid input. Please enter the number of the lane you want to use".red
+        UI.error "Invalid input. Please enter the number of the lane you want to use"
       end
     end
 
@@ -143,7 +144,7 @@ module Fastlane
       # Loads .env file for the environment passed in through options
       if env
         env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.#{env}")
-        Helper.log.info "Loading from '#{env_file}'".green
+        UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
     end

@@ -18,7 +18,6 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/AbcSize
     def execute(lane, platform = nil, parameters = nil)
       raise "No lane given" unless lane
@@ -37,23 +36,25 @@ module Fastlane
       Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
 
-      Helper.log.info "Driving the lane '#{full_lane_name}' 🚀".green
+      UI.success "Driving the lane '#{full_lane_name}' 🚀"
 
       return_val = nil
 
       path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
           # Call the platform specific before_all block and then the general one
-          before_all_blocks[current_platform].call(current_lane) if before_all_blocks[current_platform] && current_platform
-          before_all_blocks[nil].call(current_lane) if before_all_blocks[nil]
 
-          return_val = lane_obj.call(parameters || {}) # by default no parameters
+          before_all_blocks[current_platform].call(current_lane, parameters) if before_all_blocks[current_platform] && current_platform
+          before_all_blocks[nil].call(current_lane, parameters) if before_all_blocks[nil]
+
+          return_val = lane_obj.call(parameters) # by default no parameters
 
           # `after_all` is only called if no exception was raised before
           # Call the platform specific before_all block and then the general one
-          after_all_blocks[current_platform].call(current_lane) if after_all_blocks[current_platform] && current_platform
-          after_all_blocks[nil].call(current_lane) if after_all_blocks[nil]
+          after_all_blocks[current_platform].call(current_lane, parameters) if after_all_blocks[current_platform] && current_platform
+          after_all_blocks[nil].call(current_lane, parameters) if after_all_blocks[nil]
         end
 
         return return_val
@@ -62,13 +63,13 @@ module Fastlane
           # Provide error block exception without colour code
           error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
 
-          error_blocks[current_platform].call(current_lane, error_ex) if error_blocks[current_platform] && current_platform
-          error_blocks[nil].call(current_lane, error_ex) if error_blocks[nil]
+          error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
+          error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
         end
+
         raise ex
       end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/AbcSize
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
@@ -101,7 +102,7 @@ module Fastlane
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
-        Helper.log.info "Cruising over to lane '#{pretty.join(' ')}' 🚖".green
+        UI.success "Cruising over to lane '#{pretty.join(' ')}' 🚖"
 
         # Actually switch lane now
         self.current_lane = new_lane
@@ -109,12 +110,12 @@ module Fastlane
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
-        Helper.log.info "Cruising back to lane '#{original_full}' 🚘".green
+        UI.success "Cruising back to lane '#{original_full}' 🚘".green
         return result
       else
         # No action and no lane, raising an exception now
-        Helper.log.error caller.join("\n")
-        raise "Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/KrauseFx/fastlane".red
+        UI.error caller.join("\n")
+        UI.user_error!("Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/fastlane/fastlane")
       end
     end
 

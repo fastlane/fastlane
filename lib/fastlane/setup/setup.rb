@@ -22,7 +22,6 @@ module Fastlane
       else
         raise "Couldn't find platform '#{platform}'"
       end
-      ask_for_crash_reporting
     end
 
     def is_ios?
@@ -38,10 +37,6 @@ module Fastlane
       Helper.log.info "https://github.com/fastlane/enhancer to detect integration issues"
       Helper.log.info "No sensitive/private information will be uploaded"
       Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
-    end
-
-    def ask_for_crash_reporting
-      FastlaneCore::CrashReporting.ask_during_setup
     end
   end
 end

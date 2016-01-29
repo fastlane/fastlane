@@ -4,20 +4,24 @@ module Fastlane
       def self.run(params)
         keychain_path = self.expand_keychain_path(params[:path])
         add_to_search_list = params[:add_to_search_list]
-
-        if keychain_path.empty?
-          raise "Could not find the keychain file: #{keychain_path}".red
-        end
+        set_default = params[:set_default]
+        commands = []
 
         # add to search list if not already added
-        if add_to_search_list
-          add_keychain_to_search_list(keychain_path)
+        if add_to_search_list == true || add_to_search_list == :add
+          commands << add_keychain_to_search_list(keychain_path)
+        elsif add_to_search_list == :replace
+          commands << replace_keychain_in_search_list(keychain_path)
+        end
+
+        # set default keychain
+        if set_default
+          commands << default_keychain(keychain_path)
         end
 
         escaped_path = keychain_path.shellescape
         escaped_password = params[:password].shellescape
 
-        commands = []
         # unlock given keychain and disable lock and timeout
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
         commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
@@ -31,10 +35,19 @@ module Fastlane
         unless keychains.include?(keychain_path)
           keychains << keychain_path
 
-          commands = []
-          commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
-          commands
+          Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
         end
+      end
+
+      def self.replace_keychain_in_search_list(keychain_path)
+        Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
+        escaped_path = keychain_path.shellescape
+        Fastlane::Actions.sh("security list-keychains -s #{escaped_path}", log: false)
+      end
+
+      def self.default_keychain(keychain_path)
+        escaped_path = keychain_path.shellescape
+        Fastlane::Actions.sh("security default-keychain -s #{escaped_path}", log: false)
       end
 
       def self.expand_keychain_path(keychain_path)
@@ -50,7 +63,7 @@ module Fastlane
           end
         end
 
-        return ""
+        raise "Could not find the keychain file in: #{possible_locations}".red
       end
 
       #####################################################
@@ -62,7 +75,8 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the give keychain file and adds it to the keychain search list"
+        "Unlocks the give keychain file and adds it to the keychain search list\n" \
+        "Keychains can be replaced with `add_to_search_list: :replace`"
       end
 
       def self.available_options
@@ -79,7 +93,12 @@ module Fastlane
                                        env_name: "FL_UNLOCK_KEYCHAIN_ADD_TO_SEARCH_LIST",
                                        description: "Add to keychain search list",
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :set_default,
+                                       env_name: "FL_UNLOCK_KEYCHAIN_SET_DEFAULT",
+                                       description: "Set as default keychain",
+                                       is_string: false,
+                                       default_value: false)
 
         ]
       end

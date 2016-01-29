@@ -114,7 +114,7 @@ module Fastlane
           puts ""
         end
 
-        puts "More information can be found on https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"
+        puts "More information can be found on https://github.com/fastlane/fastlane/blob/master/docs/Actions.md"
         puts "\n"
 
         return # our job is done here
@@ -146,7 +146,7 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            key_name = (current.optional ? "" : "* ") + current.key.to_s
+            key_name = (current.optional ? "  " : "* ") + current.key.to_s
             description = (current.description || '') + (current.default_value ? " (default: '#{current.default_value}')" : "")
 
             rows << [key_name.yellow, description, current.env_name]

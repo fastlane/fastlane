@@ -57,6 +57,7 @@ describe Fastlane do
         expect(values[:release_type]).to eq(0.to_s)
         expect(values[:tags]).to eq(nil)
         expect(values[:teams]).to eq(nil)
+        expect(values[:owner_id]).to eq(nil)
         expect(values[:mandatory]).to eq(0.to_s)
         expect(values[:notes_type]).to eq(1.to_s)
         expect(values[:upload_dsym_only]).to eq(false)
@@ -144,6 +145,18 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(values[:tags]).to eq('123,123')
+      end
+
+      it "can change owners" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            owner_id: '123'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:owner_id]).to eq('123')
       end
     end
   end

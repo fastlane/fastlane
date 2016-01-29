@@ -5,6 +5,6 @@ This is **not** the fastlane source code, but the deployment of `fastlane` itsel
 
 For more information:
 
-- [Project Page](https://github.com/KrauseFx/fastlane)
-- [Documentation](https://github.com/KrauseFx/fastlane/tree/master/docs)
-- [fastlane source](https://github.com/KrauseFx/fastlane/tree/master/lib)
+- [Project Page](https://github.com/fastlane/fastlane)
+- [Documentation](https://github.com/fastlane/fastlane/tree/master/docs)
+- [fastlane source](https://github.com/fastlane/fastlane/tree/master/lib)

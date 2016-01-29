@@ -32,10 +32,8 @@ module Fastlane
           Helper.log.info "Successfully created pull request ##{number}. You can see it at '#{html_url}'".green
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
-        else
-          if response[:status] != 200
-            Helper.log.error "GitHub responded with #{response[:status]}: #{response[:body]}".red
-          end
+        elsif response[:status] != 200
+          Helper.log.error "GitHub responded with #{response[:status]}: #{response[:body]}".red
         end
       end
 
