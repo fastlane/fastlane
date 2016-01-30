@@ -1119,8 +1119,9 @@ update_app_identifier(
 Modify your app icon and add a badge to it. For more info how to use it see repo.
 
 ```ruby
-badge(dark: true) #or
-badge(custom: "/Users/xxx/Desktop/badge.png") #or
+badge(dark: true) # or
+badge(alpha: true) # or
+badge(custom: "/Users/xxx/Desktop/badge.png") # or
 badge(shield: "Version-0.0.3-blue", no_badge: true)
 ```
 
