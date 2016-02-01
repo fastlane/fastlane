@@ -107,7 +107,7 @@ module Screengrab
     def clear_local_previous_screenshots
       if @config[:clear_previous_screenshots]
         UI.message "Clearing output directory of screenshots at #{@config[:output_directory]}"
-        files = Dir.glob(File.join('.', @config[:output_directory], '**', '*.png'))
+        files = Dir.glob(File.join('.', @config[:output_directory], '**', '*.png'), File::FNM_CASEFOLD)
         File.delete(*files)
       end
     end
