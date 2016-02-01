@@ -6,6 +6,7 @@ HighLine.track_eof = false
 module Deliver
   class CommandsGenerator
     include Commander::Methods
+    UI = FastlaneCore::UI
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
@@ -68,12 +69,14 @@ module Deliver
 
       command :generate_summary do |c|
         c.syntax = 'deliver generate_summary'
-        c.description = 'Generate HTML Summary'
+        c.description = 'Generate HTML Summary without uploading/downloading anything'
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options)
-          Deliver::GenerateSummary.new.run(options)
+          html_path = Deliver::GenerateSummary.new.run(options)
+          UI.success "Successfully generated HTML report at '#{html_path}'"
+          system("open '#{html_path}'") unless options[:force]
         end
       end
 
