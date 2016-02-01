@@ -11,7 +11,7 @@ module Fastlane
 
         Helper.log.info "Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'"
 
-        url = "https://api.github.com/repos/#{params[:repo]}/pulls"
+        url = "#{params[:api_url]}/repos/#{params[:repo]}/pulls"
         headers = { 'User-Agent' => 'fastlane-create_pull_request' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
 
@@ -78,6 +78,12 @@ module Fastlane
                                        description: "The name of the branch you want your changes pulled into (defaults to `master`)",
                                        is_string: true,
                                        default_value: 'master',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :api_url,
+                                       env_name: "GITHUB_PULL_REQUEST_API_URL",
+                                       description: "The URL of Github API - used when the Enterprise (default to `https://api.github.com`)",
+                                       is_string: true,
+                                       default_value: 'https://api.github.com',
                                        optional: true)
         ]
       end

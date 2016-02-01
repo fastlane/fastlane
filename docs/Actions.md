@@ -1516,9 +1516,10 @@ create_pull_request(
   api_token: ENV['GITHUB_TOKEN'],
   repo: 'fastlane/fastlane',
   title: 'Amazing new feature',
-  head: 'my-feature',           # optional, defaults to current branch name.
-  base: 'master',               # optional, defaults to 'master'.
-  body: 'Please pull this in!'  # optional
+  head: 'my-feature',                 # optional, defaults to current branch name.
+  base: 'master',                     # optional, defaults to 'master'.
+  body: 'Please pull this in!',       # optional
+  api_url: 'http://yourdomain/api/v3' # optional, for Github Enterprise, defaults to 'https://api.github.com'.
 )
 ```
 
