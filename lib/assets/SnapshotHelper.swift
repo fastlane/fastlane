@@ -20,7 +20,7 @@ func setupSnapshot(app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
+func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
@@ -61,7 +61,7 @@ class Snapshot: NSObject {
         }
     }
 
-    class func snapshot(name: String, waitForLoadingIndicator: Bool = false) {
+    class func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
