@@ -66,6 +66,17 @@ module Deliver
         end
       end
 
+      command :generate_summary do |c|
+        c.syntax = 'deliver generate_summary'
+        c.description = 'Generate HTML Summary'
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          Deliver::Runner.new(options)
+          Deliver::GenerateSummary.new.run(options)
+        end
+      end
+
       command :download_screenshots do |c|
         c.syntax = 'deliver download_screenshots'
         c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
