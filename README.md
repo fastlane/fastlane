@@ -350,8 +350,6 @@ ALL_LANGUAGES = ["da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
-If you enable a clean status bar, you have to remove the `waitForLoadingIndicatorToDisappear` from the `SnapshotHelper.swift` code, as it doesn't detect when the loading indicator disappears. 
-
 ## Editing the `Snapfile`
 Change syntax highlighting to *Ruby*.
 
