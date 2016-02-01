@@ -25,12 +25,13 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec', '~> 3.1.0'
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
+  spec.add_development_dependency 'activesupport'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'rubocop', '~> 0.35.1'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
 end

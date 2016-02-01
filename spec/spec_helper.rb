@@ -1,8 +1,10 @@
-require "coveralls"
+require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'screengrab'
 require 'webmock'
+require 'pry'
+require 'active_support/core_ext/string/strip'
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
@@ -24,4 +26,8 @@ ensure
     ENV.delete(k) unless old_vals.include?(k)
     ENV[k] = old_vals[k]
   end
+end
+
+def raise_fastlane_error
+  raise_error FastlaneCore::Interface::FastlaneError
 end
