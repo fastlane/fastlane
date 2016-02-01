@@ -2,7 +2,7 @@
 
 There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
 
-To get the most up-to-date information from the command line on your current verion you can also run:
+To get the most up-to-date information from the command line on your current version you can also run:
 
 ```sh
 fastlane actions: List all available fastlane actions
