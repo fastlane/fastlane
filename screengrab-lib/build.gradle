@@ -5,6 +5,9 @@ String lookupProperty(Project project, String gradlePropName, String envVarName)
     return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
 }
 
+// TODO Establish a canonical place to set/get version number info
+def versionNameString = '0.1.2'
+
 buildscript {
     repositories {
         jcenter()
@@ -20,11 +23,8 @@ android {
 
     defaultConfig {
         targetSdkVersion 23
-
-        // TODO get a real version from somewhere
-        versionCode 2
-        versionName "0.1.1"
-
+        versionCode 3
+        versionName versionNameString
         minSdkVersion 8
     }
     buildTypes {
@@ -36,13 +36,10 @@ android {
 
 publish {
     userOrg = 'fastlane'
+    repoName = 'fastlane'
     groupId = 'tools.fastlane'
     artifactId = 'screengrab'
-
-    // TODO get a real version from somewhere
-    publishVersion = '0.1.1'
-    
-    repoName = 'fastlane'
+    publishVersion = versionNameString
     website = 'https://github.com/fastlane/screengrab'
     bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
     bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')

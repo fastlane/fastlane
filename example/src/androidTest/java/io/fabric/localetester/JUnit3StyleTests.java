@@ -4,10 +4,11 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import tools.fastlane.screengrab.Screengrab;
 import tools.fastlane.screengrab.locale.LocaleUtil;
-import tools.fastlane.screengrab.screen.ScreenUtil;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActivity> {
@@ -17,8 +18,8 @@ public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     public void setUp() {
+        getActivity();
         LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());
-        ScreenUtil.activateScreenForTesting(getActivity());
     }
 
     public void tearDown() {
@@ -39,6 +40,8 @@ public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.nav_button)).perform(click());
 
         Screengrab.screenshot("anotherActivity");
+
+        onView(withId(R.id.hello)).check(matches(isDisplayed()));
     }
 }
 
