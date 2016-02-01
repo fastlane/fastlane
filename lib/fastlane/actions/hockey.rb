@@ -54,7 +54,11 @@ module Fastlane
           Helper.log.info "Public Download URL: #{url}" if url
           Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
         else
-          raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
+          if response.body.to_s.include?("App could not be created")
+            raise "Hockey has an issue processing this app. Please pass the :public_identifier option you can get from the Hockey website. More information https://github.com/fastlane/fastlane/issues/400"
+          else
+            raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
+          end
         end
       end
 
