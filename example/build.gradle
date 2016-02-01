@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "io.fabric.localetester"
+        applicationId "tools.fastlane.localetester"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
