@@ -1,9 +1,15 @@
-package io.fabric.localetester;
+package tools.fastlane.localetester;
 
-import android.test.ActivityInstrumentationTestCase2;
+import android.support.test.rule.ActivityTestRule;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import tools.fastlane.screengrab.Screengrab;
-import tools.fastlane.screengrab.locale.LocaleUtil;
+import tools.fastlane.screengrab.locale.LocaleTestRule;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -11,37 +17,31 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-public class JUnit3StyleTests extends ActivityInstrumentationTestCase2<MainActivity> {
+@RunWith(JUnit4.class)
+public class JUnit4StyleTests {
+    @ClassRule
+    public static final LocaleTestRule localeTestRule = new LocaleTestRule();
 
-    public JUnit3StyleTests() {
-        super(MainActivity.class);
-    }
+    @Rule
+    public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
 
-    public void setUp() {
-        getActivity();
-        LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getTestLocale());
-    }
-
-    public void tearDown() {
-        LocaleUtil.changeDeviceLocaleTo(LocaleUtil.getEndingLocale());
-    }
-
+    @Test
     public void testTakeScreenshot() {
         Screengrab.screenshot("beforeFabClick");
 
-        onView(withId(R.id.fab)).perform(click());
+        onView(withId(tools.fastlane.localetester.R.id.fab)).perform(click());
 
         Screengrab.screenshot("afterFabClick");
     }
 
+    @Test
     public void testTakeMoreScreenshots() {
         Screengrab.screenshot("mainActivity");
 
-        onView(withId(R.id.nav_button)).perform(click());
+        onView(withId(tools.fastlane.localetester.R.id.nav_button)).perform(click());
 
         Screengrab.screenshot("anotherActivity");
 
         onView(withId(R.id.hello)).check(matches(isDisplayed()));
     }
 }
-
