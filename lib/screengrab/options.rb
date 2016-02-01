@@ -33,7 +33,7 @@ module Screengrab
                                      default_value: output_directory),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
-                                     description: "Don't open the HTML summary after running `screengrab`",
+                                     description: "Don't open the summary after running `screengrab`",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_package_name,
