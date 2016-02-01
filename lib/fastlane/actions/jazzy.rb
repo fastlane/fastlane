@@ -3,7 +3,9 @@ module Fastlane
     class JazzyAction < Action
       def self.run(params)
         Actions.verify_gem!('jazzy')
-        Actions.sh("jazzy")
+        command = "jazzy"
+        command << " --config #{params[:config]}" if params[:config]
+        Actions.sh(command)
       end
 
       #####################################################
@@ -19,6 +21,13 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(
+            key: :config,
+            env_name: 'FL_JAZZY_CONFIG',
+            description: 'Path to jazzy config file',
+            is_string: true,
+            optional: true
+          )
         ]
       end
 
