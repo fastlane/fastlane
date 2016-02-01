@@ -46,9 +46,12 @@ module Screengrab
 
       device_serial = select_device
 
-      device_screenshots_path = determine_device_screenshots_path(device_serial)
+      device_screenshots_paths = [
+        determine_external_screenshots_path(device_serial),
+        determine_internal_screenshots_path
+      ]
 
-      clear_device_previous_screenshots(device_serial, device_screenshots_path)
+      clear_device_previous_screenshots(device_serial, device_screenshots_paths)
 
       app_apk_path ||= select_app_apk(discovered_apk_paths)
       tests_apk_path ||= select_tests_apk(discovered_apk_paths)
@@ -61,7 +64,7 @@ module Screengrab
 
       run_tests(device_serial, test_classes_to_use, test_packages_to_use)
 
-      pull_screenshots_from_device(device_serial, device_screenshots_path)
+      pull_screenshots_from_device(device_serial, device_screenshots_paths)
 
       open_screenshots_summary
 
@@ -107,23 +110,36 @@ module Screengrab
     def clear_local_previous_screenshots
       if @config[:clear_previous_screenshots]
         UI.message "Clearing output directory of screenshots at #{@config[:output_directory]}"
-        files = Dir.glob(File.join('.', @config[:output_directory], '**', '*.png'), File::FNM_CASEFOLD)
+        files = screenshot_file_names_in(@config[:output_directory])
         File.delete(*files)
       end
     end
 
-    def determine_device_screenshots_path(device_serial)
+    def screenshot_file_names_in(output_directory)
+      Dir.glob(File.join('.', output_directory, '**', '*.png'), File::FNM_CASEFOLD)
+    end
+
+    def determine_external_screenshots_path(device_serial)
       device_ext_storage = @executor.execute(command: "adb -s #{device_serial} shell echo \\$EXTERNAL_STORAGE",
                                              print_all: true,
                                              print_command: true)
-      File.join(device_ext_storage, @config[:app_package_name])
+      File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
-    def clear_device_previous_screenshots(device_serial, device_screenshots_path)
-      UI.message 'Cleaning screenshots directory on device'
-      @executor.execute(command: "adb -s #{device_serial} shell rm -rf #{device_screenshots_path}",
-                        print_all: true,
-                        print_command: true)
+    def determine_internal_screenshots_path
+      "/data/data/#{@config[:app_package_name]}/app_screengrab"
+    end
+
+    def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
+      UI.message 'Cleaning screenshots on device'
+
+      device_screenshots_paths.each do |device_path|
+        if_device_path_exists(device_serial, device_path) do |path|
+          @executor.execute(command: "adb -s #{device_serial} shell rm -rf #{path}",
+                            print_all: true,
+                            print_command: true)
+        end
+      end
     end
 
     def validate_apk(app_apk_path)
@@ -191,22 +207,43 @@ module Screengrab
         instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
         test_output = @executor.execute(command: instrument_command.join(" \\\n"),
-                          print_all: true,
-                          print_command: true)
+                                        print_all: true,
+                                        print_command: true)
 
         UI.user_error! "Tests failed" if test_output.include?("FAILURES!!!")
       end
     end
 
-    def pull_screenshots_from_device(device_serial, device_screenshots_path)
+    def pull_screenshots_from_device(device_serial, device_screenshots_paths)
       UI.message "Pulling captured screenshots from the device"
-      @executor.execute(command: "adb -s #{device_serial} pull #{device_screenshots_path}/screengrab #{@config[:output_directory]}",
-                        print_all: true,
-                        print_command: true,
-                        error: proc do |error_output|
-                          UI.error "Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run."
-                          UI.user_error! "No screenshots were detected 📷❌"
-                        end)
+      starting_screenshot_count = screenshot_file_names_in(@config[:output_directory]).length
+
+      device_screenshots_paths.each do |device_path|
+        if_device_path_exists(device_serial, device_path) do |path|
+          @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
+                            print_all: true,
+                            print_command: true)
+        end
+      end
+
+      ending_screenshot_count = screenshot_file_names_in(@config[:output_directory]).length
+
+      # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
+      # success based on whether there are more screenshots there than when we started.
+      if starting_screenshot_count == ending_screenshot_count
+        UI.error "Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run."
+        UI.user_error! "No screenshots were detected 📷❌"
+      end
+    end
+
+    # Some device commands fail if executed against a device path that does not exist, so this helper method
+    # provides a way to conditionally execute a block only if the provided path exists on the device.
+    def if_device_path_exists(device_serial, device_path)
+      return if @executor.execute(command: "adb -s #{device_serial} shell ls #{device_path}",
+                                  print_all: false,
+                                  print_command: false).include?('No such file')
+
+      yield device_path
     end
 
     def open_screenshots_summary
