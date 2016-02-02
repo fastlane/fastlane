@@ -1,3 +1,4 @@
+
 module Screengrab
   class Runner
     NEEDED_PERMISSIONS = [
@@ -42,7 +43,8 @@ module Screengrab
         UI.important 'Consider using the :use_tests_in_classes or :use_tests_in_packages option, and organize your tests accordingly.'
       end
 
-      clear_local_previous_screenshots
+      device_type_dir_name = "#{@config[:device_type]}Screenshots"
+      clear_local_previous_screenshots(device_type_dir_name)
 
       device_serial = select_device
 
@@ -64,11 +66,11 @@ module Screengrab
 
       run_tests(device_serial, test_classes_to_use, test_packages_to_use)
 
-      pull_screenshots_from_device(device_serial, device_screenshots_paths)
+      number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
-      open_screenshots_summary
+      open_screenshots_summary(device_type_dir_name)
 
-      UI.success 'Your screenshots are ready! 📷✨'
+      UI.success "Captured #{number_of_screenshots} screenshots! 📷✨"
     end
 
     def select_device
@@ -107,16 +109,21 @@ module Screengrab
       UI.select('Select your debug tests APK', discovered_apk_paths)
     end
 
-    def clear_local_previous_screenshots
+    def clear_local_previous_screenshots(device_type_dir_name)
       if @config[:clear_previous_screenshots]
-        UI.message "Clearing output directory of screenshots at #{@config[:output_directory]}"
-        files = screenshot_file_names_in(@config[:output_directory])
-        File.delete(*files)
+        UI.message "Clearing #{device_type_dir_name} within #{@config[:output_directory]}"
+
+        # We'll clear the temporary directory where screenshots wind up after being pulled from
+        # the device as well, in case those got stranded on a previous run/failure
+        ['screenshots', device_type_dir_name].each do |dir_name|
+          files = screenshot_file_names_in(@config[:output_directory], dir_name)
+          File.delete(*files)
+        end
       end
     end
 
-    def screenshot_file_names_in(output_directory)
-      Dir.glob(File.join('.', output_directory, '**', '*.png'), File::FNM_CASEFOLD)
+    def screenshot_file_names_in(output_directory, device_type)
+      Dir.glob(File.join('.', output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
     end
 
     def determine_external_screenshots_path(device_serial)
@@ -214,25 +221,54 @@ module Screengrab
       end
     end
 
-    def pull_screenshots_from_device(device_serial, device_screenshots_paths)
+    def pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
       UI.message "Pulling captured screenshots from the device"
-      starting_screenshot_count = screenshot_file_names_in(@config[:output_directory]).length
+      starting_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(device_serial, device_path) do |path|
           @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
-                            print_all: true,
+                            print_all: false,
                             print_command: true)
         end
       end
 
-      ending_screenshot_count = screenshot_file_names_in(@config[:output_directory]).length
+      # The SDK can't 100% determine what kind of device it is running on relative to the categories that
+      # supply and Google Play care about (phone, 7" tablet, TV, etc.).
+      #
+      # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
+      # user provided device_type option value to match the directory structure that supply expects
+      move_pulled_screenshots(device_type_dir_name)
+
+      ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
       # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
       # success based on whether there are more screenshots there than when we started.
       if starting_screenshot_count == ending_screenshot_count
         UI.error "Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run."
         UI.user_error! "No screenshots were detected 📷❌"
+      end
+
+      ending_screenshot_count - starting_screenshot_count
+    end
+
+    def move_pulled_screenshots(device_type_dir_name)
+      # Glob pattern that finds the pulled screenshots directory for each locale
+      # (Matches: fastlane/metadata/android/en-US/images/screenshots)
+      screenshots_dir_pattern = File.join('.', @config[:output_directory], '**', "screenshots")
+
+      Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
+        src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)
+
+        # We move the screenshots by replacing the last segment of the screenshots directory path with
+        # the device_type specific name
+        #
+        # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
+        dest_dir = File.join(File.dirname(screenshots_dir), device_type_dir_name)
+
+        FileUtils.cp_r(src_screenshots, dest_dir)
+        FileUtils.rm_r(screenshots_dir)
+        UI.success "Screenshots copied to #{dest_dir}"
       end
     end
 
@@ -246,11 +282,11 @@ module Screengrab
       yield device_path
     end
 
-    def open_screenshots_summary
+    def open_screenshots_summary(device_type_dir_name)
       unless @config[:skip_open_summary]
         UI.message "Opening screenshots summary"
         # MCF: this isn't OK on any platform except Mac
-        @executor.execute(command: "open #{@config[:output_directory]}/*/*.png",
+        @executor.execute(command: "open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
                           print_all: false,
                           print_command: true)
       end
