@@ -35,8 +35,12 @@ module Fastlane
 
         if exit_status != 0
           # this will also append the output to the exception
-          message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
-          message += "\n#{result}" if log
+          if log
+            message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
+            message += "\n#{result}"
+          else
+            message = "Shell command exited with exit status #{exit_status} instead of 0."
+          end
           UI.crash!(message)
         end
       end
