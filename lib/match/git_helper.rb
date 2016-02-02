@@ -12,7 +12,7 @@ module Match
                                           print_all: $verbose,
                                       print_command: $verbose)
 
-      raise "Error cloning repo, make sure you have access to it '#{git_url}'".red unless File.directory?(@dir)
+      UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
       if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil? and File.exist?(File.join(@dir, "README.md"))
         UI.important "Migrating to new match..."
