@@ -59,7 +59,7 @@ Once this tool is officially released, the installation will be as simple as run
 
 ##### Gradle dependency
 ```java
-  androidTestCompile 'tools.fastlane:screengrab:0.1.1'
+androidTestCompile 'tools.fastlane:screengrab:0.1.1'
 ```
 
 ##### Configuring your Manifest Permissions
@@ -160,12 +160,17 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
 - [`supply`](https://github.com/fastlane/supply): Upload screenshots, metadata and your app to the Play Store
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
+
+You can find all the tools on [fastlane.tools](https://fastlane.tools).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup.
+
+## Code of Conduct
+
+Help us keep `screengrab` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
