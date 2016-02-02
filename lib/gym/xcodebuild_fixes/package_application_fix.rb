@@ -20,7 +20,7 @@ module Gym
           # If that location changes, search it using xcrun --sdk iphoneos -f PackageApplication
           package_application_path = "#{Xcode.xcode_path}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication"
 
-          raise "Unable to patch the `PackageApplication` script bundled in XCode. This is not supported." unless expected_md5 == Digest::MD5.file(package_application_path).hexdigest
+          UI.crash!("Unable to patch the `PackageApplication` script bundled in Xcode. This is not supported.") unless expected_md5 == Digest::MD5.file(package_application_path).hexdigest
 
           # Duplicate PackageApplication script to PackageApplication4Gym
           FileUtils.copy_file(package_application_path, @patched_package_application_path)

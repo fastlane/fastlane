@@ -6,6 +6,7 @@ HighLine.track_eof = false
 module Gym
   class CommandsGenerator
     include Commander::Methods
+    UI = FastlaneCore::UI
 
     FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options)
 
@@ -48,7 +49,7 @@ module Gym
         c.action do |_args, options|
           containing = (File.directory?("fastlane") ? 'fastlane' : '.')
           path = File.join(containing, Gym.gymfile_name)
-          raise "Gymfile already exists".yellow if File.exist?(path)
+          UI.user_error! "Gymfile already exists" if File.exist?(path)
           template = File.read("#{Helper.gem_path('gym')}/lib/assets/GymfileTemplate")
           File.write(path, template)
           UI.success "Successfully created '#{path}'. Open the file using a code editor."

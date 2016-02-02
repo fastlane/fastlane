@@ -99,7 +99,7 @@ module Gym
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
         print "Follow this guide to setup code signing https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
-        raise "Archive invalid"
+        UI.user_error!("Archive invalid")
       end
 
       def find_standard_output_path(output)

@@ -25,7 +25,7 @@ module Gym
       def project_path_array
         proj = Gym.project.xcodebuild_parameters
         return proj if proj.count > 0
-        raise "No project/workspace found"
+        UI.user_error!("No project/workspace found")
       end
 
       def options
