@@ -88,7 +88,7 @@ module Sigh
                                      optional: true,
                                      description: "Filename to use for the generated provisioning profile (must include .mobileprovision)",
                                      verify_block: proc do |value|
-                                       raise "The output name must end with .mobileprovision".red unless value.end_with? ".mobileprovision"
+                                       UI.user_error!("The output name must end with .mobileprovision") unless value.end_with?(".mobileprovision")
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_fetch_profiles,
                                      env_name: "SIGH_SKIP_FETCH_PROFILES",
