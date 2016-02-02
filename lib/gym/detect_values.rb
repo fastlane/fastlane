@@ -42,7 +42,7 @@ module Gym
           if profiles.count == 1
             profile = File.expand_path(profiles.last)
           elsif profiles.count > 1
-            puts "Found more than one provisioning profile in the project directory:"
+            UI.message "Found more than one provisioning profile in the project directory:"
             profile = choose(*(profiles))
           end
 

@@ -18,9 +18,9 @@ module Gym
                                      description: "Path the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Workspace file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Workspace file invalid".red unless File.directory?(v)
-                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless v.include?(".xcworkspace")
+                                       UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Workspace file invalid") unless File.directory?(v)
+                                       UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -29,9 +29,9 @@ module Gym
                                      description: "Path the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Project file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Project file invalid".red unless File.directory?(v)
-                                       raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
+                                       UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Project file invalid") unless File.directory?(v)
+                                       UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
@@ -103,7 +103,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
-                                       raise "Unsupported export_method, must be: #{av}" unless av.include?(value)
+                                       UI.user_error!("Unsupported export_method, must be: #{av}") unless av.include?(value)
                                      end),
 
         # Very optional
@@ -139,7 +139,7 @@ module Gym
                                      description: "The path to the provisioning profile (optional)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Provisioning profile not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                       UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
@@ -162,7 +162,7 @@ module Gym
                                      description: "Use an extra XCCONFIG file to build your app",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                       UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      short_option: "-r",

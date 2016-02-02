@@ -3,7 +3,7 @@ describe Gym do
     it "raises an exception when project path wasn't found" do
       expect do
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: "/notExistent" })
-      end.to raise_error "Project file not found at path '/notExistent'".red
+      end.to raise_error "Project file not found at path '/notExistent'"
     end
 
     it "supports additional parameters" do
