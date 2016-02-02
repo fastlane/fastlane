@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/PerceivedComplexity
 # rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
@@ -355,5 +354,4 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize
