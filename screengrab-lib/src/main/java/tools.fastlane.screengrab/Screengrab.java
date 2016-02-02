@@ -24,17 +24,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 import tools.fastlane.screengrab.file.Chmod;
 
 public class Screengrab {
-    private static final Set<Locale> accessedLocales = new HashSet<Locale>();
-
     private static final Pattern TAG_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
 
     static final String NAME_SEPARATOR = "_";
@@ -126,26 +122,36 @@ public class Screengrab {
     }
 
     private static File getFilesDirectory(Context context, Locale locale) throws IOException {
-        File directory;
+        File directory = null;
+
         if (Build.VERSION.SDK_INT >= 21) {
-            // Use external storage.
-            directory = new File(Environment.getExternalStorageDirectory(), getDirectoryName(context, locale));
-        } else {
-            // Use internal storage.
-            directory = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
+            File externalDir = new File(Environment.getExternalStorageDirectory(), getDirectoryName(context, locale));
+            directory = initializeDirectory(externalDir);
         }
 
-        Log.d(TAG, "Using files directory: " + directory.getAbsolutePath());
-
-        synchronized (accessedLocales) {
-            if (!accessedLocales.contains(locale)) {
-                deletePath(directory, false);
-                accessedLocales.add(locale);
-            }
+        if (directory == null) {
+            File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
+            directory = initializeDirectory(internalDir);
         }
 
-        createPathTo(directory);
+        if (directory == null) {
+            throw new IOException("Unable to get a screenshot storage directory");
+        }
+
+        Log.d(TAG, "Using screenshot storage directory: " + directory.getAbsolutePath());
         return directory;
+    }
+
+    private static File initializeDirectory(File dir) {
+        try {
+            createPathTo(dir);
+
+            if (dir.isDirectory() && dir.canWrite()) {
+                return dir;
+            }
+        } catch (IOException ignored) {}
+
+        return null;
     }
 
     private static String getDirectoryName(Context context, Locale locale) {
@@ -165,21 +171,6 @@ public class Screengrab {
             throw new IOException("Unable to create output dir: " + dir.getAbsolutePath());
         }
         Chmod.chmodPlusRWX(dir);
-    }
-
-    private static void deletePath(File path, boolean inclusive) {
-        for (File child : listChildrenOf(path)) {
-            deletePath(child, true);
-        }
-
-        if (inclusive) {
-            path.delete();
-        }
-    }
-
-    private static File[] listChildrenOf(File file) {
-        File[] children = file.listFiles();
-        return children == null ? new File[0] : children;
     }
 
     private Screengrab() {
