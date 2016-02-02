@@ -7,9 +7,9 @@ module Deliver
       app = options[:app]
 
       v = app.edit_version
-      raise "Could not find a version to edit for app '#{app.name}'".red unless v
+      UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
-      Helper.log.info "Starting with the upload of screenshots..."
+      UI.message("Starting with the upload of screenshots...")
 
       # First, clear all previously uploaded screenshots, but only where we have new ones
       # screenshots.each do |screenshot|
@@ -25,7 +25,7 @@ module Deliver
 
       screenshots_per_language = screenshots.group_by(&:language)
       screenshots_per_language.each do |language, screenshots_for_language|
-        Helper.log.info "Uploading #{screenshots_for_language.length} screenshots for language #{language}"
+        UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
           indized[screenshot.language] ||= {}
           indized[screenshot.language][screenshot.device_type] ||= 0
@@ -34,11 +34,11 @@ module Deliver
           index = indized[screenshot.language][screenshot.device_type]
 
           if index > 5
-            Helper.log.error "Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'"
+            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'")
             next
           end
 
-          Helper.log.info "Uploading '#{screenshot.path}'..."
+          UI.message("Uploading '#{screenshot.path}'...")
           v.upload_screenshot!(screenshot.path,
                                index,
                                screenshot.language,
@@ -46,10 +46,10 @@ module Deliver
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
-        Helper.log.info "Saving changes"
+        UI.message("Saving changes")
         v.save!
       end
-      Helper.log.info "Successfully uploaded screenshots to iTunes Connect".green
+      UI.success("Successfully uploaded screenshots to iTunes Connect")
     end
 
     def collect_screenshots(options)

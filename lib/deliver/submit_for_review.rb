@@ -4,7 +4,7 @@ module Deliver
       app = options[:app]
       select_build(options)
 
-      Helper.log.info "Submitting the app for review..."
+      UI.message("Submitting the app for review...")
       submission = app.create_submission
 
       # Set app submission information
@@ -15,9 +15,9 @@ module Deliver
 
       # User Values
       if options[:submission_information]
-        raise "`submission_information` must be a hash" unless options[:submission_information].kind_of?(Hash)
+        UI.user_error!("`submission_information` must be a hash") unless options[:submission_information].kind_of?(Hash)
         options[:submission_information].each do |key, value|
-          Helper.log.info "Setting '#{key}' to '#{value}'..."
+          UI.message("Setting '#{key}' to '#{value}'...")
           submission.send("#{key}=", value)
         end
       end
@@ -25,25 +25,25 @@ module Deliver
       # Finalize app submission
       submission.complete!
 
-      Helper.log.info "Successfully submitted the app for review!".green
+      UI.success("Successfully submitted the app for review!")
     end
 
     def select_build(options)
-      Helper.log.info "Selecting the latest build..."
+      UI.message("Selecting the latest build...")
       app = options[:app]
       v = app.edit_version
       build = wait_for_build(app)
 
-      Helper.log.info "Selecting build #{build.train_version} (#{build.build_version})..."
+      UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
 
       v.select_build(build)
       v.save!
 
-      Helper.log.info "Successfully selected build".green
+      UI.success("Successfully selected build")
     end
 
     def wait_for_build(app)
-      raise "Could not find app with app identifier #{WatchBuild.config[:app_identifier]}".red unless app
+      UI.user_error!("Could not find app with app identifier #{WatchBuild.config[:app_identifier]}") unless app
 
       start = Time.now
 
@@ -51,10 +51,10 @@ module Deliver
         build = find_build(app)
         return build if build.processing == false
 
-        Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
+        UI.message("Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
         if (Time.now - start) > (60 * 5)
-          Helper.log.info ""
-          Helper.log.info "You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\""
+          UI.message("")
+          UI.message("You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
         end
         sleep 30
       end
@@ -70,8 +70,8 @@ module Deliver
       end
 
       unless build
-        Helper.log.fatal app.latest_version.candidate_builds
-        raise "Could not find build".red
+        UI.error(app.latest_version.candidate_builds)
+        UI.crash!("Could not find build")
       end
 
       return build

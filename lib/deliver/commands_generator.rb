@@ -6,7 +6,6 @@ HighLine.track_eof = false
 module Deliver
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
@@ -39,7 +38,7 @@ module Deliver
           loaded = options.load_configuration_file("Deliverfile")
           loaded = true if options[:description] || options[:ipa] || options[:pkg] # do we have *anything* here?
           unless loaded
-            if agree("No deliver configuration found in the current directory. Do you want to setup deliver? (y/n)".yellow, true)
+            if UI.confirm("No deliver configuration found in the current directory. Do you want to setup deliver?")
               require 'deliver/setup'
               Deliver::Runner.new(options) # to login...
               Deliver::Setup.new.run(options)
@@ -56,7 +55,7 @@ module Deliver
         c.description = 'Create the initial `deliver` configuration based on an existing app'
         c.action do |args, options|
           if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
-            Helper.log.info "You already got a running deliver setup in this directory".yellow
+            Ui.important("You already got a running deliver setup in this directory")
             return 0
           end
 
@@ -103,7 +102,7 @@ module Deliver
           Deliver::Runner.new(options) # to login...
           path = (FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.')
           res = ENV["DELIVER_FORCE_OVERWRITE"]
-          res ||= agree("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}/metadata'? (y/n)", true)
+          res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}/metadata'?")
           if res
             require 'deliver/setup'
             v = options[:app].latest_version

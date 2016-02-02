@@ -1,12 +1,12 @@
 module Deliver
   class DownloadScreenshots
     def self.run(options, path)
-      Helper.log.info "Downloading all existing screenshots...".green
+      UI.message("Downloading all existing screenshots...")
       download(options, path)
-      Helper.log.info "Successfully downloaded all existing screenshots".green
+      UI.success("Successfully downloaded all existing screenshots")
     rescue => ex
-      Helper.log.error ex
-      Helper.log.error "Couldn't download already existing screenshots from iTunesConnect.".red
+      UI.error(ex)
+      UI.error("Couldn't download already existing screenshots from iTunesConnect.")
     end
 
     def self.download(options, folder_path)
@@ -18,7 +18,7 @@ module Deliver
           original_file_extension = File.basename(screenshot.original_file_name)
           file_name += "." + original_file_extension
 
-          Helper.log.info "Downloading existing screenshot '#{file_name}'"
+          UI.message("Downloading existing screenshot '#{file_name}'")
 
           # If the screen shot is for an appleTV we need to store it in a way that we'll know it's an appleTV
           # screen shot later as the screen size is the same as an iPhone 6 Plus in landscape.

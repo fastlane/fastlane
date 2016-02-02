@@ -44,7 +44,7 @@ module Deliver
 
       self.screen_size = screen_size
 
-      Helper.log.error "Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}" unless self.is_valid?
+      UI.error("Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}") unless self.is_valid?
     end
 
     # The iTC API requires a different notation for the device
@@ -139,7 +139,7 @@ module Deliver
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
-      raise "Could not find or parse file at path '#{path}'" if size.nil? or size.count == 0
+      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? or size.count == 0
 
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
       path_component = Pathname.new(path).each_filename.to_a[-3]
@@ -162,7 +162,7 @@ module Deliver
         end
       end
 
-      raise "Unsupported screen size #{size} for path '#{path}'".red
+      UI.user_error!("Unsupported screen size #{size} for path '#{path}'")
     end
   end
 

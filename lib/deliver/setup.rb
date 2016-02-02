@@ -16,7 +16,7 @@ module Deliver
       FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
       File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
 
-      Helper.log.info "Successfully created new Deliverfile at path '#{file_path}'".green
+      UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
 
     # This method takes care of creating a new 'deliver' folder, containg the app metadata
@@ -49,7 +49,7 @@ module Deliver
           resulting_path = File.join(containing, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
-          Helper.log.debug "Writing to '#{resulting_path}'"
+          UI.message("Writing to '#{resulting_path}'")
         end
       end
 
@@ -63,10 +63,10 @@ module Deliver
 
         resulting_path = File.join(containing, "#{key}.txt")
         File.write(resulting_path, content)
-        Helper.log.debug "Writing to '#{resulting_path}'"
+        UI.message("Writing to '#{resulting_path}'")
       end
 
-      puts "Successfully created new configuration files.".green
+      UI.success("Successfully created new configuration files.")
     end
 
     def download_screenshots(deliver_path, options)

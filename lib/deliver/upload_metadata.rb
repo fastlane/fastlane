@@ -31,7 +31,7 @@ module Deliver
         next unless current
 
         unless current.kind_of?(Hash)
-          Helper.log.error "Error with provided '#{key}'. Must be a hash, the key being the language.".red
+          UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
           next
         end
 
@@ -55,10 +55,10 @@ module Deliver
       set_review_information(v, options)
       set_app_rating(v, options)
 
-      Helper.log.info "Uploading metadata to iTunes Connect"
+      UI.message("Uploading metadata to iTunes Connect")
       v.save!
       details.save!
-      Helper.log.info "Successfully uploaded initial set of metadata to iTunes Connect".green
+      UI.success("Successfully uploaded initial set of metadata to iTunes Connect")
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
@@ -84,7 +84,7 @@ module Deliver
       end
 
       return unless enabled_languages.include?("default")
-      Helper.log.info "Detected languages: " + enabled_languages.to_s
+      UI.message("Detected languages: " + enabled_languages.to_s)
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         current = options[key]
@@ -111,7 +111,7 @@ module Deliver
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
       v = options[:app].edit_version
-      raise "Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently".red unless v
+      UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
       enabled_languages = []
       LOCALISED_VERSION_VALUES.each do |key|
@@ -126,7 +126,7 @@ module Deliver
         v.create_languages(enabled_languages)
         lng_text = "language"
         lng_text += "s" if enabled_languages.count != 1
-        Helper.log.info "Activating #{lng_text} #{enabled_languages.join(', ')}..."
+        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
       end
       true
@@ -143,7 +143,7 @@ module Deliver
           path = File.join(lng_folder, "#{key}.txt")
           next unless File.exist?(path)
 
-          Helper.log.info "Loading '#{path}'..."
+          UI.message("Loading '#{path}'...")
           options[key] ||= {}
           options[key][language] ||= File.read(path)
         end
@@ -154,7 +154,7 @@ module Deliver
         path = File.join(options[:metadata_path], "#{key}.txt")
         next unless File.exist?(path)
 
-        Helper.log.info "Loading '#{path}'..."
+        UI.message("Loading '#{path}'...")
         options[key] ||= File.read(path)
       end
     end
@@ -164,7 +164,7 @@ module Deliver
     def set_review_information(v, options)
       return unless options[:app_review_information]
       info = options[:app_review_information]
-      raise "`app_review_information` must be a hash" unless info.kind_of?(Hash)
+      UI.user_error!("`app_review_information` must be a hash") unless info.kind_of?(Hash)
 
       v.review_first_name = info[:first_name] if info[:first_name]
       v.review_last_name = info[:last_name] if info[:last_name]
@@ -182,8 +182,8 @@ module Deliver
       begin
         json = JSON.parse(File.read(options[:app_rating_config_path]))
       rescue => ex
-        Helper.log.fatal ex.to_s
-        raise "Error parsing JSON file at path '#{options[:app_rating_config_path]}'".red
+        UI.error(ex.to_s)
+        UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
       end
       v.update_rating(json)
     end
