@@ -13,7 +13,7 @@ module Sigh
     end
 
     def self.install_profile(profile)
-      Helper.log.info "Installing provisioning profile..."
+      UI.message "Installing provisioning profile..."
       profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
       profile_filename = ENV["SIGH_UDID"] + ".mobileprovision"
       destination = profile_path + profile_filename
@@ -27,9 +27,9 @@ module Sigh
       FileUtils.copy profile, destination
 
       if File.exist? destination
-        Helper.log.info "Profile installed at \"#{destination}\""
+        UI.success "Profile installed at \"#{destination}\""
       else
-        raise "Failed installation of provisioning profile at location: #{destination}".red
+        UI.user_error!("Failed installation of provisioning profile at location: #{destination}")
       end
     end
 
@@ -40,7 +40,6 @@ module Sigh
       return command, clean_expired, clean_pattern
     end
 
-    # rubocop:disable Metrics/AbcSize
     def self.list_profiles
       profiles = load_profiles
 
@@ -49,62 +48,61 @@ module Sigh
 
       profiles_valid = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] > soon }
       if profiles_valid.count > 0
-        Helper.log.info "Provisioning profiles installed"
-        Helper.log.info "Valid:"
+        UI.message "Provisioning profiles installed"
+        UI.message "Valid:"
         profiles_valid.each do |profile|
-          Helper.log.info profile["Name"].green
+          UI.message profile["Name"].green
         end
       end
 
       profiles_soon = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] < soon }
       if profiles_soon.count > 0
-        Helper.log.info ""
-        Helper.log.info "Expiring within 30 day:"
+        UI.message ""
+        UI.message "Expiring within 30 day:"
         profiles_soon.each do |profile|
-          Helper.log.info profile["Name"].yellow
+          UI.message profile["Name"].yellow
         end
       end
 
       profiles_expired = profiles.select { |profile| profile["ExpirationDate"] < now }
       if profiles_expired.count > 0
-        Helper.log.info ""
-        Helper.log.info "Expired:"
+        UI.message ""
+        UI.message "Expired:"
         profiles_expired.each do |profile|
-          Helper.log.info profile["Name"].red
+          UI.message profile["Name"].red
         end
       end
 
-      Helper.log.info ""
-      Helper.log.info "Summary"
-      Helper.log.info "#{profiles.count} installed profiles"
-      Helper.log.info "#{profiles_expired.count} are expired".red
-      Helper.log.info "#{profiles_soon.count} are valid but will expire within 30 days".yellow
-      Helper.log.info "#{profiles_valid.count} are valid".green
+      UI.message ""
+      UI.message "Summary"
+      UI.message "#{profiles.count} installed profiles"
+      UI.message "#{profiles_expired.count} are expired".red
+      UI.message "#{profiles_soon.count} are valid but will expire within 30 days".yellow
+      UI.message "#{profiles_valid.count} are valid".green
 
-      Helper.log.info "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
+      UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
     end
-    # rubocop:enable Metrics/AbcSize
 
     def self.cleanup_profiles(expired = false, pattern = nil)
       now = DateTime.now
 
       profiles = load_profiles.select { |profile| (expired && profile["ExpirationDate"] < now) || (!pattern.nil? && profile["Name"] =~ pattern) }
 
-      Helper.log.info "The following provisioning profiles are either expired or matches your pattern:"
+      UI.message "The following provisioning profiles are either expired or matches your pattern:"
       profiles.each do |profile|
-        Helper.log.info profile["Name"].red
+        UI.message profile["Name"].red
       end
 
       if agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
         profiles.each do |profile|
           File.delete profile["Path"]
         end
-        Helper.log.info "\n\nDeleted #{profiles.length} profiles".green
+        UI.success "\n\nDeleted #{profiles.length} profiles"
       end
     end
 
     def self.load_profiles
-      Helper.log.info "Loading Provisioning profiles from ~/Library/MobileDevice/Provisioning Profiles/"
+      UI.message "Loading Provisioning profiles from ~/Library/MobileDevice/Provisioning Profiles/"
       profiles_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/*.mobileprovision"
       profile_paths = Dir[profiles_path]
 
