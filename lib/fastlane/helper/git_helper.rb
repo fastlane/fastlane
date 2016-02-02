@@ -12,10 +12,12 @@ module Fastlane
       nil
     end
 
-    def self.last_git_tag_name(match_lightweight = true)
+    def self.last_git_tag_name(match_lightweight = true, tag_match_pattern = nil)
+      tag_pattern_param = tag_match_pattern ? "=#{tag_match_pattern.shellescape}" : ''
+
       command = ['git describe']
       command << '--tags' if match_lightweight
-      command << '`git rev-list --tags --max-count=1`'
+      command << "`git rev-list --tags#{tag_pattern_param} --max-count=1`"
       Actions.sh(command.join(' '), log: false).chomp
     rescue
       nil
