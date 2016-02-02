@@ -4,24 +4,22 @@ module Deliver
       begin
         html_path = self.render(options, screenshots, '.')
       rescue => ex
-        Helper.log.error ex.inspect
-        Helper.log.error ex.backtrace.join("\n")
-        okay = agree("Could not render HTML preview. Do you still want to continue? (y/n)".red, true)
+        UI.error(ex.inspect)
+        UI.error(ex.backtrace.join("\n"))
+        okay = UI.input("Could not render HTML preview. Do you still want to continue?")
         return if okay
-        raise "Could not render HTML page"
+        UI.crash!("Could not render HTML page")
       end
-      puts "----------------------------------------------------------------------------"
-      puts "Verifying the upload via the HTML file can be disabled by either adding"
-      puts "`force true` to your Deliverfile or using `deliver --force`"
-      puts "----------------------------------------------------------------------------"
+      UI.important("Verifying the upload via the HTML file can be disabled by either adding")
+      UI.important("`force true` to your Deliverfile or using `deliver --force`")
 
       system("open '#{html_path}'")
-      okay = agree("Does the Preview on path '#{html_path}' look okay for you? (y/n)", true)
+      okay = UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
 
       if okay
-        puts "HTML file confirmed...".green # print this to give feedback to the user immediately
+        UI.success("HTML file confirmed...") # print this to give feedback to the user immediately
       else
-        raise "Did not upload the metadata, because the HTML file was rejected by the user".yellow
+        UI.user_error!("Did not upload the metadata, because the HTML file was rejected by the user")
       end
     end
 

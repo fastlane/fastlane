@@ -17,7 +17,7 @@ module Deliver
       end
 
       options[:app_identifier] = identifier if identifier.to_s.length > 0
-      options[:app_identifier] ||= ask("The Bundle Identifier of your App: ")
+      options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
     end
 
     def find_app(options)
@@ -27,7 +27,7 @@ module Deliver
       if app
         options[:app] = app
       else
-        raise "Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})".red
+        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
     end
 

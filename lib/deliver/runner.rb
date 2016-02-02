@@ -10,10 +10,10 @@ module Deliver
     end
 
     def login
-      Helper.log.info "Login to iTunes Connect (#{options[:username]})"
+      UI.message("Login to iTunes Connect (#{options[:username]})")
       Spaceship::Tunes.login(options[:username])
       Spaceship::Tunes.select_team
-      Helper.log.info "Login successful"
+      UI.message("Login successful")
     end
 
     def run
@@ -25,7 +25,7 @@ module Deliver
         upload_binary
       end
 
-      Helper.log.info "Finished the upload to iTunes Connect".green
+      UI.success("Finished the upload to iTunes Connect")
 
       submit_for_review if options[:submit_for_review]
     end
@@ -34,13 +34,13 @@ module Deliver
     # If not, the new version will automatically be created
     def verify_version
       app_version = options[:app_version]
-      Helper.log.info "Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file..."
+      UI.message("Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file...")
 
       changed = options[:app].ensure_version!(app_version)
       if changed
-        Helper.log.info "Successfully set the version to '#{app_version}'".green
+        UI.success("Successfully set the version to '#{app_version}'")
       else
-        Helper.log.info "'#{app_version}' is the latest version on iTunes Connect".green
+        UI.success("'#{app_version}' is the latest version on iTunes Connect")
       end
     end
 
@@ -63,7 +63,7 @@ module Deliver
 
     # Upload the binary to iTunes Connect
     def upload_binary
-      Helper.log.info "Uploading binary to iTunes Connect"
+      UI.message("Uploading binary to iTunes Connect")
       if options[:ipa]
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,

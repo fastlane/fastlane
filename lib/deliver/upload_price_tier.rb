@@ -10,12 +10,12 @@ module Deliver
 
       old_price = app.price_tier
       if options[:price_tier] == old_price
-        Helper.log.info "Price Tier unchanged (tier #{options[:price_tier]})".green
+        UI.success("Price Tier unchanged (tier #{options[:price_tier]})")
         return
       end
 
       app.update_price_tier!(options[:price_tier])
-      Helper.log.info "Successfully updated the pricing from #{old_price} to #{options[:price_tier]}".green
+      UI.success("Successfully updated the pricing from #{old_price} to #{options[:price_tier]}")
     end
   end
 end
