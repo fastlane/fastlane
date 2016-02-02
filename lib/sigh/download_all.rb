@@ -2,17 +2,17 @@ module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
     def download_all
-      UI.message "Starting login with user '#{Sigh.config[:username]}'"
+      Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
-      UI.message "Successfully logged in"
+      Helper.log.info "Successfully logged in"
 
       Spaceship.provisioning_profile.all.each do |profile|
         if profile.valid?
-          UI.message "Downloading profile '#{profile.name}'..."
+          Helper.log.info "Downloading profile '#{profile.name}'...".green
           download_profile(profile)
         else
-          UI.important "Skipping invalid/expired profile '#{profile.name}'"
+          Helper.log.info "Skipping invalid/expired profile '#{profile.name}'".yellow
         end
       end
     end

@@ -41,10 +41,10 @@ module Sigh
       puts `#{command}`
 
       if $?.to_i == 0
-        UI.success "Successfully signed #{ipa}!"
+        Helper.log.info "Successfully signed #{ipa}!".green
         true
       else
-        UI.error "Something went wrong while code signing #{ipa}"
+        Helper.log.fatal "Something went wrong while code signing #{ipa}".red
         false
       end
     end
@@ -76,7 +76,7 @@ module Sigh
 
     def find_signing_identity(signing_identity)
       until installed_identies.include?(signing_identity)
-        UI.error "Couldn't find signing identity '#{signing_identity}'."
+        Helper.log.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
 
@@ -90,21 +90,19 @@ module Sigh
     end
 
     def validate_resign_path(resign_path)
-      UI.user_error!('Could not find resign.sh file. Please try re-installing the gem') unless File.exist?(resign_path)
+      raise 'Could not find resign.sh file. Please try re-installing the gem.'.red unless File.exist?(resign_path)
     end
 
     def validate_ipa_file(ipa)
-      UI.user_error!("ipa file could not be found or is not an ipa file (#{ipa})") unless File.exist?(ipa) && ipa.end_with?('.ipa')
+      raise "ipa file could not be found or is not an ipa file (#{ipa})".red unless File.exist?(ipa) && ipa.end_with?('.ipa')
     end
 
     def validate_provisioning_file(provisioning_profile)
-      unless File.exist?(provisioning_profile) && provisioning_profile.end_with?('.mobileprovision')
-        UI.user_error!("Provisioning profile file could not be found or is not a .mobileprovision file (#{provisioning_profile})")
-      end
+      raise "Provisioning profile file could not be found or is not a .mobileprovision file (#{provisioning_profile})".red unless File.exist?(provisioning_profile) && provisioning_profile.end_with?('.mobileprovision')
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identies.join("\n\t")}\n"
+      Helper.log.info "Available identities: \n\t#{installed_identies.join("\n\t")}\n"
     end
 
     def ask_for_signing_identity

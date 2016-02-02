@@ -1,10 +1,10 @@
 module Sigh
   class Repair
     def repair_all
-      UI.message "Starting login with user '#{Sigh.config[:username]}'"
+      Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
-      UI.message "Successfully logged in"
+      Helper.log.info "Successfully logged in"
 
       # Select all 'Invalid' or 'Expired' provisioning profiles
       broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile|
@@ -12,19 +12,19 @@ module Sigh
       end
 
       if broken_profiles.count == 0
-        UI.success "All provisioning profiles are valid, nothing to do"
+        Helper.log.info "All provisioning profiles are valid, nothing to do".green
         return
       end
 
-      UI.success "Going to repair #{broken_profiles.count} provisioning profiles"
+      Helper.log.info "Going to repair #{broken_profiles.count} provisioning profiles".green
 
       # Iterate over all broken profiles and repair them
       broken_profiles.each do |profile|
-        UI.message "Repairing profile '#{profile.name}'..."
+        Helper.log.info "Repairing profile '#{profile.name}'..."
         profile.repair! # yes, that's all you need to repair a profile
       end
 
-      UI.success "Successfully repaired #{broken_profiles.count} provisioning profiles"
+      Helper.log.info "Successfully repaired #{broken_profiles.count} provisioning profiles".green
     end
   end
 end

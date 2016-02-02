@@ -11,35 +11,35 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Sigh::VERSION}")
 
-      UI.message "Starting login with user '#{Sigh.config[:username]}'"
+      Helper.log.info "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
-      UI.message "Successfully logged in"
+      Helper.log.info "Successfully logged in"
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]
       profiles ||= fetch_profiles # download the profile if it's there
 
       if profiles.count > 0
-        UI.success "Found #{profiles.count} matching profile(s)"
+        Helper.log.info "Found #{profiles.count} matching profile(s)".yellow
         profile = profiles.first
 
         if Sigh.config[:force]
           if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
-            UI.important "Updating the provisioning profile"
+            Helper.log.info "Updating the provisioning profile".yellow
           else
-            UI.important "Updating the profile to include all devices"
+            Helper.log.info "Updating the profile to include all devices".yellow
             profile.devices = Spaceship.device.all_for_profile_type(profile.type)
           end
 
           profile = profile.update! # assign it, as it's a new profile
         end
       else
-        UI.important "No existing profiles found, that match the certificates you have installed, creating a new one for you"
+        Helper.log.info "No existing profiles found, that match the certificates you have installed, creating a new one for you".yellow
         ensure_app_exists!
         profile = create_profile!
       end
 
-      UI.user_error!("Something went wrong fetching the latest profile") unless profile
+      raise "Something went wrong fetching the latest profile".red unless profile
 
       if profile_type == Spaceship.provisioning_profile.in_house
         ENV["SIGH_PROFILE_ENTERPRISE"] = "1"
@@ -64,7 +64,7 @@ module Sigh
 
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
-      UI.message "Fetching profiles..."
+      Helper.log.info "Fetching profiles..."
       results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
 
       # Take the provisioning profile name into account
@@ -100,12 +100,12 @@ module Sigh
 
       unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all.find { |p| p.name == name }
-          UI.error "The name '#{name}' is already taken, using another one."
+          Helper.log.error "The name '#{name}' is already taken, using another one."
           name += " #{Time.now.to_i}"
         end
       end
 
-      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'"
+      Helper.log.info "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'".yellow
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert)
@@ -137,11 +137,11 @@ module Sigh
       end
 
       if certificates.count > 1 and !Sigh.config[:development]
-        UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
-        UI.important "Available Code Signing Identities for current filters:"
+        Helper.log.info "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options.".yellow
+        Helper.log.info "Available Code Signing Identities for current filters:".green
         certificates.each do |c|
           str = ["\t- Name:", c.owner_name, "- ID:", c.id + "- Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
-          UI.message str.green
+          Helper.log.info str.green
         end
       end
 
@@ -149,8 +149,8 @@ module Sigh
         filters = ""
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
-        UI.important "No certificates for filter: #{filters}" if filters.length > 0
-        UI.user_error!("Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)")
+        Helper.log.info "No certificates for filter: #{filters}".yellow if filters.length > 0
+        raise "Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)".red
       end
 
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
@@ -160,7 +160,7 @@ module Sigh
 
     # Downloads and stores the provisioning profile
     def download_profile(profile)
-      UI.important "Downloading provisioning profile..."
+      Helper.log.info "Downloading provisioning profile...".yellow
       profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
 
@@ -170,7 +170,7 @@ module Sigh
         f.write(profile.download)
       end
 
-      UI.success "Successfully downloaded provisioning profile..."
+      Helper.log.info "Successfully downloaded provisioning profile...".green
       return output_path
     end
 
@@ -178,21 +178,21 @@ module Sigh
     def ensure_app_exists!
       return if Spaceship::App.find(Sigh.config[:app_identifier])
       print_produce_command(Sigh.config)
-      UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
+      raise "Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'"
     end
 
     def print_produce_command(config)
-      UI.message ""
-      UI.message "==========================================".yellow
-      UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
-      UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
-      UI.message ""
-      UI.message "produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
-      UI.message ""
-      UI.message "You will be asked for any missing information, like the full name of your app"
-      UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
-      UI.message "==========================================".yellow
-      UI.message ""
+      Helper.log.info ""
+      Helper.log.info "==========================================".yellow
+      Helper.log.info "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
+      Helper.log.info "You can easily generate a new App ID on the Developer Portal using 'produce':"
+      Helper.log.info ""
+      Helper.log.info "produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      Helper.log.info ""
+      Helper.log.info "You will be asked for any missing information, like the full name of your app"
+      Helper.log.info "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
+      Helper.log.info "==========================================".yellow
+      Helper.log.info ""
     end
   end
 end
