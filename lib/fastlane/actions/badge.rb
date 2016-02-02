@@ -2,8 +2,16 @@ module Fastlane
   module Actions
     class BadgeAction < Action
       def self.run(params)
+        Actions.verify_gem!('badge')
         require 'badge'
-        Badge::Runner.new.run('.', params[:dark], params[:custom], params[:no_badge], params[:shield], params[:alpha])
+        options = {
+          dark: params[:dark],
+          custom: params[:custom],
+          no_badge: params[:no_badge],
+          shield: params[:shield],
+          alpha: params[:alpha]
+        }
+        Badge::Runner.new.run('.', options)
       end
 
       #####################################################
