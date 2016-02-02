@@ -92,9 +92,9 @@ module FastlaneCore
       else
         # Special treatment if the user specififed true, false or YES, NO
         # There is no boolean typoe, so we just do it here
-        if %w(YES yes true).include?(value)
+        if %w(YES yes true TRUE).include?(value)
           return true
-        elsif %w(NO no false).include?(value)
+        elsif %w(NO no false FALSE).include?(value)
           return false
         end
       end
