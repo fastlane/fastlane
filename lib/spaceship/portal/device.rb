@@ -147,9 +147,8 @@ module Spaceship
           end
 
           # Find the device by UDID, raise an exception if it already exists
-          if self.find_by_udid(udid, mac: mac)
-            raise "The device UDID '#{udid}' already exists on this team."
-          end
+          existing = self.find_by_udid(udid, mac: mac)
+          return existing if existing
 
           # It is valid to have the same name for multiple devices
 
