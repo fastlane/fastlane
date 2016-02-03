@@ -3,9 +3,9 @@ require 'credentials_manager'
 
 module Screengrab
   class Options
-    def self.available_options
-      output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
+    DEVICE_TYPES = ["phone", "sevenInch", "tenInch", "tv", "wear"].freeze
 
+    def self.available_options
       @@options ||= [
         FastlaneCore::ConfigItem.new(key: :android_home,
                                      short_option: "-n",
@@ -30,7 +30,7 @@ module Screengrab
                                      short_option: "-o",
                                      env_name: "SCREENGRAB_OUTPUT_DIRECTORY",
                                      description: "The directory where to store the screenshots",
-                                     default_value: output_directory),
+                                     default_value: File.join("fastlane", "metadata", "android")),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
                                      description: "Don't open the summary after running `screengrab`",
@@ -75,7 +75,7 @@ module Screengrab
                                      short_option: "-k",
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
                                      verify_block: proc do |value|
-                                       raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :tests_apk_path,
                                      env_name: 'SCREENGRAB_TESTS_APK_PATH',
@@ -84,13 +84,21 @@ module Screengrab
                                      short_option: "-b",
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
-                                       raise "Could not find APK file at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :specific_device,
                                      env_name: 'SCREENGRAB_SPECIFIC_DEVICE',
                                      optional: true,
                                      description: "Use the device or emulator with the given serial number or qualifier",
-                                     short_option: "-s")
+                                     short_option: "-s"),
+        FastlaneCore::ConfigItem.new(key: :device_type,
+                                     env_name: 'SCREENGRAB_DEVICE_TYPE',
+                                     description: "Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)",
+                                     short_option: "-d",
+                                     default_value: "phone",
+                                     verify_block: proc do |value|
+                                       UI.user_error! "device_type must be one of: #{DEVICE_TYPES}" unless DEVICE_TYPES.include?(value)
+                                     end)
       ]
     end
   end

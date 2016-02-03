@@ -10,7 +10,7 @@ coverage/
 
 example/.gradle
 example/build
-example/fastlane/screenshots
+example/fastlane/metadata
 
 screengrab-lib/build
 

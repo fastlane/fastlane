@@ -159,7 +159,7 @@ public class Screengrab {
     }
 
     private static String localeToDirName(Locale locale) {
-        return locale.getLanguage() + "-" + locale.getCountry();
+        return locale.getLanguage() + "-" + locale.getCountry() + "/images/screenshots";
     }
 
     private static void createPathTo(File dir) throws IOException {
