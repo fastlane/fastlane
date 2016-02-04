@@ -48,7 +48,7 @@ module Scan
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :build
+        actions << :build unless config[:skip_build]
         actions << :test
 
         actions
