@@ -8,5 +8,4 @@ rvm:
   - 2.1.6
   - 2.2.2
 script:
-  - danger
   - bundle exec fastlane test
