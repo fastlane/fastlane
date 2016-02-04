@@ -53,7 +53,7 @@ module Cert
                                      default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain"].last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
-                                       raise "Keychain not found at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)
                                      end)
       ]
     end

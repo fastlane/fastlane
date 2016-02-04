@@ -89,7 +89,7 @@ Only if a new certificate needs to be created, `cert` will
 - Import all the generated files into your Keychain
 
 
-```cert``` will never revoke your existing certificates. If you can't create any more certificates, `cert` will raise an exception, which means, you have to revoke one of the existing certificates to make room for a new one.
+`cert` will never revoke your existing certificates. If you can't create any more certificates, `cert` will raise an exception, which means, you have to revoke one of the existing certificates to make room for a new one.
 
 
 You can pass your Apple ID:
