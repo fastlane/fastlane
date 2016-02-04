@@ -5,8 +5,28 @@ module Fastlane
     end
 
     class SlatherAction < Action
-      # rubocop:disable Metrics/CyclomaticComplexity
-      # rubocop:disable Metrics/PerceivedComplexity
+
+      ARGS_MAP = {
+        build_directory: "--build-directory",
+        input_format: "--input-format",
+        scheme: "--scheme",
+        buildkite: "--buildkite",
+        jenkins: "--jenkins",
+        travis: "--travis",
+        circleci: "--circleci",
+        coveralls: "--coveralls",
+        simple_output: "--simple-output",
+        gutter_json: "--gutter-json",
+        cobertura_xml: "--cobertura-xml",
+        html: "--html",
+        show: "--show",
+        source_directory: "--source-directory",
+        output_directory: "--output-directory",
+        binary_basename: "--binary-basename",
+        binary_file: "--binary-file",
+        ignore: "--ignore"
+      }.freeze
+
       def self.run(params)
         # This will fail if using Bundler. Skip the check rather than needing to
         # require bundler
@@ -14,31 +34,33 @@ module Fastlane
           Actions.verify_gem!('slather')
         end
 
-        command = ""
-        command += "bundle exec " if params[:use_bundle_exec]
-        command += "slather coverage "
-        command += " --build-directory #{params[:build_directory].shellescape}" if params[:build_directory]
-        command += " --input-format #{params[:input_format]}" if params[:input_format]
-        command += " --scheme #{params[:scheme].shellescape}" if params[:scheme]
-        command += " --buildkite" if params[:buildkite]
-        command += " --jenkins" if params[:jenkins]
-        command += " --travis" if params[:travis]
-        command += " --circleci" if params[:circleci]
-        command += " --coveralls" if params[:coveralls]
-        command += " --simple-output" if params[:simple_output]
-        command += " --gutter-json" if params[:gutter_json]
-        command += " --cobertura-xml" if params[:cobertura_xml]
-        command += " --html" if params[:html]
-        command += " --show" if params[:show]
-        command += " --source-directory #{params[:source_directory].shellescape}" if params[:source_directory]
-        command += " --output-directory #{params[:output_directory].shellescape}" if params[:output_directory]
-        if params[:ignore].kind_of?(String)
-          command += " --ignore #{params[:ignore].shellescape}"
-        elsif params[:ignore].kind_of?(Array)
-          command += " #{params[:ignore].map { |path| "--ignore #{path.shellescape}" }.join(' ')}"
-        end
-        command += " #{params[:proj].shellescape}"
+        command = build_command(params)
         sh command
+      end
+
+      def self.build_command(params)
+        command = []
+        command.push("bundle exec") if params[:use_bundle_exec]
+        command << "slather coverage"
+
+        ARGS_MAP.each do |key, cli_param|
+          cli_value = params[key]
+          if cli_value
+            if cli_value.kind_of?(TrueClass)
+              command << cli_param
+            elsif cli_value.kind_of?(String)
+              command << cli_param
+              command << cli_value.shellescape
+            elsif cli_value.kind_of?(Array)
+              command << cli_value.map { |path| "#{cli_param} #{path.shellescape}" }
+            end
+          else
+            next
+          end
+        end
+
+        command << params[:proj].shellescape
+        command.join(" ")
       end
 
       #####################################################
@@ -146,6 +168,14 @@ Slather is available at https://github.com/venmo/slather
                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
                                       description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
                                       is_string: false,
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :binary_basename,
+                                      env_name: "FL_SLATHER_BINARY_BASENAME",
+                                      description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :binary_file,
+                                      env_name: "FL_SLATHER_BINARY_FILE",
+                                      description: "Binary file name to be used for code coverage",
                                       default_value: false)
         ]
       end
