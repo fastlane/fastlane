@@ -8,34 +8,34 @@ module Frameit
     end
 
     def setup_frames
-      puts "----------------------------------------------------".green
-      puts "Looks like you have no device templates installed".green
-      puts "The images can not be pre-installed due to licensing".green
-      puts "Press Enter to get started".green
-      puts "----------------------------------------------------".green
+      UI.success "----------------------------------------------------"
+      UI.success "Looks like you have no device templates installed"
+      UI.success "The images can not be pre-installed due to licensing"
+      UI.success "Press Enter to get started"
+      UI.success "----------------------------------------------------"
       STDIN.gets
 
       system("open '#{DOWNLOAD_URL}'")
-      puts "----------------------------------------------------".green
-      puts "Download the zip files for the following devices".green
-      puts "iPhone 6s, iPhone 6s Plus, iPhone 5s, iPad mini 4 and iPad Pro".green
-      puts "You only need to download the devices you want to use".green
-      puts "Press Enter when you downloaded the zip files".green
-      puts "----------------------------------------------------".green
+      UI.success "----------------------------------------------------"
+      UI.success "Download the zip files for the following devices"
+      UI.success "iPhone 6s, iPhone 6s Plus, iPhone 5s, iPad mini 4 and iPad Pro"
+      UI.success "You only need to download the devices you want to use"
+      UI.success "Press Enter when you downloaded the zip files"
+      UI.success "----------------------------------------------------"
       STDIN.gets
 
       loop do
         system("mkdir -p '#{templates_path}' && open '#{templates_path}'")
-        puts "----------------------------------------------------".green
-        puts "Extract the downloaded files into the folder".green
-        puts "'#{templates_path}', which should be open in your Finder".green
-        puts "You can just copy the whole content into it.".green
-        puts "Press Enter when you extracted the files into the given folder".green
-        puts "----------------------------------------------------".green
+        UI.success "----------------------------------------------------"
+        UI.success "Extract the downloaded files into the folder"
+        UI.success "'#{templates_path}', which should be open in your Finder"
+        UI.success "You can just copy the whole content into it."
+        UI.success "Press Enter when you extracted the files into the given folder"
+        UI.success "----------------------------------------------------"
         STDIN.gets
 
         if !frames_exist?
-          puts "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{templates_path}'".red
+          UI.error "Sorry, I can't find the PSD files. Make sure you unzipped them into '#{templates_path}'"
         else
           break # everything is finished
         end
@@ -62,7 +62,7 @@ module Frameit
         resulting_path = psd.gsub('.psd', '.png')
         next if File.exist?(resulting_path)
 
-        Helper.log.debug "Converting PSD file '#{psd}'".yellow
+        UI.important "Converting PSD file '#{psd}'"
         image = MiniMagick::Image.open(psd)
         if image
           image.format 'png'
@@ -70,7 +70,7 @@ module Frameit
 
           image.write(resulting_path)
         else
-          Helper.log.error "Could not parse PSD file at path '#{psd}'"
+          UI.error "Could not parse PSD file at path '#{psd}'"
         end
       end
     end

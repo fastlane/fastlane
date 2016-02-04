@@ -9,7 +9,7 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      raise "Couldn't find file at path '#{path}'".red unless File.exist? path
+      UI.user_error "Couldn't find file at path '#{path}'" unless File.exist? path
       @color = color
       @path = path
       @size = FastImage.size(path)
@@ -36,7 +36,7 @@ module Frameit
       when sizes::MAC
         return 'Mac'
       else
-        Helper.log.error "Unknown device type for size #{@screen_size} for path '#{path}'"
+        UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
       end
     end
 

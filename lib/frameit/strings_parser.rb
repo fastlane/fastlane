@@ -2,8 +2,8 @@ module Frameit
   # This class will parse the .string files
   class StringsParser
     def self.parse(path)
-      raise "Couldn't find strings file at path '#{path}'".red unless File.exist? path
-      raise "Must be .strings file, only got '#{path}'".red unless path.end_with? ".strings"
+      UI.user_error! "Couldn't find strings file at path '#{path}'" unless File.exist? path
+      UI.user_error! "Must be .strings file, only got '#{path}'" unless path.end_with? ".strings"
 
       result = {}
 
@@ -20,8 +20,8 @@ module Frameit
             result[key] = value
           end
         rescue => ex
-          Helper.log.error ex
-          Helper.log.error line
+          UI.error ex
+          UI.error line
         end
       end
 

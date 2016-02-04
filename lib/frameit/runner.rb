@@ -28,12 +28,12 @@ module Frameit
             screenshot = Screenshot.new(full_path, color)
             screenshot.frame!
           rescue => ex
-            Helper.log.error ex
-            Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
+            UI.error ex.to_s
+            UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
           end
         end
       else
-        Helper.log.error "Could not find screenshots"
+        UI.error "Could not find screenshots"
       end
     end
   end

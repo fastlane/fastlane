@@ -39,7 +39,7 @@ module Frameit
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
       image.format "png"
       image.write output_path
-      Helper.log.info "Added frame: '#{File.expand_path(output_path)}'".green
+      UI.success "Added frame: '#{File.expand_path(output_path)}'"
     end
 
     # puts the screenshot into the frame
@@ -58,7 +58,7 @@ module Frameit
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
       end
-      raise "Could not find offset_information for '#{screenshot}'"
+      UI.user_error! "Could not find offset_information for '#{screenshot}'"
     end
 
     #########################################################################################
@@ -179,7 +179,7 @@ module Frameit
         # too large - resizing now
         smaller = (1.0 / ratio)
 
-        Helper.log.debug "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
+        UI.message "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
 
         title.resize "#{(smaller * title.width).round}x"
         keyword.resize "#{(smaller * keyword.width).round}x" if keyword
@@ -235,8 +235,8 @@ module Frameit
 
         current_font = font(key)
         text = fetch_text(key)
-        Helper.log.debug "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
-        Helper.log.debug "Adding text '#{text}'" if $verbose
+        UI.message "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
+        UI.message "Adding text '#{text}'" if $verbose
 
         text.gsub! '\n', "\n"
 
@@ -269,7 +269,7 @@ module Frameit
 
     # Fetches the title + keyword for this particular screenshot
     def fetch_text(type)
-      raise "Valid parameters :keyword, :title" unless [:keyword, :title].include? type
+      UI.user_error! "Valid parameters :keyword, :title" unless [:keyword, :title].include? type
 
       # Try to get it from a keyword.strings or title.strings file
       strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
@@ -281,11 +281,11 @@ module Frameit
 
       # No string files, fallback to Framefile config
       result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
-      Helper.log.debug "Falling back to default text as there was nothing specified in the .strings file" if $verbose
+      UI.message "Falling back to default text as there was nothing specified in the .strings file" if $verbose
 
       if type == :title and !result
         # title is mandatory
-        raise "Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json".red
+        UI.user_error! "Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json"
       end
 
       return result
@@ -307,13 +307,13 @@ module Frameit
             end
           else
             # No `supported` array, this will always be true
-            Helper.log.debug "Found a font with no list of supported languages, using this now" if $verbose
+            UI.message "Found a font with no list of supported languages, using this now" if $verbose
             return font["font"]
           end
         end
       end
 
-      Helper.log.debug "No custom font specified for #{screenshot}, using the default one" if $verbose
+      UI.message "No custom font specified for #{screenshot}, using the default one" if $verbose
       return nil
     end
   end
