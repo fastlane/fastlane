@@ -255,15 +255,31 @@ module FastlaneCore
 
       # xcode >= 6 might hang here if the user schemes are missing
       begin
-        require 'timeout'
-        @raw = Timeout.timeout(10) { `#{command}`.to_s }
+        timeout = FastlaneCore::Project.xcode_list_timeout
+        @raw = FastlaneCore::Project.run_command(command, timeout: timeout)
       rescue Timeout::Error
-        raise "xcodebuild -list timed-out. You might need to recreate the user schemes. See https://github.com/fastlane/gym/issues/143".red
+        raise "xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
+          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT".red
       end
 
       raise "Error parsing xcode file using `#{command}`".red if @raw.length == 0
 
       return @raw
+    end
+
+    # @internal to module
+    def self.xcode_list_timeout
+      (ENV['FASTLANE_XCODE_LIST_TIMEOUT'] || 10).to_i
+    end
+
+    # @internal to module
+    # runs the specified command and kills it if timeouts
+    # @raises Timeout::Error if timeout is passed
+    # @returns the output
+    # Note: currently affected by fastlane/fastlane_core#102
+    def self.run_command(command, timeout: 0)
+      require 'timeout'
+      @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
     end
 
     private
