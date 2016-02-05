@@ -54,10 +54,7 @@ module Snapshot
             (subtest["Subtests"] || []).each do |subtest2|
               (subtest2["Subtests"] || []).each do |subtest3|
                 (subtest3["ActivitySummaries"] || []).each do |activity|
-                  # We now check if it's the rotation gesture, because that's the only thing we care about
-                  if activity["Title"] == "Set device orientation to Unknown"
-                    to_store << activity["Attachments"].last["FileName"]
-                  end
+                  check_activity(activity, to_store)
                 end
               end
             end
@@ -68,6 +65,16 @@ module Snapshot
       Helper.log.info "Found #{to_store.count} screenshots..."
       Helper.log.info "Found #{to_store.join(', ')}" if $verbose
       return to_store
+    end
+
+    def self.check_activity(activity, to_store)
+      # We now check if it's the rotation gesture, because that's the only thing we care about
+      if activity["Title"] == "Set device orientation to Unknown"
+        to_store << activity["Attachments"].last["FileName"]
+      end
+      (activity["SubActivities"] || []).each do |subactivity|
+        check_activity(subactivity, to_store)
+      end
     end
   end
 end
