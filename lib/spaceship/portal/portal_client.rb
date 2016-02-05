@@ -377,6 +377,14 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
+      if csrf_tokens.count == 0
+        r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
+          teamId: team_id,
+          provisioningProfileId: profile_id
+        })
+        parse_response(r)
+      end
+
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id
