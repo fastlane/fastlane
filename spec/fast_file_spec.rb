@@ -334,5 +334,57 @@ describe Fastlane do
         end.to raise_exception "Lane 'test' was defined multiple times!".red
       end
     end
+
+    describe "lock_exec should run as expected" do
+      before do
+        @ff = Fastlane::FastFile.new
+
+        @global_lock_file = '/tmp/fastlane_global.lock'
+        @simulator_lock_file = '/tmp/fastlane_simulator.lock'
+        @cocoapods_lock_file = '/tmp/fastlane_cocoapods.lock'
+
+        if File.exist?(@global_lock_file)
+          File.delete(@global_lock_file)
+        end
+
+        if File.exist?(@simulator_lock_file)
+          File.delete(@simulator_lock_file)
+        end
+
+        if File.exist?(@cocoapods_lock_file)
+          File.delete(@cocoapods_lock_file)
+        end
+      end
+
+      it "lock_exec default lock is created" do
+        expect do
+          @ff.lock_exec do
+            if File.exist?(@global_lock_file)
+              raise 'lock_exec lock file was created'.green
+            end
+          end
+        end.to raise_exception "lock_exec lock file was created".green
+      end
+
+      it "lock_simulator default lock is created" do
+        expect do
+          @ff.lock_simulator do
+            if File.exist?(@simulator_lock_file)
+              raise 'lock_simulator lock file was created'.green
+            end
+          end
+        end.to raise_exception "lock_simulator lock file was created".green
+      end
+
+      it "lock_cocoapods default lock is created" do
+        expect do
+          @ff.lock_pods do
+            if File.exist?(@cocoapods_lock_file)
+              raise 'lock_cocoapods lock file was created'.green
+            end
+          end
+        end.to raise_exception "lock_cocoapods lock file was created".green
+      end
+    end
   end
 end

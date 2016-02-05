@@ -183,6 +183,19 @@ module Fastlane
       end
     end
 
+    # Lock execution of block across multiple fastlane instances
+    def lock_exec(lockname = "global", &block)
+      Helper::LockerHelper.lock_exec(lockname) { yield }
+    end
+
+    def lock_simulator(&block)
+      lock_exec("simulator") { yield }
+    end
+
+    def lock_pods(&block)
+      lock_exec("cocoapods") { yield }
+    end
+
     def desc(string)
       desc_collection << string
     end
