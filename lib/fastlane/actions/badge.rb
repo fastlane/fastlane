@@ -2,8 +2,16 @@ module Fastlane
   module Actions
     class BadgeAction < Action
       def self.run(params)
+        Actions.verify_gem!('badge')
         require 'badge'
-        Badge::Runner.new.run('.', params[:dark], params[:custom], params[:no_badge], params[:shield])
+        options = {
+          dark: params[:dark],
+          custom: params[:custom],
+          no_badge: params[:no_badge],
+          shield: params[:shield],
+          alpha: params[:alpha]
+        }
+        Badge::Runner.new.run('.', options)
       end
 
       #####################################################
@@ -16,7 +24,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will add a light/dark beta badge onto your app icon.",
+          "This action will add a light/dark badge onto your app icon.",
           "You can also provide your custom badge/overlay or add an shield for more customization more info:",
           "https://github.com/HazAT/badge"
         ].join("\n")
@@ -26,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :dark,
                                        env_name: "FL_BADGE_DARK",
-                                       description: "adds a dark flavored badge ontop of your icon",
+                                       description: "Adds a dark flavored badge ontop of your icon",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
@@ -34,14 +42,14 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :custom,
                                        env_name: "FL_BADGE_CUSTOM",
-                                       description: "add your custom overlay/badge image",
+                                       description: "Add your custom overlay/badge image",
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "custom should be a valid file path".red unless value and File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :no_badge,
                                        env_name: "FL_BADGE_NO_BADGE",
-                                       description: "hides the beta badge",
+                                       description: "Hides the beta badge",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
@@ -49,9 +57,17 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield,
                                        env_name: "FL_BADGE_SHIELD",
-                                       description: "add a shield to your app icon from shield.io",
+                                       description: "Add a shield to your app icon from shield.io",
                                        optional: true,
-                                       is_string: true)
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :alpha,
+                                       env_name: "FL_BADGE_ALPHA",
+                                       description: "Adds and alpha badge instead of the default beta one",
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         raise "alpha is only a flag and should always be true".red unless value == true
+                                       end)
         ]
       end
 

@@ -5,6 +5,7 @@ module Fastlane
         require 'plist'
         require 'xcodeproj'
 
+        info_plist_key = 'INFOPLIST_FILE'
         identifier_key = 'PRODUCT_BUNDLE_IDENTIFIER'
 
         # Read existing plist file
@@ -21,6 +22,11 @@ module Fastlane
           # Fetch the build configuration objects
           configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
           raise "Info plist uses $(#{identifier_key}), but xcodeproj does not".red unless configs.count > 0
+
+          unless Helper.test?
+            configs = configs.select { |obj| obj.build_settings[info_plist_key] == params[:plist_path] }
+            raise "Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.".red unless configs.count > 0
+          end
 
           # For each of the build configurations, set app identifier
           configs.each do |c|

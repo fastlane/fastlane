@@ -72,7 +72,7 @@ module Fastlane
 
             raise "Coulnd't find 'crashlytics-devtools.jar'" unless File.exist?(jar_path)
 
-            Helper.log.info "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'".green
+            UI.success "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'"
           rescue => ex
             raise "Error fetching remote file: #{ex}"
           end

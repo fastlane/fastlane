@@ -12,7 +12,7 @@ module Fastlane
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       return unless (path || '').length > 0
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+      UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
       content = File.read(path)
 
@@ -49,7 +49,7 @@ module Fastlane
           # rubocop:enable Lint/Eval
         rescue SyntaxError => ex
           line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
-          raise "Syntax error in your Fastfile on line #{line}: #{ex}".red
+          UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
         end
       end
 
@@ -62,7 +62,7 @@ module Fastlane
 
     # User defines a new lane
     def lane(lane_name, &block)
-      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
@@ -75,7 +75,7 @@ module Fastlane
 
     # User defines a new private lane, which can't be called from the CLI
     def private_lane(lane_name, &block)
-      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
@@ -88,7 +88,7 @@ module Fastlane
 
     # User defines a lane that can overwrite existing lanes. Useful when importing a Fastfile
     def override_lane(lane_name, &block)
-      raise "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.".red unless block
+      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
                                        block: block,
@@ -148,7 +148,7 @@ module Fastlane
         # Action is available, now execute it
         return self.runner.execute_action(method_sym, class_ref, arguments)
       else
-        raise "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.".red
+        UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
       end
     end
 
@@ -162,16 +162,16 @@ module Fastlane
 
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
-      raise 'No key given'.red unless key
+      UI.crash!('No key given') unless key
 
       return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
       return true if self.runner.lanes[key.to_sym].kind_of? Hash
 
-      raise "Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}".red
+      UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
     end
 
     def actions_path(path)
-      raise "Path '#{path}' not found!".red unless File.directory?(path)
+      UI.crash!("Path '#{path}' not found!") unless File.directory?(path)
 
       Actions.load_external_actions(path)
     end
@@ -192,14 +192,14 @@ module Fastlane
     end
 
     def import(path = nil)
-      raise "Please pass a path to the `import` action".red unless path
+      UI.user_error!("Please pass a path to the `import` action") unless path
 
       path = path.dup.gsub("~", Dir.home)
       unless Pathname.new(path).absolute? # unless an absolute path
         path = File.join(File.expand_path('..', @path), path)
       end
 
-      raise "Could not find Fastfile at path '#{path}'".red unless File.exist?(path)
+      UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
 
       collector.did_launch_action(:import)
       parse(File.read(path), path)
@@ -213,7 +213,7 @@ module Fastlane
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
     def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
-      raise "Please pass a path to the `import_from_git` action".red if url.to_s.length == 0
+      UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
@@ -231,7 +231,7 @@ module Fastlane
 
         clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        Helper.log.info "Cloning remote git repo..."
+        UI.message "Cloning remote git repo..."
         Actions.sh(clone_command)
 
         Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
@@ -250,7 +250,7 @@ module Fastlane
 
         if Dir.exist?(clone_folder)
           # We want to re-clone if the folder already exists
-          Helper.log.info "Clearing the git repo..."
+          UI.message "Clearing the git repo..."
           Actions.sh("rm -rf '#{tmp_path}'")
         end
       end

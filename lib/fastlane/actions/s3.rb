@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/PerceivedComplexity
 # rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
@@ -85,13 +84,15 @@ module Fastlane
         url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
         ipa_file_name = File.basename(ipa_file)
         ipa_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file_name}"
-        dsym_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{dsym_file}" if dsym_file
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH] = ipa_url
         ENV[SharedValues::S3_IPA_OUTPUT_PATH.to_s] = ipa_url
 
         if dsym_file
+          dsym_file_name = File.basename(dsym_file)
+          dsym_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{dsym_file_name}"
+
           Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
           ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_url
         end
@@ -353,5 +354,4 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize

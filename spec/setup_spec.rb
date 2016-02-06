@@ -27,7 +27,6 @@ describe Fastlane do
       it "setup is successful and generated inital Fastfile" do
         require 'produce'
 
-        expect(Produce::Manager).to receive(:start_producing)
         allow(FastlaneCore::Helper).to receive(:gem_path).with('fastlane').and_return(File.expand_path(".")) # since we chdir later on
 
         app = "app"

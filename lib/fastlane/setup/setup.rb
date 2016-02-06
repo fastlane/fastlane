@@ -38,10 +38,6 @@ module Fastlane
       Helper.log.info "No sensitive/private information will be uploaded"
       Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
-
-    def ask_for_crash_reporting
-      FastlaneCore::CrashReporting.ask_during_setup
-    end
   end
 end
 

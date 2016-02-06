@@ -61,7 +61,7 @@ describe Fastlane do
 
           create_plist_with_identifier("$(#{identifier_key})")
           Fastlane::FastFile.new.parse("lane :test do
-            update_app_identifier ({
+            update_app_identifier({
               xcodeproj: '#{xcodeproj}',
               plist_path: '#{plist_path}',
               app_identifier: '#{app_identifier}'

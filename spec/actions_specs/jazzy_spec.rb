@@ -8,6 +8,16 @@ describe Fastlane do
 
         expect(result).to eq("jazzy")
       end
+
+      it "add config option" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          jazzy(
+            config: '.jazzy.yaml'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("jazzy --config .jazzy.yaml")
+      end
     end
   end
 end

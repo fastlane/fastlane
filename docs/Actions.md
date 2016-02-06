@@ -2,7 +2,7 @@
 
 There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
 
-To get the most up-to-date information from the command line on your current verion you can also run:
+To get the most up-to-date information from the command line on your current version you can also run:
 
 ```sh
 fastlane actions: List all available fastlane actions
@@ -743,6 +743,19 @@ increment_build_number({
 })
 ```
 
+### Local Device
+
+### `install_on_device`
+
+Installs the ipa on the device, if no id is given, the first found iOS device will be used, works via USB or Wi-Fi.
+this requires `ios-deploy` to be installed please have a look at [ios-deploy](https://github.com/phonegap/ios-deploy). to quickly install it, use `npm -g i ios-deploy`
+
+```ruby
+install_on_device(
+  device_id: "a3be6c9ff7e5c3c6028597513243b0f933b876d4"
+  ipa: "./app.ipa"
+)
+```
 
 ### [HockeyApp](http://hockeyapp.net)
 ```ruby
@@ -850,6 +863,17 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 ```
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
+
+### make_changelog_from_jenkins
+
+Generate a changelog using the Changes section the running Jenkins job.
+
+```ruby
+make_changelog_from_jenkins(
+  # Optional, lets you set a changelog in the case is not generated on Jenkins or if ran outside of Jenkins
+  fallback_changelog: "Bug fixes and performance enhancements"
+)
+```
 
 ### [GitHub Releases](https://github.com)
 
@@ -1108,8 +1132,9 @@ update_app_identifier(
 Modify your app icon and add a badge to it. For more info how to use it see repo.
 
 ```ruby
-badge(dark: true) #or
-badge(custom: "/Users/xxx/Desktop/badge.png") #or
+badge(dark: true) # or
+badge(alpha: true) # or
+badge(custom: "/Users/xxx/Desktop/badge.png") # or
 badge(shield: "Version-0.0.3-blue", no_badge: true)
 ```
 
@@ -1255,7 +1280,8 @@ changelog_from_git_commits
 changelog_from_git_commits(
   between: ['7b092b3', 'HEAD'], # Optional, lets you specify a revision/tag range between which to collect commit info
   pretty: '- (%ae) %s', # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
-  match_lightweight_tag: false # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+  tag_match_pattern: nil, # Optional, lets you search for a tag name that matches a glob(7) pattern
+  match_lightweight_tag: false, # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
   include_merges: true # Optional, lets you filter out merge commits
 )
 ```
@@ -1504,9 +1530,10 @@ create_pull_request(
   api_token: ENV['GITHUB_TOKEN'],
   repo: 'fastlane/fastlane',
   title: 'Amazing new feature',
-  head: 'my-feature',           # optional, defaults to current branch name.
-  base: 'master',               # optional, defaults to 'master'.
-  body: 'Please pull this in!'  # optional
+  head: 'my-feature',                 # optional, defaults to current branch name.
+  base: 'master',                     # optional, defaults to 'master'.
+  body: 'Please pull this in!',       # optional
+  api_url: 'http://yourdomain/api/v3' # optional, for Github Enterprise, defaults to 'https://api.github.com'.
 )
 ```
 
@@ -1701,6 +1728,25 @@ podio_item(
 ```
 To see all environment values, please run ```fastlane action podio_item```.
 
+
+### [OneSignal](http://onesignal.com)
+Create a onesignal app for managing push notifications
+
+```ruby
+ENV["ONE_SIGNAL_APP_ID"] = "Resulting OneSignal app ID"
+ENV["ONE_SIGNAL_APP_AUTH_KEY"] = "Auth key for the created App"
+
+onesignal(
+  auth_token: "Your OneSignal Auth Token",
+  app_name: "Name for OneSignal App",
+  android_token: "Your Android GCM key (optional)",
+  apns_p12: "Path to Apple .p12 file (optional)"
+  apns_p12_password: "Password for .p12 file (optional)"
+  apns_env: "production/sandbox (defaults to production)"
+)
+
+```
+
 ## Other
 
 ### update_fastlane
@@ -1745,6 +1791,20 @@ sonar(
 It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
 
 ## Misc
+
+### twitter
+
+Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
+
+```ruby
+twitter(
+  access_token: "XXXX",
+  access_token_secret: "xxx",
+  consumer_key: "xxx",
+  consumer_secret: "xxx",
+  message: "You rock!"
+)
+```
 
 ### erb
 
@@ -2054,3 +2114,76 @@ opt_out_usage
 ### skip_docs
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
+
+
+### ssh
+
+Lets you execute a series of commands on a remote host, if one of the commands in command-array returns non 0 - it fails.
+
+```ruby
+ssh(
+  host: "dev.januschka.com",
+  username: "root",
+  commands: [
+    "date",
+    "echo 1 > /tmp/file1"
+  ]
+)
+
+```
+
+If one of the commands fails an exception is raised
+
+
+ssh(
+  host: "dev.januschka.com",
+  username: "root",
+  commands: [
+    "date",
+    "false",
+    "echo 'i wont be executed'"
+  ]
+)
+
+
+### scp
+
+Allows SCP file transfer.
+
+**Upload file/folder:**
+
+```ruby
+scp(
+  host: "dev.januschka.com",
+  username: "root",
+  upload: {
+    src: "/root/dir1",
+    dst: "/tmp/new_dir"      
+  }
+)
+```
+
+**Download file/folder:**
+
+```ruby
+scp(
+  host: "dev.januschka.com",
+  username: "root",
+  download: {
+    src: "/root/dir1",
+    dst: "/tmp/new_dir"      
+  }
+)
+```
+
+### rsync
+
+a wrapper around rsync, rsync is a tool that lets you synchronize files, including permissions and so on for a more detailed information about rsync please see ***rsync(1)*** manpage.
+
+
+```ruby
+rsync(
+  source: "root@host:/tmp/1.txt",
+  destination: "/tmp/local_file.txt"
+)
+```

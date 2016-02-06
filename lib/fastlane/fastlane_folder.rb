@@ -22,7 +22,7 @@ module Fastlane
     def self.create_folder!(path = nil)
       path = File.join(path || '.', FOLDER_NAME)
       FileUtils.mkdir_p(path)
-      Helper.log.info "Created new folder '#{path}'.".green
+      UI.success "Created new folder '#{path}'."
     end
   end
 end

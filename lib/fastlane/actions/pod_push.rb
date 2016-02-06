@@ -18,6 +18,10 @@ module Fastlane
           command << " --sources='#{sources}'"
         end
 
+        if params[:allow_warnings]
+          command << " --allow-warnings"
+        end
+
         result = Actions.sh("#{command}")
         Helper.log.info "Successfully pushed Podspec ⬆️ ".green
         return result
@@ -47,6 +51,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :repo,
                                        description: "The repo you want to push. Pushes to Trunk by default",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :allow_warnings,
+                                       description: "Allow warnings during pod push",
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :sources,
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
