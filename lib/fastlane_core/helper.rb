@@ -1,4 +1,5 @@
 require 'logger'
+require 'colored'
 
 module FastlaneCore
   # rubocop:disable Metrics/ModuleLength
