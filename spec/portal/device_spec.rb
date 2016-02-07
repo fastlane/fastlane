@@ -99,13 +99,12 @@ describe Spaceship::Device do
       end.to raise_error("You cannot create a device without a device_id (UDID) and name")
     end
 
-    it "raises an exception if the device ID is already registererd" do
-      expect do
-        device = Spaceship::Device.create!(name: "Demo", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
-      end.to raise_error "The device UDID 'e5814abb3b1d92087d48b64f375d8e7694932c39' already exists on this team."
+    it "doesn't trigger an ITC call if the device ID is already registered" do
+      expect(client).to_not receive(:create_device!)
+      device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
     end
 
-    it "doesn't raise an exception if the device name is already registererd" do
+    it "doesn't raise an exception if the device name is already registered" do
       expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", mac: false).and_return({})
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
     end
