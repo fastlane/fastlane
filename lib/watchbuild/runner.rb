@@ -39,7 +39,7 @@ module WatchBuild
             time_elapsed = Time.at(seconds_elapsed).utc.strftime "%H:%M:%S hours"
           end
 
-          Helper.log.info "Waiting since #{time_elapsed} for iTunes Connect to process the build #{build.train_version} (#{build.build_version})... this might take a while..."
+          Helper.log.info "Waiting #{time_elapsed} for iTunes Connect to process the build #{build.train_version} (#{build.build_version})... this might take a while..."
         rescue => ex
           Helper.log.error ex
           Helper.log.info "Something failed... trying again to recover"
