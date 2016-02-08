@@ -5,8 +5,23 @@ String lookupProperty(Project project, String gradlePropName, String envVarName)
     return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
 }
 
-// TODO Establish a canonical place to set/get version number info
-def versionNameString = '0.1.2'
+Properties loadProperties(String filePath) {
+    new Properties().with { props ->
+        new File(filePath).withInputStream { stream ->
+            props.load(stream)
+        }
+        props
+    }
+}
+
+Properties versionProps = loadProperties('../version.properties')
+
+int versionMajor = (versionProps['major'] ?: 0) as int
+int versionMinor = (versionProps['minor'] ?: 0) as int
+int versionPatch = (versionProps['patch'] ?: 0) as int
+
+String versionNameString = [versionMajor, versionMinor, versionPatch].join('.')
+int versionCodeInt = (1000000 * versionMajor) + (10000 * versionMinor) + (100 * versionPatch)
 
 buildscript {
     repositories {
@@ -23,7 +38,7 @@ android {
 
     defaultConfig {
         targetSdkVersion 23
-        versionCode 3
+        versionCode versionCodeInt
         versionName versionNameString
         minSdkVersion 8
     }
