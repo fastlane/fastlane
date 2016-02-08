@@ -18,7 +18,7 @@ module Fastlane
         # We built our app. Store the path to the apk
         flavor = task.match(/assemble(\w*)/)
         if flavor and flavor[1]
-          flavor = flavor[1].gsub(/([a-z])([A-Z])/,'\1-\2').downcase # ProductflavorBuildtype => productflavor-buildtype
+          flavor = flavor[1].gsub(/([a-z])([A-Z])/, '\1-\2').downcase # ProductflavorBuildtype => productflavor-buildtype
           apk_path = Dir[File.join("app", "build", "outputs", "apk", "*-#{flavor}.apk")].last
           if apk_path
             Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(apk_path)
