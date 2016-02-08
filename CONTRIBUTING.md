@@ -13,7 +13,7 @@ Before submitting a new issue, do the following:
 
 When submitting a new issue, please provide the following information:
 
-- The full stack trace and output when running `buildwatch`.
+- The full stack trace and output when running `watchbuild`.
 - The command and parameters you used to launch it.
 
 ### By providing this information it's much faster and easier to help you
