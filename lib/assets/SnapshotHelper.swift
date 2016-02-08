@@ -10,6 +10,7 @@ import Foundation
 import XCTest
 
 var deviceLanguage = ""
+var locale = ""
 
 @available(*, deprecated, message="use setupSnapshot: instead")
 func setLanguage(app: XCUIApplication) {
@@ -35,7 +36,7 @@ class Snapshot: NSObject {
         let path = "/tmp/language.txt"
 
         do {
-            let locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             deviceLanguage = locale.substringToIndex(locale.startIndex.advancedBy(2, limit:locale.endIndex))
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))", "-AppleLocale", "\"\(locale)\"", "-ui_testing"]
         } catch {
