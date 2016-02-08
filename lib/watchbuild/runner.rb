@@ -16,19 +16,30 @@ module WatchBuild
       Helper.log.info "Successfully logged in"
 
       start = Time.now
-      build = wait_for_build
+      build = wait_for_build(start)
       minutes = ((Time.now - start) / 60).round
       notification(build, minutes)
     end
 
-    def wait_for_build
+    def wait_for_build(start_time)
       raise "Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}".red unless app
 
       loop do
         begin
           build = find_build
           return build if build.processing == false
-          Helper.log.info "Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while..."
+
+          seconds_elapsed = (Time.now - start_time).to_i.abs
+          case seconds_elapsed
+          when 0..59
+            time_elapsed = Time.at(seconds_elapsed).utc.strftime "%S seconds"
+          when 60..3599
+            time_elapsed = Time.at(seconds_elapsed).utc.strftime "%M:%S minutes"
+          else
+            time_elapsed = Time.at(seconds_elapsed).utc.strftime "%H:%M:%S hours"
+          end
+
+          Helper.log.info "Waiting since #{time_elapsed} for iTunes Connect to process the build #{build.train_version} (#{build.build_version})... this might take a while..."
         rescue => ex
           Helper.log.error ex
           Helper.log.info "Something failed... trying again to recover"
