@@ -24,7 +24,7 @@ module Fastlane
         from = options[:from]
 
         message = options[:message]
-        if message_format == "html"
+        if (message_format == "html") && (options[:include_html_header] == true)
           message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{message[0..9999]}</td></tr></table>"
         end
 
@@ -152,6 +152,12 @@ module Fastlane
                                            raise 'Unrecognized message_format.'.red
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :include_html_header,
+                                       env_name: "FL_HIPCHAT_INCLUDE_HTML_HEADER",
+                                       description: "Should html formatted messages include a preformatted header? (true/false)",
+                                       default_value: true,
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :from,
                                        env_name: "FL_HIPCHAT_FROM",
                                        description: "Name the message will appear be sent from",
