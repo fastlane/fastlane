@@ -20,8 +20,8 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0
       upload_metadata
 
-      has_binary = options[:ipa] || options[:pkg]
-      if !options[:skip_binary_upload] && has_binary
+      has_binary = (options[:ipa] || options[:pkg])
+      if !options[:skip_binary_upload] && !options[:build_number] && has_binary
         upload_binary
       end
 

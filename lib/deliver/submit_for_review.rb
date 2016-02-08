@@ -15,7 +15,6 @@ module Deliver
 
       # User Values
       if options[:submission_information]
-        UI.user_error!("`submission_information` must be a hash") unless options[:submission_information].kind_of?(Hash)
         options[:submission_information].each do |key, value|
           UI.message("Setting '#{key}' to '#{value}'...")
           submission.send("#{key}=", value)
@@ -29,11 +28,19 @@ module Deliver
     end
 
     def select_build(options)
-      UI.message("Selecting the latest build...")
       app = options[:app]
       v = app.edit_version
-      build = wait_for_build(app)
 
+      if options[:build_number] and options[:build_number] != "latest"
+        UI.message("Selecting existing build-number: #{options[:build_number]}")
+        build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        unless build
+          UI.user_error!("Build number: #{options[:build_number]} does not exist")
+        end
+      else
+        UI.message("Selecting the latest build...")
+        build = wait_for_build(app)
+      end
       UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
 
       v.select_build(build)

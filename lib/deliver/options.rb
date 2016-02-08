@@ -94,6 +94,15 @@ module Deliver
                                      description: "The price tier of this application",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :build_number,
+                                     short_option: "-n",
+                                     description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
+                                     default_value: "latest",
+                                     optional: true,
+                                     conflicting_options: [:ipa, :pkg],
+                                     conflict_block: proc do |value|
+                                       raise "You can't use 'build_number' and '#{value.key}' options in one run.".red
+                                     end),
         FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
                                      short_option: "-g",
                                      description: "Path to the app rating's config",

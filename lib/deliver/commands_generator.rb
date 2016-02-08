@@ -49,7 +49,17 @@ module Deliver
           Deliver::Runner.new(options).run
         end
       end
-
+      command :submit_build do |c|
+        c.syntax = 'deliver submit_build'
+        c.description = 'Submit a specific build-nr for review, use latest for the latest build'
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(Deliver::Options.available_options, options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          options[:submit_for_review] = true
+          options[:build_number] = "latest" unless options[:build_number]
+          Deliver::Runner.new(options).run
+        end
+      end
       command :init do |c|
         c.syntax = 'deliver init'
         c.description = 'Create the initial `deliver` configuration based on an existing app'
