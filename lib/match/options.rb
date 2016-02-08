@@ -91,7 +91,12 @@ module Match
                                          end
                                        end
                                      end,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
+                                     env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
