@@ -9,10 +9,13 @@ module Screengrab
 
     attr_accessor :number_of_retries
 
-    def initialize
-      @executor = FastlaneCore::CommandExecutor
-      @config = Screengrab.config
-      @android_env = Screengrab.android_environment
+    def initialize(executor = FastlaneCore::CommandExecutor,
+                   config = Screengrab.config,
+                   android_env = Screengrab.android_environment)
+
+      @executor = executor
+      @config = config
+      @android_env = android_env
     end
 
     def run
