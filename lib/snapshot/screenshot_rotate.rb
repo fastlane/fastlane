@@ -5,13 +5,13 @@ module Snapshot
   class ScreenshotRotate
     # @param (String) The path in which the screenshots are located in
     def run(path)
-      Helper.log.debug "Rotating the screenshots (if necessary)"
+      UI.verbose "Rotating the screenshots (if necessary)"
       rotate(path)
     end
 
     def rotate(path)
       Dir.glob([path, '/**/*.png'].join('/')).each do |file|
-        Helper.log.debug "Rotating '#{file}'" if $verbose
+        UI.verbose "Rotating '#{file}'"
 
         command = nil
         if file.end_with? "landscapeleft.png"

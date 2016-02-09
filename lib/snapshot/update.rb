@@ -10,23 +10,21 @@ module Snapshot
       gem_path = Helper.gem_path("snapshot")
       paths = self.class.find_helper
 
-      Helper.log.info "Found the following SnapshotHelper:"
-      puts ''
-      paths.each { |p| Helper.log.info "\t#{p}" }
-      puts ''
-      Helper.log.info "Are you sure you want to automatically update the helpers listed above?"
-      Helper.log.info "This will overwrite all its content with the latest code."
-      Helper.log.info "The underlying API will not change. You can always migrate manually by looking at"
-      Helper.log.info "https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift"
+      UI.message "Found the following SnapshotHelper:"
+      paths.each { |p| UI.message "\t#{p}" }
+      UI.important "Are you sure you want to automatically update the helpers listed above?"
+      UI.message "This will overwrite all its content with the latest code."
+      UI.message "The underlying API will not change. You can always migrate manually by looking at"
+      UI.message "https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift"
 
-      return 1 unless agree("Overwrite configuration files? (y/n)".red, true)
+      return 1 unless UI.confirm("Overwrite configuration files?")
 
       paths.each do |path|
-        Helper.log.info "Updating '#{path}'..."
+        UI.message "Updating '#{path}'..."
         File.write(path, File.read("#{gem_path}/lib/assets/SnapshotHelper.swift"))
       end
 
-      Helper.log.info "Successfully updated helper files".green
+      UI.success "Successfully updated helper files"
     end
   end
 end

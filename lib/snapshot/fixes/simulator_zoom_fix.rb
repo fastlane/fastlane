@@ -10,7 +10,7 @@ module Snapshot
         # First we need to kill the simulator
         Snapshot.kill_simulator
 
-        Helper.log.debug "Patching '#{config_path}' to scale simulator to 100%"
+        UI.message "Patching '#{config_path}' to scale simulator to 100%"
 
         FastlaneCore::Simulator.all.each do |simulator|
           simulator_name = simulator.name.tr("\s", "-")

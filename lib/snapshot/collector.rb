@@ -1,6 +1,7 @@
 module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector
+    # Returns true if it succeeds
     def self.fetch_screenshots(output, language, device_type, launch_arguments_index)
       # Documentation about how this works in the project README
       containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
@@ -14,7 +15,7 @@ module Snapshot
       end
 
       if matches.count != to_store.count
-        Helper.log.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
+        UI.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
       end
 
       matches.each_with_index do |current, index|
@@ -30,9 +31,9 @@ module Snapshot
         output_path = File.join(language_folder, components.join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
-          Helper.log.info "Copying file '#{from_path}' to '#{output_path}'...".green
+          UI.success "Copying file '#{from_path}' to '#{output_path}'..."
         else
-          Helper.log.info "Copying '#{output_path}'...".green
+          UI.success "Copying '#{output_path}'..."
         end
         FileUtils.cp(from_path, output_path)
       end
@@ -41,10 +42,10 @@ module Snapshot
     end
 
     def self.attachments(containing)
-      Helper.log.info "Collecting screenshots..."
+      UI.message "Collecting screenshots..."
 
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
-      Helper.log.info "Loading up '#{plist_path}'..." if $verbose
+      UI.verbose "Loading up '#{plist_path}'..."
       report = Plist.parse_xml(plist_path)
 
       to_store = [] # contains the names of all the attachments we want to use
@@ -62,8 +63,8 @@ module Snapshot
         end
       end
 
-      Helper.log.info "Found #{to_store.count} screenshots..."
-      Helper.log.info "Found #{to_store.join(', ')}" if $verbose
+      UI.message "Found #{to_store.count} screenshots..."
+      UI.verbose "Found #{to_store.join(', ')}"
       return to_store
     end
 

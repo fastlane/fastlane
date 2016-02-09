@@ -11,10 +11,10 @@ module Snapshot
 
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
-        Helper.log.warn "Found old snapshot configuration file 'snapshot.js'".red
-        Helper.log.warn "You updated to snapshot 1.0 which now uses UI Automation".red
-        Helper.log.warn "Please follow the migration guide: https://github.com/fastlane/snapshot/blob/master/MigrationGuide.md".red
-        Helper.log.warn "And read the updated documentation: https://github.com/fastlane/snapshot".red
+        UI.error "Found old snapshot configuration file 'snapshot.js'"
+        UI.error "You updated to snapshot 1.0 which now uses UI Automation"
+        UI.error "Please follow the migration guide: https://github.com/fastlane/snapshot/blob/master/MigrationGuide.md"
+        UI.error "And read the updated documentation: https://github.com/fastlane/snapshot"
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
@@ -24,7 +24,7 @@ module Snapshot
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
-      Helper.log.info "Building and running project - this might take some time...".green
+      UI.success "Building and running project - this might take some time..."
 
       self.number_of_retries_due_to_failing_simulator = 0
       self.collected_errors = []
@@ -101,6 +101,7 @@ module Snapshot
       puts ""
     end
 
+    # Returns true if it succeded
     def launch(language, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -119,7 +120,7 @@ module Snapshot
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
-      Helper.log_alert("#{device_type} - #{language}")
+      UI.header("#{device_type} - #{language}")
 
       prefix_hash = [
         {
@@ -155,19 +156,19 @@ module Snapshot
     end
 
     def uninstall_app(device_type)
-      Helper.log.debug "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
+      UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
       Snapshot.config[:app_identifier] ||= ask("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
-      Helper.log.info "Launch Simulator #{device_type}".yellow
-      `xcrun instruments -w #{device_udid} &> /dev/null`
+      UI.message "Launch Simulator #{device_type}"
+      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
-      Helper.log.info "Uninstall application #{Snapshot.config[:app_identifier]}".yellow
-      `xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null`
+      UI.message "Uninstall application #{Snapshot.config[:app_identifier]}"
+      Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
     end
 
     def clear_previous_screenshots
-      Helper.log.info "Clearing previously generated screenshots".yellow
+      UI.important "Clearing previously generated screenshots"
       path = File.join(".", Snapshot.config[:output_directory], "*", "*.png")
       Dir[path].each do |current|
         File.delete(current)
@@ -181,9 +182,9 @@ module Snapshot
         content = File.read(path)
 
         if content.include?("start.pressForDuration(0, thenDragToCoordinate: finish)")
-          Helper.log.error "Your '#{path}' is outdated, please run `snapshot update`".red
-          Helper.log.error "to update your Helper file".red
-          raise "Please update your Snapshot Helper file".red
+          UI.error "Your '#{path}' is outdated, please run `snapshot update`"
+          UI.error "to update your Helper file"
+          UI.user_error!("Please update your Snapshot Helper file")
         end
       end
     end
