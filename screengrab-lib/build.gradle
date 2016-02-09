@@ -1,20 +1,17 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
-
 String lookupProperty(Project project, String gradlePropName, String envVarName) {
     return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
 }
 
-Properties loadProperties(String filePath) {
+Properties loadProperties(File propsFile) {
     new Properties().with { props ->
-        new File(filePath).withInputStream { stream ->
+        propsFile.withInputStream { stream ->
             props.load(stream)
         }
         props
     }
 }
 
-Properties versionProps = loadProperties('../version.properties')
+Properties versionProps = loadProperties(rootProject.file('version.properties'))
 
 int versionMajor = (versionProps['major'] ?: 0) as int
 int versionMinor = (versionProps['minor'] ?: 0) as int
@@ -31,6 +28,9 @@ buildscript {
         classpath 'com.novoda:bintray-release:0.3.4'
     }
 }
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 23
