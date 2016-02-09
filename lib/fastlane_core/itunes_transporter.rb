@@ -46,7 +46,7 @@ module FastlaneCore
     def download(app_id, dir = nil)
       dir ||= "/tmp"
 
-      Helper.log.info "Going to download app metadata from iTunesConnect"
+      Helper.log.info "Going to download app metadata from iTunes Connect"
       command = build_download_command(@user, @password, app_id, dir)
       Helper.log.debug build_download_command(@user, 'YourPassword', app_id, dir) if $verbose
 
@@ -54,7 +54,7 @@ module FastlaneCore
 
       itmsp_path = File.join(dir, "#{app_id}.itmsp")
       if result and File.directory? itmsp_path
-        Helper.log.info "Successfully downloaded the latest package from iTunesConnect.".green
+        Helper.log.info "Successfully downloaded the latest package from iTunes Connect.".green
       else
         handle_error(@password)
       end
@@ -62,7 +62,7 @@ module FastlaneCore
       result
     end
 
-    # Uploads the modified package back to iTunesConnect
+    # Uploads the modified package back to iTunes Connect
     # @param app_id [Integer] The unique App ID
     # @param dir [String] the path in which the package file is located
     # @return (Bool) True if everything worked fine
@@ -71,7 +71,7 @@ module FastlaneCore
     def upload(app_id, dir)
       dir = File.join(dir, "#{app_id}.itmsp")
 
-      Helper.log.info "Going to upload updated app to iTunesConnect"
+      Helper.log.info "Going to upload updated app to iTunes Connect"
       Helper.log.info "This might take a few minutes, please don't interrupt the script".green
 
       command = build_upload_command(@user, @password, dir)
@@ -81,7 +81,7 @@ module FastlaneCore
 
       if result
         Helper.log.info(("-" * 102).green)
-        Helper.log.info("Successfully uploaded package to iTunesConnect. It might take a few minutes until it's visible online.".green)
+        Helper.log.info("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.".green)
         Helper.log.info(("-" * 102).green)
 
         FileUtils.rm_rf(dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
