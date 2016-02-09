@@ -48,7 +48,7 @@ When running the setup commands, please read the instructions shown in the termi
 
     fastlane init
 
-This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/produce) which will create your app on iTunesConnect and the Apple Developer Center, and enable [`sigh`](https://github.com/KrauseFx/sigh) and [`deliver`](https://github.com/KrauseFx/deliver).
+This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/produce) which will create your app on iTunes Connect and the Apple Developer Center, and enable [`sigh`](https://github.com/KrauseFx/sigh) and [`deliver`](https://github.com/KrauseFx/deliver).
 
 That's it, you should have received a success message.
 
