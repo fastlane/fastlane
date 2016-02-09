@@ -1728,6 +1728,23 @@ podio_item(
 ```
 To see all environment values, please run ```fastlane action podio_item```.
 
+### [OneSignal](https://onesignal.com)
+Create a onesignal app for managing push notifications
+
+```ruby
+ENV["ONE_SIGNAL_APP_ID"] = "Resulting OneSignal app ID"
+ENV["ONE_SIGNAL_APP_AUTH_KEY"] = "Auth key for the created App"
+
+onesignal(
+  auth_token: "Your OneSignal Auth Token",
+  app_name: "Name for OneSignal App",
+  android_token: "Your Android GCM key (optional)",
+  apns_p12: "Path to Apple .p12 file (optional)"
+  apns_p12_password: "Password for .p12 file (optional)"
+  apns_env: "production/sandbox (defaults to production)"
+)
+```
+
 ## Other
 
 ### update_fastlane
