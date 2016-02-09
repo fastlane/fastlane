@@ -88,6 +88,18 @@ module Snapshot
                                      optional: true,
                                      description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      default_value: ENV["SNAPSHOT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+        FastlaneCore::ConfigItem.new(key: :add_photos,
+                                     env_name: 'SNAPSHOT_PHOTOS',
+                                     short_option: "-j",
+                                     description: "A list of photos that should be added to the simulator before running the application",
+                                     type: Array,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :add_videos,
+                                     env_name: 'SNAPSHOT_VIDEOS',
+                                     short_option: "-u",
+                                     description: "A list of videos that should be added to the simulator before running the application",
+                                     type: Array,
+                                     optional: true),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,

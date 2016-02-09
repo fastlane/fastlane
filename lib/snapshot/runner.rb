@@ -123,6 +123,9 @@ module Snapshot
         uninstall_app(device_type)
       end
 
+      add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
+      add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
+
       command = TestCommandGenerator.generate(device_type: device_type)
 
       UI.header("#{device_type} - #{language}")
@@ -179,6 +182,21 @@ module Snapshot
       Helper.log.info "Erasing #{device_type}...".yellow
 
       `xcrun simctl erase #{device_udid} &> /dev/null`
+    end
+
+    def add_media(device_type, media_type, paths)
+      media_type = media_type.to_s
+
+      UI.verbose "Adding #{media_type}s to #{device_type}..."
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      UI.message "Launch Simulator #{device_type}"
+      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+
+      paths.each do |path|
+        UI.message "Adding '#{path}'"
+        Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+      end
     end
 
     def clear_previous_screenshots
