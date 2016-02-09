@@ -41,7 +41,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile 'tools.fastlane:screengrab:0.1.1'
+    androidTestCompile 'tools.fastlane:screengrab:0.1.2'
 
 // The following allows you to link directly against the source code of the screengrab lib project
 // for local development
