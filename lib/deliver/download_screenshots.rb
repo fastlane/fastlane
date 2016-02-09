@@ -6,7 +6,7 @@ module Deliver
       UI.success("Successfully downloaded all existing screenshots")
     rescue => ex
       UI.error(ex)
-      UI.error("Couldn't download already existing screenshots from iTunesConnect.")
+      UI.error("Couldn't download already existing screenshots from iTunes Connect.")
     end
 
     def self.download(options, folder_path)
