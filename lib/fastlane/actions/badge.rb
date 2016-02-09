@@ -11,7 +11,7 @@ module Fastlane
           shield: params[:shield],
           alpha: params[:alpha]
         }
-        Badge::Runner.new.run('.', options)
+        Badge::Runner.new.run(params[:path], options)
       end
 
       #####################################################
@@ -67,6 +67,15 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          raise "alpha is only a flag and should always be true".red unless value == true
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: "FL_BADGE_PATH",
+                                       description: "Sets the root path to look for AppIcons",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: '.',
+                                       verify_block: proc do |value|
+                                         raise "path needs to be a valid directory".red if Dir[value].empty?
                                        end)
         ]
       end
