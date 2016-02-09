@@ -5,7 +5,7 @@ module Fastlane
         if params[:path].kind_of?(String)
           paths = "'#{params[:path]}'"
         else
-          paths = params[:path].join(" ")
+          paths = params[:path].map {|path| "'#{path}'" }.join(" ")
         end
 
         result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")

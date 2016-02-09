@@ -14,7 +14,7 @@ describe Fastlane do
           git_commit(path: ['./fastlane/README.md', './fastlane/LICENSE'], message: 'message')
         end").runner.execute(:test)
 
-        expect(result).to eq("git commit -m 'message' ./fastlane/README.md ./fastlane/LICENSE")
+        expect(result).to eq("git commit -m 'message' './fastlane/README.md' './fastlane/LICENSE'")
       end
     end
   end
