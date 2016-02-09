@@ -85,7 +85,7 @@ module Match
       command << "&> /dev/null" unless $verbose # to show show an error message is something goes wrong
       success = system(command.join(' '))
 
-      raise "Error decrypting '#{path}'" unless success
+      UI.crash!("Error decrypting '#{path}'") unless success
       FileUtils.mv(tmpfile, path)
     end
   end

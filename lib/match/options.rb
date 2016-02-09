@@ -21,7 +21,7 @@ module Match
                                      default_value: 'development',
                                      verify_block: proc do |value|
                                        unless Match.environments.include?(value)
-                                         raise "Unsupported environment #{value}, must be in #{Match.environments.join(', ')}".red
+                                         UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -87,7 +87,7 @@ module Match
                                          if value.start_with?("/var/folders") or value.include?("tmp/") or value.include?("temp/")
                                            # that's fine
                                          else
-                                           raise "Specify the `git_url` instead of the `path`".red
+                                           UI.user_error!("Specify the `git_url` instead of the `path`")
                                          end
                                        end
                                      end,
