@@ -58,10 +58,6 @@ describe Match do
       expect(spaceship).to receive(:profile_exists).and_return(true)
       expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
-      profiles = "profiles"
-      expect(Spaceship).to receive(:provisioning_profile).and_return(profiles)
-      expect(profiles).to receive(:all).and_return([])
-
       Match::Runner.new.run(config)
     end
   end
