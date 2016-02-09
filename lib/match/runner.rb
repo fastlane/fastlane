@@ -74,7 +74,10 @@ module Match
 
       # Install the provisioning profiles
       profile = profiles.last
-      params[:force] = device_count_different?(profile: profile) unless params[:force]
+
+      if params[:force_for_new_devices]
+        params[:force] = device_count_different?(profile: profile) unless params[:force]
+      end
 
       if profile.nil? or params[:force]
         UI.crash!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
