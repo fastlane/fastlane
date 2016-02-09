@@ -56,7 +56,7 @@ module Snapshot
     def run_for_device_and_language(language, device, launch_arguments, retries = 0)
       return launch(language, device, launch_arguments)
     rescue => ex
-      UI.error ex.to_s # we should to show right here as well
+      UI.error ex.to_s # show the reason for failure to the user, but still maybe retry
 
       if retries < Snapshot.config[:number_of_retries]
         UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
