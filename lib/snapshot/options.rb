@@ -121,7 +121,13 @@ module Snapshot
                                      short_option: "-s",
                                      env_name: 'SNAPSHOT_SCHEME',
                                      description: "The scheme you want to use, this must be the scheme for the UI Tests",
-                                     optional: true) # optional true because we offer a picker to the user
+                                     optional: true), # optional true because we offer a picker to the user
+        FastlaneCore::ConfigItem.new(key: :number_of_retries,
+                                     short_option: "-n",
+                                     env_name: 'SNAPSHOT_NUMBER_OF_RETRIES',
+                                     description: "The number of times a test can fail before snapshot should stop retrying",
+                                     type: Integer,
+                                     default_value: 1)
       ]
     end
   end
