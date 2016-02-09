@@ -21,6 +21,10 @@ module Gym
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
                                        UI.user_error!("Workspace file invalid") unless File.directory?(v)
                                        UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
+                                     end,
+                                     conflicting_options: [:project],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can only pass either a 'workspace' or a '#{value.key}', not both")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -32,6 +36,10 @@ module Gym
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
                                        UI.user_error!("Project file invalid") unless File.directory?(v)
                                        UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
+                                     end,
+                                     conflicting_options: [:workspace],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can only pass either a 'project' or a '#{value.key}', not both")
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
