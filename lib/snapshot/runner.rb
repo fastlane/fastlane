@@ -3,7 +3,11 @@ require 'plist'
 
 module Snapshot
   class Runner
-    attr_accessor :number_of_retries
+    # The number of times we failed on launching the simulator... sigh
+    attr_accessor :number_of_retries_due_to_failing_simulator
+
+    # All the errors we experience while running snapshot
+    attr_accessor :collected_errors
 
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
@@ -22,8 +26,8 @@ module Snapshot
 
       Helper.log.info "Building and running project - this might take some time...".green
 
-      self.number_of_retries = 0
-      errors = []
+      self.number_of_retries_due_to_failing_simulator = 0
+      self.collected_errors = []
       results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
       Snapshot.config[:devices].each do |device|
@@ -31,28 +35,38 @@ module Snapshot
           Snapshot.config[:languages].each do |language|
             results[device] ||= {}
 
-            begin
-              results[device][language] = launch(language, device, launch_arguments)
-            rescue => ex
-              Helper.log.error ex # we should to show right here as well
-              Helper.log.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}"
-              errors << ex
-              results[device][language] = false
-              raise ex if Snapshot.config[:stop_after_first_error]
-            end
+            results[device][language] = run_for_device_and_language(language, device, launch_arguments)
           end
         end
       end
 
       print_results(results)
 
-      raise errors.join('; ') if errors.count > 0
+      raise self.collected_errors.join('; ') if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
 
       # Clear the Derived Data
       FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
+    end
+
+    # This is its own method so that it can re-try if the tests fail randomly
+    # @return true/false depending on if the tests succeded
+    def run_for_device_and_language(language, device, launch_arguments, retries = 0)
+      return launch(language, device, launch_arguments)
+    rescue => ex
+      UI.error ex.to_s # we should to show right here as well
+
+      if retries < Snapshot.config[:number_of_retries]
+        UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
+        run_for_device_and_language(language, device, launch_arguments, retries + 1)
+      else
+        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
+        self.collected_errors << ex
+        raise ex if Snapshot.config[:stop_after_first_error]
+        return false # for the results
+      end
     end
 
     def config_launch_arguments
@@ -125,14 +139,14 @@ module Snapshot
                                                 ErrorHandler.handle_test_error(output, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                Helper.log.info "Caught error... #{return_code}".red
+                                                UI.error "Caught error... #{return_code}"
 
-                                                self.number_of_retries += 1
-                                                if self.number_of_retries < 20
+                                                self.number_of_retries_due_to_failing_simulator += 1
+                                                if self.number_of_retries_due_to_failing_simulator < 20
                                                   launch(language, device_type, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
-                                                  raise "Too many errors... no more retries...".red
+                                                  UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
 
