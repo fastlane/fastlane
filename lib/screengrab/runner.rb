@@ -269,6 +269,7 @@ module Screengrab
         # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
         dest_dir = File.join(File.dirname(screenshots_dir), device_type_dir_name)
 
+        FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)
         FileUtils.rm_r(screenshots_dir)
         UI.success "Screenshots copied to #{dest_dir}"
