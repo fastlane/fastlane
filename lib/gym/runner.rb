@@ -88,9 +88,9 @@ module Gym
                                                 ErrorHandler.handle_build_error(output)
                                               end)
 
+      mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
       UI.success "Successfully stored the archive. You can find it in the Xcode Organizer."
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
-      mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
     end
 
     # Makes sure the archive is there and valid
