@@ -6,12 +6,16 @@ module Fastlane
 
     class GetGithubReleaseAction < Action
       def self.run(params)
-        Helper.log.info "Getting release on GitHub (#{params[:url]}: #{params[:version]})"
+        Helper.log.info "Getting release on GitHub (#{params[:server_url]}/#{params[:url]}: #{params[:version]})"
         require 'excon'
         require 'base64'
+
+        server_url = params[:server_url]
+        server_url = server_url[0..-2] if server_url.end_with? '/'
+
         headers = { 'User-Agent' => 'fastlane-get_github_release' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
-        response = Excon.get("https://api.github.com/repos/#{params[:url]}/releases", headers: headers)
+        response = Excon.get("#{server_url}/repos/#{params[:url]}/releases", headers: headers)
 
         case response[:status]
         when 404
@@ -109,6 +113,14 @@ module Fastlane
                                          raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include? "github.com"
                                          raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
                                        end),
+          FastlaneCore::ConfigItem.new(key: :server_url,
+                                       env_name: "FL_GITHUB_RELEASE_SERVER_URL",
+                                       description: "The server url. e.g. 'https://your.github.server/api/v3' (Default: 'https://api.github.com')",
+                                       default_value: "https://api.github.com",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Please include the protocol in the server url, e.g. https://your.github.server".red unless value.include? "//"
+                                       end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_GET_GITHUB_RELEASE_VERSION",
                                        description: "The version tag of the release to check"),
@@ -120,7 +132,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "czechboy0"]
+        ["KrauseFx", "czechboy0", "jaleksynas"]
       end
 
       def self.is_supported?(platform)

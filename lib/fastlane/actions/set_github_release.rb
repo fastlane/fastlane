@@ -26,9 +26,11 @@ module Fastlane
 
         repo_name = params[:repository_name]
         api_token = params[:api_token]
+        server_url = params[:server_url]
+        server_url = server_url[0..-2] if server_url.end_with? '/'
 
         # create the release
-        response = call_releases_endpoint("post", repo_name, "/releases", api_token, body)
+        response = call_releases_endpoint("post", server_url, repo_name, "/releases", api_token, body)
 
         case response[:status]
         when 201
@@ -47,7 +49,7 @@ module Fastlane
             self.upload_assets(assets, body['upload_url'], api_token)
 
             # fetch the release again, so that it contains the uploaded assets
-            get_response = self.call_releases_endpoint("get", repo_name, "/releases/#{release_id}", api_token, nil)
+            get_response = self.call_releases_endpoint("get", server_url, repo_name, "/releases/#{release_id}", api_token, nil)
             if get_response[:status] != 200
               Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
               raise "Failed to fetch the newly created release, but it *has been created* successfully.".red
@@ -139,8 +141,8 @@ module Fastlane
         return response
       end
 
-      def self.call_releases_endpoint(method, repo, endpoint, api_token, body)
-        url = "https://api.github.com/repos/#{repo}#{endpoint}"
+      def self.call_releases_endpoint(method, server, repo, endpoint, api_token, body)
+        url = "#{server}/repos/#{repo}#{endpoint}"
         self.call_endpoint(url, method, self.headers(api_token), body)
       end
 
@@ -175,6 +177,14 @@ module Fastlane
                                        verify_block: proc do |value|
                                          raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.include? "github.com"
                                          raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.split('/').count != 2
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :server_url,
+                                       env_name: "FL_GITHUB_RELEASE_SERVER_URL",
+                                       description: "The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')",
+                                       default_value: "https://api.github.com",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Please include the protocol in the server url, e.g. https://your.github.server/api/v3".red unless value.include? "//"
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
