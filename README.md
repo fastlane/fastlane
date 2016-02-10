@@ -47,19 +47,15 @@ Screengrab is a commandline tool that automates taking localized screenshots of 
 - Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/supply)
 
 # Installation
+Install the gem
 
-Once this tool is officially released, the installation will be as simple as running `gem install screengrab` For the private alpha, please follow these testing instructions:
-
-##### Command line tool installation
-1. Clone the repo with `git clone git@github.com:fastlane/screengrab.git`
-1. `cd` into your screengrab repo directory and run `rake install`
-    - You may need to `gem install bundler` if you don't already have bundler
-    - If you're using the default Ruby on Mac OS you may need to use `sudo`
-1. Run `screengrab init` to complete installation
+```
+gem install screengrab
+```
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:0.1.1'
+androidTestCompile 'tools.fastlane:screengrab:0.2.0'
 ```
 
 ##### Configuring your Manifest Permissions
