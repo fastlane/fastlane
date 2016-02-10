@@ -110,10 +110,11 @@ module Fastlane
         # Gets info used for the plist
         info = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa_file)
 
+        build_num = info['CFBundleVersion']
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
         title = info['CFBundleName']
-        full_version = "#{bundle_version}.#{info['CFBundleVersion']}"
+        full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
         plist_file_name = "#{url_part}#{title.delete(' ')}.plist"
@@ -134,6 +135,7 @@ module Fastlane
         end
         plist_render = eth.render(plist_template, {
           url: ipa_url,
+          build_num: build_num,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
@@ -147,6 +149,7 @@ module Fastlane
         end
         html_render = eth.render(html_template, {
           url: plist_url,
+          build_num: build_num,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title
@@ -160,6 +163,8 @@ module Fastlane
         end
         version_render = eth.render(version_template, {
           url: plist_url,
+          build_num: build_num,
+          bundle_version: bundle_version,
           full_version: full_version
         })
 
