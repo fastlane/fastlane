@@ -73,7 +73,7 @@ module Fastlane
 
       def self.output
         [
-          ['APK_OUTPUT_PATH', 'The path to the newly generated apk file']
+          ['GRADLE_APK_OUTPUT_PATH', 'The path to the newly generated apk file']
         ]
       end
 
