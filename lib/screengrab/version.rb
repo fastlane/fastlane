@@ -23,5 +23,5 @@ module Screengrab
   end
 
   VERSION = determine_version.freeze
-  DESCRIPTION = "Automate taking localized screenshots of your Android app on real devices or emulators".freeze
+  DESCRIPTION = "Automated localized screenshots of your Android app on every device".freeze
 end
