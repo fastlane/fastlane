@@ -33,9 +33,7 @@ screengrab
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/screengrab/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
 
-### Automates screenshots of your Android app
-
-Screengrab is a commandline tool that automates taking localized screenshots of your Android app.
+###### Automated localized screenshots of your Android app on every device
 
 <img src="assets/running-screengrab.gif" width="640">
 
