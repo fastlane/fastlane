@@ -48,7 +48,7 @@ screengrab
 Install the gem
 
 ```
-gem install screengrab
+sudo gem install screengrab
 ```
 
 ##### Gradle dependency
