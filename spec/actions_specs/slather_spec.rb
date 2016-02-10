@@ -21,11 +21,13 @@ describe Fastlane do
             source_directory: 'baz',
             output_directory: '123',
             ignore: 'nothing',
-            proj: 'foo.xcodeproj'
+            proj: 'foo.xcodeproj',
+            binary_basename: 'YourApp',
+            binary_file: 'you'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage  --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --ignore nothing foo.xcodeproj")
+        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
       end
 
       it "works with bundle" do
@@ -48,11 +50,13 @@ describe Fastlane do
             source_directory: 'baz',
             output_directory: '123',
             ignore: 'nothing',
-            proj: 'foo.xcodeproj'
+            proj: 'foo.xcodeproj',
+            binary_basename: 'YourApp',
+            binary_file: 'you'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec slather coverage  --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --ignore nothing foo.xcodeproj")
+        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
       end
 
       it "requires project to be specified" do
@@ -88,7 +92,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage  --build-directory build\\ dir --input-format bah --scheme Foo\\ App --source-directory source\\ dir --output-directory output\\ dir --ignore nothing\\ to\\ ignore foo\\ bar.xcodeproj")
+        expect(result).to eq("slather coverage --build-directory build\\ dir --input-format bah --scheme Foo\\ App --source-directory source\\ dir --output-directory output\\ dir --ignore nothing\\ to\\ ignore foo\\ bar.xcodeproj")
       end
 
       it "works with multiple ignore patterns" do
@@ -99,7 +103,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage  --ignore Pods/\\* --ignore ../\\*\\*/\\*/Xcode\\* foo.xcodeproj")
+        expect(result).to eq("slather coverage --ignore Pods/\\* --ignore ../\\*\\*/\\*/Xcode\\* foo.xcodeproj")
       end
     end
   end
