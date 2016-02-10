@@ -56,6 +56,22 @@ module Gym
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
       end
+
+      def manifest_path
+        ""
+      end
+
+      def app_thinning_path
+        ""
+      end
+
+      def app_thinning_size_report_path
+        ""
+      end
+
+      def apps_path
+        ""
+      end
     end
   end
 end
