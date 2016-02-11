@@ -88,17 +88,25 @@ module Spaceship
 
         build ||= latest_build if testing_type == 'external'
 
-        data['trains'].each do |train|
-          train["#{testing_type}Testing"]['value'] = false
-          train["#{testing_type}Testing"]['value'] = new_value if train['versionString'] == version_string
+        # Delete the irrelevant trains and update the relevant one to enable testing
+        data['trains'].delete_if do |train|
+          if train['versionString'] != version_string
+            true
+          else
+            train["#{testing_type}Testing"]['value'] = false
+            train["#{testing_type}Testing"]['value'] = new_value
 
-          # find correct build
-          train['builds'].select! { |b| !b["#{testing_type}Testing"].nil? && !build.nil? && b['buildVersion'] == build.build_version }
+            # also update the builds
+            train['builds'].each do |b|
+              next if b["#{testing_type}Testing"].nil?
+              next if build.nil?
+              next if b["buildVersion"] != build.build_version
 
-          # also update the build if it was found
-          train['builds'].each do |b|
-            b["#{testing_type}Testing"]['value'] = false
-            b["#{testing_type}Testing"]['value'] = new_value if b['trainVersion'] == version_string
+              b["#{testing_type}Testing"]['value'] = false
+              b["#{testing_type}Testing"]['value'] = new_value
+            end
+
+            false
           end
         end
 
