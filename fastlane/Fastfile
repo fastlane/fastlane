@@ -47,7 +47,7 @@ lane :release do |options|
   old_version = current_version(tool: tool_name)
   puts "Deploying #{tool_name} #{version}"
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
-    raise "Version number #{version} was already deployed"
+    UI.user_error!("Version number #{version} was already deployed")
   end
 
   # Git verification
@@ -125,7 +125,7 @@ private_lane :validate_repo do |options|
   unless no_binary.include? tool_name
     content = sh "#{binary_path} --help"
     ["--version", "https://fastlane.tools", tool_name].each do |current|
-      raise "--help missing information: '#{current}'" unless content.include? current
+      UI.user_error!("--help missing information: '#{current}'") unless content.include? current
     end
   end
 
