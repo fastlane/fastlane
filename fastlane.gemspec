@@ -48,6 +48,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'supply', '>= 0.3.0', '< 1.0.0'
   spec.add_dependency 'scan', '>= 0.5.0', '< 1.0.0'
   spec.add_dependency 'match', '>= 0.3.0', '< 1.0.0'
+  spec.add_dependency 'screengrab', '>= 0.2.0', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
