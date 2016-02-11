@@ -632,13 +632,16 @@ module Spaceship
       r.body['data']
     end
 
-    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, encryption_info: nil, encryption: nil)
+    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, encryption_info: nil, encryption: nil, is_exempt: true, proprietary: false, third_party: false)
       return unless encryption_info['exportComplianceRequired']
       # only sometimes this is required
 
       encryption_info['usesEncryption']['value'] = encryption
       encryption_info['encryptionUpdated'] ||= {}
       encryption_info['encryptionUpdated']['value'] = encryption
+      encryption_info['isExempt']['value'] = is_exempt
+      encryption_info['containsProprietaryCryptography']['value'] = proprietary
+      encryption_info['containsThirdPartyCryptography']['value'] = third_party
 
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/complete"
