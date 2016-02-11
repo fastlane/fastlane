@@ -176,7 +176,7 @@ module Spaceship
         client.submit_testflight_build_for_review!(parameters)
 
         # Last, enable beta testing for this train (per iTC requirement). This will fail until the app has been approved for beta testing
-        self.build_train.update_testing_status!(true, 'external')
+        self.build_train.update_testing_status!(true, 'external', self)
 
         return parameters
       end
