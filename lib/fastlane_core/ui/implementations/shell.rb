@@ -30,19 +30,19 @@ module FastlaneCore
     #####################################################
 
     def error(message)
-      log.error(message.red)
+      log.error(message.to_s.red)
     end
 
     def important(message)
-      log.warn(message.yellow)
+      log.warn(message.to_s.yellow)
     end
 
     def success(message)
-      log.info(message.green)
+      log.info(message.to_s.green)
     end
 
     def message(message)
-      log.info(message)
+      log.info(message.to_s)
     end
 
     def command(message)
@@ -58,7 +58,7 @@ module FastlaneCore
     end
 
     def verbose(message)
-      log.debug(message) if $verbose
+      log.debug(message.to_s) if $verbose
     end
 
     def header(message)
