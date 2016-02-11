@@ -87,23 +87,28 @@ module Spaceship
         data = client.build_trains(self.application.apple_id, testing_type)
 
         build ||= latest_build if testing_type == 'external'
+        testing_key = "#{testing_type}Testing"
 
         # Delete the irrelevant trains and update the relevant one to enable testing
         data['trains'].delete_if do |train|
           if train['versionString'] != version_string
             true
           else
-            train["#{testing_type}Testing"]['value'] = false
-            train["#{testing_type}Testing"]['value'] = new_value
+            train[testing_key]['value'] = new_value
 
             # also update the builds
-            train['builds'].each do |b|
-              next if b["#{testing_type}Testing"].nil?
-              next if build.nil?
-              next if b["buildVersion"] != build.build_version
+            train['builds'].delete_if do |b|
+              return true if b[testing_key].nil?
 
-              b["#{testing_type}Testing"]['value'] = false
-              b["#{testing_type}Testing"]['value'] = new_value
+              if build && b["buildVersion"] == build.build_version
+                b[testing_key]['value'] = new_value
+                false
+              elsif b[testing_key]['value'] == true
+                b[testing_key]['value'] = false
+                false
+              else
+                true
+              end
             end
 
             false
