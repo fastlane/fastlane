@@ -1,6 +1,7 @@
 require 'pty'
 require 'open3'
 require 'fileutils'
+require 'shellwords'
 
 module Gym
   class Runner
@@ -77,6 +78,11 @@ module Gym
       Gym::XcodebuildFixes.watchkit2_fix
     end
 
+    def mark_archive_as_built_by_gym(archive_path)
+      escaped_archive_path = archive_path.shellescape
+      system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
+    end
+
     # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
@@ -88,6 +94,7 @@ module Gym
                                                 ErrorHandler.handle_build_error(output)
                                               end)
 
+      mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
       UI.success "Successfully stored the archive. You can find it in the Xcode Organizer."
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
