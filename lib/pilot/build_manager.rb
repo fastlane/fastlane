@@ -107,9 +107,19 @@ module Pilot
       # First, set the changelog (if necessary)
       uploaded_build.update_build_information!(whats_new: options[:changelog])
 
-      # Submit for internal beta testing
+      # Submit for review before external testflight is available
+      if options[:distribute_external]
+        uploaded_build.client.submit_testflight_build_for_review!(
+          app_id: uploaded_build.build_train.application.apple_id,
+          train: uploaded_build.build_train.version_string,
+          build_number: uploaded_build.build_version,
+          platform: uploaded_build.platform
+        )
+      end
+
+      # Submit for beta testing
       type = options[:distribute_external] ? 'external' : 'internal'
-      uploaded_build.build_train.update_testing_status!(true, type)
+      uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
       return true
     end
   end
