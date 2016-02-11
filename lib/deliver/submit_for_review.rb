@@ -55,7 +55,7 @@ module Deliver
       start = Time.now
 
       loop do
-        build = find_build(app)
+        build = find_build(app.latest_version.candidate_builds)
         return build if build.processing == false
 
         UI.message("Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
@@ -68,16 +68,16 @@ module Deliver
       nil
     end
 
-    def find_build(app)
+    def find_build(candidate_builds)
       build = nil
-      app.latest_version.candidate_builds.each do |b|
+      candidate_builds.each do |b|
         if !build or b.upload_date > build.upload_date
           build = b
         end
       end
 
       unless build
-        UI.error(app.latest_version.candidate_builds)
+        UI.error(candidate_builds)
         UI.crash!("Could not find build")
       end
 
