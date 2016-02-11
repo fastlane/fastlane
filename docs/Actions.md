@@ -99,6 +99,25 @@ Add this action to your `appstore` lane. Keep in mind this action might take sev
 verify_xcode
 ```
 
+### [screengrab](https://github.com/fastlane/screengrab)
+
+`screengrab` automates taking localized screenshots of your Android app on every device
+
+```ruby
+screengrab
+```
+
+Other options (`screengrab --help`)
+
+```ruby
+screengrab(
+  locales: ['en-US', 'fr-FR', 'ja-JP'],
+  clear_previous_screenshots: true,
+  app_apk_path: 'build/outputs/apk/example-debug.apk',
+  tests_apk_path: 'build/outputs/apk/example-debug-androidTest-unaligned.apk'
+)
+```
+
 ### [snapshot](https://github.com/fastlane/snapshot)
 
 ```ruby
@@ -630,7 +649,7 @@ oclint(
   enable_clang_static_analyzer: true,   # Enable Clang Static Analyzer, and integrate results into OCLint report
   enable_global_analysis: true,         # Compile every source, and analyze across global contexts (depends on number of source files, could results in high memory load)
   allow_duplicated_violations: true     # Allow duplicated violations in the OCLint report
-)  
+)
 ```
 
 ### [SwiftLint](https://github.com/realm/SwiftLint)
@@ -2156,7 +2175,7 @@ scp(
   username: "root",
   upload: {
     src: "/root/dir1",
-    dst: "/tmp/new_dir"      
+    dst: "/tmp/new_dir"
   }
 )
 ```
@@ -2169,7 +2188,7 @@ scp(
   username: "root",
   download: {
     src: "/root/dir1",
-    dst: "/tmp/new_dir"      
+    dst: "/tmp/new_dir"
   }
 )
 ```
