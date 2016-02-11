@@ -153,6 +153,7 @@ module Spaceship
           app_id: self.build_train.application.apple_id,
           train: self.build_train.version_string,
           build_number: self.build_version,
+          platform: self.platform,
 
           # Required Metadata:
           changelog: "No changelog provided",
@@ -200,7 +201,8 @@ module Spaceship
       def cancel_beta_review!
         client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id,
                                                      train: self.build_train.version_string,
-                                              build_number: self.build_version)
+                                              build_number: self.build_version,
+                                                  platform: self.platform)
       end
     end
   end

@@ -281,9 +281,9 @@ module Spaceship
       handle_itc_response(data)
     end
 
-    def create_version!(app_id, version_number)
+    def create_version!(app_id, version_number, platform = 'ios')
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/ios/versions/create/"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/versions/create/"
         req.body = {
           version: {
             value: version_number.to_s
@@ -526,9 +526,9 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil)
+    def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/reject"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/reject"
         req.body = {}.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -567,7 +567,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil,
+    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
                                             # Required Metadata:
                                             changelog: nil,
                                             description: nil,
@@ -585,7 +585,7 @@ module Spaceship
                                             review_password: nil,
                                             encryption: false)
 
-      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number)
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       # Now fill in the values provided by the user
 
       # First the localised values:
@@ -607,7 +607,7 @@ module Spaceship
       build_info['testInfo']['reviewPassword']['value'] = review_password
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
 
         req.body = build_info.to_json
         req.headers['Content-Type'] = 'application/json'
@@ -618,13 +618,14 @@ module Spaceship
       update_encryption_compliance(app_id: app_id,
                                    train: train,
                                    build_number: build_number,
+                                   platform: platform,
                                    encryption_info: encryption_info,
                                    encryption: encryption)
     end
 
-    def get_build_info_for_review(app_id: nil, train: nil, build_number: nil)
+    def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       r = request(:get) do |req|
-        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
@@ -632,7 +633,7 @@ module Spaceship
       r.body['data']
     end
 
-    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, encryption_info: nil, encryption: nil, is_exempt: true, proprietary: false, third_party: false)
+    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, platform: 'ios', encryption_info: nil, encryption: nil, is_exempt: true, proprietary: false, third_party: false)
       return unless encryption_info['exportComplianceRequired']
       # only sometimes this is required
 
@@ -644,7 +645,7 @@ module Spaceship
       encryption_info['containsThirdPartyCryptography']['value'] = third_party
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/submit/complete"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/complete"
         req.body = encryption_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
