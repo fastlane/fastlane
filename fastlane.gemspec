@@ -30,24 +30,24 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
 
-  spec.add_dependency 'fastlane_core', '>= 0.36.1', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.36.2', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.14.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.19.4', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.9.0', '< 2.0.0'
-  spec.add_dependency 'snapshot', '>= 1.6.0', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.10.0', '< 2.0.0'
+  spec.add_dependency 'snapshot', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.4.1', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.2.0', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.3.0', '< 2.0.0'
   spec.add_dependency 'sigh', '>= 1.3.1', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.1.0', '< 2.0.0'
-  spec.add_dependency 'gym', '>= 1.5.0', '< 2.0.0'
-  spec.add_dependency 'pilot', '>= 1.2.1', '< 2.0.0'
+  spec.add_dependency 'gym', '>= 1.6.0', '< 2.0.0'
+  spec.add_dependency 'pilot', '>= 1.3.0', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.3.0', '< 1.0.0'
-  spec.add_dependency 'scan', '>= 0.4.2', '< 1.0.0'
-  spec.add_dependency 'match', '>= 0.2.5', '< 1.0.0'
+  spec.add_dependency 'scan', '>= 0.5.0', '< 1.0.0'
+  spec.add_dependency 'match', '>= 0.3.0', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
