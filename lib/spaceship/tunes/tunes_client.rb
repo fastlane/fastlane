@@ -590,21 +590,21 @@ module Spaceship
 
       # First the localised values:
       build_info['testInfo']['details'].each do |current|
-        current['whatsNew']['value'] = changelog
-        current['description']['value'] = description
-        current['feedbackEmail']['value'] = feedback_email
-        current['marketingUrl']['value'] = marketing_url
-        current['privacyPolicyUrl']['value'] = privacy_policy_url
+        current['whatsNew']['value'] = changelog if changelog
+        current['description']['value'] = description if description
+        current['feedbackEmail']['value'] = feedback_email if feedback_email
+        current['marketingUrl']['value'] = marketing_url if marketing_url
+        current['privacyPolicyUrl']['value'] = privacy_policy_url if privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
       build_info['significantChange'] ||= {}
       build_info['significantChange']['value'] = significant_change
-      build_info['testInfo']['reviewFirstName']['value'] = first_name
-      build_info['testInfo']['reviewLastName']['value'] = last_name
-      build_info['testInfo']['reviewPhone']['value'] = phone_number
-      build_info['testInfo']['reviewEmail']['value'] = review_email
-      build_info['testInfo']['reviewUserName']['value'] = review_user_name
-      build_info['testInfo']['reviewPassword']['value'] = review_password
+      build_info['testInfo']['reviewFirstName']['value'] = first_name if first_name
+      build_info['testInfo']['reviewLastName']['value'] = last_name if last_name
+      build_info['testInfo']['reviewPhone']['value'] = phone_number if phone_number
+      build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
+      build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
+      build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
 
       r = request(:post) do |req| # same URL, but a POST request
         req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
