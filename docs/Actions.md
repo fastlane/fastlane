@@ -822,6 +822,8 @@ The uploaded `version.json` file provides an easy way for apps to poll if a new 
 }
 ```
 
+This action currently supports [aws-sdk v2](https://github.com/aws/aws-sdk-ruby)
+
 ### [DeployGate](https://deploygate.com/)
 
 You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).

@@ -208,23 +208,25 @@ module Fastlane
         Actions.verify_gem!('aws-sdk')
         require 'aws-sdk'
         if s3_region
-          s3_client = AWS::S3.new(
+          s3_client = Aws::S3::Resource.new(
             access_key_id: s3_access_key,
             secret_access_key: s3_secret_access_key,
             region: s3_region
           )
         else
-          s3_client = AWS::S3.new(
+          s3_client = Aws::S3::Resource.new(
             access_key_id: s3_access_key,
             secret_access_key: s3_secret_access_key
           )
         end
 
-        bucket = s3_client.buckets[s3_bucket]
-
-        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
-        html_obj = bucket.objects.create(html_file_name, html_render.to_s, acl: :public_read)
-        version_obj = bucket.objects.create(version_file_name, version_render.to_s, acl: :public_read)
+        bucket = s3_client.bucket(s3_bucket)
+        plist_obj = bucket.object(plist_file_name)
+        plist_obj.put(body: plist_render.to_s, acl: "public-read")
+        html_obj = bucket.object(html_file_name)
+        html_obj.put(body: html_render.to_s, acl: "public-read")
+        version_obj = bucket.object(version_file_name)
+        version_obj.put(body: version_render.to_s, acl: "public-read")
 
         # Setting actionand environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
