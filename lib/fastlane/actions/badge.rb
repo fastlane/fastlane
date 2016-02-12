@@ -9,7 +9,9 @@ module Fastlane
           custom: params[:custom],
           no_badge: params[:no_badge],
           shield: params[:shield],
-          alpha: params[:alpha]
+          alpha: params[:alpha],
+          shield_io_timeout: params[:shield_io_timeout],
+          glob: params[:glob]
         }
         Badge::Runner.new.run(params[:path], options)
       end
@@ -76,7 +78,20 @@ module Fastlane
                                        default_value: '.',
                                        verify_block: proc do |value|
                                          raise "path needs to be a valid directory".red if Dir[value].empty?
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :shield_io_timeout,
+                                       env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
+                                       description: "Set custom duration for the timeout of the shield.io request in seconds",
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         raise "shield_io_timeout needs to be an integer > 0".red if value.to_i < 1
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :glob,
+                                       env_name: "FL_BADGE_GLOB",
+                                       description: "Glob pattern for finding image files",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 
