@@ -1078,15 +1078,25 @@ You can also only receive the version number without modifying it
 version = get_version_number(xcodeproj: "Project.xcodeproj")
 ```
 
+### get_build_number_repository
+```ruby
+get_build_number_repository
+```
+
+This action will get the **build number** according to what the SCM HEAD reports.
+Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).
+
+There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash.
+
 ### set_build_number_repository
 ```ruby
 set_build_number_repository
 ```
 
 This action will set the **build number** according to what the SCM HEAD reports.
-Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash).
+Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).
 
-There are no options currently available for this action.
+There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash.
 
 ### update_project_team
 This action allows you to modify the developer team. This may be useful if you want to use a different team for alpha, beta or distribution.
