@@ -87,12 +87,12 @@ module Pilot
     def list(all_testers, title)
       rows = []
       all_testers.each do |tester|
-        rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count]
+        rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count, tester.full_version, tester.pretty_install_date]
       end
 
       puts Terminal::Table.new(
         title: title.green,
-        headings: ["First", "Last", "Email", "Devices"],
+        headings: ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"],
         rows: rows
       )
     end
