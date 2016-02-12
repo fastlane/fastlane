@@ -97,7 +97,6 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :build_number,
                                      short_option: "-n",
                                      description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
-                                     default_value: "latest",
                                      optional: true,
                                      conflicting_options: [:ipa, :pkg],
                                      conflict_block: proc do |value|
