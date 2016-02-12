@@ -34,16 +34,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :destination,
                                        short_option: "-D",
                                        env_name: "FL_ERB_DST",
-                                       description: "destination file",
+                                       description: "Destination file",
                                        optional: true,
                                        is_string: true
                                       ),
           FastlaneCore::ConfigItem.new(key: :placeholders,
                                        short_option: "-p",
-                                       env_name: "FL_ERB_LOG",
-                                       description: "Log Commands",
-                                       optional: true,
-                                       default_value: true,
+                                       env_name: "FL_ERB_PLACEHOLDERS",
+                                       description: "Placeholders given as a hash",
+                                       default_value: {},
                                        is_string: false,
                                        type: Hash
                                       )
