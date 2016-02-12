@@ -7,8 +7,7 @@ module Snapshot
 
     class SimulatorZoomFix
       def self.patch
-        # First we need to kill the simulator
-        Snapshot.kill_simulator
+        Snapshot.kill_simulator # First we need to kill the simulator
 
         UI.message "Patching '#{config_path}' to scale simulator to 100%"
 
@@ -16,9 +15,7 @@ module Snapshot
           simulator_name = simulator.name.tr("\s", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 
-          command = "defaults write '#{config_path}' '#{key}' '1.0'"
-          puts command.yellow if $debug
-          `#{command}`
+          Helper.backticks("defaults write '#{config_path}' '#{key}' '1.0'", print: $verbose)
         end
       end
 
