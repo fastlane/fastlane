@@ -40,7 +40,7 @@ module Screengrab
                                      env_name: 'SCREENGRAB_APP_PACKAGE_NAME',
                                      short_option: "-a",
                                      description: "The package name of the app under test (e.g. com.yourcompany.yourapp)",
-                                     default_value: ENV["screengrab_APP_PACKAGE_NAME"] || CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :tests_package_name,
                                      env_name: 'SCREENGRAB_TESTS_PACKAGE_NAME',
                                      optional: true,
