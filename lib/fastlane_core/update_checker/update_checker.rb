@@ -68,7 +68,10 @@ module FastlaneCore
       url = UPDATE_URL + gem_name
       params = {}
       params["ci"] = "1" if Helper.is_ci?
-      params["p_hash"] = p_hash if p_hash
+
+      project_hash = p_hash
+      params["p_hash"] = project_hash if project_hash
+
       url += "?" + URI.encode_www_form(params) if params.count > 0
       return url
     end
@@ -94,7 +97,15 @@ module FastlaneCore
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
       require 'credentials_manager'
       value = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-      return Digest::SHA256.hexdigest("p" + value + "fastlan3_SAlt") if value # hashed + salted the bundle identifier
+      unless value
+        value = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+        value = "android_project_#{value}" if value # if the iOS and Android app share the same app identifier
+      end
+
+      if value
+        return Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt") # hashed + salted the bundle identifier
+      end
+
       return nil
     rescue
       return nil
