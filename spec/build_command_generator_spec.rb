@@ -58,10 +58,17 @@ describe Gym do
         expect(result).to eq(["-scheme 'Example'", "-project './examples/standard/Example.xcodeproj'"])
       end
 
-      it "#build_path" do
+      it "default #build_path" do
         result = Gym::BuildCommandGenerator.build_path
         regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
         expect(result).to match(regex)
+      end
+
+      it "user provided #build_path" do
+        options = { project: "./examples/standard/Example.xcodeproj", build_path: "/tmp/my/build_path" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        result = Gym::BuildCommandGenerator.build_path
+        expect(result).to eq("/tmp/my/build_path")
       end
 
       it "#archive_path" do

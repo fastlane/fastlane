@@ -124,10 +124,14 @@ module Gym
                                      end),
 
         # Very optional
+        FastlaneCore::ConfigItem.new(key: :build_path,
+                                     env_name: "GYM_BUILD_PATH",
+                                     description: "The directory in which the archive should be stored in",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :archive_path,
                                      short_option: "-b",
                                      env_name: "GYM_ARCHIVE_PATH",
-                                     description: "The directory in which the archive file should be stored in",
+                                     description: "The path to the created archive",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-f",
