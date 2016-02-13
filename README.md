@@ -239,7 +239,8 @@ devices([
 languages([
   "en-US",
   "de-DE",
-  "es-ES"
+  "es-ES",
+  ["pt", "pt_BR"] # Portuguese with Brazilian locale
 ])
 
 launch_arguments("-username Felix")
@@ -352,6 +353,8 @@ If you want to add frames around the screenshots and even put a title on top, ch
 ```ruby
 ALL_LANGUAGES = ["da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "id", "it", "ja", "ko", "ms", "nl", "no", "pt-BR", "pt-PT", "ru", "sv", "th", "tr", "vi", "zh-Hans", "zh-Hant"]
 ```
+
+To get more information about language and locale codes please read [Internationalization and Localization Guide](https://developer.apple.com/library/ios/documentation/MacOSX/Conceptual/BPInternational/LanguageandLocaleIDs/LanguageandLocaleIDs.html).
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.

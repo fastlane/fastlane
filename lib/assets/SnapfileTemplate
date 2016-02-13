@@ -13,7 +13,8 @@
 languages([
   "en-US",
   "de-DE",
-  "it-IT"
+  "it-IT",
+  ["pt", "pt_BR"] # Portuguese with Brazilian locale
 ])
 
 # Arguments to pass to the app on launch. See https://github.com/fastlane/snapshot#launch-arguments

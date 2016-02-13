@@ -33,9 +33,14 @@ module Snapshot
       Snapshot.config[:devices].each do |device|
         launch_arguments_set.each do |launch_arguments|
           Snapshot.config[:languages].each do |language|
+            locale = nil
+            if language.kind_of?(Array)
+              locale = language[1]
+              language = language[0]
+            end
             results[device] ||= {}
 
-            results[device][language] = run_for_device_and_language(language, device, launch_arguments)
+            results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
           end
         end
       end
@@ -53,14 +58,14 @@ module Snapshot
 
     # This is its own method so that it can re-try if the tests fail randomly
     # @return true/false depending on if the tests succeded
-    def run_for_device_and_language(language, device, launch_arguments, retries = 0)
-      return launch(language, device, launch_arguments)
+    def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
+      return launch(language, locale, device, launch_arguments)
     rescue => ex
       UI.error ex.to_s # show the reason for failure to the user, but still maybe retry
 
       if retries < Snapshot.config[:number_of_retries]
         UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
-        run_for_device_and_language(language, device, launch_arguments, retries + 1)
+        run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
       else
         UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
         self.collected_errors << ex
@@ -102,13 +107,14 @@ module Snapshot
     end
 
     # Returns true if it succeded
-    def launch(language, device_type, launch_arguments)
+    def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
       FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
       FileUtils.mkdir_p(screenshots_path)
 
       File.write("/tmp/language.txt", language)
+      File.write("/tmp/locale.txt", locale || "")
       File.write("/tmp/snapshot-launch_arguments.txt", launch_arguments.last)
 
       Fixes::SimulatorZoomFix.patch
@@ -120,7 +126,11 @@ module Snapshot
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
-      UI.header("#{device_type} - #{language}")
+      if locale
+        UI.header("#{device_type} - #{language} (#{locale})")
+      else
+        UI.header("#{device_type} - #{language}")
+      end
 
       prefix_hash = [
         {
@@ -144,7 +154,7 @@ module Snapshot
 
                                                 self.number_of_retries_due_to_failing_simulator += 1
                                                 if self.number_of_retries_due_to_failing_simulator < 20
-                                                  launch(language, device_type, launch_arguments)
+                                                  launch(language, locale, device_type, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   UI.crash!("Too many errors... no more retries...")
