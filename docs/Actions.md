@@ -624,6 +624,17 @@ lcov(
 )
 ```
 
+### [xcov](https://github.com/nakiostudio/xcov)
+Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.
+
+```ruby
+xcov(
+  workspace: "YourWorkspace.xcworkspace",
+  scheme: "YourScheme",
+  output_directory: "xcov_output"
+)  
+```
+
 ### [OCLint](http://oclint.org)
 Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your `fastlane` directory or pass a path to your file.
 
