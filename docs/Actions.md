@@ -1807,6 +1807,14 @@ sonar(
 ```
 It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action.
 
+### setup_jenkins
+
+This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will work only if the Fastlane was executed on a CI system.
+
+```ruby
+setup_jenkins
+```
+
 ## Misc
 
 ### twitter
