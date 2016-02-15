@@ -177,11 +177,7 @@ module Spaceship
 
       params.merge!(ident_params)
 
-      if csrf_tokens.count == 0
-        # If we directly create a new app without querying anything before
-        # we don't have a valid csrf token, that's why we have to do at least one request
-        apps
-      end
+      ensure_csrf
 
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
@@ -288,11 +284,7 @@ module Spaceship
     end
 
     def create_certificate!(type, csr, app_id = nil)
-      if csrf_tokens.count == 0
-        # If we directly create a new certificate without querying anything before
-        # we don't have a valid csrf token, that's why we have to do at least one request
-        certificates([Certificate::CERTIFICATE_TYPE_IDS.keys.first])
-      end
+      ensure_csrf
 
       r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
@@ -346,11 +338,7 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
-      if csrf_tokens.count == 0
-        # If we directly create a new profile without querying anything before
-        # we don't have a valid csrf token, that's why we have to do at least one request
-        provisioning_profiles
-      end
+      ensure_csrf
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", {
         teamId: team_id,
@@ -377,13 +365,7 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      if csrf_tokens.count == 0
-        r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
-          teamId: team_id,
-          provisioningProfileId: profile_id
-        })
-        parse_response(r)
-      end
+      ensure_csrf
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
@@ -404,6 +386,16 @@ module Spaceship
       })
 
       parse_response(r, 'provisioningProfile')
+    end
+
+    private
+
+    def ensure_csrf
+      if csrf_tokens.count == 0
+        # If we directly create a new app without querying anything before
+        # we don't have a valid csrf token, that's why we have to do at least one request
+        apps
+      end
     end
   end
 end
