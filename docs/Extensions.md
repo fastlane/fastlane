@@ -14,7 +14,7 @@ If you think your extension will be useful to other developers as well, clone fa
 
 ### Remote plugins
 
-If you want to keep your action implementation separate from the `fastlane` main code base, you can provide it as a plugin. 
+If you want to keep your action implementation separate from the `fastlane` main code base, you can provide it as a remote plugin.
 
 You can take a look at the example repo [https://github.com/fastlane/plugin_example](https://github.com/fastlane/plugin_example). You can store the action anywhere in your repo, to use it in your `Fastfile`, just add this to your `Fastfile`
 

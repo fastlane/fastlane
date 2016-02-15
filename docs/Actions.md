@@ -2204,3 +2204,18 @@ rsync(
   destination: "/tmp/local_file.txt"
 )
 ```
+
+### `load_plugin`
+
+If you want to keep your action implementation separate from the `fastlane` main code base, you can provide it as a remote plugin.
+
+More information in [Extensions.md](https://github.com/fastlane/fastlane/blob/master/docs/Extensions.md).
+
+To import a remote plugin use
+
+```ruby
+lane :beta do
+  load_plugin(url: "https://github.com/fastlane/plugin_example")
+  remote_plugin # that's the action that is stored in this git repo
+end
+```
