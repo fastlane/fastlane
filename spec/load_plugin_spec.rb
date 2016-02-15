@@ -13,11 +13,11 @@ describe Fastlane do
         expect(f).to receive(:clone).with({
           url: url,
           branch: "HEAD",
-          path: "fixtures/actions/remote_plugin.rb"
+          path: "fixtures/plugins/remote_plugin.rb"
         }).and_return(path)
 
         Fastlane::FastFile.new.parse("lane :test do
-          load_plugin(url: '#{url}', path: 'fixtures/actions/remote_plugin.rb')
+          load_plugin(url: '#{url}', path: 'fixtures/plugins/remote_plugin.rb')
         end").runner.execute(:test)
 
         # after
