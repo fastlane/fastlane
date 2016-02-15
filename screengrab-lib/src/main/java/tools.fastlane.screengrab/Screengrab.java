@@ -23,6 +23,7 @@ package tools.fastlane.screengrab;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Build;
@@ -74,7 +75,11 @@ public class Screengrab {
 
             @Override
             public void perform(UiController uiController, View view) {
-                final Activity activity = (Activity) view.getContext();
+                final Activity activity = scanForActivity(view.getContext());
+
+                if (activity == null) {
+                    throw new IllegalStateException("Couldn't get the activity from the view context");
+                }
 
                 if (!TAG_PATTERN.matcher(screenshotName).matches()) {
                     throw new IllegalArgumentException("Tag may only contain the letters a-z, A-Z, the numbers 0-9, " +
@@ -89,6 +94,20 @@ public class Screengrab {
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to capture screenshot.", e);
                 }
+            }
+
+            private Activity scanForActivity(Context context) {
+                if (context == null) {
+                    return null;
+
+                } else if (context instanceof Activity) {
+                    return (Activity) context;
+
+                } else if (context instanceof ContextWrapper) {
+                    return scanForActivity(((ContextWrapper) context).getBaseContext());
+                }
+
+                return null;
             }
         });
     }
