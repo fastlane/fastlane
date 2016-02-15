@@ -78,8 +78,9 @@ module Gym
         return File.join(containing, file_name)
       end
 
-      # The path to set the Derived Data to
+      # The path where archive will be created
       def build_path
+        Gym.cache[:build_path] ||= Gym.config[:build_path]
         unless Gym.cache[:build_path]
           day = Time.now.strftime("%F") # e.g. 2015-08-07
 
