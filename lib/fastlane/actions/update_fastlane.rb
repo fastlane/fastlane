@@ -23,7 +23,9 @@ module Fastlane
         "spaceship",
         "pilot",
         "supply",
-        "scan"
+        "scan",
+        "screengrab",
+        "match"
       ]
 
       def self.run(options)
