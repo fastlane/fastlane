@@ -116,7 +116,12 @@ module Snapshot
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
       `xcrun simctl shutdown booted &> /dev/null`
 
-      uninstall_app(device_type) if Snapshot.config[:reinstall_app]
+      if Snapshot.config[:erase_simulator]
+        erase_simulator(device_type)
+      elsif Snapshot.config[:reinstall_app]
+        # no need to reinstall if device has been erased
+        uninstall_app(device_type)
+      end
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
@@ -165,6 +170,15 @@ module Snapshot
 
       UI.message "Uninstall application #{Snapshot.config[:app_identifier]}"
       Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
+    end
+
+    def erase_simulator(device_type)
+      Helper.log.debug "Erasing #{device_type}..."
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      Helper.log.info "Erasing #{device_type}...".yellow
+
+      `xcrun simctl erase #{device_udid} &> /dev/null`
     end
 
     def clear_previous_screenshots
