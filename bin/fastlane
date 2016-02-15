@@ -30,7 +30,7 @@ class FastlaneApplication
 
     command :trigger do |c|
       c.syntax = 'fastlane [lane]'
-      c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
+      c.description = 'Run a sepcific lane. Pass the lane name and optionally the platform first'
       c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
       c.action do |args, options|
@@ -91,7 +91,7 @@ class FastlaneApplication
       c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
 
       c.action do |args, options|
-        ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
+        ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
         FastlaneCore::Helper.log.info "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
         Fastlane::DocsGenerator.run(ff)
       end
@@ -115,6 +115,7 @@ class FastlaneApplication
       c.option '--platform STRING', String, 'Only show actions available on the given platform'
 
       c.action do |args, options|
+        Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path) # to load local actions too
         require 'fastlane/documentation/actions_list'
         Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
       end
@@ -124,6 +125,7 @@ class FastlaneApplication
       c.syntax = 'fastlane action [tool_name]'
       c.description = 'Shows more information for a specific command'
       c.action do |args, options|
+        Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path) # to load local actions too
         require 'fastlane/documentation/actions_list'
         Fastlane::ActionsList.run(filter: args.first)
       end

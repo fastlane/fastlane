@@ -13,6 +13,13 @@ module Fastlane
       return value
     end
 
+    # Path to the Fastfile inside the fastlane folder. This is nil when none is available
+    def self.fastfile_path
+      path = File.join(self.path || '.', 'Fastfile')
+      return path if File.exist?(path)
+      return nil
+    end
+
     # Does a fastlane configuration already exist?
     def self.setup?
       return false unless path
