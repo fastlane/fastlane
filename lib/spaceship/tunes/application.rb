@@ -134,6 +134,15 @@ module Spaceship
         Tunes::AppDetails.factory(attrs)
       end
 
+      def versions_history
+        ensure_not_a_bundle
+        versions = client.versions_history(apple_id, platform)
+        versions.map do |attrs|
+          attrs.merge!(application: self)
+          Tunes::AppVersionHistory.factory(attrs)
+        end
+      end
+
       #####################################################
       # @!group Modifying
       #####################################################
@@ -334,6 +343,13 @@ module Spaceship
         raise "Tester is not on #{self.name} betatesters" unless tester
 
         tester.remove_from_app!(self.apple_id)
+      end
+
+      # private to module
+      def ensure_not_a_bundle
+        # we only support applications
+        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
+        raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
       end
     end
   end
