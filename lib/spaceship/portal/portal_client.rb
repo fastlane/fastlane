@@ -392,7 +392,7 @@ module Spaceship
 
     def ensure_csrf
       if csrf_tokens.count == 0
-        # If we directly create a new app without querying anything before
+        # If we directly create a new resource (e.g. app) without querying anything before
         # we don't have a valid csrf token, that's why we have to do at least one request
         apps
       end
