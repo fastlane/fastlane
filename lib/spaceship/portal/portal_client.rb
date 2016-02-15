@@ -10,7 +10,7 @@ module Spaceship
 
     # Fetches the latest API Key from the Apple Dev Portal
     def api_key
-      cache_path = "/tmp/spaceship_api_key.txt"
+      cache_path = File.expand_path("~/Library/Caches/spaceship_api_key.txt")
       begin
         cached = File.read(cache_path)
       rescue Errno::ENOENT
@@ -23,6 +23,7 @@ module Spaceship
       results = headers['location'].match(/.*appIdKey=(\h+)/)
       if (results || []).length > 1
         api_key = results[1]
+        FileUtils.mkdir_p(File.dirname(cache_path))
         File.write(cache_path, api_key) if api_key.length == 64
         return api_key
       else

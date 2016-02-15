@@ -34,7 +34,7 @@ unless ENV["DEBUG"]
 end
 
 cache_paths = [
-  "/tmp/spaceship_api_key.txt",
+  File.expand_path("~/Library/Caches/spaceship_api_key.txt"),
   "/tmp/spaceship_itc_login_url.txt"
 ]
 
