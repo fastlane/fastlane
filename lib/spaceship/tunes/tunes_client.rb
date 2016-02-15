@@ -324,23 +324,21 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      # We only support platforms that exist ATM
-      platform = platforms.find do |p|
-        ['ios', 'osx', 'appletvos'].include? p['platformString']
-      end
+      platform = Spaceship::Tunes::AppVersionCommon.find_platform(platforms)
+      return nil unless platform
 
-      raise "Could not find platform ios, osx or appletvos for app #{app_id}" unless platform
+      version_id = Spaceship::Tunes::AppVersionCommon.find_version_id(platform, is_live)
+      return nil unless version_id
 
-      # If your app has versions for both iOS and tvOS we will default to returning the iOS version for now.
-      # This is intentional as we need to do more work to support apps that have hybrid versions.
-      if platforms.length > 1
-        platform = platforms.detect { |p| p['platformString'] == "ios" }
-      end
-
-      version = platform[(is_live ? 'deliverableVersion' : 'inFlightVersion')]
-      return nil unless version
-      version_id = version['id']
       version_platform = platform['platformString']
+
+      app_version_data(app_id, version_platform: version_platform, version_id: version_id)
+    end
+
+    def app_version_data(app_id, version_platform: nil, version_id:nil)
+      raise "app_id is required" unless app_id
+      raise "version_platform is required" unless version_platform
+      raise "version_id is required" unless version_id
 
       r = request(:get, "ra/apps/#{app_id}/platforms/#{version_platform}/versions/#{version_id}")
       parse_response(r, 'data')

@@ -25,7 +25,7 @@ describe Spaceship::Application do
       expect(app.issues_count).to eq(0)
       expect(app.app_icon_preview_url).to eq('https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png')
 
-      expect(app.raw_data['versions'].count).to eq(2)
+      expect(app.raw_data['versionSets'].count).to eq(1)
     end
 
     it "#url" do
@@ -169,7 +169,7 @@ describe Spaceship::Application do
         end
       end
 
-      describe "#live_version weirdities", focus: true do
+      describe "#live_version weirdities" do
         it "no live version if app isn't yet uploaded" do
           app = Spaceship::Application.find(1_000_000_000)
           expect(app.live_version).to eq(nil)
