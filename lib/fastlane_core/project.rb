@@ -15,8 +15,8 @@ module FastlaneCore
           if workspace.count > 1
             puts "Select Workspace: "
             config[:workspace] = choose(*(workspace))
-          else
-            config[:workspace] = workspace.first # this will result in nil if no files were found
+          elsif !workspace.first.nil?
+            config[:workspace] = workspace.first
           end
         end
 
@@ -27,8 +27,8 @@ module FastlaneCore
           if project.count > 1
             puts "Select Project: "
             config[:project] = choose(*(project))
-          else
-            config[:project] = project.first # this will result in nil if no files were found
+          elsif !project.first.nil?
+            config[:project] = project.first
           end
         end
 
