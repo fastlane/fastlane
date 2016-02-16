@@ -22,7 +22,7 @@ module FastlaneCore
 
       available = `security find-identity -v -p codesigning`
       if available.include?("0 valid identities found")
-        UI.user_error!("Looks like there are no local code signing identities found, you can run `security find-identity -v -p codesigning` to get this output. Check out this reply for more: https://stackoverflow.com/questions/35390072/this-certificate-has-an-invalid-issuer-apple-push-services")
+        UI.error("Looks like there are no local code signing identities found, you can run `security find-identity -v -p codesigning` to get this output. Check out this reply for more: https://stackoverflow.com/questions/35390072/this-certificate-has-an-invalid-issuer-apple-push-services")
       end
 
       ids = []
