@@ -41,10 +41,7 @@ module FastlaneCore
     # Use this to log more important things
     # The logs will be green automatically
     def self.log_alert(text)
-      i = text.length + 8
-      Helper.log.info(("-" * i).green)
-      Helper.log.info("--- ".green + text.green + " ---".green)
-      Helper.log.info(("-" * i).green)
+      UI.header(text)
     end
 
     # Runs a given command using backticks (`)
