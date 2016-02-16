@@ -326,7 +326,7 @@ module Frameit
       UI.message "No custom font specified for #{screenshot}, using the default one" if $verbose
       return nil
     end
-    
+
     def scaled_font_size(font_size)
       font_ratio = font_size / 640.0
       return (font_ratio * screenshot.size[0].to_f).round
