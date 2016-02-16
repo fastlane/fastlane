@@ -5,7 +5,8 @@ describe Match do
       values = {
         app_identifier: "tools.fastlane.app",
         type: "appstore",
-        git_url: git_url
+        git_url: git_url,
+        shallow_clone: true
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
@@ -44,7 +45,7 @@ describe Match do
       key_path = "./spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
       keychain = "login.keychain"
 
-      expect(Match::GitHelper).to receive(:clone).with(git_url, true).and_return(repo_dir)
+      expect(Match::GitHelper).to receive(:clone).with(git_url, false).and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain).and_return(nil)
       expect(Match::GitHelper).to_not receive(:commit_changes)
 
