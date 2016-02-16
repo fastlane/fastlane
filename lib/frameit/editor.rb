@@ -182,7 +182,7 @@ module Frameit
           # too large - resizing now
           smaller = (1.0 / ratio)
 
-          Helper.log.debug "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
+          UI.message "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
 
           title.resize "#{(smaller * title.width).round}x"
           keyword.resize "#{(smaller * keyword.width).round}x" if keyword
