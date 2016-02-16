@@ -173,8 +173,8 @@ module Frameit
       sum_width += keyword.width + keyword_padding if keyword
 
       # Only resize if we haven't specified a custom font size
-      font_size = fontSize('title')
-      if font_size == nil
+      font_size = font_size('title')
+      if font_size.nil?
         # Resize the 2 labels if necessary
         smaller = 1.0 # default
         ratio = (sum_width + keyword_padding * 2) / image.width.to_f
@@ -238,7 +238,7 @@ module Frameit
         end
 
         current_font = font(key)
-        custom_font_size = fontSize(key)
+        custom_font_size = font_size(key)
         text = fetch_text(key)
         UI.message "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
         UI.message "Adding text '#{text}'" if $verbose
@@ -327,14 +327,13 @@ module Frameit
       return nil
     end
     
-    
-    def scaledFontSize(fontSize)
-      fontRatio = fontSize / 640.0
-      return (fontRatio * screenshot.size[0].to_f).round
+    def scaled_font_size(font_size)
+      font_ratio = font_size / 640.0
+      return (font_ratio * screenshot.size[0].to_f).round
     end
 
     # The fontSize we want to use
-    def fontSize(key)
+    def font_size(key)
       single_font_size = fetch_config[key.to_s]['fontSize']
       return single_font_size if single_font_size
 
@@ -344,19 +343,19 @@ module Frameit
           if font['supported']
             font['supported'].each do |language|
               if screenshot.path.include? language
-                return scaledFontSize(font["fontSize"])
+                return scaled_font_size(font["fontSize"])
               end
             end
           else
             # No `supported` array, this will always be true
             UI.message "Found a fontSize with no list of supported languages, using this now" if $verbose
-            return scaledFontSize(font["fontSize"])
+            return scaled_font_size(font["fontSize"])
           end
         end
       end
 
       UI.message "No custom fontSize specified for #{screenshot}, using the default one" if $verbose
       return nil
-    end    
+    end
   end
 end
