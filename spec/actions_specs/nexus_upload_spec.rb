@@ -7,7 +7,12 @@ describe Fastlane do
       end
 
       it "upload url is set correctly" do
-        expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081")).to eq "http://localhost:8081/nexus/service/local/artifact/maven/content"
+        expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
+          mount_path: "/nexus")).to eq "http://localhost:8081/nexus/service/local/artifact/maven/content"
+        expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
+          mount_path: "/custom-nexus")).to eq "http://localhost:8081/custom-nexus/service/local/artifact/maven/content"
+        expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
+          mount_path: "")).to eq "http://localhost:8081/service/local/artifact/maven/content"
       end
 
       it "ssl option is set correctly" do
@@ -95,6 +100,7 @@ describe Fastlane do
                       repo_project_name: 'myproject',
                       repo_project_version: '1.12',
                       endpoint: 'http://localhost:8081',
+                      mount_path: '/my-nexus',
                       username: 'admin',
                       password: 'admin123',
                       verbose: true)
@@ -110,7 +116,7 @@ describe Fastlane do
         expect(result).to include("-F file=@/tmp/file.ipa")
         expect(result).to include('-u admin:admin123')
         expect(result).to include('--verbose')
-        expect(result).to include('http://localhost:8081/nexus/service/local/artifact/maven/content')
+        expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
         expect(result).not_to include('-x')
         expect(result).not_to include('--proxy-user')
       end
