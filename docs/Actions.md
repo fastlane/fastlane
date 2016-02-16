@@ -967,24 +967,31 @@ appetize(
 )
 ```
 
-### [appaloosa](https://www.appaloosa-store.com)
-​
+### [Appaloosa](https://www.appaloosa-store.com)
+
 Upload your ipa or apk to your private store on Appaloosa.
-​
+
 Add the `appaloosa` action after the `gym` step or use it with your existing `apk`.
-​
+
 You can add some options:
 ```ruby
 appaloosa(
-  binary: '/path/to/binary.ipa', # path tor your IPA or APK
-  store_id: 'your_store_id', # you'll be asked for your email if you are not already registered
-  api_token: 'your_api_key', # only if already registered
-  group_ids: '112, 232, 387', # User group_ids visibility, if it's not specified we 'll publish the app for all users in your store'
-  # screenshots: after snapshot step:
-  locale: 'en-US', # When multiple values are specified in the Snapfile, we default to 'en-US'.
-  device: 'iPhone6', # By default, the screenshots from the last device will be used.
-  # or you can specify your own screenshots folder :
-  screenshots: '/path/to_your/screenshots' # path to the screenshots folder of your choice
+  # Path tor your IPA or APK
+  binary: '/path/to/binary.ipa',
+  # You can find your store’s id at the bottom of the “Settings” page of your store
+  store_id: 'your_store_id',
+  # You can find your api_token at the bottom of the “Settings” page of your store
+  api_token: 'your_api_key',
+  # User group_ids visibility, if it's not specified we'll publish the app for all users in your store'
+  group_ids: '112, 232, 387',
+  # You can use fastlane/snapshot or specify your own screenshots folder.
+  # If you use snapshot please specify a local and a device to upload your screenshots from.
+  # When multiple values are specified in the Snapfile, we default to 'en-US'
+  locale: 'en-US',
+  # By default, the screenshots from the last device will be used
+  device: 'iPhone6',
+  # Screenshots' filenames should start with device's name like "iphone6-s1.png" if device specified
+  screenshots: '/path/to_your/screenshots'
   )
 ```
 
