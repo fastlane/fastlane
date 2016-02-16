@@ -18,7 +18,13 @@ module FastlaneCore
     # rubocop:enable Style/PredicateName
 
     def self.installed_identies
+      install_wwdr_certificate unless wwdr_certificate_installed?
+
       available = `security find-identity -v -p codesigning`
+      if available.include?("0 valid identities found")
+        UI.user_error!("Looks like there are no local code signing identities found, you can run `security find-identity -v -p codesigning` to get this output. Check out this reply for more: https://stackoverflow.com/questions/35390072/this-certificate-has-an-invalid-issuer-apple-push-services")
+      end
+
       ids = []
       available.split("\n").each do |current|
         next if current.include? "REVOKED"
@@ -30,6 +36,20 @@ module FastlaneCore
       end
 
       return ids
+    end
+
+    def self.wwdr_certificate_installed?
+      certificate_name = "Apple Worldwide Developer Relations Certification Authority"
+      response = Helper.backticks("security find-certificate -c '#{certificate_name}'", print: $verbose)
+      return response.include?("attributes:")
+    end
+
+    def self.install_wwdr_certificate
+      Dir.chdir('/tmp')
+      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+      filename = File.basename(url)
+      `curl -O #{url} && security import #{filename} -k login.keychain`
+      UI.user_error!("Could not install WWDR certificate") unless $?.success?
     end
 
     def self.sha1_fingerprint(path)
