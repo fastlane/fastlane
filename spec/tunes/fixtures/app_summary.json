@@ -192,6 +192,34 @@
       "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/22/90/85/229085ce-4cbb-9311-4470-277dcc7d616e/pr_source.png/340x340bb-80.png",
       "issuesCount": 0,
       "type": "ios"
+    },{
+      "adamId": "1000000000",
+      "name": "app name why not",
+      "vendorId": "1435592086",
+      "bundleId": "net.sunapps.stuckinprepare",
+      "appType": "ios",
+      "versions": [{
+        "id": null,
+        "version": "1.0",
+        "state": "prepareForUpload",
+        "stateKey": "prepareForUpload",
+        "stateGroup": "preRelease",
+        "largeAppIcon": {
+          "assetToken": null,
+          "url": null,
+          "thumbNailUrl": null,
+          "sortOrder": null,
+          "originalFileName": null
+        },
+        "supportedHardware": [],
+        "issuesCount": 0
+      }],
+      "versionSets": null,
+      "buildVersionSets": null,
+      "lastModifiedDate": 1435596669000,
+      "iconUrl": null,
+      "issuesCount": 0,
+      "type": "ios"
     }],
     "canCreateAppBundles": true
   },

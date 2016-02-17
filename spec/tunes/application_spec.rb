@@ -10,7 +10,7 @@ describe Spaceship::Application do
     end
 
     it "the number is correct" do
-      expect(Spaceship::Application.all.count).to eq(6)
+      expect(Spaceship::Application.all.count).to eq(7)
     end
 
     it "parses application correctly" do
@@ -166,6 +166,15 @@ describe Spaceship::Application do
           v = Spaceship::Application.all.first.live_version
           expect(v.class).to eq(Spaceship::AppVersion)
           expect(v.is_live).to eq(true)
+        end
+      end
+
+      describe "#live_version weirdities", focus: true do
+        it "no live version if app isn't yet uploaded" do
+          app = Spaceship::Application.find(1_000_000_000)
+          expect(app.live_version).to eq(nil)
+          expect(app.edit_version.is_live).to eq(false)
+          expect(app.latest_version.is_live).to eq(false)
         end
       end
     end
