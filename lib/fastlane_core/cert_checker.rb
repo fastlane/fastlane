@@ -45,11 +45,12 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificate
-      Dir.chdir('/tmp')
-      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
-      filename = File.basename(url)
-      `curl -O #{url} && security import #{filename} -k login.keychain`
-      UI.user_error!("Could not install WWDR certificate") unless $?.success?
+      Dir.chdir('/tmp') do
+        url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+        filename = File.basename(url)
+        `curl -O #{url} && security import #{filename} -k login.keychain`
+        UI.user_error!("Could not install WWDR certificate") unless $?.success?
+      end
     end
 
     def self.sha1_fingerprint(path)
