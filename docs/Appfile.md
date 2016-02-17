@@ -6,7 +6,7 @@ By default an Appfile looks like:
 
 ```ruby
 app_identifier "net.sunapps.1" # The bundle identifier of your app
-apple_id "felix@krausefx.com" # Your Apple email address
+apple_id "felix@krausefx.com"  # Your Apple email address
 
 # You can uncomment the lines below and add your own 
 # team selection in case you're in multiple teams
