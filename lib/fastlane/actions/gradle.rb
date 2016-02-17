@@ -11,7 +11,7 @@ module Fastlane
 
         gradle = Helper::GradleHelper.new(gradle_path: params[:gradle_path])
 
-        result = gradle.trigger(task: task, flags: params[:flags])
+        result = gradle.trigger(task: task, flags: params[:flags], serial: params[:serial])
 
         return result unless task.start_with?("assemble")
 
@@ -51,6 +51,11 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :serial,
+                                       env_name: "FL_ANDROID_SERIAL",
+                                       description: "Android serial, wich device should be used for this command",
+                                       is_string: true,
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :task,
                                        env_name: "FL_GRADLE_TASK",
                                        description: "The gradle task you want to execute",

@@ -1817,6 +1817,30 @@ setup_jenkins
 
 ## Misc
 
+### adb
+
+Lets you execute adb commands.
+
+```ruby
+adb(
+  command: "shell ls",
+)
+```
+
+### adb_devices
+
+Returns an array of all currently connected android devices.
+e.g.: run an adb command on all connected devices.
+
+```
+adb_devices.each  do | device |
+  model = adb(command: "shell getprop ro.product.model",
+              serial: device.serial
+             ).strip
+  puts "Model #{model} is connected"
+end
+```
+
 ### twitter
 
 Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
