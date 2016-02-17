@@ -1,5 +1,6 @@
 .DS_Store
 Gemfile.lock
+/coverage/
 *UserInterfaceState.xcuserstate
 pkg
 **/Example.app.dSYM.zip
