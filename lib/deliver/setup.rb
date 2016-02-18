@@ -23,7 +23,7 @@ module Deliver
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
-      generate_metadata_files(v, deliver_path)
+      generate_metadata_files(v, File.join(deliver_path, 'metadata'))
 
       # Generate the final Deliverfile here
       gem_path = Helper.gem_path('deliver')
@@ -33,9 +33,8 @@ module Deliver
       return deliver
     end
 
-    def generate_metadata_files(v, deliver_path)
+    def generate_metadata_files(v, path)
       app_details = v.application.details
-      containing = File.join(deliver_path, 'metadata')
 
       # All the localised metadata
       (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
@@ -46,7 +45,7 @@ module Deliver
             content = app_details.send(key)[language]
           end
 
-          resulting_path = File.join(containing, language, "#{key}.txt")
+          resulting_path = File.join(path, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
           UI.message("Writing to '#{resulting_path}'")
@@ -61,7 +60,7 @@ module Deliver
           content = app_details.send(key)
         end
 
-        resulting_path = File.join(containing, "#{key}.txt")
+        resulting_path = File.join(path, "#{key}.txt")
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end
@@ -70,8 +69,9 @@ module Deliver
     end
 
     def download_screenshots(deliver_path, options)
-      FileUtils.mkdir_p(File.join(deliver_path, 'screenshots'))
-      Deliver::DownloadScreenshots.run(options, deliver_path)
+      path = File.join(deliver_path, 'screenshots')
+      FileUtils.mkdir_p(path)
+      Deliver::DownloadScreenshots.run(options, path)
     end
   end
 end
