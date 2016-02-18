@@ -284,6 +284,23 @@ This is useful when installing your application on your device using the Develop
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
+### Continuous Integration
+
+#### Repo access
+There is one tricky part of setting up a CI system to work with `match`, which is enabling the CI to access the repo. Usually you'd just add your CI's public ssh key as a deploy key to your `match` repo, but since your CI will already likely be using its public ssh key to access the codebase repo, [you won't be able to do that](https://help.github.com/articles/error-key-already-in-use/). 
+
+Some repo hosts might allow you to use the same deploy key for different repos, but GitHub will not. If your host does, you don't need to worry about this, just add your CI's public ssh key as a deploy key for your `match` repo and scroll down to "_Encryption password_".
+
+There are a few ways around this:
+
+1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
+2. Some CIs allow you to upload your signing credientials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
+
+Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials. 
+
+#### Encryption password
+Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. Match will pick this up when it's run.
+
 ### Nuke
 
 If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
