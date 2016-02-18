@@ -2,7 +2,13 @@ module Fastlane
   module Actions
     class CarthageAction < Action
       def self.run(params)
-        cmd = ["carthage bootstrap"]
+        cmd = ["carthage"]
+
+        if params[:update]
+          cmd << "update"
+        else
+          cmd << "bootstrap"
+        end
 
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
@@ -15,11 +21,21 @@ module Fastlane
       end
 
       def self.description
-        "Runs `carthage bootstrap` for your project"
+        "Runs `carthage bootstrap` or `carthage update` for your project"
       end
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :update,
+                                       env_name: "FL_CARTHAGE_UPDATE",
+                                       description: "Update the the project's dependencies",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a valid value for update. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                       end),
+
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
@@ -75,7 +91,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto"]
       end
     end
   end

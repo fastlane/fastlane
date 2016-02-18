@@ -61,12 +61,20 @@ describe Fastlane do
         end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
       end
 
-      it "default use case" do
+      it "default use case is boostrap" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap")
+      end
+
+      it "update if set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(update: true)
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage update")
       end
 
       it "adds use-ssh flag to command if use_ssh is set to true" do
