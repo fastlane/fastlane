@@ -41,7 +41,7 @@ module Fastlane
                                        env_name: "FL_ENSURE_XCODE_VERSION",
                                        description: "Xcode version to verify that is selected",
                                        is_string: true,
-                                       default_value: false)
+                                       optional: false)
         ]
       end
 
