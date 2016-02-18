@@ -27,6 +27,21 @@ describe Fastlane do
         expect(result).to include("<string>#{app_identifier}</string>")
       end
 
+      it "updates the info plist based on the given block" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_info_plist ({
+            xcodeproj: '#{xcodeproj}',
+            plist_path: '#{plist_path}',
+            block: lambda { |plist|
+              plist['CFBundleIdentifier'] = '#{app_identifier}'
+              plist['CFBundleDisplayName'] = '#{display_name}'
+            }
+          })
+        end").runner.execute(:test)
+        expect(result).to include("<string>#{display_name}</string>")
+        expect(result).to include("<string>#{app_identifier}</string>")
+      end
+
       it "throws an error when the info plist file does not exist" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
