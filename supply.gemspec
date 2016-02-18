@@ -22,10 +22,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # External
-  spec.add_dependency 'google-api-client', '~> 0.8.6' # Google API Client to access Play Publishing API
+  spec.add_dependency 'google-api-client', '~> 0.9.1' # Google API Client to access Play Publishing API
 
   # fastlane
-  spec.add_dependency 'fastlane_core', '>= 0.30.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.35.0' # all shared code and dependencies
   spec.add_dependency 'credentials_manager', '>= 0.10.0'
 
   # Development only

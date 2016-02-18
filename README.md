@@ -69,19 +69,33 @@ Install the gem
 
     sudo gem install supply
 
-## Setup a Google Developers Service Account
+## Setup
+
+Setup consists of setting up your Google Developers Service Account
 
 - Open the [Google Play Console](https://play.google.com/apps/publish/)
 - Select **Settings** tab, followed by the **API access** tab
 - Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
 - Click **Add credentials** and select **Service account**
-- Select **P12** as the Key type and click **Create**
-- Make a note of the file name of the P12 file downloaded to your computer, and close the dialog
-- Make a note of the **Email address** under **Service accounts** - this is the issuer which you will need later
+- Select **JSON** as the Key type and click **Create**
+- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
+- Make a note of the **Email address** under **Service accounts** - this is the user which you will need later
 - Back on the Google Play developer console, click **Done** to close the dialog
 - Click on **Grant Access** for the newly added service account
 - In the **Invite a New User** dialog, paste the service account email address you noted earlier into the **Email address** field
 - Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
+
+### Migrating Google credential format (from .p12 key file to .json)
+
+In previous versions of supply, credentials to your Play Console were stored as `.p12` files. Since version 0.4.0, supply now supports the recommended `.json` key Service Account credential files. If you wish to upgrade:
+
+- follow the <a href="#setup">Setup</a> procedure once again to make sure you create the appropriate JSON file
+- update your fastlane configuration or your command line invocation to use the appropriate argument if necessary.
+  Note that you don't need to take note nor pass the `issuer` argument anymore.
+
+
+The previous p12 configuration is still currently supported.
+
 
 ## Quick Start
 
