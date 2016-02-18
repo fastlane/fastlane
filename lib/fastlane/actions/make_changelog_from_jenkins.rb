@@ -2,18 +2,22 @@ module Fastlane
   module Actions
     class MakeChangelogFromJenkinsAction < Action
       def self.run(params)
-        Actions.verify_gem!('nokogiri')
-        require 'nokogiri'
+        require 'json'
         require 'net/http'
 
         changelog = ""
 
-        if Helper.is_ci?
+        if Helper.is_ci? || Helper.is_test?
           # The "BUILD_URL" environment variable is set automatically by Jenkins in every build
-          jenkins_xml_url = URI(ENV["BUILD_URL"] + "api/xml\?wrapper\=changes\&xpath\=//changeSet//comment")
-          doc = Nokogiri.XML(Net::HTTP.get(jenkins_xml_url))
-          doc.css('comment').each do |comment|
-            changelog << comment.text.strip + "\n"
+          jenkins_xml_url = URI(ENV["BUILD_URL"] + "api/json\?wrapper\=changes\&xpath\=//changeSet//comment")
+          begin
+            json = JSON.parse(Net::HTTP.get(jenkins_xml_url))
+            json['changeSet']['items'].each do |item|
+              comment = item['comment']
+              changelog << comment.strip + "\n"
+            end
+          rescue => ex
+            UI.error("Unable to read/parse changelog from jenkins: #{ex.message}")
           end
         end
 
@@ -31,7 +35,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :fallback_changelog,
-                                       description: "Fallback changelog if there is not one on Jenkins",
+                                       description: "Fallback changelog if there is not one on Jenkins, or it couldn't be read",
                                        optional: true,
                                        default_value: "")
         ]
