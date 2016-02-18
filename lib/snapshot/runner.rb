@@ -18,6 +18,8 @@ module Snapshot
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
+      Snapshot.config[:output_directory] = File.expand_path(Snapshot.config[:output_directory])
+
       verify_helper_is_current
 
       FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
