@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
 
   # fastlane
   spec.add_dependency 'fastlane_core', '>= 0.35.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.10.0'
+  spec.add_dependency 'credentials_manager', '>= 0.15.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
