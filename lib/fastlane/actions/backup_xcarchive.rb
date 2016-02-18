@@ -28,19 +28,20 @@ module Fastlane
 
         # Save archive to destination
         if zipped
-          Helper.log.info "Compressing #{xcarchive}"
+          Dir.mktmpdir("backup_xcarchive") do |dir|
+            Helper.log.info "Compressing #{xcarchive}"
+            xcarchive_folder = File.expand_path(File.dirname(xcarchive))
+            xcarchive_file = File.basename(xcarchive)
+            zip_file = File.join(dir, "#{xcarchive_file}.zip")
 
-          xcarchive_folder = File.expand_path(File.dirname(xcarchive))
-          xcarchive_file = File.basename(xcarchive)
-          zip_file = File.expand_path(File.join("#{xcarchive_file}.zip"))
+            # Create zip
+            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
 
-          # Create zip
-          Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
+            # Moved to its final destination
+            FileUtils.mv(zip_file, full_destination)
 
-          # Moved to its final destination
-          FileUtils.mv(zip_file, full_destination)
-
-          Actions.lane_context[SharedValues::BACKUP_XCARCHIVE_FILE] = "#{full_destination}/#{File.basename(zip_file)}"
+            Actions.lane_context[SharedValues::BACKUP_XCARCHIVE_FILE] = "#{full_destination}/#{File.basename(zip_file)}"
+          end
         else
           # Copy xcarchive file
           FileUtils.cp_r(xcarchive, full_destination)
