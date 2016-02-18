@@ -1,5 +1,4 @@
 # rubocop:disable Metrics/MethodLength
-# rubocop:disable Metrics/AbcSize
 require "commander"
 require "pilot/options"
 require "fastlane_core"
@@ -25,9 +24,21 @@ module Pilot
       o
     end
 
-    def handle_email(config, args)
-      config[:email] ||= args.first
-      config[:email] ||= ask("Email address of the tester: ".yellow)
+    def handle_multiple(action, args, options)
+      mgr = Pilot::TesterManager.new
+      config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+      args.push(ask("Email address of the tester: ".yellow)) if args.empty?
+      failures = []
+      args.each do |address|
+        config[:email] = address
+        begin
+          mgr.public_send(action, config)
+        rescue => ex
+          failures.push(address)
+          Helper.log.info "[#{address}]: #{ex}".red
+        end
+      end
+      raise "Some operations failed: #{failures}".red unless failures.empty?
     end
 
     def run
@@ -60,11 +71,9 @@ module Pilot
 
       command :add do |c|
         c.syntax = "pilot add"
-        c.description = "Adds a new external tester to a specific app (if given). This will also add an existing tester to an app."
+        c.description = "Adds new external tester(s) to a specific app (if given). This will also add an existing tester to an app."
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, args)
-          Pilot::TesterManager.new.add_tester(config)
+          handle_multiple('add_tester', args, options)
         end
       end
 
@@ -79,21 +88,17 @@ module Pilot
 
       command :find do |c|
         c.syntax = "pilot find"
-        c.description = "Find a tester (internal or external) by their email address"
+        c.description = "Find tester(s) (internal or external) by their email address"
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, args)
-          Pilot::TesterManager.new.find_tester(config)
+          handle_multiple('find_tester', args, options)
         end
       end
 
       command :remove do |c|
         c.syntax = "pilot remove"
-        c.description = "Remove an external tester by their email address"
+        c.description = "Remove external tester(s) by their email address"
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          handle_email(config, args)
-          Pilot::TesterManager.new.remove_tester(config)
+          handle_multiple('remove_tester', args, options)
         end
       end
 
