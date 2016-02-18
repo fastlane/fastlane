@@ -123,7 +123,7 @@ private_lane :validate_repo do |options|
   #
   binary_path = File.join("..", "bin", tool_name)
   unless no_binary.include? tool_name
-    content = sh "#{binary_path} --help"
+    content = sh "#{binary_path} --help | cat"
     ["--version", "https://fastlane.tools", tool_name].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include? current
     end
