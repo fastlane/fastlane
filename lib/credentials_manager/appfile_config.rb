@@ -94,7 +94,12 @@ module CredentialsManager
     end
 
     # Android
+    def json_key_file(*args, &block)
+      setter(:json_key_file, *args, &block)
+    end
+
     def issuer(*args, &block)
+      puts "Appfile: DEPRECATED issuer: use json_key_file instead".red
       setter(:issuer, *args, &block)
     end
 
@@ -103,6 +108,7 @@ module CredentialsManager
     end
 
     def keyfile(*args, &block)
+      puts "Appfile: DEPRECATED keyfile: use json_key_file instead".red
       setter(:keyfile, *args, &block)
     end
 
