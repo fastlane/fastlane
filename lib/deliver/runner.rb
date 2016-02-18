@@ -79,7 +79,8 @@ module Deliver
       end
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username])
-      transporter.upload(options[:app].apple_id, package_path)
+      result = transporter.upload(options[:app].apple_id, package_path)
+      UI.user_error!("Could not upload binary to iTunes Connect. Check out the error above") unless result
     end
 
     def submit_for_review
