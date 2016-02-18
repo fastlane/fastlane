@@ -16,6 +16,9 @@ module Fastlane
         sonar_runner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
         sonar_runner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
         sonar_runner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
+        sonar_runner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
+        sonar_runner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
+        sonar_runner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
           command_prefix,
@@ -66,6 +69,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :sources_path,
                                        env_name: "FL_SONAR_RUNNER_SOURCES_PATH",
                                        description: "Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_language,
+                                       env_name: "FL_SONAR_RUNNER_PROJECT_LANGUAGE",
+                                       description: "Language key, e.g. objc",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :source_encoding,
+                                       env_name: "FL_SONAR_RUNNER_SOURCE_ENCODING",
+                                       description: "Used encoding of source files, e.g., UTF-8",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_runner_args,
+                                       env_name: "FL_SONAR_RUNNER_ARGS",
+                                       description: "Pass additional arguments to sonar-runner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS=\"-Dsonar.verbose=true\"",
                                        optional: true)
         ]
       end
