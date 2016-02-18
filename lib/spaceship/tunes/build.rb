@@ -149,13 +149,11 @@ module Spaceship
       #     encryption: false
       #  }
       def submit_for_beta_review!(metadata)
-        # First, enable beta testing for this train (per iTC requirement)
-        self.build_train.update_testing_status!(true, 'external')
-
         parameters = {
           app_id: self.build_train.application.apple_id,
           train: self.build_train.version_string,
           build_number: self.build_version,
+          platform: self.platform,
 
           # Required Metadata:
           changelog: "No changelog provided",
@@ -176,6 +174,9 @@ module Spaceship
         }.merge(metadata)
 
         client.submit_testflight_build_for_review!(parameters)
+
+        # Last, enable beta testing for this train (per iTC requirement). This will fail until the app has been approved for beta testing
+        self.build_train.update_testing_status!(true, 'external', self)
 
         return parameters
       end
@@ -200,7 +201,8 @@ module Spaceship
       def cancel_beta_review!
         client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id,
                                                      train: self.build_train.version_string,
-                                              build_number: self.build_version)
+                                              build_number: self.build_version,
+                                                  platform: self.platform)
       end
     end
   end
