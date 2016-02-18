@@ -1,3 +1,2 @@
-issuer "[[ISSUER]]" # Follow https://github.com/fastlane/supply#setup to get one
-keyfile "[[KEYFILE]]" # Path to the keyfile
+json_key_file "[[JSON_KEY_FILE]]" # Path to the json secret file - Follow https://github.com/fastlane/supply#setup to get one
 package_name "[[PACKAGE_NAME]]" # e.g. com.krausefx.app
