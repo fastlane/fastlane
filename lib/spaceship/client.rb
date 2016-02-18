@@ -25,7 +25,7 @@ module Spaceship
     attr_accessor :user
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time].log by default
+    # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
     # Invalid user credentials were provided
@@ -84,14 +84,14 @@ module Spaceship
     end
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time].log by default
+    # /tmp/spaceship[time]_[pid].log by default
     def logger
       unless @logger
         if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}.log"
+          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}.log"
           @logger = Logger.new(path)
         end
 

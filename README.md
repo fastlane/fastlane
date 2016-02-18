@@ -118,7 +118,7 @@ Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sig
 
 The detailed documentation of all available classes is available on [RubyDoc](http://www.rubydoc.info/github/fastlane/spaceship/frames).
 
-You can find the log file here `/tmp/spaceship[time].log`.
+You can find the log file here `/tmp/spaceship[time]_[pid].log`.
 
 # Technical Details
 
