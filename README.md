@@ -207,6 +207,12 @@ By default `snapshot` automatically retries running UI Tests if they fail. This 
 snapshot --number_of_retries 3
 ```
 
+Add photos and/or videos to the simulator before running `snapshot`
+
+```sh
+snapshot --add_photos MyTestApp/Assets/demo.jpg --add_videos MyTestApp/Assets/demo.mp4
+```
+
 For a list for all available options run
 
 ```sh
@@ -248,6 +254,9 @@ launch_arguments("-username Felix")
 output_directory './screenshots'
 
 clear_previous_screenshots true
+
+add_photos ["MyTestApp/Assets/demo.jpg"]
+
 ```
 
 ### Completely reset all simulators
