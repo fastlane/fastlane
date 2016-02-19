@@ -2,6 +2,9 @@ require 'fastlane/actions/actions_helper'
 
 module Fastlane
   class Action
+
+    include Plugin
+
     def self.run(params)
     end
 
