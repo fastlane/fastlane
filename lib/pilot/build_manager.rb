@@ -8,10 +8,12 @@ module Pilot
       Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
 
       plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(config[:ipa]) || {}
+      platform = plist["DTPlatformName"]
+      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/spaceship/issues/247
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
                                                                   package_path: "/tmp",
-                                                                      platform: plist["DTPlatformName"])
+                                                                      platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username])
       result = transporter.upload(app.apple_id, package_path)
