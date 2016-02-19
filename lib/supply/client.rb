@@ -253,6 +253,19 @@ module Supply
         image_type)
     end
 
+    def upload_obb(obb_file_path: nil, apk_version_code: nil, expansion_file_type: nil)
+      ensure_active_edit!
+
+      android_publisher.upload_expansion_file(
+        current_package_name,
+        current_edit.id,
+        apk_version_code,
+        expansion_file_type,
+        upload_source: obb_file_path,
+        content_type: 'application/octet-stream'
+      )
+    end
+
     private
 
     def ensure_active_edit!
