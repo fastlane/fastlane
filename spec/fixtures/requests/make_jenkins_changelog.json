@@ -74,7 +74,7 @@
 		"kind": "git"
 	},
 	"culprits": [{
-		"absoluteUrl": "http://jenkins.wewanttoknow.com:10080/user/jerome@wewanttoknow.com",
+		"absoluteUrl": "http://example.com/user/jerome@wewanttoknow.com",
 		"fullName": "Jerome Lacoste"
 	}]
 }
