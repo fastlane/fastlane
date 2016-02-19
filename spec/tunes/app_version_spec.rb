@@ -531,6 +531,37 @@ describe Spaceship::AppVersion, all: true do
       end
     end
 
+    describe "update_app_version! retry mechanism" do
+      let(:update_success_data) { JSON.parse(itc_read_fixture_file('update_app_version_success.json'))['data'] }
+
+      def setup_handle_itc_response_failure(nb_failures)
+        @times_called = 0
+        allow(client).to receive(:handle_itc_response) do |data|
+          @times_called += 1
+          raise Spaceship::TunesClient::ITunesConnectTemporaryError, "simulated try again" if @times_called <= nb_failures
+          update_success_data
+        end
+        # arbitrary stub to prevent mock network failures. We override itc_response
+        itc_stub_valid_update
+      end
+
+      it "retries when ITC is temporarily unable to save changes" do
+        setup_handle_itc_response_failure(1)
+
+        version.save!
+        expect(@times_called).to eq(2)
+      end
+
+      it "retries a maximum number of times when ITC is temporarily unable to save changes" do
+        setup_handle_itc_response_failure(5)
+
+        expect do
+          version.save!
+        end.to raise_error(Spaceship::TunesClient::ITunesConnectTemporaryError)
+        expect(@times_called).to eq(5)
+      end
+    end
+
     describe "Accessing different languages" do
       it "raises an exception if language is not available" do
         expect do

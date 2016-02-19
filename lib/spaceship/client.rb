@@ -39,6 +39,9 @@ module Spaceship
     # Raised when 302 is received from portal request
     class AppleTimeoutError < StandardError; end
 
+    # Raised when 401 is received from portal request
+    class UnauthorizedAccessError < StandardError; end
+
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
     # on.
@@ -66,8 +69,14 @@ module Spaceship
     end
 
     def initialize
+      options = {
+       request: {
+          timeout:       300,
+          open_timeout:  300
+        }
+      }
       @cookie = HTTP::CookieJar.new
-      @client = Faraday.new(self.class.hostname) do |c|
+      @client = Faraday.new(self.class.hostname, options) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
@@ -168,9 +177,9 @@ module Spaceship
       end
 
       self.user = user
-
+      @password = password
       begin
-        send_login_request(user, password) # different in subclasses
+        do_login(user, password)
       rescue InvalidUserCredentialsError => ex
         raise ex unless keychain_entry
 
@@ -182,19 +191,35 @@ module Spaceship
       end
     end
 
-    def with_retry(tries = 5, &block)
-      return block.call
-    rescue Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+    def with_retry(tries = 5, &_block)
+      return yield
+    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
       unless (tries -= 1).zero?
         logger.warn("Timeout received: '#{ex.message}'.  Retrying after 3 seconds (remaining: #{tries})...")
-        sleep 3
+        sleep 3 unless defined? SpecHelper
         retry
       end
-
+      raise ex # re-raise the exception
+    rescue UnauthorizedAccessError => ex
+      if @loggedin
+        msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
+        puts msg if $verbose
+        logger.warn msg
+        do_login(self.user, @password)
+        sleep 3 unless defined? SpecHelper
+        retry
+      end
       raise ex # re-raise the exception
     end
 
     private
+
+    def do_login(user, password)
+      @loggedin = false
+      ret = send_login_request(user, password) # different in subclasses
+      @loggedin = true
+      ret
+    end
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
@@ -238,11 +263,11 @@ module Spaceship
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info("#{method.upcase}: #{url} #{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase}: #{url} #{params_to_log.join(', ')}")
     end
 
     def log_response(method, url, response)
-      logger.debug("#{method.upcase}: #{url}: #{response.body}")
+      logger.debug("<< #{method.upcase}: #{url}: #{response.body}")
     end
 
     # Actually sends the request to the remote server
@@ -250,6 +275,13 @@ module Spaceship
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
+        resp_hash = response.to_hash
+        if resp_hash[:status] == 401
+          msg = "Auth lost"
+          logger.warn msg
+          raise UnauthorizedAccessError.new, "Unauthorized Access"
+        end
+
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected"
         end
