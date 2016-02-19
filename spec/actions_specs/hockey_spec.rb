@@ -8,7 +8,7 @@ describe Fastlane do
               api_token: 'xxx'
             })
           end").runner.execute(:test)
-        end.to raise_error("Couldn't find ipa file at path ''".red)
+        end.to raise_error("You have to provide an ipa file")
       end
 
       it "raises an error if given ipa file was not found" do

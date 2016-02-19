@@ -19,6 +19,10 @@ module Fastlane
         if options[:dsym]
           dsym_filename = options[:dsym]
         else
+          if options[:ipa].to_s.length == 0
+            UI.user_error!("You have to provide an ipa file")
+          end
+
           dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
           if File.exist?(dsym_path)
             dsym_filename = dsym_path
@@ -78,6 +82,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_IPA",
                                        description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action. For Mac zip the .app. For Android provide path to .apk file",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
                                        end),
