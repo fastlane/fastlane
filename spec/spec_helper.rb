@@ -3,6 +3,7 @@ require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'spaceship'
+require 'client_stubbing'
 require 'portal/portal_stubbing'
 require 'tunes/tunes_stubbing'
 require 'du/du_stubbing'

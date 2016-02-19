@@ -5,6 +5,10 @@ module Spaceship
     class ITunesConnectError < StandardError
     end
 
+    # raised if the server failed to save temporarily
+    class ITunesConnectTemporaryError < ITunesConnectError
+    end
+
     attr_reader :du_client
 
     def initialize
@@ -120,18 +124,24 @@ module Spaceship
     end
 
     def send_login_request(user, password)
+      clear_user_cached_data
+
       data = {
         accountName: user,
         password: password,
         rememberMe: true
       }
 
-      response = request(:post) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-With'] = 'XMLHttpRequest'
-        req.headers['Accept'] = 'application/json, text/javascript'
+      begin
+        response = request(:post) do |req|
+          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['Accept'] = 'application/json, text/javascript'
+        end
+      rescue UnauthorizedAccessError
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
       # get woinst, wois, and itctx cookie values
@@ -139,7 +149,7 @@ module Spaceship
       request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
 
       case response.status
-      when 403, 401
+      when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
         return response
@@ -203,6 +213,8 @@ module Spaceship
       if errors.count > 0 # they are separated by `.` by default
         if errors.count == 1 and errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
+        elsif errors.count == 1 and errors.first.include?("try again later")
+          raise ITunesConnectTemporaryError.new, errors.first
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -338,13 +350,15 @@ module Spaceship
       raise "app_id is required" unless app_id
       raise "version_id is required" unless version_id.to_i > 0
 
-      r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}"
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      with_tunes_retry do
+        r = request(:post) do |req|
+          req.url "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
 
-      handle_itc_response(r.body)
+        handle_itc_response(r.body)
+      end
     end
 
     #####################################################
@@ -780,19 +794,38 @@ module Spaceship
 
     private
 
+    def with_tunes_retry(tries = 5, &_block)
+      return yield
+    rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
+      unless (tries -= 1).zero?
+        msg = "ITC temporary save error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        puts msg
+        logger.warn msg
+        sleep 60 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
+        retry
+      end
+      raise ex # re-raise the exception
+    end
+
+    def clear_user_cached_data
+      @content_provider_id = nil
+      @sso_token_for_image = nil
+      @sso_token_for_video = nil
+    end
+
     # the contentProviderIr found in the UserDetail instance
     def content_provider_id
-      user_detail_data.content_provider_id
+      @content_provider_id ||= user_detail_data.content_provider_id
     end
 
     # the ssoTokenForImage found in the AppVersionRef instance
     def sso_token_for_image
-      ref_data.sso_token_for_image
+      @sso_token_for_image ||= ref_data.sso_token_for_image
     end
 
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
-      ref_data.sso_token_for_video
+      @sso_token_for_video ||= ref_data.sso_token_for_video
     end
 
     def update_tester_from_app!(tester, app_id, testing)

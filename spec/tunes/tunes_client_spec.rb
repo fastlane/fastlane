@@ -48,6 +48,13 @@ describe Spaceship::TunesClient do
         data = JSON.parse(itc_read_fixture_file('update_app_version_success.json'))['data']
         expect(subject.handle_itc_response(data)).to eq(data)
       end
+
+      it "identifies try again later responses" do
+        data = JSON.parse(itc_read_fixture_file('update_app_version_temporarily_unable.json'))['data']
+        expect do
+          subject.handle_itc_response(data)
+        end.to raise_error(Spaceship::TunesClient::ITunesConnectTemporaryError, "We're temporarily unable to save your changes. Please try again later.")
+      end
     end
   end
 end
