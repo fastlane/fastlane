@@ -38,5 +38,36 @@ module Fastlane
 
       output
     end
+
+    def self.output_json(path)
+      puts JSON.pretty_generate(self.generate_json(path))
+    end
+
+    # Returns a hash
+    def self.generate_json(path)
+      ff = Fastlane::FastFile.new(path)
+      output = {}
+
+      all_keys = ff.runner.lanes.keys
+
+      all_keys.each do |platform|
+        next if (ff.runner.lanes[platform] || []).count == 0
+
+        output[platform] ||= {}
+
+        value = ff.runner.lanes[platform]
+        next unless value
+
+        value.each do |lane_name, lane|
+          next if lane.is_private
+
+          output[platform][lane_name] = {
+            description: lane.description.join("\n")
+          }
+        end
+      end
+
+      return output
+    end
   end
 end

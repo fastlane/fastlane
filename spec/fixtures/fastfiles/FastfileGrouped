@@ -21,14 +21,6 @@ end
 
 platform :ios do
   desc "Submit a new version to the App Store"
-  desc "This will do the following: "
-  desc "- Make sure the profiles are up to date and download the latest one"
-  desc "- Do a build version bump and push it"
-  desc "- Create new screenshots and store them in `./fastlane/screenshots`"
-  desc "- Collect the app metadata from `./fastlane/metadata`"
-  desc "- Upload screenshots + app metadata"
-  desc "- Build, sign and upload the app"
-  desc "This will **not** submit the app for review."
   lane :beta do
     File.write("/tmp/fastlane/ios_beta.txt", Time.now.to_s)
   end
