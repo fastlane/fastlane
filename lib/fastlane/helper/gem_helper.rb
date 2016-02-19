@@ -8,22 +8,19 @@ module Fastlane
         # We don't import this by default, as it's not always the same
         # also e.g. cocoapods is just required and not imported
       rescue Gem::LoadError
-        print_gem_error "Could not find gem '#{gem_name}'"
-        print_gem_error ""
-        print_gem_error "If you installed fastlane using `sudo gem install fastlane` run"
-        print_gem_error "`sudo gem install #{gem_name}` to install the missing gem"
-        print_gem_error ""
-        print_gem_error "If you use a Gemfile add this to your Gemfile:"
-        print_gem_error "gem '#{gem_name}'"
-        print_gem_error "and run `bundle install`"
+        UI.error("Could not find gem '#{gem_name}'")
+        UI.error("")
+        UI.error("If you installed fastlane using `sudo gem install fastlane` run")
+        UI.command("sudo gem install #{gem_name}")
+        UI.error("to install the missing gem")
+        UI.error("")
+        UI.error("If you use a Gemfile add this to your Gemfile:")
+        UI.important("  gem '#{gem_name}'")
+        UI.error("and run `bundle install`")
 
-        raise "You have to install the `#{gem_name}`".red unless Helper.is_test?
+        UI.user_error!("You have to install the `#{gem_name}` gem on this machine") unless Helper.is_test?
       end
       true
-    end
-
-    def self.print_gem_error(str)
-      Helper.log.error str.red
     end
   end
 end
