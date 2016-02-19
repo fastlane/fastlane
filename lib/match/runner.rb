@@ -80,7 +80,7 @@ module Match
       end
 
       if profile.nil? or params[:force]
-        UI.crash!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id)
