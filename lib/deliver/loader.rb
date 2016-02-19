@@ -6,7 +6,7 @@ module Deliver
     # through it as well searching for language folders.
     APPLE_TV_DIR_NAME = "appleTV".freeze
     DEFAULT_DIR_NAME = "default".freeze
-    ALL_LANGUAGES = (FastlaneCore::Languages::ALL_LANGUAGES + [APPLE_TV_DIR_NAME, APPLE_TV_DIR_NAME]).map(&:downcase).freeze
+    ALL_LANGUAGES = (FastlaneCore::Languages::ALL_LANGUAGES + [APPLE_TV_DIR_NAME, APPLE_TV_DIR_NAME, DEFAULT_DIR_NAME]).map(&:downcase).freeze
 
     def self.language_folders(root)
       Dir.glob(File.join(root, '*')).select do |path|
