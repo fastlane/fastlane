@@ -9,7 +9,7 @@ module Gym
     def run
       clear_old_files
 
-      if !Gym.config[:just_export]
+      unless Gym.config[:just_export]
         build_app
       end
       verify_archive
