@@ -9,7 +9,9 @@ module Gym
     def run
       clear_old_files
 
-      build_app
+      if !Gym.config[:just_export]
+        build_app
+      end
       verify_archive
 
       FileUtils.mkdir_p(Gym.config[:output_directory])
