@@ -2,14 +2,15 @@ module Fastlane
   module Actions
     class GitPullAction < Action
       def self.run(params)
-        command = [
-          'git',
-          'pull',
-          '--tags'
-        ]
+        commands = []
 
-        Actions.sh(command.join(' '))
-        Helper.log.info 'Sucesfully pulled from remote.'
+        unless params[:only_tags]
+          commands += ["git pull &&"]
+        end
+
+        commands += ["git fetch --tags"]
+
+        Actions.sh(commands.join(' '))
       end
 
       def self.description
@@ -18,11 +19,19 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :only_tags,
+                                       description: "Simply pull the tags, and not bring new commits to the current branch from the remote",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a valid value for only_tags. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                       end)
         ]
       end
 
-      def self.author
-        "KrauseFx"
+      def self.authors
+        ["KrauseFx", "JaviSoto"]
       end
 
       def self.is_supported?(platform)
