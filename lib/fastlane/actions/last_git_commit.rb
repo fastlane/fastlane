@@ -10,11 +10,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Return last git commit message and author"
+        "Return last git commit hash, abbreviated commit hash, commit message and author"
       end
 
       def self.return_value
-        "Returns the following dict: {author: \"Author\", message: \"commit message\"}"
+        "Returns the following dict: {commit_hash: \"commit hash\", abbreviated_commit_hash: \"abbreviated commit hash\" author: \"Author\", message: \"commit message\"}"
       end
 
       def self.author
