@@ -967,6 +967,20 @@ appetize(
 )
 ```
 
+### [Parse Cloud Code Deploy](https://www.parse.com/docs/cloudcode/guide#command-line-deploying)
+This will deploy server-side code to Parse Cloud from your local Parse installation.
+
+```ruby
+parse_deploy # deploy the default Parse application with no release notes
+parse_deploy(
+  application: "My Parse Application",
+  parse_directory: './Path/to/Parse/', 
+  release_notes: "Release notes"
+)
+```
+
+Uses the [Parse command line tool](https://parse.com/docs/cloudcode/guide#command-line) and project configurations in the Parse directory.
+
 ### [appaloosa](https://www.appaloosa-store.com)
 ​
 Upload your ipa or apk to your private store on Appaloosa.
