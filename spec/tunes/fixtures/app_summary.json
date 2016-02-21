@@ -256,6 +256,36 @@
       "iconUrl": null,
       "issuesCount": 0,
       "type": "ios"
+    }, {
+      "adamId": "928444013",
+      "name": "DragonBox Full Algebra Pack",
+      "vendorId": "20141010004",
+      "type": "iOS App Bundle",
+      "versions": null,
+      "versionSets": [{
+        "type": "BUNDLE",
+        "platformString": "ios",
+        "inFlightVersion": null,
+        "deliverableVersion": {
+          "type": "BUNDLE",
+          "version": null,
+          "state": "Developer Removed from Sale",
+          "stateGroup": "notForSale",
+          "stateKey": "developerRemovedFromSale",
+          "supportedHardware": ["ipad", "iphone"],
+          "issuesCount": 0,
+          "largeAppIcon": {
+            "assetToken": null,
+            "sortOrder": null,
+            "type": null,
+            "url": null,
+            "thumbNailUrl": null,
+            "originalFileName": null
+          }
+        }
+      }],
+      "lastModifiedDate": 1443771230000,
+      "iconUrl": "https://s5.mzstatic.com/us/r30/Purple1/v4/56/4a/b1/564ab13c-142f-bfc9-1a6d-598c017fe9a2/icon340x340.png"
     }],
     "canCreateAppBundles": true
   },

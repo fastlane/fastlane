@@ -10,7 +10,7 @@ describe Spaceship::Application do
     end
 
     it "the number is correct" do
-      expect(Spaceship::Application.all.count).to eq(7)
+      expect(Spaceship::Application.all.count).to eq(8)
     end
 
     it "parses application correctly" do
@@ -175,6 +175,25 @@ describe Spaceship::Application do
           expect(app.live_version).to eq(nil)
           expect(app.edit_version.is_live).to eq(false)
           expect(app.latest_version.is_live).to eq(false)
+        end
+      end
+
+      describe "BUNDLES", focus: true do
+        let (:bundle) { Spaceship::Application.find(928_444_013) }
+        it "can find a bundle" do
+          expect(bundle.raw_data['type']).to eq("iOS App Bundle")
+        end
+
+        it "fails to find the edit_version of a bundle" do
+          expect do
+            bundle.edit_version
+          end.to raise_error('We do not support BUNDLE types right now')
+        end
+
+        it "fails to find the live_version of a bundle" do
+          expect do
+            bundle.live_version
+          end.to raise_error('We do not support BUNDLE types right now')
         end
       end
     end
