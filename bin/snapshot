@@ -65,8 +65,8 @@ class SnapshotApplication
       c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
 
       c.action do |args, options|
-        versions = [Snapshot::LatestIosVersion.version]
-        versions = options.ios.split(',') if options.ios
+        options.default ios_version: Snapshot::LatestIosVersion.version
+        versions = options.ios_version.split(',') if options.ios_version
         require 'snapshot/reset_simulators'
 
         Snapshot::ResetSimulators.clear_everything!(versions)
