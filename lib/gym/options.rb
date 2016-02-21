@@ -124,7 +124,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :just_export,
                                      env_name: "GYM_JUST_EXPORT",
-                                     description: "Just export ipa from archive_path. Do not build again. Default false",
+                                     description: "Export ipa from previously build xarchive. Uses archive_path as source",
                                      is_string: false,
                                      optional: true),
 
