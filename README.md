@@ -170,11 +170,11 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 ## Statistics
 
-`fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer) and is available publicly.
+`fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer).
 
 You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
 
-You can optionally submit crash reports, run `fastlane enable_crash_reporting` to get started. This makes resolving issues much easier and helps improving fastlane. [More information](https://github.com/fastlane/fastlane/releases/tag/1.33.3)
+You can optionally submit crash reports, run `fastlane enable_crash_reporting` to get started. This makes resolving issues much easier and helps improve fastlane. [More information](https://github.com/fastlane/fastlane/releases/tag/1.33.3)
 
 ## Credentials
 A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/credentials_manager).
@@ -193,4 +193,4 @@ Help us keep `fastlane` open and inclusive. Please read and follow our [Code of 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
 
-> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+> This project and all fastlane tools are in no way affiliated with Apple Inc or Google. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
