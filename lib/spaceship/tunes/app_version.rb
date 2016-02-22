@@ -159,8 +159,15 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         # @param is_live (Boolean)
         def find(application, app_id, is_live)
+          # we only support applications
+          platform = Spaceship::Tunes::AppVersionCommon.find_platform(application.raw_data['versionSets'])
+          raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
+
+          # too bad the "id" field is empty, it forces us to make more requests to the server
+          # these could also be cached
           attrs = client.app_version(app_id, is_live)
           return nil unless attrs
+
           attrs.merge!(application: application)
           attrs.merge!(is_live: is_live)
 

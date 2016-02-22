@@ -10,7 +10,7 @@ describe Spaceship::Application do
     end
 
     it "the number is correct" do
-      expect(Spaceship::Application.all.count).to eq(6)
+      expect(Spaceship::Application.all.count).to eq(8)
     end
 
     it "parses application correctly" do
@@ -25,7 +25,7 @@ describe Spaceship::Application do
       expect(app.issues_count).to eq(0)
       expect(app.app_icon_preview_url).to eq('https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png')
 
-      expect(app.raw_data['versions'].count).to eq(2)
+      expect(app.raw_data['versionSets'].count).to eq(1)
     end
 
     it "#url" do
@@ -166,6 +166,34 @@ describe Spaceship::Application do
           v = Spaceship::Application.all.first.live_version
           expect(v.class).to eq(Spaceship::AppVersion)
           expect(v.is_live).to eq(true)
+        end
+      end
+
+      describe "#live_version weirdities" do
+        it "no live version if app isn't yet uploaded" do
+          app = Spaceship::Application.find(1_000_000_000)
+          expect(app.live_version).to eq(nil)
+          expect(app.edit_version.is_live).to eq(false)
+          expect(app.latest_version.is_live).to eq(false)
+        end
+      end
+
+      describe "BUNDLES", focus: true do
+        let (:bundle) { Spaceship::Application.find(928_444_013) }
+        it "can find a bundle" do
+          expect(bundle.raw_data['type']).to eq("iOS App Bundle")
+        end
+
+        it "fails to find the edit_version of a bundle" do
+          expect do
+            bundle.edit_version
+          end.to raise_error('We do not support BUNDLE types right now')
+        end
+
+        it "fails to find the live_version of a bundle" do
+          expect do
+            bundle.live_version
+          end.to raise_error('We do not support BUNDLE types right now')
         end
       end
     end
