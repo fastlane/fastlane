@@ -4,12 +4,7 @@ module Fastlane
       def self.run(params)
         cmd = ['carthage']
 
-        if params[:command]
-          cmd << params[:command]
-        else
-          cmd << 'bootstrap'
-        end
-
+        cmd << params[:command]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--platform #{params[:platform]}"           if params[:platform]
         cmd << '--verbose'                                 if params[:verbose]
@@ -32,7 +27,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :command,
                                        env_name: "FL_CARTHAGE_COMMAND",
                                        description: "Carthage command (one of `build`, `bootstrap`, `update`)",
-                                       optional: true,
+                                       default_value: 'bootstrap',
                                        verify_block: proc do |value|
                                          raise "Please pass a valid command. Use one of the following: build, bootstrap, update" unless %w(build bootstrap update).include? value
                                        end),
