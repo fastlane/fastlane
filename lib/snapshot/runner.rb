@@ -226,7 +226,7 @@ module Snapshot
       helper_files.each do |path|
         content = File.read(path)
 
-        if content.include?("start.pressForDuration(0, thenDragToCoordinate: finish)")
+        unless content.include?("SnapshotHelperVersion [1.1]")
           UI.error "Your '#{path}' is outdated, please run `snapshot update`"
           UI.error "to update your Helper file"
           UI.user_error!("Please update your Snapshot Helper file")
