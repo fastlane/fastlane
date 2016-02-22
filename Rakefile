@@ -90,12 +90,23 @@ task :fetch_rubocop do
 end
 
 task :test_all do
-  GEMS.reverse_each do |repo|
+  exceptions = []
+  ["fastlane_core", "snapshot"].reverse_each do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
-      sh "bundle exec rspec"
-      sh "rubocop"
+      begin
+        sh "bundle exec rspec"
+        sh "rubocop"
+      rescue => ex
+        exceptions << "#{repo}: #{ex}"
+      end
     end
+  end
+  if exceptions.count > 0
+    puts "--------------------"
+    raise exceptions.join("\n")
+  else
+    puts "Success"
   end
 end
 
