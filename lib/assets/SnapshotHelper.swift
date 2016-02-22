@@ -29,6 +29,7 @@ class Snapshot: NSObject {
 
     class func setupSnapshot(app: XCUIApplication) {
         setLanguage(app)
+        setLocale(app)
         setLaunchArguments(app)
     }
 
@@ -36,18 +37,31 @@ class Snapshot: NSObject {
         let path = "/tmp/language.txt"
 
         do {
-            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-            deviceLanguage = locale.substringToIndex(locale.startIndex.advancedBy(2, limit:locale.endIndex))
-            app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))", "-AppleLocale", "\"\(locale)\"", "-ui_testing"]
+            deviceLanguage = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+            app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))"]
         } catch {
             print("Couldn't detect/set language...")
         }
     }
 
+    class func setLocale(app: XCUIApplication) {
+        let path = "tmp/locale.txt"
+
+        do {
+            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+        } catch {
+            print("Couldn't detect/set locale...")
+        }
+        if locale.isEmpty {
+            locale = NSLocale(localeIdentifier: deviceLanguage).localeIdentifier
+        }
+        app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
+    }
+
     class func setLaunchArguments(app: XCUIApplication) {
         let path = "/tmp/snapshot-launch_arguments.txt"
 
-        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES"]
+        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
             let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
@@ -91,4 +105,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [[1.0]]
+// SnapshotHelperVersion [[1.1]]
