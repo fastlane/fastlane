@@ -11,6 +11,16 @@ describe Fastlane do
         end.to raise_error("Please pass a valid command. Use one of the following: build, bootstrap, update")
       end
 
+      it "raises an error if configuration is invalid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: ''
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid configuration. Use non-empty string")
+      end
+
       it "raises an error if platform is invalid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -121,6 +131,16 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage update")
+      end
+
+      it "sets the configuration to Debug" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: 'Debug'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --configuration Debug")
       end
 
       it "sets the platform to iOS" do

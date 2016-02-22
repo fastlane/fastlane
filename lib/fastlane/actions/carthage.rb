@@ -10,6 +10,7 @@ module Fastlane
           cmd << 'bootstrap'
         end
 
+        cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--platform #{params[:platform]}"           if params[:platform]
         cmd << '--verbose'                                 if params[:verbose]
         cmd << '--no-skip-current'                         if params[:no_skip_current]
@@ -34,6 +35,13 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Please pass a valid command. Use one of the following: build, bootstrap, update" unless %w(build bootstrap update).include? value
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_CARTHAGE_CONFIGURATION",
+                                       description: "The Xcode configuration to build",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Please pass a valid configuration. Use non-empty string" if value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
