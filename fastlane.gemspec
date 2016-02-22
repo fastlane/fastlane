@@ -61,4 +61,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'rubocop', '~> 0.35.1'
   spec.add_development_dependency 'appium_lib', '~> 4.1.0'
+  spec.add_development_dependency 'rest-client', '~> 1.6.7'
 end
