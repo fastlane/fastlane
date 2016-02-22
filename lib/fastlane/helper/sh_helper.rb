@@ -22,15 +22,10 @@ module Fastlane
       if Helper.test?
         result << command # only for the tests
       else
-        exit_status = nil
-        IO.popen(command, err: [:child, :out]) do |io|
-          io.sync = true
-          io.each do |line|
-            UI.command_output(line.strip) if log
-            result << line
-          end
-          io.close
-          exit_status = $?.exitstatus
+        if ENV['USE_SIMPLE_POPEN'] == 'true'
+          exit_status = execute_with_simple_popen(command, log, result)
+        else
+          exit_status = execute_with_popen(command, log, result)
         end
 
         if exit_status != 0
@@ -51,6 +46,30 @@ module Fastlane
     ensure
       Encoding.default_external = previous_encoding.first
       Encoding.default_internal = previous_encoding.last
+    end
+
+    def self.execute_with_popen(command, log, result)
+      exit_status = nil
+      IO.popen(command, err: [:child, :out]) do |io|
+        io.sync = true
+        io.each do |line|
+          UI.command_output(line.strip) if log
+          result << line
+        end
+        io.close
+        exit_status = $?.exitstatus
+      end
+      exit_status
+    end
+
+    def self.execute_with_simple_popen(command, log, result)
+      IO.popen(command, err: [:child, :out]) do |io|
+        io.each do |line|
+          UI.command_output(line.strip) if log
+          result << line
+        end
+      end
+      $?.exitstatus
     end
   end
 end
