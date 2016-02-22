@@ -76,7 +76,7 @@ fastlane appstore
 
               |  fastlane
 --------------------------|------------------------------------------------------------
-:sparkles: | Connect all iOS build tools into one workflow (both `fastlane` tools and third party tools)
+:sparkles: | Connect all iOS and Android build tools into one workflow (both `fastlane` tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
 :ship: | Deploy from any computer, including a CI-server
 :wrench: | Extend and customise the functionality 
@@ -90,7 +90,7 @@ fastlane appstore
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 140 built-in integrations available
-:computer: | Support for both iOS and Mac OS apps
+:computer: | Support for both iOS, Mac OS and Android apps
 :octocat: | Full git and mercurial support
 
 
