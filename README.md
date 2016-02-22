@@ -60,7 +60,7 @@ lane :appstore do
   cocoapods
   scan
   snapshot
-  sigh
+  match
   deliver
   sh "./customScript.sh"
 
