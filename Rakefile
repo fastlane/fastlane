@@ -91,7 +91,7 @@ end
 
 task :test_all do
   exceptions = []
-  ["fastlane_core", "snapshot"].reverse_each do |repo|
+  GEMS.reverse_each do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
       begin
