@@ -54,7 +54,7 @@
 
     <div class="oneRow">
       <span class="download" id="ios">
-        <a href="itms-services://?action=download-manifest&url=itms-services://?action=download-manifest&url=<%= url %>" id="text" class="btn btn-lg btn-default" onclick="document.getElementById('finished').id = '';">
+        <a href="itms-services://?action=download-manifest&url=itms-services://?action=download-manifest&url=<%= plist_url %>" id="text" class="btn btn-lg btn-default" onclick="document.getElementById('finished').id = '';">
           Install <%= title %> <%= bundle_version %>
         </a>
       </span>
@@ -62,7 +62,7 @@
       <!-- <span class="download" id="android">
       </span> -->
     </div>
-    
+
     <h3 id="desktop">Please open this page on your iPhone!</h3>
 
     <p id="finished">
@@ -70,7 +70,7 @@
     </p>
 
     <p id="footnote">
-      This is a beta version and is not meant to share with the public. 
+      This is a beta version and is not meant to share with the public.
     </p>
     <img src="https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane_medium.png" id="fastlaneLogo" />
   </body>

@@ -135,6 +135,7 @@ module Fastlane
         end
         plist_render = eth.render(plist_template, {
           url: ipa_url,
+          ipa_url: ipa_url,
           build_num: build_num,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
@@ -149,6 +150,8 @@ module Fastlane
         end
         html_render = eth.render(html_template, {
           url: plist_url,
+          plist_url: plist_url,
+          ipa_url: ipa_url,
           build_num: build_num,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
@@ -163,6 +166,8 @@ module Fastlane
         end
         version_render = eth.render(version_template, {
           url: plist_url,
+          plist_url: plist_url,
+          ipa_url: ipa_url,
           build_num: build_num,
           bundle_version: bundle_version,
           full_version: full_version
