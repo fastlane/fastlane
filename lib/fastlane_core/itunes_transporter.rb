@@ -23,9 +23,9 @@ module FastlaneCore
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
-      @@hide_transporter_output = true
+      @hide_transporter_output = true
 
-      @@hide_transporter_output = false if $verbose
+      @hide_transporter_output = false if $verbose
     end
 
     # Returns a new instance of the iTunesTransporter.
@@ -107,7 +107,7 @@ module FastlaneCore
       @errors = []
       @warnings = []
 
-      if defined?@@hide_transporter_output
+      if defined?@hide_transporter_output
         # Show a one time message instead
         Helper.log.info "Waiting for iTunes Connect transporter to be finished.".green
         Helper.log.info "iTunes Transporter progress... this might take a few minutes...".green
@@ -180,7 +180,7 @@ module FastlaneCore
         end
       end
 
-      if !defined?@@hide_transporter_output and line =~ OUTPUT_REGEX
+      if !defined?@hide_transporter_output and line =~ OUTPUT_REGEX
         # General logging for debug purposes
         unless output_done
           Helper.log.debug "[Transporter]: #{$1}"
