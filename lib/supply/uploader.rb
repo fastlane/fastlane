@@ -122,20 +122,53 @@ module Supply
       Supply.config[:metadata_path]
     end
 
+    # searches for obbs in the directory where the apk is located and
+    # upload at most one main and one patch file. Do nothing if it finds
+    # more than one of either of them.
     def upload_obbs(apk_path, apk_version_code)
+      expansion_paths = find_obbs(apk_path)
+      ['main', 'patch'].each do |type|
+        if expansion_paths[type]
+          upload_obb(expansion_paths[type], type, apk_version_code)
+        end
+      end
+    end
+
+    # @return a map of the obb paths for that apk
+    # keyed by their detected expansion file type
+    # E.g.
+    # { 'main' => 'path/to/main.obb', 'patch' => 'path/to/patch.obb' }
+    def find_obbs(apk_path)
       search = File.join(File.dirname(apk_path), '*.obb')
       paths = Dir.glob(search, File::FNM_CASEFOLD)
+      expansion_paths = {}
       paths.each do |path|
-        Helper.log.info "Uploading obb file #{path}..."
-        client.upload_obb(obb_file_path: path,
-                          apk_version_code: apk_version_code,
-                          expansion_file_type: obb_expansion_file_type(path))
+        type = obb_expansion_file_type(path)
+        next unless type
+        if expansion_paths[type]
+          Helper.log.warn("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
+          Helper.log.warn("If you'd like this to work differently, please submit an issue.")
+          return {}
+        end
+        expansion_paths[type] = path
       end
+      expansion_paths
+    end
+
+    def upload_obb(obb_path, expansion_file_type, apk_version_code)
+      Helper.log.info "Uploading obb file #{obb_path}..."
+      client.upload_obb(obb_file_path: obb_path,
+                        apk_version_code: apk_version_code,
+                        expansion_file_type: expansion_file_type)
     end
 
     def obb_expansion_file_type(obb_file_path)
       filename = File.basename(obb_file_path, ".obb")
-      filename.include?(".main") ? "main" : "patch"
+      if filename.include?('main')
+        'main'
+      elsif filename.include?('patch')
+        'patch'
+      end
     end
   end
 end
