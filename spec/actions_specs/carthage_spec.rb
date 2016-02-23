@@ -1,6 +1,16 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Carthage Integration" do
+      it "raises an error if command is invalid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'thisistest'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid command. Use one of the following: build, bootstrap, update")
+      end
+
       it "raises an error if use_ssh is invalid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -69,9 +79,25 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
-      it "update if set to true" do
+      it "sets the command to build" do
         result = Fastlane::FastFile.new.parse("lane :test do
-            carthage(update: true)
+            carthage(command: 'build')
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage build")
+      end
+
+      it "sets the command to bootstrap" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(command: 'bootstrap')
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "sets the command to update" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(command: 'update')
           end").runner.execute(:test)
 
         expect(result).to eq("carthage update")
