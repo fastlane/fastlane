@@ -128,6 +128,8 @@ To gradually roll out a new build use
 supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
+If you have expansion files (obbs) in the same directory as your APK, they will also be uploaded together with your APK. If the file contains (".main"), it will be identified as 'main', otherwise as type 'patch'.
+
 ## Images and Screenshots
 
 After running `supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
