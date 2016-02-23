@@ -128,7 +128,10 @@ To gradually roll out a new build use
 supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
-If you have expansion files (obbs) in the same directory as your APK, they will also be uploaded together with your APK. If the file contains (".main"), it will be identified as 'main', otherwise as type 'patch'.
+Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
+
+- they are identified as type 'main' or 'patch' (by containing 'main' or 'patch' in their file name)
+- you have at most one of each type
 
 ## Images and Screenshots
 
