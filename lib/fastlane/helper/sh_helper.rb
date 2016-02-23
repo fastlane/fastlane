@@ -63,7 +63,6 @@ module Fastlane
     end
 
     def self.execute_with_simple_popen(command, log, result)
-      puts 'Using simple popen'
       IO.popen(command, err: [:child, :out]) do |io|
         io.each do |line|
           UI.command_output(line.strip) if log
