@@ -6,7 +6,7 @@ module Snapshot
     def self.available_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
-      @@options ||= [
+      @options ||= [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      env_name: "SNAPSHOT_WORKSPACE",
