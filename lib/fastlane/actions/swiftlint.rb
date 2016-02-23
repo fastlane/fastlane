@@ -5,7 +5,21 @@ module Fastlane
         if `which swiftlint`.to_s.length == 0 and !Helper.test?
           raise "You have to install swiftlint using `brew install swiftlint`".red
         end
-        Actions.sh("swiftlint")
+
+        command_prefix = [
+          'cd',
+          File.expand_path('.').shellescape,
+          '&&'
+        ].join(' ')
+        swiftlint_args = params[:report_file] ? "> #{params[:report_file]}" : ""
+
+        command = [
+          command_prefix,
+          'swiftlint',
+          swiftlint_args
+        ].join(' ')
+
+        Action.sh command
       end
 
       #####################################################
@@ -21,6 +35,10 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :report_file,
+                                        env_name: "FL_SWIFTLINT_REPORT_FILE",
+                                        description: "Specifies a file where swiftlint output is piped to",
+                                        optional: true)
         ]
       end
 
@@ -28,10 +46,11 @@ module Fastlane
       end
 
       def self.return_value
+        "Returns error status code if serious violations found, zero otherwise"
       end
 
       def self.authors
-        ["KrauseFx"]
+        ["KrauseFx", "c_Gretzki"]
       end
 
       def self.is_supported?(platform)
