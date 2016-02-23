@@ -91,20 +91,31 @@ end
 
 task :test_all do
   exceptions = []
-  GEMS.reverse_each do |repo|
+  sh "bundle install"
+  GEMS.each do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
       begin
-        sh "bundle exec rspec"
-        sh "rubocop"
+        # From https://github.com/bundler/bundler/issues/1424#issuecomment-2123080
+        # Since we nest bundle exec in bundle exec
+        Bundler.with_clean_env do
+          sh "bundle install"
+          sh "bundle exec rspec"
+          sh "rubocop"
+        end
       rescue => ex
+        puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
         exceptions << "#{repo}: #{ex}"
       end
     end
   end
+
   if exceptions.count > 0
     puts "--------------------"
-    raise exceptions.join("\n")
+    puts "#{exceptions.count} failure(s)"
+    puts "--------------------"
+    puts exceptions.join("\n")
+    raise "Tests failed, search test log for [[FAILURE]] to find the outputs"
   else
     puts "Success"
   end
