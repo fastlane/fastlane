@@ -28,7 +28,9 @@ module Fastlane
 
       {
           author: last_git_commit_formatted_with('%an'),
-          message: last_git_commit_formatted_with('%B')
+          message: last_git_commit_formatted_with('%B'),
+          commit_hash: last_git_commit_formatted_with('%H'),
+          abbreviated_commit_hash: last_git_commit_formatted_with('%h')
       }
     end
 

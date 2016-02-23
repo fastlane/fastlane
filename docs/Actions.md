@@ -1553,7 +1553,7 @@ import_from_git(
 
 ### last_git_commit_message (was: last_git_commit)
 
-Get information about the last git commit, returns the author and the git message.
+Get information about the last git commit, returns the commit hash, the abbreviated commit hash, the author and the git message.
 
 ```ruby
 commit = last_git_commit_message
