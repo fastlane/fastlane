@@ -166,7 +166,7 @@ describe FastlaneCore do
         # Timeout doesn't kill the running process
         # i.e. see fastlane/fastlane_core#102
         expect(count_processes(text)).to eq(count + 1)
-        sleep(3)
+        sleep(5)
         expect(count_processes(text)).to eq(count)
         # you would be expected to be able to see the number of processes go back to count right away.
       end
