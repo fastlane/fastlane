@@ -108,8 +108,6 @@ end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do |options|
-  tool_name = options[:tool_name]
-
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "pry", extension: ".rb", path: "./lib/") # debugging code
@@ -119,13 +117,18 @@ private_lane :validate_repo do |options|
 
   rubocop if File.exist?("../.rubocop.yml") # some project don't yet use rubocop
 
-  # Verifying the --help command
+  # Restricted from running on Travis CI because it causes builds to hang.
   #
-  binary_path = File.join("..", "bin", tool_name)
-  unless no_binary.include? tool_name
-    content = sh "PAGER=cat #{binary_path} --help"
-    ["--version", "https://fastlane.tools", tool_name].each do |current|
-      UI.user_error!("--help missing information: '#{current}'") unless content.include? current
+  unless ENV['TRAVIS']
+    # Verifying the --help command
+    #
+    tool_name = options[:tool_name]
+    binary_path = File.join("..", "bin", tool_name)
+    unless no_binary.include? tool_name
+      content = sh "PAGER=cat #{binary_path} --help"
+      ["--version", "https://fastlane.tools", tool_name].each do |current|
+        UI.user_error!("--help missing information: '#{current}'") unless content.include? current
+      end
     end
   end
 
