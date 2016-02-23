@@ -6,7 +6,7 @@ module Screengrab
     DEVICE_TYPES = ["phone", "sevenInch", "tenInch", "tv", "wear"].freeze
 
     def self.available_options
-      @@options ||= [
+      @options ||= [
         FastlaneCore::ConfigItem.new(key: :android_home,
                                      short_option: "-n",
                                      optional: true,
