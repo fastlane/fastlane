@@ -49,12 +49,12 @@ submit_for_review true
 ##### screenshots_path
 A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution. Also includes  Watch Support.
 
-![/assets/screenshots.png](/assets/screenshots.png)
+![assets/screenshots.png](assets/screenshots.png)
 
 ##### metadata_path
 Path to the metadata you want to use. The folder has to be structured like this
 
-![/assets/metadata.png](/assets/metadata.png)
+![assets/metadata.png](assets/metadata.png)
 
 If you run `deliver init` this will automatically be created for you.
 
