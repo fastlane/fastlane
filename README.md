@@ -94,7 +94,7 @@ Already using `deliver` and just updated to 1.0? Check out the [Migration Guide]
 
 Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
 
-![/assets/metadata.png](/assets/metadata.png)
+![assets/metadata.png](assets/metadata.png)
 
 You'll see your metadata from iTunes Connect. Feel free to store the metadata in git (not the screenshots). You can now modify it locally and push the changes back to iTunes Connect.
 
