@@ -22,27 +22,46 @@ module Fastlane
 
       show_infos
 
+      FastlaneFolder.create_folder! unless Helper.is_test?
+      fastlane_actions_path = File.join(FastlaneFolder.path, 'actions')
+      is_manual_setup = false
+
       begin
-        FastlaneFolder.create_folder! unless Helper.is_test?
         setup_project
         ask_for_apple_id
         detect_if_app_is_available
         print_config_table
-        fastlane_actions_path = File.join(FastlaneFolder.path, 'actions')
         if UI.confirm("Please confirm the above values")
           default_setup(path: fastlane_actions_path)
         else
+          is_manual_setup = true
           manual_setup(path: fastlane_actions_path)
         end
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue => ex # this will also be caused by Ctrl + C
-        # Something went wrong with the setup, clear the folder again
-        # and restore previous files
-        Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
-        restore_previous_state
-        raise ex
+        if is_manual_setup
+          handle_exception(exception: ex)
+        else
+          Helper.log.error ex.to_s
+          Helper.log.error 'An error occured during the setup process. Falling back to manual setup!'.yellow
+          try_manual_setup(path: fastlane_actions_path)
+        end
       end
       # rubocop:enable Lint/RescueException
+    end
+
+    def handle_exception(exception: nil)
+      # Something went wrong with the setup, clear the folder again
+      # and restore previous files
+      Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
+      restore_previous_state
+      raise exception
+    end
+
+    def try_manual_setup(path: nil)
+      manual_setup(path: path)
+    rescue => ex
+      handle_exception(exception: ex)
     end
 
     def default_setup(path: nil)
@@ -70,7 +89,7 @@ module Fastlane
 
     def ask_to_enable_other_tools
       if self.itc_ref.nil? && self.portal_ref.nil?
-        wants_to_create_app = agree('Would you like to create your app on iTunes Connect and the Developer Portal?', true)
+        wants_to_create_app = agree('Would you like to create your app on iTunes Connect and the Developer Portal? (y/n)', true)
         if wants_to_create_app
           create_app_if_necessary
           detect_if_app_is_available # check if the app was, in fact, created.
