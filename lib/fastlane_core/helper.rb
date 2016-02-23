@@ -9,12 +9,12 @@ module FastlaneCore
       $stdout.sync = true
 
       if is_test?
-        @@log ||= Logger.new(nil) # don't show any logs when running tests
+        @log ||= Logger.new(nil) # don't show any logs when running tests
       else
-        @@log ||= Logger.new($stdout)
+        @log ||= Logger.new($stdout)
       end
 
-      @@log.formatter = proc do |severity, datetime, progname, msg|
+      @log.formatter = proc do |severity, datetime, progname, msg|
         string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
         string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
         second = "#{msg}\n"
@@ -34,7 +34,7 @@ module FastlaneCore
         [string, second].join("")
       end
 
-      @@log
+      @log
     end
 
     # This method can be used to add nice lines around the actual log
@@ -142,7 +142,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @@enabled ||= File.directory? "./fastlane"
+      @enabled ||= File.directory? "./fastlane"
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)
