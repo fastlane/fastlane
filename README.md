@@ -93,11 +93,11 @@ gym
 :outbox_tray: | All archives are stored and accessible in the Xcode Organizer
 :computer: | Supports both iOS and Mac applications
 
-![/assets/gymScreenshot.png](/assets/gymScreenshot.png)
+![assets/gymScreenshot.png](assets/gymScreenshot.png)
 
 -----
 
-![/assets/gym.gif](/assets/gym.gif)
+![assets/gym.gif](assets/gym.gif)
 
 # Installation
 
