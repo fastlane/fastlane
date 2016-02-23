@@ -11,7 +11,8 @@ module Fastlane
           shield: params[:shield],
           alpha: params[:alpha],
           shield_io_timeout: params[:shield_io_timeout],
-          glob: params[:glob]
+          glob: params[:glob],
+          alpha_channel: params[:alpha_channel]
         }
         Badge::Runner.new.run(params[:path], options)
       end
@@ -91,7 +92,15 @@ module Fastlane
                                        env_name: "FL_BADGE_GLOB",
                                        description: "Glob pattern for finding image files",
                                        optional: true,
-                                       is_string: true)
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :alpha_channel,
+                                       env_name: "FL_BADGE_ALPHA_CHANNEL",
+                                       description: "Keeps/adds an alpha channel to the icon (useful for android icons)",
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         raise "alpha_channel is only a flag and should always be true".red unless value == true
+                                       end)
         ]
       end
 
