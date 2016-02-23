@@ -89,7 +89,7 @@ fastlane appstore
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
-:hatching_chick: | Over 140 built-in integrations available
+:hatching_chick: | Over 150 built-in integrations available
 :computer: | Support for both iOS, Mac OS and Android apps
 :octocat: | Full git and mercurial support
 
