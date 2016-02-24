@@ -263,4 +263,101 @@ password has been deleted.
 
 ## Gitignore
 
-The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md).
+The documentation was moved to [Gitignore.md](https://github.com/KrauseFx/fastlane/blob/master/docs/Gitignore.md).
+
+## Synchronized Action Execution
+
+In CI environments where many fastlane instances are executed in parallel, the build might brake when the simulator is used from different instances of faslane, or when running cocoapods, or when some actions are required to run single instance across multiple fastlane processes.
+
+Synchronise iOS simulator access:
+
+```ruby
+default_platform :ios
+
+platform :ios do
+  lane :beta do
+
+    lock_simulator { 
+      xctest
+    }
+    
+  end
+end
+```
+
+Synchronise cocoapods updates:
+
+```ruby
+default_platform :ios
+
+platform :ios do
+  lane :beta do
+  
+    lock_pods { 
+      cocoapods
+    }
+    
+  end
+end
+```
+
+Generic access to a resource:
+
+```ruby
+default_platform :ios
+
+platform :ios do
+  lane :beta do
+  
+    lock_exec(lockname: "lockname") { 
+      sh '...'
+    }
+    
+  end
+end
+```
+
+You can add as many as you want actions, and use various locks:
+
+```ruby
+default_platform :ios
+
+platform :ios do
+  lane :beta do
+
+    lock_pods { 
+      cocoapods
+    }
+    
+    lock_simulator { 
+      scan
+    }
+    
+    sh "./myscript.sh"
+  end
+end
+```
+
+If the lockname is not provided, by default `global` will be used:
+
+```ruby
+default_platform :ios
+
+platform :ios do
+  lane :beta do
+
+    lock_exec { 
+      hockey
+    }
+    
+  end
+end
+```
+
+### How it works
+
+A lock file is created using format `/tmp/fastlane_#{lockname}.lock` and containing the current process id.
+
+If the file doesn't exist, then it will execute the provided block. Otherwise it will check the process id from the current lock file. 
+
+In the case when the process that created the lock file is alive, it will retry every 30 seconds for 2 hours. If after 2 hours the lock is still present, it will remove the lock file and execute the block.
