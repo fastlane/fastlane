@@ -1,5 +1,30 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
+    describe "execute" do
+      it 'handles reading which throws a EIO exception' do
+        explodes_on_strip = 'danger! lasers!'
+        fake_std_in = ['a_filename', explodes_on_strip]
+
+        # This is really raised by the `each` call, but for easier mocking
+        # we raise when the line is cleaned up with `strip` afterward
+        expect(explodes_on_strip).to receive(:strip).and_raise Errno::EIO
+
+        expect(PTY).to receive(:spawn) do |command, &block|
+          expect(command).to eq('ls')
+          block.yield fake_std_in, 'not_really_std_out', Process.pid
+        end
+
+        expect($?).to receive(:exitstatus).and_return 0
+
+        result = FastlaneCore::CommandExecutor.execute(command: 'ls')
+
+        # We are implicity also checking that the error was not rethrown because that would
+        # have crashed the test
+
+        expect(result).to eq('a_filename')
+      end
+    end
+
     describe "which" do
       require 'tempfile'
 
