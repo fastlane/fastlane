@@ -25,7 +25,7 @@ module FastlaneCore
     end
 
     def self.server_results
-      @@results ||= {}
+      @results ||= {}
     end
 
     def self.update_available?(gem_name, current_version)
