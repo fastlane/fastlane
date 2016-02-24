@@ -102,7 +102,13 @@ fastlane appstore
 
 I recommend following the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/docs/Guide.md) to get started.
 
+Up to OS X 10.10 Yosemite:
+
     sudo gem install fastlane --verbose
+
+OS X 10.11 El Capitain:
+
+    sudo gem install faslane -n/usr/local/bin --verbose
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
