@@ -55,6 +55,8 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 `scan` makes it super easy to run tests of your iOS and Mac app. It does all the heavy lifting for you to run your tests... the easy way.
 
+![https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large](https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large)
+
 ### Before `scan`
 
 ```sh
