@@ -15,6 +15,12 @@ that usually means you are using an outdated version of OpenSSL. Make sure to in
 brew update && brew upgrade openssl
 ```
 
+If you use `rvm`, try the following
+
+```
+rvm osx-ssl-certs update all
+```
+
 ### Error when running `fastlane` with Jenkins
 
 This is usually caused when running Jenkins as its own user. While this is possible, you'll have to take care of creating a temporary Keychain, filling it and then using it when building your application. 
