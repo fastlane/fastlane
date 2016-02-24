@@ -22,6 +22,10 @@ module Supply
 
     # instanciate a client given the supplied configuration
     def self.make_from_config
+      unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
+        UI.user_error! "Missing auth credentials: You must specify either 'json_key' or 'key' and 'issuer'"
+      end
+
       return Client.new(path_to_key: Supply.config[:key],
                         issuer: Supply.config[:issuer],
                         path_to_service_account_json: Supply.config[:json_key])
