@@ -64,11 +64,17 @@ class FastlaneApplication
     command :lanes do |c|
       c.syntax = 'fastlane lanes'
       c.description = 'Lists all available lanes and shows their description'
+      c.option "-j", "--json", "Output the lanes in JSON instead of text"
 
       c.action do |args, options|
         require 'fastlane/lane_list'
         path = File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile')
-        Fastlane::LaneList.output(path)
+
+        if options.json
+          Fastlane::LaneList.output_json(path)
+        else
+          Fastlane::LaneList.output(path)
+        end
       end
     end
 
