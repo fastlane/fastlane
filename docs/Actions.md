@@ -2022,6 +2022,27 @@ else
 end
 ```
 
+### verify_build
+
+Verifies that the built app was built using the expected build resources. This is relevant for people who build on machines that are used to build apps with different profiles, certificates and/or bundle identifiers to guard against configuration mistakes.
+
+Add this action to appropriate lanes and assign some values to verify, like:
+
+```ruby
+verify_build(
+  provisioning_type: 'distribution',
+  bundle_identifier: 'com.example.myapp'
+)
+```
+
+You can verify the following items:
+- app_name
+- bundle_identifier
+- provisioning_type
+- provisioning_uuid
+- team_identifier
+- team_name
+
 ### verify_pod_keys
 
 Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
