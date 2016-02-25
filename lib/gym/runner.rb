@@ -7,7 +7,7 @@ module Gym
   class Runner
     # @return (String) The path to the resulting ipa
     def run
-      unless Gym.config[:just_export]
+      unless Gym.config[:skip_build_archive]
         clear_old_files
         build_app
       end

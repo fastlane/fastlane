@@ -122,8 +122,8 @@ module Gym
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
-        FastlaneCore::ConfigItem.new(key: :just_export,
-                                     env_name: "GYM_JUST_EXPORT",
+        FastlaneCore::ConfigItem.new(key: :skip_build_archive,
+                                     env_name: "GYM_SKIP_BUILD_ARCHIVE",
                                      description: "Export ipa from previously build xarchive. Uses archive_path as source",
                                      is_string: false,
                                      optional: true),
