@@ -286,7 +286,7 @@ to update your `SnapshotHelper.swift` files. In case you modified your `Snapshot
 
 ## Launch Arguments
 
-You can provide additional arguments to your app on launch. These strings will be available in your code through `NSProcessInfo.processInfo().arguments`. Alternatively use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `NSProcessInfo.processInfo().arguments`. Alternatively use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
 
 `snapshot` includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by `snapshot`.
 
