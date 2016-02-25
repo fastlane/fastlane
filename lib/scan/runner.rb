@@ -6,8 +6,7 @@ require 'terminal-table'
 module Scan
   class Runner
     def run
-      test_app
-      handle_results
+      handle_results(test_app)
     end
 
     def test_app
@@ -20,6 +19,7 @@ module Scan
           end
         }
       ]
+      exit_status = 0
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
@@ -27,6 +27,7 @@ module Scan
                                             loading: "Loading...",
                                               error: proc do |error_output|
                                                 begin
+                                                  exit_status = $?.exitstatus
                                                   ErrorHandler.handle_build_error(error_output)
                                                 rescue => ex
                                                   SlackPoster.new.run({
@@ -35,9 +36,10 @@ module Scan
                                                   raise ex
                                                 end
                                               end)
+      exit_status
     end
 
-    def handle_results
+    def handle_results(tests_exit_status)
       # First, generate a JUnit report to get the number of tests
       require 'tempfile'
       output_file = Tempfile.new("junit_report")
@@ -66,6 +68,7 @@ module Scan
 
       ReportCollector.new.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
+      UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
       UI.user_error!("Tests failed") unless result[:failures] == 0
     end
   end
