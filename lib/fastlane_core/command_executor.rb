@@ -59,6 +59,9 @@ module FastlaneCore
             end
             Process.wait(pid)
           end
+        rescue Errno::EIO
+          # This is expected on some linux systems, that indicates that the subcommand finished
+          # and we kept trying to read, ignore it
         rescue => ex
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)
