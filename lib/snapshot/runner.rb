@@ -220,13 +220,25 @@ module Snapshot
       end
     end
 
+    def version_of_bundled_helper
+      runner_dir = File.dirname(__FILE__)
+      bundled_helper = File.read File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
+      current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
+
+      ## Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
+      current_version.gsub(%r{^//\w*}, '').strip
+    end
+
     # rubocop:disable Style/Next
     def verify_helper_is_current
+      current_version = version_of_bundled_helper
+      UI.verbose "Checking that helper files contain #{current_version}"
+
       helper_files = Update.find_helper
       helper_files.each do |path|
         content = File.read(path)
 
-        unless content.include?("SnapshotHelperVersion [1.1]")
+        unless content.include?(current_version)
           UI.error "Your '#{path}' is outdated, please run `snapshot update`"
           UI.error "to update your Helper file"
           UI.user_error!("Please update your Snapshot Helper file")
