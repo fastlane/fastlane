@@ -4,12 +4,7 @@ module Fastlane
       def self.run(params)
         cmd = ["carthage"]
 
-        if params[:update]
-          cmd << "update"
-        else
-          cmd << "bootstrap"
-        end
-
+        cmd << params[:command]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
@@ -26,16 +21,13 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :update,
-                                       env_name: "FL_CARTHAGE_UPDATE",
-                                       description: "Update the the project's dependencies",
-                                       is_string: false,
-                                       optional: true,
-                                       default_value: false,
+          FastlaneCore::ConfigItem.new(key: :command,
+                                       env_name: "FL_CARTHAGE_COMMAND",
+                                       description: "Carthage command (one of `build`, `bootstrap`, `update`)",
+                                       default_value: 'bootstrap',
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for update. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         raise "Please pass a valid command. Use one of the following: build, bootstrap, update" unless %w(build bootstrap update).include? value
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
@@ -91,7 +83,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny"]
       end
     end
   end
