@@ -209,6 +209,16 @@ update_app_group_identifiers(
 	app_group_identifiers: ['group.your.app.group.identifier'])
 ```
 
+### update_icloud_container_identifiers
+Updates the iCloud Container Identifiers in the given Entitlements file, so you can use different iCloud containers for different builds like Adhoc, App Store, etc.
+
+```ruby
+update_icloud_container_identifiers(
+  entitlements_file: '/path/to/entitlements_file.entitlements',
+  icloud_container_identifiers: ['iCloud.com.companyname.appname']
+)
+```
+
 ### ensure_xcode_version
 
 Makes sure a specific version of Xcode is selected to be used to build.
