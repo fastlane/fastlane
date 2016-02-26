@@ -36,7 +36,7 @@ describe Cert do
       expect(Cert::Runner.new.expired_certs).to eq([expired_cert])
     end
 
-    it "revokes expired certificates if so requested" do
+    it "revokes expired certificates via revoke_expired sub-command" do
       expired_cert = stub_certificate(Time.now.utc - 1)
       good_cert = stub_certificate
 
@@ -51,27 +51,27 @@ describe Cert do
       expect(expired_cert).to receive(:revoke!)
       expect(good_cert).to_not receive(:revoke!)
 
-      Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, revoke_expired: true, keychain_path: ".")
-      Cert::Runner.new.run
+      Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
+      Cert::Runner.new.revoke_expired_certs!
     end
 
-    it "does not revoke expired certificates unless requested" do
-      expired_cert = stub_certificate(Time.now.utc - 1)
-      good_cert = stub_certificate
+    it "tries to revoke all expired certificates even if one has an error" do
+      expired_cert_1 = stub_certificate(Time.now.utc - 1)
+      expired_cert_2 = stub_certificate(Time.now.utc - 1)
 
       allow(Spaceship).to receive(:login).and_return(nil)
       allow(Spaceship).to receive(:client).and_return("client")
       allow(Spaceship).to receive(:select_team).and_return(nil)
       allow(Spaceship.client).to receive(:in_house?).and_return(false)
-      allow(Spaceship.certificate.production).to receive(:all).and_return([expired_cert, good_cert])
+      allow(Spaceship.certificate.production).to receive(:all).and_return([expired_cert_1, expired_cert_2])
 
       allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
 
-      expect(expired_cert).to_not receive(:revoke!)
-      expect(good_cert).to_not receive(:revoke!)
+      expect(expired_cert_1).to receive(:revoke!).and_raise("Boom!")
+      expect(expired_cert_2).to receive(:revoke!)
 
       Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
-      Cert::Runner.new.run
+      Cert::Runner.new.revoke_expired_certs!
     end
   end
 end
