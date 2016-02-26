@@ -34,7 +34,11 @@ class Snapshot: NSObject {
     }
 
     class func setLanguage(app: XCUIApplication) {
-        let path = "/tmp/language.txt"
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.stringByAppendingPathComponent("language.txt")
 
         do {
             let trimCharacterSet = NSCharacterSet.whitespaceAndNewlineCharacterSet()
@@ -46,7 +50,11 @@ class Snapshot: NSObject {
     }
 
     class func setLocale(app: XCUIApplication) {
-        let path = "tmp/locale.txt"
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.stringByAppendingPathComponent("locale.txt")
 
         do {
             let trimCharacterSet = NSCharacterSet.whitespaceAndNewlineCharacterSet()
@@ -61,8 +69,11 @@ class Snapshot: NSObject {
     }
 
     class func setLaunchArguments(app: XCUIApplication) {
-        let path = "/tmp/snapshot-launch_arguments.txt"
+        guard let prefix = pathPrefix() else {
+            return
+        }
 
+        let path = prefix.stringByAppendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
@@ -97,6 +108,14 @@ class Snapshot: NSObject {
             print("Waiting for loading indicator to disappear...")
         }
     }
+
+    class func pathPrefix() -> NSString? {
+        if let path = NSProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString? {
+            return path.stringByAppendingPathComponent("Library/Caches/tools.fastlane")
+        }
+        print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
+        return nil
+    }
 }
 
 extension XCUIElement {
@@ -107,4 +126,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.1]
+// SnapshotHelperVersion [1.2]

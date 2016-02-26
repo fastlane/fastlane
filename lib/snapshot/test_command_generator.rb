@@ -88,7 +88,7 @@ module Snapshot
       end
 
       def derived_data_path
-        "/tmp/snapshot_derived/"
+        Snapshot.cache[:derived_data_path] ||= Dir.mktmpdir("snapshot_derived")
       end
     end
   end

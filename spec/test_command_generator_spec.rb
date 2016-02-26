@@ -7,6 +7,7 @@ describe Snapshot do
       end
 
       it "uses the default parameters" do
+        expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
         command = Snapshot::TestCommandGenerator.generate(device_type: "Something")
         ios = command.join('').match(/OS=(\d+.\d+)/)[1]
         expect(command).to eq([
@@ -14,7 +15,7 @@ describe Snapshot do
           "xcodebuild",
           "-scheme 'ExampleUITests'",
           "-project './example/Example.xcodeproj'",
-          "-derivedDataPath '/tmp/snapshot_derived/'",
+          "-derivedDataPath '/tmp/path/to/snapshot_derived'",
           "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
           :build,
           :test,

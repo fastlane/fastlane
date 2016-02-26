@@ -25,9 +25,12 @@ module Snapshot
 
     attr_accessor :project
 
+    attr_accessor :cache
+
     def config=(value)
       @config = value
       DetectValues.set_additional_default_values
+      @cache = {}
     end
 
     def snapfile_name
