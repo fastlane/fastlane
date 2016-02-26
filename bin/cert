@@ -34,6 +34,16 @@ class CertApplication
       end
     end
 
+    command :revoke_expired do |c|
+      c.syntax = 'cert revoke_expired'
+      c.description = 'Revoke expired iOS code signing certificates'
+
+      c.action do |args, options|
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+        Cert::Runner.new.revoke_expired_certs!
+      end
+    end
+
     default_command :create
 
     run!

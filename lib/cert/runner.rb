@@ -12,22 +12,19 @@ module Cert
       return ENV["CER_FILE_PATH"]
     end
 
+    def login
+      UI.message "Starting login with user '#{Cert.config[:username]}'"
+      Spaceship.login(Cert.config[:username], nil)
+      Spaceship.select_team
+      UI.message "Successfully logged in"
+    end
+
     def run
       FileUtils.mkdir_p(Cert.config[:output_path])
 
       FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Cert::VERSION}")
 
-      UI.message "Starting login with user '#{Cert.config[:username]}'"
-      Spaceship.login(Cert.config[:username], nil)
-      Spaceship.select_team
-      UI.message "Successfully logged in"
-
-      if Cert.config[:revoke_expired]
-        expired_certs.each do |certificate|
-          Helper.log.info "#{certificate.id} #{certificate.name} has expired, revoking"
-          certificate.revoke!
-        end
-      end
+      login
 
       should_create = Cert.config[:force]
       unless should_create
@@ -42,6 +39,35 @@ module Cert
       else
         UI.user_error!("Something went wrong when trying to create a new certificate...")
       end
+    end
+
+    # Command method for the :revoke_expired sub-command
+    def revoke_expired_certs!
+      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Cert::VERSION}")
+
+      login
+
+      to_revoke = expired_certs
+
+      if to_revoke.empty?
+        UI.success "No expired certificates were found to revoke! 👍"
+        return
+      end
+
+      revoke_count = 0
+
+      to_revoke.each do |certificate|
+        begin
+          UI.message "#{certificate.id} #{certificate.name} has expired, revoking..."
+          certificate.revoke!
+          revoke_count += 1
+        rescue => e
+          UI.error "An error occurred while revoking #{certificate.id} #{certificate.name}"
+          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if $verbose
+        end
+      end
+
+      UI.success "#{revoke_count} expired certificate#{'s' if revoke_count != 1} #{revoke_count == 1 ? 'has' : 'have'} been revoked! 👍"
     end
 
     def expired_certs
