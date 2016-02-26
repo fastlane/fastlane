@@ -75,7 +75,7 @@ module Match
       # Install the provisioning profiles
       profile = profiles.last
 
-      if params[:force_for_new_devices]
+      if params[:force_for_new_devices] && !params[:readonly]
         params[:force] = device_count_different?(profile: profile) unless params[:force]
       end
 
