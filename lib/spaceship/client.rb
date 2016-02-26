@@ -201,7 +201,7 @@ module Spaceship
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
-      if @loggedin
+      if @loggedin && !(tries -= 1).zero?
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
