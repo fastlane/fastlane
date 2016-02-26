@@ -22,7 +22,9 @@ module Deliver
 
       has_binary = (options[:ipa] || options[:pkg])
       if !options[:skip_binary_upload] && !options[:build_number] && has_binary
-        upload_binary
+        unless upload_binary
+          UI.user_error!("Upload binary failed")
+        end
       end
 
       UI.success("Finished the upload to iTunes Connect")
