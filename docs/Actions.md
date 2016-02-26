@@ -642,7 +642,7 @@ xcov(
   workspace: "YourWorkspace.xcworkspace",
   scheme: "YourScheme",
   output_directory: "xcov_output"
-)  
+)
 ```
 
 ### [OCLint](http://oclint.org)
@@ -1166,7 +1166,7 @@ update_info_plist(
   plist_path: "path/to/Info.plist",
   block: lambda { |plist|
     urlScheme = plist['CFBundleURLTypes'].find{|scheme| scheme['CFBundleURLName'] == 'com.acme.default-url-handler'}
-    urlScheme[:CFBundleURLSchemes] = ['acme-production']    
+    urlScheme[:CFBundleURLSchemes] = ['acme-production']
   }
 )
 ```
@@ -1760,6 +1760,25 @@ Post a message to a **group chat**.
     success: true
   )
 ```
+
+### [PubuIM](http://pubu.im)
+Get a Webhook URL by adding a Fastlane service in your Pubu dashboard. Specify PUBU_URL to the URL, and then Fastlane can send notifications with results.
+
+
+```ruby
+ENV["PUBU_URL"] = "https://hooks.pubu.im/services/xxxx" # Define a WebHook URL
+
+pubu(message: "Ping!")
+
+pubu(
+  message: "Ping!",
+  payload: {            # Optional. You can specify your own message attachments.
+    'Built by' => "Pubu"
+  },
+  color: "info"        # Optional. The value can either be one of info, warning, primary, error, muted or success. The default value is info."
+)
+```
+
 
 ### Notification
 Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
