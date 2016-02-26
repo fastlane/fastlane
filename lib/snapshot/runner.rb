@@ -115,9 +115,11 @@ module Snapshot
       FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
       FileUtils.mkdir_p(screenshots_path)
 
-      File.write("/tmp/language.txt", language)
-      File.write("/tmp/locale.txt", locale || "")
-      File.write("/tmp/snapshot-launch_arguments.txt", launch_arguments.last)
+      prefix = File.join(Dir.home, "Library/Caches/tools.fastlane")
+      FileUtils.mkdir_p(prefix)
+      File.write(File.join(prefix, "language.txt"), language)
+      File.write(File.join(prefix, "locale.txt"), locale || "")
+      File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
