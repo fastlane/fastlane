@@ -100,6 +100,37 @@ describe Fastlane do
         expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
         expect(result).not_to include('Test')
       end
+
+      context 'with valid path to compile_commands.json' do
+        context 'with no path to oclint' do
+          let(:result) do
+            Fastlane::FastFile.new.parse('lane :test do
+              oclint( compile_commands: "./fastlane/spec/fixtures/oclint/compile_commands.json" )
+            end').runner.execute(:test)
+          end
+          let(:command) {"cd #{File.expand_path('..').shellescape} && oclint -report-type=html -o=oclint_report.html" }
+
+          it 'uses system wide oclint' do
+            expect(result).to include(command)
+          end
+        end
+
+        context 'with given path to oclint' do
+          let(:result) do
+            Fastlane::FastFile.new.parse('lane :test do
+              oclint(
+                compile_commands: "./fastlane/spec/fixtures/oclint/compile_commands.json",
+                oclint_path: "test/bin/oclint"
+              )
+            end').runner.execute(:test)
+          end
+          let(:command) {"cd #{File.expand_path('..').shellescape} && test/bin/oclint -report-type=html -o=oclint_report.html" }
+
+          it 'uses oclint provided' do
+            expect(result).to include(command)
+          end
+        end
+      end
     end
   end
 end

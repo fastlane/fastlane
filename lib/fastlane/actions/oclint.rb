@@ -7,8 +7,9 @@ module Fastlane
 
     class OclintAction < Action
       def self.run(params)
-        if `which oclint`.to_s.length == 0 and !Helper.test?
-          raise "You have to install oclint. Fore more details: ".red + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
+        oclint_path = params[:oclint_path]
+        if `which #{oclint_path}`.to_s.empty? and !Helper.test?
+          raise "You have to install oclint or provide path to oclint binary. Fore more details: ".red + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
         compile_commands = params[:compile_commands]
@@ -64,7 +65,7 @@ module Fastlane
 
         command = [
           command_prefix,
-          'oclint',
+          oclint_path,
           oclint_args,
           '"' + files.join('" "') + '"'
         ].join(' ')
@@ -84,6 +85,11 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :oclint_path,
+                                       env_name: 'FL_OCLINT_PATH',
+                                       description: 'The path to oclint binary',
+                                       default_value: 'oclint',
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :compile_commands,
                                        env_name: 'FL_OCLINT_COMPILE_COMMANDS',
                                        description: 'The json compilation database, use xctool reporter \'json-compilation-database\'',
