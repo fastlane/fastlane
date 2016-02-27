@@ -32,10 +32,13 @@ module FastlaneCore
     def method_missing(method_sym, *arguments, &block)
       # First, check if the key is actually available
       if self.config.all_keys.include? method_sym
-        value = arguments.first || (block.call if block_given?) # this is either a block or a value
-        if value
-          self.config[method_sym] = value if self.config._values[method_sym].to_s.length == 0
-        end
+        # This silently prevents a value from having its value set more than once.
+        return unless self.config._values[method_sym].to_s.empty?
+
+        value = arguments.first
+        value = block.call if value.nil? && block_given?
+
+        self.config[method_sym] = value unless value.nil?
       else
         # We can't set this value, maybe the tool using this configuration system has its own
         # way of handling this block, as this might be a special block (e.g. ipa block) that's only
