@@ -83,7 +83,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :lock: | You have full control over your files and Git repo, no third party service involved
 :sparkles: | Provisioning profile will always match the correct certificate
 :boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
-:recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force`
+:recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 :busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
 :sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/gym) and other build tools 
 
