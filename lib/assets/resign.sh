@@ -87,6 +87,8 @@ RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
+# List of plist keys used for reference to and from nested apps and extensions
+NESTED_APP_REFERENCE_KEYS=(":WKCompanionAppBundleIdentifier" ":NSExtension:NSExtensionAttributes:WKAppBundleIdentifier")
 
 # options start index
 OPTIND=3
@@ -417,6 +419,25 @@ then
     done
 fi
 
+# Check for and update bundle identifiers for extensions and associated nested apps
+echo "Fixing nested app and extension references"
+for key in ${NESTED_APP_REFERENCE_KEYS[@]}; do
+    # Check if Info.plist has a reference to another app or extension
+    REF_BUNDLE_ID=`PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null`
+    if [ -n "$REF_BUNDLE_ID" ];
+    then
+        # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
+        REF_PROVISION=`provision_for_bundle_id $REF_BUNDLE_ID`
+        # Map to the new bundle id
+        NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
+        # Change if not the same
+        if [ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ];
+        then
+            echo "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}" >&2
+            `PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
+        fi
+    fi
+done
 
 if [ "$ENTITLEMENTS" != "" ];
 then
