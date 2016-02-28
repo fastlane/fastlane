@@ -231,6 +231,16 @@ module Fastlane
         html_obj = bucket.objects.create(html_file_name, html_render.to_s, acl: :public_read)
         version_obj = bucket.objects.create(version_file_name, version_render.to_s, acl: :public_read)
 
+        # When you enable versioning on a S3 bucket,
+        # writing to an object will create an object version
+        # instead of replacing the existing object.
+        # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
+        if plist_obj.kind_of? AWS::S3::ObjectVersion
+          plist_obj = plist_obj.object
+          html_obj = html_obj.object
+          version_obj = version_obj.object
+        end
+
         # Setting actionand environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
         ENV[SharedValues::S3_PLIST_OUTPUT_PATH.to_s] = plist_obj.public_url.to_s
@@ -241,7 +251,7 @@ module Fastlane
         Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_obj.public_url.to_s
         ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_obj.public_url.to_s
 
-        Helper.log.info "Successfully uploaded ipa file to '#{html_obj.public_url}'".green
+        Helper.log.info "Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'".green
       end
 
       #
