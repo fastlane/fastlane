@@ -5,6 +5,8 @@ require 'fastlane_core'
 
 require 'webmock/rspec'
 
+require 'test_commander_program'
+
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
@@ -25,4 +27,9 @@ ensure
     ENV.delete(k) unless old_vals.include?(k)
     ENV[k] = old_vals[k]
   end
+end
+
+def stub_commander_runner_args(args)
+  runner = Commander::Runner.new(args)
+  allow(Commander::Runner).to receive(:instance).and_return(runner)
 end
