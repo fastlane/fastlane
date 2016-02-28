@@ -10,7 +10,7 @@ module Frameit
       # A .strings file is UTF-16 encoded. We only want to deal with UTF-8
       content = `iconv -f UTF-16 -t UTF-8 '#{path}'`
 
-      content.split("\n").each do |line|
+      content.split("\n").each_with_index do |line, index|
         begin
           # We don't care about comments and empty lines
           if line.start_with? '"'
@@ -20,8 +20,8 @@ module Frameit
             result[key] = value
           end
         rescue => ex
-          UI.error ex
-          UI.error line
+          UI.error "Error parsing #{path} line #{index + 1}: '#{line}'"
+          UI.verbose "#{ex.message}\n#{ex.backtrace.join('\n')}"
         end
       end
 
