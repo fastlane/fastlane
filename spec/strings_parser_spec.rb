@@ -24,6 +24,16 @@ describe Frameit do
           })
         end
       end
+
+      describe "failure parsing" do
+        it "logs a helpful message on a bad file" do
+          expect(Frameit::UI).to receive(:error).with(/.*translations.bad.strings line 2:/)
+          expect(Frameit::UI).to receive(:verbose).with(/undefined method .\[\]. for nil:NilClass/)
+
+          translations = Frameit::StringsParser.parse("./spec/fixtures/translations.bad.strings")
+          expect(translations). to eq({})
+        end
+      end
     end
   end
 end
