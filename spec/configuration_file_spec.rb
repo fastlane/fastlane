@@ -7,6 +7,14 @@ describe FastlaneCore do
                                        description: "desc",
                                        is_string: false,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :a_boolean,
+                                       description: "desc",
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :another_boolean,
+                                       description: "desc",
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :ios_version,
                                        description: "desc",
                                        default_value: "123"),
@@ -47,6 +55,19 @@ describe FastlaneCore do
         config = FastlaneCore::Configuration.create(options, { app_identifier: "detlef.app.super" })
         config.load_configuration_file('ConfigFileEmpty')
         expect(config[:app_identifier]).to eq("detlef.app.super")
+      end
+
+      it "properly loads boolean values" do
+        config = FastlaneCore::Configuration.create(options, {})
+        config.load_configuration_file('ConfigFileBooleanValues')
+        expect(config[:a_boolean]).to be(false)
+        expect(config[:another_boolean]).to be(true)
+      end
+
+      it "ignores the same item being set after the first time" do
+        config = FastlaneCore::Configuration.create(options, {})
+        config.load_configuration_file('ConfigFileRepeatedValueSet')
+        expect(config[:app_identifier]).to eq('the.expected.value')
       end
 
       describe "Handling invalid broken configuration files" do
