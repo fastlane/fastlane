@@ -23,10 +23,11 @@ module Fastlane
       end
 
       # Run a certain action
-      def trigger(task: nil, flags: nil, serial:nil)
+      def trigger(task: nil, flags: nil, serial: nil)
         # raise "Could not find gradle task '#{task}' in the list of available tasks".red unless task_available?(task)
-        android_serial = serial != "" ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, gradle_path, task, flags].join(" ")
+
+        android_serial = (serial != "") ? "ANDROID_SERIAL=#{serial}" : nil
+        command = [android_serial, gradle_path, task, flags].reject(&:nil?).join(" ")
         Action.sh(command)
       end
 

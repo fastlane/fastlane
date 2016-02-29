@@ -89,6 +89,44 @@ Use `gym --help` to get all available options.
 
 The alternative to `gym` is [`ipa`](#ipa) which uses [shenzhen](https://github.com/nomad/shenzhen) under the hood.
 
+### gradle
+
+You can use the `gradle` action to integrate your gradle tasks into `fastlane`.
+
+Simple usage:
+```ruby
+gradle(
+  task: 'assemble',
+  flavor: 'WorldDomination',
+  build_type: 'Release'
+)
+```
+
+In case of an `assemble` task, the signed apk path is accessible in: `Actions.lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
+
+
+You can pass [gradle properties](https://docs.gradle.org/current/userguide/build_environment.html):
+```ruby
+gradle(
+  # ...
+
+  properties: {
+    'versionCode' => 100,
+    'versionName' => '1.0.0',
+    # ...
+  }
+)
+```
+
+To pass any other CLI flags to gradle use:
+```ruby
+gradle(
+  # ...
+
+  flags: "--exitcode --xml file.xml"
+)
+```
+
 ### verify_xcode
 
 Verifies that the Xcode installation is properly signed by Apple. This is relevant after recent [attacks targeting Xcode](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/).
