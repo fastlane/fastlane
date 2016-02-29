@@ -182,9 +182,6 @@ module FastlaneCore
       return value unless value.nil? # we already have a value
       return value if option.optional # as this value is not required, just return what we have
 
-      return value unless ask
-
-      # fallback to asking
       if Helper.is_test? or Helper.is_ci?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
@@ -193,7 +190,7 @@ module FastlaneCore
         UI.user_error!("No value found for '#{key}'")
       end
 
-      while value.nil?
+      while ask && value.nil?
         Helper.log.info "To not be asked about this value, you can specify it using '#{option.key}'".yellow
         value = ask("#{option.description}: ")
         # Also store this value to use it from now on
@@ -224,11 +221,10 @@ module FastlaneCore
       true
     end
 
-    # see fetch
-    def values(ask: true)
+    def values
       # As the user accesses all values, we need to iterate through them to receive all the values
       @available_options.each do |option|
-        @values[option.key] = fetch(option.key, ask: ask) unless @values[option.key]
+        @values[option.key] = fetch(option.key) unless @values[option.key]
       end
       @values
     end
