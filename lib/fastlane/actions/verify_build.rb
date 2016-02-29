@@ -9,7 +9,7 @@ module Fastlane
     class VerifyBuildAction < Action
       def self.run(params)
         Dir.mktmpdir do |dir|
-          app_path = self.app_path(dir)
+          app_path = self.app_path(params, dir)
 
           values = self.gather_cert_info(app_path)
 
@@ -21,8 +21,8 @@ module Fastlane
         end
       end
 
-      def self.app_path(dir)
-        ipa_path = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
+      def self.app_path(params, dir)
+        ipa_path = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
         raise "Unable to find ipa file '#{ipa_path}'." unless File.exist?(ipa_path)
         ipa_path = File.expand_path(ipa_path)
 
@@ -67,7 +67,10 @@ module Fastlane
         values['provisioning_uuid'] = plist['UUID']
         values['team_name'] = plist['TeamName']
 
-        raise "Inconsistent identifier found" unless plist['Entitlements']['application-identifier'] == "#{values['team_identifier']}.#{values['bundle_identifier']}"
+        application_identifier_prefix = plist['ApplicationIdentifierPrefix'][0]
+        full_bundle_identifier = "#{application_identifier_prefix}.#{values['bundle_identifier']}"
+
+        raise "Inconsistent identifier found; #{plist['Entitlements']['application-identifier']}, found in the embedded.mobileprovision file, should match #{full_bundle_identifier}, which is embedded in the codesign identity" unless plist['Entitlements']['application-identifier'] == full_bundle_identifier
         raise "Inconsistent identifier found" unless plist['Entitlements']['com.apple.developer.team-identifier'] == values['team_identifier']
 
         values
@@ -100,22 +103,22 @@ module Fastlane
 
       def self.evaulate(params, values)
         if params[:provisioning_type]
-          raise "Mismatched provisioning_type '#{params[:provisioning_type]}'".red unless params[:provisioning_type] == values['provisioning_type']
+          raise "Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'".red unless params[:provisioning_type] == values['provisioning_type']
         end
         if params[:provisioning_uuid]
-          raise "Mismatched provisioning_uuid '#{params[:provisioning_uuid]}'".red unless params[:provisioning_uuid] == values['provisioning_uuid']
+          raise "Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'".red unless params[:provisioning_uuid] == values['provisioning_uuid']
         end
         if params[:team_identifier]
-          raise "Mismatched team_identifier '#{params[:team_identifier]}'".red unless params[:team_identifier] == values['team_identifier']
+          raise "Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'".red unless params[:team_identifier] == values['team_identifier']
         end
         if params[:team_name]
-          raise "Mismatched team_name '#{params[:team_name]}'".red unless params[:team_name] == values['team_name']
+          raise "Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'".red unless params[:team_name] == values['team_name']
         end
         if params[:app_name]
-          raise "Mismatched app_name '#{params[:app_name]}'".red unless params[:app_name] == values['app_name']
+          raise "Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'".red unless params[:app_name] == values['app_name']
         end
         if params[:bundle_identifier]
-          raise "Mismatched bundle_identifier '#{params[:bundle_identifier]}'".red unless params[:bundle_identifier] == values['bundle_identifier']
+          raise "Mismatched bundle_identifier. Required: '#{params[:bundle_identifier]}'; Found: '#{values['bundle_identifier']}'".red unless params[:bundle_identifier] == values['bundle_identifier']
         end
 
         UI.success "Build is verified, have a 🍪."
@@ -161,6 +164,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :bundle_identifier,
                                        env_name: "FL_VERIFY_BUILD_BUNDLE_IDENTIFIER",
                                        description: "Required bundle identifier",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :ipa_path,
+                                       env_name: "FL_VERIFY_BUILD_IPA_PATH",
+                                       description: "Explicitly set the ipa path",
                                        optional: true)
         ]
       end
