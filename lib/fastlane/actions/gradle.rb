@@ -45,20 +45,13 @@ module Fastlane
         Actions.lane_context[SharedValues::GRADLE_BUILD_TYPE] = build_type if build_type
         Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor if flavor
 
-        # Are we assembling, and therefore expecting apk's?
-        is_assembling = task.start_with?('assemble')
-
-        # We need to first clean up any old apk's that might still be lying around because otherwise there is no way of knowing which were the newly generated apk's
-        if is_assembling
-          apk_search_path = File.join(project_dir, '*', 'build', 'outputs', 'apk', '*-*.apk')
-          Dir[apk_search_path].each(&File.method(:delete))
-        end
-
         # We run the actual gradle task
         result = gradle.trigger(task: gradle_task, serial: params[:serial], flags: flags.join(' '))
 
         # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` scenario
-        return result unless is_assembling
+        return result unless task.start_with?('assemble')
+
+        apk_search_path = File.join(project_dir, '*', 'build', 'outputs', 'apk', '*.apk')
 
         # Our apk is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`), however we're not interested in unaligned apk's...
         new_apks = Dir[apk_search_path].reject { |path| path =~ /^.*-unaligned.apk$/i}
