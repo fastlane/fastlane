@@ -12,7 +12,9 @@ module Fastlane
           alpha: params[:alpha],
           shield_io_timeout: params[:shield_io_timeout],
           glob: params[:glob],
-          alpha_channel: params[:alpha_channel]
+          alpha_channel: params[:alpha_channel],
+          shield_gravity: params[:shield_gravity],
+          shield_no_resize: params[:shield_no_resize]
         }
         Badge::Runner.new.run(params[:path], options)
       end
@@ -100,6 +102,19 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          raise "alpha_channel is only a flag and should always be true".red unless value == true
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :shield_gravity,
+                                       env_name: "FL_BADGE_SHIELD_GRAVITY",
+                                       description: "Position of shield on icon. Default: North - Choices include: NorthWest, North, NorthEast, West, Center, East, SouthWest, South, SouthEast",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :shield_no_resize,
+                                       env_name: "FL_BADGE_SHIELD_NO_RESIZE",
+                                       description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrinked to not exceed the icon graphic",
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         raise "shield_no_resize is only a flag and should always be true".red unless value == true
                                        end)
         ]
       end
