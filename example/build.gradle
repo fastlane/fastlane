@@ -29,6 +29,8 @@ android {
 }
 
 def supportLibVersion = '23.1.1'
+Object[] versionInfo = screengrabVersion(rootProject.file('version.properties'))
+String screengrabVersion = versionInfo[0] as String
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
@@ -41,7 +43,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile 'tools.fastlane:screengrab:0.1.2'
+    androidTestCompile "tools.fastlane:screengrab:${screengrabVersion}"
 
 // The following allows you to link directly against the source code of the screengrab lib project
 // for local development
