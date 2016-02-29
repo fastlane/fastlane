@@ -80,6 +80,14 @@ module FastlaneCore
       self.is_workspace
     end
 
+    def project_name
+      if is_workspace
+        return File.basename(options[:workspace], ".xcworkspace")
+      else
+        return File.basename(options[:project], ".xcodeproj")
+      end
+    end
+
     # Get all available schemes in an array
     def schemes
       parsed_info.schemes
@@ -109,15 +117,16 @@ module FastlaneCore
 
         if preferred_to_include and preferred.count == 1
           options[:scheme] = preferred.last
+        elsif automated_scheme_selection? && schemes.include?(project_name)
+          Helper.log.info "Using scheme matching project name (#{project_name}).".yellow
+          options[:scheme] = project_name
+        elsif Helper.is_ci?
+          Helper.log.error "Multiple schemes found but you haven't specified one.".red
+          Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
+          raise "Multiple schemes found".red
         else
-          if Helper.is_ci?
-            Helper.log.error "Multiple schemes found but you haven't specified one.".red
-            Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-            raise "Multiple schemes found".red
-          else
-            puts "Select Scheme: "
-            options[:scheme] = choose(*(schemes))
-          end
+          puts "Select Scheme: "
+          options[:scheme] = choose(*(schemes))
         end
       else
         Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
@@ -289,6 +298,12 @@ module FastlaneCore
         @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info)
       end
       @parsed_info
+    end
+
+    # If scheme not specified, do we want the scheme
+    # matching project name?
+    def automated_scheme_selection?
+      !!ENV["AUTOMATED_SCHEME_SELECTION"]
     end
   end
 end

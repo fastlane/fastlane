@@ -20,6 +20,10 @@ describe FastlaneCore do
         expect(@project.is_workspace).to eq(false)
       end
 
+      it "#project_name" do
+        expect(@project.project_name).to eq("Example")
+      end
+
       it "#schemes returns all available schemes" do
         expect(@project.schemes).to eq(["Example"])
       end
