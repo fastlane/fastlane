@@ -266,6 +266,10 @@ ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
 pilot...
 ```
 
+## Credentials Issues
+
+If your password contains special characters, `pilot` may throw a confusing error saying your "Your Apple ID or password was entered incorrectly". The easiest way to fix this error is to change your password to something that **does not** contains special characters.
+
 ## How is my password stored?
 
 `pilot` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
