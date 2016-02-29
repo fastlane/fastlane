@@ -30,9 +30,9 @@ module FastlaneCore
           else
             # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)
             # iPad Air 2 (4F3B8059-03FD-4D72-99C0-6E9BBEE2A9CE) (Shutdown) (unavailable, device type profile not found)
-            match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \((?:[^\(]+)\)(.*unavailable.*)?/)
-            if match && !match[3] && os_type == requested_os_type
-              @devices << Device.new(name: match[1], ios_version: os_version, udid: match[2])
+            match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+            if match && !match[4] && os_type == requested_os_type
+              @devices << Device.new(name: match[1], os_version: os_version, udid: match[2], state: match[3])
             end
           end
         end
@@ -42,6 +42,18 @@ module FastlaneCore
 
       def clear_cache
         @devices = nil
+      end
+
+      # Reset all simulators of this type
+      def reset_all
+        all.each(&:reset)
+      end
+
+      # Reset simulator by UDID or name and OS version
+      # Latter is useful when combined with -destination option of xcodebuild
+      def reset(udid: nil, name: nil, os_version: nil)
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
+        match.reset if match
       end
 
       # The code below works from Xcode 7 on
@@ -68,7 +80,7 @@ module FastlaneCore
       #       next unless os_version.include?(requested_os_type)
 
       #       os = os_version.gsub(requested_os_type + " ", "").strip
-      #       @devices << Device.new(name: device['name'], ios_version: os, udid: device['udid'])
+      #       @devices << Device.new(name: device['name'], os_version: os, udid: device['udid'])
       #     end
       #   end
 
@@ -88,19 +100,28 @@ module FastlaneCore
 
     class Device
       attr_accessor :name
-
       attr_accessor :udid
+      attr_accessor :os_version
+      attr_accessor :ios_version # Preserved for backwards compatibility
+      attr_accessor :state
 
-      attr_accessor :ios_version
-
-      def initialize(name: nil, udid: nil, ios_version: nil)
+      def initialize(name: nil, udid: nil, os_version: nil, state: nil)
         self.name = name
         self.udid = udid
-        self.ios_version = ios_version
+        self.os_version = os_version
+        self.ios_version = os_version
+        self.state = state
       end
 
       def to_s
         self.name
+      end
+
+      def reset
+        Helper.log.info "Resetting #{self}"
+        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        `xcrun simctl erase #{self.udid}`
+        return
       end
     end
   end
@@ -109,6 +130,14 @@ module FastlaneCore
     class << self
       def requested_os_type
         'tvOS'
+      end
+    end
+  end
+
+  class SimulatorWatch < Simulator
+    class << self
+      def requested_os_type
+        'watchOS'
       end
     end
   end
