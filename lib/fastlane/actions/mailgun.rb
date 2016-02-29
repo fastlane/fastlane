@@ -75,6 +75,11 @@ module Fastlane
                                       env_name: "MAILGUN_CI_BUILD_LINK",
                                       description: "CI Build Link",
                                       optional: true,
+                                      is_string: true),
+          FastlaneCore::ConfigItem.new(key: :template_path,
+                                      env_name: "MAILGUN_TEMPLATE_PATH",
+                                      description: "Mail HTML template",
+                                      optional: true,
                                       is_string: true)
 
         ]
@@ -98,11 +103,11 @@ module Fastlane
                         from: "#{options[:from]}<#{options[:postmaster]}>",
                         to: "#{options[:to]}",
                         subject: options[:subject],
-                        html: mail_teplate(options)
-        mail_teplate(options)
+                        html: mail_template(options)
+        mail_template(options)
       end
 
-      def self.mail_teplate(options)
+      def self.mail_template(options)
         hash = {
           author: Actions.git_author_email,
           last_commit: Actions.last_git_commit_message,
@@ -111,10 +116,18 @@ module Fastlane
         }
         hash[:success] = options[:success]
         hash[:ci_build_link] = options[:ci_build_link]
-        Fastlane::ErbTemplateHelper.render(
-          Fastlane::ErbTemplateHelper.load("mailgun_html_template"),
-          hash
-        )
+
+        # grabs module
+        eth = Fastlane::ErbTemplateHelper
+
+        # create html from template
+        html_template_path = options[:template_path]
+        if html_template_path && File.exist?(html_template_path)
+          html_template = eth.load_from_path(html_template_path)
+        else
+          html_template = eth.load("mailgun_html_template")
+        end
+        eth.render(html_template, hash)
       end
 
     end

@@ -1712,7 +1712,8 @@ mailgun(
   success: true,
   message: "Mail Body",
   app_link: "http://www.myapplink.com",
-  ci_build_link: "http://www.mycibuildlink.com"
+  ci_build_link: "http://www.mycibuildlink.com",
+  template_path: "HTML_TEMPLATE_PATH"
 )
 ```
 
