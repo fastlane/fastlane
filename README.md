@@ -182,11 +182,11 @@ lane :match do
 end
 ```
 
-Then all your your team as to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
 
 #### Passphrase
 
-When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`.Make sure to remember the password, as you'll need it when you run match on a different machine
+When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
 To set the passphrase using an environment variable, use `MATCH_PASSWORD`.
 
@@ -251,7 +251,7 @@ gym
 
 ##### Multiple Targets
 
-If you app has multiple targets (e.g. Today Widget or WatchOS Extension)
+If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
 
 ```ruby
 match(app_identifier: "tools.fastlane.app", type: "appstore")
@@ -305,7 +305,7 @@ Once you've decided which approach to take, all that's left to do is to set your
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
