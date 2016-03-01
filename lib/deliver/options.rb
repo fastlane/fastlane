@@ -65,7 +65,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_screenshots,
-                                     description: "Don't upload the screenhsots",
+                                     description: "Don't upload the screenshots",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_version,
