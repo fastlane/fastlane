@@ -89,7 +89,8 @@ module Fastlane
 
         # get the absolute paths to the files
         git_add_paths = expected_changed_files.map do |path|
-          File.expand_path(File.join(repo_pathname, path.gsub("$(SRCROOT)", ".")))
+          updated = path.gsub("$(SRCROOT)", ".").gsub("${SRCROOT}", ".")
+          File.expand_path(File.join(repo_pathname, updated))
         end
 
         # then create a commit with a message
