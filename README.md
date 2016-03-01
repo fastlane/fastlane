@@ -286,7 +286,18 @@ to update your `SnapshotHelper.swift` files. In case you modified your `Snapshot
 
 ## Launch Arguments
 
-You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `NSProcessInfo.processInfo().arguments`. Alternatively use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `NSProcessInfo.processInfo().arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+
+```ruby
+launch_arguments([
+  "-firstName Felix -lastName Krause"
+])
+```
+
+```swift
+name.text = NSUserDefaults.standardUserDefaults().stringForKey("firstName")
+// name.text = "Felix"
+```
 
 `snapshot` includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by `snapshot`.
 
@@ -294,9 +305,6 @@ You can provide additional arguments to your app on launch. These strings will b
 if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
     // runtime check that we are in snapshot mode
 }
-
-username.text = NSUserDefaults.standardUserDefaults().stringForKey("username")
-// username.text = "Felix"
 ```
 
 Specify multiple argument strings and `snapshot` will generate screenshots for each combination of arguments, devices, and languages. This is useful for comparing the same screenshots with different feature flags, dynamic text sizes, and different data sets.
