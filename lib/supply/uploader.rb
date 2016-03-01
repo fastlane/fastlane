@@ -10,8 +10,9 @@ module Supply
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
 
-        Dir.foreach(metadata_path) do |language|
+        all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
+          Helper.log.info "Preparing to upload for language '#{language}'..."
 
           listing = client.listing_for_language(language)
 
@@ -45,8 +46,6 @@ module Supply
     end
 
     def upload_metadata(language, listing)
-      Helper.log.info "Loading metadata for language '#{language}'..."
-
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(metadata_path, language, "#{key}.txt")
         listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
@@ -101,7 +100,7 @@ module Supply
         upload_obbs(apk_path, apk_version_code)
 
         if metadata_path
-          Dir.foreach(metadata_path) do |language|
+          all_languages.each do |language|
             next if language.start_with?('.') # e.g. . or .. or hidden folders
             upload_changelog(language, apk_version_code)
           end
@@ -113,6 +112,10 @@ module Supply
     end
 
     private
+
+    def all_languages
+      Dir.foreach(metadata_path).sort { |x, y| x <=> y }
+    end
 
     def client
       @client ||= Client.make_from_config
