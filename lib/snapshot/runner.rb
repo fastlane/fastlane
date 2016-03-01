@@ -175,7 +175,12 @@ module Snapshot
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
-      return Collector.fetch_screenshots(raw_output, language, device_type, launch_arguments.first)
+      if locale
+        dir_name = locale
+      else
+        dir_name = language
+      end
+      return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
     def uninstall_app(device_type)
