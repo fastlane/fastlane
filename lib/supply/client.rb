@@ -58,6 +58,8 @@ module Supply
 
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
       Google::Apis::ClientOptions.default.application_version = Supply::VERSION
+      Google::Apis::RequestOptions.default.timeout_sec = 300
+      Google::Apis::RequestOptions.default.retries = 5
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
       self.android_publisher.authorization = auth_client
