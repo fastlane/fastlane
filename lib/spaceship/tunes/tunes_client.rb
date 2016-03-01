@@ -790,6 +790,19 @@ module Spaceship
       update_tester_from_app!(tester, app_id, false)
     end
 
+    #####################################################
+    # @!group State History
+    #####################################################
+    def versions_history(app_id, platform)
+      r = request(:get, "ra/apps/#{app_id}/stateHistory?platform=#{platform}")
+      parse_response(r, 'data')['versions']
+    end
+
+    def version_states_history(app_id, platform, version_id)
+      r = request(:get, "ra/apps/#{app_id}/versions/#{version_id}/stateHistory?platform=#{platform}")
+      parse_response(r, 'data')
+    end
+
     private
 
     def with_tunes_retry(tries = 5, &_block)

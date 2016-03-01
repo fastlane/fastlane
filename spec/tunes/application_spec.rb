@@ -206,5 +206,35 @@ describe Spaceship::Application do
         end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
       end
     end
+
+    describe "Version history", focus: true do
+      it "Parses history" do
+        app = Spaceship::Application.all.first
+        history = app.versions_history
+        expect(history.count).to eq(9)
+
+        v = history[0]
+        expect(v.version_string).to eq("1.0")
+        expect(v.version_id).to eq(812_627_411)
+
+        v = history[7]
+        expect(v.version_string).to eq("1.3")
+        expect(v.version_id).to eq(815_048_522)
+        expect(v.items.count).to eq(6)
+        expect(v.items[1].state_key).to eq("waitingForReview")
+        expect(v.items[1].user_name).to eq("joe@wewanttoknow.com")
+        expect(v.items[1].user_email).to eq("joe@wewanttoknow.com")
+        expect(v.items[1].date).to eq(1_449_330_388_000)
+
+        v = history[8]
+        expect(v.version_string).to eq("1.4.1")
+        expect(v.version_id).to eq(815_259_390)
+        expect(v.items.count).to eq(7)
+        expect(v.items[3].state_key).to eq("pendingDeveloperRelease")
+        expect(v.items[3].user_name).to eq("Apple")
+        expect(v.items[3].user_email).to eq(nil)
+        expect(v.items[3].date).to eq(1_450_461_891_000)
+      end
+    end
   end
 end
