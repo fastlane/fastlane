@@ -90,6 +90,7 @@ module Deliver
 
     def validate_html(screenshots)
       return if options[:force]
+      return if options[:skip_metadata] && options[:skip_screenshots]
       HtmlGenerator.new.run(options, screenshots)
     end
   end
