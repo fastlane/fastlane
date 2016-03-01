@@ -151,7 +151,7 @@ describe FastlaneCore do
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:boolean_1]).to be(true)
+          expect(program.options[:boolean_1]).to eq(true)
         end
 
         it 'treats long flags with no data type as booleans with true values' do
@@ -159,25 +159,47 @@ describe FastlaneCore do
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:boolean_1]).to be(true)
+          expect(program.options[:boolean_1]).to eq(true)
         end
 
-        # This outcome conflicts with much of our documentation, but this test captures the current behavior
-        it 'treats short flags with no data type as booleans with true values and ignores trailing values' do
+        it 'treats short flags with no data type as booleans and captures true values' do
+          stub_commander_runner_args(['-a', 'true'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          # At this point in the options lifecycle we're getting the value back as a String
+          # this is OK because the Configuration will properly coerce the value when fetched
+          expect(program.options[:boolean_1]).to eq('true')
+        end
+
+        it 'treats long flags with no data type as booleans and captures true values' do
+          stub_commander_runner_args(['--boolean_1', 'true'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          # At this point in the options lifecycle we're getting the value back as a String
+          # this is OK because the Configuration will properly coerce the value when fetched
+          expect(program.options[:boolean_1]).to eq('true')
+        end
+
+        it 'treats short flags with no data type as booleans and captures false values' do
           stub_commander_runner_args(['-a', 'false'])
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:boolean_1]).to be(true)
+          # At this point in the options lifecycle we're getting the value back as a String
+          # this is OK because the Configuration will properly coerce the value when fetched
+          expect(program.options[:boolean_1]).to eq('false')
         end
 
-        # This outcome conflicts with much of our documentation, but this test captures the current behavior
-        it 'treats long flags with no data type as booleans with true values and ignores trailing values' do
+        it 'treats long flags with no data type as booleans and captures false values' do
           stub_commander_runner_args(['--boolean_1', 'false'])
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:boolean_1]).to be(true)
+          # At this point in the options lifecycle we're getting the value back as a String
+          # this is OK because the Configuration will properly coerce the value when fetched
+          expect(program.options[:boolean_1]).to eq('false')
         end
       end
 
@@ -218,6 +240,80 @@ describe FastlaneCore do
           program = TestCommanderProgram.run(config_items)
 
           expect(program.options[:array_1]).to eq(%w(a b c))
+        end
+      end
+
+      describe 'Multiple flags' do
+        let(:config_items) do
+          [
+            FastlaneCore::ConfigItem.new(key: :string_1,
+                                short_option: '-s',
+                                 description: 'String 1',
+                                   is_string: true),
+            FastlaneCore::ConfigItem.new(key: :array_1,
+                                short_option: '-a',
+                                 description: 'Array 1',
+                                   is_string: false,
+                                        type: Array),
+            FastlaneCore::ConfigItem.new(key: :integer_1,
+                                short_option: '-i',
+                                 description: 'Integer 1',
+                                   is_string: false,
+                                        type: Integer),
+            FastlaneCore::ConfigItem.new(key: :float_1,
+                                short_option: '-f',
+                                 description: 'Float 1',
+                                   is_string: false,
+                                        type: Float),
+            FastlaneCore::ConfigItem.new(key: :boolean_1,
+                                short_option: '-b',
+                                 description: 'Boolean 1',
+                                   is_string: false)
+          ]
+        end
+
+        it 'raises MissingArgument for short flags with missing values' do
+          stub_commander_runner_args(['-b', '-s'])
+
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+        end
+
+        it 'raises MissingArgument for long flags with missing values' do
+          stub_commander_runner_args(['--boolean_1', '--string_1'])
+
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+        end
+
+        it 'captures the provided values for short flags' do
+          stub_commander_runner_args(['-b', '-a', 'a,b,c', '-s', 'value'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:boolean_1]).to be(true)
+          expect(program.options[:string_1]).to eq('value')
+          expect(program.options[:array_1]).to eq(%w(a b c))
+        end
+
+        it 'captures the provided values for long flags' do
+          stub_commander_runner_args(['--float_1', '1.23', '--boolean_1', 'false', '--integer_1', '123'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:float_1]).to eq(1.23)
+          # At this point in the options lifecycle we're getting the value back as a String
+          # this is OK because the Configuration will properly coerce the value when fetched
+          expect(program.options[:boolean_1]).to eq('false')
+          expect(program.options[:integer_1]).to eq(123)
+        end
+
+        it 'captures the provided values for mixed flags' do
+          stub_commander_runner_args(['-f', '1.23', '-b', '--integer_1', '123'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:float_1]).to eq(1.23)
+          expect(program.options[:boolean_1]).to eq(true)
+          expect(program.options[:integer_1]).to eq(123)
         end
       end
     end
