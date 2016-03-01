@@ -6,7 +6,6 @@ module Fastlane
 
     class ScreengrabAction < Action
       def self.run(params)
-        UI.user_error! "screengrab currently only supports running on a Mac" unless Helper.mac?
         require 'screengrab'
 
         begin
