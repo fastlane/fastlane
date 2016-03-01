@@ -51,12 +51,19 @@ module FastlaneCore
         description = option.description
         description += " (#{option.env_name})" unless option.env_name.to_s.empty?
 
-        # This is the sole call to Commander to set up the option we've been building.
+        # We compact this array here to remove the short_switch variable if it is nil.
+        # Passing a nil value to global_option has been shown to create problems with
+        # option parsing!
+        #
+        # See: https://github.com/fastlane/fastlane_core/pull/89
         #
         # If we don't have a data type for this option, we tell it to act like a String.
         # This allows us to get a reasonable value for boolean options that can be
         # automatically coerced or otherwise handled by the ConfigItem for others.
-        global_option(short_switch, long_switch, (type || String), description)
+        args = [short_switch, long_switch, (type || String), description].compact
+
+        # This is the call to Commander to set up the option we've been building.
+        global_option(*args)
       end
     end
 

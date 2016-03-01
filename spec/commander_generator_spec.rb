@@ -1,6 +1,29 @@
 describe FastlaneCore do
   describe FastlaneCore::CommanderGenerator do
     describe 'while options parsing' do
+      describe '' do
+        it 'should not return `true` for String options with no short flag' do
+          config_items = [
+            FastlaneCore::ConfigItem.new(key: :long_option_only_string,
+                                 description: "desc",
+                                   is_string: true,
+                               default_value: "blah",
+                                    optional: true),
+            FastlaneCore::ConfigItem.new(key: :bool,
+                                 description: "desc",
+                               default_value: false,
+                                   is_string: false)
+          ]
+
+          stub_commander_runner_args(['--long_option_only_string', 'value', '--bool', 'false'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:long_option_only_string]).to eq('value')
+          expect(program.options[:bool]).to eq('false')
+        end
+      end
+
       describe 'pass-through arguments' do
         it 'captures those that are not command names or flags' do
           # 'test' is the command name set up by TestCommanderProgram
