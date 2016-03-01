@@ -56,6 +56,10 @@ module Supply
 
       auth_client.fetch_access_token!
 
+      if ENV["DEBUG"]
+        Google::Apis.logger.level = Logger::DEBUG
+      end
+
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
       Google::Apis::ClientOptions.default.application_version = Supply::VERSION
       Google::Apis::RequestOptions.default.timeout_sec = 300
