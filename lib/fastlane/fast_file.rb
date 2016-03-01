@@ -216,43 +216,58 @@ module Fastlane
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
-        require 'tmpdir'
-
         collector.did_launch_action(:import_from_git)
 
-        # Checkout the repo
-        repo_name = url.split("/").last
-
-        tmp_path = Dir.mktmpdir("fl_clone")
-        clone_folder = File.join(tmp_path, repo_name)
-
-        branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
-
-        clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
-        UI.message "Cloning remote git repo..."
-        Actions.sh(clone_command)
-
-        Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+        fetcher = GitFetcher.new
+        fetcher.clone(url: url, branch: branch, path: path)
 
         # We also want to check out all the local actions of this fastlane setup
         containing = path.split(File::SEPARATOR)[0..-2]
-        containing = "." if containing.count == 0
-        actions_folder = File.join(containing, "actions")
-        begin
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue
-          # We don't care about a failure here, as local actions are optional
-        end
+        containing = "." if containing.count == 0 # to support the local fastlane deployment too
 
+        folder = File.join(containing, "actions")
+        begin
+          Dir.chdir(self.clone_folder) do
+            Actions.sh("git checkout #{branch} '#{folder}'")
+          end
+        rescue => ex
+          UI.verbose(ex.to_s) # We don't care about a failure here, as local actions are optional
+        end
         import(File.join(clone_folder, path))
 
-        if Dir.exist?(clone_folder)
-          # We want to re-clone if the folder already exists
-          UI.message "Clearing the git repo..."
-          Actions.sh("rm -rf '#{tmp_path}'")
+        fetcher.clear
+      end
+    end
+
+    def load_plugin(url: nil, path: nil, branch: 'HEAD')
+      UI.user_error!("Make sure the plugin has a `.rb` extension") if path && !path.end_with?(".rb")
+      Actions.execute_action('load_plugin') do
+        collector.did_launch_action(:load_plugin)
+
+        fetcher = GitFetcher.new
+        folder = fetcher.clone(url: url, branch: branch, path: path)
+
+        path ||= "**/*.rb"
+        imported = false
+        Dir.glob(File.join(folder, path)).each do |file|
+          UI.user_error!("Couldn't find file at path '#{file}'") unless File.exist?(file)
+          require File.expand_path(file)
+          file_name = File.basename(file).gsub('.rb', '')
+          class_name = file_name.fastlane_class + 'Action'
+
+          begin
+            class_ref = Fastlane::Actions.const_get(class_name)
+
+            if class_ref < Fastlane::Action && class_ref.respond_to?(:run)
+              UI.success "Successfully loaded '#{file_name}' plugin 🌮"
+              imported = true
+            end
+          end
         end
+
+        UI.error("Couldn't find any plugins!") unless imported
+
+        fetcher.clear
       end
     end
 

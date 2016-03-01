@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::Action do
     describe "No unused options" do
-      let (:all_exceptions) { %w(pilot appstore cert deliver gym match pem produce scan sigh snapshot supply testflight mailgun testfairy ipa import_from_git hockey deploygate crashlytics artifactory appledoc slather screengrab) }
+      let (:all_exceptions) { %w(pilot appstore cert deliver gym match pem produce scan sigh snapshot supply testflight mailgun testfairy ipa import_from_git hockey deploygate crashlytics artifactory appledoc slather screengrab load_plugin) }
 
       Fastlane::ActionsList.all_actions do |action, name|
         next unless action.available_options.kind_of?(Array)

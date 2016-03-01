@@ -9,7 +9,7 @@ module Fastlane
       raise 'platform must be a string' unless platform.kind_of?(String) or platform.nil?
       raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
