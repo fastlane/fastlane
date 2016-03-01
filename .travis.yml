@@ -9,3 +9,5 @@ rvm:
   - 2.2.2
 script:
   - bundle exec fastlane test
+env:
+  - FASTLANE_XCODE_LIST_TIMEOUT=20
