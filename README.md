@@ -243,6 +243,17 @@ Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` 
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" deliver
 ```
 
+## HTTP Proxy
+iTunes Transporter is a Java application bundled with Xcode. In addtion to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
+
+```bash
+TOOLS_PATH=$( xcode-select -p )
+REL_PATH='../Applications/Application Loader.app/Contents/itms/java/lib/net.properties'
+echo "$TOOLS_PATH/$REL_PATH"
+```
+
+Add necessary proxy configuration values to the net.properties according to [Java Proxy Configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html).
+
 ## Limit
 Apple has a limit of 150 binary uploads per day. 
 
