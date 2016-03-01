@@ -28,7 +28,7 @@ When submitting a new issue, please provide the following information:
 
 ## Pull Requests
 
-Pull requests are always welcome :simple_smile:
+Pull requests are always welcome :smile:
 
 - Your code editor should use the tab spaces of 2.
 - Make sure to test the changes yourself before submitting.
