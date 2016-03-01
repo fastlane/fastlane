@@ -249,7 +249,7 @@ languages([
   ["pt", "pt_BR"] # Portuguese with Brazilian locale
 ])
 
-launch_arguments("-username Felix")
+launch_arguments(["-username Felix"])
 
 # The directory in which the screenshots should be stored
 output_directory './screenshots'
