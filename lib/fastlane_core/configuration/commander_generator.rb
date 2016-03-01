@@ -9,30 +9,66 @@ module FastlaneCore
       # First, enable `always_trace`, to show the stack trace
       always_trace!
 
-      short_codes = []
+      used_switches = []
       options.each do |option|
-        next if option.description.to_s.length == 0 # "private" options
+        next if option.description.to_s.empty? # "private" options
 
-        appendix = (option.string? ? "STRING" : "")
+        short_switch = option.short_option
+        validate_short_switch(used_switches, short_switch)
+
         type = option.data_type
-        short_option = option.short_option
 
-        raise "Short option #{short_option} already taken for key #{option.key}".red if short_codes.include? short_option
-        raise "-v is already used for the version (key #{option.key})".red if short_option == "-v"
-        raise "-h is already used for the help screen (key #{option.key})".red if short_option == "-h"
-        raise "-t is already used for the trace screen (key #{option.key})".red if short_option == "-t"
+        # This is an important bit of trickery to solve the boolean option situation.
+        #
+        # Typically, boolean command line flags do not accept trailing values. If the flag
+        # is present, the value is true, if it is missing, the value is false. fastlane
+        # supports this style of flag. For example, you can specify a flag like `--clean`,
+        # and the :clean option will be true.
+        #
+        # However, fastlane also supports another boolean flag style that accepts trailing
+        # values much like options for Strings and other value types. That looks like
+        # `--include_bitcode false` The problem is that this does not work out of the box
+        # for Commander and OptionsParser. So, we need to get tricky.
+        #
+        # The value_appendix below acts as a placeholder in the switch definition that
+        # states that we expect to have a trailing value for our options. When an option
+        # declares a data type, we use the name of that data type in all caps like:
+        # "--devices ARRAY". When the data type is nil, this implies that we're going
+        # to be doing some special handling on that value. One special thing we do
+        # automatically in Configuration is to coerce special Strings into boolean values.
+        #
+        # If the data type is nil, the trick we do is to specify a value placeholder, but
+        # we wrap it in [] brackets to mark it as optional. That means that the trailing
+        # value may or may not be present for this flag. If the flag is present, but the
+        # value is not, we get a value of `true`. Perfect for the boolean flag base-case!
+        # If the value is there, we'll actually get it back as a String, which we can
+        # later coerce into a boolean.
+        #
+        # In this way we support handling boolean flags with or without trailing values.
+        value_appendix = (type || '[VALUE]').to_s.upcase
+        long_switch = "--#{option.key} #{value_appendix}"
 
-        short_codes << short_option if short_option
-
-        # Example Call
-        # c.option '-p', '--pattern STRING', String, 'Description'
-
-        flag = "--#{option.key} #{appendix}"
         description = option.description
-        description += " (#{option.env_name})" if option.env_name.to_s.length > 0
+        description += " (#{option.env_name})" unless option.env_name.to_s.empty?
 
-        global_option short_option, flag, type, description
+        # This is the sole call to Commander to set up the option we've been building.
+        #
+        # If we don't have a data type for this option, we tell it to act like a String.
+        # This allows us to get a reasonable value for boolean options that can be
+        # automatically coerced or otherwise handled by the ConfigItem for others.
+        global_option(short_switch, long_switch, (type || String), description)
       end
+    end
+
+    def validate_short_switch(used_switches, short_switch)
+      return if short_switch.nil?
+
+      raise "Short option #{short_switch} already taken for key #{option.key}".red if used_switches.include?(short_switch)
+      raise "-v is already used for the version (key #{option.key})".red if short_switch == "-v"
+      raise "-h is already used for the help screen (key #{option.key})".red if short_switch == "-h"
+      raise "-t is already used for the trace screen (key #{option.key})".red if short_switch == "-t"
+
+      used_switches << short_switch
     end
   end
 end
