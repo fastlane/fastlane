@@ -59,7 +59,7 @@ module Fastlane
           Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
         else
           if response.body.to_s.include?("App could not be created")
-            raise "Hockey has an issue processing this app. Please pass the :public_identifier option you can get from the Hockey website. More information https://github.com/fastlane/fastlane/issues/400"
+            raise "Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400"
           else
             raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
           end
