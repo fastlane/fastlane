@@ -1135,7 +1135,7 @@ Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/li
 
 [Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
 
-From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using 
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
 
 ```objective-c
 [[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
@@ -2562,4 +2562,24 @@ set_pod_key(
   value: '1234',
   project: 'MyProject'
 )
+```
+
+### cordova_get_app_id
+
+Get a the application id from the cordova config file. You can use it
+as the app_identifier
+
+```ruby
+cordova_get_app_id
+# => "tools.fastlane.cordova"
+
+# path defaults to ./config.xml
+cordova_get_app_id(path: 'cordova/config.xml')
+
+# You can retreive platform specific ids
+# For iOS return the ios-CFBundleIdentifier value
+cordova_get_app_id(platform: :ios)
+
+# For android return the android-packageName value
+cordova_get_app_id(platform: :android)
 ```
