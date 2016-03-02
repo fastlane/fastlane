@@ -3,9 +3,9 @@ module Fastlane
     class GitAddAction < Action
       def self.run(params)
         if params[:path].kind_of?(String)
-          paths = "'#{params[:path]}'"
+          paths = params[:path].shellescape
         else
-          paths = params[:path].join(" ")
+          paths = params[:path].map(&:shellescape).join(' ')
         end
 
         result = Actions.sh("git add #{paths}")
