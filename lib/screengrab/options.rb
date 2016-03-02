@@ -5,6 +5,10 @@ module Screengrab
   class Options
     DEVICE_TYPES = ["phone", "sevenInch", "tenInch", "tv", "wear"].freeze
 
+    # Temporarily make non-Mac environments default to skipping the open summary
+    # step until we make it cross-platform
+    DEFAULT_SKIP_OPEN_SUMMARY = !FastlaneCore::Helper.mac?
+
     def self.available_options
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :android_home,
@@ -34,7 +38,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
                                      description: "Don't open the summary after running `screengrab`",
-                                     default_value: false,
+                                     default_value: DEFAULT_SKIP_OPEN_SUMMARY,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_package_name,
                                      env_name: 'SCREENGRAB_APP_PACKAGE_NAME',
