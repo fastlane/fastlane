@@ -27,6 +27,15 @@ module Scan
       return config
     end
 
+    def self.filter_simulators(simulators, deployment_target)
+      # Filter out any simulators that are not the same major and minor version of our deployment target
+      deployment_target_version = Gem::Version.new(deployment_target)
+      simulators.select do |s|
+        sim_version = Gem::Version.new(s.ios_version)
+        (sim_version >= deployment_target_version)
+      end
+    end
+
     def self.default_device_ios
       config = Scan.config
 
@@ -47,15 +56,10 @@ module Scan
 
       sims = FastlaneCore::Simulator.all
       xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
-
-      # Filter out any simulators that are not the same major version of our deployment target
-      if xcode_target.to_s.length > 0
-        min_target = xcode_target.split(".").first.to_i
-        sims = sims.select { |s| s.ios_version.to_i >= min_target }
-      end
+      sims = filter_simulators(sims, xcode_target)
 
       # An iPhone 5s is reasonable small and useful for tests
-      found = sims.find { |d| d.name == "iPhone 5s" }
+      found = sims.detect { |d| d.name == "iPhone 5s" }
       found ||= sims.first # anything is better than nothing
 
       Scan.device = found
@@ -83,15 +87,10 @@ module Scan
 
       sims = FastlaneCore::SimulatorTV.all
       xcode_target = Scan.project.build_settings(key: "TVOS_DEPLOYMENT_TARGET")
-
-      # Filter out any simulators that are not the same major version of our deployment target
-      if xcode_target.to_s.length > 0
-        min_target = xcode_target.split(".").first.to_i
-        sims = sims.select { |s| s.ios_version.to_i >= min_target }
-      end
+      sims = filter_simulators(sims, xcode_target)
 
       # Apple TV 1080p is useful for tests
-      found = sims.find { |d| d.name == "Apple TV 1080p" }
+      found = sims.detect { |d| d.name == "Apple TV 1080p" }
       found ||= sims.first # anything is better than nothing
 
       Scan.device = found
