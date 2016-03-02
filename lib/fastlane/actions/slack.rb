@@ -27,8 +27,11 @@ module Fastlane
 
         notifier = Slack::Notifier.new(options[:slack_url])
 
-        notifier.username = options[:override_slack_username_and_icon] ? options[:username] : nil
-        icon_url = options[:override_slack_username_and_icon] ? options[:icon_url] : nil
+        
+        notifier.username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
+        icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
+
+        puts icon_url
 
         if options[:channel].to_s.length > 0
           notifier.channel = options[:channel]
@@ -65,10 +68,10 @@ module Fastlane
                                        env_name: "FL_SLACK_CHANNEL",
                                        description: "#channel or @username",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :override_slack_username_and_icon,
-                                       env_name: "FL_SLACK_OVERRIDE_SLACK_USERNAME_AND_ICON",
-                                       description: "Override webook's username and icon settings? (true/false)",
-                                       default_value: true,
+          FastlaneCore::ConfigItem.new(key: :use_webhook_configured_username_and_icon,
+                                       env_name: "FL_SLACK_USE_WEBHOOK_CONFIGURED_USERNAME_AND_ICON",
+                                       description: "Use webook's default username and icon settings? (true/false)",
+                                       default_value: false,
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :slack_url,
@@ -79,13 +82,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_SLACK_USERNAME",
-                                       description: "Overrides the webook's username property if override_slack_username_and_icon is true",
+                                       description: "Overrides the webook's username property if use_webhook_configured_username_and_icon is false",
                                        default_value: "fastlane",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
-                                       description: "Overrides the webook's image property if override_slack_username_and_icon is true",
+                                       description: "Overrides the webook's image property if use_webhook_configured_username_and_icon is false",
                                        default_value: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
                                        is_string: true,
                                        optional: true),
