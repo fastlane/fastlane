@@ -27,11 +27,8 @@ module Fastlane
 
         notifier = Slack::Notifier.new(options[:slack_url])
 
-        
         notifier.username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
         icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
-
-        puts icon_url
 
         if options[:channel].to_s.length > 0
           notifier.channel = options[:channel]
