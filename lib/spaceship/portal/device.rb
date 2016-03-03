@@ -121,7 +121,7 @@ module Spaceship
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
         def find_by_udid(device_udid, mac: false)
           all(mac: mac).find do |device|
-            device.udid == device_udid
+            device.udid.casecmp(device_udid) == 0
           end
         end
 

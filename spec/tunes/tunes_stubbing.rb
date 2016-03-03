@@ -50,9 +50,19 @@ def itc_stub_applications
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/overview").
     to_return(status: 200, body: itc_read_fixture_file('app_overview.json'), headers: { 'Content-Type' => 'application/json' })
 
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/1000000000/overview").
+    to_return(status: 200, body: itc_read_fixture_file('app_overview_stuckinprepare.json'), headers: { 'Content-Type' => 'application/json' })
+
   # App Details
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/details").
     to_return(status: 200, body: itc_read_fixture_file('app_details.json'), headers: { 'Content-Type' => 'application/json' })
+
+  # Versions History
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/stateHistory?platform=ios").
+    to_return(status: 200, body: itc_read_fixture_file('app_versions_history.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/814624685/stateHistory?platform=ios").
+    to_return(status: 200, body: itc_read_fixture_file('app_version_states_history.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
 def itc_stub_candiate_builds
@@ -87,6 +97,8 @@ def itc_stub_app_versions
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/813314674").
     to_return(status: 200, body: itc_read_fixture_file('app_version.json'), headers: { 'Content-Type' => 'application/json' })
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/113314675").
+    to_return(status: 200, body: itc_read_fixture_file('app_version.json'), headers: { 'Content-Type' => 'application/json' })
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/1000000000/platforms/ios/versions/800000000").
     to_return(status: 200, body: itc_read_fixture_file('app_version.json'), headers: { 'Content-Type' => 'application/json' })
 end
 

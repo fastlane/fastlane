@@ -10,7 +10,7 @@ describe Spaceship::Application do
     end
 
     it "the number is correct" do
-      expect(Spaceship::Application.all.count).to eq(6)
+      expect(Spaceship::Application.all.count).to eq(8)
     end
 
     it "parses application correctly" do
@@ -25,7 +25,7 @@ describe Spaceship::Application do
       expect(app.issues_count).to eq(0)
       expect(app.app_icon_preview_url).to eq('https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png')
 
-      expect(app.raw_data['versions'].count).to eq(2)
+      expect(app.raw_data['versionSets'].count).to eq(1)
     end
 
     it "#url" do
@@ -168,6 +168,34 @@ describe Spaceship::Application do
           expect(v.is_live).to eq(true)
         end
       end
+
+      describe "#live_version weirdities" do
+        it "no live version if app isn't yet uploaded" do
+          app = Spaceship::Application.find(1_000_000_000)
+          expect(app.live_version).to eq(nil)
+          expect(app.edit_version.is_live).to eq(false)
+          expect(app.latest_version.is_live).to eq(false)
+        end
+      end
+
+      describe "BUNDLES", focus: true do
+        let (:bundle) { Spaceship::Application.find(928_444_013) }
+        it "can find a bundle" do
+          expect(bundle.raw_data['type']).to eq("iOS App Bundle")
+        end
+
+        it "fails to find the edit_version of a bundle" do
+          expect do
+            bundle.edit_version
+          end.to raise_error('We do not support BUNDLE types right now')
+        end
+
+        it "fails to find the live_version of a bundle" do
+          expect do
+            bundle.live_version
+          end.to raise_error('We do not support BUNDLE types right now')
+        end
+      end
     end
 
     describe "Create new version" do
@@ -176,6 +204,36 @@ describe Spaceship::Application do
         expect do
           app.create_version!('0.1')
         end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
+      end
+    end
+
+    describe "Version history", focus: true do
+      it "Parses history" do
+        app = Spaceship::Application.all.first
+        history = app.versions_history
+        expect(history.count).to eq(9)
+
+        v = history[0]
+        expect(v.version_string).to eq("1.0")
+        expect(v.version_id).to eq(812_627_411)
+
+        v = history[7]
+        expect(v.version_string).to eq("1.3")
+        expect(v.version_id).to eq(815_048_522)
+        expect(v.items.count).to eq(6)
+        expect(v.items[1].state_key).to eq("waitingForReview")
+        expect(v.items[1].user_name).to eq("joe@wewanttoknow.com")
+        expect(v.items[1].user_email).to eq("joe@wewanttoknow.com")
+        expect(v.items[1].date).to eq(1_449_330_388_000)
+
+        v = history[8]
+        expect(v.version_string).to eq("1.4.1")
+        expect(v.version_id).to eq(815_259_390)
+        expect(v.items.count).to eq(7)
+        expect(v.items[3].state_key).to eq("pendingDeveloperRelease")
+        expect(v.items[3].user_name).to eq("Apple")
+        expect(v.items[3].user_email).to eq(nil)
+        expect(v.items[3].date).to eq(1_450_461_891_000)
       end
     end
   end

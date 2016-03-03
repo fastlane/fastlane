@@ -155,6 +155,16 @@ module Spaceship
         "4APLUP237T" => ApplePay
       }
 
+      OLDER_IOS_CERTIFICATE_TYPES = [
+        # those are also sent by the browser, but not sure what they represent
+        "T44PTHVNID",
+        "DZQUP8189Y",
+        "FGQUP4785Z",
+        "S5WE21TULA",
+        "3BQKVH9I2X", # ProductionPush,
+        "FUOY7LWJET"
+      ]
+
       MAC_CERTIFICATE_TYPE_IDS = {
         "749Y1QAGU7" => MacDevelopment,
         "HXZEUKP0FP" => MacAppDistribution,
@@ -239,6 +249,7 @@ module Spaceship
           if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
+            types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
             mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self

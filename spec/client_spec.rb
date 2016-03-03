@@ -16,7 +16,6 @@ describe Spaceship::Client do
   end
 
   let(:subject) { TestClient.new }
-  let(:time_out_error) { Faraday::Error::TimeoutError.new }
   let(:unauth_error) { Spaceship::Client::UnauthorizedAccessError.new }
   let(:test_uri) { "http://example.com" }
 
@@ -35,18 +34,22 @@ describe Spaceship::Client do
   end
 
   describe 'retry' do
-    it "re-raises Timeout exception when retry limit reached" do
-      stub_client_request(time_out_error, 6, 200, nil)
+    { "Timeout" => Faraday::Error::TimeoutError.new,
+      "Connection failed" => Faraday::Error::ConnectionFailed.new("Connection Failed"),
+      "EPIPE" => Errno::EPIPE }.each do |name, exception|
+      it "re-raises #{exception} error when retry limit reached" do
+        stub_client_request(exception, 6, 200, nil)
 
-      expect do
-        subject.req_home
-      end.to raise_error(time_out_error)
-    end
+        expect do
+          subject.req_home
+        end.to raise_error(exception)
+      end
 
-    it "retries when AppleTimeoutError error raised" do
-      stub_client_request(time_out_error, 2, 200, default_body)
+      it "retries when #{exception} error raised" do
+        stub_client_request(exception, 2, 200, default_body)
 
-      expect(subject.req_home.body).to eq(default_body)
+        expect(subject.req_home.body).to eq(default_body)
+      end
     end
 
     it "raises AppleTimeoutError when response contains '302 Found'" do

@@ -11,11 +11,6 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) the supported platform of this app
-      # @example
-      #   "ios"
-      attr_accessor :platform
-
       # @return (String) The Vendor ID provided by iTunes Connect
       # @example
       #   "1435592086"
@@ -42,7 +37,6 @@ module Spaceship
       attr_mapping(
         'adamId' => :apple_id,
         'name' => :name,
-        'appType' => :platform,
         'vendorId' => :vendor_id,
         'bundleId' => :bundle_id,
         'lastModifiedDate' => :last_modified,
@@ -100,13 +94,6 @@ module Spaceship
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
-        if (raw_data['versions'] || []).count == 1
-          v = raw_data['versions'].last
-          if ['Prepare for Upload', 'prepareForUpload'].include?(v['state']) # this only applies for the initial version
-            return nil
-          end
-        end
-
         Spaceship::AppVersion.find(self, self.apple_id, true)
       end
 
@@ -116,9 +103,9 @@ module Spaceship
       end
 
       # @return (Spaceship::AppVersion) This will return the `edit_version` if available
-      #   and fallback to the `edit_version`. Use this to just access the latest data
+      #   and fallback to the `live_version`. Use this to just access the latest data
       def latest_version
-        edit_version || live_version || Spaceship::AppVersion.find(self, self.apple_id, false) # we want to get *any* version, prefered the latest one
+        edit_version || live_version
       end
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
@@ -133,10 +120,27 @@ module Spaceship
         client.get_resolution_center(apple_id, platform)
       end
 
+      # kept for backward compatibility
+      # tries to guess the platform of the currently submitted apps
+      # note that as ITC now supports multiple app types, this might break
+      # if your app supports more than one
+      def platform
+        Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])['platformString']
+      end
+
       def details
         attrs = client.app_details(apple_id)
         attrs.merge!(application: self)
         Tunes::AppDetails.factory(attrs)
+      end
+
+      def versions_history
+        ensure_not_a_bundle
+        versions = client.versions_history(apple_id, platform)
+        versions.map do |attrs|
+          attrs.merge!(application: self)
+          Tunes::AppVersionHistory.factory(attrs)
+        end
       end
 
       #####################################################
@@ -339,6 +343,13 @@ module Spaceship
         raise "Tester is not on #{self.name} betatesters" unless tester
 
         tester.remove_from_app!(self.apple_id)
+      end
+
+      # private to module
+      def ensure_not_a_bundle
+        # we only support applications
+        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
+        raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
       end
     end
   end

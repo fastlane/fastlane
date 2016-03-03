@@ -1,0 +1,43 @@
+{
+  "data": {
+    "versionString": "1.2",
+    "versionId": 814624685,
+    "items": [{
+      "stateKey": "prepareForUpload",
+      "userName": "joe@wewanttoknow.com",
+      "userEmail": "joe@wewanttoknow.com",
+      "date": 1447945811000
+    }, {
+      "stateKey": "waitingForReview",
+      "userName": "joe@wewanttoknow.com",
+      "userEmail": "joe@wewanttoknow.com",
+      "date": 1447970146000
+    }, {
+      "stateKey": "inReview",
+      "userName": "Apple",
+      "userEmail": null,
+      "date": 1448404672000
+    }, {
+      "stateKey": "pendingDeveloperRelease",
+      "userName": "Apple",
+      "userEmail": null,
+      "date": 1448418791000
+    }, {
+      "stateKey": "processing",
+      "userName": "joe@wewanttoknow.com",
+      "userEmail": "joe@wewanttoknow.com",
+      "date": 1448534161000
+    }, {
+      "stateKey": "readyForSale",
+      "userName": "Apple",
+      "userEmail": null,
+      "date": 1448534210000
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
