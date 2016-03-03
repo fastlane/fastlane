@@ -52,11 +52,10 @@ module Fastlane
         platform == :android
       end
 
-      private
-
       def self.client
         @client ||= Supply::Client.make_from_config
       end
+      private_class_method :client
     end
   end
 end
