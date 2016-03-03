@@ -92,7 +92,8 @@ end
 task :test_all do
   exceptions = []
   def bundle_install
-    sh "bundle check || bundle install --jobs=4 --retry=3"
+    cache_path = File.expand_path("/tmp/vendor/bundle")
+    sh "bundle check --path='#{cache_path}' || bundle install --path='#{cache_path}' --jobs=4 --retry=3"
   end
 
   bundle_install
