@@ -33,7 +33,7 @@ describe FastlaneCore do
       end
 
       it "finds commands without extensions which are on the PATH" do
-        Tempfile.create('foobarbaz') do |f|
+        Tempfile.new('foobarbaz') do |f|
           File.chmod(0777, f)
 
           temp_dir = File.dirname(f)
@@ -46,7 +46,7 @@ describe FastlaneCore do
       end
 
       it "finds commands with known extensions which are on the PATH" do
-        Tempfile.create(['foobarbaz', '.exe']) do |f|
+        Tempfile.new(['foobarbaz', '.exe']) do |f|
           File.chmod(0777, f)
 
           temp_dir = File.dirname(f)
@@ -59,7 +59,7 @@ describe FastlaneCore do
       end
 
       it "does not find commands with unknown extensions which are on the PATH" do
-        Tempfile.create(['foobarbaz', '.exe']) do |f|
+        Tempfile.new(['foobarbaz', '.exe']) do |f|
           File.chmod(0777, f)
 
           temp_dir = File.dirname(f)
