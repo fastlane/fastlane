@@ -91,6 +91,8 @@ end
 
 task :test_all do
   exceptions = []
+  require 'bundler'
+
   def bundle_install
     sh "bundle check || bundle install --jobs=4 --retry=3"
   end
