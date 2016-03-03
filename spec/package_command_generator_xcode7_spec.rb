@@ -1,4 +1,13 @@
 describe Gym do
+  before(:all) do
+    options = { project: "./examples/standard/Example.xcodeproj" }
+    config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    @project = FastlaneCore::Project.new(config)
+  end
+  before(:each) do
+    allow(Gym).to receive(:project).and_return(@project)
+  end
+
   describe Gym::PackageCommandGeneratorXcode7 do
     it "works with the example project with no additional parameters" do
       options = { project: "./examples/standard/Example.xcodeproj" }
@@ -21,7 +30,6 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-      require 'plist'
       expect(Plist.parse_xml(config_path)).to eq({
         'method' => "app-store",
         'uploadBitcode' => false,
@@ -36,7 +44,6 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-      require 'plist'
       expect(Plist.parse_xml(config_path)).to eq({
         'embedOnDemandResourcesAssetPacksInBundle' => true,
         'manifest' => {
@@ -66,7 +73,6 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-      require 'plist'
       expect(Plist.parse_xml(config_path)).to eq({
         'embedOnDemandResourcesAssetPacksInBundle' => true,
         'manifest' => {
@@ -106,7 +112,6 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-      require 'plist'
       expect(Plist.parse_xml(config_path)).to eq({
         'embedOnDemandResourcesAssetPacksInBundle' => false,
         'manifest' => {
@@ -128,7 +133,6 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-      require 'plist'
       expect(Plist.parse_xml(config_path)).to eq({
         'method' => "ad-hoc"
       })

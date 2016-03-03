@@ -1,11 +1,12 @@
 describe Gym do
+  before(:all) do
+    options = { project: "./examples/multipleSchemes/Example.xcodeproj" }
+    @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    @project = FastlaneCore::Project.new(@config)
+  end
+
   describe "Project with multiple Schemes and Gymfile" do
-    before do
-      options = { project: "./examples/multipleSchemes/Example.xcodeproj" }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options,
-                                                      options)
-      @project = FastlaneCore::Project.new(Gym.config)
-    end
+    before(:each) { Gym.config = @config }
 
     it "#schemes returns all available schemes" do
       expect(@project.schemes).to eq(["Example", "ExampleTests"])
