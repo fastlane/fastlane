@@ -353,7 +353,7 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      r = request(:get, "account/ios/profile/downloadProfileContent", {
+      r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
         provisioningProfileId: profile_id
       })
