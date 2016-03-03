@@ -91,7 +91,11 @@ end
 
 task :test_all do
   exceptions = []
-  sh "bundle install"
+  def bundle_install
+    sh "bundle check || bundle install --jobs=4 --retry=3"
+  end
+
+  bundle_install
   GEMS.each do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
@@ -99,7 +103,7 @@ task :test_all do
         # From https://github.com/bundler/bundler/issues/1424#issuecomment-2123080
         # Since we nest bundle exec in bundle exec
         Bundler.with_clean_env do
-          sh "bundle install"
+          bundle_install
           sh "bundle exec rspec"
           sh "rubocop"
         end
