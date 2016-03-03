@@ -90,11 +90,19 @@ module Fastlane
         ENV[SharedValues::S3_IPA_OUTPUT_PATH.to_s] = ipa_url
 
         if dsym_file
-          dsym_file_name = File.basename(dsym_file)
-          dsym_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{dsym_file_name}"
+          dsym_file_basename = File.basename(dsym_file)
+          dsym_file_name = "#{url_part}#{dsym_file_basename}"
+          dsym_file_data = File.open(dsym_file, 'rb')
 
-          Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
-          ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_url
+          upload_dsym(
+            s3_access_key,
+            s3_secret_access_key,
+            s3_bucket,
+            s3_region,
+            dsym_file_name,
+            dsym_file_data
+          )
+
         end
 
         if params[:upload_metadata] == false
@@ -241,7 +249,7 @@ module Fastlane
           version_obj = version_obj.object
         end
 
-        # Setting actionand environment variables
+        # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
         ENV[SharedValues::S3_PLIST_OUTPUT_PATH.to_s] = plist_obj.public_url.to_s
 
@@ -252,6 +260,39 @@ module Fastlane
         ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_obj.public_url.to_s
 
         Helper.log.info "Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'".green
+      end
+
+      def self.upload_dsym(s3_access_key, s3_secret_access_key, s3_bucket, s3_region, dsym_file_name, dsym_file_data)
+        Actions.verify_gem!('aws-sdk')
+        require 'aws-sdk'
+        if s3_region
+          s3_client = AWS::S3.new(
+            access_key_id: s3_access_key,
+            secret_access_key: s3_secret_access_key,
+            region: s3_region
+          )
+        else
+          s3_client = AWS::S3.new(
+            access_key_id: s3_access_key,
+            secret_access_key: s3_secret_access_key
+          )
+        end
+
+        bucket = s3_client.buckets[s3_bucket]
+
+        dsym_obj = bucket.objects.create(dsym_file_name, dsym_file_data, acl: :public_read)
+
+        # When you enable versioning on a S3 bucket,
+        # writing to an object will create an object version
+        # instead of replacing the existing object.
+        # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
+        if dsym_obj.kind_of? AWS::S3::ObjectVersion
+          dsym_obj = dsym_obj.object
+        end
+
+        # Setting action and environment variables
+        Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_obj.public_url.to_s
+        ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_obj.public_url.to_s
       end
 
       #
