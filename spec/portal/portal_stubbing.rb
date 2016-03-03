@@ -50,7 +50,7 @@ def adp_stub_provisioning
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
     to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfile.action.json'), headers: { 'Content-Type' => 'application/json' })
 
-  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=2MAY7NPHRU&teamId=XXXXXXXXXX").
+  stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
     to_return(status: 200, body: adp_read_fixture_file("downloaded_provisioning_profile.mobileprovision"), headers: {})
 
   # Create Profiles
@@ -132,8 +132,7 @@ def adp_stub_certificates
     with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => 'R58UK2EWSO' }).
     to_return(status: 200, body: adp_read_fixture_file("list_certificates_filtered.json"), headers: { 'Content-Type' => 'application/json' })
 
-  stub_request(:post, "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action").
-    with(body: { "displayId" => "XC5PH8DAAA", "type" => "R58UK2EAAA", "teamId" => "XXXXXXXXXX" }).
+  stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
     to_return(status: 200, body: adp_read_fixture_file('aps_development.cer'))
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
     with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
@@ -180,12 +179,12 @@ def adp_stub_app_groups
 end
 
 def adp_stub_download_certificate_failure
-  stub_request(:post, 'https://developer.apple.com/account/ios/certificate/certificateContentDownload.action').
+  stub_request(:get, 'https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA').
     to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
 end
 
 def adp_stub_download_provisioning_profile_failure
-  stub_request(:get, "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=2MAY7NPHRU&teamId=XXXXXXXXXX").
+  stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
     to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
 end
 
