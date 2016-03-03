@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull;
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull;
-  <b>frameit</b> &bull;
-  <a href="https://github.com/fastlane/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull;
+  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
+  <b>frameit</b> &bull; 
+  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
   <a href="https://github.com/fastlane/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
@@ -41,10 +41,10 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull;
-    <a href="#installation">Installation</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a> &bull;
+    <a href="#features">Features</a> &bull; 
+    <a href="#installation">Installation</a> &bull; 
+    <a href="#usage">Usage</a> &bull; 
+    <a href="#tips">Tips</a> &bull; 
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -101,7 +101,7 @@ You only have to do this once per computer.
 - Press ```Enter```
 - Unzip and move the content of the zip files to ```~/.frameit/devices_frames```
 - Press ```Enter```
-
+  
 # Usage
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
@@ -113,7 +113,7 @@ Just navigate to your folder of screenshots and use the following command:
 To use the silver version of the frames:
 
     frameit silver
-
+    
 To run the setup process again to add new frames use:
 
     frameit setup
@@ -122,7 +122,7 @@ When using `frameit` without titles on top, the screenshots will have the full r
 
 # Titles and Background (optional)
 
-With `frameit` 2.0 you are now able to add a custom background, title and text colors to your screenshots. Optionally you can also set a custom font size.
+With `frameit` 2.0 you are now able to add a custom background, title and text colors to your screenshots.
 
 A working example can be found in the [fastlane examples](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) project.
 
@@ -239,7 +239,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
 - [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
