@@ -5,6 +5,8 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :top_space_above_device
 
+    FONT_SIZE_REFERENCE_WIDTH = 640.0 # The size of device a, e.g. "12px" is defined for
+
     def frame!(screenshot)
       self.screenshot = screenshot
       prepare_image
@@ -328,7 +330,7 @@ module Frameit
     end
 
     def scaled_font_size(font_size)
-      font_ratio = font_size / 640.0
+      font_ratio = font_size / FONT_SIZE_REFERENCE_WIDTH
       return (font_ratio * screenshot.size[0].to_f).round
     end
 
