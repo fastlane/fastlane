@@ -1,4 +1,13 @@
 describe Gym do
+  before(:all) do
+    options = { project: "./examples/standard/Example.xcodeproj" }
+    config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    @project = FastlaneCore::Project.new(config)
+  end
+  before(:each) do
+    allow(Gym).to receive(:project).and_return(@project)
+  end
+
   describe Gym::BuildCommandGenerator do
     it "raises an exception when project path wasn't found" do
       expect do
@@ -13,7 +22,7 @@ describe Gym do
       xcargs = xcargs_hash.map do |k, v|
         "#{k.to_s.shellescape}=#{v.shellescape}"
       end.join ' '
-      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs }
+      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example' }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -33,7 +42,7 @@ describe Gym do
 
     describe "Standard Example" do
       before do
-        options = { project: "./examples/standard/Example.xcodeproj" }
+        options = { project: "./examples/standard/Example.xcodeproj", scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       end
 
@@ -65,7 +74,7 @@ describe Gym do
       end
 
       it "user provided #build_path" do
-        options = { project: "./examples/standard/Example.xcodeproj", build_path: "/tmp/my/build_path" }
+        options = { project: "./examples/standard/Example.xcodeproj", build_path: "/tmp/my/build_path", scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
         result = Gym::BuildCommandGenerator.build_path
         expect(result).to eq("/tmp/my/build_path")
@@ -78,7 +87,7 @@ describe Gym do
       end
 
       it "#buildlog_path is used when provided" do
-        options = { project: "./examples/standard/Example.xcodeproj", buildlog_path: "/tmp/my/path" }
+        options = { project: "./examples/standard/Example.xcodeproj", buildlog_path: "/tmp/my/path", scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
         result = Gym::BuildCommandGenerator.xcodebuild_log_path
         expect(result).to include("/tmp/my/path")
@@ -92,7 +101,7 @@ describe Gym do
 
     describe "Derived Data Example" do
       before do
-        options = { project: "./examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data" }
+        options = { project: "./examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data", scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       end
 
@@ -118,7 +127,7 @@ describe Gym do
       it "uses the correct build command with the example project" do
         log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
 
-        options = { project: "./examples/standard/Example.xcodeproj", result_bundle: true }
+        options = { project: "./examples/standard/Example.xcodeproj", result_bundle: true, scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         result = Gym::BuildCommandGenerator.generate

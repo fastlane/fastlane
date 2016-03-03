@@ -1,4 +1,13 @@
 describe Gym do
+  before(:all) do
+    options = { project: "./examples/standard/Example.xcodeproj" }
+    config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    @project = FastlaneCore::Project.new(config)
+  end
+  before(:each) do
+    allow(Gym).to receive(:project).and_return(@project)
+  end
+
   describe Gym::PackageCommandGeneratorLegacy do
     it "works with the example project with no additional parameters" do
       options = { project: "./examples/standard/Example.xcodeproj" }
