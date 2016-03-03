@@ -18,6 +18,7 @@ require 'spaceship/tunes/device_type'
 require 'spaceship/tunes/app_trailer'
 require 'spaceship/tunes/tester'
 require 'spaceship/tunes/app_details'
+require 'spaceship/tunes/pricing_tier'
 
 # File Uploads
 require 'spaceship/du/utilities'

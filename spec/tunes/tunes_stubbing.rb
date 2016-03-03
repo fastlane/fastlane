@@ -192,6 +192,12 @@ def itc_stub_user_detail
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_pricing_tiers
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/matrix").
+    to_return(status: 200, body: itc_read_fixture_file("pricing_tiers.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
@@ -205,5 +211,6 @@ RSpec.configure do |config|
     itc_stub_app_version_ref
     itc_stub_user_detail
     itc_stub_candiate_builds
+    itc_stub_pricing_tiers
   end
 end
