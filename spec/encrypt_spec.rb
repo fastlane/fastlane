@@ -28,14 +28,14 @@ describe Match do
       ENV["MATCH_PASSWORD"] = "invalid"
       expect do
         @e.decrypt_repo(path: @directory, git_url: @git_url)
-      end.to raise_error
+      end.to raise_error("Invalid password passed via 'MATCH_PASSWORD'")
     end
 
     it "raises an exception if no password is supplied" do
       ENV["MATCH_PASSWORD"] = ""
       expect do
         @e.encrypt_repo(path: @directory, git_url: @git_url)
-      end.to raise_error
+      end.to raise_error("No password supplied")
     end
   end
 end
