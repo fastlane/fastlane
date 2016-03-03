@@ -87,7 +87,7 @@ public class Screengrab {
                 }
                 try {
                     File screenshotDirectory = getFilesDirectory(activity.getApplicationContext(), Locale.getDefault());
-                    String screenshotFileName = System.currentTimeMillis() + NAME_SEPARATOR + screenshotName + EXTENSION;
+                    String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;
                     File screenshotFile = new File(screenshotDirectory, screenshotFileName);
                     takeScreenshot(activity, screenshotFile);
                     Log.d(TAG, "Captured screenshot \"" + screenshotFileName + "\"");
