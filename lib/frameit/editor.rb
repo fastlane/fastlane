@@ -172,22 +172,18 @@ module Frameit
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword
 
-      # Only resize if we haven't specified a custom font size
-      font_size = font_size('title')
-      if font_size.nil?
-        # Resize the 2 labels if necessary
-        smaller = 1.0 # default
-        ratio = (sum_width + keyword_padding * 2) / image.width.to_f
-        if ratio > 1.0
-          # too large - resizing now
-          smaller = (1.0 / ratio)
+      # Resize the 2 labels if necessary
+      smaller = 1.0 # default
+      ratio = (sum_width + keyword_padding * 2) / image.width.to_f
+      if ratio > 1.0
+        # too large - resizing now
+        smaller = (1.0 / ratio)
 
-          UI.message "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
+        UI.message "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
 
-          title.resize "#{(smaller * title.width).round}x"
-          keyword.resize "#{(smaller * keyword.width).round}x" if keyword
-          sum_width *= smaller
-        end
+        title.resize "#{(smaller * title.width).round}x"
+        keyword.resize "#{(smaller * keyword.width).round}x" if keyword
+        sum_width *= smaller
       end
 
       vertical_padding = vertical_frame_padding
@@ -214,13 +210,13 @@ module Frameit
       background
     end
 
-    def derived_font_size
+    def actual_font_size
       [@image.width / 10.0].max.round
     end
 
     # The space between the keyword and the title
     def keyword_padding
-      (derived_font_size / 2.0).round
+      (actual_font_size / 2.0).round
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image
@@ -238,7 +234,6 @@ module Frameit
         end
 
         current_font = font(key)
-        custom_font_size = font_size(key)
         text = fetch_text(key)
         UI.message "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
         UI.message "Adding text '#{text}'" if $verbose
@@ -249,12 +244,7 @@ module Frameit
         title_image.combine_options do |i|
           i.font current_font if current_font
           i.gravity "Center"
-          if custom_font_size
-            i.pointsize custom_font_size
-            UI.message "Using custom font size #{custom_font_size}" if $verbose
-          else
-            i.pointsize derived_font_size
-          end
+          i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
           i.fill fetch_config[key.to_s]['color']
         end
@@ -324,37 +314,6 @@ module Frameit
       end
 
       UI.message "No custom font specified for #{screenshot}, using the default one" if $verbose
-      return nil
-    end
-
-    def scaled_font_size(font_size)
-      font_ratio = font_size / 640.0
-      return (font_ratio * screenshot.size[0].to_f).round
-    end
-
-    # The fontSize we want to use
-    def font_size(key)
-      single_font_size = fetch_config[key.to_s]['fontSize']
-      return single_font_size if single_font_size
-
-      fonts = fetch_config[key.to_s]['fonts']
-      if fonts
-        fonts.each do |font|
-          if font['supported']
-            font['supported'].each do |language|
-              if screenshot.path.include? language
-                return scaled_font_size(font["fontSize"])
-              end
-            end
-          else
-            # No `supported` array, this will always be true
-            UI.message "Found a fontSize with no list of supported languages, using this now" if $verbose
-            return scaled_font_size(font["fontSize"])
-          end
-        end
-      end
-
-      UI.message "No custom fontSize specified for #{screenshot}, using the default one" if $verbose
       return nil
     end
   end
