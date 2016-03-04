@@ -405,6 +405,33 @@ module Spaceship
       end
     end
 
+    # Returns an array of all available pricing tiers
+    #
+    # @note Although this information is publicly available, the current spaceship implementation requires you to have a logged in client to access it
+    #
+    # @return [Array] the PricingTier objects (Spaceship::Tunes::PricingTier)
+    # [{
+    #   "tierStem": "0",
+    #   "tierName": "Free",
+    #   "pricingInfo": [{
+    #       "country": "United States",
+    #       "countryCode": "US",
+    #       "currencySymbol": "$",
+    #       "currencyCode": "USD",
+    #       "wholesalePrice": 0.0,
+    #       "retailPrice": 0.0,
+    #       "fRetailPrice": "$0.00",
+    #       "fWholesalePrice": "$0.00"
+    #     }, {
+    #     ...
+    # }, {
+    # ...
+    def pricing_tiers
+      r = request(:get, 'ra/apps/pricing/matrix')
+      data = parse_response(r, 'data')['pricingTiers']
+      data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
+    end
+
     # An array of supported countries
     # [{
     #   "code": "AL",
