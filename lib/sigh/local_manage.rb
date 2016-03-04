@@ -51,16 +51,16 @@ module Sigh
         UI.message "Provisioning profiles installed"
         UI.message "Valid:"
         profiles_valid.each do |profile|
-          UI.message profile["Name"].green
+          UI.message profile_info(profile).green
         end
       end
 
       profiles_soon = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] < soon }
       if profiles_soon.count > 0
         UI.message ""
-        UI.message "Expiring within 30 day:"
+        UI.message "Expiring within 30 days:"
         profiles_soon.each do |profile|
-          UI.message profile["Name"].yellow
+          UI.message profile_info(profile).yellow
         end
       end
 
@@ -69,7 +69,7 @@ module Sigh
         UI.message ""
         UI.message "Expired:"
         profiles_expired.each do |profile|
-          UI.message profile["Name"].red
+          UI.message profile_info(profile).red
         end
       end
 
@@ -81,6 +81,14 @@ module Sigh
       UI.message "#{profiles_valid.count} are valid".green
 
       UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
+    end
+
+    def self.profile_info(profile)
+      if $verbose
+        "#{profile['Name']} - #{File.basename profile['Path']}"
+      else
+        profile['Name']
+      end
     end
 
     def self.cleanup_profiles(expired = false, pattern = nil)
