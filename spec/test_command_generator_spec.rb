@@ -1,4 +1,13 @@
 describe Scan do
+  before(:all) do
+    options = { project: "./examples/standard/app.xcodeproj" }
+    config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+    @project = FastlaneCore::Project.new(config)
+  end
+  before(:each) do
+    allow(Scan).to receive(:project).and_return(@project)
+  end
+
   describe Scan::TestCommandGenerator do
     it "raises an exception when project path wasn't found" do
       expect do
@@ -103,7 +112,7 @@ describe Scan do
       it "uses the correct build command with the example project" do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = { project: "./examples/standard/app.xcodeproj", result_bundle: true }
+        options = { project: "./examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate
