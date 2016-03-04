@@ -2,7 +2,7 @@ module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector
     # Returns true if it succeeds
-    def self.fetch_screenshots(output, language, device_type, launch_arguments_index)
+    def self.fetch_screenshots(output, dir_name, device_type, launch_arguments_index)
       # Documentation about how this works in the project README
       containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
       attachments_path = File.join(containing, "Attachments")
@@ -22,7 +22,7 @@ module Snapshot
         name = current[0]
         filename = to_store[index]
 
-        language_folder = File.join(Snapshot.config[:output_directory], language)
+        language_folder = File.join(Snapshot.config[:output_directory], dir_name)
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
