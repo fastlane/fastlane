@@ -102,6 +102,8 @@ To try `spaceship`, just run `spaceship`. It will automatically start the `space
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
+This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [fastlane](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+
 ## Apple Developer Portal API
 
 ##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples

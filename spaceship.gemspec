@@ -34,10 +34,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastimage', '~> 1.6'
 
   # for the playground
-  spec.add_dependency 'pry'
   spec.add_dependency 'colored'
 
   # Development only
+  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'fastlane', ">= 1.15.0" # yes, we use fastlane to test fastlane
   spec.add_development_dependency 'rake'

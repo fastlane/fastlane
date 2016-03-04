@@ -1,9 +1,29 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+require "colored"
+
+# First we have to check if the user has `pry` installed
+# We don't want to add pry as a spaceship dependency, as 
+# it shouldn't really be added to production systems
+gem_name = "pry"
+begin
+  Gem::Specification.find_by_name(gem_name)
+rescue Gem::LoadError
+  puts("Could not find gem '#{gem_name}'".red)
+  puts("")
+  puts("If you installed spaceship using `sudo gem install spaceship` run")
+  puts("  sudo gem install #{gem_name}".yellow)
+  puts("to install the missing gem")
+  puts("")
+  puts("If you use a Gemfile add this to your Gemfile:")
+  puts("  gem '#{gem_name}'".yellow)
+  puts("and run " + "`bundle install`".yellow)
+
+  abort
+end
 
 require "spaceship"
 require "pry"
-require "colored"
 require "credentials_manager"
 
 def docs
