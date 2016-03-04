@@ -4,11 +4,11 @@ module Sigh
     CLEANUP = "cleanup"
 
     def self.start(options, args)
-      command, clean_expired, clean_pattern = get_inputs(options, args)
+      command, clean_expired, clean_pattern, force = get_inputs(options, args)
       if command == LIST
         list_profiles
       elsif command == CLEANUP
-        cleanup_profiles(clean_expired, clean_pattern)
+        cleanup_profiles(clean_expired, clean_pattern, force)
       end
     end
 
@@ -36,8 +36,9 @@ module Sigh
     def self.get_inputs(options, _args)
       clean_expired = options.clean_expired
       clean_pattern = /#{options.clean_pattern}/ if options.clean_pattern
+      force = options.force
       command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
-      return command, clean_expired, clean_pattern
+      return command, clean_expired, clean_pattern, force
     end
 
     def self.list_profiles
@@ -91,7 +92,7 @@ module Sigh
       end
     end
 
-    def self.cleanup_profiles(expired = false, pattern = nil)
+    def self.cleanup_profiles(expired = false, pattern = nil, force = nil)
       now = DateTime.now
 
       profiles = load_profiles.select { |profile| (expired && profile["ExpirationDate"] < now) || (!pattern.nil? && profile["Name"] =~ pattern) }
@@ -101,7 +102,16 @@ module Sigh
         UI.message profile["Name"].red
       end
 
-      if agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
+      delete = force
+      unless delete
+        if Helper.ci?
+          UI.user_error! "On a CI server, cleanup cannot be used without the --force option"
+        else
+          delete = agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
+        end
+      end
+
+      if delete
         profiles.each do |profile|
           File.delete profile["Path"]
         end
