@@ -43,9 +43,14 @@ module Scan
       # First, generate a JUnit report to get the number of tests
       require 'tempfile'
       output_file = Tempfile.new("junit_report")
-      cmd = ReportCollector.new.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                                  types: 'junit',
-                                                  output_file_name: output_file.path).values.last
+
+      report_collector = ReportCollector.new(Scan.config[:open_report],
+                                             Scan.config[:output_types],
+                                             Scan.config[:output_directory])
+
+      cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
+                                               types: 'junit',
+                                               output_file_name: output_file.path).values.last
       system(cmd)
 
       result = TestResultParser.new.parse_result(output_file.read)
@@ -66,7 +71,7 @@ module Scan
       })
       puts ""
 
-      ReportCollector.new.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
+      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
       UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
       UI.user_error!("Tests failed") unless result[:failures] == 0

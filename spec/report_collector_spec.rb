@@ -3,14 +3,7 @@ describe Scan do
     let (:path) { "./spec/fixtures/boring.log" }
 
     it "ignores invalid report types" do
-      options = {
-        output_types: "invalid, html",
-        output_directory: "/tmp",
-        project: "examples/standard/app.xcodeproj"
-      }
-      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-      commands = Scan::ReportCollector.new.generate_commands(path)
+      commands = Scan::ReportCollector.new(false, "invalid, html", "/tmp").generate_commands(path)
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({

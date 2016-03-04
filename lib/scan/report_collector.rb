@@ -2,6 +2,13 @@ module Scan
   class ReportCollector
     SUPPORTED = %w(html junit json-compilation-database)
 
+    # Intialize with values from Scan.config matching these param names
+    def initialize(open_report, output_types, output_directory)
+      @open_report = open_report
+      @output_types = output_types
+      @output_directory = output_directory
+    end
+
     def parse_raw_file(path)
       raise "Couldn't find file at path '#{path}'".red unless File.exist?(path)
 
@@ -10,7 +17,7 @@ module Scan
         system(command)
         Helper.log.info("Successfully generated report at '#{output_path}'".green)
 
-        if Scan.config[:open_report] and output_path.end_with?(".html")
+        if @open_report and output_path.end_with?(".html")
           # Open the HTML file
           `open --hide '#{output_path}'`
         end
@@ -19,7 +26,7 @@ module Scan
 
     # Returns a hash containg the resulting path as key and the command as value
     def generate_commands(path, types: nil, output_file_name: nil)
-      types ||= Scan.config[:output_types]
+      types ||= @output_types
       types = types.split(",") if types.kind_of?(String) # might already be an array when passed via fastlane
       commands = {}
 
@@ -32,7 +39,7 @@ module Scan
         end
 
         file_name = "report.#{type}"
-        output_path = output_file_name || File.join(File.expand_path(Scan.config[:output_directory]), file_name)
+        output_path = output_file_name || File.join(File.expand_path(@output_directory), file_name)
         parts = ["cat '#{path}' | "]
         parts << "xcpretty"
         parts << "--report #{type}"
