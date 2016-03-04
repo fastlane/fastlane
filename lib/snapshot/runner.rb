@@ -175,11 +175,9 @@ module Snapshot
                                               end)
 
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
-      if locale
-        dir_name = locale
-      else
-        dir_name = language
-      end
+
+      dir_name = locale || language
+
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
