@@ -23,7 +23,6 @@ module Fastlane
       show_infos
 
       FastlaneFolder.create_folder! unless Helper.is_test?
-      fastlane_actions_path = File.join(FastlaneFolder.path, 'actions')
       is_manual_setup = false
 
       begin
@@ -32,10 +31,10 @@ module Fastlane
         detect_if_app_is_available
         print_config_table
         if UI.confirm("Please confirm the above values")
-          default_setup(path: fastlane_actions_path)
+          default_setup
         else
           is_manual_setup = true
-          manual_setup(path: fastlane_actions_path)
+          manual_setup
         end
         Helper.log.info 'Successfully finished setting up fastlane'.green
       rescue => ex # this will also be caused by Ctrl + C
@@ -44,7 +43,7 @@ module Fastlane
         else
           Helper.log.error ex.to_s
           Helper.log.error 'An error occured during the setup process. Falling back to manual setup!'.yellow
-          try_manual_setup(path: fastlane_actions_path)
+          try_manual_setup
         end
       end
       # rubocop:enable Lint/RescueException
@@ -58,13 +57,13 @@ module Fastlane
       raise exception
     end
 
-    def try_manual_setup(path: nil)
-      manual_setup(path: path)
+    def try_manual_setup
+      manual_setup
     rescue => ex
       handle_exception(exception: ex)
     end
 
-    def default_setup(path: nil)
+    def default_setup
       copy_existing_files
       generate_appfile(manually: false)
       detect_installed_tools # after copying the existing files
@@ -72,17 +71,15 @@ module Fastlane
         create_app_if_necessary
       end
       enable_deliver
-      FileUtils.mkdir(path)
       generate_fastfile(manually: false)
       show_analytics
     end
 
-    def manual_setup(path: nil)
+    def manual_setup
       copy_existing_files
       generate_appfile(manually: true)
       detect_installed_tools # after copying the existing files
       ask_to_enable_other_tools
-      FileUtils.mkdir(path)
       generate_fastfile(manually: true)
       show_analytics
     end
