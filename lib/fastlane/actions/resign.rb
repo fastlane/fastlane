@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version])
           Helper.log.info 'Successfully re-signed .ipa 🔏.'.green
         else
           raise 'Failed to re-sign .ipa'.red
@@ -62,7 +62,12 @@ module Fastlane
                                          files.each do |file|
                                            raise "Couldn't find provisiong profile at path '#{file}'".red unless File.exist?(file)
                                          end
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       env_name: "FL_RESIGN_VERSION",
+                                       description: "Version number to force resigned ipa to use",
+                                       is_string: true,
+                                       optional: true)
         ]
       end
 
