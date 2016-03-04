@@ -3,7 +3,7 @@ $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 require "colored"
 
 # First we have to check if the user has `pry` installed
-# We don't want to add pry as a spaceship dependency, as 
+# We don't want to add pry as a spaceship dependency, as
 # it shouldn't really be added to production systems
 gem_name = "pry"
 begin
