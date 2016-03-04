@@ -219,8 +219,9 @@ module Snapshot
 
     def clear_previous_screenshots
       UI.important "Clearing previously generated screenshots"
-      path = File.join(".", Snapshot.config[:output_directory], "*", "*.png")
+      path = File.join(Snapshot.config[:output_directory], "*", "*.png")
       Dir[path].each do |current|
+        UI.verbose "Deleting #{current}"
         File.delete(current)
       end
     end
