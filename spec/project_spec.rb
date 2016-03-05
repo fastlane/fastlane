@@ -1,5 +1,160 @@
 describe FastlaneCore do
   describe FastlaneCore::Project do
+    describe 'project and workspace detection' do
+      def within_a_temp_dir
+        Dir.mktmpdir do |dir|
+          FileUtils.cd(dir) do
+            yield dir if block_given?
+          end
+        end
+      end
+
+      let(:options) do
+        [
+          FastlaneCore::ConfigItem.new(key: :project, description: "Project", optional: true),
+          FastlaneCore::ConfigItem.new(key: :workspace, description: "Workspace", optional: true)
+        ]
+      end
+
+      it 'raises if both project and workspace are specified' do
+        expect do
+          config = FastlaneCore::Configuration.new(options, { project: 'yup', workspace: 'yeah' })
+          FastlaneCore::Project.detect_projects(config)
+        end.to raise_error
+      end
+
+      it 'keeps the specified project' do
+        config = FastlaneCore::Configuration.new(options, { project: 'yup' })
+        FastlaneCore::Project.detect_projects(config)
+
+        expect(config[:project]).to eq('yup')
+        expect(config[:workspace]).to be_nil
+      end
+
+      it 'keeps the specified workspace' do
+        config = FastlaneCore::Configuration.new(options, { workspace: 'yeah' })
+        FastlaneCore::Project.detect_projects(config)
+
+        expect(config[:project]).to be_nil
+        expect(config[:workspace]).to eq('yeah')
+      end
+
+      it 'picks the only workspace file present' do
+        within_a_temp_dir do |dir|
+          workspace = './Something.xcworkspace'
+          FileUtils.mkdir_p(workspace)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:workspace]).to eq(workspace)
+        end
+      end
+
+      it 'picks the only project file present' do
+        within_a_temp_dir do |dir|
+          project = './Something.xcodeproj'
+          FileUtils.mkdir_p(project)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:project]).to eq(project)
+        end
+      end
+
+      it 'prompts to select among multiple workspace files' do
+        within_a_temp_dir do |dir|
+          workspaces = ['./Something.xcworkspace', './SomethingElse.xcworkspace']
+          FileUtils.mkdir_p(workspaces)
+
+          expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
+          expect(FastlaneCore::Project).not_to receive(:select_project)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:workspace]).to eq(workspaces.last)
+        end
+      end
+
+      it 'prompts to select among multiple project files' do
+        within_a_temp_dir do |dir|
+          projects = ['./Something.xcodeproj', './SomethingElse.xcodeproj']
+          FileUtils.mkdir_p(projects)
+
+          expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
+          expect(FastlaneCore::Project).not_to receive(:select_project)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:project]).to eq(projects.last)
+        end
+      end
+
+      it 'asks the user to specify a project when none are found' do
+        within_a_temp_dir do |dir|
+          project = './subdir/Something.xcodeproj'
+          FileUtils.mkdir_p(project)
+
+          expect(FastlaneCore::Project).to receive(:ask).and_return(project)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:project]).to eq(project)
+        end
+      end
+
+      it 'asks the user to specify a workspace when none are found' do
+        within_a_temp_dir do |dir|
+          workspace = './subdir/Something.xcworkspace'
+          FileUtils.mkdir_p(workspace)
+
+          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:workspace]).to eq(workspace)
+        end
+      end
+
+      it 'explains when a provided path is not found' do
+        within_a_temp_dir do |dir|
+          workspace = './subdir/Something.xcworkspace'
+          FileUtils.mkdir_p(workspace)
+
+          expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
+          expect(FastlaneCore::Helper.log).to receive(:error).with(/Couldn't find/)
+          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:workspace]).to eq(workspace)
+        end
+      end
+
+      it 'explains when a provided path is not valid' do
+        within_a_temp_dir do |dir|
+          workspace = './subdir/Something.xcworkspace'
+          FileUtils.mkdir_p(workspace)
+          FileUtils.mkdir_p('other-directory')
+
+          expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
+          expect(FastlaneCore::Helper.log).to receive(:error).with(/Path must end with/)
+          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+
+          config = FastlaneCore::Configuration.new(options, {})
+          FastlaneCore::Project.detect_projects(config)
+
+          expect(config[:workspace]).to eq(workspace)
+        end
+      end
+    end
+
     it "raises an exception if path was not found" do
       expect do
         FastlaneCore::Project.new(project: "/tmp/notHere123")
