@@ -10,6 +10,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 =======
@@ -296,3 +297,7 @@ local.properties
 
 Gemfile.lock
 >>>>>>> 85f61862805ed49d48409aa753817ec46e3699fe
+=======
+*/
+!assets
+>>>>>>> 9c5bdf9bbabec3b3cd6b7b88cb94a540a80c2ad7
