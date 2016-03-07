@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.gem
 *.rbc
 /.config
@@ -113,3 +114,9 @@ screenshots
 Gemfile.lock
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
 fastlane/report.xml
+=======
+pkg
+Gemfile.lock
+fastlane/report.xml
+coverage/
+>>>>>>> 7729ea8ef379159a7e67b0ed1c05839ae141dd49
