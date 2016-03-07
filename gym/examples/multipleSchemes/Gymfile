@@ -1,0 +1,3 @@
+scheme "Example"
+
+output_directory "./"

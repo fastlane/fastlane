@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 *.gem
@@ -147,3 +148,21 @@ Gemfile.lock
 
 fastlane/report.xml
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
+=======
+.DS_Store
+Gemfile.lock
+/coverage/
+*UserInterfaceState.xcuserstate
+pkg
+**/Example.app.dSYM.zip
+fastlane/report.xml
+
+# Build
+**/Example.app.dSYM.zip
+**/Example.ipa
+**/Example.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+ExampleProductName.ipa
+ExampleProductName.app.dSYM.zip
+**/*.dSYM.zip
+**/*.app
+>>>>>>> 8e58992ce630ed2a2b35ff026a76e6ba9c2c58aa
