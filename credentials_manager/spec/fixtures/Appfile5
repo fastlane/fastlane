@@ -1,0 +1,25 @@
+app_identifier do
+  ["net", "sunapps", "1"].join "."
+end
+
+apple_id do 
+  ["felix", "sunapps.net"].join "@"
+end
+
+team_id do
+  "Q2CBPJ58CC"
+end
+
+for_platform :ios do
+  apple_id do 
+    ["fabio", "sunapps.ios.net"].join "@"
+  end
+  team_id do 
+    'Q2CBPJ58AA' # for all iOS related things
+  end
+  for_lane :enterprise do
+    app_identifier do
+      'net.sunapps.ios.enterprise'
+    end
+  end
+end

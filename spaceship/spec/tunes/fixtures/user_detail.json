@@ -1,0 +1,24 @@
+{
+  "data": {
+    "isLocaleNameReversed": false,
+    "isEmailInvalid": false,
+    "hasContractInfo": false,
+    "canEditITCUsersAndRoles": true,
+    "canViewITCUsersAndRoles": true,
+    "canEditIAPUsersAndRoles": true,
+    "contentProviderType": "Purple Software",
+    "displayName": "Foo Bar",
+    "userFeatures": [],
+    "contentProviderId": "1234567",
+    "visibility": true,
+    "DYCVisibility": false,
+    "contentProvider": "We Want To Believe",
+    "userName": "foo@bar.com"
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

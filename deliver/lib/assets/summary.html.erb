@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>deliver - <%= @app_name %></title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <style>
+          .app-name {
+              font-size: 42px;
+              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
+              font-weight: 300;
+              margin-top: 22px;
+              margin-left: 25px;
+              margin-right: 25px;
+          }
+
+          .app-urls {
+              margin-left: 25px;
+              font-size: 14px;
+              margin-top: 4px;
+              margin-right: 25px;
+          }
+
+          body {
+              font-family: 'Helvetica Neue', HelveticaNeue;
+          }
+
+          hr {
+            margin-top: 40px;
+            margin-bottom: 40px;
+          }
+
+          .app-url-descr {
+              height:22px;
+              display: inline-block;
+              font-weight: 500;
+          }
+
+          .app-url {
+              color: #0056ba;
+              font-weight: 300;
+              margin-right: 10px;
+          }
+
+          .app-keyword {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+          }
+
+          .cat-headline {
+              font-weight: 700;
+              margin-bottom: 5px;
+          }
+
+
+
+          .app-description {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+          }
+
+          .app-description-text {
+              font-weight: 300;
+          }
+
+          .app-changelog {
+              margin-left: 25px;
+              margin-right: 25px;
+              margin-top: 22px;
+              font-weight: 300;
+          }
+
+          .app-screenshots {
+              margin-left: 15px;
+              margin-right: 15px;
+              margin-top: 22px;
+          }
+
+          .app-keyword-list {
+              font-weight: 300;
+          }
+
+          .app-changelog-list {
+              list-style-type: square;
+              
+              font-weight: 300;
+          }
+
+          ul {
+              margin-top: 6px;
+          }
+
+          .app-screenshot-row {
+              width: 100%;
+              margin-top: 10px;
+              margin-bottom: 10px;
+          }
+
+          .app-screenshot {
+              width: calc(20% - 30px);
+              margin-left: 10px;
+              margin-right: 10px;
+          }
+
+          #app-screenshots .cat-headline {
+              margin-left: 10px;
+              margin-right: 10px;
+          }
+        </style>
+    </head>
+    
+    <body>
+      <% @languages.each do |language| %>
+        <% if @options[:name] %>
+          <div class="app-name">
+            <%= language %>: <%= @options[:name][language] %>
+          </div>
+        <% else %>
+          <div class="app-name">
+            <%= language %>
+          </div>
+        <% end %>
+
+        <div class="app-urls">
+          <% all_keys = [:support_url, :marketing_url] %>
+          <% all_keys.each do |key| %>
+            <% value = @options[key][language] if @options[key] %>
+            <% if value %>
+              <div class="app-url-descr">
+                <%= key %>: <a target="_blank" class="app-url" href="<%= value %>"><%= value %></a>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <% if @options[:keywords] and @options[:keywords][language] %>
+          <div class="app-keyword">
+              <div class="cat-headline">Keywords</div>
+              <ul class="app-keyword-list">
+                <% @options[:keywords][language].split(" ").each do |keyword| %>
+                  <li><%= keyword %></li>
+                <% end %>
+              </ul>
+          </div>
+        <% end %>
+        
+        <% if @options[:description] %>
+          <div class="app-description">
+               <div class="cat-headline">Description</div>
+               <div class="app-description-text">
+                  <%= (@options[:description][language] || '').gsub("\n", "<br />") %>
+               </div>
+          </div>
+        <% end %>
+        
+        <% if @options[:release_notes] %>
+          <div class="app-changelog">
+              <div class="cat-headline">Changelog</div>
+              <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
+          </div>
+        <% end %>
+        
+        <div class="app-screenshots">
+          <div class="cat-headline">Screenshots</div>
+
+          <% if options[:skip_screenshots] %>
+              <h2 style="color: blue">Skipped Screenshots</h2>
+              <p>
+                Options to skip_screenshots activated. <i>deliver</i> will not modify your app screenshots.
+              </p>
+            </div>
+          <% elsif @screenshots.count > 0 %>
+            <% sc = @screenshots.find_all { |s| s.language == language } %>
+            <% sc_by_size = sc.group_by { |i| i.screen_size } %>
+
+            <% sc_by_size.keys.sort.each do |screen_size| %>
+              <% screenshots = sc_by_size[screen_size].sort { |a, b| [a.path] <=> [b.path] } %>
+              <%# we are guaranteed to have at least one element because of the group_by %>
+              <h4><%= screenshots[0].formatted_name %></h4>
+              <div class="app-screenshot-row">
+
+              <% screenshots.each_with_index do |screenshot, index| %>
+                <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>" title="Screenshot #<%=index%> for <%=language%>"></a>
+              <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <!-- no screenshots -->
+            <div style="border: 3px solid red; padding: 0px 20px">
+              <h2 style="color: red">No Screenshots Found</h2>
+              <p>
+                deliver couldn't find any screenshots. This will <b>remove</b> existing screenshots, but will also not upload any.
+              <p>
+                Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
+              </p>
+            </div>
+          <% end %>
+          </div>
+        
+        <hr />
+      <% end # end data %>
+    </body>
+</html>

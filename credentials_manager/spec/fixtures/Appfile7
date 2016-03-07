@@ -1,0 +1,7 @@
+for_platform "ios" do
+  for_lane "beta" do
+    app_identifier "abc.xyz"
+  end
+end
+
+apple_id ""

@@ -1,0 +1,12 @@
+machine:
+  xcode:
+    version: "7.2"
+dependencies:
+  override:
+    - gem install bundler
+    - bundle check --path=/tmp/vendor/bundle || bundle install --path=/tmp/vendor/bundle --jobs=4 --retry=3
+  cache_directories:
+    - /tmp/vendor/bundle
+test:
+  override:
+    - bundle exec rake test_all

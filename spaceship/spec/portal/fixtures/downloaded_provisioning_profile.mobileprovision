@@ -1,0 +1,51 @@
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AppIDName</key>
+	<string>SunApp Setup</string>
+	<key>ApplicationIdentifierPrefix</key>
+	<array>
+	<string>5A997XSHK2</string>
+	</array>
+	<key>CreationDate</key>
+	<date>2015-02-21T15:57:07Z</date>
+	<key>DeveloperCertificates</key>
+	<array>
+		<data>REDACTED</data>
+	</array>
+	<key>Entitlements</key>
+	<dict>
+		<key>keychain-access-groups</key>
+		<array>
+			<string>5A997XSHK2.*</string>
+		</array>
+		<key>get-task-allow</key>
+		<false/>
+		<key>application-identifier</key>
+		<string>5A997XSHK2.net.sunapps.9</string>
+		<key>com.apple.developer.team-identifier</key>
+		<string>5A997XSHK2</string>
+		<key>aps-environment</key>
+		<string>production</string>
+		<key>beta-reports-active</key>
+		<true/>
+
+	</dict>
+	<key>ExpirationDate</key>
+	<date>2016-02-10T23:44:20Z</date>
+	<key>Name</key>
+	<string>App Name</string>
+	<key>TeamIdentifier</key>
+	<array>
+		<string>5A997XSHK2</string>
+	</array>
+	<key>TeamName</key>
+	<string>SunApps GmbH</string>
+	<key>TimeToLive</key>
+	<integer>354</integer>
+	<key>UUID</key>
+	<string>REDACRED</string>
+	<key>Version</key>
+	<integer>1</integer>
+</dict>
+</plist>

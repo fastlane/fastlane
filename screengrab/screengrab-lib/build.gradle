@@ -1,0 +1,54 @@
+String lookupProperty(Project project, String gradlePropName, String envVarName) {
+    return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
+}
+
+Object[] versionInfo = screengrabVersion(rootProject.file('version.properties'))
+String versionNameString = versionInfo[0] as String
+int versionCodeInt = versionInfo[1] as int
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        targetSdkVersion 23
+        versionCode versionCodeInt
+        versionName versionNameString
+        minSdkVersion 8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+publish {
+    userOrg = 'fastlane'
+    repoName = 'fastlane'
+    groupId = 'tools.fastlane'
+    artifactId = 'screengrab'
+    publishVersion = versionNameString
+    website = 'https://github.com/fastlane/screengrab'
+    bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
+    bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
+}
+
+dependencies {
+    compile "com.android.support:support-annotations:23.1.1"
+    compile 'com.android.support.test:runner:0.4.1'
+    compile 'com.android.support.test:rules:0.4.1'
+    compile 'com.android.support.test.espresso:espresso-core:2.2.1'
+}

@@ -1,0 +1,88 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "companyName": {
+      "value": "Felix Krause",
+      "isEditable": false,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "versionString": null,
+    "appRegInfo": null,
+    "bundleIds": {
+      "*": "Xcode iOS Wildcard App ID - *"
+    },
+    "enabledPlatformsForCreation": {
+      "value": ["appletvos", "ios"],
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "name": null,
+    "primaryLanguage": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "bundleId": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "bundleIdSuffix": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "vendorId": null,
+    "initialPlatform": "ios",
+    "adamId": null,
+    "newApp": {
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "bundleId": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "bundleIdSuffix": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "vendorId": null,
+      "adamId": null,
+      "appType": "ios",
+      "name": null,
+      "liveVersion": null,
+      "inFlightVersion": null,
+      "primaryLanguage": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "canAddVersion": false,
+      "appPageSectionLinks": null,
+      "appPageMoreLinks": null,
+      "appPageActionLinks": null,
+      "appTransferState": null,
+      "isDeleted": false,
+      "bundleSummaryInfo": null
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

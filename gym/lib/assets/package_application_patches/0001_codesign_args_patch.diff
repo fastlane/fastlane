@@ -1,0 +1,38 @@
+From 13f2c76fd11b0d861ddf205d4d6ccc0c45a0d4b2 Mon Sep 17 00:00:00 2001
+From: Fabio Milano
+Date: Thu, 13 Aug 2015 15:02:41 +0200
+Subject: [PATCH] Fixed codesign_args
+
+Code signatures made in Mavericks and later do not support altering which files are sealed by a code signature.
+The --resource-rules option to codesign isn't supported anymore
+
+See https://developer.apple.com/library/mac/technotes/tn2206/_index.html#//apple_ref/doc/uid/DTS40007919-CH1-TNTAG206
+
+---
+ PackageApplication4Gym | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/PackageApplication4Gym b/PackageApplication4Gym
+index fc4d7de..b97431f 100755
+--- a/PackageApplication4Gym
++++ b/PackageApplication4Gym
+@@ -152,9 +152,15 @@ if ( defined $opt{sign} ) {
+         }
+     }
+ 
+-    my @codesign_args = ("/usr/bin/codesign", "--force", "--preserve-metadata=identifier,entitlements,resource-rules",
++    my @codesign_args;
++    if (-e '$destApp/ResourceRules.plist') {  # If ResourceRules.plist exists, include it in codesign arguments, for backwards compatability
++        @codesign_args = ("/usr/bin/codesign", "--force", "--preserve-metadata=identifier,entitlements,resource-rules",
+                          "--sign", $opt{sign},
+                          "--resource-rules=$destApp/ResourceRules.plist");
++    } else { # If ResourceRules.plist isn't found, don't include it in the codesign arguments
++        @codesign_args = ("/usr/bin/codesign", "--force", "--preserve-metadata=identifier,entitlements",
++                         "--sign", $opt{sign});
++    }
+ 
+     if ( -e $entitlements_plist ) {
+         push(@codesign_args, '--entitlements');
+-- 
+2.2.1
+

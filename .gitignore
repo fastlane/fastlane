@@ -1,7 +1,7 @@
 *.gem
 *.rbc
 /.config
-/coverage/
+coverage/
 /InstalledFiles
 /pkg/
 /spec/reports/
@@ -33,12 +33,10 @@ Gemfile.lock
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
-assets/fastlane_ultra_large.png
-
 # Added by Felix
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
-spec/fixtures/fastfiles/report.xml
-fastlane/report.xml
+**/report.xml
+**/.bundle

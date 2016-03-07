@@ -1,0 +1,47 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+Properties loadProperties(File propsFile) {
+    new Properties().with { props ->
+        propsFile.withInputStream { stream ->
+            props.load(stream)
+        }
+        props
+    }
+}
+
+/**
+ * @return an Array containing the [versionNameString, versionCodeInt]
+ */
+Object[] screengrabVersion(File propsFile) {
+    Properties versionProps = loadProperties(propsFile)
+
+    int versionMajor = (versionProps['major'] ?: 0) as int
+    int versionMinor = (versionProps['minor'] ?: 0) as int
+    int versionPatch = (versionProps['patch'] ?: 0) as int
+    
+    String versionNameString = [versionMajor, versionMinor, versionPatch].join('.')
+    int versionCodeInt = (1000000 * versionMajor) + (10000 * versionMinor) + (100 * versionPatch)
+
+    [versionNameString, versionCodeInt]
+}
+
+

@@ -1,0 +1,59 @@
+{
+  "creationTimestamp": "2015-04-29T16:07:12Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "048120d0-d6eb-49b9-9c70-dff6ee4b3373",
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action?content-type=text/x-url-arguments&accept=application/json&requestId=048120d0-d6eb-49b9-9c70-dff6ee4b3373&userLocale=en_US&teamId=S56PJTAYEL",
+  "responseId": "a64fde92-de9e-46d2-b184-98af3d0a6c11",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "certRequest": {
+    "certRequestId": "ESF52FQGU6",
+    "statusCode": 4,
+    "statusString": "Issued",
+    "csrPlatform": "ios",
+    "dateRequestedString": "Apr 29, 2015",
+    "dateRequested": "2015-04-29T16:07:11Z",
+    "expirationDate": "2016-04-28T15:57:11Z",
+    "expirationDateString": "Apr 28, 2016",
+    "certificateId": "HG3FQ9M282",
+    "typeString": "APNs Production iOS",
+    "certificateType": {
+      "certificateTypeDisplayId": "UPV3DW712I",
+      "name": "APNs Production iOS",
+      "platform": "ios",
+      "permissionType": "production",
+      "distributionType": "production",
+      "distributionMethod": "push",
+      "ownerType": "bundle",
+      "daysOverlap": 364,
+      "maxActive": 2
+    },
+    "certificate": {
+      "name": null,
+      "certificateId": "HG3FQ9M282",
+      "serialNumber": "7C4B29A2943BACA0",
+      "status": "Issued",
+      "statusCode": 0,
+      "expirationDate": "2016-04-28",
+      "certificatePlatform": "ios",
+      "certificateType": {
+        "certificateTypeDisplayId": "UPV3DW712I",
+        "name": "APNs Production iOS",
+        "platform": "ios",
+        "permissionType": "production",
+        "distributionType": "production",
+        "distributionMethod": "push",
+        "ownerType": "bundle",
+        "daysOverlap": 364,
+        "maxActive": 2
+      },
+      "hasAskKey": false
+    }
+  }
+}
