@@ -80,13 +80,11 @@ module Deliver
     end
 
     # Validates the given screenshots (size and format)
-    # rubocop:disable Style/PredicateName
     def is_valid?
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
     end
-    # rubocop:enable Style/PredicateName
 
     def self.devices
       return {

@@ -11,11 +11,9 @@ module FastlaneCore
     end
 
     # Legacy Method, use `installed?` instead
-    # rubocop:disable Style/PredicateName
     def self.is_installed?(path)
       installed?(path)
     end
-    # rubocop:enable Style/PredicateName
 
     def self.installed_identies
       install_wwdr_certificate unless wwdr_certificate_installed?

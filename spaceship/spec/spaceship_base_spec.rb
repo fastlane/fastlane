@@ -31,11 +31,9 @@ describe Spaceship::Base do
             'isLiveString' => :is_live
           })
 
-          # rubocop:disable Style/PredicateName
           def is_live
             super == 'true'
           end
-          # rubocop:enable Style/PredicateName
         end
       end
 

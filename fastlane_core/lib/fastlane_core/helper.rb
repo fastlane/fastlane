@@ -73,7 +73,6 @@ module FastlaneCore
     end
 
     # Use Helper.test? and Helper.ci? instead (legacy calls)
-    # rubocop:disable Style/PredicateName
     def self.is_test?
       self.test?
     end
@@ -85,7 +84,6 @@ module FastlaneCore
     def self.is_mac?
       self.mac?
     end
-    # rubocop:enable Style/PredicateName
 
     # Do we want to disable the colored output?
     def self.colors_disabled?

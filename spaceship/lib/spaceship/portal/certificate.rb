@@ -320,11 +320,9 @@ module Spaceship
       end
 
       # @return (Bool): Is this certificate a push profile for apps?
-      # rubocop:disable Style/PredicateName
       def is_push?
         self.kind_of? PushCertificate
       end
-      # rubocop:enable Style/PredicateName
 
       # @return (Bool) Is this a Mac profile?
       def mac?
