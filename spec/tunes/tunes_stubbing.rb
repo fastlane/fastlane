@@ -210,6 +210,13 @@ def itc_stub_pricing_tiers
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_release_to_store
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/releaseToStore").
+    with(body: "898536088").
+    to_return(status: 200, body: itc_read_fixture_file("update_app_version_success.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
@@ -224,5 +231,6 @@ RSpec.configure do |config|
     itc_stub_user_detail
     itc_stub_candiate_builds
     itc_stub_pricing_tiers
+    itc_stub_release_to_store
   end
 end
