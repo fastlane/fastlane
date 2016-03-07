@@ -26,19 +26,32 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
+<<<<<<< HEAD
 Gemfile.lock
 .ruby-version
 .ruby-gemset
+=======
+# Gemfile.lock
+# .ruby-version
+# .ruby-gemset
+>>>>>>> e2b023a1e65d2ad0574311fa3ecffdfe27f66c40
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
+<<<<<<< HEAD
 assets/fastlane_ultra_large.png
+=======
+>>>>>>> e2b023a1e65d2ad0574311fa3ecffdfe27f66c40
 
 # Added by Felix
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
+<<<<<<< HEAD
 spec/fixtures/fastfiles/report.xml
+=======
+Gemfile.lock
+>>>>>>> e2b023a1e65d2ad0574311fa3ecffdfe27f66c40
 fastlane/report.xml

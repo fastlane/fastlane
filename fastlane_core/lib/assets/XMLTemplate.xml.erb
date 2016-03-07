@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://apple.com/itunes/importer" version="software5.4">
+  <software_assets apple_id="<%= @data[:apple_id] %>" app_platform="<%= @data[:platform] %>">
+    <asset type="<%= @data[:archive_type] %>">
+      <data_file>
+        <size><%= @data[:file_size] %></size>
+        <file_name><%= @data[:ipa_path] %></file_name>
+        <checksum type="md5"><%= @data[:md5] %></checksum>
+      </data_file>
+    </asset>
+  </software_assets>
+</package>
