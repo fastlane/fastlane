@@ -282,6 +282,18 @@ module Spaceship
       end
 
       #####################################################
+      # @!group release
+      #####################################################
+
+      def release!
+        version = self.edit_version
+        if version.nil?
+          raise "Could not find a valid version to release"
+        end
+        version.release!
+      end
+
+      #####################################################
       # @!group General
       #####################################################
       def setup

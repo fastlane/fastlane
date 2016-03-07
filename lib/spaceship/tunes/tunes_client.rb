@@ -731,6 +731,24 @@ module Spaceship
     end
 
     #####################################################
+    # @!group release
+    #####################################################
+
+    def release!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/versions/#{version}/releaseToStore"
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
     # @!group Testers
     #####################################################
     def testers(tester)

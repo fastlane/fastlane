@@ -134,6 +134,18 @@ describe Spaceship::AppVersion, all: true do
       end
     end
 
+    describe "release an app version" do
+      it "allows release the edit version" do
+        version = app.edit_version
+
+        version.raw_status = 'pendingDeveloperRelease'
+
+        status = version.release!
+        # Note right now we don't really update the raw_data after the release
+        expect(version.raw_status).to eq('pendingDeveloperRelease')
+      end
+    end
+
     describe "#url" do
       it "live version" do
         expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/deliverable')

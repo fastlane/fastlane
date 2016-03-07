@@ -454,6 +454,10 @@ module Spaceship
         end
       end
 
+      def release!
+        client.release!(self.application.apple_id, self.version_id)
+      end
+
       # These methods takes care of properly parsing values that
       # are not returned in the right format, e.g. boolean as string
       def release_on_approval
