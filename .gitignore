@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 =======
@@ -272,3 +273,26 @@ fastlane/report.xml
 Gemfile.lock
 fastlane/report.xml
 >>>>>>> 42106ec48b5335b4a1d6be209cb26d51ad64c88a
+=======
+build
+
+*.iml
+.idea/
+
+report.xml
+
+pkg/
+coverage/
+
+example/.gradle
+example/build
+example/fastlane/metadata
+
+screengrab-lib/build
+
+.gradle
+
+local.properties
+
+Gemfile.lock
+>>>>>>> 85f61862805ed49d48409aa753817ec46e3699fe
