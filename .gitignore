@@ -1,5 +1,8 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 *.gem
 *.rbc
 /.config
@@ -10,6 +13,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -24,6 +28,8 @@ screenshots/
 >>>>>>> 3a8e4a9bb803cce8e1f10c0b0e4269a3a5f9c1cf
 =======
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
+=======
+>>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 
 ## Specific to RubyMotion:
 .dat*
@@ -47,6 +53,7 @@ build/
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Gemfile.lock
 .ruby-version
 .ruby-gemset
@@ -65,10 +72,16 @@ Gemfile.lock
 # .ruby-version
 # .ruby-gemset
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
+=======
+# Gemfile.lock
+# .ruby-version
+# .ruby-gemset
+>>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -79,12 +92,15 @@ assets/fastlane_ultra_large.png
 >>>>>>> dccc722c16b9c1e272e32969d7e27c4730f4eb96
 =======
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
+=======
+>>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 
 # Added by Felix
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -126,3 +142,8 @@ pkg
 Gemfile.lock
 fastlane/report.xml
 >>>>>>> 0e6e54bb0b93c1f460400ea067a5e41237079e81
+=======
+Gemfile.lock
+
+fastlane/report.xml
+>>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
