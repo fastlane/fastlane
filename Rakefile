@@ -108,7 +108,7 @@ task :test_all do
         Bundler.with_clean_env do
           bundle_install
           sh "bundle exec rspec"
-          sh "rubocop"
+          sh "bundle exec rubocop"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
