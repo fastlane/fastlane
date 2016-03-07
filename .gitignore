@@ -6,6 +6,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 =======
@@ -238,3 +239,8 @@ examples/*/test_output/*
 Gemfile.lock
 fastlane/report.xml
 >>>>>>> f1b7e5d71992714370369688e7521001b6815894
+=======
+pkg
+Gemfile.lock
+fastlane/report.xml
+>>>>>>> 1f3a1ac41b8c4ed6b176406fb85b5f0e6caf6bb8
