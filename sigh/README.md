@@ -66,7 +66,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Support for **multiple Teams**
 - Support for **Enterprise Profiles**
 
-To automate iOS Push profiles you can use [PEM](https://github.com/fastlane/fastlane/tree/master/PEM).
+To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fastlane/tree/master/pem).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
