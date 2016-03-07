@@ -19,7 +19,6 @@ describe Fastlane do
 
         expect(ENV['BACKUP_XCARCHIVE_DESTINATION']).to be_nil
         expect(ENV['DERIVED_DATA_PATH']).to be_nil
-        expect(ENV['GYM_BUILD_PATH']).to be_nil
         expect(ENV['GYM_CODE_SIGNING_IDENTITY']).to be_nil
         expect(ENV['GYM_DERIVED_DATA_PATH']).to be_nil
         expect(ENV['GYM_OUTPUT_DIRECTORY']).to be_nil
@@ -44,7 +43,6 @@ describe Fastlane do
         derived_data = File.expand_path(File.join(pwd, "../derivedData"))
         expect(ENV['BACKUP_XCARCHIVE_DESTINATION']).to eq(output)
         expect(ENV['DERIVED_DATA_PATH']).to eq(derived_data)
-        expect(ENV['GYM_BUILD_PATH']).to eq(output)
         expect(ENV['GYM_CODE_SIGNING_IDENTITY']).to be_nil
         expect(ENV['GYM_DERIVED_DATA_PATH']).to eq(derived_data)
         expect(ENV['GYM_OUTPUT_DIRECTORY']).to eq(output)
@@ -67,7 +65,6 @@ describe Fastlane do
         derived_data = File.expand_path(File.join(pwd, "../derivedData"))
         expect(ENV['BACKUP_XCARCHIVE_DESTINATION']).to eq(output)
         expect(ENV['DERIVED_DATA_PATH']).to eq(derived_data)
-        expect(ENV['GYM_BUILD_PATH']).to eq(output)
         expect(ENV['GYM_CODE_SIGNING_IDENTITY']).to be_nil
         expect(ENV['GYM_DERIVED_DATA_PATH']).to eq(derived_data)
         expect(ENV['GYM_OUTPUT_DIRECTORY']).to eq(output)
@@ -152,7 +149,6 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(ENV['BACKUP_XCARCHIVE_DESTINATION']).to eq("/tmp/output/directory")
-          expect(ENV['GYM_BUILD_PATH']).to eq("/tmp/output/directory")
           expect(ENV['GYM_OUTPUT_DIRECTORY']).to eq("/tmp/output/directory")
           expect(ENV['SCAN_OUTPUT_DIRECTORY']).to eq("/tmp/output/directory")
         end
