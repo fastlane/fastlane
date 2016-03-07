@@ -7,6 +7,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 =======
@@ -244,3 +245,8 @@ pkg
 Gemfile.lock
 fastlane/report.xml
 >>>>>>> 1f3a1ac41b8c4ed6b176406fb85b5f0e6caf6bb8
+=======
+pkg
+Gemfile.lock
+fastlane/report.xml
+>>>>>>> 5dff30df8712b1120ff992446804178deedab922
