@@ -2,8 +2,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
+=======
+>>>>>>> 8bf35f592115a1b6ca57a79b8a47f44c54e8b9b3
 *.gem
 *.rbc
 /.config
@@ -14,6 +17,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -31,6 +35,8 @@ screenshots/
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
+=======
+>>>>>>> 8bf35f592115a1b6ca57a79b8a47f44c54e8b9b3
 
 ## Specific to RubyMotion:
 .dat*
@@ -49,6 +55,7 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -78,10 +85,16 @@ Gemfile.lock
 # .ruby-version
 # .ruby-gemset
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
+=======
+# Gemfile.lock
+# .ruby-version
+# .ruby-gemset
+>>>>>>> 8bf35f592115a1b6ca57a79b8a47f44c54e8b9b3
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -95,12 +108,15 @@ assets/fastlane_ultra_large.png
 >>>>>>> e2eac7dc7825d86ef5b865c496a546d0ee78bf95
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
+=======
+>>>>>>> 8bf35f592115a1b6ca57a79b8a47f44c54e8b9b3
 
 # Added by Felix
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -166,3 +182,8 @@ ExampleProductName.app.dSYM.zip
 **/*.dSYM.zip
 **/*.app
 >>>>>>> 8e58992ce630ed2a2b35ff026a76e6ba9c2c58aa
+=======
+Gemfile.lock
+fastlane/report.xml
+
+>>>>>>> 8bf35f592115a1b6ca57a79b8a47f44c54e8b9b3
