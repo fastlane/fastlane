@@ -3,7 +3,7 @@ CredentialsManager
 
 `CredentialsManager` is used by most components in the [fastlane.tools](https://fastlane.tools) toolchain.
 
-All code related to your username and password can be found here: [account_manager.rb](https://github.com/fastlane/CredentialsManager/blob/master/lib/credentials_manager/account_manager.rb)
+All code related to your username and password can be found here: [account_manager.rb](https://github.com/fastlane/fastlane/blob/master/credentials_manager/lib/credentials_manager/account_manager.rb)
 
 ## Usage
 Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master/credentials_manager#implementing-a-custom-solution) you can use the command line interface to add credentials to the keychain.
