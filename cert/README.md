@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <b>cert</b> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -39,11 +39,11 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 
 -------
 <p align="center">
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#why">Why?</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#installation">Installation</a> &bull;
+    <a href="#why">Why?</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#how-does-it-work">How does it work?</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -65,11 +65,11 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Why?
 
-Please check out [this guide](https://github.com/fastlane/cert/blob/master/ManualSteps.md) which shows how to manually create an iOS code signing profile and a provisioning profile using the Apple Developer Portal.
+Please check out [this guide](https://github.com/fastlane/fastlane/blob/master/cert/ManualSteps.md) which shows how to manually create an iOS code signing profile and a provisioning profile using the Apple Developer Portal.
 
-**After** checking out the [guide](https://github.com/fastlane/cert/blob/master/ManualSteps.md), take a look how `cert` and [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh) do all that for you.
+**After** checking out the [guide](https://github.com/fastlane/fastlane/blob/master/cert/ManualSteps.md), take a look how `cert` and [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh) do all that for you.
 
-![assets/cert.gif](assets/cert.gif) 
+![assets/cert.gif](assets/cert.gif)
 
 In the gif I used `cert && sigh`, which will first create an iOS code signing certificate and then a provisioning profile for your app if `cert` succeeded.
 
@@ -100,7 +100,7 @@ For a list of available commands run
 
     cert --help
 
-Keep in mind, there is no way for `cert` to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer. 
+Keep in mind, there is no way for `cert` to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer.
 
 ## Environment Variables
 
@@ -124,7 +124,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 
 
 ## How is my password stored?
-`cert` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
+`cert` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/blob/master/credentials_manager/README.md) for more information.
 
 # Tips
 
@@ -139,7 +139,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
