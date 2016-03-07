@@ -1,0 +1,12 @@
+{
+  "data": {
+    "ssoTokenForVideo": "the_sso_token_for_video",
+    "ssoTokenForImage": "the_sso_token_for_image"
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

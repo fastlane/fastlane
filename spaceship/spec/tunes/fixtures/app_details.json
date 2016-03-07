@@ -1,0 +1,137 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "adamId": "1039164429",
+    "localizedMetadata": {
+      "value": [{
+        "localeCode": "en-US",
+        "name": {
+          "value": "Updated by fastlane",
+          "isEditable": true,
+          "isRequired": true,
+          "errorKeys": null,
+          "maxLength": 255,
+          "minLength": 2
+        },
+        "privacyPolicyUrl": {
+          "value": "https://fastlane.tools",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null,
+          "maxLength": 255,
+          "minLength": 0
+        },
+        "privacyPolicy": {
+          "value": null,
+          "isEditable": false,
+          "isRequired": false,
+          "errorKeys": null
+        }
+      }, {
+        "localeCode": "de-DE",
+        "name": {
+          "value": "why new itc 2",
+          "isEditable": true,
+          "isRequired": true,
+          "errorKeys": null,
+          "maxLength": 255,
+          "minLength": 2
+        },
+        "privacyPolicyUrl": {
+          "value": null,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null,
+          "maxLength": 255,
+          "minLength": 0
+        },
+        "privacyPolicy": {
+          "value": null,
+          "isEditable": false,
+          "isRequired": false,
+          "errorKeys": null
+        }
+      }],
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "availablePrimaryLocaleCodes": ["en-US", "de-DE"],
+    "primaryLocaleCode": {
+      "value": "en-US",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "primaryCategory": {
+      "value": "MZGenre.Sports",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "primaryFirstSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "primarySecondSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondaryCategory": {
+      "value": "MZGenre.Games",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondaryFirstSubCategory": {
+      "value": "MZGenre.Educational",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondarySecondSubCategory": {
+      "value": "MZGenre.Puzzle",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "availableBundleIds": null,
+    "bundleId": {
+      "value": "tools.fastlane.app",
+      "isEditable": false,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "bundleIdSuffix": {
+      "value": null,
+      "isEditable": false,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "license": {
+      "countries": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "isEmptyValue": true,
+      "EULAText": null
+    },
+    "vendorId": "1441930512",
+    "rating": null,
+    "ageBandMinAge": null,
+    "ageBandMaxAge": null,
+    "countryRatings": null
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
