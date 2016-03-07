@@ -185,7 +185,7 @@ To define the title and optionally the keyword, put two `.strings` files into th
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
-**Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #49](https://github.com/fastlane/frameit/issues/49)
+**Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
 
 #### Uploading screenshots to iTC
