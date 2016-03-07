@@ -264,7 +264,7 @@ Change syntax highlighting to *Ruby*.
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `deliver` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+Help us keep `deliver` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

@@ -188,7 +188,7 @@ Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contrib
 
 ## Code of Conduct
 
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/code-of-conduct).
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
