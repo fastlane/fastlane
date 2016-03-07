@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <b>deliver</b> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <b>deliver</b> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -29,7 +29,7 @@
 deliver
 ============
 
-[![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
 [![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
@@ -42,11 +42,11 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#quick-start">Quick Start</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -88,7 +88,7 @@ The guide will create all the necessary files for you, using the existing app me
 
 From now on, you can run `deliver` to deploy a new update, or just upload new app metadata and screenshots.
 
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/deliver/blob/master/MigrationGuide.md).
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/fastlane/blob/master/deliver/MigrationGuide.md).
 
 # Usage
 
@@ -118,7 +118,7 @@ deliver --pkg "MacApp.pkg"
 
 If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
 
-This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md)
+This is just a small sub-set of what you can do with `deliver`, check out the full documentation in [Deliverfile.md](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md)
 
 Download existing screenshots from iTunes Connect
 
@@ -139,19 +139,19 @@ Select a previously uploaded build and submit it for review.
 deliver submit_build --build_number 830
 ```
 
-Check out [Deliverfile.md](https://github.com/fastlane/deliver/blob/master/Deliverfile.md) for more options.
+Check out [Deliverfile.md](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md) for more options.
 
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/deliver/blob/master/MigrationGuide.md).
+Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/fastlane/blob/master/deliver/MigrationGuide.md).
 
 # Credentials
 
-A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
+A detailed description about how your credentials are handled is available in a [credentials_manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
 
 ### How does this thing even work? Is magic involved? 🎩###
 
 Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 
-Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data. 
+Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data.
 
 `deliver` uses the following techniques under the hood:
 
@@ -171,7 +171,7 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
@@ -208,7 +208,7 @@ You can do the same with folders
 
 ```
    default
-      keywords.txt     
+      keywords.txt
       marketing_url.txt
       name.txt
       privacy_url.txt
@@ -233,7 +233,7 @@ In this case, default values for keywords, urls, name and release notes are used
 If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
-Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md).
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md).
 
 ## Firewall Issues
 
@@ -255,7 +255,7 @@ echo "$TOOLS_PATH/$REL_PATH"
 Add necessary proxy configuration values to the net.properties according to [Java Proxy Configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html).
 
 ## Limit
-Apple has a limit of 150 binary uploads per day. 
+Apple has a limit of 150 binary uploads per day.
 
 ## Editing the ```Deliverfile```
 Change syntax highlighting to *Ruby*.
