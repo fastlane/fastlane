@@ -236,7 +236,7 @@ After building the archive it is being checked by `gym`. If it's valid, it gets 
 
 Using this method there are no workarounds for WatchKit or Swift required, as it uses the same technique Xcode uses when exporting your binary.
 
-Note: the [xcbuild-safe.sh script](https://github.com/fastlane/gym/tree/master/lib/assets/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
+Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/tree/master/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
 
 ### Xcode 6 and below
 
@@ -247,7 +247,7 @@ Note: the [xcbuild-safe.sh script](https://github.com/fastlane/gym/tree/master/l
 --sign "identity" --embed "provProfile"
 ```
 
-Note: the official PackageApplication script is replaced by a custom PackageApplication4Gym script. This script is obtained by applying a [set of patches](https://github.com/fastlane/gym/tree/master/lib/assets/package_application_patches) on the fly to fix some known issues in the official Xcode PackageApplication script.
+Note: the official PackageApplication script is replaced by a custom PackageApplication4Gym script. This script is obtained by applying a [set of patches](https://github.com/fastlane/fastlane/tree/master/gym/lib/assets/package_application_patches) on the fly to fix some known issues in the official Xcode PackageApplication script.
 
 Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is compressed and moved to the output folder as well.
 
