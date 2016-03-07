@@ -8,7 +8,7 @@ fastlane
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
-[![Build Status](https://img.shields.io/travis/fastlane/fastlane/master.svg?style=flat)](https://travis-ci.org/fastlane/fastlane)
+[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
 
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles and releasing your application.
 
@@ -37,7 +37,7 @@ fastlane beta
 :sparkles: | Connect all iOS and Android build tools into one workflow (both `fastlane` tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
 :ship: | Deploy from any computer, including a CI-server
-:wrench: | Extend and customise the functionality 
+:wrench: | Extend and customise the functionality
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
@@ -90,7 +90,7 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane action [action_name]`: Shows a more detailed description of an action
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
-- `fastlane new_action`: Create a new action (integration) for fastlane  
+- `fastlane new_action`: Create a new action (integration) for fastlane
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
@@ -106,7 +106,7 @@ Additionally to the `fastlane` commands, you now have access to those `fastlane`
 - [`codes`](https://github.com/fastlane/codes): Create promo codes for iOS Apps using the command line
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
