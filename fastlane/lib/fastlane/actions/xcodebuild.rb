@@ -351,7 +351,7 @@ module Fastlane
       end
 
       def self.details
-        "More information on GitHub: https://github.com/fastlane/fastlane/blob/master/docs/Actions.md#xcodebuild"
+        "More information on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xcodebuild"
       end
 
       def self.author
