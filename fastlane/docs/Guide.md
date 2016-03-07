@@ -131,7 +131,7 @@ You can already try running it, put a line (`say "It works"`) to the `:inhouse` 
 
 You should hear your computer speaking to you, which is great!
 
-A list of available actions can be found in the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md).
+A list of available actions can be found in the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
 
 Automating the deployment process is a great next step. You should use `increment_build_number` when you want to upload builds to iTunes Connect ([Activate incrementing build numbers](https://developer.apple.com/library/ios/qa/qa1827/_index.html)).
 
@@ -152,7 +152,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 For all those projects you get all required configuration files, which help you get a sense of how you can use `fastlane`.
 
-Also, check out the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/docs/Actions.md) to see a list of available integrations and options.
+Also, check out the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) to see a list of available integrations and options.
 
 # Help
 
