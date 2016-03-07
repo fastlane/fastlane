@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
   <b>screengrab</b> &bull;
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull;
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -42,7 +42,7 @@ screengrab
 - Easily verify that localizations fit into labels on all screen dimensions to find UI mistakes before you ship
 - You only need to configure it once for anyone on your team to run it
 - Keep your screenshots perfectly up-to-date with every app update. Your customers deserve it!
-- Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/supply)
+- Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://github.com/fastlane/fastlane/tree/master/supply)
 
 # Installation
 Install the gem
@@ -153,7 +153,7 @@ If you're having trouble getting your device unlocked and the screen activated t
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`supply`](https://github.com/fastlane/supply): Upload screenshots, metadata and your app to the Play Store
+- [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload screenshots, metadata and your app to the Play Store
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).
 

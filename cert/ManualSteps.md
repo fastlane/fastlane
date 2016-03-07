@@ -1,4 +1,4 @@
-# [cert](https://github.com/fastlane/cert)
+# [cert](https://github.com/fastlane/fastlane/tree/master/cert)
 
 #### To create a new certificate and a provisioning profile you have to do the following steps on the Apple Developer Portal
 

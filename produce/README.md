@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
   <b>produce</b> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -159,7 +159,7 @@ Get a list of all available options using
 
 All available values can also be passed using environment variables, run `produce --help` to get a list of all available parameters.
 
-## [`fastlane`](https://github.com/fastlane/fastlane) Integration
+## [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) Integration
 
 Your `Fastfile` should look like this
 ```ruby
@@ -186,27 +186,27 @@ apple_id ENV['PRODUCE_APPLE_ID']
 
 This will tell `deliver`, which `App ID` to use, since the app is not yet available in the App Store.
 
-You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://github.com/fastlane/deliver) to upload your app metadata using a CLI
+You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload your app metadata using a CLI
 
 ## How is my password stored?
-`produce` uses the [password manager](https://github.com/fastlane/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/credentials_manager) for more information.
+`produce` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
-- [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
-- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
-- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
+- [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
+- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 

@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <b>gym</b> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -196,7 +196,7 @@ end
 
 You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
 
-For more information visit the [fastlane GitHub page](https://github.com/fastlane/fastlane).
+For more information visit the [fastlane GitHub page](https://github.com/fastlane/fastlane/tree/master/fastlane).
 
 # How does it work?
 
@@ -255,17 +255,17 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
-- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
+- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
-- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
-- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
+- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 

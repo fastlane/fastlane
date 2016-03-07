@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/fastlane/scan"
+        "More information: https://github.com/fastlane/fastlane/tree/master/scan"
       end
 
       def self.author

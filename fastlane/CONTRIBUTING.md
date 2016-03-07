@@ -3,7 +3,7 @@
 To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https://github.com/fastlane/countdown) repo. It will help you set up the development environment within minutes.
 
 1. Create an issue to discuss about your idea.
-2. Fork it (https://github.com/fastlane/fastlane/fork).
+2. Fork it (https://github.com/fastlane/fastlane/tree/master/fastlane).
 3. Create your feature branch (`git checkout -b my-new-feature`).
 4. Commit your changes (`git commit -am 'Add some feature'`).
 5. Push to the branch (`git push origin my-new-feature`).
@@ -13,9 +13,9 @@ To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https
 
 Before submitting a new issue, do the following:
 
-- Verify you're running the latest version by running `fastlane -v` and compare it with the [project page on GitHub](https://github.com/fastlane/fastlane).
+- Verify you're running the latest version by running `fastlane -v` and compare it with the [project page on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane).
 - Verify you have Xcode tools installed by running `xcode-select --install`.
-- Make sure to read through the [README](https://github.com/fastlane/fastlane) of the project.
+- Make sure to read through the [README](https://github.com/fastlane/fastlane/tree/master/fastlane) of the project.
 
 When submitting a new issue, please provide the following information:
 
@@ -27,7 +27,7 @@ When submitting a new issue, please provide the following information:
 
 ## Helping to Resolve Existing Issues
 
-If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: A good place to start is by reviewing the list of [open issues](https://github.com/fastlane/fastlane/issues) or [open PRs](https://github.com/fastlane/fastlane/pulls) for things that need attention. When you find one that you'd like to help with, the [countdown](https://github.com/fastlane/countdown) repo is the best way to get set up with the source code for all of the fastlane projects. With that, working on the following things are super valuable:
+If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: A good place to start is by reviewing the list of [open issues](https://github.com/fastlane/fastlane/issues) or [open PRs](https://github.com/fastlane/fastlane/tree/master/fastlane) for things that need attention. When you find one that you'd like to help with, the [countdown](https://github.com/fastlane/countdown) repo is the best way to get set up with the source code for all of the fastlane projects. With that, working on the following things are super valuable:
 
 ### Verifying Bug Reports
 

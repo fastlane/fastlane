@@ -12,7 +12,7 @@ module Match
         UI.important("You can also run `match` in readonly mode to not require any access to the")
         UI.important("Developer Portal. This way you only share the keys and credentials")
         UI.command("match --readonly")
-        UI.important("More information https://github.com/fastlane/match#access-control")
+        UI.important("More information https://github.com/fastlane/fastlane/tree/master/match#access-control")
       end
 
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
@@ -45,7 +45,7 @@ module Match
       UI.error("for the user #{params[:username]}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
-      UI.user_error!("To reset the certificates of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/match")
+      UI.user_error!("To reset the certificates of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
 
     def profile_exists(params, uuid)
@@ -58,7 +58,7 @@ module Match
       UI.error("for the user #{params[:username]}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by deleting the provisioning profile on the Dev Portal")
-      UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/match")
+      UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
   end
 end

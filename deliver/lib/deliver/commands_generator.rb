@@ -21,7 +21,7 @@ module Deliver
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/deliver'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/deliver'
       program :help_formatter, :compact
 
       FastlaneCore::CommanderGenerator.new.generate(Deliver::Options.available_options)

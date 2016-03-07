@@ -150,7 +150,7 @@ module Sigh
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important "No certificates for filter: #{filters}" if filters.length > 0
-        UI.user_error!("Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/cert)")
+        UI.user_error!("Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/fastlane/tree/master/cert)")
       end
 
       return certificates if Sigh.config[:development] # development profiles support multiple certificates

@@ -34,7 +34,7 @@ module Fastlane
 
       output << "This README.md is auto-generated and will be re-generated every time to run [fastlane](https://fastlane.tools).  "
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools).  "
-      output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane)."
+      output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane)."
 
       File.write(output_path, output.join("\n"))
       UI.success "Successfully generated documentation to path '#{File.expand_path(output_path)}'" if $verbose

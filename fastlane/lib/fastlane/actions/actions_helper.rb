@@ -90,13 +90,13 @@ module Fastlane
             UI.success "Successfully loaded custom action '#{file}'."
           else
             UI.error "Could not find method 'run' in class #{class_name}."
-            UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
+            UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
             UI.user_error!("Action '#{file_name}' is damaged!")
           end
         rescue NameError
           # Action not found
           UI.error "Could not find '#{class_name}' class defined."
-          UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane'
+          UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
           UI.user_error!("Action '#{file_name}' is damaged!")
         end
       end

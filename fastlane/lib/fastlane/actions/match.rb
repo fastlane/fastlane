@@ -36,7 +36,7 @@ module Fastlane
       end
 
       def self.details
-        "More details https://github.com/fastlane/match"
+        "More details https://github.com/fastlane/fastlane/tree/master/match"
       end
 
       def self.available_options

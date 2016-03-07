@@ -22,7 +22,7 @@ module Supply
       program :description, Supply::DESCRIPTION
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/supply'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/supply'
       program :help_formatter, :compact
 
       always_trace!

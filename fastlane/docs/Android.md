@@ -44,7 +44,7 @@ Store your p12 file in a secure place and pass the path to it here
 
 ### Finishing up
 
-You'll be asked if you want to start using [supply](https://github.com/fastlane/supply). Do it if you plan on upload screenshots or binaries to Google Play.
+You'll be asked if you want to start using [supply](https://github.com/fastlane/fastlane/tree/master/supply). Do it if you plan on upload screenshots or binaries to Google Play.
 
 ### Editing the configuration files
 

@@ -29,7 +29,7 @@ For more information about the recommended setup with Jenkins open the [Jenkins 
 
 ### Code signing issues
 
-Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/match).
+Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 ### Multiple targets of the same underlying app
 

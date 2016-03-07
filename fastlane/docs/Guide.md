@@ -32,7 +32,7 @@ If you have not used the command line tools before (which is likely if you just 
 
     sudo xcodebuild -license accept
 
-### [fastlane](https://github.com/fastlane/fastlane)
+### [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
 Install the gem and all its dependencies (this might take a few minutes).
 
@@ -48,18 +48,18 @@ When running the setup commands, please read the instructions shown in the termi
 
     fastlane init
 
-This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/produce) which will create your app on iTunes Connect and the Apple Developer Center, and enable [`sigh`](https://github.com/KrauseFx/sigh) and [`deliver`](https://github.com/KrauseFx/deliver).
+This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/fastlane/tree/master/produce) which will create your app on iTunes Connect and the Apple Developer Center, and enable [`sigh`](https://github.com/KrauseFx/sigh) and [`deliver`](https://github.com/KrauseFx/deliver).
 
 That's it, you should have received a success message.
 
 What did this setup do?
 
 - Created a `fastlane` folder
-- Moved existing [`deliver`](https://github.com/fastlane/deliver) and [`snapshot`](https://github.com/fastlane/snapshot) configuration into the `fastlane` folder (if they existed).
+- Moved existing [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver) and [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot) configuration into the `fastlane` folder (if they existed).
 - Created `fastlane/Appfile`, which stores your *Apple ID* and *Bundle Identifier*.
 - Created `fastlane/Fastfile`, which stores your deployment pipelines.
 
-The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/deliver), [CocoaPods](http://cocoapods.org/)).
+The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver), [CocoaPods](http://cocoapods.org/)).
 
 ### Individual Tools
 
@@ -67,10 +67,10 @@ Before running `fastlane`, make sure, all tools are correctly set up.
 
 For example, try running the following (depending on what you plan on using):
 
-- [deliver](https://github.com/fastlane/deliver)
-- [snapshot](https://github.com/fastlane/snapshot)
-- [sigh](https://github.com/fastlane/sigh)
-- [frameit](https://github.com/fastlane/frameit)
+- [deliver](https://github.com/fastlane/fastlane/tree/master/deliver)
+- [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot)
+- [sigh](https://github.com/fastlane/fastlane/tree/master/sigh)
+- [frameit](https://github.com/fastlane/fastlane/tree/master/frameit)
 
 All those tools have detailed instructions on how to set them up. It's easier to set them up now, than later.
 

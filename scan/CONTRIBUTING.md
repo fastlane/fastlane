@@ -6,9 +6,9 @@ To clone the [fastlane](https://fastlane.tools) repos, use the [countdown](https
 
 Before submitting a new issue, do the following:
 
-- Verify you're running the latest version by running `scan -v` and compare it with the [project page on GitHub](https://github.com/fastlane/scan).
+- Verify you're running the latest version by running `scan -v` and compare it with the [project page on GitHub](https://github.com/fastlane/fastlane/tree/master/scan).
 - Verify you have Xcode tools installed by running `xcode-select --install`.
-- Make sure to read through the [README](https://github.com/fastlane/scan) of the project.
+- Make sure to read through the [README](https://github.com/fastlane/fastlane/tree/master/scan) of the project.
 
 
 When submitting a new issue, please provide the following information:

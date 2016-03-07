@@ -10,7 +10,7 @@ describe Fastlane do
       it "raises an error if unknow method is called" do
         expect do
           Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
-        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/fastlane/fastlane"
+        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
       end
     end
 
@@ -228,7 +228,7 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid, :ios)
-          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/fastlane/fastlane"
+          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
         end
 
         it "raises an exception when not passing a hash" do

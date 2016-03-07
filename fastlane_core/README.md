@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 

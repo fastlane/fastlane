@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="100" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <b>spaceship</b> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -56,7 +56,7 @@ spaceship is a Ruby library that exposes both the Apple Developer Center and the
 
 Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
-Using spaceship, the execution time of [sigh](https://github.com/fastlane/sigh) was reduced from over 1 minute to less than 5 seconds.
+Using spaceship, the execution time of [sigh](https://github.com/fastlane/fastlane/tree/master/sigh) was reduced from over 1 minute to less than 5 seconds.
 
 spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 

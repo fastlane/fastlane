@@ -1,7 +1,7 @@
 describe Match do
   describe Match::Runner do
     it "creates a new profile and certificate if it doesn't exist yet" do
-      git_url = "https://github.com/fastlane/certificates"
+      git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
         app_identifier: "tools.fastlane.app",
         type: "appstore",
@@ -32,7 +32,7 @@ describe Match do
     end
 
     it "uses existing certificates and profiles if they exist" do
-      git_url = "https://github.com/fastlane/certificates"
+      git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
         app_identifier: "tools.fastlane.app",
         type: "appstore",

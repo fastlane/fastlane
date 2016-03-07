@@ -2,7 +2,7 @@
 
 Check out the official `fastlane` code signing guide: [https://codesigning.guide](https://codesigning.guide) for a detailed description on how to setup codesigning in teams.
 
-It is recommended to use [match](https://github.com/fastlane/match) to generate and maintain your certificates and provisioning profiles. 
+It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) to generate and maintain your certificates and provisioning profiles. 
 
 -------------------
 ## Deprecated

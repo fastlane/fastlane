@@ -5,7 +5,7 @@ describe Match do
       @content = "#{Time.now.to_i} so random"
       @full_path = File.join(@directory, "randomFile.mobileprovision")
       File.write(@full_path, @content)
-      @git_url = "https://github.com/fastlane/so_random"
+      @git_url = "https://github.com/fastlane/fastlane/tree/master/so_random"
       allow(Dir).to receive(:mktmpdir).and_return(@directory)
       ENV["MATCH_PASSWORD"] = "my_pass"
 

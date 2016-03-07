@@ -1,4 +1,4 @@
-## [fastlane match](https://github.com/fastlane/match)
+## [fastlane match](https://github.com/fastlane/fastlane/tree/master/match)
 
 This repository contains all your certificates and provisioning profiles needed to build and sign your applications. They are encrypted using OpenSSL via a passphrase.
 
@@ -6,7 +6,7 @@ This repository contains all your certificates and provisioning profiles needed 
 
 Do not modify this file, as it gets overwritten every time you run `match`.
 
-### Install [fastlane match](https://github.com/fastlane/match)
+### Install [fastlane match](https://github.com/fastlane/fastlane/tree/master/match)
 
 ```
 sudo gem install match
@@ -32,7 +32,7 @@ match adhoc
 match development
 ```
 
-For more information open [fastlane match git repo](https://github.com/fastlane/match)
+For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match)
 
 ### Content
 
@@ -46,4 +46,4 @@ This directory contains all provisioning profiles
 
 ------------------------------------
 
-For more information open [fastlane match git repo](https://github.com/fastlane/match)
+For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match)

@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/fastlane/supply"
+        "More information: https://github.com/fastlane/fastlane/tree/master/supply"
       end
 
       def self.available_options

@@ -115,7 +115,7 @@ module Fastlane
       else
         # No action and no lane, raising an exception now
         UI.error caller.join("\n")
-        UI.user_error!("Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/fastlane/fastlane")
+        UI.user_error!("Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
       end
     end
 

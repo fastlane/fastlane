@@ -62,7 +62,7 @@ carthage(
 )
 ```
 
-### [gym](https://github.com/fastlane/gym)
+### [gym](https://github.com/fastlane/fastlane/tree/master/gym)
 
 `gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file.
 
@@ -137,7 +137,7 @@ Add this action to your `appstore` lane. Keep in mind this action might take sev
 verify_xcode
 ```
 
-### [screengrab](https://github.com/fastlane/screengrab)
+### [screengrab](https://github.com/fastlane/fastlane/tree/master/screengrab)
 
 `screengrab` automates taking localized screenshots of your Android app on every device
 
@@ -156,7 +156,7 @@ screengrab(
 )
 ```
 
-### [snapshot](https://github.com/fastlane/snapshot)
+### [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot)
 
 ```ruby
 snapshot
@@ -171,7 +171,7 @@ snapshot(
 )
 ```
 
-Take a look at the [prefilling data guide](https://github.com/fastlane/snapshot#prefilling) on the `snapshot` documentation.
+Take a look at the [prefilling data guide](https://github.com/fastlane/fastlane/tree/master/snapshot#prefilling) on the `snapshot` documentation.
 
 ### clear_derived_data
 
@@ -183,7 +183,7 @@ clear_derived_data
 
 ### ipa
 
-**Note**: This action is deprecated, use [gym](https://github.com/fastlane/gym) instead.
+**Note**: This action is deprecated, use [gym](https://github.com/fastlane/fastlane/tree/master/gym) instead.
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
@@ -291,7 +291,7 @@ If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake
 xcake
 ```
 
-### [resign](https://github.com/fastlane/sigh#resign)
+### [resign](https://github.com/fastlane/fastlane/tree/master/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
 If you have used the `ipa` and `sigh` actions, then this action automatically gets the `ipa` and `provisioning_profile` values respectively from those actions and you don't need to manually set them (although you can always override them).
@@ -398,7 +398,7 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
 
-**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead.
 
 Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md).
 
@@ -488,7 +488,7 @@ More usage examples (assumes the above .env setup is being used):
 
 See how [Wikipedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses the `xctest` action to test their app.
 
-**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/gym) for building your ipa file and [scan](https://github.com/fastlane/scan) for testing your app instead.
+**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead.
 
 ### copy_artifacts
 This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
@@ -520,7 +520,7 @@ clean_build_artifacts
 
 See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) cleans their build artifacts after building and distributing their app.
 
-### [frameit](https://github.com/fastlane/frameit)
+### [frameit](https://github.com/fastlane/fastlane/tree/master/frameit)
 By default, the device color will be black
 ```ruby
 frameit
@@ -575,7 +575,7 @@ recreate_schemes(
 
 ## Testing
 
-### [scan](https://github.com/fastlane/scan)
+### [scan](https://github.com/fastlane/fastlane/tree/master/scan)
 
 `scan` makes it super easy to run tests of your iOS and Mac applications
 
@@ -758,16 +758,16 @@ appium(
 
 ## Deploying
 
-### [pilot](https://github.com/fastlane/pilot)
+### [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
 
 ```ruby
 pilot(username: "felix@krausefx.com",
       app_identifier: "com.krausefx.app")
 ```
 
-More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/pilot).
+More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/fastlane/tree/master/pilot).
 
-### [deliver](https://github.com/fastlane/deliver)
+### [deliver](https://github.com/fastlane/fastlane/tree/master/deliver)
 ```ruby
 deliver
 ```
@@ -797,7 +797,7 @@ To upload a new binary to Apple TestFlight use the `testflight` action:
 testflight
 ```
 
-This will use [deliver](https://github.com/fastlane/deliver) under the hood.
+This will use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) under the hood.
 
 Additionally you can skip the submission of the new binary to the testers to only upload the build:
 
@@ -1248,20 +1248,20 @@ badge(shield: "Version-0.0.3-blue", no_badge: true)
 
 ## Developer Portal
 
-### [match](https://github.com/fastlane/match)
+### [match](https://github.com/fastlane/fastlane/tree/master/match)
 
-Check out [codesigning.guide](https://codesigning.guide) for more information about the concept of [match](https://github.com/fastlane/match).
+Check out [codesigning.guide](https://codesigning.guide) for more information about the concept of [match](https://github.com/fastlane/fastlane/tree/master/match).
 
-`match` allows you to easily sync your certificates and profiles across your team using git. More information on [GitHub](https://github.com/fastlane/match).
+`match` allows you to easily sync your certificates and profiles across your team using git. More information on [GitHub](https://github.com/fastlane/fastlane/tree/master/match).
 
 ```ruby
 match(type: "appstore", app_identifier: "tools.fastlane.app")
 match(type: "development", readonly: true)
 ```
 
-### [sigh](https://github.com/fastlane/sigh)
+### [sigh](https://github.com/fastlane/fastlane/tree/master/sigh)
 
-**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
 
 This will generate and download your App Store provisioning profile. `sigh` will store the generated profile in the current folder.
 
@@ -1281,7 +1281,7 @@ sigh(
 
 See how [Wikpedia](https://github.com/fastlane/examples/blob/master/Wikipedia/Fastfile) uses `sigh` to automatically retrieve the latest provisioning profile.
 
-### [PEM](https://github.com/fastlane/PEM)
+### [PEM](https://github.com/fastlane/fastlane/tree/master/PEM)
 
 This will generate a new push profile if necessary (the old one is about to expire).
 
@@ -1307,11 +1307,11 @@ Use the `fastlane action pem` command to view all available options.
 
 [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) uses `PEM` to automatically create a new push profile for Parse.com if necessary before a release.
 
-### [cert](https://github.com/fastlane/cert)
+### [cert](https://github.com/fastlane/fastlane/tree/master/cert)
 
-**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
 
-The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/fastlane/cert).
+The `cert` action can be used to make sure to have the latest signing certificate installed. More information on the [`cert` project page](https://github.com/fastlane/fastlane/tree/master/cert).
 
 ```ruby
 cert
@@ -1328,7 +1328,7 @@ cert(
 )
 ```
 
-### [produce](https://github.com/fastlane/produce)
+### [produce](https://github.com/fastlane/fastlane/tree/master/produce)
 
 Create new apps on iTunes Connect and Apple Developer Portal. If the app already exists, `produce` will not do anything.
 
@@ -2054,7 +2054,7 @@ say "I can speak"
 You can store a string in the clipboard running
 
 ```ruby
-clipboard(value: "https://github.com/fastlane/fastlane")
+clipboard(value: "https://github.com/fastlane/fastlane/tree/master/fastlane")
 ```
 
 This can be used to store some generated URL or value for easy copy & paste (e.g. the download link):

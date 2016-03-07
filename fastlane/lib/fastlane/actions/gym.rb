@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/fastlane/gym"
+        "More information: https://github.com/fastlane/fastlane/tree/master/gym"
       end
 
       def self.return_value

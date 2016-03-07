@@ -10,7 +10,7 @@ module Gym
         when /Your build settings specify a provisioning profile with the UUID/
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile which doesn't exist on your local machine"
-          print "You can use sigh (https://github.com/fastlane/sigh) to download and install the provisioning profile"
+          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
           print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
         when /Provisioning profile does not match bundle identifier/
           print "Invalid code signing settings"
@@ -21,12 +21,12 @@ module Gym
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print "You don't have the provisioning profile for '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
-          print "You can use sigh (https://github.com/fastlane/sigh) to download and install the provisioning profile"
+          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
           print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
         when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
           print "You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
-          print "You can use sigh (https://github.com/fastlane/sigh) to download and install the provisioning profile"
+          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
           print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
 
         # Insert more code signing specific errors here

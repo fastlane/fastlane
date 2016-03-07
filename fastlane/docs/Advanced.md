@@ -130,7 +130,7 @@ Import from another git repository, which you can use to have one git repo with 
 
 
 ```ruby
-import_from_git(url: 'https://github.com/fastlane/fastlane')
+import_from_git(url: 'https://github.com/fastlane/fastlane/tree/master/fastlane')
 # or
 import_from_git(url: 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git',
                path: 'fastlane/Fastfile')
@@ -246,7 +246,7 @@ You can set the environment variable `FASTLANE_SKIP_UPDATE_CHECK` to skip the up
 
 ## Adding Credentials
 
-You can add credentials for use by `fastlane` to your keychain using the [CredentialsManager](https://github.com/fastlane/credentials_manager) command line interface. This is useful for situations like CI environments.
+You can add credentials for use by `fastlane` to your keychain using the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) command line interface. This is useful for situations like CI environments.
 
 **Adding a Credential**
 ```

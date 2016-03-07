@@ -31,7 +31,7 @@ module Fastlane
 
       def self.details
         [
-          "More details can be found on https://github.com/fastlane/pilot",
+          "More details can be found on https://github.com/fastlane/fastlane/tree/master/pilot",
           "This integration will only do the TestFlight upload"
         ].join("\n")
       end

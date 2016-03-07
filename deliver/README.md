@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
@@ -7,18 +7,18 @@
 </h3>
 <p align="center">
   <b>deliver</b> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -62,7 +62,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
 - Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
 
-To upload builds to TestFlight check out [pilot](https://github.com/fastlane/pilot).
+To upload builds to TestFlight check out [pilot](https://github.com/fastlane/fastlane/tree/master/pilot).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -145,36 +145,36 @@ Already using `deliver` and just updated to 1.0? Check out the [Migration Guide]
 
 # Credentials
 
-A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/credentials_manager).
+A detailed description about your credentials is available on a [separate repo](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
 
 ### How does this thing even work? Is magic involved? 🎩###
 
-Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/credentials_manager))
+Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 
 Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data. 
 
 `deliver` uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to upload the binary to iTunes Connect. iTMSTransporter is a command line tool provided by Apple.
-- For all metadata related actions `deliver` uses [spaceship](https://github.com/fastlane/spaceship)
+- For all metadata related actions `deliver` uses [spaceship](https://github.com/fastlane/fastlane/tree/master/spaceship)
 
 # Tips
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/fastlane/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
+- [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
+- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
-- [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
-- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
-- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
+- [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
+- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -230,7 +230,7 @@ In this case, default values for keywords, urls, name and release notes are used
 
 ## Automatically create screenshots
 
-If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/snapshot), check out [fastlane](https://fastlane.tools)!
+If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
 Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md).

@@ -33,7 +33,7 @@ module Fastlane
       def details
         [
           'For more information about produce, visit its GitHub page:',
-          'https://github.com/fastlane/produce'
+          'https://github.com/fastlane/fastlane/tree/master/produce'
         ].join(' ')
       end
 

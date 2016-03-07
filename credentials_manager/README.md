@@ -6,7 +6,7 @@ CredentialsManager
 All code related to your username and password can be found here: [account_manager.rb](https://github.com/fastlane/CredentialsManager/blob/master/lib/credentials_manager/account_manager.rb)
 
 ## Usage
-Along with the [Ruby libraries](https://github.com/fastlane/credentials_manager#implementing-a-custom-solution) you can use the command line interface to add credentials to the keychain.
+Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master/credentials_manager#implementing-a-custom-solution) you can use the command line interface to add credentials to the keychain.
 
 **Adding Credentials**
 ```

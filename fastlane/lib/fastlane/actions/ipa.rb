@@ -73,7 +73,7 @@ module Fastlane
           Helper.log.info "You are using legacy `shenzhen` to build your app".yellow
           Helper.log.info "It is recommended to upgrade to `gym`".yellow
           Helper.log.info "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile".yellow
-          Helper.log.info "https://github.com/fastlane/gym".yellow
+          Helper.log.info "https://github.com/fastlane/fastlane/tree/master/gym".yellow
         rescue => ex
           [
             "-------------------------------------------------------",
@@ -81,7 +81,7 @@ module Fastlane
             " => " + ex.to_s,
             "A build error occured. You are using legacy `shenzhen` for building",
             "it is recommended to upgrade to `gym`: ",
-            "https://github.com/fastlane/gym",
+            "https://github.com/fastlane/fastlane/tree/master/gym",
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|

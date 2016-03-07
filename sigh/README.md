@@ -1,24 +1,24 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
   <b>sigh</b> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
 -------
 
@@ -66,7 +66,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Support for **multiple Teams**
 - Support for **Enterprise Profiles**
 
-To automate iOS Push profiles you can use [PEM](https://github.com/fastlane/PEM).
+To automate iOS Push profiles you can use [PEM](https://github.com/fastlane/fastlane/tree/master/PEM).
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -83,7 +83,7 @@ See ```sigh``` in action:
 
 # Installation
 
-**Note**: It is recommended to use [match](https://github.com/fastlane/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
 
     sudo gem install sigh
 
@@ -149,9 +149,9 @@ For a list of available parameters and commands run
     sigh --help
 
 
-### Use with [`fastlane`](https://github.com/fastlane/fastlane)
+### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
-`sigh` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane) in combination with [`cert`](https://github.com/fastlane/cert).
+`sigh` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [`cert`](https://github.com/fastlane/fastlane/tree/master/cert).
 
 Update your `Fastfile` to contain the following code:
 
@@ -204,7 +204,7 @@ Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
 Run `sigh --help` to get a list of all available environment variables.
 
-If you're using [cert](https://github.com/fastlane/cert) in combination with [fastlane](https://github.com/fastlane/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
+If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in combination with [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
 
 # How does it work?
 
@@ -212,24 +212,24 @@ If you're using [cert](https://github.com/fastlane/cert) in combination with [fa
 
 
 ## How is my password stored?
-`sigh` uses the [CredentialsManager](https://github.com/fastlane/credentials_manager) from `fastlane`.
+`sigh` uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
-- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
+- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
-- [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
-- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
-- [`match`](https://github.com/fastlane/match): Easily sync your certificates and profiles across your team using git
+- [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
+- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -241,7 +241,7 @@ It will show you the `mobileprovision` files like this:
 
 ## App Identifier couldn't be found
 
-If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/produce), which does exactly that.
+If you also want to create a new App Identifier on the Apple Developer Portal, check out [produce](https://github.com/fastlane/fastlane/tree/master/produce), which does exactly that.
 
 ## What happens to my Xcode managed profiles?
 

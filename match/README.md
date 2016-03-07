@@ -1,23 +1,23 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane">
+  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
     <img src="assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/sigh">sigh</a> &bull; 
-  <a href="https://github.com/fastlane/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/pilot">pilot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/scan">scan</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <b>match</b>
 </p>
 -------
@@ -85,7 +85,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 :recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 :busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
-:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/gym) and other build tools 
+:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools 
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -122,7 +122,7 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby
-git_url "https://github.com/fastlane/certificates"
+git_url "https://github.com/fastlane/fastlane/tree/master/certificates"
 
 app_identifier "tools.fastlane.app" 
 username "user@fastlane.tools"
@@ -172,7 +172,7 @@ match appstore -a tools.fastlane.app
 match appstore -a tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane) by creating a match lane like this:
+You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a match lane like this:
 
 ```
 lane :match do
@@ -237,10 +237,10 @@ Add `match` to your `Fastfile` to automatically fetch the latest code signing ce
 ```ruby
 match(type: "appstore")
 
-match(git_url: "https://github.com/fastlane/certificates", 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates", 
       type: "development")
 
-match(git_url: "https://github.com/fastlane/certificates", 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates", 
       type: "adhoc", 
       app_identifier: "tools.fastlane.app")
 
@@ -369,22 +369,22 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
 - `match` does not currently support In-House Enterprise profiles as they are harder to control
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
-- The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/match)
+- The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/fastlane/tree/master/match)
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
-- [`deliver`](https://github.com/fastlane/deliver): Upload screenshots, metadata and your app to the App Store
-- [`snapshot`](https://github.com/fastlane/snapshot): Automate taking localized screenshots of your iOS app on every device
-- [`frameit`](https://github.com/fastlane/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/pem): Automatically generate and renew your push notification profiles
-- [`produce`](https://github.com/fastlane/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/fastlane/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/pilot): The best way to manage your TestFlight testers and builds from your terminal
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
+- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
-- [`gym`](https://github.com/fastlane/gym): Building your iOS apps has never been easier
-- [`scan`](https://github.com/fastlane/scan): The easiest way to run tests of your iOS and Mac app
+- [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
