@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "F106A2AEA4B7C56AA502AA3410AF6D66ABD0F8EB",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F106A2AEA4B7C56AA502AA3410AF6D66ABD0F8EB" : 0,
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B7759E5D-2F4F-466E-9DA8-7EA795AB8A2A",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F106A2AEA4B7C56AA502AA3410AF6D66ABD0F8EB" : "scan\/",
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Mac",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "examples\/Mac\/Mac.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/countdown",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/cry",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F106A2AEA4B7C56AA502AA3410AF6D66ABD0F8EB"
+    }
+  ]
+}

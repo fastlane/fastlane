@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adaa2a7838c2a72e48312e0bcf2bccf2c74ca7a6
 =======
@@ -184,6 +185,10 @@ fastlane/report.xml
 .DS_Store
 Gemfile.lock
 /coverage/
+=======
+.DS_Store
+Gemfile.lock
+>>>>>>> 835f6e89ac3eafddcf0c4e1c9809409e97518c4f
 *UserInterfaceState.xcuserstate
 pkg
 **/Example.app.dSYM.zip
@@ -197,6 +202,7 @@ ExampleProductName.ipa
 ExampleProductName.app.dSYM.zip
 **/*.dSYM.zip
 **/*.app
+<<<<<<< HEAD
 >>>>>>> 8e58992ce630ed2a2b35ff026a76e6ba9c2c58aa
 =======
 Gemfile.lock
@@ -207,3 +213,8 @@ fastlane/report.xml
 Gemfile.lock
 fastlane/report.xml
 >>>>>>> 4dc80da87bd7f00959d5a48508f3ee5b77e13724
+=======
+
+examples/*/test_output/*
+/coverage/
+>>>>>>> 835f6e89ac3eafddcf0c4e1c9809409e97518c4f
