@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,7 +30,7 @@ match
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
 [![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
@@ -40,10 +40,10 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 -------
 <p align="center">
-    <a href="#why-match">Why?</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#is-this-secure">Is this secure?</a> &bull; 
+    <a href="#why-match">Why?</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#is-this-secure">Is this secure?</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -53,7 +53,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 ## Why match?
 
-Before starting to use `match`, make sure to read the [codesigning.guide](https://codesigning.guide) 
+Before starting to use `match`, make sure to read the [codesigning.guide](https://codesigning.guide)
 
 > When deploying an app to the App Store, beta testing service or even installing it on a device, most development teams have separate code signing identities for every member. This results in dozens of profiles including a lot of duplicates.
 
@@ -85,7 +85,7 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 :recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 :busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
-:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools 
+:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -117,14 +117,14 @@ match init
 
 You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
 
-This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder). 
+This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby
 git_url "https://github.com/fastlane/fastlane/tree/master/certificates"
 
-app_identifier "tools.fastlane.app" 
+app_identifier "tools.fastlane.app"
 username "user@fastlane.tools"
 ```
 
@@ -198,7 +198,7 @@ To set up the certificates and provisioning profiles on a new machine, you just 
 match development
 ```
 
-You can also run `match` in a `readonly` mode to be sure it won't create any new certificates or profiles. 
+You can also run `match` in a `readonly` mode to be sure it won't create any new certificates or profiles.
 
 ```
 match development --readonly
@@ -237,11 +237,11 @@ Add `match` to your `Fastfile` to automatically fetch the latest code signing ce
 ```ruby
 match(type: "appstore")
 
-match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates", 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
       type: "development")
 
-match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates", 
-      type: "adhoc", 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+      type: "adhoc",
       app_identifier: "tools.fastlane.app")
 
 # `match` should be called before building the app with `gym`
@@ -268,7 +268,7 @@ Additionally it is recommended to disable the `Fix Issue` button using the [FixC
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
-`match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project. 
+`match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
 <img src="assets/UDIDPrint.png" width="700" />
 
@@ -282,14 +282,14 @@ e.g. `$(sigh_tools.fastlane.app_development)`
 
 #### To build from Xcode manually
 
-This is useful when installing your application on your device using the Development profile. 
+This is useful when installing your application on your device using the Development profile.
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
 ### Continuous Integration
 
 #### Repo access
-There is one tricky part of setting up a CI system to work with `match`, which is enabling the CI to access the repo. Usually you'd just add your CI's public ssh key as a deploy key to your `match` repo, but since your CI will already likely be using its public ssh key to access the codebase repo, [you won't be able to do that](https://help.github.com/articles/error-key-already-in-use/). 
+There is one tricky part of setting up a CI system to work with `match`, which is enabling the CI to access the repo. Usually you'd just add your CI's public ssh key as a deploy key to your `match` repo, but since your CI will already likely be using its public ssh key to access the codebase repo, [you won't be able to do that](https://help.github.com/articles/error-key-already-in-use/).
 
 Some repo hosts might allow you to use the same deploy key for different repos, but GitHub will not. If your host does, you don't need to worry about this, just add your CI's public ssh key as a deploy key for your `match` repo and scroll down to "_Encryption password_".
 
@@ -298,7 +298,7 @@ There are a few ways around this:
 1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
 2. Some CIs allow you to upload your signing credientials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
 
-Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials. 
+Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.
 
 #### Encryption password
 Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. Match will pick this up when it's run.
@@ -341,11 +341,11 @@ openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decr
 
 Both your keys and provisioning profiles are encrypted using OpenSSL using a passphrase.
 
-Storing your private keys in a Git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions: 
+Storing your private keys in a Git repo may sound off-putting at first. We did an in-depth analysis of potential security issues and came to the following conclusions:
 
 #### What could happen if someone stole a private key?
 
-If attackers would have your certificate and provisioning profile, they could codesign an application with the same bundle identifier. 
+If attackers would have your certificate and provisioning profile, they could codesign an application with the same bundle identifier.
 
 What's the worst that could happen for each of the profile types?
 
@@ -355,7 +355,7 @@ An App Store profile can't be used for anything as long as it's not re-signed by
 
 ##### Development and Ad Hoc Profiles
 
-In general those profiles are harmless as they can only be used to install a signed application on a small subset of devices. To add new devices, the attacker would also need your Apple Developer Portal credentials (which are not stored in git, but in your local keychain). 
+In general those profiles are harmless as they can only be used to install a signed application on a small subset of devices. To add new devices, the attacker would also need your Apple Developer Portal credentials (which are not stored in git, but in your local keychain).
 
 ##### Enterprise Profiles
 
@@ -382,7 +382,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 

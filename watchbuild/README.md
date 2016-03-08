@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -26,7 +26,7 @@ WatchBuild
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/watchbuild/LICENSE)
 [![Gem](https://img.shields.io/gem/v/watchbuild.svg?style=flat)](http://rubygems.org/gems/watchbuild)
 
 ###### Get a notification once your iTunes Connect build is finished processing
@@ -37,13 +37,13 @@ When you upload a new binary from Xcode to iTunes Connect, you have to wait unti
 
 As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) varies from a few minutes to multiple hours, it's easy to forget to check iTunes Connect to see if the build is ready. WatchBuild lets you know as soon as it is done.
 
-WatchBuild is a simple standalone tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect. 
+WatchBuild is a simple standalone tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect.
 
 Once the build is ready to be pushed to TestFlight or for review, you get a OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
 
 ### Why use WatchBuild?
 
-WatchBuild is a standalone tool and can be used without any of the other [fastlane tools](https://fastlane.tools). This is *big*, since you can use WatchBuild also if you use Xcode to upload your app. 
+WatchBuild is a standalone tool and can be used without any of the other [fastlane tools](https://fastlane.tools). This is *big*, since you can use WatchBuild also if you use Xcode to upload your app.
 
 This tool is not a replacement for [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) (Upload metadata and builds to iTunes Connect) or [pilot](https://github.com/fastlane/fastlane/tree/master/pilot) (Upload and distribute new builds to TestFlight), but is meant as a small helpful utility with the main purpose to wait for the binary processing to be finished.
 
@@ -51,9 +51,9 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -83,7 +83,7 @@ For a list of available parameters and commands run
 
 ## How is my password stored?
 
-`WatchBuild` uses the secure [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from [fastlane](https://fastlane.tools) that stores credentials in your local keychain. 
+`WatchBuild` uses the secure [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from [fastlane](https://fastlane.tools) that stores credentials in your local keychain.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
@@ -98,7 +98,7 @@ For a list of available parameters and commands run
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
