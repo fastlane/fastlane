@@ -282,7 +282,7 @@ Basically you can run
 snapshot update
 ```
 
-to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift).
+to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift).
 
 ## Launch Arguments
 
