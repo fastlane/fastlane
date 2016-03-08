@@ -18,7 +18,7 @@ module Match
     end
 
     def self.environment_variable_name(params)
-      ["sigh", params[:app_identifier], params[:type]].join("_")
+      ["sigh", params[:app_identifier], params[:type], params[:platform]].join("_")
     end
   end
 end

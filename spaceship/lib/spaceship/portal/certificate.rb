@@ -241,29 +241,46 @@ module Spaceship
           klass.new(attrs)
         end
 
+        # <b>DEPRECATED:</b> Use <tt>all_by_platform</tt> instead.
         # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
         def all(mac: false)
+          Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
+          all_by_platform(platform: mac ? 'mac' : 'ios')
+        end
+
+        # @param platform [String] Fetches platform certificates. (Ignored if called from a subclass)
+        # @return (Array) Returns all certificates of this account.
+        #  If this is called from a subclass of Certificate, this will
+        #  only include certificates matching the current type.
+        def all_by_platform(platform: 'ios')
           if self == Certificate # are we the base-class?
-            type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = platform == 'mac' ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
-            types += OLDER_IOS_CERTIFICATE_TYPES unless mac
+            types += OLDER_IOS_CERTIFICATE_TYPES unless platform == 'mac'
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
-            mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
           end
 
-          client.certificates(types, mac: mac).map do |cert|
+          client.certificates_by_platform(types, platform: platform).map do |cert|
             factory(cert)
           end
         end
 
+        # <b>DEPRECATED:</b> Use <tt>find_by_platform</tt> instead.
         # @param mac [Bool] Searches Mac certificates if true
         # @return (Certificate) Find a certificate based on the ID of the certificate.
         def find(certificate_id, mac: false)
-          all(mac: mac).find do |c|
+          Helper.log.warn '`find` is deprecated. Please use `find_by_platform` instead.'.red
+          find_by_platform(certificate_id, platform: mac ? 'mac' : 'ios')
+        end
+
+        # @param platform [String] Platform to search for
+        # @return (Certificate) Find a certificate based on the ID of the certificate.
+        def find_by_platform(certificate_id, platform: 'ios')
+          all_by_platform(platform: platform).detect do |c|
             c.id == certificate_id
           end
         end
@@ -306,7 +323,7 @@ module Spaceship
 
       # @return (String) Download the raw data of the certificate without parsing
       def download_raw
-        client.download_certificate(id, type_display_id, mac: mac?)
+        client.download_certificate_by_platform(id, type_display_id, platform: mac? ? 'mac' : 'ios')
       end
 
       # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate
@@ -316,7 +333,7 @@ module Spaceship
 
       # Revoke the certificate. You shouldn't use this method probably.
       def revoke!
-        client.revoke_certificate!(id, type_display_id, mac: mac?)
+        client.revoke_certificate_by_platform!(id, type_display_id, platform: mac? ? 'mac' : 'ios')
       end
 
       # @return (Bool): Is this certificate a push profile for apps?
