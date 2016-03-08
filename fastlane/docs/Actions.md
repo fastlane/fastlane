@@ -2355,3 +2355,17 @@ rsync(
   destination: "/tmp/local_file.txt"
 )
 ```
+
+### ifttt
+
+Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this `fastlane` action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc.
+
+```ruby
+ifttt(
+  api_key: "...",
+  event_name: "...",
+  value1: "foo",
+  value2: "bar",
+  value3: "baz"
+)
+```
