@@ -89,7 +89,7 @@ app_review_information(
 ```
 
 ##### submission_information 
-Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_submission.rb#L18-L69).
+Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb#L18-L69).
 
 ```ruby
 submission_information({
