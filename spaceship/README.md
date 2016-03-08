@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="assets/fastlane.png" width="100" />
+    <img src="../fastlane/assets/fastlane.png" width="100" />
     <br />
     fastlane
   </a>
