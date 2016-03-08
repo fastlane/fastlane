@@ -36,7 +36,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
     <a href="#installation">Installation</a> &bull;
     <a href="#quick-start">Quick Start</a> &bull;
     <a href="#examples">Example Setups</a> &bull;
-    <a href="https://github.com/fastlane/fastlane/tree/master/docs">Documentation</a> &bull;
+    <a href="https://github.com/fastlane/fastlane/tree/master/fastlane/docs">Documentation</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -128,7 +128,7 @@ The setup assistant will create all the necessary files for you, using the exist
 - Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
 
-For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/docs).
+For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
 
 There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
