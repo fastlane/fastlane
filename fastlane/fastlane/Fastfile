@@ -57,10 +57,18 @@ lane :release do |options|
   git_pull
   push_to_git_remote
 
+  # Preparing GitHub Tag in fastlane repo
+  add_git_tag(tag: "#{tool_name}/#{version}")
+  push_git_tags
+
   # Preparing GitHub Release
   #
   github_release = get_github_release(url: github_url(tool: tool_name), version: version)
   if (github_release || {}).fetch('body', '').length == 0
+    print_release_changelog(tool: tool_name, old_version: old_version)
+
+    # For now, continue to open the git comparison from the old repository, so that we can
+    # catch any changes that were made before the mono-repo change (eventually remove this)
     `open https://github.com/#{github_url(tool: tool_name)}/compare/#{old_version}...master`
 
     title = prompt(text: 'Title: ')
@@ -167,4 +175,13 @@ desc "Get a reference to the module of this tool"
 desc "This method can be overwritten by the individual Fastfiles of the tools (e.g. PEM)"
 private_lane :module_ref do |options|
   Object.const_get(options[:tool_name].split('_').collect(&:capitalize).join)
+end
+
+desc "Print out the changelog since the last tagged release"
+private_lane :print_release_changelog do |options|
+  tool_name = options[:tool]
+  old_version = options[:old_version]
+
+  cmd = "git log --pretty='* %B' #{tool_name}/#{old_version}...HEAD --no-merges .."
+  puts "Changes since release #{old_version}:\n" + `#{cmd}`.gsub("\n\n", "\n")
 end
