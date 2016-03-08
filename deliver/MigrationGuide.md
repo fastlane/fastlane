@@ -6,7 +6,7 @@ Originally `deliver` was designed to be "The Continuous Delivery tool for iOS". 
 
 ### What do I have to do to get my setup working again?
 
-In general, check out the latest documentation for the [Deliverfile](https://github.com/fastlane/deliver/blob/master/Deliverfile.md).
+In general, check out the latest documentation for the [Deliverfile](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md).
 
 With 1.0 the app will not be submitted to Review by default. You can use the `deliver --submit_for_review` to submit after the upload.
 
@@ -43,8 +43,8 @@ From     | To              | Note
 `title`  | `name` | requires `name({ "en-US" => "App name" })`
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
-`ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/fastlane/deliver/blob/master/Deliverfile.md#app_rating_config_path)
-`submit_further_information` | `submission_information` | [New Format](https://github.com/fastlane/deliver/blob/master/Deliverfile.md#submission_information)
+`ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md#app_rating_config_path)
+`submit_further_information` | `submission_information` | [New Format](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md#submission_information)
 
 **The following commands have been removed:**
 
@@ -57,9 +57,9 @@ Removed                   | Use instead
 
 Changed                   | &nbsp;
 --------------------------|------------------------
-Language Codes | [Reference.md](https://github.com/fastlane/deliver/blob/master/Reference.md)
-Age Rating | [Reference.md](https://github.com/fastlane/deliver/blob/master/Reference.md)
-App Categories | [Reference.md](https://github.com/fastlane/deliver/blob/master/Reference.md)
+Language Codes | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
+Age Rating | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
+App Categories | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
 
 ### What's different now? :recycle: 
 
