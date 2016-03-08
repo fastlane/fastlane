@@ -233,7 +233,7 @@ In this case, default values for keywords, urls, name and release notes are used
 If you want to integrate `deliver` with [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
-Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md).
+Detailed instructions about how to set up `deliver` and `fastlane` in `Jenkins` can be found in the [fastlane README](https://github.com/fastlane/fastlane/blob/master/docs/Jenkins.md).
 
 ## Firewall Issues
 
