@@ -238,7 +238,7 @@ actions_path '../custom_actions_folder/'
 
 ## The Appfile
 
-The documentation was moved to [Appfile.md](https://github.com/fastlane/fastlane/blob/master/docs/Appfile.md).
+The documentation was moved to [Appfile.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md).
 
 ## Skip update check when launching `fastlane`
 
@@ -263,4 +263,4 @@ password has been deleted.
 
 ## Gitignore
 
-The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md).
+The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md).
