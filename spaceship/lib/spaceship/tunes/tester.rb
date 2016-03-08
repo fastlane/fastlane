@@ -87,14 +87,16 @@ module Spaceship
         # @param email (String) (required): The email of the new tester
         # @param first_name (String) (optional): The first name of the new tester
         # @param last_name (String) (optional): The last name of the new tester
+        # @param app_id (String) (optional): The numeric apple id of the application.
         # @example
-        #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett")
+        #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett", app_id:"12345467")
         # @return (Tester): The newly created tester
-        def create!(email: nil, first_name: nil, last_name: nil)
+        def create!(email: nil, first_name: nil, last_name: nil, app_id: nil)
           data = client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
-                                    last_name: last_name)
+                                    last_name: last_name,
+                                       app_id: app_id)
           self.factory(data)
         end
 
@@ -105,7 +107,11 @@ module Spaceship
         # @return (Array) Returns all beta testers available for this account filtered by app
         # @param app_id (String) (required): The app id to filter the testers
         def all_by_app(app_id)
-          client.testers_by_app(self, app_id).map { |tester| self.factory(tester) }
+          if app_id
+            client.testers_by_app(self, app_id).map { |tester| self.factory(tester) }
+          else
+            all
+          end
         end
 
         # @return (Spaceship::Tunes::Tester) Returns the tester matching the parameter
@@ -113,8 +119,12 @@ module Spaceship
         # @param app_id (String) (required): The app id to filter the testers
         # @param identifier (String) (required): Value used to filter the tester, case insensitive
         def find_by_app(app_id, identifier)
-          all_by_app(app_id).find do |tester|
-            (tester.tester_id.to_s.casecmp(identifier.to_s).zero? or tester.email.to_s.casecmp(identifier.to_s).zero?)
+          if app_id
+            all_by_app(app_id).detect do |tester|
+              (tester.tester_id.to_s.casecmp(identifier.to_s).zero? or tester.email.to_s.casecmp(identifier.to_s).zero?)
+            end
+          else
+            find(identifier)
           end
         end
 
@@ -149,6 +159,7 @@ module Spaceship
             index: "ra/users/pre/ext",
             index_by_app: "ra/user/externalTesters/#{app_id}/",
             create: "ra/users/pre/create",
+            create_by_app: "ra/user/externalTesters/#{app_id}/",
             delete: "ra/users/pre/ext/delete",
             update_by_app: "ra/user/externalTesters/#{app_id}/"
           }

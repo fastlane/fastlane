@@ -55,5 +55,18 @@ module Pilot
       result ||= ask("Please enter the app's bundle identifier: ")
       return result
     end
+
+    # Perform the app_id lookup based solely on the passed parameters
+    # nil if app_id is not configured.
+    def find_app_id_no_prompt
+      return @apple_id if @apple_id
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      if app_filter
+        @app = Spaceship::Application.find(app_filter)
+        raise "Couldn't find app with '#{app_filter}'" unless @app
+        @apple_id = @app.apple_id
+        return @apple_id
+      end
+    end
   end
 end
