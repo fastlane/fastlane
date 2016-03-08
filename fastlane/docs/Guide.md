@@ -48,7 +48,7 @@ When running the setup commands, please read the instructions shown in the termi
 
     fastlane init
 
-This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/fastlane/tree/master/produce) which will create your app on iTunes Connect and the Apple Developer Center, and enable [`sigh`](https://github.com/KrauseFx/sigh) and [`deliver`](https://github.com/KrauseFx/deliver).
+This will prompt you for your _Apple ID_ in order run [`produce`](https://github.com/fastlane/fastlane/tree/master/produce) which will create your app on iTunes Connect and the Apple Developer Center, and enable [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver).
 
 That's it, you should have received a success message.
 
@@ -59,7 +59,7 @@ What did this setup do?
 - Created `fastlane/Appfile`, which stores your *Apple ID* and *Bundle Identifier*.
 - Created `fastlane/Fastfile`, which stores your deployment pipelines.
 
-The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver), [CocoaPods](http://cocoapods.org/)).
+The setup automatically detects, which tools you're using (e.g. [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver), [CocoaPods](https://cocoapods.org/)).
 
 ### Individual Tools
 
@@ -144,7 +144,7 @@ This will execute your existing build script. Everything inside the `"` will be 
 
 ### Create your own actions (build steps)
 
-If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [fastlane new_action](https://github.com/fastlane/fastlane/blob/master/docs/README.md#extensions).
+If you want a fancy command (like `snapshot` has), you can build your own extension very easily using [fastlane new_action](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/README.md#extensions).
 
 # Example projects
 
