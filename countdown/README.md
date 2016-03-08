@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/assets/fastlane_text.png" width=400 />
+    <img src="../fastlane/assets/fastlane.png" />
     <br />
     countdown
   </a>
