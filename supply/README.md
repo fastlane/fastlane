@@ -195,7 +195,7 @@ You can add changelog files under the `changelogs/` directory for each locale. T
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `supply` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `supply` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
