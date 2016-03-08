@@ -278,7 +278,7 @@ If your password contains special characters, `pilot` may throw a confusing erro
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
