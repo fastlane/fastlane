@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <b>frameit</b> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <b>frameit</b> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,9 +30,9 @@ frameit
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/frameit/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
-[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Quickly put your screenshots into the right device frames
 
@@ -41,10 +41,10 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -101,7 +101,7 @@ You only have to do this once per computer.
 - Press ```Enter```
 - Unzip and move the content of the zip files to ```~/.frameit/devices_frames```
 - Press ```Enter```
-  
+
 # Usage
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
@@ -113,7 +113,7 @@ Just navigate to your folder of screenshots and use the following command:
 To use the silver version of the frames:
 
     frameit silver
-    
+
 To run the setup process again to add new frames use:
 
     frameit setup
@@ -239,7 +239,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
@@ -277,7 +277,7 @@ brew install imagemagick
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `frameit` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `frameit` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

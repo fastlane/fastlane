@@ -30,7 +30,7 @@ screengrab
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/screengrab/LICENSE)
 [![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
 
 ###### Automated localized screenshots of your Android app on every device
@@ -164,7 +164,7 @@ Please submit an issue on GitHub and provide information about your setup.
 
 ## Code of Conduct
 
-Help us keep `screengrab` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `screengrab` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

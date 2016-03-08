@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -26,9 +26,9 @@ FastlaneCore
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane_core/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane_core.svg?style=flat)](http://rubygems.org/gems/fastlane_core)
-[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 All shared code of the fastlane tools is stored in this repository.
 
@@ -47,7 +47,7 @@ This gem contains all shared classes and code:
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

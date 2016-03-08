@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <b>spaceship</b> &bull;
@@ -28,10 +28,10 @@
 -------
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/spaceship/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/fastlane/spaceship/badge.svg?branch=master&t=ldL8gg)](https://coveralls.io/r/fastlane/spaceship?branch=master)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
-[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 
 Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/KrauseFx) and [@snatchev](https://twitter.com/snatchev)
@@ -189,7 +189,7 @@ The initial release was sponsored by [ZeroPush](https://zeropush.com).
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

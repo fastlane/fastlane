@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <b>pem</b> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <b>pem</b> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,12 +30,12 @@ pem
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pem/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
 
-Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server? 
+Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server?
 
 `pem` does all that for, just by running `pem`.
 
@@ -45,11 +45,11 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#how-does-it-work">How does it work?</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -85,7 +85,7 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```pem``` will never revoke your existing certificates. 
+```pem``` will never revoke your existing certificates.
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
@@ -110,11 +110,11 @@ You can specify a name for the output file:
 To get a list of available options run:
 
     pem --help
-    
+
 
 ### Note about empty `p12` passwords and Keychain Access.app
 
-`pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password. 
+`pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password.
 While the file is valid, Mac OSX's Keychain Access will not allow you to open the file without specifing a passphrase.
 
 Instead, you may verify the file is valid using OpenSSL:
@@ -147,7 +147,7 @@ Run `pem --help` to get a list of available environment variables.
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS app has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
@@ -157,7 +157,7 @@ Run `pem --help` to get a list of available environment variables.
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the ```pem``` files like this: 
+It will show you the ```pem``` files like this:
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 
@@ -165,7 +165,7 @@ It will show you the ```pem``` files like this:
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `pem` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `pem` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

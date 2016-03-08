@@ -8,7 +8,7 @@ fastlane
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
-[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles and releasing your application.
 
@@ -118,7 +118,7 @@ Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contrib
 
 ## Code of Conduct
 
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

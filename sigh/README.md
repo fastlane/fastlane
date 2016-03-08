@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <b>sigh</b> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <b>sigh</b> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,9 +30,9 @@ sigh
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/sigh/LICENSE)
 [![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
-[![Build Status](https://circleci.com/gh/fastlane/fastlane/tree/master.svg?style=shield&circle-token=b5b757bac12d544854dd1b414ca9106ce1602766)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Because you would rather spend your time building stuff than fighting provisioning
 
@@ -42,12 +42,12 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#resign">Resign</a> &bull; 
-    <a href="#how-does-it-work">How does it work?</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#resign">Resign</a> &bull;
+    <a href="#how-does-it-work">How does it work?</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -96,7 +96,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
     sigh
 Yes, that's the whole command!
 
-```sigh``` will create, repair and download profiles for the App Store by default. 
+```sigh``` will create, repair and download profiles for the App Store by default.
 
 You can pass your bundle identifier and username like this:
 
@@ -105,12 +105,12 @@ You can pass your bundle identifier and username like this:
 If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
     sigh --adhoc
-    
+
 If you want to generate a **Development** profile:
 
     sigh --development
 
-To generate the profile in a specific directory: 
+To generate the profile in a specific directory:
 
     sigh -o "~/Certificates/"
 
@@ -121,13 +121,13 @@ To download all your provisioning profiles use
 For a list of available parameters and commands run
 
     sigh --help
-    
+
 ### Advanced
 
 By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
     sigh --skip_install
-    
+
 To save the provisioning profile under a specific name, use the -q option:
 
     sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
@@ -226,7 +226,7 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
@@ -236,7 +236,7 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the `mobileprovision` files like this: 
+It will show you the `mobileprovision` files like this:
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 ## App Identifier couldn't be found
@@ -251,7 +251,7 @@ If you also want to create a new App Identifier on the Apple Developer Portal, c
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `sigh` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `sigh` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

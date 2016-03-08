@@ -6,11 +6,11 @@
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -29,7 +29,7 @@
 Pilot
 ============
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pilot/LICENSE)
 [![Gem](https://img.shields.io/gem/v/pilot.svg?style=flat)](http://rubygems.org/gems/pilot)
 
 
@@ -49,9 +49,9 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -69,7 +69,7 @@ For all commands you can specify the Apple ID to use using `-u felix@krausefx.co
 
 ## Uploading builds
 
-To upload a new build, just run 
+To upload a new build, just run
 
 ```
 pilot upload
@@ -164,7 +164,7 @@ To add a new tester to both your iTunes Connect account and to your app (if give
 pilot add email@invite.com
 ```
 
-Additionally you can specify the app identifier (if necessary): 
+Additionally you can specify the app identifier (if necessary):
 
 ```
 pilot add email@email.com -a com.krausefx.app
@@ -278,7 +278,7 @@ If your password contains special characters, `pilot` may throw a confusing erro
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

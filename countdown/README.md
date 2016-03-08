@@ -7,11 +7,11 @@
 </h3>
 
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -27,7 +27,7 @@ countdown
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/countdown/LICENSE)
 
 ###### Get started with fastlane development the fast way
 
@@ -114,7 +114,7 @@ FastlaneCore::CommandExecutor.execute(command: "ls",
                                           # handle error here
                                         end)
 
-# or if you just want to receive a simple value 
+# or if you just want to receive a simple value
 # use this only if the command doesn't take long
 diff = Helper.backticks("git diff")
 
@@ -191,7 +191,7 @@ To submit the changes to the fastlane main repo, you have to do the following:
 - Open the GitHub page of the repository you changed (e.g. [https://github.com/fastlane/fastlane/tree/master/gym](https://github.com/fastlane/fastlane/tree/master/gym))
 - Click on `Fork` on the top right
 - On your terminal, navigate to the project you modified and run `git remote add upstream https://github.com/[my_user]/[tool_name]` (or use the `git` URL if you use private key auth)
-- Squash your commits into one. For example,  to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History) 
+- Squash your commits into one. For example,  to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
 - Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
 - Open `https://github.com/fastlane/[tool_name]` in your browser and click the green "Create Pull Request" button
 
@@ -199,7 +199,7 @@ To submit the changes to the fastlane main repo, you have to do the following:
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/CODE_OF_CONDUCT.md).
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
