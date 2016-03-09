@@ -4,7 +4,6 @@ module Fastlane
       USED_ENV_NAMES = [
         "BACKUP_XCARCHIVE_DESTINATION",
         "DERIVED_DATA_PATH",
-        "GYM_BUILD_PATH",
         "GYM_CODE_SIGNING_IDENTITY",
         "GYM_DERIVED_DATA_PATH",
         "GYM_OUTPUT_DIRECTORY",
@@ -51,7 +50,6 @@ module Fastlane
         if params[:output_directory]
           output_directory_path = File.expand_path(params[:output_directory])
           UI.message "Set output directory path to: \"#{output_directory_path}\"."
-          ENV['GYM_BUILD_PATH'] = output_directory_path
           ENV['GYM_OUTPUT_DIRECTORY'] = output_directory_path
           ENV['SCAN_OUTPUT_DIRECTORY'] = output_directory_path
           ENV['BACKUP_XCARCHIVE_DESTINATION'] = output_directory_path
