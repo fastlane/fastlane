@@ -1,0 +1,19 @@
+{
+  "data": {
+    "trains": [{
+      "versionString": "2.0.1",
+      "displayVersionString": "2.0.1",
+      "items": null
+    }, {
+      "versionString": "2.0",
+      "displayVersionString": "2.0",
+      "items": null
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
