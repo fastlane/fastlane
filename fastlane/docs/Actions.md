@@ -877,7 +877,7 @@ The following environment variables may be used in place of parameters: `CRASHLY
 
 ### [upload_symbols_to_crashlytics]
 
-This action allows you to upload additional symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
 
 ```ruby
 upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
