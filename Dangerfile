@@ -1,6 +1,6 @@
 warn("Big PR") if lines_of_code > 500
 
-if (pr_body + pr_title).include?("WIP")
+if (pr_body.to_s + pr_title.to_s).include?("WIP")
   warn("Pull Request is Work in Progress")
 end
 
