@@ -55,7 +55,9 @@ module Snapshot
       ReportsGenerator.new.generate
 
       # Clear the Derived Data
-      FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
+      unless Snapshot.config[:derived_data_path]
+        FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
+      end
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
