@@ -144,7 +144,12 @@ module Snapshot
                                      env_name: 'SNAPSHOT_BREAK_ON_FIRST_ERROR',
                                      description: "Should snapshot stop immediately after the tests completely failed on one device?",
                                      default_value: false,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :derived_data_path,
+                                     short_option: "-f",
+                                     env_name: "SNAPSHOT_DERIVED_DATA_PATH",
+                                     description: "The directory where build products and other derived data will go",
+                                     optional: true)
       ]
     end
   end
