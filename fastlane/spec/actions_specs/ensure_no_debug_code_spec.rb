@@ -5,7 +5,7 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
           ensure_no_debug_code(text: 'pry', path: '.', extension: 'rb')
         end").runner.execute(:test)
-        expect(result).to eq("grep -R 'pry' '#{File.absolute_path('../')}'")
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('../')}'")
       end
     end
   end
