@@ -104,7 +104,8 @@ lane :release do |options|
   end
 
   puts "You can now tweet:".green
-  puts "[#{tool_name}] #{github_release['name']} #{release_url}"
+  tag_url = "https://github.com/fastlane/fastlane/releases/tag/#{tool_name}/#{version}"
+  puts "[#{tool_name}] #{github_release['name']} #{tag_url}"
 end
 
 error do |lane, exception|
