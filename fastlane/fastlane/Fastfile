@@ -57,10 +57,6 @@ lane :release do |options|
   git_pull
   push_to_git_remote
 
-  # Preparing GitHub Tag in fastlane repo
-  add_git_tag(tag: "#{tool_name}/#{version}")
-  push_git_tags
-
   # Preparing GitHub Release
   #
   github_release = get_github_release(url: github_url(tool: tool_name), version: version)
@@ -82,10 +78,13 @@ lane :release do |options|
       description: description,
       is_draft: false
     )
-  end
 
-  release_url = github_release['html_url']
-  clipboard(value: release_url)
+    release_url = github_release['html_url']
+    clipboard(value: release_url)
+
+    message = [title, description, release_url].join("\n\n")
+    add_fastlane_git_tag(tag: "#{tool_name}/#{version}", message: message)
+  end
 
   # Actual release
   #
@@ -184,4 +183,10 @@ private_lane :print_release_changelog do |options|
 
   cmd = "git log --pretty='* %B' #{tool_name}/#{old_version}...HEAD --no-merges .."
   puts "Changes since release #{old_version}:\n" + `#{cmd}`.gsub("\n\n", "\n")
+end
+
+desc "Add a git tag in the fastlane repo for this release"
+private_lane :add_fastlane_git_tag do |options|
+  `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
+  push_git_tags
 end
