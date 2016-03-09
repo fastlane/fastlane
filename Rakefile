@@ -1,4 +1,3 @@
-
 GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab)
 RAILS = %w(boarding refresher enhancer)
 
@@ -86,45 +85,6 @@ task :fetch_rubocop do
     unless %w(gym fastlane_core).include?(repo) # some repos need Mac OS
       File.write(File.join(repo, '.travis.yml'), File.read('./fastlane/.travis.yml'))
     end
-  end
-end
-
-task :test_all do
-  exceptions = []
-  require 'bundler'
-
-  def bundle_install
-    cache_path = File.expand_path("/tmp/vendor/bundle")
-    sh "bundle check --path='#{cache_path}' || bundle install --path='#{cache_path}' --jobs=4 --retry=3"
-  end
-
-  bundle_install
-  GEMS.each do |repo|
-    box "Testing #{repo}"
-    Dir.chdir(repo) do
-      begin
-        # From https://github.com/bundler/bundler/issues/1424#issuecomment-2123080
-        # Since we nest bundle exec in bundle exec
-        Bundler.with_clean_env do
-          bundle_install
-          sh "bundle exec rspec"
-          sh "bundle exec rubocop"
-        end
-      rescue => ex
-        puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
-        exceptions << "#{repo}: #{ex}"
-      end
-    end
-  end
-
-  if exceptions.count > 0
-    puts "--------------------"
-    puts "#{exceptions.count} failure(s)"
-    puts "--------------------"
-    puts exceptions.join("\n")
-    raise "Tests failed, search test log for [[FAILURE]] to find the outputs"
-  else
-    puts "Success"
   end
 end
 
