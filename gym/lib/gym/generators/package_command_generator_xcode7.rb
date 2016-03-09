@@ -37,7 +37,7 @@ module Gym
 
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
-        Gym.cache[:temporary_output_path] ||= "#{Tempfile.new('gym').path}.gym_output"
+        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
       end
 
       def ipa_path
@@ -68,7 +68,7 @@ module Gym
 
       # The path the config file we use to sign our app
       def config_path
-        Gym.cache[:config_path] ||= "#{Tempfile.new('gym').path}_config.plist"
+        Gym.cache[:config_path] ||= "#{Tempfile.new('gym_config').path}.plist"
         return Gym.cache[:config_path]
       end
 
