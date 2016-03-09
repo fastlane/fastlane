@@ -578,7 +578,7 @@ describe Spaceship::AppVersion, all: true do
       it "raises an exception if language is not available" do
         expect do
           version.description["ja-JP"]
-        end.to raise_error "Language 'ja-JP' is not activated for this app version."
+        end.to raise_error "Language 'ja-JP' is not activated / available for this app version."
       end
 
       # it "allows the creation of a new language" do
