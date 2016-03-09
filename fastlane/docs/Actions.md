@@ -871,6 +871,19 @@ This action allows you to upload symbolication files to Crashlytics. It's extra 
 upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
 ```
 
+### `download_dsyms`
+
+This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled.
+
+```ruby
+lane :refresh_dsyms do
+  download_dsyms                  # Download dSYM files from iTC
+  upload_symbols_to_crashlytics   # Upload them to Crashlytics
+  clean_build_artifacts           # Delete the local dSYM files
+end
+```
+
+
 ### AWS S3 Distribution
 
 Upload a new build to Amazon S3 to distribute the build to beta testers. Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.
