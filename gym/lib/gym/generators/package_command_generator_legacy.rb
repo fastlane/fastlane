@@ -40,6 +40,11 @@ module Gym
         [""]
       end
 
+      # Place where the IPA file will be created, so it can be safely moved to the destination folder
+      def temporary_output_path
+        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
+      end
+
       def appfile_path
         path = Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").first
         path ||= Dir[BuildCommandGenerator.archive_path + "/**/*.app"].last
@@ -49,7 +54,7 @@ module Gym
 
       # We export it to the temporary folder and move it over to the actual output once it's finished and valid
       def ipa_path
-        File.join(BuildCommandGenerator.build_path, "#{Gym.config[:output_name]}.ipa")
+        File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
       end
 
       # The path the the dsym file for this app. Might be nil
