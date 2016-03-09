@@ -1,0 +1,55 @@
+{
+  "data": {
+    "versionString": "2.0.1",
+    "displayVersionString": "2.0.1",
+    "items": [{
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "id": 123123,
+      "buildVersion": "4",
+      "trainVersion": "2.0.1",
+      "uploadDate": 1443019906000,
+      "iconUrl": "https://is4-ssl.mzstatic.com/image/thumb/Newsstand6/v4/9a/be/17/9abe173a-6411-8903-f1c2-5c6e28970d20/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand6/v4/9a/be/17/9abe173a-6411-8903-f1c2-5c6e28970d20/Icon-76@2x.png.png",
+      "appName": "App Name",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": true,
+      "processing": false,
+      "processingState": null,
+      "exportComplianceState": "notRequired",
+      "externalStatus": "submitForReview",
+      "storeStatus": "readyForSale",
+      "hasBuildDetail": true
+    }, {
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "id": 123123343,
+      "buildVersion": "3",
+      "trainVersion": "2.0.1",
+      "uploadDate": 1443018762000,
+      "iconUrl": "https://is2-ssl.mzstatic.com/image/thumb/Newsstand3/v4/7c/e7/24/7ce724a4-40b3-d494-10dc-af487835e528/Icon-76@2x.png.png/150x150bb-80.png",
+      "iconAssetToken": "Newsstand3/v4/7c/e7/24/7ce724a4-40b3-d494-10dc-af487835e528/Icon-76@2x.png.png",
+      "appName": "App Name",
+      "platform": "ios",
+      "betaEntitled": true,
+      "exceededFileSizeLimit": false,
+      "wentLiveWithVersion": false,
+      "processing": false,
+      "processingState": null,
+      "exportComplianceState": "missing",
+      "externalStatus": "none",
+      "storeStatus": null,
+      "hasBuildDetail": true
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
