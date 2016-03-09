@@ -17,7 +17,7 @@ module Fastlane
         command = []
         command << File.expand_path(params[:binary_path])
         command << "-a #{params[:api_token]}"
-        command << "-p ios"
+        command << "-p #{params[:platform]}"
         command << File.expand_path(params[:dsym_path])
 
         return Actions.sh command.join(" ")
@@ -33,7 +33,7 @@ module Fastlane
 
       def self.details
         [
-          "This action allows you to upload additional symbolication files to Crashlytics.",
+          "This action allows you to upload symbolication files to Crashlytics.",
           "It's extra useful if you use it to download the latest dSYM files from Apple when you",
           "use Bitcode"
         ].join(" ")
@@ -62,6 +62,14 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_PLATFORM",
+                                       description: "The platform of the app (ios, tvos, mac)",
+                                       default_value: "ios",
+                                       verify_block: proc do |value|
+                                         available = ['ios', 'tvos', 'mac']
+                                         UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end)
         ]
       end
