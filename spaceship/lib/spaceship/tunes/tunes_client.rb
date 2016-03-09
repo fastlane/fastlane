@@ -574,6 +574,22 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # All build trains, even if there is no TestFlight
+    def all_build_trains(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=ios")
+      handle_itc_response(r.body)
+    end
+
+    def all_builds_for_train(app_id: nil, train: nil)
+      r = request(:get, "ra/apps/#{app_id}/trains/#{train}/buildHistory?platform=ios")
+      handle_itc_response(r.body)
+    end
+
+    def build_details(app_id: nil, train: nil, build_number: nil)
+      r = request(:get, "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/details")
+      handle_itc_response(r.body)
+    end
+
     def update_build_information!(app_id: nil,
                                   train: nil,
                                   build_number: nil,
