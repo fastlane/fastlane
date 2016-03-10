@@ -10,3 +10,4 @@ dependencies:
 test:
   override:
     - bundle exec rake test_all
+    - bundle exec danger

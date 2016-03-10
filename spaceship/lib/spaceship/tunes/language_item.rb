@@ -26,7 +26,7 @@ module Spaceship
         end
         return result if result
 
-        raise "Language '#{lang}' is not activated for this app version."
+        raise "Language '#{lang}' is not activated / available for this app version."
       end
 
       # @return (Array) An array containing all languages that are already available

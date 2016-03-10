@@ -1,16 +1,16 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="assets/fastlane.png" width="150" />
+    <img src="../fastlane/assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,7 +30,7 @@ gym
 ============
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/gym/LICENSE)
 [![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
@@ -40,10 +40,10 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <p align="center">
-    <a href="#whats-gym">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
+    <a href="#whats-gym">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -66,7 +66,7 @@ xcodebuild -exportArchive \
            -exportFormat ipa \
            -archivePath "build/MyApp.xcarchive" \
            -exportPath "build/MyApp.ipa" \
-           -exportProvisioningProfile "ProvisioningProfileName" 
+           -exportProvisioningProfile "ProvisioningProfileName"
 ```
 
 ### With `gym`
@@ -89,7 +89,7 @@ gym
 :package: | Automatically generates an `ipa` and a compressed `dSYM` file
 :bullettrain_side: | Don't remember any complicated build commands, just `gym`
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
-:floppy_disk:   | Store common build settings in a `Gymfile` 
+:floppy_disk:   | Store common build settings in a `Gymfile`
 :outbox_tray: | All archives are stored and accessible in the Xcode Organizer
 :computer: | Supports both iOS and Mac applications
 
@@ -182,7 +182,7 @@ For the list of available options run `xcodebuild -help`.
 
 # Automating the whole process
 
-`gym` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow. 
+`gym` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
 Using `fastlane` you can define a configuration like
 
@@ -200,9 +200,9 @@ For more information visit the [fastlane GitHub page](https://github.com/fastlan
 
 # How does it work?
 
-`gym` uses the latest APIs to build and sign your application. The 2 main components are 
+`gym` uses the latest APIs to build and sign your application. The 2 main components are
 
-- `xcodebuild` 
+- `xcodebuild`
 - [xcpretty](https://github.com/supermarin/xcpretty)
 
 When you run `gym` without the `--silent` mode it will print out every command it executes.
@@ -243,7 +243,7 @@ Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/tree/mas
 ```
 /usr/bin/xcrun /path/to/PackageApplication4Gym -v \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive/Products/Applications/name.app' -o \
-'/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \ 
+'/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \
 --sign "identity" --embed "provProfile"
 ```
 
@@ -263,7 +263,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 

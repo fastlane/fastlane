@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="assets/fastlane.png" width="150" />
+    <img src="../fastlane/assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
@@ -30,7 +30,7 @@ screengrab
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/screengrab/LICENSE)
 [![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
 
 ###### Automated localized screenshots of your Android app on every device

@@ -26,7 +26,6 @@ module Fastlane
 
     class S3Action < Action
       def self.run(config)
-        require 'shenzhen'
         # Calling fetch on config so that default values will be used
         params = {}
         params[:ipa] = config[:ipa]
@@ -44,9 +43,6 @@ module Fastlane
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
         params[:version_file_name] = config[:version_file_name]
-
-        # Maps nice developer build parameters to Shenzhen args
-        build_args = params_to_build_args(params)
 
         # Pulling parameters for other uses
         s3_region = params[:region]
@@ -69,21 +65,16 @@ module Fastlane
         version_template_path = params[:version_template_path]
         version_file_name = params[:version_file_name]
 
-        if Helper.is_test?
-          return build_args
-        end
+        s3_client = self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
+        bucket = s3_client.buckets[s3_bucket]
 
-        # Joins args into space delimited string
-        build_args = build_args.join(' ')
+        url_part = self.expand_path_with_substitutions_from_ipa_plist(ipa_file, s3_path)
 
-        command = "krausefx-ipa distribute:s3 #{build_args}"
-        Helper.log.debug command
-        Actions.sh command
+        ipa_file_basename = File.basename(ipa_file)
+        ipa_file_name = "#{url_part}#{ipa_file_basename}"
+        ipa_file_data = File.open(ipa_file, 'rb')
 
-        # Gets URL for IPA file
-        url_part = expand_path_with_substitutions_from_ipa_plist( ipa_file, s3_path )
-        ipa_file_name = File.basename(ipa_file)
-        ipa_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{url_part}#{ipa_file_name}"
+        ipa_url = self.upload_file(bucket, ipa_file_name, ipa_file_data)
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH] = ipa_url
@@ -94,14 +85,11 @@ module Fastlane
           dsym_file_name = "#{url_part}#{dsym_file_basename}"
           dsym_file_data = File.open(dsym_file, 'rb')
 
-          upload_dsym(
-            s3_access_key,
-            s3_secret_access_key,
-            s3_bucket,
-            s3_region,
-            dsym_file_name,
-            dsym_file_data
-          )
+          dsym_url = self.upload_file(bucket, dsym_file_name, dsym_file_data)
+
+          # Setting action and environment variables
+          Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
+          ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_url
 
         end
 
@@ -187,37 +175,26 @@ module Fastlane
         #
         #####################################
 
-        upload_plist_and_html_to_s3(
-          s3_access_key,
-          s3_secret_access_key,
-          s3_bucket,
-          s3_region,
-          plist_file_name,
-          plist_render,
-          html_file_name,
-          html_render,
-          version_file_name,
-          version_render
-        )
+        plist_url = self.upload_file(bucket, plist_file_name, plist_render)
+        html_url = self.upload_file(bucket, html_file_name, html_render)
+        version_url = self.upload_file(bucket, version_file_name, version_render)
+
+        # Setting action and environment variables
+        Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_url
+        ENV[SharedValues::S3_PLIST_OUTPUT_PATH.to_s] = plist_url
+
+        Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH] = html_url
+        ENV[SharedValues::S3_HTML_OUTPUT_PATH.to_s] = html_url
+
+        Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_url
+        ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_url
+
+        Helper.log.info "Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'".green
 
         return true
       end
 
-      def self.params_to_build_args(params)
-        # Remove nil value params unless :clean or :archive
-        params = params.delete_if { |k, v| (k != :clean && k != :archive ) && v.nil? }
-
-        # Maps nice developer param names to Shenzhen's `ipa build` arguments
-        params.collect do |k, v|
-          v ||= ''
-          if S3_ARGS_MAP[k]
-            value = (v.to_s.length > 0 ? "\"#{v}\"" : "")
-            "#{S3_ARGS_MAP[k]} #{value}".strip
-          end
-        end.compact
-      end
-
-      def self.upload_plist_and_html_to_s3(s3_access_key, s3_secret_access_key, s3_bucket, s3_region, plist_file_name, plist_render, html_file_name, html_render, version_file_name, version_render)
+      def self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
         Actions.verify_gem!('aws-sdk')
         require 'aws-sdk'
         if s3_region
@@ -232,67 +209,22 @@ module Fastlane
             secret_access_key: s3_secret_access_key
           )
         end
-
-        bucket = s3_client.buckets[s3_bucket]
-
-        plist_obj = bucket.objects.create(plist_file_name, plist_render.to_s, acl: :public_read)
-        html_obj = bucket.objects.create(html_file_name, html_render.to_s, acl: :public_read)
-        version_obj = bucket.objects.create(version_file_name, version_render.to_s, acl: :public_read)
-
-        # When you enable versioning on a S3 bucket,
-        # writing to an object will create an object version
-        # instead of replacing the existing object.
-        # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
-        if plist_obj.kind_of? AWS::S3::ObjectVersion
-          plist_obj = plist_obj.object
-          html_obj = html_obj.object
-          version_obj = version_obj.object
-        end
-
-        # Setting action and environment variables
-        Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_obj.public_url.to_s
-        ENV[SharedValues::S3_PLIST_OUTPUT_PATH.to_s] = plist_obj.public_url.to_s
-
-        Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH] = html_obj.public_url.to_s
-        ENV[SharedValues::S3_HTML_OUTPUT_PATH.to_s] = html_obj.public_url.to_s
-
-        Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_obj.public_url.to_s
-        ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_obj.public_url.to_s
-
-        Helper.log.info "Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'".green
+        s3_client
       end
 
-      def self.upload_dsym(s3_access_key, s3_secret_access_key, s3_bucket, s3_region, dsym_file_name, dsym_file_data)
-        Actions.verify_gem!('aws-sdk')
-        require 'aws-sdk'
-        if s3_region
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key,
-            region: s3_region
-          )
-        else
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key
-          )
-        end
-
-        bucket = s3_client.buckets[s3_bucket]
-
-        dsym_obj = bucket.objects.create(dsym_file_name, dsym_file_data, acl: :public_read)
+      def self.upload_file(bucket, file_name, file_data)
+        obj = bucket.objects.create(file_name, file_data, acl: :public_read)
 
         # When you enable versioning on a S3 bucket,
         # writing to an object will create an object version
         # instead of replacing the existing object.
         # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
-        if dsym_obj.kind_of? AWS::S3::ObjectVersion
-          dsym_obj = dsym_obj.object
+        if obj.kind_of? AWS::S3::ObjectVersion
+          obj = obj.object
         end
 
-        # Setting action and environment variables
-        Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_obj.public_url.to_s
-        ENV[SharedValues::S3_DSYM_OUTPUT_PATH.to_s] = dsym_obj.public_url.to_s
+        # Return public url
+        obj.public_url.to_s
       end
 
       #

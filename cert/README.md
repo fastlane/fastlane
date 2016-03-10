@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="assets/fastlane.png" width="150" />
+    <img src="../fastlane/assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
@@ -30,7 +30,7 @@ cert
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/fastlanetools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/cert/LICENSE)
 [![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
 
 ###### Automatically create and maintain iOS code signing certificates.

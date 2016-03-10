@@ -1,16 +1,16 @@
 <h3 align="center">
   <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="assets/fastlane.png" width="150" />
+    <img src="../fastlane/assets/fastlane.png" width="150" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull; 
-  <b>snapshot</b> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull; 
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull; 
+  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
+  <b>snapshot</b> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
@@ -30,7 +30,7 @@ snapshot
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/snapshot/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
 ###### Automate taking localized screenshots of your iOS app on every device
@@ -57,7 +57,7 @@ Apple announced a new version of Xcode with support for UI Tests built in right 
 
 As a result, `snapshot` was completely rewritten from ground up without changing its public API.
 
-Please check out the [MigrationGuide to 1.0](/MigrationGuide.md) :+1:
+Please check out the [MigrationGuide to 1.0](/snapshot/MigrationGuide.md) :+1:
 
 **Why change to UI Tests?**
 
@@ -69,13 +69,13 @@ Please check out the [MigrationGuide to 1.0](/MigrationGuide.md) :+1:
 
 -------
 <p align="center">
-    <a href="#features">Features</a> &bull; 
-    <a href="#installation">Installation</a> &bull; 
-    <a href="#ui-tests">UI Tests</a> &bull; 
-    <a href="#quick-start">Quick Start</a> &bull; 
-    <a href="#usage">Usage</a> &bull; 
-    <a href="#tips">Tips</a> &bull; 
-    <a href="#how-does-it-work">How?</a> &bull; 
+    <a href="#features">Features</a> &bull;
+    <a href="#installation">Installation</a> &bull;
+    <a href="#ui-tests">UI Tests</a> &bull;
+    <a href="#quick-start">Quick Start</a> &bull;
+    <a href="#usage">Usage</a> &bull;
+    <a href="#tips">Tips</a> &bull;
+    <a href="#how-does-it-work">How?</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -120,11 +120,11 @@ Install the gem
 Make sure, you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
-    
+
 # UI Tests
 
 ## Getting started
-This project uses Apple's newly announced UI Tests. I will not go into detail on how to write scripts. 
+This project uses Apple's newly announced UI Tests. I will not go into detail on how to write scripts.
 
 Here a few links to get started:
 
@@ -141,13 +141,13 @@ Here a few links to get started:
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 - Run `snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
-- (Objective C only) add the bridging header to your test class. 
+- (Objective C only) add the bridging header to your test class.
  - `#import "MYUITests-Swift.h"`
  - The bridging header is named after your test target with -Swift.h appended.
 - In your UI Test class, click the `Record` button on the bottom left and record your interaction
 - To take a snapshot, call the following between interactions
  -  Swift: `snapshot("01LoginScreen")`
- -  Objective C: `[Snapshot snapshot:@"01LoginScreen" waitForLoadingIndicator:YES];` 
+ -  Objective C: `[Snapshot snapshot:@"01LoginScreen" waitForLoadingIndicator:YES];`
 - Add the following code to your `setUp()` method
 
 **Swift**
@@ -193,7 +193,7 @@ There are a lot of options available that define how to build your app, for exam
 
 ```sh
 snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
-``` 
+```
 
 Reinstall the app before running `snapshot`
 
@@ -268,7 +268,7 @@ You can run this command in the terminal to delete and re-create all iOS simulat
 snapshot reset_simulators
 ```
 
-**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running `snapshot`. 
+**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running `snapshot`.
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
@@ -276,13 +276,13 @@ You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for 
 
 Some updates require the helper files to be updated. `snapshot` will automatically warn you and tell you how to update.
 
-Basically you can run 
+Basically you can run
 
 ```
 snapshot update
 ```
 
-to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/snapshot/blob/master/lib/assets/SnapshotHelper.swift).
+to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift).
 
 ## Launch Arguments
 
@@ -325,7 +325,7 @@ When you run unit tests in Xcode, the reporter generates a plist file, documenti
 
 When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
 
-`snapshot` then iterates through all test events and check where we did this weird rotation. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application. 
+`snapshot` then iterates through all test events and check where we did this weird rotation. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application.
 
 In the test output, the Swift `snapshot` function will print out something like this
 
@@ -355,7 +355,7 @@ Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/rada
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git

@@ -22,7 +22,7 @@ fastlane
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
@@ -35,8 +35,8 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
     <a href="#quick-start">Quick Start</a> &bull;
-    <a href="#examples">Example Setups</a> &bull; 
-    <a href="https://github.com/fastlane/fastlane/tree/master/docs">Documentation</a> &bull; 
+    <a href="#examples">Example Setups</a> &bull;
+    <a href="https://github.com/fastlane/fastlane/tree/master/fastlane/docs">Documentation</a> &bull;
     <a href="#need-help">Need help?</a>
 </p>
 
@@ -79,7 +79,7 @@ fastlane appstore
 :sparkles: | Connect all iOS and Android build tools into one workflow (both `fastlane` tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
 :ship: | Deploy from any computer, including a CI-server
-:wrench: | Extend and customise the functionality 
+:wrench: | Extend and customise the functionality
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
@@ -128,7 +128,7 @@ The setup assistant will create all the necessary files for you, using the exist
 - Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
 
-For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/docs).
+For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
 
 There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
@@ -144,7 +144,7 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane action [action_name]`: Shows a more detailed description of an action
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
-- `fastlane new_action`: Create a new action (integration) for fastlane  
+- `fastlane new_action`: Create a new action (integration) for fastlane
 
 ## Examples
 
@@ -163,7 +163,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
 - [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers 
+- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
