@@ -963,6 +963,32 @@ set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Al
 
 You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
 
+### make_changelog_from_git
+
+Generate a changelog using `git log`.
+
+```ruby
+make_changelog_from_git(
+  appInfoFile: 'Resources/Project-Info.plist',
+  logLimiter: '- AUTO: Patch Version Bump',
+  changelogFilePath: "fastlane/Changelog.txt"
+)
+```
+
+Using action fully:
+
+```ruby
+make_changelog_from_git(
+  appInfoFile: 'Resources/Project-Info.plist', # Optional: Path to your Xcode project info.plist file (to retrieve $bundleVersion and $buildNumber)
+  logLimiter: '- AUTO: Patch Version Bump', # Some string which will work as limiter if you want to limit number of lines to show
+  numberOfLogLines: 100, # Optional: Max number of lines to fetch
+  template: "Here's my new shiny changelog for $bundleVersion($buildNumber):\n$changelog", # Optional: $bundleVersion, $buildNumber and $changelog are supported for now
+  logFormat: "* %h %ae - %s", # Optional: You can use any other format for commit. See https://git-scm.com/docs/pretty-formats for details
+  showChangelog: true, # Optional: Shows changelog in fastlane logs
+  changelogFilePath: "fastlane/Changelog.txt" # Set path where changelog file will be written
+)
+```
+
 ### make_changelog_from_jenkins
 
 Generate a changelog using the Changes section the running Jenkins job.
