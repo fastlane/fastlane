@@ -740,6 +740,18 @@ ensure_no_debug_code(text: "NSLog",
                 extension: "m")
 ```
 
+```ruby
+ensure_no_debug_code(text: "(^#define DEBUG|NSLog)",
+                     path: "./lib",
+                extension: "m")
+```
+
+```ruby
+ensure_no_debug_code(text: "<<<<<<",
+                     path: "./lib",
+               extensions: ["m", "swift"])
+```
+
 ### [Appium](http://appium.io/)
 
 Run UI testing by `Appium::Driver` with RSpec.

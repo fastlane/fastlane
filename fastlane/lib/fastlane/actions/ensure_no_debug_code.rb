@@ -2,7 +2,23 @@ module Fastlane
   module Actions
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
-        command = "grep -R '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        command = "grep -RE '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+
+        extensions = []
+        extensions << params[:extension] unless params[:extension].nil?
+
+        if params[:extensions]
+          params[:extensions].each do |extension|
+            extension.delete!('.') if extension.include? "."
+            extensions << extension
+          end
+        end
+
+        if extensions.count > 1
+          command << " --include=\\*.{#{extensions.join(',')}}"
+        elsif extensions.count > 0
+          command << " --include=\\*.#{extensions.join(',')}"
+        end
         return command if Helper.is_test?
 
         Helper.log.info command.yellow
@@ -14,14 +30,7 @@ module Fastlane
 
         found = []
         results.split("\n").each do |current_raw|
-          current = current_raw.strip
-          if params[:extension]
-            if current.include? ".#{params[:extension]}:"
-              found << current
-            end
-          else
-            found << current
-          end
+          found << current_raw.strip
         end
 
         raise "Found debug code '#{params[:text]}': \n\n#{found.join("\n")}" if found.count > 0
@@ -62,7 +71,12 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          value.delete!('.') if value.include? "."
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :extensions,
+                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
+                                       description: "An array of file extensions that should be searched for",
+                                       optional: true,
+                                       is_string: false)
         ]
       end
 
