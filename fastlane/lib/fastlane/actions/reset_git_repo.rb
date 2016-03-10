@@ -30,7 +30,7 @@ module Fastlane
             Helper.log.info 'Git repo was reset and cleaned back to a pristine state.'.green
           else
             paths.each do |path|
-              Helper.log.warn("Couldn't find file at path '#{path}'") unless File.exist?(path)
+              Helper.log.warn "Couldn't find file at path '#{path}'" unless File.exist?(path)
               Actions.sh("git checkout -- '#{path}'")
             end
             Helper.log.info "Git cleaned up #{paths.count} files.".green
