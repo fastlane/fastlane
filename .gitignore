@@ -8,6 +8,7 @@ coverage/
 /test/tmp/
 /test/version_tmp/
 /tmp/
+rspec_logs.json
 
 ## Specific to RubyMotion:
 .dat*
