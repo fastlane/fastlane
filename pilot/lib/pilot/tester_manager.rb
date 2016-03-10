@@ -70,6 +70,7 @@ module Pilot
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
         app = Spaceship::Application.find(app_filter)
+        raise "Couldn't find app with '#{app_filter}'" unless app
         int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
         ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
       else
