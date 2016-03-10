@@ -53,6 +53,7 @@ module Pilot
       result = config[:app_identifier]
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
       result ||= ask("Please enter the app's bundle identifier: ")
+      Helper.log.debug "App identifier (#{result})"
       return result
     end
   end
