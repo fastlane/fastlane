@@ -19,7 +19,7 @@ module Fastlane
 
         # download certificate
         unless File.exist?(params[:certificate])
-          Helper.log.info("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
+          Helper.log.info "Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'"
           require 'open-uri'
           File.open(params[:certificate], "w") do |file|
             file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
