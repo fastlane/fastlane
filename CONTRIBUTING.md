@@ -88,6 +88,172 @@ One of the best ways we can keep fastlane an approachable, stable, and dependabl
 
 Writing a custom action is an easy way to extend the capabilities of fastlane. Actions that make good candidates for inclusion in the fastlane codebase are **flexible** and apply to **many projects, teams, and development setups**. Before working to contribute your custom action to fastlane, consider whether it is likely to solve a problem that many developers have. If not, it can still provide value for your fastlane environment! Check out the documentation for creating [local action extensions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/README.md#extensions).
 
+## Getting started
+
+Make sure you have `bundler` installed using `gem install bundler`
+
+Clone the `fastlane` repo
+
+```
+git clone https://github.com/fastlane/fastlane
+```
+
+Clone all `fastlane` repos and install development dependencies
+
+```
+cd countdown
+[sudo] rake bootstrap
+```
+
+If you don't use [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/) you might need to run `sudo rake bootstrap` to not run into a permission error.
+
+Before working on something, make sure to have pulled the latest changes. To pull the changes run
+
+```
+rake pull
+```
+
+## Developing
+
+When working on something, directly edit the Ruby files in the project folders. Make sure to switch to 2 spaces in your text editor.
+
+To run the modified version of the tool, run the following in the project directory
+
+```
+./bin/[tool_name]
+```
+
+## Debugging
+
+I personally use a plain Sublime Text with a terminal. Debugging is pretty easy, just insert the following code to where you want to jump in:
+
+```ruby
+require 'pry'
+binding.pry
+```
+
+You then jump into an interactive debugger that allows you to print out variables, call methods and much more. Continue running the original script using `control` + `d`
+
+## Interacting with the user
+
+You'll see some old code still using `puts` or `Helper.log.info` to print out values. From now, please only use the new `UI` class to interact with the user (both input and output)
+
+```ruby
+UI.message "Neutral message (usually white)"
+UI.success "Succesully finished processing (usually green)"
+UI.error "Wahaha, what's going on here! (usually red)"
+UI.important "Make sure to use Windows (usually yellow)"
+
+UI.header "Inputs" # a big box
+
+name = UI.input("What's your name? ")
+if UI.confirm("Are you '#{name}'?")
+  UI.success "Oh yeah"
+else
+  UI.error "Wups, invalid"
+end
+
+UI.password("Your password please: ") # password inputs are hidden
+
+###### A "Dropdown" for the user
+project = UI.select("Select your project: ", ["Test Project", "Test Workspace"])
+
+UI.success("Okay #{name}, you selected '#{project}'")
+
+###### To run a command use
+FastlaneCore::CommandExecutor.execute(command: "ls",
+                                    print_all: true,
+                                        error: proc do |error_output|
+                                          # handle error here
+                                        end)
+
+###### or if you just want to receive a simple value use this only if the command doesn't take long
+diff = Helper.backticks("git diff")
+
+###### fastlane "crash" because of a user error everything that is caused by the user and is not unexpected
+UI.user_error!("You don't have a project in the current directory")
+
+###### an actual crash when something unexpected happened
+UI.crash!("Network timeout")
+```
+
+The output will look like this
+
+<img src="assets/UI.png" width="550" />
+
+## Running tests
+
+In the directory of one project, run the tests using
+
+`rake test`
+
+This will do a few things:
+
+- Runs the tests (you can run them via `rspec` too)
+- Makes sure no debug code (like `pry`) is still there
+- The `--help` command works as expected
+
+The tests are executed using `fastlane` :rocket:
+
+To run only a subset of the tests, you can add the `now: true` keyword to the test
+
+```ruby
+it "raises an exception if it rains", now: true do
+  ...
+end
+```
+
+and then run these tests only using
+
+```sh
+rspec -t now
+```
+
+## Running the local code
+
+Run your local copy using
+
+```
+./bin/[gem]
+```
+
+or install the local copy (might require `sudo`)
+
+```
+bundle install && rake install
+```
+
+## rubocop validation
+
+The `fastlane` repos use [rubocop](https://github.com/bbatsov/rubocop) to validate the code style.
+
+The style validation is automatically done when running `rake test`.
+
+To automatically fix common code style issues (e.g. wrong spacing), run `rubocop -a`
+
+## Submit a pull request
+
+To submit the changes to the fastlane main repo, you have to do the following:
+
+- Open the GitHub page of the `fastlane`repository  (e.g. [https://github.com/fastlane/fastlane](https://github.com/fastlane/fastlane))
+- Click on `Fork` on the top right
+- On your terminal, navigate to the project and run `git remote add upstream https://github.com/[my_user]/fastlane` (or use the `git` URL if you use private key auth)
+- Squash your commits into one. For example,  to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
+- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
+- Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
+
+## Need help?
+Please submit an [issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup
+
+## Code of Conduct
+Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+
+
 # Above All, Thanks for Your Contributions
 
 Thank you for reading to the end, and for taking the time to contribute to the project! If you include the 🔑 emoji at the top of the body of your issue or pull request, we'll know that you've given this your full attention and are doing your best to help!
+
+## License
+This project is licensed under the terms of the MIT license. See the LICENSE file.
+
+> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
