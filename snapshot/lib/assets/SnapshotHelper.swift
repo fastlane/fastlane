@@ -12,19 +12,22 @@ import XCTest
 var deviceLanguage = ""
 var locale = ""
 
-@available(*, deprecated, message="use setupSnapshot: instead")
+@available(*, introduced=9.0, deprecated=9.0, message="use setupSnapshot: instead")
 func setLanguage(app: XCUIApplication) {
     setupSnapshot(app)
 }
 
+@available(iOS 9.0, *)
 func setupSnapshot(app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
+@available(iOS 9.0, *)
 func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
+@available(iOS 9.0, *)
 class Snapshot: NSObject {
 
     class func setupSnapshot(app: XCUIApplication) {
@@ -118,6 +121,7 @@ class Snapshot: NSObject {
     }
 }
 
+@available(iOS 9.0, *)
 extension XCUIElement {
     var isLoadingIndicator: Bool {
         return self.frame.size == CGSize(width: 10, height: 20)
