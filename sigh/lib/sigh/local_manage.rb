@@ -77,7 +77,7 @@ module Sigh
       UI.message ""
       UI.message "Summary"
       UI.message "#{profiles.count} installed profiles"
-      UI.message "#{profiles_expired.count} are expired".red
+      UI.message "#{profiles_expired.count} are expired".red if profiles_expired.count > 0
       UI.message "#{profiles_soon.count} are valid but will expire within 30 days".yellow
       UI.message "#{profiles_valid.count} are valid".green
 
