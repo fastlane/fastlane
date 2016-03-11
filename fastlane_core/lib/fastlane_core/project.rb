@@ -14,7 +14,7 @@ module FastlaneCore
           workspace = Dir["./*.xcworkspace"]
           if workspace.count > 1
             puts "Select Workspace: "
-            config[:workspace] = choose(*(workspace))
+            config[:workspace] = choose(*workspace)
           elsif !workspace.first.nil?
             config[:workspace] = workspace.first
           end
@@ -26,7 +26,7 @@ module FastlaneCore
           project = Dir["./*.xcodeproj"]
           if project.count > 1
             puts "Select Project: "
-            config[:project] = choose(*(project))
+            config[:project] = choose(*project)
           elsif !project.first.nil?
             config[:project] = project.first
           end
@@ -126,7 +126,7 @@ module FastlaneCore
           raise "Multiple schemes found".red
         else
           puts "Select Scheme: "
-          options[:scheme] = choose(*(schemes))
+          options[:scheme] = choose(*schemes)
         end
       else
         Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red

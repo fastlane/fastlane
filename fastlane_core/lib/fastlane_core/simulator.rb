@@ -24,8 +24,8 @@ module FastlaneCore
         end
 
         output.split(/\n/).each do |line|
-          next if line.match(/^== /)
-          if line.match(/^-- /)
+          next if line =~ /^== /
+          if line =~ /^-- /
             (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
           else
             # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)

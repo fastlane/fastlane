@@ -62,7 +62,7 @@ module Spaceship
         req.headers['X-Apple-Upload-ContentProviderId'] = content_provider_id
         req.headers['X-Original-Filename'] = upload_file.file_name
         req.headers['X-Apple-Upload-Validation-RuleSets'] = du_validation_rule_set if du_validation_rule_set
-        req.headers['Content-Length'] = "#{upload_file.file_size}"
+        req.headers['Content-Length'] = upload_file.file_size.to_s
         req.headers['Connection'] = "keep-alive"
       end
 

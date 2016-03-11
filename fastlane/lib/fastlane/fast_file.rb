@@ -100,12 +100,12 @@ module Fastlane
     end
 
     # User defines a platform block
-    def platform(platform_name, &block)
+    def platform(platform_name)
       SupportedPlatforms.verify!(platform_name)
 
       self.current_platform = platform_name
 
-      block.call
+      yield
 
       self.current_platform = nil
     end
