@@ -5,7 +5,7 @@ module Fastlane
         template = File.read(params[:template])
         result =   ERB.new(template).result(OpenStruct.new(params[:placeholders]).instance_eval { binding })
         File.open(params[:destination], 'w') { |file| file.write(result) } if params[:destination]
-        Helper.log.info "Successfully parsed template: '#{params[:template]}' and rendered output to: #{params[:destination]}" if params[:destination]
+        UI.message("Successfully parsed template: '#{params[:template]}' and rendered output to: #{params[:destination]}") if params[:destination]
         result
       end
 

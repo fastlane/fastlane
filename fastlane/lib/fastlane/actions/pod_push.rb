@@ -23,7 +23,7 @@ module Fastlane
         end
 
         result = Actions.sh(command.to_s)
-        Helper.log.info "Successfully pushed Podspec ⬆️ ".green
+        UI.success("Successfully pushed Podspec ⬆️ ")
         return result
       end
 

@@ -8,14 +8,14 @@ module Fastlane
       INSTALLR_API = "https://www.installrapp.com/apps.json"
 
       def self.run(params)
-        Helper.log.info 'Upload to Installr has been started. This may take some time.'.green
+        UI.success('Upload to Installr has been started. This may take some time.')
 
         response = self.upload_build(params)
 
         case response.status
         when 200...300
           Actions.lane_context[SharedValues::INSTALLR_BUILD_INFORMATION] = response.body
-          Helper.log.info 'Build successfully uploaded to Installr!'.green
+          UI.success('Build successfully uploaded to Installr!')
         else
           raise "Error when trying to upload build file to Installr: #{response.body}".red
         end

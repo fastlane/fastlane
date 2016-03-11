@@ -45,7 +45,7 @@ module Fastlane
     # Get the author email of the last git commit
     # <b>DEPRECATED:</b> Use <tt>git_author_email</tt> instead.
     def self.git_author
-      Helper.log.warn '`git_author` is deprecated. Please use `git_author_email` instead.'.red
+      UI.important('`git_author` is deprecated. Please use `git_author_email` instead.')
       git_author_email
     end
 
@@ -59,7 +59,7 @@ module Fastlane
     # Returns the unwrapped subject and body of the last commit
     # <b>DEPRECATED:</b> Use <tt>last_git_commit_message</tt> instead.
     def self.last_git_commit
-      Helper.log.warn '`last_git_commit` is deprecated. Please use `last_git_commit_message` instead.'.red
+      UI.important('`last_git_commit` is deprecated. Please use `last_git_commit_message` instead.')
       last_git_commit_message
     end
 

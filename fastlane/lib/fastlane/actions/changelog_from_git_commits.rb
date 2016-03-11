@@ -10,11 +10,11 @@ module Fastlane
           from, to = params[:between]
         else
           from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
-          Helper.log.debug "Found the last Git tag: #{from}"
+          UI.verbose("Found the last Git tag: #{from}")
           to = 'HEAD'
         end
 
-        Helper.log.info "Collecting Git commits between #{from} and #{to}".green
+        UI.success("Collecting Git commits between #{from} and #{to}")
 
         # Normally it is not good practice to take arbitrary input and convert it to a symbol
         # because prior to Ruby 2.2, symbols are never garbage collected. However, we've

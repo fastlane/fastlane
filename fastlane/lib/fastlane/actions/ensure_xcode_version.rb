@@ -13,10 +13,10 @@ module Fastlane
         versions_match = selected_version == "Xcode #{required_version}"
 
         if versions_match
-          Helper.log.info("Selected Xcode version is correct: #{selected_version}".green)
+          UI.success("Selected Xcode version is correct: #{selected_version}")
         else
-          Helper.log.info("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
-          Helper.log.info "To correct this, use: `xcode_select(version: #{required_version})`."
+          UI.message("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
+          UI.message("To correct this, use: `xcode_select(version: #{required_version})`.")
 
           raise "Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}\n"
         end

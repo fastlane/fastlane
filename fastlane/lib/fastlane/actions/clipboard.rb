@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ClipboardAction < Action
       def self.run(params)
-        Helper.log.info "Storing '#{params[:value]}' in the clipboard 🎨"
+        UI.message("Storing '#{params[:value]}' in the clipboard 🎨")
 
         `echo "#{params[:value]}" | tr -d '\n' | pbcopy` # we don't use `sh`, as the command looks ugly
       end

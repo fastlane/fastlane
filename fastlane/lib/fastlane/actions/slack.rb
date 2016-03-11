@@ -44,9 +44,9 @@ module Fastlane
                                attachments: [slack_attachment]
 
         if result.code.to_i == 200
-          Helper.log.info 'Successfully sent Slack notification'.green
+          UI.success('Successfully sent Slack notification')
         else
-          Helper.log.debug result
+          UI.verbose(result)
           raise 'Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.'.red
         end
       end

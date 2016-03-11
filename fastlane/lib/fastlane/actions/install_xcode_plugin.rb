@@ -10,8 +10,8 @@ module Fastlane
         FileUtils.mkdir_p(plugins_path)
         Action.sh "unzip -qo '#{zip_path}' -d '#{plugins_path}'"
 
-        Helper.log.info "Plugin #{File.basename(params[:url], '.zip')} installed successfully".green
-        Helper.log.info("Please restart Xcode to use the newly installed plugin")
+        UI.success("Plugin #{File.basename(params[:url], '.zip')} installed successfully")
+        UI.message("Please restart Xcode to use the newly installed plugin")
       end
 
       #####################################################

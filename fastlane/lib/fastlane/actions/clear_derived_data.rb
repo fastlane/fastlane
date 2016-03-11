@@ -3,9 +3,9 @@ module Fastlane
     class ClearDerivedDataAction < Action
       def self.run(options)
         path = File.expand_path(options[:derived_data_path])
-        Helper.log.info "Derived Data path located at: #{path}"
+        UI.message("Derived Data path located at: #{path}")
         FileUtils.rm_rf(path) if File.directory?(path)
-        Helper.log.info "Successfully cleared Derived Data ♻️".green
+        UI.success("Successfully cleared Derived Data ♻️")
       end
 
       #####################################################

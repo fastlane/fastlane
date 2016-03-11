@@ -4,13 +4,13 @@ module Fastlane
     def run
       platform = nil
       if is_ios?
-        Helper.log.info "Detected iOS/Mac project in current directory..."
+        UI.message("Detected iOS/Mac project in current directory...")
         platform = :ios
       elsif is_android?
-        Helper.log.info "Detected Android project in current directory..."
+        UI.message("Detected Android project in current directory...")
         platform = :android
       else
-        Helper.log.info "Couldn't automatically detect the platform"
+        UI.message("Couldn't automatically detect the platform")
         val = agree("Is this project an iOS project? (y/n) ".yellow, true)
         platform = (val ? :ios : :android)
       end
@@ -33,10 +33,10 @@ module Fastlane
     end
 
     def show_analytics
-      Helper.log.info "fastlane will send the number of errors for each action to"
-      Helper.log.info "https://github.com/fastlane/enhancer to detect integration issues"
-      Helper.log.info "No sensitive/private information will be uploaded"
-      Helper.log.info("You can disable this by adding `opt_out_usage` to your Fastfile")
+      UI.message("fastlane will send the number of errors for each action to")
+      UI.message("https://github.com/fastlane/enhancer to detect integration issues")
+      UI.message("No sensitive/private information will be uploaded")
+      UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
   end
 end

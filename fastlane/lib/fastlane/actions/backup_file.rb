@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         path = params[:path]
         FileUtils.cp(path, "#{path}.back", {preserve: true})
-        Helper.log.info "Successfully created a backup 💾"
+        UI.message("Successfully created a backup 💾")
       end
 
       def self.description
