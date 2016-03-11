@@ -14,13 +14,22 @@ module Fastlane
         end
         UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
 
-        command = []
-        command << File.expand_path(params[:binary_path])
-        command << "-a #{params[:api_token]}"
-        command << "-p #{params[:platform]}"
-        command << File.expand_path(params[:dsym_path])
+        dsym_paths = []
+        dsym_paths << params[:dsym_path]
+        dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
 
-        return Actions.sh command.join(" ")
+        UI.error("Couldn't find any dSYMs, please pass them using the dsym_path option") if dsym_paths.count == 0
+
+        dsym_paths.each do |current_path|
+          command = []
+          command << File.expand_path(params[:binary_path])
+          command << "-a #{params[:api_token]}"
+          command << "-p #{params[:platform]}"
+          command << File.expand_path(current_path)
+          Actions.sh(command.join(" "))
+        end
+
+        UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
       end
 
       #####################################################
@@ -45,6 +54,7 @@ module Fastlane
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
                                        description: "Path to the DSYM file or zip to upload",
                                        default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).first,
+                                       optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                          UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?("dSYM.zip") || value.end_with?(".dSYM")
