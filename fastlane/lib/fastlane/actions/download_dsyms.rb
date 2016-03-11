@@ -23,7 +23,7 @@ module Fastlane
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
               File.write(file_name, result)
-              UI.success("🔑 Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
+              UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
 
               Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
               Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(file_name)
