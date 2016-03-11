@@ -2304,6 +2304,10 @@ Add this your `Fastfile` to not send any data to the fastlane web service. You c
 opt_out_usage
 ```
 
+### rocket
+
+Print an ascii Rocket :rocket:. Useful after using `crashlytics` or `pilot` to indicate that your new build has been shipped to outer-space.
+
 ### skip_docs
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
