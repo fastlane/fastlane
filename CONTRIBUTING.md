@@ -117,6 +117,12 @@ To run the modified version of the tool, run the following in the project direct
 ./bin/[tool_name]
 ```
 
+or install the local copy (might require `sudo`)
+
+```
+bundle install && rake install
+```
+
 ## Debugging
 
 I personally use a plain Sublime Text with a terminal. Debugging is pretty easy, just insert the following code to where you want to jump in:
@@ -201,20 +207,6 @@ and then run these tests only using
 
 ```sh
 rspec -t now
-```
-
-## Running the local code
-
-Run your local copy using
-
-```
-./bin/[gem]
-```
-
-or install the local copy (might require `sudo`)
-
-```
-bundle install && rake install
 ```
 
 ## rubocop validation
