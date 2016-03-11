@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
