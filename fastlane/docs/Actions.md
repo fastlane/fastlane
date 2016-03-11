@@ -907,6 +907,20 @@ lane :refresh_dsyms do
   clean_build_artifacts           # Delete the local dSYM files
 end
 ```
+### [upload_symbols_to_sentry](https://getsentry.com)
+
+This action allows you to upload symbolication files to Sentry.
+
+```ruby
+upload_sybols_to_sentry(
+  api_key: '...',
+  org_slug: '...',
+  project_slug: '...',
+  dsym_path: './App.dSYM.zip'
+)
+```
+
+The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
 ### AWS S3 Distribution
