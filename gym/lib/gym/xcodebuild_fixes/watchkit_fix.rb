@@ -33,7 +33,7 @@ module Gym
 
       # Should only be applied if watchkit app is not a watchkit2 app
       def should_apply_watchkit1_fix?
-        watchkit? && !(Gym::XcodebuildFixes.watchkit2?)
+        watchkit? && !Gym::XcodebuildFixes.watchkit2?
       end
     end
   end

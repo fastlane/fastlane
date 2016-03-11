@@ -238,7 +238,7 @@ module Spaceship
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
       headers.merge!(csrf_tokens)
-      headers.merge!({ 'User-Agent' => USER_AGENT })
+      headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)

@@ -6,7 +6,7 @@ module Fastlane
 
         cmd = ['pod cache clean']
 
-        cmd << "#{params[:name]}" if params[:name]
+        cmd << params[:name].to_s if params[:name]
         cmd << '--all'
 
         Actions.sh(cmd.join(' '))

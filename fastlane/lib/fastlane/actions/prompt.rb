@@ -17,7 +17,7 @@ module Fastlane
           user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
         end
 
-        user_input = (user_input.downcase == 'y') if params[:boolean]
+        user_input = user_input.casecmp('y').zero? if params[:boolean]
         return user_input
       end
 

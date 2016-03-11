@@ -93,7 +93,7 @@ module FastlaneCore
       verify_interactive!(message)
 
       important(message)
-      choose(*(options))
+      choose(*options)
     end
 
     def password(message)

@@ -119,7 +119,7 @@ module CredentialsManager
     #
     # Discussion If received lane name does not match the lane name available as environment variable, no changes will
     #             be applied.
-    def for_lane(lane_name, &block)
+    def for_lane(lane_name)
       if lane_name.to_s.split(" ").count > 1
         # That's the legacy syntax 'platform name'
         puts "You use deprecated syntax '#{lane_name}' in your Appfile.".yellow
@@ -131,7 +131,7 @@ module CredentialsManager
       end
 
       if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
-        block.call
+        yield
       end
     end
 
@@ -142,15 +142,15 @@ module CredentialsManager
     #
     # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
     #             be applied.
-    def for_platform(platform_name, &block)
+    def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
-        block.call
+        yield
       end
     end
 
     private
 
-    def setter(key, *args, &_block)
+    def setter(key, *args)
       if block_given?
         value = yield
       else
