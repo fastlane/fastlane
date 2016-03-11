@@ -48,7 +48,7 @@ fastlane beta
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 150 built-in integrations available
-:computer: | Support for both iOS, Mac OS and Android apps
+:computer: | Support for iOS, Mac OS and Android apps
 :octocat: | Full git and mercurial support
 
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
