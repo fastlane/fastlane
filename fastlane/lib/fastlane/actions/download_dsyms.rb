@@ -19,8 +19,8 @@ module Fastlane
         app.all_build_train_numbers.each do |train_number|
           app.all_builds_for_train(train: train_number).each do |build|
             download_url = build.details.dsym_url
-            if download_url =~ URI.regexp
-              result = Net::HTTP.get(URI(download_url))
+            if download_url
+              result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
               File.write(file_name, result)
               UI.success("🔑 Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
@@ -32,6 +32,14 @@ module Fastlane
             end
           end
         end
+      end
+
+      def self.download(url)
+        uri = URI.parse(url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = (uri.scheme == "https")
+        res = http.get(uri.request_uri)
+        res.body
       end
 
       #####################################################
