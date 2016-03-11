@@ -101,10 +101,10 @@ module Fastlane
         begin
           Actions.sh(command)
 
-          Helper.log.info "Committed \"#{params[:message]}\" 💾.".green
+          UI.success("Committed \"#{params[:message]}\" 💾.")
         rescue => ex
-          Helper.log.error ex
-          Helper.log.info "Didn't commit any changes. 😐".yellow
+          UI.error(ex)
+          UI.important("Didn't commit any changes. 😐")
         end
       end
 

@@ -15,7 +15,7 @@ module Fastlane
           raise "The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}. Please update using `sudo gem update fastlane`.".red
         end
 
-        Helper.log.info "fastlane version valid"
+        UI.message("fastlane version valid")
       end
 
       def self.step_text

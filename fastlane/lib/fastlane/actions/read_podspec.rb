@@ -13,7 +13,7 @@ module Fastlane
         require 'cocoapods-core'
         spec = Pod::Spec.from_file(path).to_hash
 
-        Helper.log.info "Reading podspec from file #{path}".green
+        UI.success("Reading podspec from file #{path}")
 
         Actions.lane_context[SharedValues::READ_PODSPEC_JSON] = spec
         return spec

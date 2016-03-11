@@ -65,7 +65,7 @@ module Fastlane
         Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(last_apk_path) if last_apk_path
 
         # Give a helpful message in case there were no new apk's. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk
-        Helper.log.info 'Couldn\'t find any new signed apk files...'.red if new_apks.empty?
+        UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty?
 
         return result
       end

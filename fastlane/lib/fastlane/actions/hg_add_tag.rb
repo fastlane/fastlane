@@ -5,7 +5,7 @@ module Fastlane
       def self.run(options)
         tag = options[:tag]
 
-        Helper.log.info "Adding mercurial tag '#{tag}' 🎯."
+        UI.message("Adding mercurial tag '#{tag}' 🎯.")
 
         command = "hg tag \"#{tag}\""
         return command if Helper.is_test?

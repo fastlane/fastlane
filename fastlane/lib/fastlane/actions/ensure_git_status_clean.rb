@@ -10,7 +10,7 @@ module Fastlane
         repo_clean = `git status --porcelain`.empty?
 
         if repo_clean
-          Helper.log.info 'Git status is clean, all good! 💪'.green
+          UI.success('Git status is clean, all good! 💪')
           Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START] = true
         else
           raise 'Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.'.red

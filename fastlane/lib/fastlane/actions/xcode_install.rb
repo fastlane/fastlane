@@ -14,14 +14,14 @@ module Fastlane
         installer = XcodeInstall::Installer.new
 
         if installer.installed?(params[:version])
-          Helper.log.info "Xcode #{params[:version]} is already installed ✨".green
+          UI.success("Xcode #{params[:version]} is already installed ✨")
         else
           installer.install_version(params[:version], true, true, true, true)
         end
 
         xcode = installer.installed_versions.find { |x| x.version == params[:version] }
         raise "Could not find Xcode with version '#{params[:version]}'" unless xcode
-        Helper.log.info "Using Xcode #{params[:version]} on path '#{xcode.path}'"
+        UI.message("Using Xcode #{params[:version]} on path '#{xcode.path}'")
         xcode.approve_license
 
         ENV["DEVELOPER_DIR"] = File.join(xcode.path, "/Contents/Developer")

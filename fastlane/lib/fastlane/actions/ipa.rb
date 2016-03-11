@@ -38,7 +38,7 @@ module Fastlane
         build_args = params_to_build_args(params)
 
         unless params[:scheme]
-          Helper.log.warn "You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`"
+          UI.important("You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`")
         end
 
         # If no dest directory given, default to current directory
@@ -55,7 +55,7 @@ module Fastlane
 
         core_command = "krausefx-ipa build #{build_args} --verbose | xcpretty"
         command = "set -o pipefail && #{core_command}"
-        Helper.log.debug command
+        UI.verbose(command)
 
         begin
           Actions.sh command
@@ -70,10 +70,10 @@ module Fastlane
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
           ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
 
-          Helper.log.info "You are using legacy `shenzhen` to build your app".yellow
-          Helper.log.info "It is recommended to upgrade to `gym`".yellow
-          Helper.log.info "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile".yellow
-          Helper.log.info "https://github.com/fastlane/fastlane/tree/master/gym".yellow
+          UI.important("You are using legacy `shenzhen` to build your app")
+          UI.important("It is recommended to upgrade to `gym`")
+          UI.important("To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile")
+          UI.important("https://github.com/fastlane/fastlane/tree/master/gym")
         rescue => ex
           [
             "-------------------------------------------------------",
@@ -85,7 +85,7 @@ module Fastlane
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|
-            Helper.log.error txt.yellow
+            UI.error(txt)
           end
 
           # Raise a custom exception, as the the normal one is useless for the user

@@ -28,7 +28,7 @@ module Fastlane
 
           return sh(cmd.join(' '))
         else
-          Helper.log.info "No Gemfile found"
+          UI.message("No Gemfile found")
         end
       end
       # rubocop:enable Metrics/CyclomaticComplexity
@@ -40,7 +40,7 @@ module Fastlane
         possible_gemfiles.each do |gemfile|
           gemfile = File.absolute_path(gemfile)
           return true if File.exist?(gemfile)
-          Helper.log.info "Gemfile not found at: '#{gemfile}'"
+          UI.message("Gemfile not found at: '#{gemfile}'")
         end
         return false
       end

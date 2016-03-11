@@ -26,7 +26,7 @@ module Fastlane
         current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
 
         if params[:version_number]
-          Helper.log.debug "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version =~ /\d.\d.\d/
+          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ /\d.\d.\d/
 
           # Specific version
           next_version_number = params[:version_number]
@@ -70,7 +70,7 @@ module Fastlane
 
         return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
-        Helper.log.error 'Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html'.yellow
+        UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
         raise ex
       end
 

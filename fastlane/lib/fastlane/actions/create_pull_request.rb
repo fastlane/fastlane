@@ -9,7 +9,7 @@ module Fastlane
         require 'excon'
         require 'base64'
 
-        Helper.log.info "Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'"
+        UI.message("Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'")
 
         url = "#{params[:api_url]}/repos/#{params[:repo]}/pulls"
         headers = { 'User-Agent' => 'fastlane-create_pull_request' }
@@ -29,11 +29,11 @@ module Fastlane
           body = JSON.parse(response.body)
           number = body['number']
           html_url = body['html_url']
-          Helper.log.info "Successfully created pull request ##{number}. You can see it at '#{html_url}'".green
+          UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
         elsif response[:status] != 200
-          Helper.log.error "GitHub responded with #{response[:status]}: #{response[:body]}".red
+          UI.error("GitHub responded with #{response[:status]}: #{response[:body]}")
         end
       end
 

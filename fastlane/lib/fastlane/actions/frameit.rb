@@ -11,7 +11,7 @@ module Fastlane
           color = Frameit::Color::BLACK
           color = Frameit::Color::SILVER if config[:white] || config[:silver]
 
-          Helper.log.info "Framing screenshots at path #{config[:path]}"
+          UI.message("Framing screenshots at path #{config[:path]}")
 
           Dir.chdir(config[:path]) do
             ENV["FRAMEIT_FORCE_DEVICE_TYPE"] = config[:force_device_type] if config[:force_device_type]
