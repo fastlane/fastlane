@@ -67,7 +67,6 @@ task :test_all do
   exceptions = []
   repos_with_exceptions = []
   rspec_log_file = "rspec_logs.json"
-  rubocop_config = ENV['CI'] ? '../.rubocop-ci.yml' : '../.rubocop.yml'
 
   bundle_install
   for_each_gem do |repo|
@@ -79,7 +78,7 @@ task :test_all do
         # Since we nest bundle exec in bundle exec
         Bundler.with_clean_env do
           bundle_install
-          sh "bundle exec rubocop --config #{rubocop_config}"
+          sh "bundle exec rubocop"
           sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
         end
       rescue => ex
