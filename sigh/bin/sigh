@@ -66,6 +66,7 @@ class SighApplication
                'Can be provided multiple times if the application contains nested applications and app extensions, which need their own provisioning profile.'\
                'The path may be prefixed with a identifier in order to determine which provisioning profile should be used on which app.',
                &multiple_values_option_proc(c, "provisioning_profile", &proc { |value| value.split('=', 2) })
+      c.option '-d', '--display_name STRING', String, 'Display name to use'
 
       c.action do |args, options|
         Sigh::Resign.new.run(options, args)
