@@ -1,6 +1,7 @@
 module Match
   class Encrypt
     require 'security'
+    require 'shellwords'
 
     def server_name(git_url)
       ["match", git_url].join("_")
@@ -77,9 +78,9 @@ module Match
 
       tmpfile = File.join(Dir.mktmpdir, "temporary")
       command = ["openssl aes-256-cbc"]
-      command << "-k \"#{password}\""
-      command << "-in \"#{path}\""
-      command << "-out \"#{tmpfile}\""
+      command << "-k #{password.shellescape}"
+      command << "-in #{path.shellescape}"
+      command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
       command << "&> /dev/null" unless $verbose # to show show an error message is something goes wrong
