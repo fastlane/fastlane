@@ -8,7 +8,7 @@ Make sure you have `bundler` installed using `gem install bundler`
 - Create an issue to discuss your idea/feature/enhancement.
 - Click on `Fork` on the top right
 - Then clone your new repo locally `git clone https://github.com/[my_user]/fastlane.git`
-- On your terminal, navigate to the project and run `git remote add upstream https://github.com/[my_user]/fastlane` (or use the `git` URL if you use private key auth)
+- On your terminal, navigate to the project and run `git remote add upstream https://github.com/fastlane/fastlane` (or use the `git` URL if you use private key auth)
 - Create your feature branch (`git checkout -b my-new-feature`).
 - Commit your changes (`git commit -am 'Add some feature'`).
 - Push to the branch (`git push origin my-new-feature`).
@@ -24,7 +24,7 @@ rake pull
 
 To submit the changes to the fastlane main repo, you have to do the following:
 
-- Squash your commits into one. For example,  to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
+- Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
 - Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
@@ -109,7 +109,7 @@ Writing a custom action is an easy way to extend the capabilities of fastlane. A
 
 ## Developing
 
-When working on something, directly edit the Ruby files in the project folders. Make sure to switch to 2 spaces in your text editor.
+When working on something, directly edit the Ruby files in the project folders. Make sure to switch your text editor to use spaces and indentations should be 2 spaces.
 
 To run the modified version of the tool, run the following in the project directory
 
