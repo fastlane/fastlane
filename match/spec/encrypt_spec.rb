@@ -7,7 +7,7 @@ describe Match do
       File.write(@full_path, @content)
       @git_url = "https://github.com/fastlane/fastlane/tree/master/so_random"
       allow(Dir).to receive(:mktmpdir).and_return(@directory)
-      ENV["MATCH_PASSWORD"] = "my_pass"
+      ENV["MATCH_PASSWORD"] = '2"QAHg@v(Qp{=*n^'
 
       @e = Match::Encrypt.new
     end
