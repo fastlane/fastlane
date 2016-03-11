@@ -168,8 +168,8 @@ module Spaceship
           attrs = client.app_version(app_id, is_live)
           return nil unless attrs
 
-          attrs.merge!(application: application)
-          attrs.merge!(is_live: is_live)
+          attrs[:application] = application
+          attrs[:is_live] = is_live
 
           return self.factory(attrs)
         end
@@ -429,7 +429,7 @@ module Spaceship
 
           trailer.merge!({
             "pictureAssetToken" => video_preview_data["token"],
-            "previewFrameTimeCode" => "#{ts}",
+            "previewFrameTimeCode" => ts.to_s,
             "isPortrait" => Utilities.portrait?(video_preview_path)
           })
         else # removing trailer

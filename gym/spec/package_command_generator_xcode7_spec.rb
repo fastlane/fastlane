@@ -15,12 +15,12 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-        "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild} -exportArchive",
-        "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-        "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-        "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
-        ""
-      ])
+                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             ""
+                           ])
     end
 
     it "generates a valid plist file we need" do

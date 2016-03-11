@@ -40,7 +40,7 @@ module Gym
             profile = File.expand_path(profiles.last)
           elsif profiles.count > 1
             UI.message "Found more than one provisioning profile in the project directory:"
-            profile = choose(*(profiles))
+            profile = choose(*profiles)
           end
 
           Gym.config[:provisioning_profile_path] = profile

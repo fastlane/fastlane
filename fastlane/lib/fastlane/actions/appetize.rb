@@ -30,7 +30,7 @@ module Fastlane
             platform: 'ios'
         }
 
-        params.merge!(privateKey: options[:private_key]) unless options[:private_key].nil?
+        params[:privateKey] = options[:private_key] unless options[:private_key].nil?
         req.body = JSON.generate(params)
         response = https.request(req)
 
@@ -61,15 +61,14 @@ module Fastlane
       private_class_method :parse_response
 
       def self.help_message(response)
-        message =
-            case response.body
-            when 'Invalid token'
-              'Invalid API Token specified.'
-            when 'Error downloading zip file'
-              'URL should be wrong'
-            when 'No app with specified privateKey found'
-              'Invalid privateKey specified'
-            end
+        message = case response.body
+                  when 'Invalid token'
+                    'Invalid API Token specified.'
+                  when 'Error downloading zip file'
+                    'URL should be wrong'
+                  when 'No app with specified privateKey found'
+                    'Invalid privateKey specified'
+                  end
         Helper.log.error message.red if message
       end
       private_class_method :help_message
