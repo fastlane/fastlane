@@ -130,7 +130,7 @@ module Spaceship
 
       def details
         attrs = client.app_details(apple_id)
-        attrs.merge!(application: self)
+        attrs[:application] = self
         Tunes::AppDetails.factory(attrs)
       end
 
@@ -138,7 +138,7 @@ module Spaceship
         ensure_not_a_bundle
         versions = client.versions_history(apple_id, platform)
         versions.map do |attrs|
-          attrs.merge!(application: self)
+          attrs[:application] = self
           Tunes::AppVersionHistory.factory(attrs)
         end
       end
@@ -213,7 +213,7 @@ module Spaceship
       # This is used to receive dSYM files from Apple
       def all_builds_for_train(train: nil)
         client.all_builds_for_train(app_id: self.apple_id, train: train).fetch("items", []).collect do |attrs|
-          attrs.merge!(apple_id: self.apple_id)
+          attrs[:apple_id] = self.apple_id
           Tunes::Build.factory(attrs)
         end
       end
@@ -225,7 +225,7 @@ module Spaceship
         data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
 
         builds = data.fetch('processingBuilds', []).collect do |attrs|
-          attrs.merge!(build_train: self)
+          attrs[:build_train] = self
           Tunes::ProcessingBuild.factory(attrs)
         end
 
@@ -239,7 +239,7 @@ module Spaceship
         data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
 
         builds = data.fetch('processingBuilds', []).collect do |attrs|
-          attrs.merge!(build_train: self)
+          attrs[:build_train] = self
           Tunes::ProcessingBuild.factory(attrs)
         end
 

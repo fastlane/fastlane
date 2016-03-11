@@ -47,7 +47,7 @@ module Fastlane
                                        default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                         UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?("dSYM.zip") || value.end_with?(".dSYM")
+                                         UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?("dSYM.zip", ".dSYM")
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",

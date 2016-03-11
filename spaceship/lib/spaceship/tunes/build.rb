@@ -121,7 +121,7 @@ module Spaceship
         response = client.build_details(app_id: self.apple_id,
                                          train: self.train_version,
                                   build_number: self.build_version)
-        response.merge!('apple_id' => self.apple_id)
+        response['apple_id'] = self.apple_id
         BuildDetails.factory(response)
       end
 

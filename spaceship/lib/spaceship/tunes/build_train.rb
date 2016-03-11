@@ -49,7 +49,7 @@ module Spaceship
 
           result = {}
           trains.each do |attrs|
-            attrs.merge!(application: application)
+            attrs[:application] = application
             current = self.factory(attrs)
             result[current.version_string] = current
           end
@@ -62,12 +62,12 @@ module Spaceship
         super
 
         @builds = (self.raw_data['builds'] || []).collect do |attrs|
-          attrs.merge!(build_train: self)
+          attrs[:build_train] = self
           Tunes::Build.factory(attrs)
         end
 
         @processing_builds = (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
-          attrs.merge!(build_train: self)
+          attrs[:build_train] = self
           Tunes::Build.factory(attrs)
         end
 

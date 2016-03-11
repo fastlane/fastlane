@@ -80,7 +80,7 @@ module Spaceship
 
       if t_name.length > 0
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].downcase == t_name.downcase
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
         end
       end
 

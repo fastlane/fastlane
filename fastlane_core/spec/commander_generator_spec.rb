@@ -30,11 +30,11 @@ describe FastlaneCore do
           stub_commander_runner_args(['test', 'other', '-b'])
 
           program = TestCommanderProgram.run([
-            FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                short_option: '-b',
-                                 description: 'Boolean 1',
-                                   is_string: false)
-          ])
+                                               FastlaneCore::ConfigItem.new(key: :boolean_1,
+                                                                   short_option: '-b',
+                                                                    description: 'Boolean 1',
+                                                                      is_string: false)
+                                             ])
 
           expect(program.args).to eq(['other'])
         end
