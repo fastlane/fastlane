@@ -235,7 +235,7 @@ module Fastlane
         pipe_command = "| tee '#{buildlog_path}/xcodebuild.log' #{xcpretty_command}"
 
         FileUtils.mkdir_p buildlog_path
-        Helper.log.info "For a more detailed xcodebuild log open #{buildlog_path}/xcodebuild.log"
+        UI.message("For a more detailed xcodebuild log open #{buildlog_path}/xcodebuild.log")
 
         output_result = ""
 
@@ -253,8 +253,8 @@ module Fastlane
             if (iphone_simulator_time_out_error =~ ex.message) != nil
               raise_error = false
 
-              Helper.log.warn "First attempt failed with iPhone Simulator error: #{iphone_simulator_time_out_error.source}"
-              Helper.log.warn "Retrying once more..."
+              UI.important("First attempt failed with iPhone Simulator error: #{iphone_simulator_time_out_error.source}")
+              UI.important("Retrying once more...")
               output_result = Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} #{pipe_command}"
             end
           end
@@ -320,12 +320,12 @@ module Fastlane
         workspaces = Dir.glob("*.xcworkspace")
 
         if workspaces.length > 1
-          Helper.log.warn "Multiple workspaces detected."
+          UI.important("Multiple workspaces detected.")
         end
 
         unless workspaces.empty?
           workspace = workspaces.first
-          Helper.log.warn "Using workspace \"#{workspace}\""
+          UI.important("Using workspace \"#{workspace}\"")
         end
 
         return workspace
@@ -500,7 +500,7 @@ module Fastlane
 
     class XctestAction < Action
       def self.run(params)
-        Helper.log.info "Have you seen the new 'scan' tool to run tests? https://github.com/fastlane/fastlane/tree/master/scan".yellow
+        UI.important("Have you seen the new 'scan' tool to run tests? https://github.com/fastlane/fastlane/tree/master/scan")
         params_hash = params || {}
         params_hash[:build] = true
         params_hash[:test] = true

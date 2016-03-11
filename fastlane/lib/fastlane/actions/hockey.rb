@@ -27,14 +27,14 @@ module Fastlane
           if File.exist?(dsym_path)
             dsym_filename = dsym_path
           else
-            Helper.log.info "Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly".yellow
+            UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
             dsym_filename = nil
           end
         end
 
         raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if dsym_filename && !File.exist?(dsym_filename)
 
-        Helper.log.info 'Starting with ipa upload to HockeyApp... this could take some time.'.green
+        UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
@@ -55,8 +55,8 @@ module Fastlane
           Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
 
-          Helper.log.info "Public Download URL: #{url}" if url
-          Helper.log.info 'Build successfully uploaded to HockeyApp!'.green
+          UI.message("Public Download URL: #{url}") if url
+          UI.success('Build successfully uploaded to HockeyApp!')
         else
           if response.body.to_s.include?("App could not be created")
             raise "Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400"

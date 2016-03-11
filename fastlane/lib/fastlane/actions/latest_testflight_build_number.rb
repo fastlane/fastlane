@@ -22,12 +22,12 @@ module Fastlane
           if app.build_trains.keys.last
             version_number = app.build_trains.keys.last
           else
-            Helper.log.info "You have to specify a new version number: "
+            UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
           end
         end
 
-        Helper.log.info "Fetching the latest build number for version #{version_number}"
+        UI.message("Fetching the latest build number for version #{version_number}")
 
         train = app.build_trains[version_number]
         begin
@@ -37,7 +37,7 @@ module Fastlane
           build_number = params[:initial_build_number]
         end
 
-        Helper.log.info "Latest upload is build number: #{build_number}"
+        UI.message("Latest upload is build number: #{build_number}")
         Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_number
       end
 

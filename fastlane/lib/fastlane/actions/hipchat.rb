@@ -104,7 +104,7 @@ module Fastlane
                                        description: "Hipchat API Token",
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
-                                           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.".red
+                                           UI.error("Please add 'ENV[\"HIPCHAT_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.")
                                            raise 'No HIPCHAT_API_TOKEN given.'.red
                                          end
                                        end),
@@ -124,7 +124,7 @@ module Fastlane
                                        description: "Version of the Hipchat API. Must be 1 or 2",
                                        verify_block: proc do |value|
                                          if value.nil? || ![1, 2].include?(value.to_i)
-                                           Helper.log.fatal "Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.".red
+                                           UI.error("Please add 'ENV[\"HIPCHAT_API_VERSION\"] = \"1 or 2\"' to your Fastfile's `before_all` section.")
                                            raise 'No HIPCHAT_API_VERSION given.'.red
                                          end
                                        end),
@@ -146,7 +146,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          unless ["html", "text"].include?(value.to_s)
-                                           Helper.log.fatal "Please specify the message format as either 'html' or 'text'.".red
+                                           UI.error("Please specify the message format as either 'html' or 'text'.")
                                            raise 'Unrecognized message_format.'.red
                                          end
                                        end),

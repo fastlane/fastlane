@@ -5,11 +5,11 @@ module Fastlane
 
     class VerifyXcodeAction < Action
       def self.run(params)
-        Helper.log.info "Verifying your Xcode installation at path '#{params[:xcode_path]}'...".green
+        UI.success("Verifying your Xcode installation at path '#{params[:xcode_path]}'...")
 
         # Check 1/2
 
-        Helper.log.info "Verifying Xcode was signed by Apple Inc.".green
+        UI.success("Verifying Xcode was signed by Apple Inc.")
         command = "codesign --display --verbose=4 '#{params[:xcode_path]}'"
 
         must_includes = [
@@ -22,12 +22,12 @@ module Fastlane
 
         verify(command: command, must_includes: must_includes, params: params)
 
-        Helper.log.info "Successfully verified the code signature".green
+        UI.success("Successfully verified the code signature")
 
         # Check 2/2
         # More information https://developer.apple.com/news/?id=09222015a
-        Helper.log.info "Verifying Xcode using GateKeeper..."
-        Helper.log.info "This will take up to a few minutes, now is a great time to go for a coffee ☕...".green
+        UI.message("Verifying Xcode using GateKeeper...")
+        UI.success("This will take up to a few minutes, now is a great time to go for a coffee ☕...")
 
         command = "/usr/sbin/spctl --assess --verbose '#{params[:xcode_path]}'"
         must_includes = ['accepted']
@@ -35,7 +35,7 @@ module Fastlane
         output = verify(command: command, must_includes: must_includes, params: params)
 
         if output.include?("source=Mac App Store") or output.include?("source=Apple") or output.include?("source=Apple System")
-          Helper.log.info "Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧".green
+          UI.success("Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧")
         else
           show_and_raise_error("Invalid Download Source of Xcode: #{output}", params[:xcode_path])
         end
@@ -60,10 +60,10 @@ module Fastlane
       end
 
       def self.show_and_raise_error(error, xcode_path)
-        Helper.log.fatal "Attention: Your Xcode Installation might be hacked.".red
-        Helper.log.fatal "This might be a false alarm, if so, please submit an issue on GitHub".red
-        Helper.log.fatal "The following information couldn't be found:".red
-        Helper.log.fatal error.yellow
+        UI.error("Attention: Your Xcode Installation might be hacked.")
+        UI.error("This might be a false alarm, if so, please submit an issue on GitHub")
+        UI.error("The following information couldn't be found:")
+        UI.error(error)
         raise "The Xcode installation at path '#{xcode_path}' might be compromised."
       end
 

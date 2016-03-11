@@ -54,7 +54,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          Helper.log.info "Install using `brew install homebrew/boneyard/appledoc`"
+          UI.message("Install using `brew install homebrew/boneyard/appledoc`")
           raise "appledoc not installed".red if `which appledoc`.length == 0
         end
 
@@ -68,10 +68,10 @@ module Fastlane
 
         # Maps parameter hash to CLI args
         appledoc_args = params_hash_to_cli_args(params_hash)
-        Helper.log.info "Generating documentation.".green
+        UI.success("Generating documentation.")
         cli_args = appledoc_args.join(' ')
         command = "appledoc #{cli_args}".strip + " \"#{params_hash[:input]}\""
-        Helper.log.debug command
+        UI.verbose(command)
         Actions.sh command
       end
 

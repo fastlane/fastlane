@@ -8,8 +8,8 @@ module Fastlane
       require 'plist'
 
       def self.run(params)
-        Helper.log.info "Entitlements File: #{params[:entitlements_file]}"
-        Helper.log.info "New App Group Identifiers: #{params[:app_group_identifiers]}"
+        UI.message("Entitlements File: #{params[:entitlements_file]}")
+        UI.message("New App Group Identifiers: #{params[:app_group_identifiers]}")
 
         entitlements_file = params[:entitlements_file]
         raise "Could not find entitlements file at path '#{entitlements_file}'".red unless File.exist?(entitlements_file)
@@ -23,12 +23,12 @@ module Fastlane
         raise 'No existing App group field specified. Please specify an App Group in the entitlements file.'.red unless app_group_field
 
         # set new app group identifiers
-        Helper.log.info "Old App Group Identifiers: #{app_group_field}"
+        UI.message("Old App Group Identifiers: #{app_group_field}")
         result['com.apple.security.application-groups'] = params[:app_group_identifiers]
 
         # save entitlements file
         result.save_plist(entitlements_file)
-        Helper.log.info "New App Group Identifiers set: #{result['com.apple.security.application-groups']}"
+        UI.message("New App Group Identifiers set: #{result['com.apple.security.application-groups']}")
 
         Actions.lane_context[SharedValues::APP_GROUP_IDENTIFIERS] = result['com.apple.security.application-groups']
       end

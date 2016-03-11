@@ -24,7 +24,7 @@ module Fastlane
           current << authors.first.green if authors.count == 1
           current << "Multiple".green if authors.count > 1
         else
-          Helper.log.error "Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.".red
+          UI.error("Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.")
           current << "Please update action file".red
         end
         rows << current

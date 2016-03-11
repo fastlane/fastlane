@@ -9,7 +9,7 @@ module Fastlane
         end
 
         result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")
-        Helper.log.info "Successfully committed \"#{params[:path]}\" 💾.".green
+        UI.success("Successfully committed \"#{params[:path]}\" 💾.")
         return result
       end
 

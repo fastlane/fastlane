@@ -3,14 +3,14 @@ module Fastlane
     class PromptAction < Action
       def self.run(params)
         params[:text] += " (y/n)" if params[:boolean]
-        Helper.log.info params[:text]
+        UI.message(params[:text])
 
         return params[:ci_input] if Helper.is_ci?
 
         if params[:multi_line_end_keyword]
           # Multi line
           end_tag = params[:multi_line_end_keyword]
-          Helper.log.info "Submit inputs using \"#{params[:multi_line_end_keyword]}\"".yellow
+          UI.important("Submit inputs using \"#{params[:multi_line_end_keyword]}\"")
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         else
           # Standard one line input

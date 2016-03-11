@@ -7,7 +7,7 @@ module Fastlane
 
         # try to resign the ipa
         if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version])
-          Helper.log.info 'Successfully re-signed .ipa 🔏.'.green
+          UI.success('Successfully re-signed .ipa 🔏.')
         else
           raise 'Failed to re-sign .ipa'.red
         end

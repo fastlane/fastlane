@@ -16,7 +16,7 @@ module Fastlane
         raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exist?(compile_commands)
 
         if params[:select_reqex]
-          Helper.log.warn "'select_reqex' paramter is deprecated. Please use 'select_regex' instead.".yellow
+          UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
           select_regex = params[:select_reqex]
         end
 
@@ -46,7 +46,7 @@ module Fastlane
         oclint_args << "-list-enabled-rules" if params[:list_enabled_rules]
 
         if params[:rc]
-          Helper.log.warn "It's recommended to use 'thresholds' instead of deprecated 'rc' parameter".yellow
+          UI.important("It's recommended to use 'thresholds' instead of deprecated 'rc' parameter")
           oclint_args << "-rc=#{params[:rc]}" if params[:rc] # Deprecated
         end
 

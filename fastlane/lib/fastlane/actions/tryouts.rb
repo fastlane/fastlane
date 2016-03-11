@@ -9,15 +9,15 @@ module Fastlane
       TRYOUTS_API_BUILD_RELEASE_TEMPLATE = "https://api.tryouts.io/v1/applications/%s/releases/"
 
       def self.run(params)
-        Helper.log.info 'Upload to Tryouts has been started. This may take some time.'.green
+        UI.success('Upload to Tryouts has been started. This may take some time.')
 
         response = self.upload_build(params)
 
         case response.status
         when 200...300
           Actions.lane_context[SharedValues::TRYOUTS_BUILD_INFORMATION] = response.body
-          Helper.log.info 'Build successfully uploaded to Tryouts!'.green
-          Helper.log.info "Release download url: #{response.body['download_url']}" if response.body["download_url"]
+          UI.success('Build successfully uploaded to Tryouts!')
+          UI.message("Release download url: #{response.body['download_url']}") if response.body["download_url"]
         else
           raise "Error when trying to upload build file to Tryouts: #{response.body}".red
         end

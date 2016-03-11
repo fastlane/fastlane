@@ -78,8 +78,8 @@ module Fastlane
         gcovr_args = gcovr_args.join(" ")
 
         command = "gcovr #{gcovr_args}"
-        Helper.log.info "Generating code coverage.".green
-        Helper.log.debug command
+        UI.success("Generating code coverage.")
+        UI.verbose(command)
         Actions.sh command
       end
 

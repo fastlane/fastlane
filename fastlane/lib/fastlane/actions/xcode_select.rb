@@ -28,7 +28,7 @@ module Fastlane
         # Verify that a path to a directory was passed in
         raise "Path '#{xcode_path}' doesn't exist".red unless Dir.exist?(xcode_path)
 
-        Helper.log.info "Setting Xcode version to #{xcode_path} for all build steps"
+        UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
         ENV["DEVELOPER_DIR"] = File.join(xcode_path, "/Contents/Developer")
       end
