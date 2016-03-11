@@ -4,12 +4,6 @@ def for_each_gem
   end
 end
 
-def rspec_json_from_log(gem_name, file)
-  log = File.join(gem_name, file)
-  file_text = File.read(log)
-  log_json = JSON.parse(file_text)
-end
-
 def messages_for_failed_tests(failures_by_gem)
   failures_by_gem.reduce([]) do |memo, (gem_name, failures)|
     memo += failures.map do |f|
@@ -78,8 +72,8 @@ task :test_all do
         # Since we nest bundle exec in bundle exec
         Bundler.with_clean_env do
           bundle_install
-          sh "bundle exec rubocop"
           sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
+          sh "bundle exec rubocop"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
@@ -95,7 +89,11 @@ task :test_all do
 
   for_each_gem do |gem_name|
     failed_tests_by_gem[gem_name] = []
-    log_json = rspec_json_from_log(gem_name, rspec_log_file)
+
+    log_file_path = File.join(gem_name, rspec_log_file)
+    next unless File.readable?(log_file_path)
+
+    log_json = JSON.parse(File.read(log_file_path))
     tests = log_json["examples"]
     summary = log_json["summary"]
 
@@ -107,7 +105,7 @@ task :test_all do
   failure_messages = messages_for_failed_tests(failed_tests_by_gem)
 
   puts ("*" * 80).yellow
-  box "Summary"
+  box "Testing Summary"
   puts "\nFinished in #{duration.round(3)} seconds"
   puts "#{example_count} examples, #{failure_messages.count} failure(s)".send(failure_messages.empty? ? :green : :red)
 
@@ -121,7 +119,7 @@ task :test_all do
   if exceptions.empty?
     puts "Success 🚀".green
   else
-    box "Exceptions"
-    puts "\n" + exceptions.join("\n")
+    box "Exceptions 💣"
+    puts "\n" + exceptions.map(&:red).join("\n")
   end
 end
