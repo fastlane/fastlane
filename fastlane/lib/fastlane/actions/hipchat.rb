@@ -56,7 +56,6 @@ module Fastlane
             http.use_ssl = true
 
             response = http.post(uri.path, params.to_json, json_headers)
-            check_response_code(response, channel)
           else
             uri = URI.parse("https://#{api_host}/v2/room/#{channel}/notification")
             response = Net::HTTP.post_form(uri, { 'from' => from,
@@ -65,9 +64,8 @@ module Fastlane
                                                   'message_format' => message_format,
                                                   'message' => message,
                                                   'notify' => options[:notify_room] ? 'true' : 'false' })
-
-            check_response_code(response, channel)
           end
+          check_response_code(response, channel)
         end
       end
 

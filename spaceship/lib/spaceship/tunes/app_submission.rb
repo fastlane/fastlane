@@ -98,14 +98,14 @@ module Spaceship
         def factory(attrs)
           # fill content rights section if iTC returns nil
           if attrs["contentRights"].nil?
-            attrs.merge!("contentRights" => {
+            attrs["contentRights"] = {
               "containsThirdPartyContent" => {
                 "value" => nil
               },
               "hasRights" => {
                 "value" => nil
               }
-            })
+            }
           end
 
           obj = self.new(attrs)
@@ -115,8 +115,8 @@ module Spaceship
         # @param application (Spaceship::Tunes::Application) The app this submission is for
         def create(application, version)
           attrs = client.prepare_app_submissions(application.apple_id, application.edit_version.version_id)
-          attrs.merge!(application: application)
-          attrs.merge!(version: version)
+          attrs[:application] = application
+          attrs[:version] = version
 
           return self.factory(attrs)
         end

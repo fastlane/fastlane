@@ -67,11 +67,11 @@ end
 
 def itc_stub_build_details
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/buildHistory?platform=ios").
-         to_return(status: 200, body: itc_read_fixture_file('build_history.json'), headers: { 'Content-Type' => 'application/json' })
+    to_return(status: 200, body: itc_read_fixture_file('build_history.json'), headers: { 'Content-Type' => 'application/json' })
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/2.0.1/buildHistory?platform=ios").
-         to_return(status: 200, body: itc_read_fixture_file('build_history_for_train.json'), headers: { 'Content-Type' => 'application/json' })
+    to_return(status: 200, body: itc_read_fixture_file('build_history_for_train.json'), headers: { 'Content-Type' => 'application/json' })
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/2.0.1/builds/4/details").
-       to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
+    to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
 def itc_stub_candiate_builds

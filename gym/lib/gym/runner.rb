@@ -210,8 +210,6 @@ module Gym
       end
     end
 
-    private
-
     def find_archive_path
       if Gym.config[:use_legacy_build_api]
         BuildCommandGenerator.archive_path

@@ -18,7 +18,7 @@ describe Fastlane do
         expect(result[1]).to_not include '-u'
         expect(result[1]).to include '~/Library/Keychains/test.keychain'
         expect(result[2]).to start_with "security list-keychains -s"
-        expect(result[2]).to end_with "#{File.expand_path('~/Library/Keychains/test.keychain')}"
+        expect(result[2]).to end_with File.expand_path('~/Library/Keychains/test.keychain').to_s
       end
 
       it "works with name and password that contain spaces or `\"`" do

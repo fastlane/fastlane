@@ -193,8 +193,8 @@ module Spaceship
           csr = OpenSSL::X509::Request.new
           csr.version = 0
           csr.subject = OpenSSL::X509::Name.new([
-            ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
-          ])
+                                                  ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
+                                                ])
           csr.public_key = key.public_key
           csr.sign(key, OpenSSL::Digest::SHA1.new)
           return [csr, key]
