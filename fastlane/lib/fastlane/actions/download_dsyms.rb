@@ -19,13 +19,17 @@ module Fastlane
         app.all_build_train_numbers.each do |train_number|
           app.all_builds_for_train(train: train_number).each do |build|
             download_url = build.details.dsym_url
-            result = Net::HTTP.get(URI(download_url))
-            file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
-            File.write(file_name, result)
-            UI.success("🔑 Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
+            if download_url =~ URI.regexp
+              result = Net::HTTP.get(URI(download_url))
+              file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
+              File.write(file_name, result)
+              UI.success("🔑 Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
 
-            Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
-            Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(file_name)
+              Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
+              Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(file_name)
+            else
+              UI.message("No dSYM URL for #{build.build_version} (#{build.train_version})")
+            end
           end
         end
       end
