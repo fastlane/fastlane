@@ -57,6 +57,7 @@ module FastlaneCore
 
         option = option_for_key(key)
         if option
+          UI.deprecated("Using deprecated option: '--#{key}' (#{option.deprecated})") if option.deprecated
           option.verify!(value) # Call the verify block for it too
         else
           UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
