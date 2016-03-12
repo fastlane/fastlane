@@ -202,7 +202,7 @@ module Spaceship
         # @return (ProvisioningProfile): The profile that was just created
         def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false)
           Helper.log.warn '`create!` is deprecated. Please use `create_by_platform!` instead.'.red
-          create_by_platform!(name: name, bundle_id: bundle_id, certificate: certificate, devices: devices, platform: mac ? 'mac' : 'ios')
+          create_by_platform!(name: name, bundle_id: bundle_id, certificate: certificate, devices: devices, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
         end
 
         # Create a new provisioning profile
@@ -216,7 +216,7 @@ module Spaceship
         #  and Development profiles and add none for AppStore and Enterprise Profiles
         # @param platform (String) (optional): The profile you are maling an id for
         # @return (ProvisioningProfile): The profile that was just created
-        def create_by_platform!(name: nil, bundle_id: nil, certificate: nil, devices: [], platform: 'ios', sub_platform: nil)
+        def create_by_platform!(name: nil, bundle_id: nil, certificate: nil, devices: [], platform: Spaceship::Portal::AppType::IOS, sub_platform: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
@@ -237,9 +237,9 @@ module Spaceship
           if devices.nil? or devices.count == 0
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
-              devices = if platform == 'mac'
+              devices = if platform == Spaceship::Portal::AppType::MAC
                           Spaceship::Device.all_macs
-                        elsif platform == 'ios' and !sub_platform.nil? and sub_platform.casecmp('tvos') == 0
+                        elsif platform == Spaceship::Portal::AppType::IOS and !sub_platform.nil? and sub_platform.casecmp('tvos') == 0
                           Spaceship::Device.all_apple_tvs
                         else
                           Spaceship::Device.all_for_profile_type(self.type)
@@ -266,13 +266,13 @@ module Spaceship
         #  only return the profiles that are of this type
         def all(mac: false)
           Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
-          all_by_platform(platform: mac ? 'mac' : 'ios')
+          all_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
         end
 
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all_by_platform(platform: 'ios')
+        def all_by_platform(platform: Spaceship::Portal::AppType::IOS)
           profiles = client.provisioning_profiles_by_platform(platform: platform).map do |profile|
             self.factory(profile)
           end
@@ -295,14 +295,14 @@ module Spaceship
         #   This may also contain invalid or expired profiles
         def find_by_bundle_id(bundle_id, mac: false)
           Helper.log.warn '`find_by_bundle_id` is deprecated. Please use `find_by_bundle_id_by_platform` instead.'.red
-          find_by_bundle_id_by_platform(bundle_id, platform: mac ? 'mac' : 'ios')
+          find_by_bundle_id_by_platform(bundle_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
         end
 
         # @return (Array) Returns an array of provisioning
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id_by_platform(bundle_id, platform: 'ios')
+        def find_by_bundle_id_by_platform(bundle_id, platform: Spaceship::Portal::AppType::IOS)
           all_by_platform(platform: platform).select do |profile|
             profile.app.bundle_id == bundle_id
           end
@@ -429,7 +429,7 @@ module Spaceship
 
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
-        platform == 'mac'
+        platform == Spaceship::Portal::AppType::MAC
       end
     end
   end

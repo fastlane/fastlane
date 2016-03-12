@@ -248,18 +248,18 @@ module Spaceship
         #  only include certificates matching the current type.
         def all(mac: false)
           Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
-          all_by_platform(platform: mac ? 'mac' : 'ios')
+          all_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
         end
 
         # @param platform [String] Fetches platform certificates. (Ignored if called from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
-        def all_by_platform(platform: 'ios')
+        def all_by_platform(platform: Spaceship::Portal::AppType::IOS)
           if self == Certificate # are we the base-class?
-            type_ids = platform == 'mac' ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = platform == Spaceship::Portal::AppType::MAC ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
-            types += OLDER_IOS_CERTIFICATE_TYPES unless platform == 'mac'
+            types += OLDER_IOS_CERTIFICATE_TYPES unless platform == Spaceship::Portal::AppType::MAC
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
           end
@@ -274,12 +274,12 @@ module Spaceship
         # @return (Certificate) Find a certificate based on the ID of the certificate.
         def find(certificate_id, mac: false)
           Helper.log.warn '`find` is deprecated. Please use `find_by_platform` instead.'.red
-          find_by_platform(certificate_id, platform: mac ? 'mac' : 'ios')
+          find_by_platform(certificate_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
         end
 
         # @param platform [String] Platform to search for
         # @return (Certificate) Find a certificate based on the ID of the certificate.
-        def find_by_platform(certificate_id, platform: 'ios')
+        def find_by_platform(certificate_id, platform: Spaceship::Portal::AppType::IOS)
           all_by_platform(platform: platform).detect do |c|
             c.id == certificate_id
           end
@@ -323,7 +323,7 @@ module Spaceship
 
       # @return (String) Download the raw data of the certificate without parsing
       def download_raw
-        client.download_certificate_by_platform(id, type_display_id, platform: mac? ? 'mac' : 'ios')
+        client.download_certificate_by_platform(id, type_display_id, platform: mac? ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
       end
 
       # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate
@@ -333,7 +333,7 @@ module Spaceship
 
       # Revoke the certificate. You shouldn't use this method probably.
       def revoke!
-        client.revoke_certificate_by_platform!(id, type_display_id, platform: mac? ? 'mac' : 'ios')
+        client.revoke_certificate_by_platform!(id, type_display_id, platform: mac? ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
       end
 
       # @return (Bool): Is this certificate a push profile for apps?

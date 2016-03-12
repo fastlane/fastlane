@@ -1,4 +1,45 @@
 module Spaceship
+  class PortalConstants < Spaceship::Client
+    APP_ID_URL = {
+        Spaceship::Portal::AppType::IOS => 'account/ios/identifiers/listAppIds.action',
+        Spaceship::Portal::AppType::WEB => 'account/ios/identifiers/listWebsitePushIds.action',
+        Spaceship::Portal::AppType::TVOS => 'account/ios/identifiers/listAppIds.action',
+        Spaceship::Portal::AppType::MAC => 'account/mac/identifiers/listAppIds.action',
+        Spaceship::Portal::AppType::PASS => 'account/ios/identifiers/listPassTypeIds.action',
+        Spaceship::Portal::AppType::ICLOUD => 'account/cloudContainer/listCloudContainers.action',
+        Spaceship::Portal::AppType::MERCHANT => 'account/ios/identifiers/listOMCs.action'
+    }.freeze
+
+    EXPECTED_KEY_APP_ID_URL = {
+        Spaceship::Portal::AppType::IOS => 'appIds',
+        Spaceship::Portal::AppType::WEB => 'websitePushIdList',
+        Spaceship::Portal::AppType::TVOS => 'appIds',
+        Spaceship::Portal::AppType::MAC => 'appIds',
+        Spaceship::Portal::AppType::PASS => 'passTypeIdList',
+        Spaceship::Portal::AppType::ICLOUD => 'cloudContainerList',
+        Spaceship::Portal::AppType::MERCHANT => 'identifierList'
+    }.freeze
+
+    CREATE_APP_ID_URL = {
+        Spaceship::Portal::AppType::IOS => 'account/ios/identifiers/addAppId.action',
+        Spaceship::Portal::AppType::WEB => 'account/ios/identifiers/addWebsitePushId.action',
+        Spaceship::Portal::AppType::TVOS => 'account/ios/identifiers/addAppId.action',
+        Spaceship::Portal::AppType::MAC => 'account/mac/identifiers/addAppId.action',
+        Spaceship::Portal::AppType::PASS => 'account/ios/identifiers/addPassTypeId.action',
+        Spaceship::Portal::AppType::ICLOUD => 'account/cloudContainer/addCloudContainer.action',
+        Spaceship::Portal::AppType::MERCHANT => 'account/ios/identifiers/addOMC.action'
+    }.freeze
+
+    DELETE_APP_ID_URL = {
+        Spaceship::Portal::AppType::IOS => 'account/ios/identifiers/deleteAppId.action',
+        Spaceship::Portal::AppType::WEB => 'account/ios/identifiers/deleteWebsitePushId.action',
+        Spaceship::Portal::AppType::TVOS => 'account/ios/identifiers/deleteAppId.action',
+        Spaceship::Portal::AppType::MAC => 'account/mac/identifiers/deleteAppId.action',
+        Spaceship::Portal::AppType::PASS => 'account/ios/identifiers/deletePassTypeId.action',
+        Spaceship::Portal::AppType::ICLOUD => '', # You can not delete iCloud Containers
+        Spaceship::Portal::AppType::MERCHANT => 'account/ios/identifiers/deleteOMC.action'
+    }.freeze
+  end
   class PortalClient < Spaceship::Client
     #####################################################
     # @!group Init and Login
@@ -98,10 +139,10 @@ module Spaceship
     end
 
     def platform_slug(platform)
-      if platform == 'mac'
-        'mac'
+      if platform == Spaceship::Portal::AppType::MAC
+        Spaceship::Portal::AppType::MAC
       else
-        'ios'
+        Spaceship::Portal::AppType::IOS
       end
     end
     private :platform_slug
@@ -113,23 +154,36 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>apps_by_platform</tt> instead.
     def apps(mac: false)
       Helper.log.warn '`apps` is deprecated. Please use `apps_by_platform` instead.'.red
-      apps_by_platform(platform: mac ? 'mac' : 'ios')
+      apps_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def apps_by_platform(platform: 'ios')
-      puts platform
-      paging do |page_number|
-        r = request(:post, "account/#{platform_slug(platform)}/identifiers/listAppIds.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
-        parse_response(r, 'appIds')
+    def apps_by_platform(platform: nil)
+      platforms = [platform]
+      platforms = Spaceship::Portal::AppType::PLATFORMS if platform.nil?
+
+      results = []
+
+      platforms.each do |the_platform|
+        output = paging do |page_number|
+          r = request(:post, Spaceship::PortalConstants::APP_ID_URL[the_platform], {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+          })
+          parse_response(r, Spaceship::PortalConstants::EXPECTED_KEY_APP_ID_URL[the_platform])
+        end
+
+        output.each {|app| app['appIdPlatform'] = the_platform } if Spaceship::Portal::AppType::ADD_PLATFORM.include? the_platform # We add the platform here for some of the app platform types because there response data does not include it.
+        results += output
       end
+
+      results
     end
 
     def details_for_app(app)
+      raise 'The developer portal does not allow details the specified platform' if app.platform == Spaceship::Portal::AppType::MERCHANT or app.platform == Spaceship::Portal::AppType::ICLOUD or app.platform == Spaceship::Portal::AppType::PASS or app.platform == Spaceship::Portal::AppType::WEB
+
       r = request(:post, "account/#{platform_slug(app.platform)}/identifiers/getAppIdDetail.action", {
         teamId: team_id,
         appIdId: app.app_id
@@ -162,10 +216,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>create_app_by_platform!</tt> instead.
     def create_app!(type, name, bundle_id, mac: false)
       Helper.log.warn '`create_app!` is deprecated. Please use `create_app_by_platform!` instead.'.red
-      create_app_by_platform!(type, name, bundle_id, platform: mac ? 'mac' : 'ios')
+      create_app_by_platform!(type, name, bundle_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def create_app_by_platform!(type, name, bundle_id, platform: 'ios')
+    def create_app_by_platform!(type, name, bundle_id, platform: Spaceship::Portal::AppType::IOS)
       ident_params = case type.to_sym
                      when :explicit
                        {
@@ -193,18 +247,20 @@ module Spaceship
 
       ensure_csrf
 
-      r = request(:post, "account/#{platform_slug(platform)}/identifiers/addAppId.action", params)
+      r = request(:post, Spaceship::PortalConstants::CREATE_APP_ID_URL[platform], params)
       parse_response(r, 'appId')
     end
 
     # <b>DEPRECATED:</b> Use <tt>delete_app_by_platform!</tt> instead.
     def delete_app!(app_id, mac: false)
       Helper.log.warn '`delete_app!` is deprecated. Please use `delete_app_by_platform!` instead.'.red
-      delete_app_by_platform!(app_id, platform: mac ? 'mac' : 'ios')
+      delete_app_by_platform!(app_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def delete_app_by_platform!(app_id, platform: 'ios')
-      r = request(:post, "account/#{platform_slug(platform)}/identifiers/deleteAppId.action", {
+    def delete_app_by_platform!(app_id, platform: Spaceship::Portal::AppType::IOS)
+      raise 'The developer portal does not allow deleting of iCloud Container App Ids' if platform == Spaceship::Portal::AppType::ICLOUD
+
+      r = request(:post, Spaceship::PortalConstants::DELETE_APP_ID_URL[platform], {
           teamId: team_id,
           appIdId: app_id
       })
@@ -250,10 +306,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>devices_by_platform</tt> instead.
     def devices(mac: false)
       Helper.log.warn '`devices` is deprecated. Please use `devices_by_platform` instead.'.red
-      devices_by_platform(platform: mac ? 'mac' : 'ios')
+      devices_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def devices_by_platform(platform: 'ios')
+    def devices_by_platform(platform: Spaceship::Portal::AppType::IOS)
       paging do |page_number|
         r = request(:post, "account/#{platform_slug(platform)}/device/listDevices.action", {
           teamId: team_id,
@@ -281,10 +337,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>create_device_by_platform!</tt> instead.
     def create_device!(device_name, device_id, mac: false)
       Helper.log.warn '`create_device!` is deprecated. Please use `create_device_by_platform!` instead.'.red
-      create_device_by_platform!(device_name, device_id, platform: mac ? 'mac' : 'ios')
+      create_device_by_platform!(device_name, device_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def create_device_by_platform!(device_name, device_id, platform: 'ios')
+    def create_device_by_platform!(device_name, device_id, platform: Spaceship::Portal::AppType::IOS)
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(platform)}/addDevice.action"
         r.params = {
@@ -304,10 +360,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>certificates_by_platform</tt> instead.
     def certificates(types, mac: false)
       Helper.log.warn '`certificates` is deprecated. Please use `certificates_by_platform` instead.'.red
-      certificates_by_platform(types, platform: mac ? 'mac' : 'ios')
+      certificates_by_platform(types, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def certificates_by_platform(types, platform: 'ios')
+    def certificates_by_platform(types, platform: Spaceship::Portal::AppType::IOS)
       paging do |page_number|
         r = request(:post, "account/#{platform_slug(platform)}/certificate/listCertRequests.action", {
           teamId: team_id,
@@ -335,10 +391,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>download_certificate_by_platform</tt> instead.
     def download_certificate(certificate_id, type, mac: false)
       Helper.log.warn '`download_certificate` is deprecated. Please use `download_certificate_by_platform` instead.'.red
-      download_certificate_by_platform(certificate_id, type, platform: mac ? 'mac' : 'ios')
+      download_certificate_by_platform(certificate_id, type, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def download_certificate_by_platform(certificate_id, type, platform: 'ios')
+    def download_certificate_by_platform(certificate_id, type, platform: Spaceship::Portal::AppType::IOS)
       { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
       r = request(:get, "account/#{platform_slug(platform)}/certificate/downloadCertificateContent.action", {
@@ -357,10 +413,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>revoke_certificate_by_platform!</tt> instead.
     def revoke_certificate!(certificate_id, type, mac: false)
       Helper.log.warn '`revoke_certificate!` is deprecated. Please use `revoke_certificate_by_platform!` instead.'.red
-      revoke_certificate_by_platform!(certificate_id, type, platform: mac ? 'mac' : 'ios')
+      revoke_certificate_by_platform!(certificate_id, type, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def revoke_certificate_by_platform!(certificate_id, type, platform: 'ios')
+    def revoke_certificate_by_platform!(certificate_id, type, platform: Spaceship::Portal::AppType::IOS)
       r = request(:post, "account/#{platform_slug(platform)}/certificate/revokeCertificate.action", {
           teamId: team_id,
           certificateId: certificate_id,
@@ -376,10 +432,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>provisioning_profiles_by_platform</tt> instead.
     def provisioning_profiles(mac: false)
       Helper.log.warn '`provisioning_profiles` is deprecated. Please use `provisioning_profiles_by_platform` instead.'.red
-      provisioning_profiles_by_platform(platform: mac ? 'mac' : 'ios')
+      provisioning_profiles_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def provisioning_profiles_by_platform(platform: 'ios')
+    def provisioning_profiles_by_platform(platform: Spaceship::Portal::AppType::IOS)
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(platform)}/listProvisioningProfiles.action"
         r.params = {
@@ -395,10 +451,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>create_provisioning_profile_by_platform!</tt> instead.
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
       Helper.log.warn '`create_provisioning_profile!` is deprecated. Please use `create_provisioning_profile_by_platform!` instead.'.red
-      create_provisioning_profile_by_platform!(name, distribution_method, app_id, certificate_ids, device_ids, platform: mac ? 'mac' : 'ios')
+      create_provisioning_profile_by_platform!(name, distribution_method, app_id, certificate_ids, device_ids, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def create_provisioning_profile_by_platform!(name, distribution_method, app_id, certificate_ids, device_ids, platform: 'ios', sub_platform: nil)
+    def create_provisioning_profile_by_platform!(name, distribution_method, app_id, certificate_ids, device_ids, platform: Spaceship::Portal::AppType::IOS, sub_platform: nil)
       ensure_csrf
 
       params = {
@@ -419,10 +475,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>create_provisioning_profile_by_platform!</tt> instead.
     def download_provisioning_profile(profile_id, mac: false)
       Helper.log.warn '`download_provisioning_profile` is deprecated. Please use `download_provisioning_profile_by_platform` instead.'.red
-      download_provisioning_profile_by_platform(profile_id, platform: mac ? 'mac' : 'ios')
+      download_provisioning_profile_by_platform(profile_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def download_provisioning_profile_by_platform(profile_id, platform: 'ios')
+    def download_provisioning_profile_by_platform(profile_id, platform: Spaceship::Portal::AppType::IOS)
       r = request(:get, "account/#{platform_slug(platform)}/profile/downloadProfileContent", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -438,10 +494,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>delete_provisioning_profile_by_platform!</tt> instead.
     def delete_provisioning_profile!(profile_id, mac: false)
       Helper.log.warn '`delete_provisioning_profile!` is deprecated. Please use `delete_provisioning_profile_by_platform!` instead.'.red
-      delete_provisioning_profile_by_platform!(profile_id, platform: mac ? 'mac' : 'ios')
+      delete_provisioning_profile_by_platform!(profile_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def delete_provisioning_profile_by_platform!(profile_id, platform: 'ios')
+    def delete_provisioning_profile_by_platform!(profile_id, platform: Spaceship::Portal::AppType::IOS)
       ensure_csrf
 
       r = request(:post, "account/#{platform_slug(platform)}/profile/deleteProvisioningProfile.action", {
@@ -454,10 +510,10 @@ module Spaceship
     # <b>DEPRECATED:</b> Use <tt>repair_provisioning_profile_by_platform!</tt> instead.
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
       Helper.log.warn '`repair_provisioning_profile!` is deprecated. Please use `repair_provisioning_profile_by_platform!` instead.'.red
-      repair_provisioning_profile_by_platform!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, platform: mac ? 'mac' : 'ios')
+      repair_provisioning_profile_by_platform!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
     end
 
-    def repair_provisioning_profile_by_platform!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, platform: 'ios')
+    def repair_provisioning_profile_by_platform!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, platform: Spaceship::Portal::AppType::IOS)
       r = request(:post, "account/#{platform_slug(platform)}/profile/regenProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id,
