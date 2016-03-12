@@ -38,6 +38,13 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
+    # Level Deprecated: Show that a particular function is deprecated
+    #
+    #   By default those messages shown in strong blue
+    def deprecated(_message)
+      not_implemented(__method__)
+    end
+
     # Level Command: Print out a terminal command that is being
     #   executed.
     #

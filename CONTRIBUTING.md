@@ -175,6 +175,9 @@ UI.user_error!("You don't have a project in the current directory")
 
 ###### an actual crash when something unexpected happened
 UI.crash!("Network timeout")
+
+###### a deprecation message
+UI.deprecated("The '--key' parameter is deprecated")
 ```
 
 The output will look like this
