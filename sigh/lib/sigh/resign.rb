@@ -3,6 +3,8 @@ require 'shellwords'
 module Sigh
   # Resigns an existing ipa file
   class Resign
+    ID_SEPARATOR = " - "
+
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
 
@@ -78,7 +80,8 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until installed_identies.include?(signing_identity)
+      all_identities = installed_identies.map { |id| id.to_s.split(ID_SEPARATOR) }.flatten
+      until all_identities.include?(signing_identity)
         UI.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
@@ -121,7 +124,7 @@ module Sigh
       ids = []
       available.split("\n").each do |current|
         begin
-          (ids << current.match(/.*\"(.*)\"/)[1])
+          (ids << "#{current.match(/[a-zA-Z0-9]{40}/)}#{ID_SEPARATOR}#{current.match(/.*\"(.*)\"/)[1]}")
         rescue
           nil
         end # the last line does not match
