@@ -595,4 +595,28 @@ describe Spaceship::AppVersion, all: true do
       # end
     end
   end
+
+  describe "Modifying the app live version" do
+    let(:version) { Spaceship::Application.all.first.live_version }
+
+    describe "Generate promo codes", focus: true do
+      it "fetches remaining promocodes" do
+        promocodes = version.generate_promocodes!(1)
+
+        expect(promocodes.effective_date).to eq(1457864552300)
+        expect(promocodes.expiration_date).to eq(1460283752300)
+        expect(promocodes.username).to eq('joe@wewanttoknow.com')
+
+        expect(promocodes.codes.count).to eq(1)
+        expect(promocodes.codes[0]).to eq('6J49JFRPTXXXX')
+        expect(promocodes.version.app_id).to eq(816549081)
+        expect(promocodes.version.app_name).to eq('DragonBox Numbers')
+        expect(promocodes.version.version).to eq('1.5.0')
+        expect(promocodes.version.platform).to eq('ios')
+        expect(promocodes.version.number_of_codes).to eq(3)
+        expect(promocodes.version.maximum_number_of_codes).to eq(100)
+        expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
+    end
+  end
 end

@@ -819,6 +819,33 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    #####################################################
+    # @!group Promo codes
+    #####################################################
+    def app_promocodes(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/promocodes/versions")
+      parse_response(r, 'data')['versions']
+    end
+
+    def generate_app_version_promocodes!(app_id: nil, version_id: nil, quantity: nil)
+      data = {
+        numberOfCodes: { value: quantity },
+        agreedToContract: { value: true }
+      }
+      url = "ra/apps/#{app_id}/promocodes/versions/#{version_id}"
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')
+    end
+
+    def app_promocodes_history(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/promocodes/history")
+      parse_response(r, 'data')['requests']
+    end
+
     private
 
     def with_tunes_retry(tries = 5, &_block)
