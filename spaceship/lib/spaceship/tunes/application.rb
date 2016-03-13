@@ -376,6 +376,23 @@ module Spaceship
         tester.remove_from_app!(self.apple_id)
       end
 
+      #####################################################
+      # @!group Promo codes
+      #####################################################
+      def promocodes
+        data = client.app_promocodes(app_id: self.apple_id)
+        data.map do |attrs|
+          Tunes::AppVersionPromocodes.factory(attrs)
+        end
+      end
+
+      def promocodes_history
+        data = client.app_promocodes_history(app_id: self.apple_id)
+        data.map do |attrs|
+          Tunes::AppVersionGeneratedPromocodes.factory(attrs)
+        end
+      end
+
       # private to module
       def ensure_not_a_bundle
         # we only support applications

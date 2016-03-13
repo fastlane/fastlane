@@ -457,6 +457,18 @@ module Spaceship
         client.release!(self.application.apple_id, self.version_id)
       end
 
+      #####################################################
+      # @!group Promo codes
+      #####################################################
+      def generate_promocodes!(quantity)
+        data = client.generate_app_version_promocodes!(
+          app_id: self.application.apple_id,
+          version_id: self.version_id,
+          quantity: quantity
+        )
+        Tunes::AppVersionGeneratedPromocodes.factory(data)
+      end
+
       # These methods takes care of properly parsing values that
       # are not returned in the right format, e.g. boolean as string
       def release_on_approval

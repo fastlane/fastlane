@@ -1,0 +1,19 @@
+{
+  "data": {
+    "versions": [{
+      "id": 816549081,
+      "appName": "DragonBox Numbers",
+      "version": "1.5.0",
+      "platform": "ios",
+      "numberOfCodes": 2,
+      "maximumNumberOfCodes": 100,
+      "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
