@@ -1,46 +1,5 @@
 module Spaceship
   module Portal
-    class AppType < PortalBase
-      # Represents an iOS platform in Spaceship
-      IOS = 'ios'.freeze
-
-      # Represents a Web platform in Spaceship
-      WEB = 'web'.freeze
-
-      # Represents a Pass platform in Spaceship
-      PASS = 'pass'.freeze
-
-      # Represents a tvOS platform in Spaceship
-      TVOS = 'tvOS'.freeze
-
-      # Represents a Mac platform in Spaceship
-      MAC = 'mac'.freeze
-
-      # Represents a Merchant platform in Spaceship
-      MERCHANT = 'merchant'.freeze
-
-      # Represents an iCloud Container platform in Spaceship
-      ICLOUD = 'icloud'.freeze
-
-      # An array representing app platforms that need the platform added.
-      ADD_PLATFORM = [
-        PASS,
-        ICLOUD,
-        MERCHANT,
-        WEB
-      ].freeze
-
-      PLATFORMS = [
-        IOS,
-        WEB,
-        TVOS,
-        MAC,
-        PASS,
-        ICLOUD,
-        MERCHANT
-      ].freeze
-    end
-
     # Represents an App ID from the Developer Portal
     class App < PortalBase
       # @return (String) The identifier of this app, provided by the Dev Portal
@@ -128,6 +87,45 @@ module Spaceship
         'associatedIdentifiersCount' => :identifiers_count
       )
 
+      # Represents an iOS platform in Spaceship
+      IOS = 'ios'.freeze
+
+      # Represents a Web platform in Spaceship
+      WEB = 'web'.freeze
+
+      # Represents a Pass platform in Spaceship
+      PASS = 'pass'.freeze
+
+      # Represents a tvOS platform in Spaceship
+      TVOS = 'tvOS'.freeze
+
+      # Represents a Mac platform in Spaceship
+      MAC = 'mac'.freeze
+
+      # Represents a Merchant platform in Spaceship
+      MERCHANT = 'merchant'.freeze
+
+      # Represents an iCloud Container platform in Spaceship
+      ICLOUD = 'icloud'.freeze
+
+      # An array representing app platforms that need the platform added.
+      ADD_PLATFORM = [
+        PASS,
+        ICLOUD,
+        MERCHANT,
+        WEB
+      ].freeze
+
+      PLATFORMS = [
+        IOS,
+        WEB,
+        TVOS,
+        MAC,
+        PASS,
+        ICLOUD,
+        MERCHANT
+      ].freeze
+
       class << self
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
@@ -140,12 +138,12 @@ module Spaceship
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
           Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
-          all_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          all_by_platform(platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # @param platform (String) The platform to search for
         # @return (Array) Returns all apps available for this account
-        def all_by_platform(platform: Spaceship::Portal::AppType::IOS)
+        def all_by_platform(platform: nil)
           client.apps_by_platform(platform: platform).map { |app| self.factory(app) }
         end
 
@@ -159,7 +157,7 @@ module Spaceship
         # @return (App) The app you just created
         def create!(bundle_id: nil, name: nil, mac: false)
           Helper.log.warn '`create!` is deprecated. Please use `create_by_platform!` instead.'.red
-          create_by_platform!(bundle_id: bundle_id, name: name, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          create_by_platform!(bundle_id: bundle_id, name: name, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # Creates a new App ID on the Apple Dev Portal
@@ -169,7 +167,7 @@ module Spaceship
         # @param name [String] the name of the App
         # @param platform [String] The platform
         # @return (App) The app you just created
-        def create_by_platform!(bundle_id: nil, name: nil, platform: Spaceship::Portal::AppType::IOS)
+        def create_by_platform!(bundle_id: nil, name: nil, platform: Spaceship::Portal::App::IOS)
           if bundle_id.end_with?('*')
             type = :wildcard
           else
@@ -186,13 +184,13 @@ module Spaceship
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
           Helper.log.warn '`find` is deprecated. Please use `find_by_platform` instead.'.red
-          find_by_platform(bundle_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          find_by_platform(bundle_id, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # Find a specific App ID based on the bundle_id
         # @param platform [String] The platform to search for
         # @return (App) The app you're looking for. This is nil if the app can't be found.
-        def find_by_platform(bundle_id, platform: Spaceship::Portal::AppType::IOS)
+        def find_by_platform(bundle_id, platform: nil)
           all_by_platform(platform: platform).detect do |app|
             app.bundle_id == bundle_id
           end
@@ -234,12 +232,12 @@ module Spaceship
 
       # @return (Bool) Is this a Mac app?
       def mac?
-        platform == Spaceship::Portal::AppType::MAC
+        platform == Spaceship::Portal::App::MAC
       end
 
       # @return (Bool) Is this a Web app?
       def web?
-        platform == Spaceship::Portal::AppType::WEB
+        platform == Spaceship::Portal::App::WEB
       end
     end
   end

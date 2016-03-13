@@ -71,7 +71,15 @@ module PEM
                                      short_option: "-e",
                                      env_name: "PEM_OUTPUT_PATH",
                                      description: "The path to a directory in which all certificates and private keys should be stored",
-                                     default_value: ".")
+                                     default_value: "."),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-f",
+                                     env_name: "PEM_PLATFORM",
+                                     optional: true,
+                                     description: "The platform to search on with the specified bundle id",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, web, merchant, pass or mac") unless ['ios', 'merchant', 'mac', 'web', 'pass'].include? value
+                                     end)
       ]
     end
   end

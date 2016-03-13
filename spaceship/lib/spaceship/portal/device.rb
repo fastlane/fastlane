@@ -63,12 +63,12 @@ module Spaceship
         # @return (Array) Returns all devices registered for this account
         def all(mac: false)
           Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
-          all_by_platform(platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          all_by_platform(platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # @param platform [String] Fetches devices of a specific platform
         # @return (Array) Returns all devices registered for this account
-        def all_by_platform(platform: Spaceship::Portal::AppType::IOS)
+        def all_by_platform(platform: Spaceship::Portal::App::IOS)
           client.devices_by_platform(platform: platform).map { |device| self.factory(device) }
         end
 
@@ -99,7 +99,7 @@ module Spaceship
 
         # @return (Array) Returns all Macs registered for this account
         def all_macs
-          all_by_platform(platform: Spaceship::Portal::AppType::MAC)
+          all_by_platform(platform: Spaceship::Portal::App::MAC)
         end
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
@@ -122,13 +122,13 @@ module Spaceship
         #  This is *not* the UDID. nil if no device was found.
         def find(device_id, mac: false)
           Helper.log.warn '`find` is deprecated. Please use `find_by_platform` instead.'.red
-          find_by_platform(device_id, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          find_by_platform(device_id, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # @param platform [String] Searches for specified platform
         # @return (Device) Find a device based on the ID of the device. *Attention*:
         #  This is *not* the UDID. nil if no device was found.
-        def find_by_platform(device_id, platform: Spaceship::Portal::AppType::IOS)
+        def find_by_platform(device_id, platform: Spaceship::Portal::App::IOS)
           all_by_platform(platform: platform).detect do |device|
             device.id == device_id
           end
@@ -139,12 +139,12 @@ module Spaceship
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
         def find_by_udid(device_udid, mac: false)
           Helper.log.warn '`find_by_udid` is deprecated. Please use `find_by_udid_by_platform` instead.'.red
-          find_by_udid_by_platform(device_udid, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          find_by_udid_by_platform(device_udid, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # @param platform [String] Searches for specified platform
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
-        def find_by_udid_by_platform(device_udid, platform: Spaceship::Portal::AppType::IOS)
+        def find_by_udid_by_platform(device_udid, platform: Spaceship::Portal::App::IOS)
           all_by_platform(platform: platform).detect do |device|
             device.udid.casecmp(device_udid) == 0
           end
@@ -155,12 +155,12 @@ module Spaceship
         # @return (Device) Find a device based on its name. nil if no device was found.
         def find_by_name(device_name, mac: false)
           Helper.log.warn '`find_by_name` is deprecated. Please use `find_by_name_by_platform` instead.'.red
-          find_by_name_by_platform(device_name, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          find_by_name_by_platform(device_name, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # @param platform [String] Searches for specified platform
         # @return (Device) Find a device based on its name. nil if no device was found.
-        def find_by_name_by_platform(device_name, platform: Spaceship::Portal::AppType::IOS)
+        def find_by_name_by_platform(device_name, platform: Spaceship::Portal::App::IOS)
           all_by_platform(platform: platform).detect do |device|
             device.name == device_name
           end
@@ -176,7 +176,7 @@ module Spaceship
         # @return (Device): The newly created device
         def create!(name: nil, udid: nil, mac: false)
           Helper.log.warn '`create!` is deprecated. Please use `create_by_platform!` instead.'.red
-          create_by_platform!(name: name, udid: udid, platform: mac ? Spaceship::Portal::AppType::MAC : Spaceship::Portal::AppType::IOS)
+          create_by_platform!(name: name, udid: udid, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
         end
 
         # Register a new device to this account
@@ -186,7 +186,7 @@ module Spaceship
         # @example
         #   Spaceship.device.create!(name: "Felix Krause's iPhone 6", udid: "4c24a7ee5caaa4847f49aaab2d87483053f53b65")
         # @return (Device): The newly created device
-        def create_by_platform!(name: nil, udid: nil, platform: Spaceship::Portal::AppType::IOS)
+        def create_by_platform!(name: nil, udid: nil, platform: Spaceship::Portal::App::IOS)
           # Check whether the user has passed in a UDID and a name
           unless udid && name
             raise "You cannot create a device without a device_id (UDID) and name"
