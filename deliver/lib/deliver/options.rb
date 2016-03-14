@@ -82,6 +82,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
+                                     env_name: "DELIVER_SUBMIT_FOR_REVIEW",
                                      description: "Submit the new version for Review after uploading everything",
                                      is_string: false,
                                      default_value: false),
