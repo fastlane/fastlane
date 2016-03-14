@@ -883,6 +883,19 @@ This action allows you to upload symbolication files to Crashlytics. It's extra 
 upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
 ```
 
+### Apteligent
+
+Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolication.
+
+```ruby
+apteligent(
+  app_id:'...',
+  api_key:'...'
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
+
 ### `download_dsyms`
 
 This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled.
