@@ -16,19 +16,27 @@ module Fastlane
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
+        build_file = [
+          options[:ipa],
+          options[:apk]
+        ].detect { |e| !e.to_s.empty? }
+
         if options[:dsym]
           dsym_filename = options[:dsym]
         else
-          if options[:ipa].to_s.length == 0
-            UI.user_error!("You have to provide an ipa file")
+
+          if build_file.nil?
+            UI.user_error!("You have to provide a build file")
           end
 
-          dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
-          if File.exist?(dsym_path)
-            dsym_filename = dsym_path
-          else
-            UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
-            dsym_filename = nil
+          dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
+          if options[:ipa]
+            if File.exist?(dsym_path)
+              dsym_filename = dsym_path
+            else
+              UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
+              dsym_filename = nil
+            end
           end
         end
 
@@ -44,7 +52,7 @@ module Fastlane
 
         return values if Helper.test?
 
-        ipa_filename = options[:ipa]
+        ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
         response = client.upload_build(ipa_filename, values)
@@ -72,6 +80,18 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: "FL_HOCKEY_APK",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:ipa],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use 'apk' and '#{value.key}' options in one run".red
+                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",
@@ -85,6 +105,10 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:apk],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use 'ipa' and '#{value.key}' options in one run".red
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
@@ -166,12 +190,13 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        ["KrauseFx", "modzelewski"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
       end
+
     end
   end
 end
