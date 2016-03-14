@@ -2,7 +2,7 @@ module Fastlane
   class SetupAndroid < Setup
     def run
       if FastlaneFolder.setup? and !Helper.is_test?
-        Helper.log.info "Fastlane already set up at path #{folder}".yellow
+        UI.important("Fastlane already set up at path #{folder}")
         return
       end
 
@@ -17,12 +17,12 @@ module Fastlane
 
       init_supply
 
-      Helper.log.info 'Successfully finished setting up fastlane'.green
+      UI.success('Successfully finished setting up fastlane')
     end
 
     def generate_appfile
-      Helper.log.info '------------------------------'
-      Helper.log.info 'To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.'.green
+      UI.message('------------------------------')
+      UI.success('To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.')
 
       package_name = ask('Package Name (com.krausefx.app): '.yellow)
       puts ""
@@ -36,7 +36,7 @@ module Fastlane
       template.gsub!('[[PACKAGE_NAME]]', package_name)
       path = File.join(folder, 'Appfile')
       File.write(path, template)
-      Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
+      UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
     end
 
     def generate_fastfile
@@ -46,14 +46,14 @@ module Fastlane
 
       path = File.join(folder, 'Fastfile')
       File.write(path, template)
-      Helper.log.info "Created new file '#{path}'. Edit it to manage your own deployment lanes.".green
+      UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
     end
 
     def init_supply
-      Helper.log.info ""
+      UI.message("")
       question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?".yellow
-      Helper.log.info question
-      Helper.log.info "This will download your existing metadata and screenshots into the `fastlane` folder"
+      UI.message(question)
+      UI.message("This will download your existing metadata and screenshots into the `fastlane` folder")
       if agree(question + " (y/n) ", true)
         begin
           require 'supply'
@@ -61,11 +61,11 @@ module Fastlane
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, {})
           Supply::Setup.new.perform_download
         rescue => ex
-          Helper.log.error ex.to_s
-          Helper.log.error "supply failed, but don't worry, you can launch supply using `supply init` whenever you want.".red
+          UI.error(ex.to_s)
+          UI.error("supply failed, but don't worry, you can launch supply using `supply init` whenever you want.")
         end
       else
-        Helper.log.info "You can run `supply init` to do so at a later point.".green
+        UI.success("You can run `supply init` to do so at a later point.")
       end
     end
 

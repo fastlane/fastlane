@@ -30,7 +30,7 @@ module Fastlane
         xcs = XcodeServer.new(host, username, password)
         bots = xcs.fetch_all_bots
 
-        Helper.log.info "Fetched #{bots.count} Bots from Xcode Server at #{host}.".yellow
+        UI.important("Fetched #{bots.count} Bots from Xcode Server at #{host}.")
 
         # pull out names
         bot_names = bots.map { |bot| bot['name'] }
@@ -41,7 +41,7 @@ module Fastlane
 
         bot = found_bots[0]
 
-        Helper.log.info "Found Bot with name #{bot_name} with id #{bot['_id']}.".green
+        UI.success("Found Bot with name #{bot_name} with id #{bot['_id']}.")
 
         # we have our bot, get finished integrations, sorted from newest to oldest
         integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
@@ -57,7 +57,7 @@ module Fastlane
 
         # consider: only taking the last successful one? or allow failing tests? warnings?
 
-        Helper.log.info "Using integration #{integration['number']}.".yellow
+        UI.important("Using integration #{integration['number']}.")
 
         # fetch assets for this integration
         assets_path = xcs.fetch_assets(integration['_id'], target_folder, self)
@@ -65,21 +65,21 @@ module Fastlane
 
         asset_entries = Dir.entries(assets_path).map { |i| File.join(assets_path, i) }
 
-        Helper.log.info "Successfully downloaded #{asset_entries.count} assets to file #{assets_path}!".green
+        UI.success("Successfully downloaded #{asset_entries.count} assets to file #{assets_path}!")
 
         # now find the archive and unzip it
         zipped_archive_path = asset_entries.find { |i| i.end_with?('xcarchive.zip') }
 
         if zipped_archive_path
 
-          Helper.log.info "Found an archive in the assets folder...".yellow
+          UI.important("Found an archive in the assets folder...")
 
           archive_file_path = File.basename(zipped_archive_path, File.extname(zipped_archive_path))
           archive_dir_path = File.dirname(zipped_archive_path)
           archive_path = File.join(archive_dir_path, archive_file_path)
           if File.exist?(archive_path)
             # we already have the archive, skip
-            Helper.log.info "Archive #{archive_path} already exists, not unzipping again...".yellow
+            UI.important("Archive #{archive_path} already exists, not unzipping again...")
           else
             # unzip the archive
             sh "unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\""
@@ -135,9 +135,9 @@ module Fastlane
             f = open(temp_file, 'w')
             streamer = lambda do |chunk, remaining_bytes, total_bytes|
               if remaining_bytes && total_bytes
-                Helper.log.info "Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%".yellow
+                UI.important("Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%")
               else
-                Helper.log.error chunk.to_s.red
+                UI.error(chunk.to_s)
               end
               f.write(chunk)
             end

@@ -18,8 +18,8 @@ module Fastlane
       end
     rescue => ex
       if action.respond_to? :action_name
-        Helper.log.fatal "You passed invalid parameters to '#{action.action_name}'.".red
-        Helper.log.fatal "Check out the error below and available options by running `fastlane action #{action.action_name}`".red
+        UI.error("You passed invalid parameters to '#{action.action_name}'.")
+        UI.error("Check out the error below and available options by running `fastlane action #{action.action_name}`")
       end
       raise ex
     end

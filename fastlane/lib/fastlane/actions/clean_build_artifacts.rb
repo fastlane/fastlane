@@ -16,11 +16,11 @@ module Fastlane
             next if file.match(options[:exclude_pattern])
           end
 
-          Helper.log.debug "Cleaning up '#{file}'".yellow
+          UI.verbose("Cleaning up '#{file}'")
           File.delete(file)
         end
 
-        Helper.log.info 'Cleaned up build artifacts 🐙'.green
+        UI.success('Cleaned up build artifacts 🐙')
       end
 
       def self.available_options

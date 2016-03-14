@@ -34,7 +34,7 @@ module Fastlane
           # Write changes to the file
           project.save
 
-          Helper.log.info "Updated #{params[:xcodeproj]} 💾.".green
+          UI.success("Updated #{params[:xcodeproj]} 💾.")
         else
           # Update plist value
           plist['CFBundleIdentifier'] = params[:app_identifier]
@@ -43,7 +43,7 @@ module Fastlane
           plist_string = Plist::Emit.dump(plist)
           File.write(info_plist_path, plist_string)
 
-          Helper.log.info "Updated #{params[:plist_path]} 💾.".green
+          UI.success("Updated #{params[:plist_path]} 💾.")
         end
       end
 

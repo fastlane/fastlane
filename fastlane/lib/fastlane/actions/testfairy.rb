@@ -9,7 +9,7 @@ module Fastlane
         require 'shenzhen'
         require 'shenzhen/plugins/testfairy'
 
-        Helper.log.info 'Starting with ipa upload to TestFairy...'.green
+        UI.success('Starting with ipa upload to TestFairy...')
 
         client = Shenzhen::Plugins::TestFairy::Client.new(
           params[:api_key]
@@ -19,8 +19,8 @@ module Fastlane
 
         response = client.upload_build(params[:ipa], params.values)
         if parse_response(response)
-          Helper.log.info "Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}".green
-          Helper.log.info "Build successfully uploaded to TestFairy.".green
+          UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
+          UI.success("Build successfully uploaded to TestFairy.")
         else
           raise 'Error when trying to upload ipa to TestFairy'.red
         end
@@ -38,7 +38,7 @@ module Fastlane
 
           return true
         else
-          Helper.log.fatal "Error uploading to TestFairy: #{response.body}".red
+          UI.error("Error uploading to TestFairy: #{response.body}")
 
           return false
         end

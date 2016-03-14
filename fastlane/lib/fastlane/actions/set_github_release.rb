@@ -10,8 +10,8 @@ module Fastlane
 
     class SetGithubReleaseAction < Action
       def self.run(params)
-        Helper.log.info "Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".".yellow
-        Helper.log.info "Will also upload assets #{params[:upload_assets]}.".yellow if params[:upload_assets]
+        UI.important("Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".")
+        UI.important("Will also upload assets #{params[:upload_assets]}.") if params[:upload_assets]
 
         require 'json'
         body_obj = {
@@ -34,11 +34,11 @@ module Fastlane
 
         case response[:status]
         when 201
-          Helper.log.info "Successfully created release at tag \"#{params[:tag_name]}\" on GitHub".green
+          UI.success("Successfully created release at tag \"#{params[:tag_name]}\" on GitHub")
           body = JSON.parse(response.body)
           html_url = body['html_url']
           release_id = body['id']
-          Helper.log.info "See release at \"#{html_url}\"".yellow
+          UI.important("See release at \"#{html_url}\"")
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = body
@@ -51,29 +51,29 @@ module Fastlane
             # fetch the release again, so that it contains the uploaded assets
             get_response = self.call_releases_endpoint("get", server_url, repo_name, "/releases/#{release_id}", api_token, nil)
             if get_response[:status] != 200
-              Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+              UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
               raise "Failed to fetch the newly created release, but it *has been created* successfully.".red
             end
 
             get_body = JSON.parse(get_response.body)
             Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = get_body
-            Helper.log.info "Successfully uploaded assets #{assets} to release \"#{html_url}\"".green
+            UI.success("Successfully uploaded assets #{assets} to release \"#{html_url}\"")
             return get_body
           else
             return body
           end
         when 422
-          Helper.log.error response.body
-          Helper.log.error "Release on tag #{params[:tag_name]} already exists!".red
+          UI.error(response.body)
+          UI.error("Release on tag #{params[:tag_name]} already exists!")
         when 404
-          Helper.log.error response.body
+          UI.error(response.body)
           raise "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
         when 401
-          Helper.log.error response.body
+          UI.error(response.body)
           raise "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
         else
           if response[:status] != 200
-            Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+            UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
           end
         end
         return nil
@@ -114,16 +114,16 @@ module Fastlane
         headers = self.headers(api_token)
         headers['Content-Type'] = 'application/zip' # how do we detect other types e.g. other binary files? file extensions?
 
-        Helper.log.info "Uploading #{name}".yellow
+        UI.important("Uploading #{name}")
         response = self.call_endpoint(expanded_url, "post", headers, File.read(file))
 
         # inspect the response
         case response.status
         when 201
           # all good in the hood
-          Helper.log.info "Successfully uploaded #{name}.".green
+          UI.success("Successfully uploaded #{name}.")
         else
-          Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+          UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
           raise "Failed to upload asset #{name} to GitHub."
         end
       end

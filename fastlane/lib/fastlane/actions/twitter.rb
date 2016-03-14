@@ -11,7 +11,7 @@ module Fastlane
           config.access_token_secret = params[:access_token_secret]
         end
         client.update(params[:message])
-        Helper.log.info ['[TWITTER]', "Successfully tweeted ", params[:message]].join(': ')
+        UI.message(['[TWITTER]', "Successfully tweeted ", params[:message]].join(': '))
       end
 
       #####################################################

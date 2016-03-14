@@ -61,7 +61,7 @@ module Fastlane
           appium_path = "#{appium_path}/#{APPIUM_APP_BUNDLE_PATH}"
         end
 
-        Helper.log.info("Appium executable detected: #{appium_path}")
+        UI.message("Appium executable detected: #{appium_path}")
         appium_path
       end
 

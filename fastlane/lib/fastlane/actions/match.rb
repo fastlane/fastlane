@@ -22,7 +22,7 @@ module Fastlane
         profile_type = "development" if values[:type] == 'development'
         profile_type = "enterprise" if values[:type] == 'enterprise'
 
-        Helper.log.info "Setting Provisioning Profile type to '#{profile_type}'"
+        UI.message("Setting Provisioning Profile type to '#{profile_type}'")
 
         Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE] = profile_type
       end
