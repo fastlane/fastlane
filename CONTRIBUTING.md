@@ -17,7 +17,7 @@ Make sure you have `bundler` installed using `gem install bundler`
 Before working on something, make sure to have pulled the latest changes. To pull the changes run
 
 ```
-rake pull
+git pull master
 ```
 
 ## Submit a pull request
