@@ -7,3 +7,7 @@ end
 if pr_body.length < 5
   warn "Please provide a changelog summary in the Pull Request description @#{pr_author}"
 end
+
+if files_modified.grep(/.gemspec/)
+  warn ".gemspec file was modified"
+end
