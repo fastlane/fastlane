@@ -12,7 +12,7 @@ fastlane
 
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles and releasing your application.
 
-You define how your process looks like
+Use a lane to define your process:
 
 ```ruby
 lane :beta do
@@ -26,7 +26,7 @@ lane :beta do
 end
 ```
 
-To deploy your app to the App Store you can run
+To deploy your app to the App Store, you can run:
 ```
 fastlane beta
 ```
@@ -37,7 +37,7 @@ fastlane beta
 :sparkles: | Connect all iOS and Android build tools into one workflow (both `fastlane` tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
 :ship: | Deploy from any computer, including a CI-server
-:wrench: | Extend and customise the functionality
+:wrench: | Extend and customise functionality
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
@@ -57,17 +57,17 @@ fastlane beta
 
     sudo gem install fastlane --verbose
 
-Make sure, you have the latest version of the Xcode command line tools installed:
+Make sure you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
 
-If you experience slow launch times of fastlane, try running
+If you experience slow launch times of fastlane, try running:
 
     gem cleanup
 
 System Requirements: `fastlane` requires Mac OS X or Linux with Ruby 2.0.0 or above.
 
-If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
+If you want to take a look at a project already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
 
 ## Quick Start
 
@@ -94,9 +94,9 @@ Usually you'll use fastlane by triggering individual lanes:
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-Additionally to the `fastlane` commands, you now have access to those `fastlane` tools:
+Additionally to the `fastlane` commands, you now have access to these `fastlane` tools:
 
-- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
