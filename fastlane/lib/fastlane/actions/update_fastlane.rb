@@ -55,6 +55,15 @@ module Fastlane
           return
         end
 
+        if updater.respond_to? :highest_installed_gems
+          UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
+          UI.important "Please update your version of ruby gems before proceeding."
+          UI.command "gem install rubygems-update"
+          UI.command "update_rubygems"
+          UI.command "gem update --system"
+          return
+        end
+
         highest_versions = updater.highest_installed_gems.keep_if { |key| tools_to_update.include? key }
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
