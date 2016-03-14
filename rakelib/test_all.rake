@@ -121,5 +121,6 @@ task :test_all do
   else
     box "Exceptions 💣"
     puts "\n" + exceptions.map(&:red).join("\n")
+    raise "All tests did not complete successfully".red
   end
 end
