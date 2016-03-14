@@ -23,31 +23,50 @@ module Deliver
       # Now, fill in the new ones
       indized = {} # per language and device type
 
+      progressFile = 'progress.dump'
+      if not options[:skip_uploaded_screenshots]
+        File.delete(progressFile) unless File.exist?(progressFile)
+      end
+      progress = File.exist?(progressFile) ? Marshal.load(File.read(progressFile)) : []
+
+      lastError = false
       screenshots_per_language = screenshots.group_by(&:language)
       screenshots_per_language.each do |language, screenshots_for_language|
-        UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
-        screenshots_for_language.each do |screenshot|
-          indized[screenshot.language] ||= {}
-          indized[screenshot.language][screenshot.device_type] ||= 0
-          indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
+        next if progress.include?(language)
+        begin
+          UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
+          screenshots_for_language.each do |screenshot|
+            indized[screenshot.language] ||= {}
+            indized[screenshot.language][screenshot.device_type] ||= 0
+            indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
 
-          index = indized[screenshot.language][screenshot.device_type]
+            index = indized[screenshot.language][screenshot.device_type]
 
-          if index > 5
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'")
-            next
+            if index > 5
+              UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'")
+              next
+            end
+
+            UI.message("Uploading '#{screenshot.path}'...")
+            v.upload_screenshot!(screenshot.path,
+                                 index,
+                                 screenshot.language,
+                                 screenshot.device_type)
           end
-
-          UI.message("Uploading '#{screenshot.path}'...")
-          v.upload_screenshot!(screenshot.path,
-                               index,
-                               screenshot.language,
-                               screenshot.device_type)
+          # ideally we should only save once, but itunes server can't cope it seems
+          # so we save per language. See issue #349
+          UI.message("Saving changes")
+          v.save!
+          progress << language
+          File.open(progressFile, 'w') { |f| f.write(Marshal.dump(progress)) }
+        rescue
+          UI.error("An error occurred for language #{language}, will try again next time")
+          lastError = $!
+          # something failed, try again next time
         end
-        # ideally we should only save once, but itunes server can't cope it seems
-        # so we save per language. See issue #349
-        UI.message("Saving changes")
-        v.save!
+      end
+      if lastError
+        raise lastError
       end
       UI.success("Successfully uploaded screenshots to iTunes Connect")
     end
@@ -60,7 +79,7 @@ module Deliver
     def collect_screenshots_for_languages(path)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
-
+      lastError = false
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
 
@@ -88,10 +107,18 @@ module Deliver
             end
           end
 
-          screenshots << AppScreenshot.new(file_path, language)
+          begin
+            screenshots << AppScreenshot.new(file_path, language)
+          rescue
+            lastError = $!
+            UI.error(lastError)
+          end
         end
       end
 
+      if lastError
+        raise lastError 
+      end
       return screenshots
     end
   end
