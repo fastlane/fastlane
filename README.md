@@ -110,7 +110,7 @@ Additionally to the `fastlane` commands, you now have access to these `fastlane`
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
 ## Need help?
-Please submit an issue on GitHub and provide information about your setup
+Please submit an issue on GitHub and provide information about your setup.
 
 ## Special Thanks
 
