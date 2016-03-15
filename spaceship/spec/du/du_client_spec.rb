@@ -11,6 +11,10 @@ describe Spaceship::DUClient, :du do
 
   subject { Spaceship::DUClient.new }
 
+  before do
+    allow(Spaceship::Utilities).to receive(:md5digest).and_return("FAKEMD5")
+  end
+
   describe "#upload_large_icon and #upload_watch_icon" do
     let(:correct_jpg_image) { du_uploadimage_correct_jpg }
     let(:bad_png_image) { du_uploadimage_invalid_png }
