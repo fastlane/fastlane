@@ -12,8 +12,6 @@ FASTLANE_MEMBERS = %w(asfalcone chaselatta fastlane-bot hemal i2amsam kimyoutora
 
 ALL_TOOL_LABELS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab)
 
-GITHUB_TOKEN = ENV['GITHUB_SCRIPT_TOKEN'] || ENV['FL_GITHUB_RELEASE_API_TOKEN']
-
 BASE_URL = 'https://api.github.com'.freeze
 
 # Uses the provided Faraday connection and starting URL + params to iteratively
