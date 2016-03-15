@@ -40,7 +40,7 @@ module Match
       cert_type = :development if params[:type] == "development"
       cert_type = :enterprise if Match.enterprise? && params[:type] == "enterprise"
 
-      team = params[:team_id] ? params[:team_id] : (params[:team_name] ? params[:team_name] : "")
+      team = params[:team_id] || params[:team_name] || ""
       certs = Dir[File.join(params[:workspace], "certs", team, cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:workspace], "certs", team, cert_type.to_s, "*.p12")]
 
@@ -71,7 +71,7 @@ module Match
       prov_type = params[:type].to_sym
 
       profile_name = [Match::Generator.profile_type_name(prov_type), params[:app_identifier]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      team = params[:team_id] ? params[:team_id] : (params[:team_name] ? params[:team_name] : "")
+      team = params[:team_id] || params[:team_name] || ""
       profiles = Dir[File.join(params[:workspace], "profiles", team, prov_type.to_s, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles

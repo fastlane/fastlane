@@ -3,8 +3,8 @@ module Match
   class Generator
     def self.generate_certificate(params, cert_type)
       require 'cert'
-      
-      team = params[:team_id] ? params[:team_id] : (params[:team_name] ? params[:team_name] : "")       
+
+      team = params[:team_id] || params[:team_name] || ""
       output_path = File.join(params[:workspace], "certs", team, cert_type.to_s)
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
@@ -40,7 +40,7 @@ module Match
       prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"] && !params[:type] == "development"
 
       profile_name = ["match", profile_type_name(prov_type), params[:app_identifier]].join(" ")
-      team = params[:team_id] ? params[:team_id] : (params[:team_name] ? params[:team_name] : "")   
+      team = params[:team_id] || params[:team_name] || ""
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: params[:app_identifier],
