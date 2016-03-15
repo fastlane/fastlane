@@ -6,6 +6,11 @@ module Spaceship
       # @!group General metadata
       #####################################################
 
+      # @return (String) The App identifier of this app, provided by iTunes Connect
+      # @example
+      #   "1013943394"
+      attr_accessor :apple_id
+
       # @return (Spaceship::Tunes::BuildTrain) A reference to the build train this build is contained in
       attr_accessor :build_train
 
@@ -112,12 +117,25 @@ module Spaceship
         self.internal_expiry_date ||= 0
       end
 
+      def details
+        response = client.build_details(app_id: self.apple_id,
+                                         train: self.train_version,
+                                  build_number: self.build_version)
+        response['apple_id'] = self.apple_id
+        BuildDetails.factory(response)
+      end
+
+      def apple_id
+        return @apple_id if @apple_id
+        return self.build_train.application.apple_id
+      end
+
       def update_build_information!(whats_new: nil,
                                     description: nil,
                                     feedback_email: nil)
         parameters = {
-          app_id: self.build_train.application.apple_id,
-          train: self.build_train.version_string,
+          app_id: self.apple_id,
+          train: self.train_version,
           build_number: self.build_version,
           platform: self.platform
         }.merge({
@@ -150,8 +168,8 @@ module Spaceship
       #  }
       def submit_for_beta_review!(metadata)
         parameters = {
-          app_id: self.build_train.application.apple_id,
-          train: self.build_train.version_string,
+          app_id: self.apple_id,
+          train: self.train_version,
           build_number: self.build_version,
           platform: self.platform,
 
@@ -199,8 +217,8 @@ module Spaceship
 
       # This will cancel the review process for this TestFlight build
       def cancel_beta_review!
-        client.remove_testflight_build_from_review!(app_id: self.build_train.application.apple_id,
-                                                     train: self.build_train.version_string,
+        client.remove_testflight_build_from_review!(app_id: self.apple_id,
+                                                     train: self.train_version,
                                               build_number: self.build_version,
                                                   platform: self.platform)
       end

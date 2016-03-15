@@ -31,7 +31,7 @@ module Fastlane
           devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
           raise 'Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless devices_file.first == ['Device ID', 'Device Name']
 
-          Helper.log.info "Fetching list of currently registered devices..."
+          UI.message("Fetching list of currently registered devices...")
           existing_devices = Spaceship::Device.all
 
           device_objs = devices_file.drop(1).map do |device|
@@ -46,7 +46,7 @@ module Fastlane
           raise 'You must pass either a valid `devices` or `devices_file`. Please check the readme.'.red
         end
 
-        Helper.log.info "Successfully registered new devices.".green
+        UI.success("Successfully registered new devices.")
         return device_objs
       end
 

@@ -17,7 +17,7 @@ module Fastlane
         taxi_cmd << ["--id", params[:device_id]] if params[:device_id]
         return taxi_cmd.join(" ") if Helper.test?
         Actions.sh(taxi_cmd.join(" "))
-        Helper.log.info "Deployed #{params[:ipa]} to device!"
+        UI.message("Deployed #{params[:ipa]} to device!")
       end
 
       #####################################################

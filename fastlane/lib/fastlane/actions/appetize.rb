@@ -30,15 +30,15 @@ module Fastlane
             platform: 'ios'
         }
 
-        params.merge!(privateKey: options[:private_key]) unless options[:private_key].nil?
+        params[:privateKey] = options[:private_key] unless options[:private_key].nil?
         req.body = JSON.generate(params)
         response = https.request(req)
 
         raise 'Error when trying to upload ipa to Appetize.io'.red unless parse_response(response)
-        Helper.log.info "App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}"
-        Helper.log.info "Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}"
-        Helper.log.info "App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}"
-        Helper.log.info "Build successfully uploaded to Appetize.io".green
+        UI.message("App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}")
+        UI.message("Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}")
+        UI.message("App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}")
+        UI.success("Build successfully uploaded to Appetize.io")
       end
 
       def self.parse_response(response)
@@ -54,23 +54,22 @@ module Fastlane
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
       rescue
-        Helper.log.fatal "Error uploading to Appetize.io: #{response.body}".red
+        UI.error("Error uploading to Appetize.io: #{response.body}")
         help_message(response)
         return false
       end
       private_class_method :parse_response
 
       def self.help_message(response)
-        message =
-            case response.body
-            when 'Invalid token'
-              'Invalid API Token specified.'
-            when 'Error downloading zip file'
-              'URL should be wrong'
-            when 'No app with specified privateKey found'
-              'Invalid privateKey specified'
-            end
-        Helper.log.error message.red if message
+        message = case response.body
+                  when 'Invalid token'
+                    'Invalid API Token specified.'
+                  when 'Error downloading zip file'
+                    'URL should be wrong'
+                  when 'No app with specified privateKey found'
+                    'Invalid privateKey specified'
+                  end
+        UI.error(message) if message
       end
       private_class_method :help_message
 

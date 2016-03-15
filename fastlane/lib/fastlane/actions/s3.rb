@@ -189,7 +189,7 @@ module Fastlane
         Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH] = version_url
         ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_url
 
-        Helper.log.info "Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'".green
+        UI.success("Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'")
 
         return true
       end

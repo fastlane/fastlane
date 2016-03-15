@@ -6,7 +6,7 @@ module Fastlane
 
     class GetGithubReleaseAction < Action
       def self.run(params)
-        Helper.log.info "Getting release on GitHub (#{params[:server_url]}/#{params[:url]}: #{params[:version]})"
+        UI.message("Getting release on GitHub (#{params[:server_url]}/#{params[:url]}: #{params[:version]})")
         require 'excon'
         require 'base64'
 
@@ -19,14 +19,14 @@ module Fastlane
 
         case response[:status]
         when 404
-          Helper.log.error "Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+          UI.error("Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).")
           return nil
         when 401
-          Helper.log.error "You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.".red
+          UI.error("You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.")
           return nil
         else
           if response[:status] != 200
-            Helper.log.error "GitHub responded with #{response[:status]}:#{response[:body]}".red
+            UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
             return nil
           end
         end
@@ -37,11 +37,11 @@ module Fastlane
 
           # Found it
           Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
-          Helper.log.info "Version is already live on GitHub.com 🚁"
+          UI.message("Version is already live on GitHub.com 🚁")
           return current
         end
 
-        Helper.log.info "Couldn't find GitHub release #{params[:version]}".yellow
+        UI.important("Couldn't find GitHub release #{params[:version]}")
         return nil
       end
 

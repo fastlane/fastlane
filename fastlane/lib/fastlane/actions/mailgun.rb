@@ -101,7 +101,7 @@ module Fastlane
         sandbox_domain = options[:postmaster].split("@").last
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
                         from: "#{options[:from]}<#{options[:postmaster]}>",
-                        to: "#{options[:to]}",
+                        to: (options[:to]).to_s,
                         subject: options[:subject],
                         html: mail_template(options)
         mail_template(options)

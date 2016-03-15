@@ -10,43 +10,43 @@ module Fastlane
         version_number = params[:version]
         unless version_number
           # Automatically fetch the latest version
-          Helper.log.info "Fetching the latest version for this app"
+          UI.message("Fetching the latest version for this app")
           if app.edit_version and app.edit_version.version
             version_number = app.edit_version.version
           else
-            Helper.log.info "You have to specify a new version number: "
+            UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
           end
         end
 
-        Helper.log.info "Going to update version #{version_number}"
+        UI.message("Going to update version #{version_number}")
 
         changelog = params[:changelog]
         unless changelog
           path = "./fastlane/changelog.txt"
-          Helper.log.info "Looking for changelog in '#{path}'..."
+          UI.message("Looking for changelog in '#{path}'...")
           if File.exist? path
             changelog = File.read(path)
           else
-            Helper.log.error "Couldn't find changelog.txt"
-            Helper.log.info "Please enter the changelog here:"
+            UI.error("Couldn't find changelog.txt")
+            UI.message("Please enter the changelog here:")
             changelog = STDIN.gets
           end
         end
 
-        Helper.log.info "Going to update the changelog to:\n\n#{changelog.yellow}\n\n"
+        UI.important("Going to update the changelog to:\n\n#{changelog}\n\n")
 
         if (v = app.edit_version)
           if v.version != version_number
             # Version is already there, make sure it matches the one we want to create
-            Helper.log.info "Changing existing version number from '#{v.version}' to '#{version_number}'"
+            UI.message("Changing existing version number from '#{v.version}' to '#{version_number}'")
             v.version = version_number
             v.save!
           else
-            Helper.log.info "Updating changelog for existing version #{v.version}"
+            UI.message("Updating changelog for existing version #{v.version}")
           end
         else
-          Helper.log.info "Creating the new version: #{version_number}"
+          UI.message("Creating the new version: #{version_number}")
           app.create_version!(version_number)
           app = Spaceship::Application.find(params[:app_identifier]) # Replace with .reload method once available
           v = app.edit_version
@@ -55,10 +55,10 @@ module Fastlane
         v.release_notes.languages.each do |lang|
           v.release_notes[lang] = changelog
         end
-        Helper.log.info "Uploading changes to iTunes Connect..."
+        UI.message("Uploading changes to iTunes Connect...")
         v.save!
 
-        Helper.log.info "👼 Successfully pushed the new changelog to #{v.url}".green
+        UI.success("👼 Successfully pushed the new changelog to #{v.url}")
       end
 
       #####################################################

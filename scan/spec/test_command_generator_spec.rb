@@ -28,16 +28,16 @@ describe Scan do
 
       result = Scan::TestCommandGenerator.generate
       expect(result).to start_with([
-        "set -o pipefail &&",
-        "env NSUnbufferedIO=YES xcodebuild",
-        "-scheme 'app'",
-        "-project './examples/standard/app.xcodeproj'",
-        "-sdk '9.0'",
-        "-destination '#{Scan.config[:destination]}'",
-        "DEBUG=1 BUNDLE_NAME=Example\\ App",
-        :build,
-        :test
-      ])
+                                     "set -o pipefail &&",
+                                     "env NSUnbufferedIO=YES xcodebuild",
+                                     "-scheme 'app'",
+                                     "-project './examples/standard/app.xcodeproj'",
+                                     "-sdk '9.0'",
+                                     "-destination '#{Scan.config[:destination]}'",
+                                     "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                                     :build,
+                                     :test
+                                   ])
     end
 
     describe "Standard Example" do
@@ -51,14 +51,14 @@ describe Scan do
 
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
-          "set -o pipefail &&",
-          "env NSUnbufferedIO=YES xcodebuild",
-          "-scheme 'app'",
-          "-project './examples/standard/app.xcodeproj'",
-          "-destination '#{Scan.config[:destination]}'",
-          :build,
-          :test
-        ])
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme 'app'",
+                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-destination '#{Scan.config[:destination]}'",
+                                       :build,
+                                       :test
+                                     ])
       end
 
       it "#project_path_array" do
@@ -96,15 +96,15 @@ describe Scan do
 
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
-          "set -o pipefail &&",
-          "env NSUnbufferedIO=YES xcodebuild",
-          "-scheme 'app'",
-          "-project './examples/standard/app.xcodeproj'",
-          "-destination '#{Scan.config[:destination]}'",
-          "-derivedDataPath '/tmp/my/derived_data'",
-          :build,
-          :test
-        ])
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme 'app'",
+                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-destination '#{Scan.config[:destination]}'",
+                                       "-derivedDataPath '/tmp/my/derived_data'",
+                                       :build,
+                                       :test
+                                     ])
       end
     end
 
@@ -117,15 +117,15 @@ describe Scan do
 
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
-          "set -o pipefail &&",
-          "env NSUnbufferedIO=YES xcodebuild",
-          "-scheme 'app'",
-          "-project './examples/standard/app.xcodeproj'",
-          "-destination '#{Scan.config[:destination]}'",
-          "-resultBundlePath './fastlane/test_output/app.test_result'",
-          :build,
-          :test
-        ])
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme 'app'",
+                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-destination '#{Scan.config[:destination]}'",
+                                       "-resultBundlePath './fastlane/test_output/app.test_result'",
+                                       :build,
+                                       :test
+                                     ])
       end
     end
   end

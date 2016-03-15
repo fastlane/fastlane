@@ -16,7 +16,7 @@ module Fastlane
 
     def run
       if FastlaneFolder.setup? and !Helper.is_test?
-        Helper.log.info "Fastlane already set up at path #{folder}".yellow
+        UI.important("Fastlane already set up at path #{folder}")
         return
       end
 
@@ -36,13 +36,13 @@ module Fastlane
           is_manual_setup = true
           manual_setup
         end
-        Helper.log.info 'Successfully finished setting up fastlane'.green
+        UI.success('Successfully finished setting up fastlane')
       rescue => ex # this will also be caused by Ctrl + C
         if is_manual_setup
           handle_exception(exception: ex)
         else
-          Helper.log.error ex.to_s
-          Helper.log.error 'An error occured during the setup process. Falling back to manual setup!'.yellow
+          UI.error(ex.to_s)
+          UI.error('An error occured during the setup process. Falling back to manual setup!')
           try_manual_setup
         end
       end
@@ -52,7 +52,7 @@ module Fastlane
     def handle_exception(exception: nil)
       # Something went wrong with the setup, clear the folder again
       # and restore previous files
-      Helper.log.fatal 'Error occurred with the setup program! Reverting changes now!'.red
+      UI.error('Error occurred with the setup program! Reverting changes now!')
       restore_previous_state
       raise exception
     end
@@ -127,9 +127,9 @@ module Fastlane
     end
 
     def show_infos
-      Helper.log.info 'This setup will help you get up and running in no time.'.green
-      Helper.log.info "fastlane will check what tools you're already using and set up".green
-      Helper.log.info 'the tool automatically for you. Have fun! '.green
+      UI.success('This setup will help you get up and running in no time.')
+      UI.success("fastlane will check what tools you're already using and set up")
+      UI.success('the tool automatically for you. Have fun! ')
     end
 
     def files_to_copy
@@ -142,7 +142,7 @@ module Fastlane
         next unless File.exist?(current)
         file_name = File.basename(current)
         to_path = File.join(folder, file_name)
-        Helper.log.info "Moving '#{current}' to '#{to_path}'".green
+        UI.success("Moving '#{current}' to '#{to_path}'")
         FileUtils.mv(current, to_path)
       end
     end
@@ -172,7 +172,7 @@ module Fastlane
 
       path = File.join(folder, 'Appfile')
       File.write(path, template)
-      Helper.log.info "Created new file '#{path}'. Edit it to manage your preferred app metadata information.".green
+      UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
     end
 
     # Detect if the app was created on the Dev Portal / iTC
@@ -206,7 +206,7 @@ module Fastlane
         ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
       rescue => exception
         if exception.to_s.include?("The App Name you entered has already been used")
-          Helper.log.info "It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.".yellow
+          UI.important("It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.")
           Produce.config[:app_name] = ask("App Name: ".yellow)
           Produce.config[:skip_devcenter] = true # since we failed on iTC
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
@@ -222,7 +222,7 @@ module Fastlane
     end
 
     def enable_deliver
-      Helper.log.info "Loading up 'deliver', this might take a few seconds"
+      UI.message("Loading up 'deliver', this might take a few seconds")
       require 'deliver'
       require 'deliver/setup'
       options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
@@ -248,13 +248,13 @@ module Fastlane
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
       self.tools.each do |key, value|
-        Helper.log.info "'#{key}' enabled.".magenta if value
-        Helper.log.info "'#{key}' not enabled.".yellow unless value
+        UI.message("'#{key}' enabled.".magenta) if value
+        UI.important("'#{key}' not enabled.") unless value
       end
 
       path = File.join(folder, 'Fastfile')
       File.write(path, template)
-      Helper.log.info "Created new file '#{path}'. Edit it to manage your own deployment lanes.".green
+      UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
     end
 
     def folder
@@ -267,12 +267,12 @@ module Fastlane
         from_path = File.join(folder, current)
         to_path = File.basename(current)
         if File.exist?(from_path)
-          Helper.log.info "Moving '#{from_path}' to '#{to_path}'".yellow
+          UI.important("Moving '#{from_path}' to '#{to_path}'")
           FileUtils.mv(from_path, to_path)
         end
       end
 
-      Helper.log.info "Deleting the 'fastlane' folder".yellow
+      UI.important("Deleting the 'fastlane' folder")
       FileUtils.rm_rf(folder)
     end
   end

@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastlane_core', '>= 0.30.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '>= 0.18.0' # communication with Apple
+  spec.add_dependency 'spaceship', '>= 0.18.0', '< 1.0.0' # communication with Apple
   spec.add_dependency 'terminal-notifier' # show a notification once the build is ready
 
   # Development only
@@ -34,5 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
-  spec.add_development_dependency 'rubocop', '~> 0.35.1'
+  spec.add_development_dependency "rubocop", '~> 0.38.0'
 end

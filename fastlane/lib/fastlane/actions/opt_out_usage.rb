@@ -3,7 +3,7 @@ module Fastlane
     class OptOutUsageAction < Action
       def self.run(params)
         ENV['FASTLANE_OPT_OUT_USAGE'] = "YES"
-        Helper.log.info "Disabled upload of used actions"
+        UI.message("Disabled upload of used actions")
       end
 
       def self.description

@@ -275,3 +275,21 @@ Style/StringLiterals:
 # Configuration parameters: WordRegex.
 Style/WordArray:
   MinSize: 19
+
+# Added after upgrade to 0.38.0
+
+Style/MutableConstant:
+  Enabled: false
+
+# length > 0 is good
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+Style/ConditionalAssignment: 
+  Enabled: false
+
+Style/SpaceAroundKeyword:
+  Enabled: false
+
+Style/IfInsideElse:
+  Enabled: false

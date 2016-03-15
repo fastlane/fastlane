@@ -13,9 +13,9 @@ module Fastlane
   module Actions
     class TestmunkAction < Action
       def self.run(config)
-        Helper.log.info 'Testmunk: Uploading the .ipa and starting your tests'.green
+        UI.success('Testmunk: Uploading the .ipa and starting your tests')
 
-        Helper.log.info 'Zipping features/ to features.zip'.green
+        UI.success('Zipping features/ to features.zip')
         zipped_features_path = File.expand_path('features.zip')
         Actions.sh(%(zip -r "features" "features/"))
 
@@ -26,7 +26,7 @@ module Fastlane
             " https://#{config[:api]}@api.testmunk.com/apps/#{config[:app]}/testruns")
 
         if response
-          Helper.log.info 'Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.'.green
+          UI.success('Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.')
         else
           raise 'Something went wrong while uploading your app to Testmunk'.red
         end

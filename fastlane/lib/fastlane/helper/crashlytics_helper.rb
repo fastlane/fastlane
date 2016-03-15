@@ -62,7 +62,7 @@ module Fastlane
           FileUtils.mkdir_p(containing)
 
           begin
-            Helper.log.info "Downloading Crashlytics Support Library - this might take a minute...".yellow
+            UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
             result = Net::HTTP.get(URI(url))
             File.write(zip_path, result)

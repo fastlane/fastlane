@@ -9,12 +9,12 @@ module Fastlane
         path = File.join(path, "project.pbxproj")
         raise "Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!".red unless File.exist?(path)
 
-        Helper.log.info("Updating development team (#{params[:teamid]}) for the given project '#{path}'")
+        UI.message("Updating development team (#{params[:teamid]}) for the given project '#{path}'")
 
         p = File.read(path)
         File.write(path, p.gsub(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};"))
 
-        Helper.log.info("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'".green)
+        UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'")
       end
 
       def self.description

@@ -72,8 +72,8 @@ module Sigh
         filtered = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
         if Sigh.config[:ignore_profiles_with_different_name]
           results = filtered
-        else
-          results = filtered if (filtered || []).count > 0
+        elsif (filtered || []).count > 0
+          results = filtered
         end
       end
 

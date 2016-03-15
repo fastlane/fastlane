@@ -12,12 +12,12 @@ module Fastlane
         Net::SCP.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |scp|
           if params[:upload]
             scp.upload! params[:upload][:src], params[:upload][:dst], recursive: true
-            Helper.log.info ['[SCP COMMAND]', "Successfully Uploaded", params[:upload][:src], params[:upload][:dst]].join(': ')
+            UI.message(['[SCP COMMAND]', "Successfully Uploaded", params[:upload][:src], params[:upload][:dst]].join(': '))
           end
           if params[:download]
 
             t_ret = scp.download! params[:download][:src], params[:download][:dst], recursive: true
-            Helper.log.info ['[SCP COMMAND]', "Successfully Downloaded", params[:upload][:src], params[:upload][:dst]].join(': ')
+            UI.message(['[SCP COMMAND]', "Successfully Downloaded", params[:upload][:src], params[:upload][:dst]].join(': '))
             unless params[:download][:dst]
               ret = t_ret
             end

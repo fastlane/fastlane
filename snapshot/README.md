@@ -57,7 +57,7 @@ Apple announced a new version of Xcode with support for UI Tests built in right 
 
 As a result, `snapshot` was completely rewritten from ground up without changing its public API.
 
-Please check out the [MigrationGuide to 1.0](/MigrationGuide.md) :+1:
+Please check out the [MigrationGuide to 1.0](/snapshot/MigrationGuide.md) :+1:
 
 **Why change to UI Tests?**
 

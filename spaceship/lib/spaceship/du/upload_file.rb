@@ -12,7 +12,7 @@ module Spaceship
     class << self
       def from_path(path)
         raise "Image must exists at path: #{path}" unless File.exist?(path)
-        path = remove_alpha_channel(path) if File.extname(path).downcase == '.png'
+        path = remove_alpha_channel(path) if File.extname(path).casecmp('.png').zero?
 
         content_type = Utilities.content_type(path)
         self.new(

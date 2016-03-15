@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require 'xcodeproj'
 
-        Helper.log.info "Recreate schemes for project: #{params[:project]}"
+        UI.message("Recreate schemes for project: #{params[:project]}")
 
         project = Xcodeproj::Project.open(params[:project])
         project.recreate_user_schemes

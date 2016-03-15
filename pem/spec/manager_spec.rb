@@ -16,8 +16,8 @@ describe PEM do
       PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options)
       PEM::Manager.start
 
-      expect(File.exist? "production_com.krausefx.app.pem").to eq(true)
-      expect(File.exist? "production_com.krausefx.app.pkey").to eq(true)
+      expect(File.exist?("production_com.krausefx.app.pem")).to eq(true)
+      expect(File.exist?("production_com.krausefx.app.pkey")).to eq(true)
     end
 
     it "Successful run with output_path" do
@@ -25,9 +25,9 @@ describe PEM do
       PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options)
       PEM::Manager.start
 
-      expect(File.exist? "tmp/production_com.krausefx.app.pem").to eq(true)
-      expect(File.exist? "tmp/production_com.krausefx.app.pkey").to eq(true)
-      expect(File.exist? "tmp/production_com.krausefx.app.p12").to eq(false)
+      expect(File.exist?("tmp/production_com.krausefx.app.pem")).to eq(true)
+      expect(File.exist?("tmp/production_com.krausefx.app.pkey")).to eq(true)
+      expect(File.exist?("tmp/production_com.krausefx.app.p12")).to eq(false)
     end
 
     after :all do

@@ -9,7 +9,7 @@ module Fastlane
         ]
 
         result = Actions.sh(command.join(' '))
-        Helper.log.info 'Tags pushed to remote'.green
+        UI.success('Tags pushed to remote')
         result
       end
 

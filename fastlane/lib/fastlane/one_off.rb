@@ -10,7 +10,7 @@ module Fastlane
           key, value = current.split(":", 2)
           raise "Please pass values like this: key:value" unless key.length > 0
           value = CommandLineHandler.convert_value(value)
-          Helper.log.debug "Using #{key}: #{value}".yellow
+          UI.verbose("Using #{key}: #{value}")
           action_parameters[key.to_sym] = value
         else
           action_name ||= current

@@ -34,7 +34,7 @@ module Fastlane
           # Write changes to the file
           project.save
 
-          Helper.log.info "Updated #{params[:xcodeproj]} 💾.".green
+          UI.success("Updated #{params[:xcodeproj]} 💾.")
         else
           # Update plist value
           plist['CFBundleIdentifier'] = params[:app_identifier]
@@ -43,7 +43,7 @@ module Fastlane
           plist_string = Plist::Emit.dump(plist)
           File.write(info_plist_path, plist_string)
 
-          Helper.log.info "Updated #{params[:plist_path]} 💾.".green
+          UI.success("Updated #{params[:plist_path]} 💾.")
         end
       end
 
@@ -66,14 +66,14 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.include? "workspace"
+                                         raise "Please pass the path to the project, not the workspace".red unless value.end_with?(".xcodeproj")
                                          raise "Could not find Xcode project".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :plist_path,
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PLIST_PATH",
                                        description: "Path to info plist, relative to your Xcode project",
                                        verify_block: proc do |value|
-                                         raise "Invalid plist file".red unless value[-6..-1].downcase == ".plist"
+                                         raise "Invalid plist file".red unless value[-6..-1].casecmp(".plist").zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',

@@ -56,8 +56,21 @@ module Pilot
       tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
 
       if tester
-        tester.delete!
-        Helper.log.info "Successfully removed tester #{tester.email}".green
+        app_filter = (config[:apple_id] || config[:app_identifier])
+        if app_filter
+          begin
+            app = Spaceship::Application.find(app_filter)
+            raise "Couldn't find app with '#{app_filter}'" unless app
+            tester.remove_from_app!(app.apple_id)
+            Helper.log.info "Successfully removed tester #{tester.email} from app #{app_filter}".green
+          rescue => ex
+            Helper.log.error "Could not remove #{tester.email} from app: #{ex}".red
+            raise ex
+          end
+        else
+          tester.delete!
+          Helper.log.info "Successfully removed tester #{tester.email}".green
+        end
       else
         Helper.log.error "Tester not found: #{config[:email]}".red
       end
@@ -70,6 +83,7 @@ module Pilot
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
         app = Spaceship::Application.find(app_filter)
+        raise "Couldn't find app with '#{app_filter}'" unless app
         int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
         ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
       else

@@ -10,7 +10,7 @@ module Fastlane
         # Check if parameters are set
         if params[:app_identifier] or params[:display_name] or params[:block]
           if (params[:app_identifier] or params[:display_name]) and params[:block]
-            Helper.log.warn("block parameter can not be specified with app_identifier or display_name")
+            UI.important("block parameter can not be specified with app_identifier or display_name")
             return false
           end
 
@@ -31,10 +31,10 @@ module Fastlane
           plist_string = Plist::Emit.dump(plist)
           File.write(info_plist_path, plist_string)
 
-          Helper.log.info "Updated #{params[:plist_path]} 💾.".green
+          UI.success("Updated #{params[:plist_path]} 💾.")
           plist_string
         else
-          Helper.log.warn("You haven't specified any parameters to update your plist.")
+          UI.important("You haven't specified any parameters to update your plist.")
           false
         end
       end
@@ -66,7 +66,7 @@ module Fastlane
                                        env_name: "FL_UPDATE_PLIST_PATH",
                                        description: "Path to info plist",
                                        verify_block: proc do |value|
-                                         raise "Invalid plist file".red unless value[-6..-1].downcase == ".plist"
+                                         raise "Invalid plist file".red unless value[-6..-1].casecmp(".plist").zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_PLIST_APP_IDENTIFIER',

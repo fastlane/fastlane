@@ -22,7 +22,7 @@ module Fastlane
           Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
           Actions.lane_context[SharedValues::CERT_CERTIFICATE_ID] = certificate_id
 
-          Helper.log.info("Use signing certificate '#{certificate_id}' from now on!".green)
+          UI.success("Use signing certificate '#{certificate_id}' from now on!")
 
           ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
         ensure

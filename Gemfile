@@ -2,5 +2,4 @@ source "https://rubygems.org"
 
 gemspec path: "fastlane"
 
-gem "rake"
-gem "danger"
+gem "danger", "0.6.0"

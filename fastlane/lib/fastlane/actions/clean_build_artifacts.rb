@@ -8,6 +8,7 @@ module Fastlane
         ]
 
         paths += Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] || []
+        paths += Actions.lane_context[Actions::SharedValues::DSYM_PATHS] || []
         paths = paths.uniq
 
         paths.reject { |file| file.nil? || !File.exist?(file) }.each do |file|
@@ -15,11 +16,11 @@ module Fastlane
             next if file.match(options[:exclude_pattern])
           end
 
-          Helper.log.debug "Cleaning up '#{file}'".yellow
+          UI.verbose("Cleaning up '#{file}'")
           File.delete(file)
         end
 
-        Helper.log.info 'Cleaned up build artifacts 🐙'.green
+        UI.success('Cleaned up build artifacts 🐙')
       end
 
       def self.available_options

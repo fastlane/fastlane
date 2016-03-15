@@ -740,6 +740,18 @@ ensure_no_debug_code(text: "NSLog",
                 extension: "m")
 ```
 
+```ruby
+ensure_no_debug_code(text: "(^#define DEBUG|NSLog)",
+                     path: "./lib",
+                extension: "m")
+```
+
+```ruby
+ensure_no_debug_code(text: "<<<<<<",
+                     path: "./lib",
+               extensions: ["m", "swift"])
+```
+
 ### [Appium](http://appium.io/)
 
 Run UI testing by `Appium::Driver` with RSpec.
@@ -862,6 +874,41 @@ crashlytics(
 Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
+
+### [upload_symbols_to_crashlytics]
+
+This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+
+```ruby
+upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
+```
+
+### `download_dsyms`
+
+This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled.
+
+```ruby
+lane :refresh_dsyms do
+  download_dsyms                  # Download dSYM files from iTC
+  upload_symbols_to_crashlytics   # Upload them to Crashlytics
+  clean_build_artifacts           # Delete the local dSYM files
+end
+```
+### [upload_symbols_to_sentry](https://getsentry.com)
+
+This action allows you to upload symbolication files to Sentry.
+
+```ruby
+upload_sybols_to_sentry(
+  api_key: '...',
+  org_slug: '...',
+  project_slug: '...',
+  dsym_path: './App.dSYM.zip'
+)
+```
+
+The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
+
 
 ### AWS S3 Distribution
 
@@ -2271,6 +2318,10 @@ Add this your `Fastfile` to not send any data to the fastlane web service. You c
 opt_out_usage
 ```
 
+### rocket
+
+Print an ascii Rocket :rocket:. Useful after using `crashlytics` or `pilot` to indicate that your new build has been shipped to outer-space.
+
 ### skip_docs
 
 Tell `fastlane` to not automatically create a `fastlane/README.md` when running `fastlane`. You can always trigger the creation of this file manually by running `fastlane docs`
@@ -2345,5 +2396,19 @@ a wrapper around rsync, rsync is a tool that lets you synchronize files, includi
 rsync(
   source: "root@host:/tmp/1.txt",
   destination: "/tmp/local_file.txt"
+)
+```
+
+### ifttt
+
+Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this `fastlane` action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc.
+
+```ruby
+ifttt(
+  api_key: "...",
+  event_name: "...",
+  value1: "foo",
+  value2: "bar",
+  value3: "baz"
 )
 ```

@@ -28,7 +28,7 @@ module Fastlane
 
         self.post_to_typetalk(message, topic_id, typetalk_token)
 
-        Helper.log.info 'Successfully sent Typetalk notification'.green
+        UI.success('Successfully sent Typetalk notification')
       end
 
       def self.post_to_typetalk(message, topic_id, typetalk_token)

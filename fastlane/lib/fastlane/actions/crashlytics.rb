@@ -9,11 +9,11 @@ module Fastlane
 
         # We need to store notes in a file, because the crashlytics CLI (iOS) says so
         if params[:notes]
-          Helper.log.error "Overwriting :notes_path, because you specified :notes" if params[:notes_path]
+          UI.error("Overwriting :notes_path, because you specified :notes") if params[:notes_path]
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
         elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
-          Helper.log.info "Sending FL_CHANGELOG as release notes to Beta by Crashlytics"
+          UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
             Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog').path
@@ -27,13 +27,13 @@ module Fastlane
           raise "You have to either pass an ipa or an apk file to the Crashlytics action".red
         end
 
-        Helper.log.info 'Uploading the build to Crashlytics Beta. Time for some ☕️.'.green
-        Helper.log.debug command.join(" ") if $verbose
+        UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
+        UI.verbose(command.join(" ")) if $verbose
         Actions.sh command.join(" ")
 
         return command if Helper.test?
 
-        Helper.log.info 'Build successfully uploaded to Crashlytics Beta 🌷'.green
+        UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
       end
 
       def self.description

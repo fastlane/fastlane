@@ -2,13 +2,13 @@ module Fastlane
   module Actions
     class VerifyPodKeysAction < Action
       def self.run(params)
-        Helper.log.info "Validating CocoaPods Keys"
+        UI.message("Validating CocoaPods Keys")
 
         options = plugin_options
         target = options["target"] || ""
 
         options["keys"].each do |key|
-          Helper.log.info " - #{key}"
+          UI.message(" - #{key}")
           validate(key, target)
         end
       end
