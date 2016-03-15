@@ -90,7 +90,7 @@ module Fastlane
                                        description: "The path to the Xcode installation to test",
                                        default_value: File.expand_path('../../', FastlaneCore::Helper.xcode_path),
                                        verify_block: proc do |value|
-                                         raise "Couldn't find Xcode at path '#{value}'".red unless File.exist?(value)
+                                         UI.crash!("Couldn't find Xcode at path '#{value}'") unless File.exist?(value)
                                        end)
         ]
       end

@@ -5,7 +5,7 @@ module Fastlane
     class InstallOnDeviceAction < Action
       def self.run(params)
         unless Helper.test?
-          raise "ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions".red if `which ios-deploy`.length == 0
+          UI.crash!("ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions") if `which ios-deploy`.length == 0
         end
         taxi_cmd = [
           "ios-deploy",

@@ -23,10 +23,10 @@ module Fastlane
         xcode_path = (params || []).first
 
         # Verify that a param was passed in
-        raise "Path to Xcode application required (e.x. \"/Applications/Xcode.app\")".red unless xcode_path.to_s.length > 0
+        UI.crash!("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")") unless xcode_path.to_s.length > 0
 
         # Verify that a path to a directory was passed in
-        raise "Path '#{xcode_path}' doesn't exist".red unless Dir.exist?(xcode_path)
+        UI.crash!("Path '#{xcode_path}' doesn't exist") unless Dir.exist?(xcode_path)
 
         UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
