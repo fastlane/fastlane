@@ -73,6 +73,18 @@ class SnapshotApplication
       end
     end
 
+    command :clear_derived_data do |c|
+      c.syntax = 'snapshot clear_derived_data -f path'
+      c.description = "Clear the directory where build products and other derived data will go"
+      c.option "-f", "--derived_data_path", String, "The directory where build products and other derived data will go"
+
+      c.action do |args, options|
+        if options.derived_data_path && Dir.exist?(options.derived_data_path)
+          FileUtils.rm_rf(options.derived_data_path)
+        end
+      end
+    end
+
     default_command :run
 
     run!
