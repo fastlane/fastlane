@@ -35,12 +35,25 @@ module Spaceship
     class NoUserCredentialsError < StandardError; end
 
     class UnexpectedResponse < StandardError;
-      def self.handle_response(response)
-        if (response.body["userString"])
-          msg = "🍎 returned an unexpected response:\n#{}{response.body['resultString']}\n#{response.body['userString']}"
-          UI.user_error!(msg)
-        else
-          raise UnexpectedResponse.new, response.body
+      class << self
+        def handle_response(response)
+          if response.body['userString']
+            msg = "🍎 returned an unexpected response:\n#{response.body['resultString']}\n#{response.body['userString']}"
+            user_error!(UnexpectedResponse.new(msg))
+          else
+            raise UnexpectedResponse.new, response.body
+          end
+        end
+
+        def user_error!(e)
+          require 'colored'
+
+          if $verbose # with stack trace
+            puts e.backtrace.nil?
+            raise e, "[!] #{e.message}".red, e.backtrace
+          else # without stack trace
+            abort "\n[!] #{e.message}".red
+          end
         end
       end
     end
