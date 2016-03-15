@@ -60,6 +60,7 @@ task :issue_stats do
   conn = Faraday.new(:url => BASE_URL)
 
   QUERY_START_TIME = (Time.now.utc - (QUERY_DAYS * SECONDS_PER_DAY)).freeze
+  puts "Fetching GitHub issues..."
 
   # Fetch only issues updated within the query time period to keep our GitHub request count reasonable
   since = QUERY_START_TIME.strftime("%Y-%m-%dT%H:%M:%SZ")
