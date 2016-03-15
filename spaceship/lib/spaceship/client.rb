@@ -34,7 +34,7 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < StandardError; end
 
-    class UnexpectedResponse < StandardError;
+    class UnexpectedResponse < StandardError
       class << self
         def handle_response(response)
           if response.body['userString']
@@ -49,7 +49,6 @@ module Spaceship
           require 'colored'
 
           if $verbose # with stack trace
-            puts e.backtrace.nil?
             raise e, "[!] #{e.message}".red, e.backtrace
           else # without stack trace
             abort "\n[!] #{e.message}".red
