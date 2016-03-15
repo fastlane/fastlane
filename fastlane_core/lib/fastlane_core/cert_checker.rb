@@ -2,7 +2,7 @@ module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
     def self.installed?(path)
-      raise "Could not find file '#{path}'".red unless File.exist?(path)
+      UI.crash!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies
       finger_print = sha1_fingerprint(path)

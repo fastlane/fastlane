@@ -38,7 +38,7 @@ module Commander
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         error_message = "\n[!] #{e}".red
         if $verbose # with stack trace
-          raise e, "[!] #{e.message}".red, e.backtrace
+          UI.crash!(e, "[!] #{e.message}", e.backtrace)
         else
           abort error_message # without stack trace
         end
@@ -46,7 +46,7 @@ module Commander
         FastlaneCore::CrashReporting.handle_crash(e)
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
-        raise e, "[!] #{e.message}".red, e.backtrace
+        UI.crash!(e, "[!] #{e.message}", e.backtrace)
       end
     end
   end

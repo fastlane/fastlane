@@ -174,7 +174,7 @@ module FastlaneCore
           Helper.log.fatal "Transporter transfer failed.".red
           Helper.log.warn(@warnings.join("\n").yellow)
           Helper.log.error(@errors.join("\n").red)
-          raise "Return status of iTunes Transporter was #{$1}: #{@errors.join('\n')}".red
+          UI.crash!("Return status of iTunes Transporter was #{$1}: #{@errors.join('\n')}")
         else
           Helper.log.info "iTunes Transporter successfully finished its job".green
         end
