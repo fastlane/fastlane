@@ -152,7 +152,11 @@ end
 
 desc "e.g. fastlane/deliver"
 private_lane :github_url do |options|
-  ["fastlane", options[:tool]].join("/")
+  org = "fastlane"
+  if ["deliver", "gym"].include?(options[:tool])
+    org = "fastlane-old"
+  end
+  [org, options[:tool]].join("/")
 end
 
 desc "Get the version number of the last release"
