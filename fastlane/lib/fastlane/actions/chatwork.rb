@@ -27,7 +27,7 @@ module Fastlane
         else
           require 'json'
           json = JSON.parse(response.body)
-          raise "HTTP Error: #{response.code} #{json['errors']}".red
+          UI.crash!("HTTP Error: #{response.code} #{json['errors']}")
         end
       end
 
@@ -43,7 +43,7 @@ module Fastlane
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
                                            UI.error("Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.")
-                                           raise 'No CHATWORK_API_TOKEN given.'.red
+                                           UI.crash!('No CHATWORK_API_TOKEN given.')
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,

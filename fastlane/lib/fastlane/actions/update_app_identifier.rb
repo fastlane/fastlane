@@ -10,7 +10,7 @@ module Fastlane
 
         # Read existing plist file
         info_plist_path = File.join(params[:xcodeproj], '..', params[:plist_path])
-        raise "Couldn't find info plist file at path '#{params[:plist_path]}'".red unless File.exist?(info_plist_path)
+        UI.crash!("Couldn't find info plist file at path '#{params[:plist_path]}'") unless File.exist?(info_plist_path)
         plist = Plist.parse_xml(info_plist_path)
 
         # Check if current app identifier product bundle identifier
@@ -21,10 +21,10 @@ module Fastlane
 
           # Fetch the build configuration objects
           configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
-          raise "Info plist uses $(#{identifier_key}), but xcodeproj does not".red unless configs.count > 0
+          UI.crash!("Info plist uses $(#{identifier_key}), but xcodeproj does not") unless configs.count > 0
 
           configs = configs.select { |obj| obj.build_settings[info_plist_key] == params[:plist_path] }
-          raise "Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.".red unless configs.count > 0
+          UI.crash!("Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.") unless configs.count > 0
 
           # For each of the build configurations, set app identifier
           configs.each do |c|
@@ -66,14 +66,14 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red unless value.end_with?(".xcodeproj")
-                                         raise "Could not find Xcode project".red unless File.exist?(value)
+                                         UI.crash!("Please pass the path to the project, not the workspace") unless value.end_with?(".xcodeproj")
+                                         UI.crash!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :plist_path,
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PLIST_PATH",
                                        description: "Path to info plist, relative to your Xcode project",
                                        verify_block: proc do |value|
-                                         raise "Invalid plist file".red unless value[-6..-1].casecmp(".plist").zero?
+                                         UI.crash!("Invalid plist file") unless value[-6..-1].casecmp(".plist").zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',

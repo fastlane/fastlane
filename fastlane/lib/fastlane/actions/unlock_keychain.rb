@@ -63,7 +63,7 @@ module Fastlane
           end
         end
 
-        raise "Could not find the keychain file in: #{possible_locations}".red
+        UI.crash!("Could not find the keychain file in: #{possible_locations}")
       end
 
       #####################################################

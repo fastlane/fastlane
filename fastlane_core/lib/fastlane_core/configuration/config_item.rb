@@ -10,7 +10,7 @@ module FastlaneCore
     # @param default_value the value which is used if there was no given values and no environment values
     # @param verify_block an optional block which is called when a new value is set.
     #   Check value is valid. This could be type checks or if a folder/file exists
-    #   You have to raise a specific exception if something goes wrong. Append .red after the string
+    #   You have to UI.crash!(a specific exception) if something goes wrong. Append  after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param type (Class) the data type of this config item. Takes precedence over `is_string`
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
@@ -24,7 +24,7 @@ module FastlaneCore
         raise "short_option must be a String of length 1" unless short_option.kind_of? String and short_option.delete('-').length == 1
       end
       if description
-        raise "Do not let descriptions end with a '.', since it's used for user inputs as well".red if description[-1] == '.'
+        UI.crash!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
 
       if type.to_s.length > 0 and short_option.to_s.length == 0

@@ -28,7 +28,7 @@ module Fastlane
         if response
           UI.success('Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.')
         else
-          raise 'Something went wrong while uploading your app to Testmunk'.red
+          UI.crash!('Something went wrong while uploading your app to Testmunk')
         end
       end
 

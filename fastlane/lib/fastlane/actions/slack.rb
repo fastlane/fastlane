@@ -47,7 +47,7 @@ module Fastlane
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
-          raise 'Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.'.red
+          UI.crash!('Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.')
         end
       end
 

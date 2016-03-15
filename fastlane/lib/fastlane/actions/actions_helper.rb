@@ -25,7 +25,7 @@ module Fastlane
     #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
       start = Time.now # before the raise block, since `start` is required in the ensure block
-      raise 'No block given'.red unless block_given?
+      UI.crash!('No block given') unless block_given?
 
       error = nil
       exc = nil

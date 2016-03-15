@@ -27,7 +27,7 @@ module Fastlane
         ipa_path = File.expand_path(ipa_path)
 
         `unzip '#{ipa_path}' -d #{dir}`
-        raise "Unable to unzip ipa".red unless $? == 0
+        UI.crash!("Unable to unzip ipa") unless $? == 0
 
         app_path = File.expand_path("#{dir}/Payload/*.app")
 
@@ -36,7 +36,7 @@ module Fastlane
 
       def self.gather_cert_info(app_path)
         cert_info = `codesign -vv -d #{app_path} 2>&1`
-        raise "Unable to verify code signing".red unless $? == 0
+        UI.crash!("Unable to verify code signing") unless $? == 0
 
         values = {}
 
@@ -59,7 +59,7 @@ module Fastlane
 
       def self.update_with_profile_info(app_path, values)
         profile = `cat #{app_path}/embedded.mobileprovision | security cms -D`
-        raise "Unable to extract profile".red unless $? == 0
+        UI.crash!("Unable to extract profile") unless $? == 0
 
         plist = Plist.parse_xml(profile)
 
@@ -103,22 +103,22 @@ module Fastlane
 
       def self.evaulate(params, values)
         if params[:provisioning_type]
-          raise "Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'".red unless params[:provisioning_type] == values['provisioning_type']
+          UI.crash!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
         end
         if params[:provisioning_uuid]
-          raise "Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'".red unless params[:provisioning_uuid] == values['provisioning_uuid']
+          UI.crash!("Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'") unless params[:provisioning_uuid] == values['provisioning_uuid']
         end
         if params[:team_identifier]
-          raise "Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'".red unless params[:team_identifier] == values['team_identifier']
+          UI.crash!("Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'") unless params[:team_identifier] == values['team_identifier']
         end
         if params[:team_name]
-          raise "Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'".red unless params[:team_name] == values['team_name']
+          UI.crash!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'") unless params[:team_name] == values['team_name']
         end
         if params[:app_name]
-          raise "Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'".red unless params[:app_name] == values['app_name']
+          UI.crash!("Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'") unless params[:app_name] == values['app_name']
         end
         if params[:bundle_identifier]
-          raise "Mismatched bundle_identifier. Required: '#{params[:bundle_identifier]}'; Found: '#{values['bundle_identifier']}'".red unless params[:bundle_identifier] == values['bundle_identifier']
+          UI.crash!("Mismatched bundle_identifier. Required: '#{params[:bundle_identifier]}'; Found: '#{values['bundle_identifier']}'") unless params[:bundle_identifier] == values['bundle_identifier']
         end
 
         UI.success "Build is verified, have a 🍪."

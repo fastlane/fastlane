@@ -32,7 +32,7 @@ module Fastlane
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if dsym_filename && !File.exist?(dsym_filename)
+        UI.crash!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
         UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
 
@@ -61,7 +61,7 @@ module Fastlane
           if response.body.to_s.include?("App could not be created")
             raise "Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400"
           else
-            raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
+            UI.crash!("Error when trying to upload ipa to HockeyApp: #{response.body}")
           end
         end
       end
@@ -76,7 +76,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
-                                         raise "No API token for Hockey given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                         UI.crash!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
@@ -84,7 +84,7 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.crash!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
