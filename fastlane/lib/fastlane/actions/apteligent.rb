@@ -47,7 +47,7 @@ module Fastlane
         options = []
         options << "--silent"
         options << "-F dsym=@#{file_path}"
-        options << "-F dsym=@#{file_path}"
+        options << "-F key=#{params[:api_key].shellescape}"
         options
       end
 
