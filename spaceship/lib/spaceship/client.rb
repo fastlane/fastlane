@@ -34,7 +34,16 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < StandardError; end
 
-    class UnexpectedResponse < StandardError; end
+    class UnexpectedResponse < StandardError;
+      def self.handle_response(response)
+        if (response.body["userString"])
+          msg = "🍎 returned an unexpected response:\n#{}{response.body['resultString']}\n#{response.body['userString']}"
+          UI.user_error!(msg)
+        else
+          raise UnexpectedResponse.new, response.body
+        end
+      end
+    end
 
     # Raised when 302 is received from portal request
     class AppleTimeoutError < StandardError; end
@@ -297,7 +306,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new, response.body
+        UnexpectedResponse.handle_response(response)
       else
         store_csrf_tokens(response)
         content
