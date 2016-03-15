@@ -22,7 +22,7 @@ module Fastlane
         require 'shenzhen/plugins/deploygate'
 
         # Available options: https://deploygate.com/docs/api
-        Helper.log.info 'Starting with ipa upload to DeployGate... this could take some time ⏳'.green
+        UI.success('Starting with ipa upload to DeployGate... this could take some time ⏳')
 
         client = Shenzhen::Plugins::DeployGate::Client.new(
           options[:api_token],
@@ -33,8 +33,8 @@ module Fastlane
 
         response = client.upload_build(options[:ipa], options.values)
         if parse_response(response)
-          Helper.log.info "DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}"
-          Helper.log.info "Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!".green
+          UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
+          UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")
         else
           raise 'Error when trying to upload ipa to DeployGate'.red
         end
@@ -44,7 +44,7 @@ module Fastlane
         if response.body && response.body.key?('error')
 
           if response.body['error']
-            Helper.log.error "Error uploading to DeployGate: #{response.body['message']}".red
+            UI.error("Error uploading to DeployGate: #{response.body['message']}")
             help_message(response)
             return
           else
@@ -56,7 +56,7 @@ module Fastlane
             Actions.lane_context[SharedValues::DEPLOYGATE_APP_INFO] = res
           end
         else
-          Helper.log.fatal "Error uploading to DeployGate: #{response.body}".red
+          UI.error("Error uploading to DeployGate: #{response.body}")
           return
         end
         true
@@ -73,7 +73,7 @@ module Fastlane
           when 'application create error: limit'
             'Plan limit: You have reached to the limit of current plan or your plan was expired.'
           end
-        Helper.log.error message.red if message
+        UI.error(message) if message
       end
       private_class_method :help_message
 

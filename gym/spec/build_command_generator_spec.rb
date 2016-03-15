@@ -27,17 +27,17 @@ describe Gym do
 
       result = Gym::BuildCommandGenerator.generate
       expect(result).to eq([
-        "set -o pipefail &&",
-        "xcodebuild",
-        "-scheme 'Example'",
-        "-project './examples/standard/Example.xcodeproj'",
-        "-sdk '9.0'",
-        "-destination 'generic/platform=iOS'",
-        "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-        "DEBUG=1 BUNDLE_NAME=Example\\ App",
-        :archive,
-        "| tee #{log_path.shellescape} | xcpretty"
-      ])
+                             "set -o pipefail &&",
+                             "xcodebuild",
+                             "-scheme 'Example'",
+                             "-project './examples/standard/Example.xcodeproj'",
+                             "-sdk '9.0'",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             :archive,
+                             "| tee #{log_path.shellescape} | xcpretty"
+                           ])
     end
 
     describe "Standard Example" do
@@ -51,15 +51,15 @@ describe Gym do
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
-          "set -o pipefail &&",
-          "xcodebuild",
-          "-scheme 'Example'",
-          "-project './examples/standard/Example.xcodeproj'",
-          "-destination 'generic/platform=iOS'",
-          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-          :archive,
-          "| tee #{log_path.shellescape} | xcpretty"
-        ])
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme 'Example'",
+                               "-project './examples/standard/Example.xcodeproj'",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               :archive,
+                               "| tee #{log_path.shellescape} | xcpretty"
+                             ])
       end
 
       it "#project_path_array" do
@@ -110,16 +110,16 @@ describe Gym do
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
-          "set -o pipefail &&",
-          "xcodebuild",
-          "-scheme 'Example'",
-          "-project './examples/standard/Example.xcodeproj'",
-          "-destination 'generic/platform=iOS'",
-          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-          "-derivedDataPath '/tmp/my/derived_data'",
-          :archive,
-          "| tee #{log_path.shellescape} | xcpretty"
-        ])
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme 'Example'",
+                               "-project './examples/standard/Example.xcodeproj'",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               "-derivedDataPath '/tmp/my/derived_data'",
+                               :archive,
+                               "| tee #{log_path.shellescape} | xcpretty"
+                             ])
       end
     end
 
@@ -132,16 +132,16 @@ describe Gym do
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
-          "set -o pipefail &&",
-          "xcodebuild",
-          "-scheme 'Example'",
-          "-project './examples/standard/Example.xcodeproj'",
-          "-destination 'generic/platform=iOS'",
-          "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-          "-resultBundlePath './ExampleProductName.result'",
-          :archive,
-          "| tee #{log_path.shellescape} | xcpretty"
-        ])
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme 'Example'",
+                               "-project './examples/standard/Example.xcodeproj'",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               "-resultBundlePath './ExampleProductName.result'",
+                               :archive,
+                               "| tee #{log_path.shellescape} | xcpretty"
+                             ])
       end
     end
   end

@@ -22,8 +22,8 @@ module Fastlane
           command << " --allow-warnings"
         end
 
-        result = Actions.sh("#{command}")
-        Helper.log.info "Successfully pushed Podspec ⬆️ ".green
+        result = Actions.sh(command.to_s)
+        UI.success("Successfully pushed Podspec ⬆️ ")
         return result
       end
 

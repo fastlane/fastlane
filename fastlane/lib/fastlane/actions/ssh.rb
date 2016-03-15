@@ -48,17 +48,17 @@ module Fastlane
 
         Net::SSH.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |ssh|
           params[:commands].each do |cmd|
-            Helper.log.info ['[SSH COMMAND]', cmd.yellow].join(': ') if params[:log]
+            UI.important(['[SSH COMMAND]', cmd].join(': ')) if params[:log]
             return_value = ssh_exec!(ssh, cmd)
-            Helper.log.error "SSH Command failed '#{cmd}' Exit-Code: #{return_value[:exit_code]}" if return_value[:exit_code] > 0
+            UI.error("SSH Command failed '#{cmd}' Exit-Code: #{return_value[:exit_code]}") if return_value[:exit_code] > 0
             raise "SSH Command failed" if return_value[:exit_code] > 0
 
             stderr << return_value[:stderr]
             stdout << return_value[:stdout]
           end
         end
-        Helper.log.info "Succesfully executed #{params[:commands].count} commands on host: #{params[:host]}"
-        Helper.log.info "\n########### \n #{stdout} \n###############".magenta if params[:log]
+        UI.message("Succesfully executed #{params[:commands].count} commands on host: #{params[:host]}")
+        UI.message("\n########### \n #{stdout} \n###############".magenta) if params[:log]
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = stdout
         Actions.lane_context[SharedValues::SSH_STDERR_VALUE] = stderr
         return {stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE]}

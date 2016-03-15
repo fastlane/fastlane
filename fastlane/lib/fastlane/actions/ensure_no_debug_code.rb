@@ -21,7 +21,7 @@ module Fastlane
         end
         return command if Helper.is_test?
 
-        Helper.log.info command.yellow
+        UI.important(command)
         results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason
 
         # Example Output
@@ -34,7 +34,7 @@ module Fastlane
         end
 
         raise "Found debug code '#{params[:text]}': \n\n#{found.join("\n")}" if found.count > 0
-        Helper.log.info "No debug code found in code base 🐛"
+        UI.message("No debug code found in code base 🐛")
       end
 
       #####################################################

@@ -12,7 +12,7 @@ describe Fastlane do
               )
             end").runner.execute(:test)
         rescue => e
-          expect("#{e}").to eq("Failed to fetch Bots from Xcode Server at https://1.2.3.4, response: 500: .".red)
+          expect(e.to_s).to eq("Failed to fetch Bots from Xcode Server at https://1.2.3.4, response: 500: .".red)
         else
           fail "Error should have been raised"
         end
@@ -20,9 +20,9 @@ describe Fastlane do
 
       it "fails if selected bot doesn't have any integrations" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
-        to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
+          to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
         stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
-        to_return(status: 200, body: "{\"count\":0,\"results\":[]}")
+          to_return(status: 200, body: "{\"count\":0,\"results\":[]}")
 
         begin
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -32,7 +32,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect("#{e}").to eq("Failed to find any completed integration for Bot \"bot-2\"".red)
+          expect(e.to_s).to eq("Failed to find any completed integration for Bot \"bot-2\"".red)
         else
           fail "Error should have been raised"
         end
@@ -40,9 +40,9 @@ describe Fastlane do
 
       it "fails if integration number specified is not available" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
-        to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
+          to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
         stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
-        to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
+          to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
 
         begin
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -53,7 +53,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect("#{e}").to eq("Specified integration number 3 does not exist.".red)
+          expect(e.to_s).to eq("Specified integration number 3 does not exist.".red)
         else
           fail "Error should have been raised"
         end
@@ -61,11 +61,11 @@ describe Fastlane do
 
       it "fails if assets are not available" do
         stub_request(:get, "https://1.2.3.4:20343/api/bots").
-        to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
+          to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_bots.json"))
         stub_request(:get, "https://1.2.3.4:20343/api/bots/c7ccb2e699d02c74cf750a189360426d/integrations?last=10").
-        to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
+          to_return(status: 200, body: File.read("./spec/fixtures/requests/xcode_server_integrations.json"))
         stub_request(:get, "https://1.2.3.4:20343/api/integrations/0a0fb158e7bf3d06aa87bf96eb001454/assets").
-        to_return(status: 500)
+          to_return(status: 500)
 
         begin
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -75,7 +75,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect("#{e}").to eq("Integration doesn't have any assets (it probably never ran).".red)
+          expect(e.to_s).to eq("Integration doesn't have any assets (it probably never ran).".red)
         else
           fail "Error should have been raised"
         end

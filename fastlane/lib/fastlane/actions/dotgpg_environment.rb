@@ -8,7 +8,7 @@ module Fastlane
         Actions.verify_gem!('dotgpg')
         require 'dotgpg/environment'
 
-        Helper.log.info "Reading secrets from #{options[:dotgpg_file]}"
+        UI.message("Reading secrets from #{options[:dotgpg_file]}")
         Dotgpg::Environment.new(options[:dotgpg_file]).apply
       end
 

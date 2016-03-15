@@ -5,20 +5,20 @@ module Fastlane
 
     class UpdateProjectCodeSigningAction < Action
       def self.run(params)
-        Helper.log.info "You shouldn't use update_project_code_signing"
-        Helper.log.info "Have you considered using the recommended way to do code sining?"
-        Helper.log.info "https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+        UI.message("You shouldn't use update_project_code_signing")
+        UI.message("Have you considered using the recommended way to do code sining?")
+        UI.message("https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md")
 
         path = params[:path]
         path = File.join(path, "project.pbxproj")
         raise "Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!".red unless File.exist?(path)
 
-        Helper.log.info("Updating provisioning profile UDID (#{params[:udid]}) for the given project '#{path}'")
+        UI.message("Updating provisioning profile UDID (#{params[:udid]}) for the given project '#{path}'")
 
         p = File.read(path)
         File.write(path, p.gsub(/PROVISIONING_PROFILE = ".*";/, "PROVISIONING_PROFILE = \"#{params[:udid]}\";"))
 
-        Helper.log.info("Successfully updated project settings to use UDID '#{params[:udid]}'".green)
+        UI.success("Successfully updated project settings to use UDID '#{params[:udid]}'")
       end
 
       def self.description

@@ -44,9 +44,9 @@ describe Fastlane do
 
           # Move one folder above as specs are execute in fastlane folder
           root_path = File.expand_path("..")
-          file_basename = File.basename("#{custom_app_path}", '.*')
+          file_basename = File.basename(custom_app_path.to_s, '.*')
 
-          dsym_folder_path = File.join(root_path, File.join("#{custom_app_path}", 'dSYMs'))
+          dsym_folder_path = File.join(root_path, File.join(custom_app_path.to_s, 'dSYMs'))
           zipped_dsym_path = File.join(root_path, "#{file_basename}.app.dSYM.zip")
 
           # MyApp is hardcoded into tested class so we'll just use that here

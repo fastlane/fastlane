@@ -9,7 +9,7 @@ module Fastlane
         end
 
         result = Actions.sh("git add #{paths}")
-        Helper.log.info "Successfully added \"#{params[:path]}\" 💾.".green
+        UI.success("Successfully added \"#{params[:path]}\" 💾.")
         return result
       end
 

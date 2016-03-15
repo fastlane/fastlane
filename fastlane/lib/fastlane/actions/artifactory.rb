@@ -15,15 +15,15 @@ module Fastlane
               "sha1" => Digest::SHA1.file(file_path),
               "md5" => Digest::MD5.file(file_path)
           }
-          Helper.log.info "Uploading file: #{artifact.local_path} ..."
+          UI.message("Uploading file: #{artifact.local_path} ...")
           upload = artifact.upload(params[:repo], params[:repo_path], params[:properties])
-          Helper.log.info "Uploaded Artifact:"
-          Helper.log.info "Repo: #{upload.repo}"
-          Helper.log.info "URI: #{upload.uri}"
-          Helper.log.info "Size: #{upload.size}"
-          Helper.log.info "SHA1: #{upload.sha1}"
+          UI.message("Uploaded Artifact:")
+          UI.message("Repo: #{upload.repo}")
+          UI.message("URI: #{upload.uri}")
+          UI.message("Size: #{upload.size}")
+          UI.message("SHA1: #{upload.sha1}")
         else
-          Helper.log.info "File not found: '#{file_path}'"
+          UI.message("File not found: '#{file_path}'")
         end
       end
 

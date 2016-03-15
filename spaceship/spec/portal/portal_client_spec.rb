@@ -186,11 +186,10 @@ describe Spaceship::Client do
       it 'returns a list of certificates hashes' do
         expect(certificates).to be_instance_of(Array)
         expect(certificates.first.keys).to eq(
-          ["certRequestId", "name", "statusString", "dateRequestedString", "dateRequested",
-           "dateCreated", "expirationDate", "expirationDateString", "ownerType", "ownerName",
-           "ownerId", "canDownload", "canRevoke", "certificateId", "certificateStatusCode",
-           "certRequestStatusCode", "certificateTypeDisplayId", "serialNum", "typeString"
-          ])
+          %w(certRequestId name statusString dateRequestedString dateRequested
+             dateCreated expirationDate expirationDateString ownerType ownerName
+             ownerId canDownload canRevoke certificateId certificateStatusCode
+             certRequestStatusCode certificateTypeDisplayId serialNum typeString))
       end
     end
 

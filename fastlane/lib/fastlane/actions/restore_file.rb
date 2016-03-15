@@ -7,7 +7,7 @@ module Fastlane
         raise "Could not find file '#{backup_path}'" unless File.exist? backup_path
         FileUtils.cp(backup_path, path, {preserve: true})
         FileUtils.rm(backup_path)
-        Helper.log.info "Successfully restored backup 📤"
+        UI.message("Successfully restored backup 📤")
       end
 
       def self.description

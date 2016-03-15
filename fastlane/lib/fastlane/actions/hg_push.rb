@@ -11,7 +11,7 @@ module Fastlane
         return command.join(' ') if Helper.is_test?
 
         Actions.sh(command.join(' '))
-        Helper.log.info 'Successfully pushed changes to remote 🚀.'.green
+        UI.success('Successfully pushed changes to remote 🚀.')
       end
 
       def self.description

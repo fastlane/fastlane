@@ -15,12 +15,12 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-        "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
-        "''",
-        "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
-        "exportFormat ipa",
-        ""
-      ])
+                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "''",
+                             "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
+                             "exportFormat ipa",
+                             ""
+                           ])
     end
 
     it "works with the example project with no additional parameters and an apostrophe/single quote in the product name" do
@@ -31,12 +31,12 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-        "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
-        "Krause\\'s\\ App",
-        "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
-        "exportFormat ipa",
-        ""
-      ])
+                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "Krause\\'s\\ App",
+                             "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
+                             "exportFormat ipa",
+                             ""
+                           ])
     end
 
     it "supports passing a path to a provisioning profile" do
@@ -50,13 +50,13 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-        "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
-        "''",
-        "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
-        "exportFormat ipa",
-        "--embed './spec/fixtures/dummy.mobileprovision'",
-        ""
-      ])
+                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "''",
+                             "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
+                             "exportFormat ipa",
+                             "--embed './spec/fixtures/dummy.mobileprovision'",
+                             ""
+                           ])
     end
   end
 end

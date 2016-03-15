@@ -17,8 +17,8 @@ module Fastlane
 
           return value
         rescue => ex
-          Helper.log.error ex
-          Helper.log.error "Unable to find plist file at '#{path}'".red
+          UI.error(ex)
+          UI.error("Unable to find plist file at '#{path}'")
         end
       end
 

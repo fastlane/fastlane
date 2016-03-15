@@ -29,7 +29,7 @@ module Fastlane
         # Save archive to destination
         if zipped
           Dir.mktmpdir("backup_xcarchive") do |dir|
-            Helper.log.info "Compressing #{xcarchive}"
+            UI.message("Compressing #{xcarchive}")
             xcarchive_folder = File.expand_path(File.dirname(xcarchive))
             xcarchive_file = File.basename(xcarchive)
             zip_file = File.join(dir, "#{xcarchive_file}.zip")

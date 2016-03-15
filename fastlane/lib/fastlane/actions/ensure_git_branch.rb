@@ -9,7 +9,7 @@ module Fastlane
         branch = params[:branch]
         branch_expr = /#{branch}/
         if Actions.git_branch =~ branch_expr
-          Helper.log.info "Git branch match `#{branch}`, all good! 💪".green
+          UI.success("Git branch match `#{branch}`, all good! 💪")
         else
           raise "Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.".red
         end

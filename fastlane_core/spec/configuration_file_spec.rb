@@ -47,7 +47,7 @@ describe FastlaneCore do
         expect do
           config = FastlaneCore::Configuration.create(options, {})
           config.load_configuration_file("ConfigFileKeyNotHere")
-        end.to raise_error (/Could not find option \'not_existent\' in the list of available options.*/)
+        end.to raise_error(/Could not find option \'not_existent\' in the list of available options.*/)
       end
 
       it "overwrites existing values" do

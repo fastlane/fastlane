@@ -36,7 +36,7 @@ module FastlaneCore
         return unless self.config._values[method_sym].to_s.empty?
 
         value = arguments.first
-        value = block.call if value.nil? && block_given?
+        value = yield if value.nil? && block_given?
 
         self.config[method_sym] = value unless value.nil?
       else
