@@ -29,7 +29,7 @@ module Fastlane
 
         UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
         UI.verbose(command.join(" ")) if $verbose
-        Actions.sh command.join(" ")
+        Actions.sh(command.join(" "), log: false)
 
         return command if Helper.test?
 

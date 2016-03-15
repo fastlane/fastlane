@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 require 'rubygems/spec_fetcher'
 require 'rubygems/command_manager'
 
@@ -128,4 +127,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize
