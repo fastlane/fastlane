@@ -10,4 +10,5 @@ dependencies:
 test:
   override:
     - bundle exec rake test_all
+  post:
     - bundle exec danger
