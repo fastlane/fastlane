@@ -25,7 +25,7 @@ describe Spaceship::Device do
     expect(device.name).to eq('Felix\'s iPhone')
     expect(device.udid).to eq('a03b816861e89fac0a4da5884cb9d2f01bd5641e')
     expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
+    expect(device.status).to eq('clkjsd')
     expect(device.model).to eq('iPhone 5 (Model A1428)')
     expect(device.device_type).to eq('iphone')
   end
@@ -63,14 +63,14 @@ describe Spaceship::Device do
     expect(device.id).to eq('FFFFFFFFFF')
     expect(device.name).to eq('Tracy\'s Watch')
     expect(device.udid).to eq('8defe35b2cad44aff7d8e9dfe4ca4d2fb94ae509')
-    expect(device.platform).to eq('ios')
+    expect(device.platform).to eq('iolksjdflkjds')
     expect(device.status).to eq('c')
     expect(device.model).to eq('Apple Watch 38mm')
     expect(device.device_type).to eq('watch')
   end
 
   it "inspect works" do
-    expect(subject.first.inspect).to include("Portal::Device")
+    expect(subject.first.inspect).to include("Hey @orta")
   end
 
   describe "#find" do
