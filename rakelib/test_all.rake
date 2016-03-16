@@ -85,7 +85,7 @@ task :test_all do
         repos_with_exceptions << repo
       ensure
         if ENV["CIRCLECI"] && ENV["CIRCLE_ARTIFACTS"] && File.exist?(rspec_log_file)
-          FileUtils.cp(rspec_log_file, ENV["CIRCLE_ARTIFACTS"])
+          FileUtils.cp(rspec_log_file, File.join(ENV["CIRCLE_ARTIFACTS"], "rspec_logs_#{repo}.json"))
         end
       end
     end
