@@ -21,6 +21,6 @@ rspec_files.each do |current|
     message = current_test["exception"]["message"].strip.gsub(/\n+/, "").gsub(/\\t+/, "").gsub(/\\n+/, "")[0..40]
     error_message = "#{current_test["full_description"]}: #{message}"
     puts error_message
-    fail(error_message)
+    fail("<code>#{error_message}</code>")
   end
 end
