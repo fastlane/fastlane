@@ -36,18 +36,35 @@ module Commander
         OptionParser::MissingArgument => e
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        error_message = "\n[!] #{e}".red
-        if $verbose # with stack trace
-          raise e, "[!] #{e.message}".red, e.backtrace
-        else
-          abort error_message # without stack trace
-        end
+        display_user_error!(e, e.message)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        FastlaneCore::CrashReporting.handle_crash(e)
-        # From https://stackoverflow.com/a/4789702/445598
-        # We do this to make the actual error message red and therefore more visible
-        raise e, "[!] #{e.message}".red, e.backtrace
+
+        # Some spaceship exception classes implement this method in order to share error information sent by Apple
+        # However, fastlane_core and spaceship can not know about each other's classes! To make this information
+        # passing work, we use a bit of Ruby duck-typing to check whether the unknown exception type has any of
+        # this kind of information to share with us. If so, we'll present it in the manner of a user_error!
+        if e.respond_to? :apple_provided_error_info
+          message = e.apple_provided_error_info.unshift("Apple provided the following error info:").join("\n\t")
+          display_user_error!(e, message)
+        else
+          FastlaneCore::CrashReporting.handle_crash(e)
+          # From https://stackoverflow.com/a/4789702/445598
+          # We do this to make the actual error message red and therefore more visible
+          reraise_formatted(e, e.message)
+        end
       end
+    end
+
+    def display_user_error!(e, message)
+      if $verbose # with stack trace
+        reraise_formatted(e, message)
+      else
+        abort "\n[!] #{message}".red # without stack trace
+      end
+    end
+
+    def reraise_formatted(e, message)
+      raise e, "[!] #{message}".red, e.backtrace
     end
   end
 end
