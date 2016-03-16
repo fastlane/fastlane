@@ -1,0 +1,17 @@
+{
+  "responseId": "612597ae-99e2-44af-bf8a-c721678335ba",
+  "resultCode": 35,
+  "resultString": "There were errors in the data supplied. Please correct and re-submit.",
+  "userString": "There are no current devices on this team matching the provided device IDs.",
+  "creationTimestamp": "2016-03-11T07:23:20Z",
+  "protocolVersion": "QH65B2",
+  "userLocale": "en_US",
+  "requestUrl": "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action",
+  "httpCode": 200,
+  "validationMessages": [
+    {
+      "validationKey": "deviceIds",
+      "validationUserMessage": "There are no current devices on this team matching the provided device IDs."
+    }
+  ]
+}

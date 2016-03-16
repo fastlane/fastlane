@@ -15,10 +15,12 @@ SimpleCov.at_exit do
   SimpleCov.result.format!
 end
 
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-]
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
+  [
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ]
+)
 
 SimpleCov.start
 
@@ -30,10 +32,6 @@ ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"
 ENV.delete("FASTLANE_USER") # just in case the dev env has it
 
-unless ENV["DEBUG"]
-  $stdout = File.open("/tmp/spaceship_tests", "w")
-end
-
 cache_paths = [
   File.expand_path("~/Library/Caches/spaceship_api_key.txt"),
   "/tmp/spaceship_itc_login_url.txt"
@@ -41,6 +39,14 @@ cache_paths = [
 
 def try_delete(path)
   FileUtils.rm_f path if File.exist? path
+end
+
+def with_verbosity(verbose)
+  orig_verbose = $verbose
+  $verbose = verbose
+  yield if block_given?
+ensure
+  $verbose = orig_verbose
 end
 
 RSpec.configure do |config|
