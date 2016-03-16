@@ -88,7 +88,7 @@ module Frameit
 
           if key == 'padding'
             unless value.kind_of?(Integer) || value.split('x').length == 2
-              UI.user_error!("padding must be type integer or pair of integers of format 'AxB'")
+              UI.user_error! "padding must be type integer or pair of integers of format 'AxB' or a percentage" unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
             end
           end
         end
