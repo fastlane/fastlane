@@ -8,21 +8,13 @@ if pr_body.length < 5
   warn "Please provide a changelog summary in the Pull Request description @#{pr_author}"
 end
 
-org = ENV["CIRCLE_PROJECT_USERNAME"] || "fastlane"
-proj = ENV["CIRCLE_PROJECT_REPONAME"] || "fastlane"
-build_number = ENV["CIRCLE_BUILD_NUM"]
-circle_token = ENV["CIRCLE_TOKEN"]
-
-artifacts_url = "https://circleci.com/api/v1/project/#{org}/#{proj}/#{build_number}/artifacts?circle-token=#{circle_token}"
-require 'open-uri'
 require 'json'
 
-artifacts = JSON.parse(open(artifacts_url).read)
-fail("Could not find test artifacts") if artifacts.count == 0
+rspec_files = Dir[File.join(ENV["CIRCLE_ARTIFACTS"], "rspec_logs_*.json")]
+fail("Could not find test artifacts") if rspec_files.count == 0
+rspec_files.each do |current|
+  rspec = JSON.parse(File.read(current))
 
-artifacts.each do |current|
-  rspec_url = current["url"]
-  rspec = JSON.parse(open(rspec_url).read)
   rspec["examples"].each do |current_test|
     next if current_test["status"] == "passed"
 
