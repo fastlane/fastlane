@@ -38,20 +38,19 @@ module Spaceship
       class << self
         def handle_response(response)
           if response.body['userString']
-            msg = "🍎 returned an unexpected response:\n#{response.body['resultString']}\n#{response.body['userString']}"
-            user_error!(UnexpectedResponse.new(msg))
+            user_error!("Apple returned an unexpected response:\n#{response.body['resultString']}\n#{response.body['userString']}")
           else
-            raise UnexpectedResponse.new, response.body
+            raise UnexpectedResponse, response.body
           end
         end
 
-        def user_error!(e)
+        def user_error!(msg)
           require 'colored'
 
           if $verbose # with stack trace
-            raise e, "[!] #{e.message}".red, e.backtrace
+            raise UnexpectedResponse, "[!] #{msg}".red
           else # without stack trace
-            abort "\n[!] #{e.message}".red
+            abort "\n[!] #{msg}".red
           end
         end
       end
