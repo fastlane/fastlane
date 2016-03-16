@@ -162,6 +162,7 @@ module Spaceship
       #     last_name: "Krause",
       #     review_email: "Contact email address for Apple",
       #     phone_number: "0128383383",
+      #     review_notes: "Review notes"
       #
       #   # Optional Metadata:
       #     privacy_policy_url: nil,
@@ -170,35 +171,17 @@ module Spaceship
       #     review_password: nil,
       #     encryption: false
       #  }
+      # Note that iTC will pull a lot of this information from previous builds or the app store information,
+      # all of the required values must be set either in this hash or automatically for this to work
       def submit_for_beta_review!(metadata)
         parameters = {
           app_id: self.apple_id,
           train: self.train_version,
           build_number: self.build_version,
-          platform: self.platform,
-
-          # Required Metadata:
-          changelog: "No changelog provided",
-          description: "No app description provided",
-          feedback_email: "contact@company.com",
-          marketing_url: "http://marketing.com",
-          first_name: "Felix",
-          last_name: "Krause",
-          review_email: "contact@company.com",
-          phone_number: "0123456789",
-          significant_change: false,
-
-          # Optional Metadata:
-          privacy_policy_url: nil,
-          review_user_name: nil,
-          review_password: nil,
-          encryption: false
+          platform: self.platform
         }.merge(metadata)
 
         client.submit_testflight_build_for_review!(parameters)
-
-        # Last, enable beta testing for this train (per iTC requirement). This will fail until the app has been approved for beta testing
-        self.build_train.update_testing_status!(true, 'external', self)
 
         return parameters
       end
