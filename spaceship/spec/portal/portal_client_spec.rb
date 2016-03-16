@@ -218,14 +218,14 @@ describe Spaceship::Client do
       end
 
       it "aborts with a user-friendly error message when a parsable error response is returned and $verbose is false" do
-        msg = "\n[!] Apple returned an unexpected response:\nThere were errors in the data supplied. Please correct and re-submit.\nThere are no current devices on this team matching the provided device IDs.".red
+        msg = "\n[!] Apple returned an unexpected response:\n\tThere were errors in the data supplied. Please correct and re-submit.\n\tThere are no current devices on this team matching the provided device IDs.".red
         expect(Spaceship::Client::UnexpectedResponse).to receive(:abort).with(msg)
 
         subject.create_provisioning_profile!("parsable_error", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
       end
 
       it "raises with a user-friendly error message when a parsable error response is returned and $verbose is true" do
-        msg = "[!] Apple returned an unexpected response:\nThere were errors in the data supplied. Please correct and re-submit.\nThere are no current devices on this team matching the provided device IDs.".red
+        msg = "[!] Apple returned an unexpected response:\n\tThere were errors in the data supplied. Please correct and re-submit.\n\tThere are no current devices on this team matching the provided device IDs.".red
 
         expectation = proc do |error|
           expect(error.message).to eq(msg)

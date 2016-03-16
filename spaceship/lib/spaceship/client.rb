@@ -38,7 +38,11 @@ module Spaceship
       class << self
         def handle_response!(response)
           if response.body['userString']
-            user_error!("Apple returned an unexpected response:\n#{response.body['resultString']}\n#{response.body['userString']}")
+            require 'cgi'
+
+            result_string = CGI.unescapeHTML(response.body['resultString'])
+            user_string = CGI.unescapeHTML(response.body['userString'])
+            user_error!("Apple returned an unexpected response:\n\t#{result_string}\n\t#{user_string}")
           else
             raise UnexpectedResponse, response.body
           end

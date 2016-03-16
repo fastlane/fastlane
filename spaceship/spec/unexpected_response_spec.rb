@@ -23,7 +23,7 @@ describe Spaceship::Client::UnexpectedResponse do
       with_verbosity(true) do
         expect do
           Spaceship::Client::UnexpectedResponse.handle_response!(response)
-        end.to raise_error(Spaceship::Client::UnexpectedResponse, "[!] Apple returned an unexpected response:\nResult string\nUser string".red)
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, "[!] Apple returned an unexpected response:\n\tResult string\n\tUser string".red)
       end
     end
 
@@ -31,7 +31,7 @@ describe Spaceship::Client::UnexpectedResponse do
       stub_response_body({'userString' => 'User string', 'resultString' => 'Result string'})
 
       with_verbosity(false) do
-        expect(Spaceship::Client::UnexpectedResponse).to receive(:abort).with("\n[!] Apple returned an unexpected response:\nResult string\nUser string".red)
+        expect(Spaceship::Client::UnexpectedResponse).to receive(:abort).with("\n[!] Apple returned an unexpected response:\n\tResult string\n\tUser string".red)
 
         Spaceship::Client::UnexpectedResponse.handle_response!(response)
       end
