@@ -6,7 +6,10 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Match::VERSION}")
-
+      if params[:export]
+        Match::Export.new.run(params, type: params[:type])
+        return
+      end
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 

@@ -82,6 +82,25 @@ class MatchApplication
       end
     end
 
+    command :export do |comm|
+      comm.syntax = "match export"
+      comm.description = "Exports Provisiong Profile + Certificate + P12"
+      comm.action do |args, options|
+        FastlaneCore::UI.user_error!("Please run `match export [type], allowed values: distribution and development")
+      end
+      ["development", "distribution"].each do |type|
+        command "export #{type}" do |c|
+          c.syntax = "match export #{type}"
+          c.description = "Exporting for  #{type}"
+          c.action do |args, options|
+            params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+            params.load_configuration_file("Matchfile")
+
+            Match::Export.new.run(params, type: type.to_s)
+          end
+        end
+      end
+    end
     command "nuke" do |c|
       # We have this empty command here, since otherwise the normal `match` command will be executed
       c.syntax = "match nuke"
