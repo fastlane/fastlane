@@ -82,6 +82,16 @@ class MatchApplication
       end
     end
 
+    command :decrypt do |c|
+      c.syntax = "match decrypt"
+      c.description = "Decrypts the repository and keeps it on the filesystem"
+      c.action do |args, options|
+        params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+        params.load_configuration_file("Matchfile")
+        decrypted_repo = Match::GitHelper.clone(params[:git_url], params[:shallow_clone])
+        UI.success "Repo is at: '#{decrypted_repo}'"
+      end
+    end
     command "nuke" do |c|
       # We have this empty command here, since otherwise the normal `match` command will be executed
       c.syntax = "match nuke"
