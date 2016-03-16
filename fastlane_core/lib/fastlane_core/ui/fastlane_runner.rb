@@ -43,12 +43,14 @@ module Commander
     end
 
     def handle_unknown_error!(e)
-      # Some spaceship exception classes implement this method in order to share error information sent by Apple
+      # Some spaceship exception classes implement this method in order to share error information sent by Apple.
       # However, fastlane_core and spaceship can not know about each other's classes! To make this information
-      # passing work, we use a bit of Ruby duck-typing to check whether the unknown exception type has any of
-      # this kind of information to share with us. If so, we'll present it in the manner of a user_error!
-      if e.respond_to? :apple_provided_error_info
-        message = e.apple_provided_error_info.unshift("Apple provided the following error info:").join("\n\t")
+      # passing work, we use a bit of Ruby duck-typing to check whether the unknown exception type implements
+      # the right method. If so, we'll present any returned error info in the manner of a user_error!
+      error_info = e.respond_to?(:apple_provided_error_info) ? e.apple_provided_error_info : nil
+
+      if error_info
+        message = error_info.unshift("Apple provided the following error info:").join("\n\t")
         display_user_error!(e, message)
       else
         FastlaneCore::CrashReporting.handle_crash(e)
