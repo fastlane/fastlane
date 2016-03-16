@@ -34,7 +34,11 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < StandardError; end
 
-    class UnexpectedResponse < StandardError; end
+    class UnexpectedResponse < StandardError
+      def apple_provided_error_info
+        ['Line 1', 'Line 2']
+      end
+    end
 
     # Raised when 302 is received from portal request
     class AppleTimeoutError < StandardError; end
