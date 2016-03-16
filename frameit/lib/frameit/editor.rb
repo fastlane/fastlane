@@ -245,7 +245,8 @@ module Frameit
     end
 
     def actual_font_size
-      [@image.width / 10.0].max.round
+      font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      [@image.width * font_scale_factor].max.round
     end
 
     # The space between the keyword and the title

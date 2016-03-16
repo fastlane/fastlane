@@ -91,6 +91,10 @@ module Frameit
               UI.user_error! "padding must be type integer or pair of integers of format 'AxB' or a percentage" unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
             end
           end
+
+          if key == 'font_scale_factor'
+            UI.user_error! "font_scale_factor must be numeric" unless value.kind_of?(Numeric)
+          end
         end
       end
     end
