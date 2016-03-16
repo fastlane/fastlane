@@ -130,7 +130,7 @@ module Snapshot
       `xcrun simctl shutdown booted &> /dev/null`
 
       if Snapshot.config[:erase_simulator]
-        erase_simulator(device_type)
+        erase_simulator(device_type, language, locale)
       elsif Snapshot.config[:reinstall_app]
         # no need to reinstall if device has been erased
         uninstall_app(device_type)
@@ -195,14 +195,50 @@ module Snapshot
       Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
     end
 
-    def erase_simulator(device_type)
+    def erase_simulator(device_type, language, locale)
       Helper.log.debug "Erasing #{device_type}..."
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       Helper.log.info "Erasing #{device_type}...".yellow
 
       `xcrun simctl erase #{device_udid} &> /dev/null`
-    end
+
+      #
+      # Configure the simulator to use the chosen AppleLocale and
+      # AppleLanguages. It defaults to en_US and en which means that
+      # your app will run in chosen language but the system will
+      # not. That means that ll system provided UI, like the keyboard
+      # and system dialogs, will be in English.
+      #
+
+      # Note to self: language is nl/es-MX/zh-TW
+
+      apple_locale = language.sub("-", "_")
+      apple_languages = [language]
+      apple_keyboards = ["es_MX@hw=Spanish - ISO;sw=QWERTY-Spanish", "emoji@sw=Emoji"]
+
+      UI.message "Configuring simulator: AppleLocale=#{apple_locale} AppleLanguages=[#{apple_languages}]"
+
+      UI.message "Before"
+      plist = Hash[]
+      plist[:AppleLocale] = apple_locale
+      plist[:AppleLanguages] = apple_languages
+      plist[:AppleKeyboards] = apple_keyboards
+      plist[:ApplePasscodeKeyboards] = apple_keyboards
+      #plist[:AppleKeyboardsExpanded] = 1
+      #plist[:AddingEmojiKeybordHandled] = true
+      #plist[:AppleLanguagesDidMigrate] = "9.2"
+      puts plist
+      plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
+      File.write(plist_path, Plist::Emit.dump(plist))
+
+      plist = Hash[]
+      plist[:KeyboardLastUsed] = "es_MX@hw=Spanish - ISO;sw=QWERTY-Spanish"
+      plist[:KeyboardLastUsedForLanguage] = Hash["ASCIICapable": "es_MX@hw=Spanish - ISO;sw=QWERTY-Spanish", "#{apple_locale}": "es_MX@hw=Spanish - ISO;sw=QWERTY-Spanish"]
+      puts plist
+      plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist"
+      File.write(plist_path, Plist::Emit.dump(plist))
+     end
 
     def add_media(device_type, media_type, paths)
       media_type = media_type.to_s
