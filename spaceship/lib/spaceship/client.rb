@@ -35,8 +35,17 @@ module Spaceship
     class NoUserCredentialsError < StandardError; end
 
     class UnexpectedResponse < StandardError
+      attr_reader :error_info
+
+      def initialize(error_info = nil)
+        super(error_info)
+        @error_info = error_info
+      end
+
       def apple_provided_error_info
-        ['Line 1', 'Line 2']
+        return nil unless @error_info && @error_info['resultString']
+
+        [@error_info['resultString'], @error_info['userString']].compact.uniq
       end
     end
 
@@ -301,7 +310,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new, response.body
+        raise UnexpectedResponse.new(response.body)
       else
         store_csrf_tokens(response)
         content
