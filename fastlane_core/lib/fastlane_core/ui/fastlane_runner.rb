@@ -50,20 +50,20 @@ module Commander
           FastlaneCore::CrashReporting.handle_crash(e)
           # From https://stackoverflow.com/a/4789702/445598
           # We do this to make the actual error message red and therefore more visible
-          reraise_formatted(e, e.message)
+          reraise_formatted!(e, e.message)
         end
       end
     end
 
     def display_user_error!(e, message)
       if $verbose # with stack trace
-        reraise_formatted(e, message)
+        reraise_formatted!(e, message)
       else
         abort "\n[!] #{message}".red # without stack trace
       end
     end
 
-    def reraise_formatted(e, message)
+    def reraise_formatted!(e, message)
       raise e, "[!] #{message}".red, e.backtrace
     end
   end
