@@ -29,7 +29,11 @@ module Spaceship
     attr_accessor :logger
 
     # Invalid user credentials were provided
-    class InvalidUserCredentialsError < StandardError; end
+    class InvalidUserCredentialsError < StandardError
+      def apple_provided_error_info
+        message ? [message] : nil
+      end
+    end
 
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < StandardError; end
@@ -43,7 +47,7 @@ module Spaceship
       end
 
       def apple_provided_error_info
-        return nil unless @error_info && @error_info['resultString']
+        return nil unless @error_info.is_a?(Hash) && @error_info['resultString']
 
         [@error_info['resultString'], @error_info['userString']].compact.uniq
       end
