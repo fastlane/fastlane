@@ -77,6 +77,7 @@ task :test_all do
         Bundler.with_clean_env do
           bundle_install
           sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
+          FileUtils.cp(rspec_log_file, ENV["CIRCLE_ARTIFACTS"]) if ENV["CIRCLECI"] && ENV["CIRCLE_ARTIFACTS"]
           sh "bundle exec rubocop"
         end
       rescue => ex
