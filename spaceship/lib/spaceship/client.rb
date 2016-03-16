@@ -36,7 +36,7 @@ module Spaceship
 
     class UnexpectedResponse < StandardError
       class << self
-        def handle_response(response)
+        def handle_response!(response)
           if response.body['userString']
             user_error!("Apple returned an unexpected response:\n#{response.body['resultString']}\n#{response.body['userString']}")
           else
@@ -317,7 +317,7 @@ module Spaceship
       end
 
       if content.nil?
-        UnexpectedResponse.handle_response(response)
+        UnexpectedResponse.handle_response!(response)
       else
         store_csrf_tokens(response)
         content
