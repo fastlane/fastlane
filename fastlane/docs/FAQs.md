@@ -21,6 +21,24 @@ If you use `rvm`, try the following
 rvm osx-ssl-certs update all
 ```
 
+### Fastlane is slow (to start)
+
+Fastlane uses rubygems and [rubygems is known to be slow itself](http://www.sitepoint.com/rubygems-slow/)
+
+If you see abnormal slowdown when you run fastlane, here are 2 known ways to reduce this problem:
+
+* if you use fatlane with a Gemfile, use `bundle exec` to reduce the amount of searched gems. E.g.
+
+```
+bundle exec fastlane actions
+```
+
+* alternatively it is recommended to clean up older version of gems using
+
+```
+gem cleanup
+```
+
 ### Error when running `fastlane` with Jenkins
 
 This is usually caused when running Jenkins as its own user. While this is possible, you'll have to take care of creating a temporary Keychain, filling it and then using it when building your application. 
