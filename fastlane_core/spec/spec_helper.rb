@@ -32,6 +32,14 @@ ensure
   end
 end
 
+def with_verbose(verbose)
+  orig_verbose = $verbose
+  $verbose = verbose
+  yield if block_given?
+ensure
+  $verbose = orig_verbose
+end
+
 def stub_commander_runner_args(args)
   runner = Commander::Runner.new(args)
   allow(Commander::Runner).to receive(:instance).and_return(runner)
