@@ -8,9 +8,21 @@ describe Commander::Runner do
       end
     end
 
+    class NilReturningError < StandardError
+      def apple_provided_error_info
+        nil
+      end
+    end
+
     it 'should reraise errors that are not of special interest' do
       expect do
         Commander::Runner.new.handle_unknown_error!(StandardError.new('my message'))
+      end.to raise_error(StandardError, '[!] my message'.red)
+    end
+
+    it 'should reraise errors that return nil from #apple_provided_error_info' do
+      expect do
+        Commander::Runner.new.handle_unknown_error!(NilReturningError.new('my message'))
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
