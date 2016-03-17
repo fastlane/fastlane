@@ -10,6 +10,9 @@ coverage/
 /tmp/
 rspec_logs.json
 
+## Specific to Android
+.gradle/
+
 ## Specific to RubyMotion:
 .dat*
 .repl_history
