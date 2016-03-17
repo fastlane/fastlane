@@ -19,14 +19,14 @@ lane :beta do
   increment_build_number
   cocoapods
   match
-  deliver
+  testflight
   sh "./customScript.sh"
 
   slack
 end
 ```
 
-To deploy your app to the App Store, you can run:
+To deploy a new beta version of your app
 ```
 fastlane beta
 ```

@@ -39,8 +39,12 @@ def format_failure(failure, gem_name, count)
 end
 
 def bundle_install
-  cache_path = File.expand_path("/tmp/vendor/bundle")
-  sh "bundle check --path='#{cache_path}' || bundle install --path='#{cache_path}' --jobs=4 --retry=3"
+  if ENV['CI']
+    cache_path = File.expand_path("/tmp/vendor/bundle")
+    path = " --path='#{cache_path}'"
+  end
+
+  sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
 end
 
 def get_line_from_file(line_number, file)
@@ -79,6 +83,10 @@ task :test_all do
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
         exceptions << "#{repo}: #{ex}"
         repos_with_exceptions << repo
+      ensure
+        if ENV["CIRCLECI"] && ENV["CIRCLE_ARTIFACTS"] && File.exist?(rspec_log_file)
+          FileUtils.cp(rspec_log_file, File.join(ENV["CIRCLE_ARTIFACTS"], "rspec_logs_#{repo}.json"))
+        end
       end
     end
   end

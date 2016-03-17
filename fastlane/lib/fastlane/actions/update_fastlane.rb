@@ -27,6 +27,7 @@ module Fastlane
         "match"
       ]
 
+      # rubocop:disable Metrics/AbcSize
       def self.run(options)
         if options[:no_update]
           return
@@ -51,6 +52,15 @@ module Fastlane
           UI.important("It seems that your Gem directory is not writable by your current User.")
           UI.important("Fastlane would need sudo rights to update itself, however, running 'sudo fastlane' is not recommended.")
           UI.important("If you still want to use this action, please read the Actions.md documentation on a guide how to set this up.")
+          return
+        end
+
+        if updater.respond_to? :highest_installed_gems
+          UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
+          UI.important "Please update your version of ruby gems before proceeding."
+          UI.command "gem install rubygems-update"
+          UI.command "update_rubygems"
+          UI.command "gem update --system"
           return
         end
 
@@ -94,6 +104,7 @@ module Fastlane
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
         end
       end
+      # rubocop:enable Metrics/AbcSize
 
       def self.all_installed_tools
         Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq

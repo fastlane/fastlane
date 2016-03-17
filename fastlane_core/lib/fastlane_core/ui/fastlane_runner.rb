@@ -36,18 +36,41 @@ module Commander
         OptionParser::MissingArgument => e
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        error_message = "\n[!] #{e}".red
-        if $verbose # with stack trace
-          raise e, "[!] #{e.message}".red, e.backtrace
-        else
-          abort error_message # without stack trace
-        end
+        display_user_error!(e, e.message)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        handle_unknown_error!(e)
+      end
+    end
+
+    def handle_unknown_error!(e)
+      # Some spaceship exception classes implement #preferred_error_info in order to share error info
+      # that we'd rather display instead of crashing with a stack trace. However, fastlane_core and
+      # spaceship can not know about each other's classes! To make this information passing work, we
+      # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
+      # method. If so, we'll present any returned error info in the manner of a user_error!
+      error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
+
+      if error_info
+        error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
+        display_user_error!(e, error_info)
+      else
         FastlaneCore::CrashReporting.handle_crash(e)
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
-        raise e, "[!] #{e.message}".red, e.backtrace
+        reraise_formatted!(e, e.message)
       end
+    end
+
+    def display_user_error!(e, message)
+      if $verbose # with stack trace
+        reraise_formatted!(e, message)
+      else
+        abort "\n[!] #{message}".red # without stack trace
+      end
+    end
+
+    def reraise_formatted!(e, message)
+      raise e, "[!] #{message}".red, e.backtrace
     end
   end
 end

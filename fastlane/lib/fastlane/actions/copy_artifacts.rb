@@ -10,7 +10,7 @@ module Fastlane
         base_command = params[:keep_original] ? 'cp' : 'mv'
         options = []
         options << '-f'
-        options << '-r' if params[:keep_original] # we only want the -r flag for the cp command, which we get when the user asks to keep the original
+        options << '-R' if params[:keep_original] # we only want the -R flag for the cp command, which we get when the user asks to keep the original
         options << params[:artifacts].map { |e| e.tr(' ', '\ ') }
         options << params[:target_path]
 
