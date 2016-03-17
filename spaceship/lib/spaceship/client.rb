@@ -32,8 +32,10 @@ module Spaceship
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
     class BasicPreferredInfoError < StandardError
+      TITLE = 'The request could not be completed because:'.freeze
+
       def preferred_error_info
-        message ? [message] : nil
+        message ? [TITLE, message] : nil
       end
     end
 
@@ -54,7 +56,11 @@ module Spaceship
       def preferred_error_info
         return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
 
-        [@error_info['resultString'], @error_info['userString']].compact.uniq
+        [
+          "Apple provided the following error info:",
+          @error_info['resultString'],
+          @error_info['userString']
+        ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
       end
     end
 
