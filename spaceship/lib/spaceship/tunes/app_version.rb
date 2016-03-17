@@ -301,10 +301,24 @@ module Spaceship
           @large_app_icon.reset!
           return
         end
-        upload_image = UploadFile.from_path icon_path
-        image_data = client.upload_large_icon(self, upload_image)
 
-        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
+        # compare md5's to see if we have to re-upload file
+        local_md5 = Utilities.md5digest(icon_path)
+        matched = UploadFile.deconstruct_upload_filename(@large_app_icon.original_file_name)
+
+        if matched
+          remote_md5 = matched[:md5]
+        end
+
+        # return fasle if upload skipped
+        if !(remote_md5 && local_md5 == remote_md5)
+          upload_image = UploadFile.from_path icon_path
+          image_data = client.upload_large_icon(self, upload_image)
+
+          @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
+        else
+          false
+        end
       end
 
       # Uploads or removes the watch icon
@@ -314,10 +328,24 @@ module Spaceship
           @watch_app_icon.reset!
           return
         end
-        upload_image = UploadFile.from_path icon_path
-        image_data = client.upload_watch_icon(self, upload_image)
 
-        @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
+        # compare md5's to see if we have to re-upload file
+        local_md5 = Utilities.md5digest(icon_path)
+        matched = UploadFile.deconstruct_upload_filename(@watch_app_icon.original_file_name)
+
+        if matched
+          remote_md5 = matched[:md5]
+        end
+
+        # return fasle if upload skipped
+        if !(remote_md5 && local_md5 == remote_md5)
+          upload_image = UploadFile.from_path icon_path
+          image_data = client.upload_watch_icon(self, upload_image)
+
+          @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
+        else
+          false
+        end
       end
 
       # Uploads or removes the transit app file

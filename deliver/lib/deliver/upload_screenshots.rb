@@ -46,11 +46,11 @@ module Deliver
       v.screenshots.each do |lang, screenshots_for_lang|
         screenshots_for_lang.each do |current|
           original_file_name = current.original_file_name
-          matched = original_file_name.match(/ftl_([0-9a-f]{32})_(.*)/)
+          matched = Spaceship::UploadFile.deconstruct_upload_filename(original_file_name)
 
           if matched
-            md5 = matched[1]
-            original_file_name = matched[2]
+            md5 = matched[:md5]
+            original_file_name = matched[:original_file_name]
           end
           # store remote checksum. We will need it later to determine if we have to upload screenshot
           @checksums_remote.add_md5(current.language, current.device_type, md5)

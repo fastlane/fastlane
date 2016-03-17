@@ -233,13 +233,21 @@ describe Spaceship::AppVersion, all: true do
         json = JSON.parse(du_read_fixture_file("upload_image_success.json"))
         allow(client.du_client).to receive(:upload_large_icon).and_return(json)
         allow(client.du_client).to receive(:upload_watch_icon).and_return(json)
+        allow(Spaceship::Utilities).to receive(:md5digest).and_return("FAKEMD5")
       end
 
-      it "modifies the large app data after update" do
+      it "modifies the large app data after update if file changed" do
+        allow(Spaceship::UploadFile).to receive(:deconstruct_upload_filename).and_return({ md5: 'FAKEMD55', original_file_name: '' })
         version.upload_large_icon!("path_to_jpg")
         expect(version.large_app_icon.url).to eq(nil)
         expect(version.large_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
         expect(version.large_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
+      end
+
+      it "skips modification of the large app data if file not changed" do
+        allow(Spaceship::UploadFile).to receive(:deconstruct_upload_filename).and_return({ md5: 'FAKEMD5', original_file_name: '' })
+
+        expect(version.upload_large_icon!("path_to_jpg")).to eq(false)
       end
 
       it "deletes the large app data" do
@@ -249,11 +257,18 @@ describe Spaceship::AppVersion, all: true do
         expect(version.large_app_icon.asset_token).to eq(nil)
       end
 
-      it "modifies the watch app data after update" do
+      it "modifies the watch app data after update if file changed" do
+        allow(Spaceship::UploadFile).to receive(:deconstruct_upload_filename).and_return({ md5: 'FAKEMD55', original_file_name: '' })
         version.upload_watch_icon!("path_to_jpg")
         expect(version.watch_app_icon.url).to eq(nil)
         expect(version.watch_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
         expect(version.watch_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
+      end
+
+      it "skips modification of the watch app data if file not changed" do
+        allow(Spaceship::UploadFile).to receive(:deconstruct_upload_filename).and_return({ md5: 'FAKEMD5', original_file_name: '' })
+
+        expect(version.upload_watch_icon!("path_to_jpg")).to eq(false)
       end
 
       it "deletes the watch app data" do
