@@ -28,15 +28,20 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
-    # Invalid user credentials were provided
-    class InvalidUserCredentialsError < StandardError
-      def apple_provided_error_info
+    # Base class for errors that want to present their message as
+    # preferred error info for fastlane error handling. See:
+    # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
+    class BasicPreferredInfoError < StandardError
+      def preferred_error_info
         message ? [message] : nil
       end
     end
 
+    # Invalid user credentials were provided
+    class InvalidUserCredentialsError < BasicPreferredInfoError; end
+
     # Raised when no user credentials were passed at all
-    class NoUserCredentialsError < StandardError; end
+    class NoUserCredentialsError < BasicPreferredInfoError; end
 
     class UnexpectedResponse < StandardError
       attr_reader :error_info
@@ -46,18 +51,18 @@ module Spaceship
         @error_info = error_info
       end
 
-      def apple_provided_error_info
-        return nil unless @error_info.is_a?(Hash) && @error_info['resultString']
+      def preferred_error_info
+        return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
 
         [@error_info['resultString'], @error_info['userString']].compact.uniq
       end
     end
 
     # Raised when 302 is received from portal request
-    class AppleTimeoutError < StandardError; end
+    class AppleTimeoutError < BasicPreferredInfoError; end
 
     # Raised when 401 is received from portal request
-    class UnauthorizedAccessError < StandardError; end
+    class UnauthorizedAccessError < BasicPreferredInfoError; end
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
