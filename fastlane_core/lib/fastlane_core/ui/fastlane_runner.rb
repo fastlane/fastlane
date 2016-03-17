@@ -51,8 +51,8 @@ module Commander
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
 
       if error_info
-        message = error_info.unshift("Apple provided the following error info:").join("\n\t")
-        display_user_error!(e, message)
+        error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
+        display_user_error!(e, error_info)
       else
         FastlaneCore::CrashReporting.handle_crash(e)
         # From https://stackoverflow.com/a/4789702/445598
