@@ -96,6 +96,11 @@ module Match
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
                                      description: "Renew the provisioning profiles if the device count on the developer portal has changed",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_docs,
+                                     env_name: "MATCH_SKIP_DOCS",
+                                     description: "Skip generation of a README.md for the created git repository",
+                                     is_string: false,
                                      default_value: false)
       ]
     end
