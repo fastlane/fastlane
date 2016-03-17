@@ -28,19 +28,47 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
+    # Base class for errors that want to present their message as
+    # preferred error info for fastlane error handling. See:
+    # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
+    class BasicPreferredInfoError < StandardError
+      TITLE = 'The request could not be completed because:'.freeze
+
+      def preferred_error_info
+        message ? [TITLE, message] : nil
+      end
+    end
+
     # Invalid user credentials were provided
-    class InvalidUserCredentialsError < StandardError; end
+    class InvalidUserCredentialsError < BasicPreferredInfoError; end
 
     # Raised when no user credentials were passed at all
-    class NoUserCredentialsError < StandardError; end
+    class NoUserCredentialsError < BasicPreferredInfoError; end
 
-    class UnexpectedResponse < StandardError; end
+    class UnexpectedResponse < StandardError
+      attr_reader :error_info
+
+      def initialize(error_info = nil)
+        super(error_info)
+        @error_info = error_info
+      end
+
+      def preferred_error_info
+        return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
+
+        [
+          "Apple provided the following error info:",
+          @error_info['resultString'],
+          @error_info['userString']
+        ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
+      end
+    end
 
     # Raised when 302 is received from portal request
-    class AppleTimeoutError < StandardError; end
+    class AppleTimeoutError < BasicPreferredInfoError; end
 
     # Raised when 401 is received from portal request
-    class UnauthorizedAccessError < StandardError; end
+    class UnauthorizedAccessError < BasicPreferredInfoError; end
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
@@ -297,7 +325,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new, response.body
+        raise UnexpectedResponse.new(response.body)
       else
         store_csrf_tokens(response)
         content
