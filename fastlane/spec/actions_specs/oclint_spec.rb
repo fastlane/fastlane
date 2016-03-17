@@ -16,7 +16,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to match(/cd .* && oclint -report-type=html -o=oclint_report.html \".*/)
+        expect(result).to match(/cd .* && oclint -report-type=html -o=oclint_report.html -p .*?compile_commands\.json \".*/)
       end
 
       it "works with all parameters" do
