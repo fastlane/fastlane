@@ -23,7 +23,11 @@ module Fastlane
         select_regex = params[:select_regex] if params[:select_regex] # Overwrite deprecated select_reqex
         exclude_regex = params[:exclude_regex]
 
-        files = JSON.parse(File.read(compile_commands)).map { |compile_command| compile_command['file'] }
+        files = JSON.parse(File.read(compile_commands)).map do |compile_command|
+          file = compile_command['file']
+          File.exist?(file) ? file : File.join(compile_command['directory'], file)
+        end
+
         files.uniq!
         files.select! do |file|
           file_ruby = file.gsub('\ ', ' ')
@@ -62,6 +66,7 @@ module Fastlane
         oclint_args << "-enable-clang-static-analyzer" if params[:enable_clang_static_analyzer]
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
+        oclint_args << "-p #{params[:compile_commands]}" if params[:compile_commands]
 
         command = [
           command_prefix,
