@@ -34,7 +34,7 @@ module Sigh
           profile = profile.update! # assign it, as it's a new profile
         end
       else
-        UI.important "No existing profiles found, that match the certificates you have installed, creating a new one for you"
+        UI.important "No existing profiles found, that match the certificates you have installed locally! Creating a new provisioning profile for you"
         ensure_app_exists!
         profile = create_profile!
       end
@@ -86,7 +86,11 @@ module Sigh
           file = Tempfile.new('cert')
           file.write(cert.download_raw)
           file.close
-          installed = true if FastlaneCore::CertChecker.installed?(file.path)
+          if FastlaneCore::CertChecker.installed?(file.path)
+            installed = true
+          else
+            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}")
+          end
         end
         installed
       end
@@ -136,6 +140,16 @@ module Sigh
         true
       end
 
+      unless Sigh.config[:skip_certificate_verification]
+        certificates = certificates.find_all do |c|
+          file = Tempfile.new('cert')
+          file.write(c.download_raw)
+          file.close
+
+          FastlaneCore::CertChecker.installed?(file.path)
+        end
+      end
+
       if certificates.count > 1 and !Sigh.config[:development]
         UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
         UI.important "Available Code Signing Identities for current filters:"
@@ -150,7 +164,7 @@ module Sigh
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important "No certificates for filter: #{filters}" if filters.length > 0
-        UI.user_error!("Could not find a matching code signing identity for #{profile_type}. You can use cert to generate one (https://github.com/fastlane/fastlane/tree/master/cert)")
+        UI.user_error!("Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. You can use cert to generate one: \nhttps://github.com/fastlane/fastlane/tree/master/cert")
       end
 
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
