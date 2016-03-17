@@ -3,13 +3,13 @@ require 'spec_helper'
 describe Commander::Runner do
   describe '#handle_unknown_error' do
     class CustomError < StandardError
-      def apple_provided_error_info
+      def preferred_error_info
         ['Line 1', 'Line 2']
       end
     end
 
     class NilReturningError < StandardError
-      def apple_provided_error_info
+      def preferred_error_info
         nil
       end
     end
@@ -20,7 +20,7 @@ describe Commander::Runner do
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
-    it 'should reraise errors that return nil from #apple_provided_error_info' do
+    it 'should reraise errors that return nil from #preferred_error_info' do
       expect do
         Commander::Runner.new.handle_unknown_error!(NilReturningError.new('my message'))
       end.to raise_error(StandardError, '[!] my message'.red)

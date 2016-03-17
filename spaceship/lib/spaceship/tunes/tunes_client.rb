@@ -2,7 +2,7 @@ module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
     # ITunesConnectError is only thrown when iTunes Connect raises an exception
-    class ITunesConnectError < StandardError
+    class ITunesConnectError < BasicPreferredInfoError
     end
 
     # raised if the server failed to save temporarily
