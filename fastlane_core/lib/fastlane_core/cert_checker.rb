@@ -4,7 +4,7 @@ module FastlaneCore
     def self.installed?(path)
       raise "Could not find file '#{path}'".red unless File.exist?(path)
 
-      ids = installed_identies
+      ids = installed_identities
       finger_print = sha1_fingerprint(path)
 
       return ids.include? finger_print
@@ -15,11 +15,11 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies
+    def self.installed_identities
       install_wwdr_certificate unless wwdr_certificate_installed?
 
       available = `security find-identity -v -p codesigning`
-      if available.include?("0 valid identities found")
+      available.match(/\b0 valid identities found\b/) do |match|
         UI.error("Looks like there are no local code signing identities found, you can run `security find-identity -v -p codesigning` to get this output. Check out this reply for more: https://stackoverflow.com/questions/35390072/this-certificate-has-an-invalid-issuer-apple-push-services")
       end
 
