@@ -27,6 +27,7 @@ module Fastlane
         "match"
       ]
 
+      # rubocop:disable Metrics/AbcSize
       def self.run(options)
         if options[:no_update]
           return
@@ -103,6 +104,7 @@ module Fastlane
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
         end
       end
+      # rubocop:enable Metrics/AbcSize
 
       def self.all_installed_tools
         Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq
