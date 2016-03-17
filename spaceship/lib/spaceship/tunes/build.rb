@@ -53,6 +53,9 @@ module Spaceship
       # @return (Bool) Is internal beta testing enabled for this train? Only one train can have enabled testing.
       attr_reader :internal_testing_enabled
 
+      # @return (String) The status of internal testflight testing for this build. One of active, submitForReview, approvedInactive, waiting
+      attr_reader :external_testing_status
+
       # @return (Bool) Does this build support WatchKit?
       attr_accessor :watch_kit_enabled
 
@@ -99,7 +102,8 @@ module Spaceship
         'watchKitEnabled' => :watch_kit_enabled,
         'readyToInstall' => :ready_to_install,
         'internalTesting.value' => :internal_testing_enabled,
-        'externalTesting.value' => :external_testing_enabled
+        'externalTesting.value' => :external_testing_enabled,
+        'buildTestInformationTO.externalStatus' => :external_testing_status
       )
 
       class << self
