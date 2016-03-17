@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil)
+    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -23,7 +23,7 @@ module Match
         return self.clone(git_url, shallow_clone)
       end
 
-      copy_readme(@dir)
+      copy_readme(@dir) unless skip_docs
       Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
 
       return @dir
