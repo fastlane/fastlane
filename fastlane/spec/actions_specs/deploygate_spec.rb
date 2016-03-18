@@ -65,6 +65,19 @@ describe Fastlane do
           end").runner.execute(:test)
         end.not_to raise_error
       end
+
+      it "works with valid parameters include optionals" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            deploygate({
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              user: 'deploygate',
+              api_token: 'thisistest',
+              release_note: 'This is a test release.',
+            })
+          end").runner.execute(:test)
+        end.not_to raise_error
+      end
     end
   end
 end
