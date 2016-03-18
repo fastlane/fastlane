@@ -83,7 +83,7 @@ describe Spaceship::Device do
 
   describe "#create" do
     it "should create and return a new device" do
-      expect(client).to receive(:create_device!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", mac: false).and_return({})
+      expect(client).to receive(:create_device_by_platform!).with("Demo Device", "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", platform: 'ios').and_return({})
       device = Spaceship::Device.create!(name: "Demo Device", udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
     end
 
@@ -100,12 +100,12 @@ describe Spaceship::Device do
     end
 
     it "doesn't trigger an ITC call if the device ID is already registered" do
-      expect(client).to_not receive(:create_device!)
+      expect(client).to_not receive(:create_device_by_platform!)
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
     end
 
     it "doesn't raise an exception if the device name is already registered" do
-      expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", mac: false).and_return({})
+      expect(client).to receive(:create_device_by_platform!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", platform: 'ios').and_return({})
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
     end
   end

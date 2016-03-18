@@ -142,6 +142,35 @@ module Spaceship
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
+      PLATFORM_CERTIFICATE_TYPE_IDS = {
+        Spaceship::Portal::App::MAC => [
+          MacDevelopment,
+          MacAppDistribution,
+          MacInstallerDistribution,
+          DeveloperIDInstaller,
+          DeveloperIDApplication,
+          MacProductionPush,
+          MacDevelopmentPush
+        ],
+        Spaceship::Portal::App::IOS => [
+          Development,
+          Production,
+          InHouse,
+          Certificate,
+          DevelopmentPush,
+          ProductionPush
+        ],
+        Spaceship::Portal::App::PASS => [
+          Passbook
+        ],
+        Spaceship::Portal::App::WEB => [
+          WebsitePush
+        ],
+        Spaceship::Portal::App::MERCHANT => [
+          ApplePay
+        ]
+      }.freeze
+
       IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
         "R58UK2EWSO" => Production,
@@ -241,29 +270,46 @@ module Spaceship
           klass.new(attrs)
         end
 
+        # <b>DEPRECATED:</b> Use <tt>all_by_platform</tt> instead.
         # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
         def all(mac: false)
+          puts '`all` is deprecated. Please use `all_by_platform` instead.'.red
+          all_by_platform(platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
+        end
+
+        # @param platform [String] Fetches platform certificates. (Ignored if called from a subclass)
+        # @return (Array) Returns all certificates of this account.
+        #  If this is called from a subclass of Certificate, this will
+        #  only include certificates matching the current type.
+        def all_by_platform(platform: Spaceship::Portal::App::IOS)
           if self == Certificate # are we the base-class?
-            type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = platform == Spaceship::Portal::App::MAC ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
-            types += OLDER_IOS_CERTIFICATE_TYPES unless mac
+            types += OLDER_IOS_CERTIFICATE_TYPES unless platform == Spaceship::Portal::App::MAC
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
-            mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
           end
 
-          client.certificates(types, mac: mac).map do |cert|
+          client.certificates_by_platform(types, platform: platform).map do |cert|
             factory(cert)
           end
         end
 
+        # <b>DEPRECATED:</b> Use <tt>find_by_platform</tt> instead.
         # @param mac [Bool] Searches Mac certificates if true
         # @return (Certificate) Find a certificate based on the ID of the certificate.
         def find(certificate_id, mac: false)
-          all(mac: mac).find do |c|
+          puts '`find` is deprecated. Please use `find_by_platform` instead.'.red
+          find_by_platform(certificate_id, platform: mac ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
+        end
+
+        # @param platform [String] Platform to search for
+        # @return (Certificate) Find a certificate based on the ID of the certificate.
+        def find_by_platform(certificate_id, platform: Spaceship::Portal::App::IOS)
+          all_by_platform(platform: platform).detect do |c|
             c.id == certificate_id
           end
         end
@@ -286,9 +332,9 @@ module Spaceship
 
           # look up the app_id by the bundle_id
           if bundle_id
-            app = Spaceship::App.find(bundle_id)
+            app = Spaceship::App.find_by_platform(bundle_id)
             raise "Could not find app with bundle id '#{bundle_id}'" unless app
-            app_id = app.app_id
+            app_id = app.app_id || app.website_push_id || app.pass_type_id || app.omc_id
           end
 
           # ensure csr is a OpenSSL::X509::Request
@@ -306,7 +352,7 @@ module Spaceship
 
       # @return (String) Download the raw data of the certificate without parsing
       def download_raw
-        client.download_certificate(id, type_display_id, mac: mac?)
+        client.download_certificate_by_platform(id, type_display_id, platform: mac? ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
       end
 
       # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate
@@ -316,7 +362,7 @@ module Spaceship
 
       # Revoke the certificate. You shouldn't use this method probably.
       def revoke!
-        client.revoke_certificate!(id, type_display_id, mac: mac?)
+        client.revoke_certificate_by_platform!(id, type_display_id, platform: mac? ? Spaceship::Portal::App::MAC : Spaceship::Portal::App::IOS)
       end
 
       # @return (Bool): Is this certificate a push profile for apps?
