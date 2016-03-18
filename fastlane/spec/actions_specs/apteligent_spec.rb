@@ -12,7 +12,7 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
-      it "mandatory options are used correctly", now: true do
+      it "mandatory options are used correctly" do
         ENV['DSYM_OUTPUT_PATH'] = nil
         ENV['DSYM_ZIP_PATH'] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
