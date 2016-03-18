@@ -957,6 +957,7 @@ deploygate(
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
   message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+  distribution_key: '(Optional) Target Distribution Key'
 )
 ```
 

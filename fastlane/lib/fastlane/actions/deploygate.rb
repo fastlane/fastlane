@@ -31,7 +31,12 @@ module Fastlane
 
         return options[:ipa] if Helper.test?
 
-        response = client.upload_build(options[:ipa], options.values)
+        filter = [:message, :distribution_key, :release_note]
+        response = client.upload_build(
+          options[:ipa],
+          options.values.select do |key, _|
+            filter.include? key
+          end)
         if parse_response(response)
           UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
           UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")
@@ -105,7 +110,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "DEPLOYGATE_MESSAGE",
                                        description: "Release Notes",
-                                       default_value: "No changelog provided")
+                                       default_value: "No changelog provided"),
+          FastlaneCore::ConfigItem.new(key: :distribution_key,
+                                       optional: true,
+                                       env_name: "DEPLOYGATE_DISTRIBUTION_KEY",
+                                       description: "Target Distribution Key"),
+          FastlaneCore::ConfigItem.new(key: :release_note,
+                                       optional: true,
+                                       env_name: "DEPLOYGATE_RELEASE_NOTE",
+                                       description: "Release note for distribution page")
         ]
       end
 
