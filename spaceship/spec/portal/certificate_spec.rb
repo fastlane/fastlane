@@ -80,7 +80,7 @@ describe Spaceship::Certificate do
   describe '#revoke' do
     let(:cert) { Spaceship::Portal::Certificate.all.first }
     it 'revokes certificate by the given cert id' do
-      expect(client).to receive(:revoke_certificate!).with('XC5PH8DAAA', 'R58UK2EAAA', mac: false)
+      expect(client).to receive(:revoke_certificate_by_platform!).with('XC5PH8DAAA', 'R58UK2EAAA', platform: 'ios')
       cert.revoke!
     end
   end

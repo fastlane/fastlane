@@ -74,12 +74,21 @@ module Spaceship
           self.new(attrs)
         end
 
+        # <b>DEPRECATED:</b> Use <tt>all_by_platform</tt> instead.
         # @param mac [Bool] Fetches Mac apps if true
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
-          client.apps(mac: mac).map { |app| self.factory(app) }
+          Helper.log.warn '`all` is deprecated. Please use `all_by_platform` instead.'.red
+          all_by_platform(platform: mac ? 'mac' : 'ios')
         end
 
+        # @param platform (String) The platform to search for
+        # @return (Array) Returns all apps available for this account
+        def all_by_platform(platform: 'ios')
+          client.apps_by_platform(platform: platform).map { |app| self.factory(app) }
+        end
+
+        # <b>DEPRECATED:</b> Use <tt>create_by_platform!</tt> instead.
         # Creates a new App ID on the Apple Dev Portal
         #
         # if bundle_id ends with '*' then it is a wildcard id otherwise, it is an explicit id
@@ -88,21 +97,42 @@ module Spaceship
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
         def create!(bundle_id: nil, name: nil, mac: false)
+          Helper.log.warn '`create!` is deprecated. Please use `create_by_platform!` instead.'.red
+          create_by_platform!(bundle_id: bundle_id, name: name, platform: mac ? 'mac' : 'ios')
+        end
+
+        # Creates a new App ID on the Apple Dev Portal
+        #
+        # if bundle_id ends with '*' then it is a wildcard id otherwise, it is an explicit id
+        # @param bundle_id [String] the bundle id (app_identifier) of the app associated with this provisioning profile
+        # @param name [String] the name of the App
+        # @param platform [String] The platform
+        # @return (App) The app you just created
+        def create_by_platform!(bundle_id: nil, name: nil, platform: 'ios')
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac)
+          new_app = client.create_app_by_platform!(type, name, bundle_id, platform: platform)
           self.new(new_app)
         end
 
+        # <b>DEPRECATED:</b> Use <tt>find_by_platform</tt> instead.
         # Find a specific App ID based on the bundle_id
         # @param mac [Bool] Searches Mac apps if true
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
-          all(mac: mac).find do |app|
+          Helper.log.warn '`find` is deprecated. Please use `find_by_platform` instead.'.red
+          find_by_platform(bundle_id, platform: mac ? 'mac' : 'ios')
+        end
+
+        # Find a specific App ID based on the bundle_id
+        # @param platform [String] The platform to search for
+        # @return (App) The app you're looking for. This is nil if the app can't be found.
+        def find_by_platform(bundle_id, platform: 'ios')
+          all_by_platform(platform: platform).detect do |app|
             app.bundle_id == bundle_id
           end
         end
@@ -110,9 +140,9 @@ module Spaceship
 
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
       # or there are active profiles
-      # @return (App) The app you just deletd
+      # @return (App) The app you just deleted
       def delete!
-        client.delete_app!(app_id, mac: mac?)
+        client.delete_app_by_platform!(app_id, platform: platform)
         self
       end
 

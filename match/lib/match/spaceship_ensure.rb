@@ -21,7 +21,7 @@ module Match
     end
 
     def bundle_identifier_exists(params)
-      found = Spaceship.app.find(params[:app_identifier])
+      found = Spaceship.app.find(params[:app_identifier], platform: params[:platform])
       return if found
 
       require 'sigh'
