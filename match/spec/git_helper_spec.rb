@@ -12,6 +12,28 @@ describe Match do
     end
 
     describe "#clone" do
+      it "skips README file generation if so requested" do
+        path = Dir.mktmpdir # to have access to the actual path
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        shallow_clone = false
+        command = "git clone '#{git_url}' '#{path}'"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
+
+        result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
+        expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
+      end
+
       it "clones the repo" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
@@ -31,6 +53,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
       end
 
       it "clones the repo (not shallow)" do
@@ -52,6 +75,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
       end
 
       after(:each) do
