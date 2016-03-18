@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "apteligent" do
-
       it "raises an error if no dsym source has been found" do
         file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
 
@@ -34,7 +33,6 @@ describe Fastlane do
         expect(result).to include("-F file=@/tmp/file.dSYM.zip")
         expect(result).to include("-F key=abc")
       end
-
     end
   end
 end

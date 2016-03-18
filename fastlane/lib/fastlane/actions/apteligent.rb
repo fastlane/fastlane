@@ -5,7 +5,7 @@ module Fastlane
         command = []
         command << "curl"
         command += upload_options(params)
-        command << upload_url(params[:app_id])
+        command << upload_url(params[:app_id].shellescape)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
         # will reanable it when it is fixed
@@ -13,14 +13,13 @@ module Fastlane
         shell_command = command.join(' ')
         result = Helper.is_test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
-
       end
 
       def self.fail_on_error(result)
         if result != "200"
-         UI.crash "Server error, failed to upload the dSYM file."
-       else
-         UI.success 'dSYM successfully uploaded to Apteligent!'
+          UI.crash "Server error, failed to upload the dSYM file."
+        else
+          UI.success 'dSYM successfully uploaded to Apteligent!'
         end
       end
 
@@ -66,10 +65,10 @@ module Fastlane
                                        env_name: "FL_APTELIGENT_FILE",
                                        description: "dSYM.zip file to upload to Apteligent",
                                        optional: true),
-         FastlaneCore::ConfigItem.new(key: :app_id,
-                            env_name: "FL_APTELIGENT_APP_ID",
-                            description: "Apteligent App ID key e.g. 569f5c87cb99e10e00c7xxxx",
-                            optional: false),
+          FastlaneCore::ConfigItem.new(key: :app_id,
+                                       env_name: "FL_APTELIGENT_APP_ID",
+                                      description: "Apteligent App ID key e.g. 569f5c87cb99e10e00c7xxxx",
+                                      optional: false),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_APTELIGENT_API_KEY",
                                        description: "Apteligent App API key e.g. IXPQIi8yCbHaLliqzRoo065tH0lxxxxx",
