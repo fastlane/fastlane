@@ -4,7 +4,7 @@ require 'faraday'
 require 'terminal-table'
 require 'colored'
 
-QUERY_DAYS = 13
+QUERY_DAYS = 4
 
 SECONDS_PER_DAY = 86_400
 
@@ -98,7 +98,7 @@ task :issue_stats do
     total_row
   end
 
-  box('Issue statistics over the past 14 days')
+  box("Issue statistics over the past #{QUERY_DAYS} days")
   table = Terminal::Table.new :headings => ['Labels', 'Opened', 'Closed', 'Net'], :rows => pretty_issues
   table.add_separator
   table.add_row colorized_row(totals)
