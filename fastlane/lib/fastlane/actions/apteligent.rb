@@ -14,7 +14,6 @@ module Fastlane
         return shell_command if Helper.is_test?
         result = Actions.sh(shell_command)
         fail_on_error(result)
-
       end
 
       def self.fail_on_error(result)
