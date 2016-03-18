@@ -889,8 +889,8 @@ Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolic
 
 ```ruby
 apteligent(
-  app_id:'...',
-  api_key:'...'
+  app_id: '...',
+  api_key: '...'
 )
 ```
 
