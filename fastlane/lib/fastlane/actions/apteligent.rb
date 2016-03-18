@@ -13,12 +13,14 @@ module Fastlane
         shell_command = command.join(' ')
         result = Helper.is_test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
-        result
+
       end
 
       def self.fail_on_error(result)
-        if result.include?("error")
-          raise "Server error, failed to upload the dSYM file".red
+        if result != "200"
+         UI.crash "Server error, failed to upload the dSYM file."
+       else
+         UI.success 'dSYM successfully uploaded to Apteligent!'
         end
       end
 
@@ -33,11 +35,10 @@ module Fastlane
 
         if file_path
           expanded_file_path = File.expand_path(file_path)
-          raise "Couldn't find file at path '#{expanded_file_path}'".red unless File.exist?(expanded_file_path)
-
+          UI.user_error!("Couldn't find file at path '#{expanded_file_path}'") unless File.exist?(expanded_file_path)
           return expanded_file_path
         else
-          raise "Couldn't find any dSYM file".red
+          UI.user_error!("Couldn't find dSYM file")
         end
       end
 
@@ -45,7 +46,7 @@ module Fastlane
         file_path = dsym_path(params).shellescape
 
         options = []
-        options << "--silent"
+        options << "--write-out %{http_code} --silent --output /dev/null"
         options << "-F dsym=@#{file_path}"
         options << "-F key=#{params[:api_key].shellescape}"
         options
@@ -65,16 +66,14 @@ module Fastlane
                                        env_name: "FL_APTELIGENT_FILE",
                                        description: "dSYM.zip file to upload to Apteligent",
                                        optional: true),
+         FastlaneCore::ConfigItem.new(key: :app_id,
+                            env_name: "FL_APTELIGENT_APP_ID",
+                            description: "Apteligent App ID key e.g. 569f5c87cb99e10e00c7xxxx",
+                            optional: false),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_APTELIGENT_API_KEY",
                                        description: "Apteligent App API key e.g. IXPQIi8yCbHaLliqzRoo065tH0lxxxxx",
-                                       optional: false),
-
-          FastlaneCore::ConfigItem.new(key: :app_id,
-                             env_name: "FL_APTELIGENT_APP_ID",
-                             description: "Apteligent App ID key e.g. 569f5c87cb99e10e00c7xxxx",
-                             optional: false)
-
+                                       optional: false)
         ]
       end
 
