@@ -10,6 +10,7 @@ HighLine.track_eof = false
 class SnapshotApplication
   include Commander::Methods
 
+  # rubocop:disable Metrics/MethodLength
   def run
     program :version, Snapshot::VERSION
     program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
@@ -29,9 +30,7 @@ class SnapshotApplication
       c.description = 'Take new screenshots based on the Snapfile.'
 
       c.action do |args, options|
-        o = options.__hash__.dup
-        o.delete(:verbose)
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
+        load_config(options)
 
         Snapshot::DependencyChecker.check_simulators
         Snapshot::Runner.new.work
@@ -73,9 +72,36 @@ class SnapshotApplication
       end
     end
 
+    command :clear_derived_data do |c|
+      c.syntax = 'snapshot clear_derived_data -f path'
+      c.description = "Clear the directory where build products and other derived data will go"
+
+      c.action do |args, options|
+        load_config(options)
+        derived_data_path = Snapshot.config[:derived_data_path]
+
+        if !derived_data_path
+          Snapshot::UI.user_error! "No derived_data_path"
+        elsif !Dir.exist?(derived_data_path)
+          Snapshot::UI.important "Path #{derived_data_path} does not exist"
+        else
+          FileUtils.rm_rf(derived_data_path)
+          Snapshot::UI.success "Removed #{derived_data_path}"
+        end
+      end
+    end
+
     default_command :run
 
     run!
+  end
+
+  private
+
+  def load_config(options)
+    o = options.__hash__.dup
+    o.delete(:verbose)
+    Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
   end
 end
 
