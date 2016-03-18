@@ -69,7 +69,7 @@ module Match
     def profile(params: nil, certificate_id: nil)
       prov_type = params[:type].to_sym
 
-      profile_name = [Match::Generator.profile_type_name(prov_type), params[:app_identifier]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
+      profile_name = [Match::Generator.profile_type_name(prov_type), params[:app_identifier], params[:platform]].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       profiles = Dir[File.join(params[:workspace], "profiles", prov_type.to_s, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles
