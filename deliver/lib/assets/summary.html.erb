@@ -138,7 +138,7 @@
           <div class="app-keyword">
               <div class="cat-headline">Keywords</div>
               <ul class="app-keyword-list">
-                <% @options[:keywords][language].split(" ").each do |keyword| %>
+                <% split_keywords(@options[:keywords][language]).each do |keyword| %>
                   <li><%= keyword %></li>
                 <% end %>
               </ul>
