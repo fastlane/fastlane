@@ -133,7 +133,7 @@ module FastlaneCore
 
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp")
+    def build_upload_command(username, password, source = "/tmp", team_id = "")
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
@@ -142,19 +142,21 @@ module FastlaneCore
         "-f '#{source}'",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         "-t 'Signiant'",
-        "-k 100000"
-      ].join(' ')
+        "-k 100000",
+        ("-itc_provider #{team_id}" if team_id.length > 0)
+      ].compact.join(' ')
     end
 
-    def build_download_command(username, password, apple_id, destination = "/tmp")
+    def build_download_command(username, password, apple_id, destination = "/tmp", team_id = "")
       [
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
         "-apple_id #{apple_id}",
-        "-destination '#{destination}'"
-      ].join(' ')
+        "-destination '#{destination}'",
+        ("-itc_provider #{team_id}" if team_id.length > 0)
+      ].compact.join(' ')
     end
 
     def handle_error(password)
@@ -190,7 +192,7 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp")
+    def build_upload_command(username, password, source = "/tmp", team_id = "")
       [
         Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
@@ -209,11 +211,12 @@ module FastlaneCore
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         '-t Signiant',
         '-k 100000',
+        ("-itc_provider #{team_id}" if team_id.length > 0),
         '2>&1' # cause stderr to be written to stdout
       ].compact.join(' ') # compact gets rid of the possibly nil ENV value
     end
 
-    def build_download_command(username, password, apple_id, destination = "/tmp")
+    def build_download_command(username, password, apple_id, destination = "/tmp", team_id = "")
       [
         Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
@@ -230,8 +233,9 @@ module FastlaneCore
         "-p #{password.shellescape}",
         "-apple_id #{apple_id.shellescape}",
         "-destination #{destination.shellescape}",
+        ("-itc_provider #{team_id}" if team_id.length > 0),
         '2>&1' # cause stderr to be written to stdout
-      ].join(' ')
+      ].compact.join(' ')
     end
 
     def handle_error(password)
@@ -270,7 +274,10 @@ module FastlaneCore
     # @param use_shell_script if true, forces use of the iTMSTransporter shell script.
     #                         if false, allows a direct call to the iTMSTransporter Java app (preferred).
     #                         see: https://github.com/fastlane/fastlane/pull/4003
-    def initialize(user = nil, password = nil, use_shell_script = false)
+    # @param team_id Represents the developer team id (not the iTC id). If provided, will add the correct
+    #                flag to the upload command.
+    #                see: https://github.com/fastlane/fastlane/issues/1524
+    def initialize(user = nil, password = nil, use_shell_script = false, team_id = nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the better direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.xcode_version.start_with?('6.')
@@ -292,6 +299,7 @@ module FastlaneCore
       end
 
       @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+      @team_id = team_id || (ENV['FASTLANE_TEAM_ID'] || '').strip
     end
 
     # Downloads the latest version of the app metadata package from iTC.
@@ -304,8 +312,8 @@ module FastlaneCore
       dir ||= "/tmp"
 
       UI.message("Going to download app metadata from iTunes Connect")
-      command = @transporter_executor.build_download_command(@user, @password, app_id, dir)
-      UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir))
+      command = @transporter_executor.build_download_command(@user, @password, app_id, dir, @team_id)
+      UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir, @team_id))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
@@ -340,8 +348,14 @@ module FastlaneCore
       UI.message("Going to upload updated app to iTunes Connect")
       UI.success("This might take a few minutes, please don't interrupt the script")
 
+<<<<<<< 4d22f03f0181e6085053d9e4d1cd5da23b3758e5
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir)
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir))
+=======
+      command = @transporter_executor.build_upload_command(@user, @password, dir, @team_id)
+
+      UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', dir, @team_id))
+>>>>>>> Ads Apple Developer Id to itunes_transporter.rb. Allows deliver to work with multiple iTunes Providers
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
