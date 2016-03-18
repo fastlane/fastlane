@@ -9,7 +9,7 @@ describe Fastlane do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
           Fastlane::Actions::ApteligentAction.dsym_path(params: nil)
-        end.to  raise_error(FastlaneCore::Interface::FastlaneError)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "mandatory options are used correctly", now: true do
