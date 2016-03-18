@@ -81,8 +81,7 @@ module WatchBuild
       end
 
       unless build
-        Helper.log.fatal v.candidate_builds
-        raise "Could not find build".red
+        UI.user_error!("No processing builds available for app #{WatchBuild.config[:app_identifier]}")
       end
 
       return build
