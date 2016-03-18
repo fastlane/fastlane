@@ -37,7 +37,7 @@ module Match
 
       prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"] && !params[:type] == "development"
 
-      profile_name = ["match", profile_type_name(prov_type), params[:app_identifier]].join(" ")
+      profile_name = ["match", profile_type_name(prov_type), params[:app_identifier], params[:platform]].join(" ")
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: params[:app_identifier],
@@ -48,7 +48,8 @@ module Match
         force: true,
         cert_id: certificate_id,
         provisioning_name: profile_name,
-        ignore_profiles_with_different_name: true
+        ignore_profiles_with_different_name: true,
+        platform: params[:platform]
       })
 
       Sigh.config = arguments
