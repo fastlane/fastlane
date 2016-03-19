@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
           raise 'Failed to re-sign .ipa'.red
@@ -66,6 +66,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_RESIGN_VERSION",
                                        description: "Version number to force resigned ipa to use",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :display_name,
+                                       env_name: "FL_DISPLAY_NAME",
+                                       description: "Display name to force resigned ipa to use",
                                        is_string: true,
                                        optional: true)
         ]
