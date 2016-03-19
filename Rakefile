@@ -1,4 +1,5 @@
-GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab)
+# the order of the gems represents the order of the dependencies in the graph
+GEMS = %w(credentials_manager spaceship fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot scan supply watchbuild match screengrab fastlane)
 RAILS = %w(boarding refresher enhancer)
 
 #####################################################

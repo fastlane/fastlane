@@ -78,6 +78,7 @@ task :test_all do
           bundle_install
           sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
           sh "bundle exec rubocop"
+          sh "rake install"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
