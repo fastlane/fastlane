@@ -58,5 +58,14 @@ describe Gym do
                              ""
                            ])
     end
+
+    it "uses a temporary folder to store the resulting ipa file" do
+      options = { project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorLegacy.generate
+      expect(Gym::PackageCommandGeneratorLegacy.temporary_output_path).to match(%r{#{Dir.tmpdir}/gym_output.+})
+      expect(Gym::PackageCommandGeneratorLegacy.ipa_path).to match(%r{#{Dir.tmpdir}/gym_output.+/ExampleProductName.ipa})
+    end
   end
 end
