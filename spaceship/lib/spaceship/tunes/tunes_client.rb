@@ -125,7 +125,6 @@ module Spaceship
 
     def send_login_request(user, password)
       clear_user_cached_data
-
       data = {
         accountName: user,
         password: password,
@@ -155,6 +154,14 @@ module Spaceship
         return response
       else
         if response["Location"] == "/auth" # redirect to 2 step auth page
+          if File.exist?(persistent_cookie_path)
+            @cookie.load(persistent_cookie_path)
+            if self.team_id.to_s.length > 0
+              return true
+            else
+              File.delete(persistent_cookie_path) # session is already invalid
+            end
+          end
           handle_two_step(response)
           return true
         elsif (response.body || "").include?('invalid="true"')
@@ -188,7 +195,7 @@ module Spaceship
         old_client = (begin
                         Tunes::RecoveryDevice.client
                       rescue
-                        nil
+                        nil # since client might be nil, which raises an exception
                       end)
         Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
         devices = r.body["trustedDevices"].collect do |current|
@@ -210,6 +217,7 @@ module Spaceship
     end
 
     def select_device(r, device_id)
+      # Request Token
       r = request(:put) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
@@ -222,6 +230,7 @@ module Spaceship
       code = ask("Please enter the 4 digit code: ")
       puts "Requesting session..."
 
+      # Send token back to server to get a valid session
       r = request(:post) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
@@ -232,6 +241,33 @@ module Spaceship
       end
       handle_itc_response(r.body) # this will fail if the code is invalid
       # If it works, r.body is actually nil
+      raise "Could not login" unless r.headers["set-cookie"].include?("myacinfo")
+
+      # Tell iTC that we are trustworthy (obviously)
+      # This will update our local cookies to something new
+      # They probably have a longer time to live than the other poor cookies
+      # Changed Keys
+      # - myacinfo
+      # - DES5c148586dfd451e55afb0175f62418f91
+
+      r = request(:get) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+      end
+
+      # We want to store the myacinfo cookie
+      @cookie.save(persistent_cookie_path, :yaml, session: true)
+      # really important to specify the session
+      # otherwise myacinfo and more won't be stored
+
+      return true
+    end
+
+    def persistent_cookie_path
+      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
+      FileUtils.mkdir_p(File.expand_path("..", path))
+      return path
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
