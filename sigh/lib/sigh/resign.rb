@@ -78,7 +78,7 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until installed_identies.include?(signing_identity)
+      until installed_identities.include?(signing_identity)
         UI.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
@@ -107,7 +107,7 @@ module Sigh
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identies.join("\n\t")}\n"
+      UI.message "Available identities: \n\t#{installed_identities.join("\n\t")}\n"
     end
 
     def ask_for_signing_identity
@@ -116,7 +116,7 @@ module Sigh
     end
 
     # Array of available signing identities
-    def installed_identies
+    def installed_identities
       available = `security find-identity -v -p codesigning`
       ids = []
       available.split("\n").each do |current|
