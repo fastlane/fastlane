@@ -155,7 +155,8 @@ module Spaceship
         return response
       else
         if response["Location"] == "/auth" # redirect to 2 step auth page
-          raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
+          handle_two_step(response)
+          return true
         elsif (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -168,6 +169,71 @@ module Spaceship
       end
     end
 
+    def handle_two_step(response)
+      @x_apple_web_session_token = response["x-apple-web-session-token"]
+      @scnt = response["scnt"]
+
+      r = request(:get) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth"
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["Accept"] = "application/json"
+      end
+
+      if r.body.kind_of?(Hash) && r.body["trustedDevices"].kind_of?(Array)
+        if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
+          raise ITunesConnectError.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
+        end
+
+        old_client = (begin
+                        Tunes::RecoveryDevice.client
+                      rescue
+                        nil
+                      end)
+        Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
+        devices = r.body["trustedDevices"].collect do |current|
+          Tunes::RecoveryDevice.factory(current)
+        end
+        Tunes::RecoveryDevice.client = old_client
+
+        puts "Two Step Verification for account '#{self.user}' is enabled"
+        puts "Please select a device to verify your identity"
+        available = devices.collect do |c|
+          "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
+        end
+        result = choose(*available)
+        device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
+        select_device(r, device_id)
+      else
+        raise "Invalid 2 step response #{r.body}"
+      end
+    end
+
+    def select_device(r, device_id)
+      r = request(:put) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
+        req.headers["Accept"] = "application/json"
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+      end
+      handle_itc_response(r.body)
+
+      puts "Successfully requested notification"
+      code = ask("Please enter the 4 digit code: ")
+      puts "Requesting session..."
+
+      r = request(:post) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
+        req.headers["Accept"] = "application/json"
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.body = { "code" => code.to_s }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body) # this will fail if the code is invalid
+      # If it works, r.body is actually nil
+    end
+
     # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/PerceivedComplexity
     def handle_itc_response(raw)
@@ -178,7 +244,8 @@ module Spaceship
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
          data.fetch('sectionInfoKeys', []).count == 0 and
-         data.fetch('sectionWarningKeys', []).count == 0
+         data.fetch('sectionWarningKeys', []).count == 0 and
+         data.fetch('validationErrors', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -203,7 +270,8 @@ module Spaceship
       end
 
       errors = handle_response_hash.call(data)
-      errors += data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
+      errors += data.fetch('sectionErrorKeys', [])
+      errors += data.fetch('validationErrors', [])
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
