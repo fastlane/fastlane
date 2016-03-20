@@ -44,13 +44,22 @@ module WatchBuild
           UI.error(ex)
           UI.message("Something failed... trying again to recover")
         end
-        sleep 30
+        if WatchBuild.config[:sample_only_once] == false
+          sleep 30
+        else
+          break
+        end
       end
       nil
     end
 
     def notification(build, minutes)
       require 'terminal-notifier'
+
+      if build.nil?
+        Helper.log.info "Application build is still processing"
+        return
+      end
 
       url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{@app.apple_id}/activity/ios/builds/#{build.train_version}/#{build.build_version}/details"
       TerminalNotifier.notify("Build finished processing",
