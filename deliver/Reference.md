@@ -20,7 +20,7 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). `deli
 - `Photography`
 - `Productivity`
 - `Reference`
-- `Shopping`
+- `Apps.Shopping`
 - `SocialNetworking`
 - `Sports`
 - `Travel`
