@@ -2412,3 +2412,11 @@ ifttt(
   value3: "baz"
 )
 ```
+
+### reset_simulators
+
+Reset all the iOS simulators. Useful with test actions to ensure a clean simulator.
+
+```ruby
+reset_simulators
+```
