@@ -30,6 +30,7 @@ module Fastlane
           # Store the number in the shared hash
           Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
+        return build_number
       rescue => ex
         UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
         raise ex
