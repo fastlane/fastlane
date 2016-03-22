@@ -21,6 +21,24 @@ If you use `rvm`, try the following
 rvm osx-ssl-certs update all
 ```
 
+### fastlane is slow (to start)
+
+If you experiennce slow launch times of `fastlane`, there are 2 solutions to solve this problem:
+
+##### Uninstall unused gems
+
+```
+[sudo] gem cleanup
+```
+
+##### Use a Gemfile
+
+Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From the on launch `fastlane` using:
+
+```
+bundle exec fastlane ...
+```
+
 ### Error when running `fastlane` with Jenkins
 
 This is usually caused when running Jenkins as its own user. While this is possible, you'll have to take care of creating a temporary Keychain, filling it and then using it when building your application. 
