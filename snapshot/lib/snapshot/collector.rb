@@ -43,12 +43,16 @@ module Snapshot
 
     def self.attachments(containing)
       UI.message "Collecting screenshots..."
-
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
+      return attachments_in_file(plist_path)
+    end
+
+    def self.attachments_in_file(plist_path)
       UI.verbose "Loading up '#{plist_path}'..."
       report = Plist.parse_xml(plist_path)
 
       to_store = [] # contains the names of all the attachments we want to use
+
       report["TestableSummaries"].each do |summary|
         (summary["Tests"] || []).each do |test|
           (test["Subtests"] || []).each do |subtest|
@@ -71,7 +75,11 @@ module Snapshot
     def self.check_activity(activity, to_store)
       # We now check if it's the rotation gesture, because that's the only thing we care about
       if activity["Title"] == "Set device orientation to Unknown"
-        to_store << activity["Attachments"].last["FileName"]
+        if activity["Attachments"]
+          to_store << activity["Attachments"].last["FileName"]
+        else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
+          to_store << "Screenshot_#{activity['UUID']}.png"
+        end
       end
       (activity["SubActivities"] || []).each do |subactivity|
         check_activity(subactivity, to_store)
