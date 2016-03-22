@@ -25,22 +25,20 @@ That's your package name, which usually looks something like `com.krausefx.app`
 To enable `fastlane` to access Google Play you have to follow these steps:
 
 - Open the [Google Play Console](https://play.google.com/apps/publish/)
-- Open _Settings => API-Access_
-- Create a new Service Account - follow the link of the dialog
-- Create new Client ID
-- Select _Service Account_
-- Click _Generate new P12 key_ and store the downloaded file
-- The _Email address_ underneath _Service account_ is the email address you have to enter as the `Issuer`
-- Back on the Google Play developer console, click on _Grant Access_ for the newly added service account
-- Choose _Release Manager_ from the dropdown and confirm
+- Select **Settings** tab, followed by the **API access** tab
+- Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
+- Click **Add credentials** and select **Service account**
+- Select **JSON** as the Key type and click **Create**
+- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
+- Make a note of the **Email address** under **Service accounts** - this is the user which you will need later
+- Back on the Google Play developer console, click **Done** to close the dialog
+- Click on **Grant Access** for the newly added service account
+- In the **Invite a New User** dialog, paste the service account email address you noted earlier into the **Email address** field
+- Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
 
-### Issuer
+### JSON Key
 
-Copy and paste the email address which looks like this `137123276006-aaaeltp0aqgn2opfb7tk46ovaaa3hv1g@developer.gserviceaccount.com`
-
-### Keyfile
-
-Store your p12 file in a secure place and pass the path to it here
+The path to the json secret file that you're asked for should be the JSON file you downloaded from Google Play Console
 
 ### Finishing up
 
