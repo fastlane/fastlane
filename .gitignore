@@ -12,6 +12,8 @@ rspec_logs.json
 
 ## Specific to Android
 .gradle/
+*.iml
+local.properties
 
 ## Specific to RubyMotion:
 .dat*
