@@ -38,12 +38,12 @@ module Scan
           next
         end
 
-        case #{type}
-		  when "junit"
-		    file_name = "TEST-report.xml"
-		  else
-		    file_name = "report.#{type}"
-		end
+        case type
+        when "junit"
+          file_name = "TEST-report.xml"
+        else
+          file_name = "report.#{type}"
+        end
         output_path = output_file_name || File.join(File.expand_path(@output_directory), file_name)
         parts = ["cat '#{path}' | "]
         parts << "xcpretty"

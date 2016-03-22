@@ -8,7 +8,7 @@ describe Scan do
       expect(commands.count).to eq(2)
       expect(commands).to eq({
         "/tmp/report.html" => "cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null ",
-		"/tmp/TEST-report.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/TEST-report.xml' &> /dev/null "
+        "/tmp/TEST-report.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/TEST-report.xml' &> /dev/null "
       })
     end
   end
