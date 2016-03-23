@@ -20,6 +20,11 @@ describe FastlaneCore do
         stub_const('ENV', { 'GITLAB_CI' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
+
+      it "returns true when building in Xcode Server" do
+        stub_const('ENV', { 'XCS' => true })
+        expect(FastlaneCore::Helper.is_ci?).to be true
+      end
     end
 
     # Mac OS only (to work on Linux)
