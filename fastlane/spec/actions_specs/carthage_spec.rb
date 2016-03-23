@@ -8,7 +8,7 @@ describe Fastlane do
               command: 'thisistest'
             )
           end").runner.execute(:test)
-        end.to raise_error("Please pass a valid command. Use one of the following: build, bootstrap, update")
+        end.to raise_error("Please pass a valid command. Use one of the following: build, bootstrap, update, archive")
       end
 
       it "raises an error if use_ssh is invalid" do
@@ -49,6 +49,16 @@ describe Fastlane do
             )
           end").runner.execute(:test)
         end.to raise_error("Please pass a valid value for no_build. Use one of the following: true, false")
+      end
+
+      it "raises an error if no_skip_current is invalid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_skip_current: 'thisistest'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid value for no_skip_current. Use one of the following: true, false")
       end
 
       it "raises an error if verbose is invalid" do
@@ -101,6 +111,14 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage update")
+      end
+
+      it "sets the command to archive" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(command: 'archive')
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage archive")
       end
 
       it "adds use-ssh flag to command if use_ssh is set to true" do
@@ -181,6 +199,28 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap")
+      end
+
+      it "adds no-skip-current flag to command if no_skip_current is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              no_skip_current: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage build --no-skip-current")
+      end
+
+      it "doesn't add a no-skip-current flag to command if no_skip_current is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              no_skip_current: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage build")
       end
 
       it "adds verbose flag to command if verbose is set to true" do
