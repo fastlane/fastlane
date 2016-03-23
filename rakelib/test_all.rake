@@ -40,8 +40,8 @@ end
 
 def bundle_install
   if ENV['CI']
-    cache_path = File.expand_path("/tmp/vendor/bundle")
-    path = " --path='#{cache_path}'"
+    cache_path = File.expand_path("~/.bundle")
+    path = " --path=#{cache_path}"
   end
 
   sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"

@@ -3,9 +3,9 @@ machine:
     version: "7.2"
 dependencies:
   override:
-    - bundle check --path=/tmp/vendor/bundle || bundle install --path=/tmp/vendor/bundle --jobs=4 --retry=3
+    - bundle check --path=~/.bundle || bundle install --path=~/.bundle --jobs=4 --retry=3
   cache_directories:
-    - /tmp/vendor/bundle
+    - ~/.bundle
 test:
   override:
     - bundle exec danger
