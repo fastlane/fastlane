@@ -12,8 +12,6 @@ require 'json'
 
 containing_dir = ENV["CIRCLE_ARTIFACTS"] || "." # for local testing
 rspec_files = Dir[File.join(containing_dir, "rspec_logs_*.json")]
-fail("Could not find test artifacts") if rspec_files.count == 0
-
 rspec_files.each do |current|
   rspec = JSON.parse(File.read(current))
 
