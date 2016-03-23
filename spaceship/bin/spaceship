@@ -27,7 +27,7 @@ require "pry"
 require "credentials_manager"
 
 def docs
-  url = 'https://github.com/fastlane/spaceship/tree/master/docs'
+  url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
   `open '#{url}'`
   url
 end
