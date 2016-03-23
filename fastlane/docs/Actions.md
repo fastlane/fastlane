@@ -2318,6 +2318,28 @@ Add this your `Fastfile` to not send any data to the fastlane web service. You c
 opt_out_usage
 ```
 
+### figlet
+
+This action is a wrapper around the [figlet](http://www.figlet.org) ascii text generation tool.  You can install it on mac with `brew install figlet`.  
+
+```ruby
+figlet(text: "FIGLET TEST")
+```
+
+will print out
+
+```
+ _____ _   _ ___ ____    ___ ____    _____ _______  _______
+|_   _| | | |_ _/ ___|  |_ _/ ___|  |_   _| ____\ \/ /_   _|
+  | | | |_| || |\___ \   | |\___ \    | | |  _|  \  /  | |
+  | | |  _  || | ___) |  | | ___) |   | | | |___ /  \  | |
+  |_| |_| |_|___|____/  |___|____/    |_| |_____/_/\_\ |_|
+
+```
+You can also pass in a custom font with the `font:` option.  run the `figlist` command to list all available fonts on your system
+
+
+
 ### rocket
 
 Print an ascii Rocket :rocket:. Useful after using `crashlytics` or `pilot` to indicate that your new build has been shipped to outer-space.
