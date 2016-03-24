@@ -121,6 +121,7 @@ describe Spaceship::AppVersion, all: true do
         expect(build.icon_url).to eq("https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png")
         expect(build.upload_date).to eq(1_443_150_586_000)
         expect(build.processing).to eq(false)
+        expect(build.apple_id).to eq("898536088")
       end
 
       it "allows choosing of the build for the version to submit" do
