@@ -1,10 +1,10 @@
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
-    def self.installed?(path)
+    def self.installed?(path, keychain = nil)
       raise "Could not find file '#{path}'".red unless File.exist?(path)
 
-      ids = installed_identies
+      ids = installed_identies( keychain )
       finger_print = sha1_fingerprint(path)
 
       return ids.include? finger_print
@@ -15,10 +15,10 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies
-      install_wwdr_certificate unless wwdr_certificate_installed?
+    def self.installed_identies( keychain = nil )
+      install_wwdr_certificate unless wwdr_certificate_installed?( keychain )
 
-      available = list_available_identities
+      available = list_available_identities( keychain )
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
       if /\b0 valid identities found\b/ =~ available
         UI.error([
@@ -42,21 +42,21 @@ module FastlaneCore
       return ids
     end
 
-    def self.list_available_identities
-      `security find-identity -v -p codesigning`
+    def self.list_available_identities( keychain = nil )
+      `security find-identity -v -p codesigning #{keychain.to_s}`
     end
 
-    def self.wwdr_certificate_installed?
+    def self.wwdr_certificate_installed?( keychain )
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}'", print: $verbose)
+      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain}", print: $verbose)
       return response.include?("attributes:")
     end
 
-    def self.install_wwdr_certificate
+    def self.install_wwdr_certificate( keychain = nil )
       Dir.chdir('/tmp') do
         url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
         filename = File.basename(url)
-        `curl -O #{url} && security import #{filename} -k login.keychain`
+        `curl -O #{url} && security import #{filename} -k #{keychain || 'login.keychain'}`
         UI.user_error!("Could not install WWDR certificate") unless $?.success?
       end
     end

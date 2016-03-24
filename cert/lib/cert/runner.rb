@@ -5,7 +5,7 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"])
+      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], Cert.config[:keychain_path])
       UI.message "Verifying the certificated is properly installed locally..."
       UI.user_error!("Could not find the newly generated certificate installed") unless installed
       UI.success "Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}"
