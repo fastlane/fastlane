@@ -23,13 +23,15 @@ module Deliver
       # Now, fill in the new ones
       indized = {} # per language and device type
 
-      progressFile = 'progress.dump'
-      if not options[:skip_uploaded_screenshots]
-        File.delete(progressFile) unless File.exist?(progressFile)
-      end
-      progress = File.exist?(progressFile) ? Marshal.load(File.read(progressFile)) : []
+      progress_file = 'progress.dump'
 
-      lastError = false
+      unless options[:skip_uploaded_screenshots]
+        if File.exist?(progress_file)
+          File.delete(progress_file)
+      end
+      progress = File.exist?(progress_file) ? Marshal.load(File.read(progress_file)) : []
+
+      last_error = false
       screenshots_per_language = screenshots.group_by(&:language)
       screenshots_per_language.each do |language, screenshots_for_language|
         next if progress.include?(language)
@@ -58,15 +60,15 @@ module Deliver
           UI.message("Saving changes")
           v.save!
           progress << language
-          File.open(progressFile, 'w') { |f| f.write(Marshal.dump(progress)) }
+          File.open(progress_file, 'w') { |f| f.write(Marshal.dump(progress)) }
         rescue
           UI.error("An error occurred for language #{language}, will try again next time")
-          lastError = $!
+          last_error = $!
           # something failed, try again next time
         end
       end
-      if lastError
-        raise lastError
+      if last_error
+        raise last_error
       end
       UI.success("Successfully uploaded screenshots to iTunes Connect")
     end
@@ -79,7 +81,7 @@ module Deliver
     def collect_screenshots_for_languages(path)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
-      lastError = false
+      last_error = false
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
 
@@ -110,14 +112,14 @@ module Deliver
           begin
             screenshots << AppScreenshot.new(file_path, language)
           rescue
-            lastError = $!
-            UI.error(lastError)
+            last_error = $!
+            UI.error(last_error)
           end
         end
       end
 
-      if lastError
-        raise lastError 
+      if last_error
+        raise last_error
       end
       return screenshots
     end

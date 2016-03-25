@@ -38,12 +38,12 @@ module Deliver
 
           path = File.join(containing_folder, file_name)
 
-          if skip_downloaded and File.exists?(path)
+          if skip_downloaded and File.exist?(path)
             UI.message("Skipping already downloaded screenshot '#{file_name}' (language='#{screenshot.language}')")
           else
             begin
               UI.message("Downloading existing screenshot '#{file_name}' (language='#{screenshot.language}')")
-            File.write(path, open(screenshot.url).read)
+              File.write(path, open(screenshot.url).read)
             rescue
               UI.error("Downloading failed for existing screenshot '#{file_name}' (language='#{screenshot.language}')")
             end
