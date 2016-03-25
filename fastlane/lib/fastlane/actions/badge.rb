@@ -43,14 +43,14 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "dark is only a flag and should always be true".red unless value == true
+                                         UI.user_error!("dark is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :custom,
                                        env_name: "FL_BADGE_CUSTOM",
                                        description: "Add your custom overlay/badge image",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "custom should be a valid file path".red unless value and File.exist?(value)
+                                         UI.user_error!("custom should be a valid file path") unless value and File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :no_badge,
                                        env_name: "FL_BADGE_NO_BADGE",
@@ -58,7 +58,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "no_badge is only a flag and should always be true".red unless value == true
+                                         UI.user_error!("no_badge is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield,
                                        env_name: "FL_BADGE_SHIELD",
@@ -71,7 +71,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "alpha is only a flag and should always be true".red unless value == true
+                                         UI.user_error!("alpha is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_BADGE_PATH",
@@ -80,7 +80,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: '.',
                                        verify_block: proc do |value|
-                                         raise "path needs to be a valid directory".red if Dir[value].empty?
+                                         UI.user_error!("path needs to be a valid directory") if Dir[value].empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield_io_timeout,
                                        env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
@@ -88,7 +88,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "shield_io_timeout needs to be an integer > 0".red if value.to_i < 1
+                                         UI.user_error!("shield_io_timeout needs to be an integer > 0") if value.to_i < 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :glob,
                                        env_name: "FL_BADGE_GLOB",
@@ -101,7 +101,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "alpha_channel is only a flag and should always be true".red unless value == true
+                                         UI.user_error!("alpha_channel is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield_gravity,
                                        env_name: "FL_BADGE_SHIELD_GRAVITY",
@@ -114,7 +114,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "shield_no_resize is only a flag and should always be true".red unless value == true
+                                         UI.user_error!("shield_no_resize is only a flag and should always be true") unless value == true
                                        end)
         ]
       end

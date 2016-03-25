@@ -57,7 +57,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          raise "xcodebuild not installed".red if `which xcodebuild`.length == 0
+          UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
         end
 
         # The args we will build with
@@ -155,7 +155,7 @@ module Fastlane
         # Formatting style
         if params && params[:output_style]
           output_style = params[:output_style]
-          raise "Invalid output_style #{output_style}".red unless [:standard, :basic].include?(output_style)
+          UI.user_error!("Invalid output_style #{output_style}") unless [:standard, :basic].include?(output_style)
         else
           output_style = :standard
         end

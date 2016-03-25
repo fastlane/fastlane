@@ -28,7 +28,7 @@ module Fastlane
                                        default_value: Dir["dotgpg/*.gpg"].last,
                                        optional: false,
                                        verify_block: proc do |value|
-                                         raise "Dotgpg file '#{File.expand_path(value)}' not found".red unless File.exist?(value)
+                                         UI.user_error!("Dotgpg file '#{File.expand_path(value)}' not found") unless File.exist?(value)
                                        end)
         ]
       end

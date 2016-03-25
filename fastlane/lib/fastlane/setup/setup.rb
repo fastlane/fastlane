@@ -20,7 +20,7 @@ module Fastlane
       elsif platform == :android
         SetupAndroid.new.run
       else
-        raise "Couldn't find platform '#{platform}'"
+        UI.user_error!("Couldn't find platform '#{platform}'")
       end
     end
 

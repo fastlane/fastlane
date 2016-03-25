@@ -20,7 +20,7 @@ describe Fastlane do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
           Fastlane::Actions::SplunkmintAction.dsym_path(params: nil)
-        end.to raise_exception "Couldn't find any dSYM file".red
+        end.to raise_exception("Couldn't find any dSYM file")
       end
 
       it "raises an error if no dsym source has been found in SharedValues::DSYM_OUTPUT_PATH" do
@@ -31,7 +31,7 @@ describe Fastlane do
 
         expect do
           Fastlane::Actions::SplunkmintAction.dsym_path(params: nil)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "raises an error if no dsym source has been found in SharedValues::DSYM_ZIP_PATH" do
@@ -42,7 +42,7 @@ describe Fastlane do
 
         expect do
           Fastlane::Actions::SplunkmintAction.dsym_path(params: nil)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "raises an error if no dsym source has been found in ENV['DSYM_OUTPUT_PATH']" do
@@ -54,7 +54,7 @@ describe Fastlane do
 
         expect do
           Fastlane::Actions::SplunkmintAction.dsym_path(params: nil)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "raises an error if no dsym source has been found in ENV['DSYM_ZIP_PATH']" do
@@ -66,7 +66,7 @@ describe Fastlane do
 
         expect do
           Fastlane::Actions::SplunkmintAction.dsym_path(params: nil)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "proxy options are set correctly" do
@@ -89,7 +89,7 @@ describe Fastlane do
                         api_key: '33823d3a',
                         api_token: 'e05ba40754c4869fb7e0b61')
           end").runner.execute(:test)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "raises an error if file could not be read from any source" do
@@ -103,7 +103,7 @@ describe Fastlane do
             splunkmint(api_key: '33823d3a',
                         api_token: 'e05ba40754c4869fb7e0b61')
           end").runner.execute(:test)
-        end.to raise_exception "Couldn't find any dSYM file".red
+        end.to raise_exception("Couldn't find any dSYM file")
       end
 
       it "mandatory options are used correctly" do

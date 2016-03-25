@@ -34,7 +34,7 @@ module Fastlane
         req.body = JSON.generate(params)
         response = https.request(req)
 
-        raise 'Error when trying to upload ipa to Appetize.io'.red unless parse_response(response)
+        UI.user_error!("Error when trying to upload ipa to Appetize.io") unless parse_response(response)
         UI.message("App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}")
         UI.message("Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}")
         UI.message("App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}")
@@ -83,14 +83,14 @@ module Fastlane
                                       description: "Appetize.io API Token",
                                       is_string: true,
                                       verify_block: proc do |value|
-                                        raise "No API Token for Appetize.io given, pass using `api_token: 'token'`".red unless value.to_s.length > 0
+                                        UI.user_error!("No API Token for Appetize.io given, pass using `api_token: 'token'`") unless value.to_s.length > 0
                                       end),
          FastlaneCore::ConfigItem.new(key: :url,
                                       env_name: "APPETIZE_URL",
                                       description: "Target url of the zipped build",
                                       is_string: true,
                                       verify_block: proc do |value|
-                                        raise "No URL of your zipped build".red unless value.to_s.length > 0
+                                        UI.user_error!("No URL of your zipped build") unless value.to_s.length > 0
                                       end),
          FastlaneCore::ConfigItem.new(key: :private_key,
                                       env_name: "APPETIZE_PRIVATEKEY",

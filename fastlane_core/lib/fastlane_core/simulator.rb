@@ -20,7 +20,7 @@ module FastlaneCore
 
         unless output.include?("== Devices ==")
           Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
-          raise "xcrun simctl not working.".red
+          UI.user_error!("xcrun simctl not working.")
         end
 
         output.split(/\n/).each do |line|
@@ -71,7 +71,7 @@ module FastlaneCore
       #   rescue => ex
       #     Helper.log.error ex
       #     Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
-      #     raise "xcrun simctl not working.".red
+      #     UI.user_error!("xcrun simctl not working.")
       #   end
 
       #   data["devices"].each do |os_version, l|

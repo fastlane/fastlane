@@ -29,7 +29,7 @@ module Produce
 
         Helper.log.info "Created group #{group.app_group_id}"
 
-        raise "Something went wrong when creating the new app group - it's not listed in the app groups list" unless app_group_exists? group_identifier
+        UI.user_error!("Something went wrong when creating the new app group - it's not listed in the app groups list") unless app_group_exists? group_identifier
 
         ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
 
@@ -46,7 +46,7 @@ module Produce
         Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the groups".red
       else
         app = Spaceship.app.find(app_identifier)
-        raise "Something went wrong when fetching the app - it's not listed in the apps list" if app.nil?
+        UI.user_error!("Something went wrong when fetching the app - it's not listed in the apps list") if app.nil?
 
         new_groups = []
 

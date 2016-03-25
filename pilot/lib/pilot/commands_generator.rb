@@ -39,7 +39,7 @@ module Pilot
           Helper.log.info "[#{address}]: #{ex}".red
         end
       end
-      raise "Some operations failed: #{failures}".red unless failures.empty?
+      UI.user_error!("Some operations failed: #{failures}") unless failures.empty?
     end
 
     def run

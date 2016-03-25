@@ -16,7 +16,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             get_build_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
-        end.to raise_error("Please pass the path to the project, not the workspace".red)
+        end.to raise_error("Please pass the path to the project, not the workspace")
       end
     end
   end

@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         params = nil unless params.kind_of? Array
         team = (params || []).first
-        raise "Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red unless team.to_s.length > 0
+        UI.user_error!("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')") unless team.to_s.length > 0
 
         UI.message("Setting Team ID to '#{team}' for all build steps")
 

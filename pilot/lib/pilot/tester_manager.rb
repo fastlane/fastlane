@@ -23,7 +23,7 @@ module Pilot
         if app_filter
           begin
             app = Spaceship::Application.find(app_filter)
-            raise "Couldn't find app with '#{app_filter}'" unless app
+            UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
             tester.add_to_app!(app.apple_id)
             Helper.log.info "Successfully added tester to app #{app_filter}".green
           rescue => ex
@@ -43,7 +43,7 @@ module Pilot
       tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
       tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
-      raise "Tester #{config[:email]} not found".red unless tester
+      UI.user_error!("Tester #{config[:email]} not found") unless tester
 
       describe_tester(tester)
       return tester
@@ -60,7 +60,7 @@ module Pilot
         if app_filter
           begin
             app = Spaceship::Application.find(app_filter)
-            raise "Couldn't find app with '#{app_filter}'" unless app
+            UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
             tester.remove_from_app!(app.apple_id)
             Helper.log.info "Successfully removed tester #{tester.email} from app #{app_filter}".green
           rescue => ex
@@ -83,7 +83,7 @@ module Pilot
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
         app = Spaceship::Application.find(app_filter)
-        raise "Couldn't find app with '#{app_filter}'" unless app
+        UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
         int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
         ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
       else

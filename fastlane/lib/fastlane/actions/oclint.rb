@@ -9,11 +9,11 @@ module Fastlane
       def self.run(params)
         oclint_path = params[:oclint_path]
         if `which #{oclint_path}`.to_s.empty? and !Helper.test?
-          raise "You have to install oclint or provide path to oclint binary. Fore more details: ".red + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
+          UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
         compile_commands = params[:compile_commands]
-        raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exist?(compile_commands)
+        UI.user_error!("Could not find json compilation database at path '#{compile_commands}'") unless File.exist?(compile_commands)
 
         if params[:select_reqex]
           UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
