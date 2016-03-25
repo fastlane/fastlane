@@ -259,7 +259,7 @@ module Spaceship
       # - myacinfo
       # - DES5c148586dfd451e55afb0175f62418f91
 
-      r = request(:get) do |req|
+      request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
         req.headers["scnt"] = @scnt
         req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
