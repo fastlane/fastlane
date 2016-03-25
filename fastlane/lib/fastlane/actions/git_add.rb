@@ -32,10 +32,10 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          if value.kind_of?(String)
-                                           raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
+                                           UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                          else
                                            value.each do |x|
-                                             raise "Couldn't find file at path '#{x}'".red unless File.exist?(x)
+                                             UI.user_error!("Couldn't find file at path '#{x}'") unless File.exist?(x)
                                            end
                                          end
                                        end)

@@ -10,7 +10,7 @@ module Scan
     end
 
     def parse_raw_file(path)
-      raise "Couldn't find file at path '#{path}'".red unless File.exist?(path)
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
 
       commands = generate_commands(path)
       commands.each do |output_path, command|

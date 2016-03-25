@@ -21,7 +21,7 @@ module CredentialsManager
 
     def initialize(path = nil)
       if path
-        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
+        UI.user_error!("Could not find Appfile at path '#{path}'") unless File.exist?(path)
       end
 
       path ||= self.class.default_path

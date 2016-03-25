@@ -3,10 +3,10 @@ module Fastlane
     class CrashlyticsHelper
       class << self
         def generate_ios_command(params)
-          raise "No value found for 'crashlytics_path'" unless params[:crashlytics_path]
+          UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
           submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
           submit_binary ||= "Crashlytics.framework/submit" if Helper.test?
-          raise "Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'" unless submit_binary
+          UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
 
           command = []
           command << submit_binary
@@ -31,7 +31,7 @@ module Fastlane
 
           params[:crashlytics_path] = download_android_tools unless params[:crashlytics_path]
 
-          raise "The `crashlytics_path` must be a jar file for Android" unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
+          UI.user_error!("The `crashlytics_path` must be a jar file for Android") unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
 
           command = ["java"]
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
@@ -70,11 +70,11 @@ module Fastlane
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"
 
-            raise "Coulnd't find 'crashlytics-devtools.jar'" unless File.exist?(jar_path)
+            UI.user_error!("Coulnd't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
             UI.success "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'"
           rescue => ex
-            raise "Error fetching remote file: #{ex}"
+            UI.user_error!("Error fetching remote file: #{ex}")
           end
 
           return jar_path

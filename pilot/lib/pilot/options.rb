@@ -26,8 +26,8 @@ module Pilot
                                      description: "Path to the ipa file to upload",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       raise "Could not find ipa file at path '#{value}'" unless File.exist? value
-                                       raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
+                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
+                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
@@ -67,7 +67,7 @@ module Pilot
                                      description: "The tester's email",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Please pass a valid email address" unless value.include? "@"
+                                       UI.user_error!("Please pass a valid email address") unless value.include? "@"
                                      end),
         FastlaneCore::ConfigItem.new(key: :testers_file_path,
                                      short_option: "-c",
@@ -82,7 +82,7 @@ module Pilot
                                      default_value: 30,
                                      type: Integer,
                                      verify_block: proc do |value|
-                                       raise "Please enter a valid positive number of seconds" unless value.to_i > 0
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-q",

@@ -46,7 +46,7 @@ module Fastlane
                                        optional: true,
                                        env_name: 'DSYM_ZIP_XCARCHIVE_PATH',
                                        verify_block: proc do |value|
-                                         raise "Couldn't find xcarchive file at path '#{value}'".red if !Helper.test? && !File.exist?(value)
+                                         UI.user_error!("Couldn't find xcarchive file at path '#{value}'") if !Helper.test? && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        description: 'Path for generated dsym. Optional, default is your apps root directory',

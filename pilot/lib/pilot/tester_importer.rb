@@ -3,7 +3,7 @@ require "fastlane_core"
 module Pilot
   class TesterImporter < Manager
     def import_testers(options)
-      raise "Import file path is required".red unless options[:testers_file_path]
+      UI.user_error!("Import file path is required") unless options[:testers_file_path]
 
       start(options)
 

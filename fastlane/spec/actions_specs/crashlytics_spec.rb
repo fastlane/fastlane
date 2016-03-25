@@ -262,7 +262,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`".red)
+            end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`")
           end
 
           it "raises an error if no build secret was given" do
@@ -274,7 +274,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red)
+            end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`")
           end
 
           it "raises an error if no ipa path was given" do
@@ -286,7 +286,7 @@ describe Fastlane do
                   build_secret: 'wadus'
                 })
               end").runner.execute(:test)
-            end.to raise_error("You have to either pass an ipa or an apk file to the Crashlytics action".red)
+            end.to raise_error("You have to either pass an ipa or an apk file to the Crashlytics action")
           end
 
           it "raises an error if the given ipa path was not found" do
@@ -299,7 +299,7 @@ describe Fastlane do
                   ipa_path: './fastlane/wadus'
                 })
               end").runner.execute(:test)
-            end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'".red)
+            end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'")
           end
         end
       end

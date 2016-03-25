@@ -9,7 +9,7 @@ module Fastlane
         if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
-          raise 'Failed to re-sign .ipa'.red
+          UI.user_error!("Failed to re-sign .ipa")
         end
       end
 
@@ -38,7 +38,7 @@ module Fastlane
                                        description: "Path to the ipa file to resign. Optional if you use the `gym` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :signing_identity,
                                        env_name: "FL_RESIGN_SIGNING_IDENTITY",
@@ -60,7 +60,7 @@ module Fastlane
                                                  else [value]
                                                  end
                                          files.each do |file|
-                                           raise "Couldn't find provisiong profile at path '#{file}'".red unless File.exist?(file)
+                                           UI.user_error!("Couldn't find provisiong profile at path '#{file}'") unless File.exist?(file)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,

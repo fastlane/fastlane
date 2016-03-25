@@ -3,12 +3,12 @@ module Fastlane
     class SwiftlintAction < Action
       def self.run(params)
         if `which swiftlint`.to_s.length == 0 and !Helper.test?
-          raise "You have to install swiftlint using `brew install swiftlint`".red
+          UI.user_error!("You have to install swiftlint using `brew install swiftlint`")
         end
 
         version = Gem::Version.new(Helper.test? ? '0.0.0' : `swiftlint version`.chomp)
         if params[:mode] == :autocorrect and version < Gem::Version.new('0.5.0') and !Helper.test?
-          raise "Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`".red
+          UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
         command = "swiftlint #{params[:mode]}"
@@ -17,7 +17,7 @@ module Fastlane
 
         if params[:files]
           if version < Gem::Version.new('0.5.1') and !Helper.test?
-            raise "Your version of swiftlint (#{version}) does not support list of files as input.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`".red
+            UI.user_error!("Your version of swiftlint (#{version}) does not support list of files as input.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           end
 
           files = params[:files].map.with_index(0) { |f, i| "SCRIPT_INPUT_FILE_#{i}=#{f.shellescape}" }.join(" ")

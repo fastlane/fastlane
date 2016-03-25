@@ -5,9 +5,9 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      raise 'lane must be a string' unless lane.kind_of?(String) or lane.nil?
-      raise 'platform must be a string' unless platform.kind_of?(String) or platform.nil?
-      raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
       ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
 

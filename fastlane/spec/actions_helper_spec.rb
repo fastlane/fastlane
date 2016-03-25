@@ -13,7 +13,7 @@ describe Fastlane do
       it "stores the action properly when an exeception occurred" do
         expect do
           Fastlane::Actions.execute_action(step_name) do
-            raise "Some error"
+            UI.user_error!("Some error")
           end
         end.to raise_error "Some error"
 

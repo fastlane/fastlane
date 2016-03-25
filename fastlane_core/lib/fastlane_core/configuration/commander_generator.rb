@@ -70,10 +70,10 @@ module FastlaneCore
     def validate_short_switch(used_switches, short_switch)
       return if short_switch.nil?
 
-      raise "Short option #{short_switch} already taken for key #{option.key}".red if used_switches.include?(short_switch)
-      raise "-v is already used for the version (key #{option.key})".red if short_switch == "-v"
-      raise "-h is already used for the help screen (key #{option.key})".red if short_switch == "-h"
-      raise "-t is already used for the trace screen (key #{option.key})".red if short_switch == "-t"
+      UI.user_error!("Short option #{short_switch} already taken for key #{option.key}") if used_switches.include?(short_switch)
+      UI.user_error!("-v is already used for the version (key #{option.key})") if short_switch == "-v"
+      UI.user_error!("-h is already used for the help screen (key #{option.key})") if short_switch == "-h"
+      UI.user_error!("-t is already used for the trace screen (key #{option.key})") if short_switch == "-t"
 
       used_switches << short_switch
     end

@@ -17,7 +17,7 @@ module Fastlane
           end
           Actions.lane_context[SharedValues::DOWNLOAD_CONTENT] = result
         rescue => ex
-          raise "Error fetching remote file: #{ex}"
+          UI.user_error!("Error fetching remote file: #{ex}")
         end
       end
 

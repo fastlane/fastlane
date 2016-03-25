@@ -20,15 +20,15 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # rubocop:disable Metrics/AbcSize
     def execute(lane, platform = nil, parameters = nil)
-      raise "No lane given" unless lane
+      UI.crash!("No lane given") unless lane
 
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
       lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
 
-      raise "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}".red unless lane_obj
-      raise "You can't call the private lane '#{lane}' directly" if lane_obj.is_private
+      UI.user_error!("Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}") unless lane_obj
+      UI.user_error!("You can't call the private lane '#{lane}' directly") if lane_obj.is_private
 
       ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
       ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
@@ -97,7 +97,7 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
-        raise "Parameters for a lane must always be a hash".red unless (parameters.first || {}).kind_of? Hash
+        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of? Hash
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
@@ -137,7 +137,7 @@ module Fastlane
               # This action does not use the new action format
               # Just passing the arguments to this method
             else
-              raise "You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.".red
+              UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
             end
 
             class_ref.run(arguments)
@@ -156,7 +156,7 @@ module Fastlane
           platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
           unless class_ref.is_supported?(platform)
-            raise "Action '#{name}' doesn't support required operating system '#{platform}'.".red
+            UI.user_error!("Action '#{name}' doesn't support required operating system '#{platform}'.")
           end
         end
       end
@@ -179,7 +179,7 @@ module Fastlane
       lanes[lane.platform] ||= {}
 
       if !override and lanes[lane.platform][lane.name]
-        raise "Lane '#{lane.name}' was defined multiple times!".red
+        UI.user_error!("Lane '#{lane.name}' was defined multiple times!")
       end
 
       lanes[lane.platform][lane.name] = lane

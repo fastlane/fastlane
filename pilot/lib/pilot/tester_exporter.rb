@@ -4,7 +4,7 @@ require "pilot/tester_util"
 module Pilot
   class TesterExporter < Manager
     def export_testers(options)
-      raise "Export file path is required".red unless options[:testers_file_path]
+      UI.user_error!("Export file path is required") unless options[:testers_file_path]
 
       start(options)
       require 'csv'

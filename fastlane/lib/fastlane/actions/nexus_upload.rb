@@ -74,7 +74,7 @@ module Fastlane
                                        optional: false,
                                        verify_block: proc do |value|
                                          file_path = File.expand_path(value)
-                                         raise "Couldn't find file at path '#{file_path}'".red unless File.exist?(file_path)
+                                         UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
                                        end),
           FastlaneCore::ConfigItem.new(key: :repo_id,
                                        env_name: "FL_NEXUS_REPO_ID",
