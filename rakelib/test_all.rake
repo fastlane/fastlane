@@ -40,8 +40,8 @@ end
 
 def bundle_install
   if ENV['CI']
-    cache_path = File.expand_path("/tmp/vendor/bundle")
-    path = " --path='#{cache_path}'"
+    cache_path = File.expand_path("~/.bundle")
+    path = " --path=#{cache_path}"
   end
 
   sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
@@ -75,8 +75,18 @@ task :test_all do
         # From https://github.com/bundler/bundler/issues/1424#issuecomment-2123080
         # Since we nest bundle exec in bundle exec
         Bundler.with_clean_env do
+          rspec_command_parts = [
+            "bundle exec rspec",
+            "--format documentation",
+            "--format j --out #{rspec_log_file}"
+          ]
+          if ENV['CIRCLECI']
+            output_file = File.join(ENV['CIRCLE_TEST_REPORTS'], 'rspec', "#{repo}-junit.xml")
+            rspec_command_parts << "--format RspecJunitFormatter --out #{output_file}"
+          end
+
           bundle_install
-          sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
+          sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
         end
       rescue => ex

@@ -957,6 +957,7 @@ deploygate(
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
   message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+  distribution_key: '(Optional) Target Distribution Key'
 )
 ```
 
@@ -1601,7 +1602,7 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true,              # optional, default: false
+  force: true               # optional, default: false
 )
 ```
 
@@ -2411,4 +2412,12 @@ ifttt(
   value2: "bar",
   value3: "baz"
 )
+```
+
+### reset_simulators
+
+Reset all the iOS simulators. Useful with test actions to ensure a clean simulator.
+
+```ruby
+reset_simulators
 ```

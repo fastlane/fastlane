@@ -211,6 +211,7 @@ module Spaceship
         builds = []
         res.each do |attrs|
           next unless attrs["type"] == "BUILD" # I don't know if it can be something else.
+          attrs[:apple_id] = self.application.apple_id
           builds << Tunes::Build.factory(attrs)
         end
         return builds

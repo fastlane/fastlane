@@ -9,9 +9,12 @@ coverage/
 /test/version_tmp/
 /tmp/
 rspec_logs.json
+test_output/
 
 ## Specific to Android
 .gradle/
+*.iml
+local.properties
 
 ## Specific to RubyMotion:
 .dat*
