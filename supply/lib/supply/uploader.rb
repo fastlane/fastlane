@@ -5,7 +5,7 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk]
+      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
@@ -23,7 +23,7 @@ module Supply
         end
       end
 
-      upload_binary unless Supply.config[:skip_upload_apk]
+      upload_binaries unless Supply.config[:skip_upload_apk]
 
       UI.message("Uploading all changes to Google Play...")
       client.commit_current_edit!
@@ -88,19 +88,33 @@ module Supply
       end
     end
 
-    def upload_binary
-      apk_path = Supply.config[:apk]
+    def upload_binaries
+      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
 
+      apk_version_codes = []
+
+      apk_paths.each do |apk_path|
+        apk_version_codes.push(upload_binary_data(apk_path))
+      end
+
+      update_track(apk_version_codes)
+    end
+
+    private
+
+    ##
+    # Upload binary apk and obb and corresponding change logs with client
+    #
+    # @param [String] apk_path
+    #    Path of the apk file to upload.
+    #
+    # @return [Integer] The apk version code returned after uploading, or nil if there was a problem
+    def upload_binary_data(apk_path)
+      apk_version_code = nil
       if apk_path
         UI.message("Preparing apk at path '#{apk_path}' for upload...")
         apk_version_code = client.upload_apk(apk_path)
-
-        UI.message("Updating track '#{Supply.config[:track]}'...")
-        if Supply.config[:track].eql? "rollout"
-          client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
-        else
-          client.update_track(Supply.config[:track], 1.0, apk_version_code)
-        end
+        UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
         upload_obbs(apk_path, apk_version_code)
 
@@ -110,13 +124,20 @@ module Supply
             upload_changelog(language, apk_version_code)
           end
         end
-
       else
         UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
+      apk_version_code
     end
 
-    private
+    def update_track(apk_version_codes)
+      UI.message("Updating track '#{Supply.config[:track]}'...")
+      if Supply.config[:track].eql? "rollout"
+        client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
+      else
+        client.update_track(Supply.config[:track], 1.0, apk_version_codes)
+      end
+    end
 
     def all_languages
       Dir.foreach(metadata_path).sort { |x, y| x <=> y }
