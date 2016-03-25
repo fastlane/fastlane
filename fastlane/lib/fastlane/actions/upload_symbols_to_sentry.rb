@@ -69,19 +69,19 @@ module Fastlane
                                        env_name: "SENTRY_API_KEY",
                                        description: "API Key for Sentry",
                                        verify_block: proc do |value|
-                                         raise "No API token for SentryAction given, pass using `api_key: 'key'`".red unless value and !value.empty?
+                                         UI.user_error!("No API token for SentryAction given, pass using `api_key: 'key'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :org_slug,
                                        env_name: "SENTRY_ORG_SLUG",
                                        description: "Organization slug for Sentry project",
                                        verify_block: proc do |value|
-                                         raise "No organization slug for SentryAction given, pass using `org_slug: 'org'`".red unless value and !value.empty?
+                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :project_slug,
                                        env_name: "SENTRY_PROJECT_SLUG",
                                        description: "Prgoject slug for Sentry",
                                        verify_block: proc do |value|
-                                         raise "No project slug for SentryAction given, pass using `project_slug: 'project'`".red unless value and !value.empty?
+                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "SENTRY_DSYM_PATH",

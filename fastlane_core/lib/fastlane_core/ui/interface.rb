@@ -136,7 +136,7 @@ module FastlaneCore
     # @!group Helpers
     #####################################################
     def not_implemented(method_name)
-      raise "Current UI '#{self}' doesn't support method '#{method_name}'".red
+      UI.user_error!("Current UI '#{self}' doesn't support method '#{method_name}'")
     end
 
     def to_s

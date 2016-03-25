@@ -25,7 +25,7 @@ module Fastlane
     #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
       start = Time.now # before the raise block, since `start` is required in the ensure block
-      raise 'No block given'.red unless block_given?
+      UI.crash!("No block given") unless block_given?
 
       error = nil
       exc = nil
@@ -75,7 +75,7 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise 'You need to pass a valid path' unless File.exist?(path)
+      UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
       Dir[File.expand_path('*.rb', path)].each do |file|
         require file

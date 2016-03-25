@@ -66,14 +66,14 @@ module Fastlane
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
                                        verify_block: proc do |value|
-                                         raise "Couldn't find xcarchive file at path '#{value}'".red if !Helper.test? && !File.exist?(value)
+                                         UI.user_error!("Couldn't find xcarchive file at path '#{value}'") if !Helper.test? && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        description: 'Where your archive will be placed',
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_DESTINATION',
                                        verify_block: proc do |value|
-                                         raise "Couldn't find the destination folder at '#{value}'".red if !Helper.test? && !File.directory?(value) && !File.exist?(value)
+                                         UI.user_error!("Couldn't find the destination folder at '#{value}'") if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
                                        description: 'Enable compression of the archive. Default value `true`',

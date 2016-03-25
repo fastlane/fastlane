@@ -22,14 +22,14 @@ module Fastlane
 
         if devices
           device_objs = devices.map do |k, v|
-            raise "Passed invalid UDID: #{v} for device: #{k}".red unless UDID_REGEXP =~ v
+            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless UDID_REGEXP =~ v
             Spaceship::Device.create!(name: k, udid: v)
           end
         elsif devices_file
           require 'csv'
 
           devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
-          raise 'Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless devices_file.first == ['Device ID', 'Device Name']
+          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
 
           UI.message("Fetching list of currently registered devices...")
           existing_devices = Spaceship::Device.all
@@ -37,13 +37,13 @@ module Fastlane
           device_objs = devices_file.drop(1).map do |device|
             next if existing_devices.map(&:udid).include?(device[0])
 
-            raise 'Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)'.red unless device.count == 2
-            raise "Passed invalid UDID: #{device[0]} for device: #{device[1]}".red unless UDID_REGEXP =~ device[0]
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
+            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless UDID_REGEXP =~ device[0]
 
             Spaceship::Device.create!(name: device[1], udid: device[0])
           end
         else
-          raise 'You must pass either a valid `devices` or `devices_file`. Please check the readme.'.red
+          UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
         end
 
         UI.success("Successfully registered new devices.")
@@ -69,7 +69,7 @@ module Fastlane
                                        description: "Provide a path to the devices to register",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Could not find file '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",

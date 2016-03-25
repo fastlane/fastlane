@@ -135,7 +135,7 @@ module FastlaneCore
         result = File.join(self.xcode_path, path)
         return result if File.exist?(result)
       end
-      raise "Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.".red
+      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     def self.fastlane_enabled?

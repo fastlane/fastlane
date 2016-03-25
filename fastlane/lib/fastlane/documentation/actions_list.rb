@@ -153,7 +153,7 @@ module Fastlane
 
           elsif current.kind_of? Array
             # Legacy actions that don't use the new config manager
-            raise "Invalid number of elements in this row: #{current}. Must be 2 or 3".red unless [2, 3].include? current.count
+            UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
             rows.last << nil while fill_all and rows.last.count < 3 # to have a nice border in the table

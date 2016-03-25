@@ -58,7 +58,7 @@ module FastlaneCore
           # copy to Xcode provisioning profile directory
           FileUtils.copy(path, destination)
           unless File.exist?(destination)
-            raise "Failed installation of provisioning profile at location: '#{destination}'".red
+            UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
           end
         end
 

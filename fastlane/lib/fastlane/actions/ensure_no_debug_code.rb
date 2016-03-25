@@ -33,7 +33,7 @@ module Fastlane
           found << current_raw.strip
         end
 
-        raise "Found debug code '#{params[:text]}': \n\n#{found.join("\n")}" if found.count > 0
+        UI.user_error!("Found debug code '#{params[:text]}': \n\n#{found.join("\n")}") if found.count > 0
         UI.message("No debug code found in code base 🐛")
       end
 
@@ -63,7 +63,7 @@ module Fastlane
                                        description: "The directory containing all the source files",
                                        default_value: ".",
                                        verify_block: proc do |value|
-                                         raise "Couldn't find the folder at '#{File.absolute_path(value)}'".red unless File.directory?(value)
+                                         UI.user_error!("Couldn't find the folder at '#{File.absolute_path(value)}'") unless File.directory?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :extension,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSION",

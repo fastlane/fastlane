@@ -5,7 +5,7 @@ module FastlaneCore
       # Project discovery
       def detect_projects(config)
         if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
-          raise "You can only pass either a workspace or a project path, not both".red
+          UI.user_error!("You can only pass either a workspace or a project path, not both")
         end
 
         return if config[:project].to_s.length > 0
@@ -72,7 +72,7 @@ module FastlaneCore
       self.is_workspace = (options[:workspace].to_s.length > 0)
 
       if !path or !File.directory?(path)
-        raise "Could not find project at path '#{path}'".red
+        UI.user_error!("Could not find project at path '#{path}'")
       end
     end
 
@@ -123,7 +123,7 @@ module FastlaneCore
         elsif Helper.is_ci?
           Helper.log.error "Multiple schemes found but you haven't specified one.".red
           Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-          raise "Multiple schemes found".red
+          UI.user_error!("Multiple schemes found")
         else
           puts "Select Scheme: "
           options[:scheme] = choose(*schemes)
@@ -132,7 +132,7 @@ module FastlaneCore
         Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
         Helper.log.error "Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use".red
 
-        raise "No Schemes found".red
+        UI.user_error!("No Schemes found")
       end
     end
     # rubocop:enable Metrics/AbcSize
@@ -267,11 +267,11 @@ module FastlaneCore
         timeout = FastlaneCore::Project.xcode_list_timeout
         @raw = FastlaneCore::Project.run_command(command, timeout: timeout)
       rescue Timeout::Error
-        raise "xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
-          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT".red
+        UI.user_error!("xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
+          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
       end
 
-      raise "Error parsing xcode file using `#{command}`".red if @raw.length == 0
+      UI.user_error!("Error parsing xcode file using `#{command}`") if @raw.length == 0
 
       return @raw
     end

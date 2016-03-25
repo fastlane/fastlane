@@ -26,7 +26,7 @@ module Fastlane
                                        description: "Carthage command (one of `build`, `bootstrap`, `update`)",
                                        default_value: 'bootstrap',
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid command. Use one of the following: build, bootstrap, update" unless %w(build bootstrap update).include? value
+                                         UI.user_error!("Please pass a valid command. Use one of the following: build, bootstrap, update") unless %w(build bootstrap update).include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
@@ -34,7 +34,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for use_ssh. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         UI.user_error!("Please pass a valid value for use_ssh. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
@@ -42,7 +42,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for use_submodules. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         UI.user_error!("Please pass a valid value for use_submodules. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
@@ -50,7 +50,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for use_binaries. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         UI.user_error!("Please pass a valid value for use_binaries. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
           FastlaneCore::ConfigItem.new(key: :no_build,
                                        env_name: "FL_CARTHAGE_NO_BUILD",
@@ -58,7 +58,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for no_build. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         UI.user_error!("Please pass a valid value for no_build. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_CARTHAGE_VERBOSE",
@@ -66,14 +66,14 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid value for verbose. Use one of the following: true, false" unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+                                         UI.user_error!("Please pass a valid value for verbose. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS" unless ["all", "iOS", "Mac", "watchOS"].include? value
+                                         UI.user_error!("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS") unless ["all", "iOS", "Mac", "watchOS"].include? value
                                        end)
         ]
       end

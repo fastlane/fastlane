@@ -22,7 +22,7 @@ module WatchBuild
     end
 
     def wait_for_build(start_time)
-      raise "Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}".red unless app
+      UI.user_error!("Could not find app with app identiifer #{WatchBuild.config[:app_identifier]}") unless app
 
       loop do
         begin

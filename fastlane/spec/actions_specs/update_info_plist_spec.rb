@@ -52,7 +52,7 @@ describe Fastlane do
               display_name: '#{display_name}'
             })
           end").runner.execute(:test)
-        end.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'".red)
+        end.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'")
       end
 
       it "returns 'false' if no plist parameters are specified" do

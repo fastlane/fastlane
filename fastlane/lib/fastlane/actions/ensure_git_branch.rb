@@ -11,7 +11,7 @@ module Fastlane
         if Actions.git_branch =~ branch_expr
           UI.success("Git branch match `#{branch}`, all good! 💪")
         else
-          raise "Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.".red
+          UI.user_error!("Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.")
         end
       end
 

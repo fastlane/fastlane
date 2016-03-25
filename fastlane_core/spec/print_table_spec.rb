@@ -11,7 +11,7 @@ describe FastlaneCore do
                              description: "Directory in which the profile should be stored",
                            default_value: ".",
                             verify_block: proc do |value|
-                              raise "Could not find output directory '#{value}'".red unless File.exist?(value)
+                              UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
                             end),
         FastlaneCore::ConfigItem.new(key: :a_bool,
                                      description: "Metadata: A bool",

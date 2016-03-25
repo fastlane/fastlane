@@ -22,19 +22,19 @@ module Fastlane
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
           unless Helper.is_test?
-            raise "Could not find the specified xcodeproj: #{xcodeproj_path}" unless File.directory?(xcodeproj_path)
+            UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
           end
         else
           # find an xcodeproj (ignoring the Cocoapods one)
           xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
 
           # no projects found: error
-          raise 'Could not find a .xcodeproj in the current repository\'s working directory.'.red if xcodeproj_paths.count == 0
+          UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
 
           # too many projects found: error
           if xcodeproj_paths.count > 1
             relative_projects = xcodeproj_paths.map { |e| Pathname.new(e).relative_path_from(repo_pathname).to_s }.join("\n")
-            raise "Found multiple .xcodeproj projects in the current repository's working directory. Please specify your app's main project: \n#{relative_projects}".red
+            UI.user_error!("Found multiple .xcodeproj projects in the current repository's working directory. Please specify your app's main project: \n#{relative_projects}")
           end
 
           # one project found: great
@@ -76,7 +76,7 @@ module Fastlane
         end
 
         # little user hint
-        raise 'No file changes picked up. Make sure you run the `increment_build_number` action first.'.red if hg_dirty_files.empty?
+        UI.user_error!("No file changes picked up. Make sure you run the `increment_build_number` action first.") if hg_dirty_files.empty?
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         dirty_set = Set.new(hg_dirty_files.map(&:downcase))
@@ -91,7 +91,7 @@ module Fastlane
                    "stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to ",
                    "bypass this check, and always commit a version bump regardless of the state of the working directory."
                   ].join("\n")
-            raise str.red
+            UI.user_error!(str)
           end
         end
 
@@ -123,8 +123,8 @@ module Fastlane
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
-                                         raise "Could not find Xcode project".red unless File.exist?(value)
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_FORCE_COMMIT",

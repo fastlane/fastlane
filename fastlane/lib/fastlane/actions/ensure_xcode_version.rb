@@ -18,7 +18,7 @@ module Fastlane
           UI.message("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
           UI.message("To correct this, use: `xcode_select(version: #{required_version})`.")
 
-          raise "Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}\n"
+          UI.user_error!("Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: #{selected_version}\n")
         end
       end
 

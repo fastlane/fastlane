@@ -12,7 +12,7 @@ describe Fastlane do
           content = File.read(File.join("lib", "fastlane", "actions", name + ".rb"))
           action.available_options.each do |option|
             unless content.include?("[:#{option.key}]")
-              raise "Action '#{name}' doesn't use the option :#{option.key}"
+              UI.user_error!("Action '#{name}' doesn't use the option :#{option.key}")
             end
           end
         end

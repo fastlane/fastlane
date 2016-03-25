@@ -6,7 +6,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
               produce('text')
             end").runner.execute(:test)
-        end.to raise_error("You have to call the integration like `produce(key: \"value\")`. Run `fastlane action produce` for all available keys. Please check out the current documentation on GitHub.".red)
+        end.to raise_error("You have to call the integration like `produce(key: \"value\")`. Run `fastlane action produce` for all available keys. Please check out the current documentation on GitHub.")
       end
     end
   end

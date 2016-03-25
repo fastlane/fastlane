@@ -6,7 +6,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             oclint
           end").runner.execute(:test)
-        end.to raise_error("Could not find json compilation database at path 'compile_commands.json'".red)
+        end.to raise_error("Could not find json compilation database at path 'compile_commands.json'")
       end
 
       it "works with compilation database only" do

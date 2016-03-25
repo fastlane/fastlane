@@ -14,9 +14,9 @@ module Snapshot
                                      description: "Path the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Workspace file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Workspace file invalid".red unless File.directory?(v)
-                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless v.include?(".xcworkspace")
+                                       UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Workspace file invalid") unless File.directory?(v)
+                                       UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -25,9 +25,9 @@ module Snapshot
                                      description: "Path the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Project file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Project file invalid".red unless File.directory?(v)
-                                       raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
+                                       UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Project file invalid") unless File.directory?(v)
+                                       UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :devices,
                                      description: "A list of devices you want to take the screenshots from",
@@ -38,7 +38,7 @@ module Snapshot
                                        available = FastlaneCore::Simulator.all
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
-                                           raise "Device '#{current}' not in list of available simulators '#{available.join(', ')}'".red
+                                           UI.user_error!("Device '#{current}' not in list of available simulators '#{available.join(', ')}'")
                                          end
                                        end
                                      end),

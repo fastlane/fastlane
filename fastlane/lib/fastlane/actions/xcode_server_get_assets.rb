@@ -37,7 +37,7 @@ module Fastlane
 
         # match the bot name with a found bot, otherwise fail
         found_bots = bots.select { |bot| bot['name'] == bot_name }
-        raise "Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}".red if found_bots.count == 0
+        UI.user_error!("Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}") if found_bots.count == 0
 
         bot = found_bots[0]
 
@@ -45,12 +45,12 @@ module Fastlane
 
         # we have our bot, get finished integrations, sorted from newest to oldest
         integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
-        raise "Failed to find any completed integration for Bot \"#{bot_name}\"".red if (integrations || []).count == 0
+        UI.user_error!("Failed to find any completed integration for Bot \"#{bot_name}\"") if (integrations || []).count == 0
 
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override
           integration = integrations.find { |i| i['number'] == integration_number_override }
-          raise "Specified integration number #{integration_number_override} does not exist.".red unless integration
+          UI.user_error!("Specified integration number #{integration_number_override} does not exist.") unless integration
         else
           integration = integrations.first
         end
@@ -61,7 +61,7 @@ module Fastlane
 
         # fetch assets for this integration
         assets_path = xcs.fetch_assets(integration['_id'], target_folder, self)
-        raise "Failed to fetch assets for integration #{integration['number']}." unless assets_path
+        UI.user_error!("Failed to fetch assets for integration #{integration['number']}.") unless assets_path
 
         asset_entries = Dir.entries(assets_path).map { |i| File.join(assets_path, i) }
 
@@ -117,14 +117,14 @@ module Fastlane
 
         def fetch_all_bots
           response = get_endpoint('/bots')
-          raise "You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.".red if response.status == 401
-          raise "Failed to fetch Bots from Xcode Server at #{@host}, response: #{response.status}: #{response.body}.".red if response.status != 200
+          UI.user_error!("You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.") if response.status == 401
+          UI.user_error!("Failed to fetch Bots from Xcode Server at #{@host}, response: #{response.status}: #{response.body}.") if response.status != 200
           JSON.parse(response.body)['results']
         end
 
         def fetch_integrations(bot_id)
           response = get_endpoint("/bots/#{bot_id}/integrations?last=10")
-          raise "Failed to fetch Integrations for Bot #{bot_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}".red if response.status != 200
+          UI.user_error!("Failed to fetch Integrations for Bot #{bot_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}") if response.status != 200
           JSON.parse(response.body)['results']
         end
 
@@ -145,8 +145,8 @@ module Fastlane
             response = self.get_endpoint("/integrations/#{integration_id}/assets", streamer)
             f.close
 
-            raise "Integration doesn't have any assets (it probably never ran).".red if response.status == 500
-            raise "Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}".red if response.status != 200
+            UI.user_error!("Integration doesn't have any assets (it probably never ran).") if response.status == 500
+            UI.user_error!("Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}") if response.status != 200
 
             # unzip it, it's a .tar.gz file
             out_folder = File.join(dir, "out_#{rand(1000000)}")
@@ -161,7 +161,7 @@ module Fastlane
             # rename the folder in out_folder to asset_foldername
             found_folder = Dir.entries(out_folder).select { |item| item != '.' && item != '..' }[0]
 
-            raise "Internal error, couldn't find unzipped folder".red if found_folder.nil?
+            UI.user_error!("Internal error, couldn't find unzipped folder") if found_folder.nil?
 
             unzipped_folder_temp_name = File.join(out_folder, found_folder)
             unzipped_folder = File.join(out_folder, asset_foldername)

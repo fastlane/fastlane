@@ -30,7 +30,7 @@ describe Fastlane do
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        end.to raise_error("Could not find entitlements file at path 'xyz.#{File.join(test_path, entitlements_path)}'".red)
+        end.to raise_error("Could not find entitlements file at path 'xyz.#{File.join(test_path, entitlements_path)}'")
       end
 
       it "throws an error when the identifiers are not in an array" do
@@ -41,7 +41,7 @@ describe Fastlane do
             app_group_identifiers: '#{new_app_group}'
           )
           end").runner.execute(:test)
-        end.to raise_error('The parameter app_group_identifiers need to be an Array.'.red)
+        end.to raise_error('The parameter app_group_identifiers need to be an Array.')
       end
 
       it "throws an error when the entitlements file is not parsable" do
@@ -54,7 +54,7 @@ describe Fastlane do
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        end.to raise_error("Entitlements file at '#{File.join(test_path, entitlements_path)}' cannot be parsed.".red)
+        end.to raise_error("Entitlements file at '#{File.join(test_path, entitlements_path)}' cannot be parsed.")
       end
 
       it "throws an error when the entitlements file doesn't contain an app group" do
@@ -67,7 +67,7 @@ describe Fastlane do
             app_group_identifiers: ['#{new_app_group}']
           )
           end").runner.execute(:test)
-        end.to raise_error("No existing App group field specified. Please specify an App Group in the entitlements file.".red)
+        end.to raise_error("No existing App group field specified. Please specify an App Group in the entitlements file.")
       end
 
       after do

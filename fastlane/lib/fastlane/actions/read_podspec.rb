@@ -42,7 +42,7 @@ module Fastlane
                                        description: "Path to the podspec to be read",
                                        default_value: Dir['*.podspec*'].first,
                                        verify_block: proc do |value|
-                                         raise "File #{value} not found".red unless File.exist?(value)
+                                         UI.user_error!("File #{value} not found") unless File.exist?(value)
                                        end)
         ]
       end

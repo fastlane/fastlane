@@ -51,7 +51,7 @@ module Fastlane
             return 'hg parent --template "{node|short}"'
           end
         else
-          raise "No repository detected"
+          UI.user_error!("No repository detected")
         end
       end
 

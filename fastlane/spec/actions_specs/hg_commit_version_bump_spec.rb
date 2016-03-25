@@ -53,7 +53,7 @@ describe Fastlane do
             test_expected_files: '#{expected_files}',
           })
         end").runner.execute(:test)
-        end.to raise_exception('No file changes picked up. Make sure you run the `increment_build_number` action first.'.red)
+        end.to raise_exception('No file changes picked up. Make sure you run the `increment_build_number` action first.')
       end
     end
   end
