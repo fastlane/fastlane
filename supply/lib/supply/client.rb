@@ -193,13 +193,16 @@ module Supply
       return result_upload.version_code
     end
 
+    # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!
+
+      track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
 
       track_body = Androidpublisher::Track.new({
         track: track,
         user_fraction: rollout,
-        version_codes: [apk_version_code]
+        version_codes: track_version_codes
       })
 
       android_publisher.update_track(
