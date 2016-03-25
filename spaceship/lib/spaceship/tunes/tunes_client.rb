@@ -154,14 +154,10 @@ module Spaceship
         return response
       else
         if response["Location"] == "/auth" # redirect to 2 step auth page
-          if File.exist?(persistent_cookie_path)
-            @cookie.load(persistent_cookie_path)
-            if self.team_id.to_s.length > 0
-              return true
-            else
-              File.delete(persistent_cookie_path) # session is already invalid
-            end
+          if load_session_from_file
+            return true
           end
+
           handle_two_step(response)
           return true
         elsif (response.body || "").include?('invalid="true"')
@@ -174,6 +170,19 @@ module Spaceship
           raise ITunesConnectError.new, info.join("\n")
         end
       end
+    end
+
+    # Only needed for 2 step
+    def load_session_from_file
+      if File.exist?(persistent_cookie_path)
+        @cookie.load(persistent_cookie_path)
+        if self.team_id.to_s.length > 0 # this will send a request that will fail if the cookie is invalid
+          return true
+        else
+          File.delete(persistent_cookie_path) # session is already invalid
+        end
+      end
+      return false
     end
 
     def handle_two_step(response)
