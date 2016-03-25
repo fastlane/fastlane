@@ -89,7 +89,7 @@ module Fastlane
           end
 
           # Raise a custom exception, as the the normal one is useless for the user
-          raise "A build error occured, this is usually related to code signing. Take a look at the error above".red
+          UI.user_error!("A build error occured, this is usually related to code signing. Take a look at the error above")
         end
       end
 

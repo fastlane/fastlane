@@ -20,7 +20,7 @@ describe Fastlane do
                 ipa: './notHere.ipa'
               })
             end").runner.execute(:test)
-          end.to raise_error("Couldn't find ipa file at path './notHere.ipa'".red)
+          end.to raise_error("Couldn't find ipa file at path './notHere.ipa'")
         end
       end
 
@@ -33,7 +33,7 @@ describe Fastlane do
                 apk: './notHere.ipa'
               })
             end").runner.execute(:test)
-          end.to raise_error("Couldn't find apk file at path './notHere.ipa'".red)
+          end.to raise_error("Couldn't find apk file at path './notHere.ipa'")
         end
       end
 
@@ -46,7 +46,7 @@ describe Fastlane do
               dsym: './notHere.dSYM.zip'
             })
           end").runner.execute(:test)
-        end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found".red)
+        end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found")
       end
 
       it "raises an error if both ipa and apk provided" do
@@ -58,7 +58,7 @@ describe Fastlane do
               apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
             })
           end").runner.execute(:test)
-        end.to raise_error("You can't use 'ipa' and 'apk' options in one run".red)
+        end.to raise_error("You can't use 'ipa' and 'apk' options in one run")
       end
 
       it "works with valid parameters" do

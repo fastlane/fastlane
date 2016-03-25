@@ -84,7 +84,7 @@ module FastlaneCore
           if error
             error.call(o, status)
           else
-            raise "Exit status: #{status}"
+            UI.user_error!("Exit status: #{status}")
           end
         end
 

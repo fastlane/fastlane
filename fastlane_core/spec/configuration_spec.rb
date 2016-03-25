@@ -31,7 +31,7 @@ describe FastlaneCore do
             key: :cert_name,
        env_name: "asdf",
     description: "Set the profile name.")], {})
-        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well".red
+        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well"
       end
 
       it "raises an error if a a key was used twice" do
@@ -87,14 +87,14 @@ describe FastlaneCore do
                                        short_option: "-f",
                                        conflicting_options: [:bar, :oof],
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'"
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-f'")
                                        end),
           FastlaneCore::ConfigItem.new(key: :bar,
                                        short_option: "-b"),
           FastlaneCore::ConfigItem.new(key: :oof,
                                        short_option: "-o",
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'"
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-o'")
                                        end)
         ]
 
@@ -135,14 +135,14 @@ describe FastlaneCore do
                                        short_option: "-f",
                                        conflicting_options: [:bar, :oof],
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-f'")
                                        end),
           FastlaneCore::ConfigItem.new(key: :bar,
                                        short_option: "-b"),
           FastlaneCore::ConfigItem.new(key: :oof,
                                        short_option: "-o",
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-o'")
                                        end)
         ]
 
@@ -153,7 +153,7 @@ describe FastlaneCore do
 
         expect do
           FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "You can't use option '-b' along with '-f'".red
+        end.to raise_error "You can't use option '-b' along with '-f'"
       end
 
       it "raises an error for unresolved conflict between options" do
@@ -183,14 +183,14 @@ describe FastlaneCore do
                                        short_option: "-f",
                                        conflicting_options: [:bar, :oof],
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-f'")
                                        end),
           FastlaneCore::ConfigItem.new(key: :bar,
                                        short_option: "-b"),
           FastlaneCore::ConfigItem.new(key: :oof,
                                        short_option: "-o",
                                        conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
+                                         UI.user_error!("You can't use option '#{value.short_option}' along with '-o'")
                                        end)
         ]
 
@@ -201,7 +201,7 @@ describe FastlaneCore do
 
         expect do
           FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "You can't use option '-b' along with '-f'".red
+        end.to raise_error "You can't use option '-b' along with '-f'"
       end
 
       it "sets the data type correctly if `is_string` is not set but type is specified" do
@@ -306,7 +306,7 @@ describe FastlaneCore do
                                description: "Directory in which the profile should be stored",
                              default_value: "notExistent",
                               verify_block: proc do |value|
-                                raise "Could not find output directory '#{value}'"
+                                UI.user_error!("Could not find output directory '#{value}'")
                               end)
         expect do
           @config = FastlaneCore::Configuration.create([c], {})
@@ -388,7 +388,7 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: proc do |value|
-                                  raise "Could not find output directory '#{value}'" unless File.exist?(value)
+                                  UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
                                 end)
           ]
           @values = {

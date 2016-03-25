@@ -64,7 +64,7 @@ module Scan
 
       Scan.device = found
 
-      raise "No simulators found".red unless Scan.device
+      UI.user_error!("No simulators found") unless Scan.device
     end
 
     def self.default_device_tvos
@@ -95,7 +95,7 @@ module Scan
 
       Scan.device = found
 
-      raise "No simulators found".red unless Scan.device
+      UI.user_error!("No simulators found") unless Scan.device
     end
 
     # Is it an iOS device or a Mac?

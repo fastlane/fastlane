@@ -76,7 +76,7 @@ module Supply
 
     # Begin modifying a certain package
     def begin_edit(package_name: nil)
-      raise "You currently have an active edit" if @current_edit
+      UI.user_error!("You currently have an active edit") if @current_edit
 
       self.current_edit = android_publisher.insert_edit(package_name)
 
@@ -280,7 +280,7 @@ module Supply
     private
 
     def ensure_active_edit!
-      raise "You need to have an active edit, make sure to call `begin_edit`" unless @current_edit
+      UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
     end
   end
 end

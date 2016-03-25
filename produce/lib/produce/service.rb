@@ -77,7 +77,7 @@ module Produce
           when "untilfirstauth"
             app.update_service(Spaceship.app_service.data_protection.until_first_auth)
           else
-            raise "Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'".red
+            UI.user_error!("Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'")
           end
         else
           app.update_service(Spaceship.app_service.data_protection.off)
@@ -126,7 +126,7 @@ module Produce
             app.update_service(Spaceship.app_service.icloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
           else
-            raise "Unknown service '#{options.icloud}'. Valid values: 'legacy', 'cloudkit'".red
+            UI.user_error!("Unknown service '#{options.icloud}'. Valid values: 'legacy', 'cloudkit'")
           end
         else
           app.update_service(Spaceship.app_service.icloud.off)

@@ -14,7 +14,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             s3({})
           end").runner.execute(:test)
-        end.to raise_error("No S3 access key given, pass using `access_key: 'key'`".red)
+        end.to raise_error("No S3 access key given, pass using `access_key: 'key'`")
       end
 
       it "raise an error if no S3 secret access key was given" do
@@ -24,7 +24,7 @@ describe Fastlane do
               access_key: 'access_key'
               })
           end").runner.execute(:test)
-        end.to raise_error("No S3 secret access key given, pass using `secret_access_key: 'secret key'`".red)
+        end.to raise_error("No S3 secret access key given, pass using `secret_access_key: 'secret key'`")
       end
 
       it "raise an error if no S3 bucket was given" do
@@ -35,7 +35,7 @@ describe Fastlane do
               secret_access_key: 'secret_access_key'
               })
           end").runner.execute(:test)
-        end.to raise_error("No S3 bucket given, pass using `bucket: 'bucket'`".red)
+        end.to raise_error("No S3 bucket given, pass using `bucket: 'bucket'`")
       end
 
       it "raise an error if no IPA was given" do
@@ -47,7 +47,7 @@ describe Fastlane do
               bucket: 'bucket'
               })
           end").runner.execute(:test)
-        end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`".red)
+        end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`")
       end
 
       it "raise an error if no IPA was given" do
@@ -59,7 +59,7 @@ describe Fastlane do
               bucket: 'bucket'
               })
           end").runner.execute(:test)
-        end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`".red)
+        end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`")
       end
     end
   end

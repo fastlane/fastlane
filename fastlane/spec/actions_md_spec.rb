@@ -11,7 +11,7 @@ describe "Actions.md" do
     it "Actions.md contains the action '#{name}'" do
       next if @exceptions.include?(name)
       unless @actions_md.include?(name)
-        raise "#{name} needs to be added to docs/Actions.md"
+        UI.user_error!("#{name} needs to be added to docs/Actions.md")
       end
     end
   end

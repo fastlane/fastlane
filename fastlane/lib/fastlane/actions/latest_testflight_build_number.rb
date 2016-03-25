@@ -33,7 +33,7 @@ module Fastlane
         begin
           build_number = train.builds.map(&:build_version).map(&:to_i).sort.last
         rescue
-          raise "could not find a build on iTC - and 'initial_build_number' option is not set" unless params[:initial_build_number]
+          UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
           build_number = params[:initial_build_number]
         end
 

@@ -51,7 +51,7 @@ describe Fastlane do
                         proxy_username: 'admin',
                         proxy_password: 'admin')
           end").runner.execute(:test)
-        end.to raise_exception "Couldn't find file at path '#{file_path}'".red
+        end.to raise_exception("Couldn't find file at path '#{file_path}'")
       end
 
       it "mandatory options are used correctly" do

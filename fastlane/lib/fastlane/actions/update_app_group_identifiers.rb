@@ -12,15 +12,15 @@ module Fastlane
         UI.message("New App Group Identifiers: #{params[:app_group_identifiers]}")
 
         entitlements_file = params[:entitlements_file]
-        raise "Could not find entitlements file at path '#{entitlements_file}'".red unless File.exist?(entitlements_file)
+        UI.user_error!("Could not find entitlements file at path '#{entitlements_file}'") unless File.exist?(entitlements_file)
 
         # parse entitlements
         result = Plist.parse_xml(entitlements_file)
-        raise "Entitlements file at '#{entitlements_file}' cannot be parsed.".red unless result
+        UI.user_error!("Entitlements file at '#{entitlements_file}' cannot be parsed.") unless result
 
         # get app group field
         app_group_field = result['com.apple.security.application-groups']
-        raise 'No existing App group field specified. Please specify an App Group in the entitlements file.'.red unless app_group_field
+        UI.user_error!("No existing App group field specified. Please specify an App Group in the entitlements file.") unless app_group_field
 
         # set new app group identifiers
         UI.message("Old App Group Identifiers: #{app_group_field}")
@@ -43,15 +43,15 @@ module Fastlane
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_ENTITLEMENTS_FILE_PATH", # The name of the environment variable
                                        description: "The path to the entitlement file which contains the app group identifiers", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         raise "Please pass a path to an entitlements file. ".red unless value.include? ".entitlements"
-                                         raise "Could not find entitlements file".red if !File.exist?(value) and !Helper.is_test?
+                                         UI.user_error!("Please pass a path to an entitlements file. ") unless value.include? ".entitlements"
+                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) and !Helper.is_test?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",
                                        description: "An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']",
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "The parameter app_group_identifiers need to be an Array.".red unless value.kind_of? Array
+                                         UI.user_error!("The parameter app_group_identifiers need to be an Array.") unless value.kind_of? Array
                                        end)
         ]
       end

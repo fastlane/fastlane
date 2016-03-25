@@ -20,7 +20,7 @@ module Fastlane
         end
 
         xcode = installer.installed_versions.find { |x| x.version == params[:version] }
-        raise "Could not find Xcode with version '#{params[:version]}'" unless xcode
+        UI.user_error!("Could not find Xcode with version '#{params[:version]}'") unless xcode
         UI.message("Using Xcode #{params[:version]} on path '#{xcode.path}'")
         xcode.approve_license
 

@@ -23,7 +23,7 @@ module Pilot
 
       @app ||= Spaceship::Application.find(@apple_id)
       unless @app
-        raise "Could not find app with #{(config[:apple_id] || config[:app_identifier])}"
+        UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
       return @app
     end
@@ -40,7 +40,7 @@ module Pilot
 
       if config[:app_identifier]
         @app ||= Spaceship::Application.find(config[:app_identifier])
-        raise "Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect".red unless @app
+        UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect") unless @app
         app_id ||= @app.apple_id
       end
 

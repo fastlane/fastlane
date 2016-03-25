@@ -57,9 +57,9 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise ":between must be of type array".red unless value.kind_of?(Array)
-                                         raise ":between must not contain nil values".red if value.any?(&:nil?)
-                                         raise ":between must be an array of size 2".red unless (value || []).size == 2
+                                         UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
+                                         UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
+                                         UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
@@ -92,7 +92,7 @@ module Fastlane
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
                                          matches_option = GIT_MERGE_COMMIT_FILTERING_OPTIONS.any? { |opt| opt.to_s == value }
-                                         raise "Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}".red unless matches_option
+                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}") unless matches_option
                                        end
                                       )
         ]

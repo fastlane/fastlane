@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         podspec_path = params[:path]
 
-        raise "Could not find podspec file at path '#{podspec_path}'".red unless File.exist? podspec_path
+        UI.user_error!("Could not find podspec file at path '#{podspec_path}'") unless File.exist? podspec_path
 
         version_podspec_file = Helper::PodspecHelper.new(podspec_path)
 
@@ -27,7 +27,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: Dir["*.podspec"].last,
                                        verify_block: proc do |value|
-                                         raise "Please pass a path to the `version_get_podspec` action".red if value.length == 0
+                                         UI.user_error!("Please pass a path to the `version_get_podspec` action") if value.length == 0
                                        end)
         ]
       end

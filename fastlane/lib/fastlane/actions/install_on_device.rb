@@ -5,7 +5,7 @@ module Fastlane
     class InstallOnDeviceAction < Action
       def self.run(params)
         unless Helper.test?
-          raise "ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions".red if `which ios-deploy`.length == 0
+          UI.user_error!("ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions") if `which ios-deploy`.length == 0
         end
         taxi_cmd = [
           "ios-deploy",
@@ -60,8 +60,8 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].first,
                                        verify_block: proc do |value|
                                          unless Helper.test?
-                                           raise "Could not find ipa file at path '#{value}'" unless File.exist? value
-                                           raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
+                                           UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
+                                           UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                          end
                                        end
                                       )

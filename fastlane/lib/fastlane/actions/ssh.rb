@@ -51,7 +51,7 @@ module Fastlane
             UI.important(['[SSH COMMAND]', cmd].join(': ')) if params[:log]
             return_value = ssh_exec!(ssh, cmd)
             UI.error("SSH Command failed '#{cmd}' Exit-Code: #{return_value[:exit_code]}") if return_value[:exit_code] > 0
-            raise "SSH Command failed" if return_value[:exit_code] > 0
+            UI.user_error!("SSH Command failed") if return_value[:exit_code] > 0
 
             stderr << return_value[:stderr]
             stdout << return_value[:stdout]
